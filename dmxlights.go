@@ -11,8 +11,6 @@ import (
 	"os/signal"
 	"time"
 
-	//"github.com/rakyll/launchpad"
-
 	"github.com/rakyll/launchpad/mk2"
 )
 

@@ -1,6 +1,6 @@
 package patten
 
-import "github.com/dhowlett/launchpad-mk3/common"
+import "github.com/dhowlett99/dmxlights/common"
 
 const (
 	full = 3

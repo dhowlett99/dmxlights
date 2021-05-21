@@ -1,4 +1,4 @@
-module github.com/dhowlett/launchpad
+module github.com/dhowlett99/dmxlights
 
 go 1.15
 
