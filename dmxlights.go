@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/rakyll/launchpad/mk2"
 )
 
@@ -23,77 +25,6 @@ var fadeSpeed int
 var presets map[string]bool
 var savePreset bool
 var flashButtons [][]bool
-
-type Light struct {
-	X          int
-	Y          int
-	Brightness int
-	Red        int
-	Green      int
-	Blue       int
-}
-
-type Color struct {
-	R int
-	G int
-	B int
-}
-
-type Patten struct {
-	Name     string
-	Length   int // 8, 4 or 2
-	Size     int
-	Fixtures int // 8 Fixtures
-	Chase    []int
-	Steps    []Steps
-}
-
-type Sequence struct {
-	// commands
-	Start        bool
-	Stop         bool
-	ReadConfig   bool
-	LoadConfig   bool
-	UpdateSpeed  bool
-	UpdatePatten bool
-	UpdateFade   bool
-	// parameters
-	FadeTime     time.Duration
-	Name         string
-	Number       int
-	Run          bool
-	Patten       Patten
-	Colors       []Color
-	Speed        int
-	CurrentSpeed time.Duration
-	X            int
-	Y            int
-}
-
-type Hit struct {
-	X int
-	Y int
-}
-
-type Steps struct {
-	Fixtures []Fixture
-}
-
-type Fixture struct {
-	Brightness int
-	Colors     []Color
-}
-
-type ButtonPresets struct {
-	X int
-	Y int
-}
-
-type Event struct {
-	Start   bool
-	Fixture int
-	Step    int
-}
 
 func savePresets(presets map[string]bool) {
 	// Marshall the config into a json object.
@@ -142,7 +73,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	fmt.Println("Derek Lighting")
+	fmt.Println("Derek common.Lighting")
 
 	fmt.Println("Loading Presets")
 	presets = loadPresets()
@@ -159,40 +90,40 @@ func main() {
 	pad.Program()
 
 	// Create a channel to send events to the launchpad.
-	eventsForLauchpad := make(chan Light)
+	eventsForLauchpad := make(chan common.Light)
 
 	// Now create a thread to handle those events.
 	go listenAndSendToLaunchPad(eventsForLauchpad, pad)
 
-	// Start off by turning off all of the lights
+	// Start off by turning off all of the Lights
 	//pad.Clear()
 
 	// Create a channel to listen for buttons being pressed.
 	buttonChannel := pad.Listen()
 
 	// Build the default set of Pattens.
-	Pattens := makePatterns()
+	Pattens := patten.MakePatterns()
 
 	// Make a channel to communicate with each sequence.
 	// Create a channel for par cans.
-	sequence1 := make(chan Sequence)
+	sequence1 := make(chan common.Sequence)
 	// sequence2 := make(chan Sequence)
 	// sequence3 := make(chan Sequence)
 	// sequence4 := make(chan Sequence)
 
-	sequences := []chan Sequence{}
+	sequences := []chan common.Sequence{}
 	sequences = append(sequences, sequence1)
 	// sequences = append(sequences, sequence2)
 	// sequences = append(sequences, sequence3)
 	// sequences = append(sequences, sequence4)
 
 	// Make channels for each sequence to talk back to us on.
-	readSequence1 := make(chan Sequence)
+	readSequence1 := make(chan common.Sequence)
 	// readSequence2 := make(chan Sequence)
 	// readSequence3 := make(chan Sequence)
 	// readSequence4 := make(chan Sequence)
 
-	readSequences := []chan Sequence{}
+	readSequences := []chan common.Sequence{}
 	readSequences = append(readSequences, readSequence1)
 	// readSequences = append(readSequences, readSequence2)
 	// readSequences = append(readSequences, readSequence3)
@@ -204,7 +135,7 @@ func main() {
 	// go CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
 	// go CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
 
-	// Light up any existing presets.
+	// common.Light up any existing presets.
 	initPresets(eventsForLauchpad, presets)
 
 	fmt.Println("Setup Presets Done")
@@ -217,7 +148,7 @@ func main() {
 		flashButtons[i] = make([]bool, 9)
 	}
 
-	// Light the logo blue.
+	// common.Light the logo blue.
 	pad.Light(8, -1, 79)
 	// err = pad.Logo()
 	// if err != nil {
@@ -255,7 +186,8 @@ func main() {
 				if savePreset {
 					fmt.Printf("Write Config\n")
 					presets[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-					lightOn(eventsForLauchpad, Light{hit.X, hit.Y, full, 3, 0, 0})
+					LightOn(eventsForLauchpad, common.Light{
+						X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
 					askToSaveConfig(sequences, readSequences, hit.X, hit.Y)
 					savePreset = false
@@ -266,7 +198,7 @@ func main() {
 						fmt.Printf("Read Config:")
 						fmt.Printf(" OK \n")
 						clearAll(pad, eventsForLauchpad, sequences)
-						lightOn(eventsForLauchpad, Light{hit.X, hit.Y, full, 3, 0, 0})
+						LightOn(eventsForLauchpad, common.Light{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 						askToLoadConfig(sequences, hit.X, hit.Y)
 						// Reset flash buttons
 						for x := 0; x < 9; x++ {
@@ -282,9 +214,9 @@ func main() {
 
 			// Select standard Patten.
 			if hit.X == 2 && hit.Y == 7 {
-				cmd := Sequence{
+				cmd := common.Sequence{
 					UpdatePatten: true,
-					Patten: Patten{
+					Patten: common.Patten{
 						Name: "rgbchase",
 					},
 				}
@@ -304,9 +236,9 @@ func main() {
 			}
 			// Select pairs Patten.
 			if hit.X == 3 && hit.Y == 7 {
-				cmd := Sequence{
+				cmd := common.Sequence{
 					UpdatePatten: true,
-					Patten: Patten{
+					Patten: common.Patten{
 
 						Name: "pairs",
 					},
@@ -333,7 +265,7 @@ func main() {
 					sequenceSpeed = 1
 				}
 				fmt.Printf("Seq Speed %d\n", sequenceSpeed)
-				cmd := Sequence{
+				cmd := common.Sequence{
 					Speed:       sequenceSpeed,
 					UpdateSpeed: true,
 				}
@@ -359,7 +291,7 @@ func main() {
 				if sequenceSpeed > 12 {
 					sequenceSpeed = 12
 				}
-				cmd := Sequence{
+				cmd := common.Sequence{
 					Speed:       sequenceSpeed,
 					UpdateSpeed: true,
 				}
@@ -382,13 +314,12 @@ func main() {
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				lightOn(eventsForLauchpad, Light{8, 0, full, 3, 3, 0})
-
-				event := Light{8, 1, full, 0, 0, 0}
+				LightOn(eventsForLauchpad, common.Light{X: 8, Y: 0, Brightness: full, Red: 3, Green: 3, Blue: 0})
+				event := common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 2, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 3, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -396,14 +327,14 @@ func main() {
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				event := Light{8, 1, full, 3, 3, 0}
+				event := common.Light{X: 8, Y: 1, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = Light{8, 0, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 2, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 3, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -411,14 +342,14 @@ func main() {
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				event := Light{8, 2, full, 3, 3, 0}
+				event := common.Light{X: 8, Y: 2, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = Light{8, 1, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 3, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 0, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -426,21 +357,21 @@ func main() {
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				event := Light{8, 3, full, 3, 3, 0}
+				event := common.Light{X: 8, Y: 3, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = Light{8, 1, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 2, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = Light{8, 4, full, 0, 0, 0}
+				event = common.Light{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
 
 			// Start sequence.
 			if hit.X == 8 && hit.Y == 5 {
-				cmd := Sequence{
+				cmd := common.Sequence{
 					Start: true,
 				}
 				if selectedSequence == 1 {
@@ -458,7 +389,7 @@ func main() {
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
-				cmd := Sequence{
+				cmd := common.Sequence{
 					Stop: true,
 				}
 				if selectedSequence == 1 {
@@ -483,7 +414,7 @@ func main() {
 				}
 				fmt.Printf("Fade down speed:%d", fadeSpeed)
 				fadeTime := setFade(fadeSpeed)
-				cmd := Sequence{
+				cmd := common.Sequence{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
 					Number:     selectedSequence,
@@ -512,7 +443,7 @@ func main() {
 				}
 				fmt.Printf("Fade up speed:%d", fadeSpeed)
 				fadeTime := setSpeed(fadeSpeed)
-				cmd := Sequence{
+				cmd := common.Sequence{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
 				}
@@ -532,13 +463,13 @@ func main() {
 				continue
 			}
 
-			// // Light a button is pressed.
+			// // common.Light a button is pressed.
 			// if !button[hit.X][hit.Y] {
-			// 	event := Light{hit.X, hit.Y, 0, 3}
+			// 	event := common.Light{hit.X, hit.Y, 0, 3}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = true
 			// } else {
-			// 	event := Light{hit.X, hit.Y, 0, 0}
+			// 	event := common.Light{hit.X, hit.Y, 0, 0}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = false
 			// }
@@ -547,20 +478,20 @@ func main() {
 	}
 }
 
-func initPresets(eventsForLauchpad chan Light, presets map[string]bool) {
+func initPresets(eventsForLauchpad chan common.Light, presets map[string]bool) {
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				lightOn(eventsForLauchpad, Light{x, y, full, 3, 0, 0})
+				LightOn(eventsForLauchpad, common.Light{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 			}
 		}
 	}
 }
 
-func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan Light, sequences []chan Sequence) {
+func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.Light, sequences []chan common.Sequence) {
 	fmt.Printf("C L E A R\n")
 	pad.Reset()
-	cmd := Sequence{
+	cmd := common.Sequence{
 		Stop: true,
 	}
 	for _, seq := range sequences {
@@ -570,22 +501,22 @@ func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan Light, sequences []chan
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				lightOn(eventsForLauchpad, Light{x, y, full, 3, 0, 0})
+				LightOn(eventsForLauchpad, common.Light{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 			}
 		}
 	}
 }
 
-func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan Light, commandChannel chan Sequence, replyChannel chan Sequence, Pattens map[string]Patten) {
+func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.Light, commandChannel chan common.Sequence, replyChannel chan common.Sequence, Pattens map[string]common.Patten) {
 
 	fmt.Printf("Setup default command\n")
 	// set default values.
-	command := Sequence{
+	command := common.Sequence{
 		Name:     "cans",
 		Number:   mySequenceNumber,
 		FadeTime: 0 * time.Millisecond,
 		Run:      true,
-		Patten: Patten{
+		Patten: common.Patten{
 			Name:     "standard",
 			Length:   2,
 			Size:     2,
@@ -594,7 +525,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			Steps:    Pattens["standard"].Steps,
 		},
 		CurrentSpeed: 500 * time.Millisecond,
-		Colors: []Color{
+		Colors: []common.Color{
 			{
 				R: 0,
 				G: 0,
@@ -606,9 +537,9 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 	// Create a channel for every fixture.
 	fmt.Printf("Create a channel for every fixture.\n")
-	fixtureChannels := []chan Event{}
+	fixtureChannels := []chan common.Event{}
 	for fixture := 0; fixture < command.Patten.Fixtures; fixture++ {
-		channel := make(chan Event)
+		channel := make(chan common.Event)
 		fixtureChannels = append(fixtureChannels, channel)
 	}
 
@@ -623,7 +554,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 	}
 
-	event := Event{}
+	event := common.Event{}
 	// Now start the fixture threads by sending an event.
 	for {
 		//fmt.Printf("Step to fixture loop %d fixtureChannels = %+v\n", event.Fixture, fixtureChannels)
@@ -637,7 +568,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		}
 	}
 }
-func fixtureReceiver(channel chan Event, fixture int, command Sequence, commandChannel chan Sequence, replyChannel chan Sequence, mySequenceNumber int, Pattens map[string]Patten, eventsForLauchpad chan Light) {
+func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, mySequenceNumber int, Pattens map[string]common.Patten, eventsForLauchpad chan common.Light) {
 
 	// Start the step counter so we know where we are in the sequence.
 	stepCount := 0
@@ -669,13 +600,13 @@ func fixtureReceiver(channel chan Event, fixture int, command Sequence, commandC
 			if R > 0 || G > 0 || B > 0 {
 				for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
 					command = listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := Light{fixture, mySequenceNumber - 1, 3, R, green, B}
+					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
 				command = listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
 				for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
 					command = listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := Light{fixture, mySequenceNumber - 1, 3, R, green, B}
+					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
 			}
@@ -694,8 +625,8 @@ func fixtureReceiver(channel chan Event, fixture int, command Sequence, commandC
 }
 
 // waitForConfig
-func waitForConfig(replyChannel chan Sequence) Sequence {
-	command := Sequence{}
+func waitForConfig(replyChannel chan common.Sequence) common.Sequence {
+	command := common.Sequence{}
 	select {
 	case command = <-replyChannel:
 		fmt.Printf("Config Received for seq: %s\n", command.Name)
@@ -708,7 +639,7 @@ func waitForConfig(replyChannel chan Sequence) Sequence {
 }
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func listenCommandChannelAndWait(command Sequence, commandChannel chan Sequence, replyChannel chan Sequence, CurrentSpeed time.Duration, mySequenceNumber int) Sequence {
+func listenCommandChannelAndWait(command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, CurrentSpeed time.Duration, mySequenceNumber int) common.Sequence {
 
 	currentCommand := command
 	select {
@@ -782,7 +713,7 @@ func listenCommandChannelAndWait(command Sequence, commandChannel chan Sequence,
 // listenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func listenAndSendToLaunchPad(eventsForLauchpad chan Light, pad *mk2.Launchpad) {
+func listenAndSendToLaunchPad(eventsForLauchpad chan common.Light, pad *mk2.Launchpad) {
 	var green int
 	var red int
 	var blue int
@@ -906,335 +837,13 @@ func setFade(commandSpeed int) (Speed time.Duration) {
 	return Speed * time.Millisecond
 }
 
-// lightOn Turn on a light.
-func lightOn(eventsForLauchpad chan Light, light Light) {
-	event := Light{light.X, light.Y, full, light.Red, light.Green, light.Blue}
+// common.LightOn Turn on a common.Light.
+func LightOn(eventsForLauchpad chan common.Light, Light common.Light) {
+	event := common.Light{X: Light.X, Y: Light.Y, Brightness: full, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
 	eventsForLauchpad <- event
 }
 
-func makePatterns() map[string]Patten {
-
-	Pattens := make(map[string]Patten)
-
-	standard := Patten{
-		Steps: []Steps{
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-		},
-	}
-
-	rgbchase := Patten{
-		Steps: []Steps{
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}, {R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}, {R: 0, G: 3, B: 0}, {R: 0, G: 0, B: 3}}},
-				},
-			},
-		},
-	}
-
-	pairs := Patten{
-		Steps: []Steps{
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []Fixture{
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []Color{{R: 3, G: 0, B: 0}}},
-				},
-			},
-		},
-	}
-
-	Pattens["standard"] = standard
-	Pattens["rgbchase"] = rgbchase
-	Pattens["pairs"] = pairs
-
-	return Pattens
-}
-
-func writeConfig(config []Sequence, filename string) {
+func writeConfig(config []common.Sequence, filename string) {
 
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
@@ -1252,9 +861,9 @@ func writeConfig(config []Sequence, filename string) {
 
 }
 
-func readConfig(filename string) []Sequence {
+func readConfig(filename string) []common.Sequence {
 
-	config := []Sequence{}
+	config := []common.Sequence{}
 
 	// Read the file.
 	data, err := ioutil.ReadFile(filename)
@@ -1270,8 +879,8 @@ func readConfig(filename string) []Sequence {
 	return config
 }
 
-func askToLoadConfig(sequences []chan Sequence, X int, Y int) {
-	cmd := Sequence{
+func askToLoadConfig(sequences []chan common.Sequence, X int, Y int) {
+	cmd := common.Sequence{
 		LoadConfig: true,
 		X:          X,
 		Y:          Y,
@@ -1281,10 +890,10 @@ func askToLoadConfig(sequences []chan Sequence, X int, Y int) {
 	}
 }
 
-func askToSaveConfig(sequences []chan Sequence, replyChannel []chan Sequence, X int, Y int) {
+func askToSaveConfig(sequences []chan common.Sequence, replyChannel []chan common.Sequence, X int, Y int) {
 
 	fmt.Printf("askToSaveConfig: Save Preset in X:%d Y:%d \n", X, Y)
-	config := []Sequence{}
+	config := []common.Sequence{}
 
 	go func() {
 		// wait for responses from sequences.
@@ -1297,7 +906,7 @@ func askToSaveConfig(sequences []chan Sequence, replyChannel []chan Sequence, X 
 	}()
 
 	// ask for all the sequencers for their config.
-	cmd := Sequence{
+	cmd := common.Sequence{
 		ReadConfig: true,
 		X:          X,
 		Y:          Y,
@@ -1307,7 +916,7 @@ func askToSaveConfig(sequences []chan Sequence, replyChannel []chan Sequence, X 
 	}
 }
 
-func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan Light, seqNumber int, green int, red int, blue int) {
+func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common.Light, seqNumber int, green int, red int, blue int) {
 	go func(pad *mk2.Launchpad, x int, y int) {
 
 		for {
@@ -1315,11 +924,11 @@ func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan Light,
 			if !flashButtons[x][y] {
 				break
 			}
-			event := Light{x, y, full, red, green, blue}
+			event := common.Light{X: x, Y: y, Brightness: full, Red: red, Green: green, Blue: blue}
 			eventsForLauchpad <- event
 
 			time.Sleep(1 * time.Second)
-			event = Light{x, y, full, 0, 0, 0}
+			event = common.Light{X: x, Y: y, Brightness: full, Red: 0, Green: 0, Blue: 0}
 			eventsForLauchpad <- event
 			time.Sleep(1 * time.Second)
 		}

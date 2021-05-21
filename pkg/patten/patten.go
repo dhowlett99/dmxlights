@@ -1,12 +1,12 @@
 package patten
 
-import "github.com/dhowlett99/dmxlights/common"
+import "github.com/dhowlett99/dmxlights/pkg/common"
 
 const (
 	full = 3
 )
 
-func makePatterns() map[string]common.Patten {
+func MakePatterns() map[string]common.Patten {
 
 	Pattens := make(map[string]common.Patten)
 
