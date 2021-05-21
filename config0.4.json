@@ -1,7 +1,7 @@
 [
  {
-  "StartSeq": false,
-  "StopSeq": false,
+  "Start": false,
+  "Stop": false,
   "ReadConfig": false,
   "LoadConfig": false,
   "UpdateSpeed": false,
@@ -10,7 +10,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 1,
-  "Start": true,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -108,11 +108,125 @@
          "B": 0
         }
        ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
       }
      ]
     },
     {
      "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 3,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
       {
        "Brightness": 3,
        "Colors": [
@@ -222,90 +336,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -317,6 +347,16 @@
         {
          "R": 0,
          "G": 3,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
          "B": 0
         }
        ]
@@ -444,11 +484,125 @@
          "B": 0
         }
        ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
       }
      ]
     },
     {
      "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 3,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ]
+      },
       {
        "Brightness": 3,
        "Colors": [
@@ -598,90 +752,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -693,6 +763,16 @@
         {
          "R": 0,
          "G": 3,
+         "B": 0
+        }
+       ]
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
          "B": 0
         }
        ]
@@ -709,2153 +789,7 @@
    }
   ],
   "Speed": 3,
-  "CurrentSpeed": 50000000,
-  "Status": false,
-  "X": 0,
-  "Y": 4
- },
- {
-  "StartSeq": false,
-  "StopSeq": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
-  "FadeTime": 0,
-  "Name": "cans",
-  "Number": 2,
-  "Start": true,
-  "Patten": {
-   "Name": "standard",
-   "Length": 2,
-   "Size": 2,
-   "Fixtures": 8,
-   "Chase": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
-   ],
-   "Steps": [
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  "Colors": [
-   {
-    "R": 0,
-    "G": 0,
-    "B": 0
-   }
-  ],
-  "Speed": 3,
-  "CurrentSpeed": 50000000,
-  "Status": false,
-  "X": 0,
-  "Y": 4
- },
- {
-  "StartSeq": false,
-  "StopSeq": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
-  "FadeTime": 0,
-  "Name": "cans",
-  "Number": 3,
-  "Start": true,
-  "Patten": {
-   "Name": "standard",
-   "Length": 2,
-   "Size": 2,
-   "Fixtures": 8,
-   "Chase": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
-   ],
-   "Steps": [
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  "Colors": [
-   {
-    "R": 0,
-    "G": 0,
-    "B": 0
-   }
-  ],
-  "Speed": 3,
-  "CurrentSpeed": 50000000,
-  "Status": false,
-  "X": 0,
-  "Y": 4
- },
- {
-  "StartSeq": false,
-  "StopSeq": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
-  "FadeTime": 0,
-  "Name": "cans",
-  "Number": 4,
-  "Start": true,
-  "Patten": {
-   "Name": "standard",
-   "Length": 2,
-   "Size": 2,
-   "Fixtures": 8,
-   "Chase": [
-    1,
-    2,
-    3,
-    4,
-    5,
-    6,
-    7,
-    8
-   ],
-   "Steps": [
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ]
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ]
-      }
-     ]
-    }
-   ]
-  },
-  "Colors": [
-   {
-    "R": 0,
-    "G": 0,
-    "B": 0
-   }
-  ],
-  "Speed": 3,
-  "CurrentSpeed": 50000000,
-  "Status": false,
+  "CurrentSpeed": 500000000,
   "X": 0,
   "Y": 4
  }

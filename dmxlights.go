@@ -12,6 +12,7 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/rakyll/launchpad/mk2"
 )
@@ -189,7 +190,7 @@ func main() {
 					LightOn(eventsForLauchpad, common.Light{
 						X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
-					askToSaveConfig(sequences, readSequences, hit.X, hit.Y)
+					config.AskToSaveConfig(sequences, readSequences, hit.X, hit.Y)
 					savePreset = false
 					flashButtons[8][4] = false
 				} else {
@@ -199,7 +200,7 @@ func main() {
 						fmt.Printf(" OK \n")
 						clearAll(pad, eventsForLauchpad, sequences)
 						LightOn(eventsForLauchpad, common.Light{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
-						askToLoadConfig(sequences, hit.X, hit.Y)
+						config.AskToLoadConfig(sequences, hit.X, hit.Y)
 						// Reset flash buttons
 						for x := 0; x < 9; x++ {
 							for y := 0; y < 9; y++ {
@@ -624,20 +625,6 @@ func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 	}
 }
 
-// waitForConfig
-func waitForConfig(replyChannel chan common.Sequence) common.Sequence {
-	command := common.Sequence{}
-	select {
-	case command = <-replyChannel:
-		fmt.Printf("Config Received for seq: %s\n", command.Name)
-		break
-	case <-time.After(500 * time.Millisecond):
-		fmt.Printf("Config TIMEOUT for seq: %s\n", command.Name)
-		break
-	}
-	return command
-}
-
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func listenCommandChannelAndWait(command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, CurrentSpeed time.Duration, mySequenceNumber int) common.Sequence {
 
@@ -698,7 +685,7 @@ func listenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 	if command.LoadConfig {
 		X := command.X
 		Y := command.Y
-		config := readConfig(fmt.Sprintf("config%d.%d.json", X, Y))
+		config := config.ReadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
 
 		for _, seq := range config {
 			if seq.Number == mySequenceNumber {
@@ -841,79 +828,6 @@ func setFade(commandSpeed int) (Speed time.Duration) {
 func LightOn(eventsForLauchpad chan common.Light, Light common.Light) {
 	event := common.Light{X: Light.X, Y: Light.Y, Brightness: full, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
 	eventsForLauchpad <- event
-}
-
-func writeConfig(config []common.Sequence, filename string) {
-
-	// Marshall the config into a json object.
-	data, err := json.MarshalIndent(config, "", " ")
-	if err != nil {
-		log.Fatalf("Error marshalling config: %v", err)
-	}
-
-	//fmt.Println(string(data))
-
-	// Write to file
-	err = ioutil.WriteFile(filename, data, 0644)
-	if err != nil {
-		log.Fatalf("Error writing config: %v to file:%s", err, filename)
-	}
-
-}
-
-func readConfig(filename string) []common.Sequence {
-
-	config := []common.Sequence{}
-
-	// Read the file.
-	data, err := ioutil.ReadFile(filename)
-	if err != nil {
-		log.Fatalf("Error reading config: %v from file:%s", err, filename)
-	}
-
-	err = json.Unmarshal(data, &config)
-	if err != nil {
-		log.Fatalf("Error reading config: %v from file:%s", err, filename)
-	}
-
-	return config
-}
-
-func askToLoadConfig(sequences []chan common.Sequence, X int, Y int) {
-	cmd := common.Sequence{
-		LoadConfig: true,
-		X:          X,
-		Y:          Y,
-	}
-	for _, seq := range sequences {
-		seq <- cmd
-	}
-}
-
-func askToSaveConfig(sequences []chan common.Sequence, replyChannel []chan common.Sequence, X int, Y int) {
-
-	fmt.Printf("askToSaveConfig: Save Preset in X:%d Y:%d \n", X, Y)
-	config := []common.Sequence{}
-
-	go func() {
-		// wait for responses from sequences.
-		time.Sleep(100 * time.Millisecond)
-		for _, replyChannel := range replyChannel {
-			config = append(config, waitForConfig(replyChannel))
-		}
-		// write to config file.
-		writeConfig(config, fmt.Sprintf("config%d.%d.json", config[0].X, config[0].Y))
-	}()
-
-	// ask for all the sequencers for their config.
-	cmd := common.Sequence{
-		ReadConfig: true,
-		X:          X,
-		Y:          Y,
-	}
-	for _, seq := range sequences {
-		seq <- cmd
-	}
 }
 
 func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common.Light, seqNumber int, green int, red int, blue int) {
