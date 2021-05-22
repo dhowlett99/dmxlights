@@ -18,7 +18,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		Name:     "cans",
 		Number:   mySequenceNumber,
 		FadeTime: 0 * time.Millisecond,
-		Run:      false,
+		Run:      true,
 		Patten: common.Patten{
 			Name:     "standard",
 			Length:   2,
@@ -38,34 +38,37 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		Speed: 3,
 	}
 
+	channels := []chan common.Event{}
 	// Create a channel for every fixture.
 	fmt.Printf("Create a channel for every fixture.\n")
-	fixtureChannels := []chan common.Event{}
 	for fixture := 0; fixture < command.Patten.Fixtures; fixture++ {
 		channel := make(chan common.Event)
-		fixtureChannels = append(fixtureChannels, channel)
+		channels = append(channels, channel)
 	}
 
 	// Now start the fixture threads listening.
 	fmt.Printf("Now start the fixture threads listening.")
-	for thisFixture, channel := range fixtureChannels {
-
-		//fmt.Printf("Start a thread %d fixture.\n", fixture)
-		//time.Sleep(1 * time.Second)
-
-		go fixture.FixtureReceiver(channel, thisFixture, command, commandChannel, replyChannel, mySequenceNumber, Pattens, eventsForLauchpad)
-
+	for thisFixture, channel := range channels {
+		go fixture.FixtureReceiver(channel,
+			thisFixture,
+			command,
+			commandChannel,
+			replyChannel,
+			mySequenceNumber,
+			Pattens,
+			eventsForLauchpad)
 	}
 
-	event := common.Event{}
-	// Now start the fixture threads by sending an event.
+	cmd := common.Event{}
+	// Now trigger the fixture by sending an event.
 	for {
-		//fmt.Printf("Step to fixture loop %d fixtureChannels = %+v\n", event.Fixture, fixtureChannels)
+		// Listen on the command channel which controls the sequence.
 		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-		for index, channel := range fixtureChannels {
-			event.Fixture = index
-			event.Run = command.Run
-			channel <- event
+		fmt.Printf("Seq: Command is %t\n", command.Run)
+		if command.Run {
+			for _, channel := range channels {
+				channel <- cmd
+			}
 		}
 	}
 }

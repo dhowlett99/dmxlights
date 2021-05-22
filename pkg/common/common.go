@@ -70,6 +70,8 @@ type ButtonPresets struct {
 type Event struct {
 	Fixture int
 	Run     bool
+	Stop    bool
+	Start   bool
 }
 
 // LightOn Turn on a common.Light.

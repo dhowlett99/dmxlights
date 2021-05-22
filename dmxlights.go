@@ -42,7 +42,7 @@ func main() {
 		os.Exit(1)
 	}()
 
-	fmt.Println("Derek common.Lighting")
+	fmt.Println("Derek Lighting")
 
 	fmt.Println("Loading Presets")
 	presetsStore = presets.LoadPresets()
@@ -76,33 +76,33 @@ func main() {
 	// Make a channel to communicate with each sequence.
 	// Create a channel for par cans.
 	sequence1 := make(chan common.Sequence)
-	// sequence2 := make(chan Sequence)
-	// sequence3 := make(chan Sequence)
-	// sequence4 := make(chan Sequence)
+	sequence2 := make(chan common.Sequence)
+	sequence3 := make(chan common.Sequence)
+	sequence4 := make(chan common.Sequence)
 
 	sequences := []chan common.Sequence{}
 	sequences = append(sequences, sequence1)
-	// sequences = append(sequences, sequence2)
-	// sequences = append(sequences, sequence3)
-	// sequences = append(sequences, sequence4)
+	sequences = append(sequences, sequence2)
+	sequences = append(sequences, sequence3)
+	sequences = append(sequences, sequence4)
 
 	// Make channels for each sequence to talk back to us on.
 	readSequence1 := make(chan common.Sequence)
-	// readSequence2 := make(chan Sequence)
-	// readSequence3 := make(chan Sequence)
-	// readSequence4 := make(chan Sequence)
+	readSequence2 := make(chan common.Sequence)
+	readSequence3 := make(chan common.Sequence)
+	readSequence4 := make(chan common.Sequence)
 
 	readSequences := []chan common.Sequence{}
 	readSequences = append(readSequences, readSequence1)
-	// readSequences = append(readSequences, readSequence2)
-	// readSequences = append(readSequences, readSequence3)
-	// readSequences = append(readSequences, readSequence4)
+	readSequences = append(readSequences, readSequence2)
+	readSequences = append(readSequences, readSequence3)
+	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
 	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens)
-	// go CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
-	// go CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
-	// go CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
+	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
+	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
+	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -187,15 +187,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 				continue
 			}
 			// Select pairs Patten.
@@ -210,15 +210,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 				continue
 			}
 
@@ -236,15 +236,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 
 				continue
 			}
@@ -262,15 +262,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 
 				continue
 			}
@@ -311,15 +311,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
@@ -329,15 +329,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 			}
 
 			// Fade time decrease.
@@ -356,15 +356,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 
 				continue
 			}
@@ -384,15 +384,15 @@ func main() {
 				if selectedSequence == 1 {
 					sequence1 <- cmd
 				}
-				// if selectedSequence == 2 {
-				// 	sequence2 <- cmd
-				// }
-				// if selectedSequence == 3 {
-				// 	sequence3 <- cmd
-				// }
-				// if selectedSequence == 4 {
-				// 	sequence4 <- cmd
-				// }
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
 
 				continue
 			}
