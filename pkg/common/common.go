@@ -68,13 +68,30 @@ type ButtonPresets struct {
 }
 
 type Event struct {
-	Start   bool
 	Fixture int
-	Step    int
+	Run     bool
 }
 
 // LightOn Turn on a common.Light.
 func LightOn(eventsForLauchpad chan ALight, Light ALight) {
 	event := ALight{X: Light.X, Y: Light.Y, Brightness: 3, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
 	eventsForLauchpad <- event
+}
+
+// LightOff Turn on a common.Light.
+func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
+	event := ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}
+	eventsForLauchpad <- event
+}
+
+// LightOn Turn on a common.Light.
+func SequenceSelect(eventsForLauchpad chan ALight, sequenceNumber int) {
+
+	// Turn off all sequence lights.
+	for seq := 0; seq < 4; seq++ {
+		LightOff(eventsForLauchpad, 8, seq)
+	}
+	// Now turn blue the selected seq light.
+	LightOn(eventsForLauchpad, ALight{X: 8, Y: sequenceNumber - 1, Brightness: 3, Red: 0, Green: 0, Blue: 3})
+
 }

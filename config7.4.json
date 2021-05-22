@@ -10,7 +10,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 1,
-  "Run": false,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -790,7 +790,7 @@
   ],
   "Speed": 3,
   "CurrentSpeed": 100000000,
-  "X": 0,
+  "X": 7,
   "Y": 4
  }
 ]

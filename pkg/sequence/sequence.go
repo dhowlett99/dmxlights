@@ -18,7 +18,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		Name:     "cans",
 		Number:   mySequenceNumber,
 		FadeTime: 0 * time.Millisecond,
-		Run:      true,
+		Run:      false,
 		Patten: common.Patten{
 			Name:     "standard",
 			Length:   2,
@@ -64,9 +64,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
 		for index, channel := range fixtureChannels {
 			event.Fixture = index
-			if command.Run {
-				event.Start = true
-			}
+			event.Run = command.Run
 			channel <- event
 		}
 	}

@@ -2,6 +2,7 @@ package fixture
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -21,47 +22,49 @@ func FixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 		event := <-channel
 
 		// Are we being asked to start.
-		if event.Start {
-			// Listen on this fixtures channel for the step events.
-			step := Pattens[command.Patten.Name].Steps
-			totalSteps := len(command.Patten.Steps)
-			tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
+		if !event.Run {
+			time.Sleep(100 * time.Millisecond)
+			continue
+		}
+		// Listen on this fixtures channel for the step events.
+		step := Pattens[command.Patten.Name].Steps
+		totalSteps := len(command.Patten.Steps)
+		tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
 
-			R := step[stepCount].Fixtures[fixture].Colors[currentColor].R
-			G := step[stepCount].Fixtures[fixture].Colors[currentColor].G
-			B := step[stepCount].Fixtures[fixture].Colors[currentColor].B
+		R := step[stepCount].Fixtures[fixture].Colors[currentColor].R
+		G := step[stepCount].Fixtures[fixture].Colors[currentColor].G
+		B := step[stepCount].Fixtures[fixture].Colors[currentColor].B
 
-			if currentColor <= tolalColors {
-				currentColor++
+		if currentColor <= tolalColors {
+			currentColor++
+		}
+		// Fade up.
+		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
+		if R > 0 || G > 0 || B > 0 {
+			for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
+				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+				event := common.ALight{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
+				eventsForLauchpad <- event
 			}
-			// Fade up.
+		}
+		// Fade down.
+		if R == 0 || G == 0 || B == 0 {
 			command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
-			if R > 0 || G > 0 || B > 0 {
-				for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
-					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := common.ALight{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
-					eventsForLauchpad <- event
-				}
+			for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
+				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+				event := common.ALight{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
+				eventsForLauchpad <- event
 			}
-			// Fade down.
-			if R == 0 || G == 0 || B == 0 {
-				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
-				for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
-					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := common.ALight{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
-					eventsForLauchpad <- event
-				}
-			}
+		}
 
-			if currentColor == tolalColors {
-				stepCount++
-				currentColor = 0
-			}
+		if currentColor == tolalColors {
+			stepCount++
+			currentColor = 0
+		}
 
-			if stepCount >= totalSteps {
-				stepCount = 0
-				currentColor = 0
-			}
+		if stepCount >= totalSteps {
+			stepCount = 0
+			currentColor = 0
 		}
 	}
 }

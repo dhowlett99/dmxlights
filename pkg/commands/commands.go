@@ -48,12 +48,14 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 	if command.Start {
 		fmt.Printf("Received Start Seq \n")
 		command = currentCommand
+		command.Start = false
 		command.Run = true
 	}
 
 	if command.Stop {
 		fmt.Printf("Received Stop Seq \n")
 		command = currentCommand
+		command.Stop = false
 		command.Run = false
 	}
 

@@ -65,7 +65,7 @@ func main() {
 	go listenAndSendToLaunchPad(eventsForLauchpad, pad)
 
 	// Start off by turning off all of the Lights
-	//pad.Clear()
+	pad.Reset()
 
 	// Create a channel to listen for buttons being pressed.
 	buttonChannel := pad.Listen()
@@ -117,12 +117,8 @@ func main() {
 		flashButtons[i] = make([]bool, 9)
 	}
 
-	// common.Light the logo blue.
+	// Light the logo blue.
 	pad.Light(8, -1, 79)
-	// err = pad.Logo()
-	// if err != nil {
-	// 	fmt.Printf("Error setting logo %s\n", err.Error())
-	// }
 
 	for {
 		select {
@@ -131,7 +127,6 @@ func main() {
 
 			pad.Light(hit.X, hit.Y, 79)
 			fmt.Printf("Pad X:%d Y:%d\n", hit.X, hit.Y)
-			//time.Sleep(1 * time.Second)
 
 			if hit.X == 0 && hit.Y == -1 {
 				clearAll(pad, eventsForLauchpad, sequences)
@@ -283,58 +278,28 @@ func main() {
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 0, Brightness: full, Red: 3, Green: 3, Blue: 0})
-				event := common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				continue
 			}
 
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				event := common.ALight{X: 8, Y: 1, Brightness: full, Red: 3, Green: 3, Blue: 0}
-				eventsForLauchpad <- event
-
-				event = common.ALight{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				continue
 			}
 
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				event := common.ALight{X: 8, Y: 2, Brightness: full, Red: 3, Green: 3, Blue: 0}
-				eventsForLauchpad <- event
-
-				event = common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				continue
 			}
 
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				event := common.ALight{X: 8, Y: 3, Brightness: full, Red: 3, Green: 3, Blue: 0}
-				eventsForLauchpad <- event
-
-				event = common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
-				event = common.ALight{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}
-				eventsForLauchpad <- event
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				continue
 			}
 
