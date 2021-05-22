@@ -598,19 +598,19 @@ func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 				currentColor++
 			}
 			// Fade up.
-			command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
+			command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
 			if R > 0 || G > 0 || B > 0 {
 				for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
-					command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
 					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
 			}
 			// Fade down.
 			if R == 0 || G == 0 || B == 0 {
-				command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
+				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
 				for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
-					command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
 					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
