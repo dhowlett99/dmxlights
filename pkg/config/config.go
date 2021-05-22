@@ -88,7 +88,7 @@ func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
 	command := common.Sequence{}
 	select {
 	case command = <-replyChannel:
-		//fmt.Printf("Config Received for seq: %s\n", command.Name)
+		fmt.Printf("Config Received for seq: %s\n", command.Name)
 		break
 	case <-time.After(500 * time.Millisecond):
 		//fmt.Printf("Config TIMEOUT for seq: %s\n", command.Name)

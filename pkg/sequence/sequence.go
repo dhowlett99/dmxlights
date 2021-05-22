@@ -64,7 +64,10 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 	for {
 		// Listen on the command channel which controls the sequence.
 		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-		fmt.Printf("Seq: Command is %t\n", command.Run)
+		if command.Stop {
+			fmt.Printf("Seq: Stop is %t\n", command.Stop)
+		}
+		//fmt.Printf("Seq: Command is %t\n", command.Run)
 		if command.Run {
 			for _, channel := range channels {
 				channel <- cmd

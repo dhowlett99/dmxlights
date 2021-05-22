@@ -125,8 +125,8 @@ func main() {
 
 		case hit := <-buttonChannel:
 
-			pad.Light(hit.X, hit.Y, 79)
-			fmt.Printf("Pad X:%d Y:%d\n", hit.X, hit.Y)
+			// pad.Light(hit.X, hit.Y, 79)
+			// fmt.Printf("Pad X:%d Y:%d\n", hit.X, hit.Y)
 
 			if hit.X == 0 && hit.Y == -1 {
 				clearAll(pad, eventsForLauchpad, sequences)
