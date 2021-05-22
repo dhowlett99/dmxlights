@@ -1,13 +1,11 @@
 package main
 
 import (
-	"encoding/json"
 	"fmt"
 	"log"
 	"os"
 	"syscall"
 
-	"io/ioutil"
 	"os/signal"
 	"time"
 
@@ -15,6 +13,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
+	"github.com/dhowlett99/dmxlights/pkg/presets"
+	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/rakyll/launchpad/mk2"
 )
 
@@ -24,61 +24,28 @@ const (
 
 var sequenceSpeed int
 var fadeSpeed int
-var presets map[string]bool
+var presetsStore map[string]bool
 var savePreset bool
 var flashButtons [][]bool
-
-func savePresets(presets map[string]bool) {
-	// Marshall the config into a json object.
-	data, err := json.MarshalIndent(presets, "", " ")
-	if err != nil {
-		log.Fatalf("Error marshalling config: %v", err)
-	}
-
-	// Write to file
-	err = ioutil.WriteFile("presets.json", data, 0644)
-	if err != nil {
-		log.Fatalf("Error writing config: %v to file:%s", err, "presets.json")
-	}
-}
-
-func loadPresets() map[string]bool {
-
-	presets := map[string]bool{}
-
-	// Read the file.
-	data, err := ioutil.ReadFile("presets.json")
-	if err != nil {
-		fmt.Printf("Error reading prests: %v from file:%s", err, "presets.json")
-		return presets
-	}
-
-	err = json.Unmarshal(data, &presets)
-	if err != nil {
-		log.Fatalf("Error unmashalling presets: %v from file:%s", err, "presets.json")
-	}
-
-	return presets
-}
 
 // main thread is used to get commands from the lauchpad.
 func main() {
 
 	selectedSequence := 0
-	presets = make(map[string]bool)
+	presetsStore = make(map[string]bool)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
-		savePresets(presets)
+		presets.SavePresets(presetsStore)
 		os.Exit(1)
 	}()
 
 	fmt.Println("Derek common.Lighting")
 
 	fmt.Println("Loading Presets")
-	presets = loadPresets()
+	presetsStore = presets.LoadPresets()
 	fmt.Println("Loading Presets Done")
 
 	// Setup a connection to the launchpad.
@@ -92,7 +59,7 @@ func main() {
 	pad.Program()
 
 	// Create a channel to send events to the launchpad.
-	eventsForLauchpad := make(chan common.Light)
+	eventsForLauchpad := make(chan common.ALight)
 
 	// Now create a thread to handle those events.
 	go listenAndSendToLaunchPad(eventsForLauchpad, pad)
@@ -132,13 +99,13 @@ func main() {
 	// readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens)
+	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens)
 	// go CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
 	// go CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
 	// go CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
 
 	// common.Light up any existing presets.
-	initPresets(eventsForLauchpad, presets)
+	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	fmt.Println("Setup Presets Done")
 
@@ -187,8 +154,8 @@ func main() {
 			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
 				if savePreset {
 					fmt.Printf("Write Config\n")
-					presets[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-					LightOn(eventsForLauchpad, common.Light{
+					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
+					common.LightOn(eventsForLauchpad, common.ALight{
 						X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
 					config.AskToSaveConfig(sequences, readSequences, hit.X, hit.Y)
@@ -196,11 +163,11 @@ func main() {
 					flashButtons[8][4] = false
 				} else {
 					// Load config, but only if it exists in the presets map.
-					if presets[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
+					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
 						fmt.Printf("Read Config:")
 						fmt.Printf(" OK \n")
 						clearAll(pad, eventsForLauchpad, sequences)
-						LightOn(eventsForLauchpad, common.Light{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
+						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 						config.AskToLoadConfig(sequences, hit.X, hit.Y)
 						// Reset flash buttons
 						for x := 0; x < 9; x++ {
@@ -316,12 +283,12 @@ func main() {
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				LightOn(eventsForLauchpad, common.Light{X: 8, Y: 0, Brightness: full, Red: 3, Green: 3, Blue: 0})
-				event := common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 0, Brightness: full, Red: 3, Green: 3, Blue: 0})
+				event := common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -329,14 +296,14 @@ func main() {
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				event := common.Light{X: 8, Y: 1, Brightness: full, Red: 3, Green: 3, Blue: 0}
+				event := common.ALight{X: 8, Y: 1, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = common.Light{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -344,14 +311,14 @@ func main() {
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				event := common.Light{X: 8, Y: 2, Brightness: full, Red: 3, Green: 3, Blue: 0}
+				event := common.ALight{X: 8, Y: 2, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 3, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 0, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -359,14 +326,14 @@ func main() {
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				event := common.Light{X: 8, Y: 3, Brightness: full, Red: 3, Green: 3, Blue: 0}
+				event := common.ALight{X: 8, Y: 3, Brightness: full, Red: 3, Green: 3, Blue: 0}
 				eventsForLauchpad <- event
 
-				event = common.Light{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 1, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 2, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
-				event = common.Light{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}
+				event = common.ALight{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}
 				eventsForLauchpad <- event
 				continue
 			}
@@ -467,11 +434,11 @@ func main() {
 
 			// // common.Light a button is pressed.
 			// if !button[hit.X][hit.Y] {
-			// 	event := common.Light{hit.X, hit.Y, 0, 3}
+			// 	event := common.ALight{hit.X, hit.Y, 0, 3}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = true
 			// } else {
-			// 	event := common.Light{hit.X, hit.Y, 0, 0}
+			// 	event := common.ALight{hit.X, hit.Y, 0, 0}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = false
 			// }
@@ -480,17 +447,7 @@ func main() {
 	}
 }
 
-func initPresets(eventsForLauchpad chan common.Light, presets map[string]bool) {
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				LightOn(eventsForLauchpad, common.Light{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
-			}
-		}
-	}
-}
-
-func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.Light, sequences []chan common.Sequence) {
+func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, sequences []chan common.Sequence) {
 	fmt.Printf("C L E A R\n")
 	pad.Reset()
 	cmd := common.Sequence{
@@ -502,128 +459,8 @@ func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.Light, sequences
 
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				LightOn(eventsForLauchpad, common.Light{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
-			}
-		}
-	}
-}
-
-func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.Light, commandChannel chan common.Sequence, replyChannel chan common.Sequence, Pattens map[string]common.Patten) {
-
-	fmt.Printf("Setup default command\n")
-	// set default values.
-	command := common.Sequence{
-		Name:     "cans",
-		Number:   mySequenceNumber,
-		FadeTime: 0 * time.Millisecond,
-		Run:      true,
-		Patten: common.Patten{
-			Name:     "standard",
-			Length:   2,
-			Size:     2,
-			Fixtures: 8,
-			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
-			Steps:    Pattens["standard"].Steps,
-		},
-		CurrentSpeed: 100 * time.Millisecond,
-		Colors: []common.Color{
-			{
-				R: 0,
-				G: 0,
-				B: 0,
-			},
-		},
-		Speed: 3,
-	}
-
-	// Create a channel for every fixture.
-	fmt.Printf("Create a channel for every fixture.\n")
-	fixtureChannels := []chan common.Event{}
-	for fixture := 0; fixture < command.Patten.Fixtures; fixture++ {
-		channel := make(chan common.Event)
-		fixtureChannels = append(fixtureChannels, channel)
-	}
-
-	// Now start the fixture threads listening.
-	fmt.Printf("Now start the fixture threads listening.")
-	for fixture, channel := range fixtureChannels {
-
-		//fmt.Printf("Start a thread %d fixture.\n", fixture)
-		//time.Sleep(1 * time.Second)
-
-		go fixtureReceiver(channel, fixture, command, commandChannel, replyChannel, mySequenceNumber, Pattens, eventsForLauchpad)
-
-	}
-
-	event := common.Event{}
-	// Now start the fixture threads by sending an event.
-	for {
-		//fmt.Printf("Step to fixture loop %d fixtureChannels = %+v\n", event.Fixture, fixtureChannels)
-		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-		for index, channel := range fixtureChannels {
-			event.Fixture = index
-			if command.Run {
-				event.Start = true
-			}
-			channel <- event
-		}
-	}
-}
-func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, mySequenceNumber int, Pattens map[string]common.Patten, eventsForLauchpad chan common.Light) {
-
-	// Start the step counter so we know where we are in the sequence.
-	stepCount := 0
-
-	// Start the color counter.
-	currentColor := 0
-
-	fmt.Printf("Now Listening on channel %d\n", fixture)
-	for {
-
-		event := <-channel
-
-		// Are we being asked to start.
-		if event.Start {
-			// Listen on this fixtures channel for the step events.
-			step := Pattens[command.Patten.Name].Steps
-			totalSteps := len(command.Patten.Steps)
-			tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
-
-			R := step[stepCount].Fixtures[fixture].Colors[currentColor].R
-			G := step[stepCount].Fixtures[fixture].Colors[currentColor].G
-			B := step[stepCount].Fixtures[fixture].Colors[currentColor].B
-
-			if currentColor <= tolalColors {
-				currentColor++
-			}
-			// Fade up.
-			command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
-			if R > 0 || G > 0 || B > 0 {
-				for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
-					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
-					eventsForLauchpad <- event
-				}
-			}
-			// Fade down.
-			if R == 0 || G == 0 || B == 0 {
-				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
-				for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
-					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
-					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
-					eventsForLauchpad <- event
-				}
-			}
-
-			if currentColor == tolalColors {
-				stepCount++
-				currentColor = 0
-			}
-
-			if stepCount >= totalSteps {
-				stepCount = 0
-				currentColor = 0
+			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
+				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 			}
 		}
 	}
@@ -632,7 +469,7 @@ func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 // listenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func listenAndSendToLaunchPad(eventsForLauchpad chan common.Light, pad *mk2.Launchpad) {
+func listenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Launchpad) {
 	var green int
 	var red int
 	var blue int
@@ -676,13 +513,7 @@ func listenAndSendToLaunchPad(eventsForLauchpad chan common.Light, pad *mk2.Laun
 	}
 }
 
-// common.LightOn Turn on a common.Light.
-func LightOn(eventsForLauchpad chan common.Light, Light common.Light) {
-	event := common.Light{X: Light.X, Y: Light.Y, Brightness: full, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
-	eventsForLauchpad <- event
-}
-
-func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common.Light, seqNumber int, green int, red int, blue int) {
+func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
 	go func(pad *mk2.Launchpad, x int, y int) {
 
 		for {
@@ -690,11 +521,11 @@ func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common
 			if !flashButtons[x][y] {
 				break
 			}
-			event := common.Light{X: x, Y: y, Brightness: full, Red: red, Green: green, Blue: blue}
+			event := common.ALight{X: x, Y: y, Brightness: full, Red: red, Green: green, Blue: blue}
 			eventsForLauchpad <- event
 
 			time.Sleep(1 * time.Second)
-			event = common.Light{X: x, Y: y, Brightness: full, Red: 0, Green: 0, Blue: 0}
+			event = common.ALight{X: x, Y: y, Brightness: full, Red: 0, Green: 0, Blue: 0}
 			eventsForLauchpad <- event
 			time.Sleep(1 * time.Second)
 		}

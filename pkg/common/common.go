@@ -2,7 +2,7 @@ package common
 
 import "time"
 
-type Light struct {
+type ALight struct {
 	X          int
 	Y          int
 	Brightness int
@@ -71,4 +71,10 @@ type Event struct {
 	Start   bool
 	Fixture int
 	Step    int
+}
+
+// LightOn Turn on a common.Light.
+func LightOn(eventsForLauchpad chan ALight, Light ALight) {
+	event := ALight{X: Light.X, Y: Light.Y, Brightness: 3, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
+	eventsForLauchpad <- event
 }
