@@ -23,7 +23,7 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 	if command.UpdateSpeed {
 		saveSpeed := command.Speed
 		fmt.Printf("Received update speed %d\n", saveSpeed)
-		CurrentSpeed = setSpeed(command.Speed)
+		CurrentSpeed = SetSpeed(command.Speed)
 		command = currentCommand
 		command.CurrentSpeed = CurrentSpeed
 		command.Speed = saveSpeed
@@ -78,4 +78,84 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 		command.LoadConfig = true
 	}
 	return command
+}
+
+func SetSpeed(commandSpeed int) (Speed time.Duration) {
+	if commandSpeed == 0 {
+		Speed = 3500
+	}
+	if commandSpeed == 1 {
+		Speed = 3000
+	}
+	if commandSpeed == 2 {
+		Speed = 2500
+	}
+	if commandSpeed == 3 {
+		Speed = 1000
+	}
+	if commandSpeed == 4 {
+		Speed = 1500
+	}
+	if commandSpeed == 5 {
+		Speed = 1000
+	}
+	if commandSpeed == 6 {
+		Speed = 750
+	}
+	if commandSpeed == 7 {
+		Speed = 500
+	}
+	if commandSpeed == 8 {
+		Speed = 250
+	}
+	if commandSpeed == 9 {
+		Speed = 150
+	}
+	if commandSpeed == 10 {
+		Speed = 100
+	}
+	if commandSpeed == 11 {
+		Speed = 50
+	}
+	return Speed * time.Millisecond
+}
+
+func SetFade(commandSpeed int) (Speed time.Duration) {
+	if commandSpeed == 0 {
+		Speed = 1000
+	}
+	if commandSpeed == 1 {
+		Speed = 900
+	}
+	if commandSpeed == 2 {
+		Speed = 800
+	}
+	if commandSpeed == 3 {
+		Speed = 700
+	}
+	if commandSpeed == 4 {
+		Speed = 600
+	}
+	if commandSpeed == 5 {
+		Speed = 500
+	}
+	if commandSpeed == 6 {
+		Speed = 400
+	}
+	if commandSpeed == 7 {
+		Speed = 300
+	}
+	if commandSpeed == 8 {
+		Speed = 200
+	}
+	if commandSpeed == 9 {
+		Speed = 150
+	}
+	if commandSpeed == 10 {
+		Speed = 100
+	}
+	if commandSpeed == 11 {
+		Speed = 50
+	}
+	return Speed * time.Millisecond
 }

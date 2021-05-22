@@ -415,7 +415,7 @@ func main() {
 					fadeSpeed = 0
 				}
 				fmt.Printf("Fade down speed:%d", fadeSpeed)
-				fadeTime := setFade(fadeSpeed)
+				fadeTime := commands.SetFade(fadeSpeed)
 				cmd := common.Sequence{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
@@ -444,7 +444,7 @@ func main() {
 					fadeSpeed = 12
 				}
 				fmt.Printf("Fade up speed:%d", fadeSpeed)
-				fadeTime := setSpeed(fadeSpeed)
+				fadeTime := commands.SetSpeed(fadeSpeed)
 				cmd := common.Sequence{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
@@ -674,86 +674,6 @@ func listenAndSendToLaunchPad(eventsForLauchpad chan common.Light, pad *mk2.Laun
 
 		pad.Light(event.X, event.Y, green+red+blue)
 	}
-}
-
-func setSpeed(commandSpeed int) (Speed time.Duration) {
-	if commandSpeed == 0 {
-		Speed = 3500
-	}
-	if commandSpeed == 1 {
-		Speed = 3000
-	}
-	if commandSpeed == 2 {
-		Speed = 2500
-	}
-	if commandSpeed == 3 {
-		Speed = 1000
-	}
-	if commandSpeed == 4 {
-		Speed = 1500
-	}
-	if commandSpeed == 5 {
-		Speed = 1000
-	}
-	if commandSpeed == 6 {
-		Speed = 750
-	}
-	if commandSpeed == 7 {
-		Speed = 500
-	}
-	if commandSpeed == 8 {
-		Speed = 250
-	}
-	if commandSpeed == 9 {
-		Speed = 150
-	}
-	if commandSpeed == 10 {
-		Speed = 100
-	}
-	if commandSpeed == 11 {
-		Speed = 50
-	}
-	return Speed * time.Millisecond
-}
-
-func setFade(commandSpeed int) (Speed time.Duration) {
-	if commandSpeed == 0 {
-		Speed = 1000
-	}
-	if commandSpeed == 1 {
-		Speed = 900
-	}
-	if commandSpeed == 2 {
-		Speed = 800
-	}
-	if commandSpeed == 3 {
-		Speed = 700
-	}
-	if commandSpeed == 4 {
-		Speed = 600
-	}
-	if commandSpeed == 5 {
-		Speed = 500
-	}
-	if commandSpeed == 6 {
-		Speed = 400
-	}
-	if commandSpeed == 7 {
-		Speed = 300
-	}
-	if commandSpeed == 8 {
-		Speed = 200
-	}
-	if commandSpeed == 9 {
-		Speed = 150
-	}
-	if commandSpeed == 10 {
-		Speed = 100
-	}
-	if commandSpeed == 11 {
-		Speed = 50
-	}
-	return Speed * time.Millisecond
 }
 
 // common.LightOn Turn on a common.Light.
