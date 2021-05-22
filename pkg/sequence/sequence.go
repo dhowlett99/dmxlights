@@ -36,6 +36,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			},
 		},
 		Speed: 3,
+		Shift: 2,
 	}
 
 	channels := []chan common.Event{}

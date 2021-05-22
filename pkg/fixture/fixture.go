@@ -25,7 +25,6 @@ func FixtureReceiver(channel chan common.Event,
 	fmt.Printf("Now Listening on channel %d\n", fixture)
 	for {
 
-		// Listen on this fixtures channel for the step events.
 		<-channel
 
 		step := Pattens[command.Patten.Name].Steps

@@ -43,6 +43,7 @@ type Sequence struct {
 	Patten       Patten
 	Colors       []Color
 	Speed        int
+	Shift        int
 	CurrentSpeed time.Duration
 	X            int
 	Y            int

@@ -489,10 +489,10 @@ func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common
 			event := common.ALight{X: x, Y: y, Brightness: full, Red: red, Green: green, Blue: blue}
 			eventsForLauchpad <- event
 
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 			event = common.ALight{X: x, Y: y, Brightness: full, Red: 0, Green: 0, Blue: 0}
 			eventsForLauchpad <- event
-			time.Sleep(1 * time.Second)
+			time.Sleep(500 * time.Millisecond)
 		}
 	}(pad, x, y)
 }
