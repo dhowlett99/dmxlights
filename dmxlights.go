@@ -11,6 +11,7 @@ import (
 	"os/signal"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
@@ -525,7 +526,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    Pattens["standard"].Steps,
 		},
-		CurrentSpeed: 500 * time.Millisecond,
+		CurrentSpeed: 100 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -559,7 +560,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 	// Now start the fixture threads by sending an event.
 	for {
 		//fmt.Printf("Step to fixture loop %d fixtureChannels = %+v\n", event.Fixture, fixtureChannels)
-		command = listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
+		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
 		for index, channel := range fixtureChannels {
 			event.Fixture = index
 			if command.Run {
@@ -596,17 +597,20 @@ func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 			if currentColor <= tolalColors {
 				currentColor++
 			}
-			// Fade up
-			command = listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
+			// Fade up.
+			command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
 			if R > 0 || G > 0 || B > 0 {
 				for green := 0; green <= step[stepCount].Fixtures[fixture].Colors[0].G; green++ {
-					command = listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+					command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
 					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
-				command = listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
+			}
+			// Fade down.
+			if R == 0 || G == 0 || B == 0 {
+				command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, (command.CurrentSpeed/4)/2, mySequenceNumber)
 				for green := step[stepCount].Fixtures[fixture].Colors[0].G; green >= 0; green-- {
-					command = listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
+					command = command.listenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed/4, mySequenceNumber)
 					event := common.Light{X: fixture, Y: mySequenceNumber - 1, Brightness: 3, Red: R, Green: green, Blue: B}
 					eventsForLauchpad <- event
 				}
@@ -623,78 +627,6 @@ func fixtureReceiver(channel chan common.Event, fixture int, command common.Sequ
 			}
 		}
 	}
-}
-
-// listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func listenCommandChannelAndWait(command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, CurrentSpeed time.Duration, mySequenceNumber int) common.Sequence {
-
-	currentCommand := command
-	select {
-	case command = <-commandChannel:
-		//fmt.Printf("COMMAND\n")
-		break
-	case <-time.After(CurrentSpeed):
-		//fmt.Printf("TIMEOUT\n")
-		break
-	}
-	if command.UpdateSpeed {
-		saveSpeed := command.Speed
-		fmt.Printf("Received update speed %d\n", saveSpeed)
-		CurrentSpeed = setSpeed(command.Speed)
-		command = currentCommand
-		command.CurrentSpeed = CurrentSpeed
-		command.Speed = saveSpeed
-	}
-
-	if command.UpdatePatten {
-		savePattenName := command.Patten.Name
-		fmt.Printf("Received update pattten %s\n", savePattenName)
-		command = currentCommand
-		command.Patten.Name = savePattenName
-		command.UpdatePatten = true
-	}
-
-	if command.UpdateFade {
-		fadeTime := command.FadeTime
-		fmt.Printf("Received new fade time of %v\n", fadeTime)
-		command = currentCommand
-		command.FadeTime = fadeTime
-		command.UpdateFade = true
-	}
-
-	if command.Start {
-		fmt.Printf("Received Start Seq \n")
-		command = currentCommand
-		command.Run = true
-	}
-
-	if command.Stop {
-		fmt.Printf("Received Stop Seq \n")
-		command = currentCommand
-		command.Run = false
-	}
-
-	if command.ReadConfig {
-		fmt.Printf("Sending Reply on %d\n", currentCommand.Number)
-		currentCommand.X = command.X
-		currentCommand.Y = command.Y
-		replyChannel <- currentCommand
-		command = currentCommand
-	}
-
-	if command.LoadConfig {
-		X := command.X
-		Y := command.Y
-		config := config.ReadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
-
-		for _, seq := range config {
-			if seq.Number == mySequenceNumber {
-				command = seq
-			}
-		}
-		command.LoadConfig = true
-	}
-	return command
 }
 
 // listenAndSendToLaunchPad is the thread that listens for events to send to
