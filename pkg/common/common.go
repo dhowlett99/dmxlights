@@ -61,6 +61,7 @@ type Steps struct {
 type Fixture struct {
 	Brightness int
 	Colors     []Color
+	SaveColor  Color
 }
 
 type ButtonPresets struct {

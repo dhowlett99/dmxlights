@@ -12,7 +12,7 @@ import (
 
 func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, commandChannel chan common.Sequence, replyChannel chan common.Sequence, Pattens map[string]common.Patten) {
 
-	fmt.Printf("Setup default command\n")
+	//fmt.Printf("Setup default command\n")
 	// set default values.
 	command := common.Sequence{
 		Name:     "cans",
@@ -27,7 +27,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    Pattens["standard"].Steps,
 		},
-		CurrentSpeed: 100 * time.Millisecond,
+		CurrentSpeed: 300 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -41,14 +41,14 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 	channels := []chan common.Event{}
 	// Create a channel for every fixture.
-	fmt.Printf("Create a channel for every fixture.\n")
+	//fmt.Printf("Create a channel for every fixture.\n")
 	for fixture := 0; fixture < command.Patten.Fixtures; fixture++ {
 		channel := make(chan common.Event)
 		channels = append(channels, channel)
 	}
 
 	// Now start the fixture threads listening.
-	fmt.Printf("Now start the fixture threads listening.")
+	//fmt.Printf("Now start the fixture threads listening.")
 	for thisFixture, channel := range channels {
 		go fixture.FixtureReceiver(channel,
 			thisFixture,
@@ -70,9 +70,28 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 		}
 		//fmt.Printf("Seq: Command is %t\n", command.Run)
 		if command.Run {
-			for _, channel := range channels {
+
+			//fmt.Printf("Seq says start fixture 0\n")
+			for index, channel := range channels {
+				cmd.Fixture = index
 				channel <- cmd
 			}
+			time.Sleep(1 * time.Second)
+
 		}
+
+		// for command.Run {
+
+		// 	for _, channel := range channels {
+		// 		channel <- cmd
+		// 	}
+		// }
+		// // for {
+		// // 	for command.Start {
+		// // 		fmt.Printf("Seq says start \n")
+		// // 		channels[0] <- cmd
+		// // 	}
+		// // 	command.Start = false
+		// // }
 	}
 }

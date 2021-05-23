@@ -22,7 +22,6 @@ func MakePatterns() map[string]common.Patten {
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
 			{
@@ -35,7 +34,6 @@ func MakePatterns() map[string]common.Patten {
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
 			{
@@ -48,25 +46,10 @@ func MakePatterns() map[string]common.Patten {
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
 			{
 				Fixtures: []common.Fixture{
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -83,7 +66,6 @@ func MakePatterns() map[string]common.Patten {
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -92,7 +74,6 @@ func MakePatterns() map[string]common.Patten {
 			},
 			{
 				Fixtures: []common.Fixture{
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -111,9 +92,20 @@ func MakePatterns() map[string]common.Patten {
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
 				},
 			},
 		},
