@@ -99,7 +99,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 					lastColor[fixture] = event.Color
 					channels[fixture] <- event
 
-					time.Sleep(100 * time.Microsecond)
+					time.Sleep(10 * time.Microsecond)
 
 					event.Shift = 1
 

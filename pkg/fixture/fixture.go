@@ -41,7 +41,7 @@ func FixtureReceiver(channel chan common.Event,
 					Y:          mySequenceNumber - 1,
 					Brightness: 3,
 					Red:        event.Color.R,
-					Green:      green + event.Shift,
+					Green:      green,
 					Blue:       event.Color.B}
 				eventsForLauchpad <- e
 			}
