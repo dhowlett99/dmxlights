@@ -27,7 +27,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    Pattens["standard"].Steps,
 		},
-		CurrentSpeed: 300 * time.Millisecond,
+		CurrentSpeed: 100 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -54,44 +54,86 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			thisFixture,
 			command,
 			commandChannel,
-			replyChannel,
 			mySequenceNumber,
-			Pattens,
 			eventsForLauchpad)
 	}
 
-	cmd := common.Event{}
-	// Now trigger the fixture by sending an event.
 	for {
-		// Listen on the command channel which controls the sequence.
-		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-		if command.Stop {
-			fmt.Printf("Seq: Stop is %t\n", command.Stop)
-		}
-		//fmt.Printf("Seq: Command is %t\n", command.Run)
+
+		// Start the color counter.
+		currentColor := 0
+
+		//totalSteps := len(command.Patten.Steps)
+
+		lastColor := make(map[int]common.Color)
+
+		step := Pattens[command.Patten.Name].Steps
+
 		if command.Run {
+			for stepCount := 0; stepCount < len(Pattens[command.Patten.Name].Steps); stepCount++ {
 
-			//fmt.Printf("Seq says start fixture 0\n")
-			for index, channel := range channels {
-				cmd.Fixture = index
-				channel <- cmd
+				for fixture := range step[stepCount].Fixtures {
+					// Listen on the command channel which controls the sequence.
+					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
+					if command.Stop {
+						fmt.Printf("Seq: Stop is %t\n", command.Stop)
+					}
+					//tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
+
+					R := step[stepCount].Fixtures[fixture].Colors[currentColor].R
+					G := step[stepCount].Fixtures[fixture].Colors[currentColor].G
+					B := step[stepCount].Fixtures[fixture].Colors[currentColor].B
+
+					//fmt.Printf("Step is %d Fixture is %d Green is %d\n", stepCount, fixture, G)
+
+					// Now trigger the fixture by sending an event.
+					event := common.Event{
+						Fadeup: true,
+						Color: common.Color{
+							R: R,
+							G: G,
+							B: B,
+						},
+						FadeTime: command.CurrentSpeed / 4,
+					}
+					lastColor[fixture] = event.Color
+					channels[fixture] <- event
+
+					time.Sleep(100 * time.Microsecond)
+
+					event.Shift = 1
+
+					event = common.Event{
+						Fadedown:  true,
+						LastColor: lastColor[fixture],
+						Color: common.Color{
+							R: R,
+							G: G,
+							B: B,
+						},
+						FadeTime: command.CurrentSpeed,
+						Shift:    event.Shift,
+					}
+					lastColor[fixture] = event.Color
+					channels[fixture] <- event
+
+					//time.Sleep(100 * time.Millisecond)
+				}
+
+				// if currentColor <= tolalColors {
+				// 	currentColor++
+				// }
+
+				// if currentColor == tolalColors {
+				// 	stepCount++
+				// 	currentColor = 0
+				// }
+
+				// if stepCount >= totalSteps {
+				// 	stepCount = 0
+				// 	currentColor = 0
+				// }
 			}
-			time.Sleep(1 * time.Second)
-
 		}
-
-		// for command.Run {
-
-		// 	for _, channel := range channels {
-		// 		channel <- cmd
-		// 	}
-		// }
-		// // for {
-		// // 	for command.Start {
-		// // 		fmt.Printf("Seq says start \n")
-		// // 		channels[0] <- cmd
-		// // 	}
-		// // 	command.Start = false
-		// // }
 	}
 }

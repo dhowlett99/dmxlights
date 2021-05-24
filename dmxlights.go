@@ -100,9 +100,9 @@ func main() {
 
 	// Start threads for each sequence.
 	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens)
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
+	// go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
+	// go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
+	// go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)

@@ -23,7 +23,7 @@ type Patten struct {
 	Size     int
 	Fixtures int // 8 Fixtures
 	Chase    []int
-	Steps    []Steps
+	Steps    []Step
 }
 
 type Sequence struct {
@@ -54,7 +54,7 @@ type Hit struct {
 	Y int
 }
 
-type Steps struct {
+type Step struct {
 	Fixtures []Fixture
 }
 
@@ -70,10 +70,16 @@ type ButtonPresets struct {
 }
 
 type Event struct {
-	Fixture int
-	Run     bool
-	Stop    bool
-	Start   bool
+	Fixture   int
+	Run       bool
+	Stop      bool
+	Start     bool
+	Fadeup    bool
+	Fadedown  bool
+	Shift     int
+	FadeTime  time.Duration
+	LastColor Color
+	Color     Color
 }
 
 // LightOn Turn on a common.Light.
