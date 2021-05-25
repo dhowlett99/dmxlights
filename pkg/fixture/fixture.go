@@ -19,18 +19,18 @@ func FixtureReceiver(channel chan common.Event,
 
 		if event.Fadeup {
 			// Fade up.
-			for green := 0; green <= event.Color.G; green++ {
-				time.Sleep(event.FadeTime)
-				e := common.ALight{
-					X:          fixture,
-					Y:          mySequenceNumber - 1,
-					Brightness: 3,
-					Red:        event.Color.B,
-					Green:      green,
-					Blue:       event.Color.B,
-				}
-				eventsForLauchpad <- e
+			// for green := 0; green <= event.Color.G; green++ {
+			// 	time.Sleep(event.FadeTime)
+			e := common.ALight{
+				X:          fixture,
+				Y:          mySequenceNumber - 1,
+				Brightness: 3,
+				Red:        event.Color.B,
+				Green:      event.Color.G,
+				Blue:       event.Color.B,
 			}
+			eventsForLauchpad <- e
+			// }
 		}
 
 		if event.Fadedown {

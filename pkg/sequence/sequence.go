@@ -10,7 +10,7 @@ import (
 	"github.com/rakyll/launchpad/mk2"
 )
 
-func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, commandChannel chan common.Sequence, replyChannel chan common.Sequence, Pattens map[string]common.Patten) {
+func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, commandChannel chan common.Sequence, replyChannel chan common.Sequence, pattens map[string]common.Patten) {
 
 	//fmt.Printf("Setup default command\n")
 	// set default values.
@@ -25,9 +25,9 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 			Size:     2,
 			Fixtures: 8,
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
-			Steps:    Pattens["standard"].Steps,
+			Steps:    pattens["standard"].Steps,
 		},
-		CurrentSpeed: 100 * time.Millisecond,
+		CurrentSpeed: 50 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -61,79 +61,137 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 	for {
 
 		// Start the color counter.
-		currentColor := 0
+		//currentColor := 0
 
 		//totalSteps := len(command.Patten.Steps)
 
-		lastColor := make(map[int]common.Color)
+		// lastColor := make(map[int]common.Color)
 
-		step := Pattens[command.Patten.Name].Steps
+		// step := Pattens[command.Patten.Name].Steps
+
+		//lastStep := common.Step{}
 
 		if command.Run {
-			for stepCount := 0; stepCount < len(Pattens[command.Patten.Name].Steps); stepCount++ {
+			for _, step := range pattens[command.Patten.Name].Steps {
 
-				for fixture := range step[stepCount].Fixtures {
-					// Listen on the command channel which controls the sequence.
-					command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-					if command.Stop {
-						fmt.Printf("Seq: Stop is %t\n", command.Stop)
-					}
-					//tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
-
-					R := step[stepCount].Fixtures[fixture].Colors[currentColor].R
-					G := step[stepCount].Fixtures[fixture].Colors[currentColor].G
-					B := step[stepCount].Fixtures[fixture].Colors[currentColor].B
-
-					//fmt.Printf("Step is %d Fixture is %d Green is %d\n", stepCount, fixture, G)
-
-					// Now trigger the fixture by sending an event.
-					event := common.Event{
-						Fadeup: true,
-						Color: common.Color{
-							R: R,
-							G: G,
-							B: B,
-						},
-						FadeTime: command.CurrentSpeed / 4,
-					}
-					lastColor[fixture] = event.Color
-					channels[fixture] <- event
-
-					time.Sleep(10 * time.Microsecond)
-
-					event.Shift = 1
-
-					event = common.Event{
-						Fadedown:  true,
-						LastColor: lastColor[fixture],
-						Color: common.Color{
-							R: R,
-							G: G,
-							B: B,
-						},
-						FadeTime: command.CurrentSpeed,
-						Shift:    event.Shift,
-					}
-					lastColor[fixture] = event.Color
-					channels[fixture] <- event
-
-					//time.Sleep(100 * time.Millisecond)
+				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
+				if command.Stop {
+					fmt.Printf("Seq: Stop is %t\n", command.Stop)
 				}
 
-				// if currentColor <= tolalColors {
-				// 	currentColor++
-				// }
-
-				// if currentColor == tolalColors {
-				// 	stepCount++
-				// 	currentColor = 0
-				// }
-
-				// if stepCount >= totalSteps {
-				// 	stepCount = 0
-				// 	currentColor = 0
-				// }
+				//for _, actualStep := range calcSteps(lastStep, step) {
+				playStep(step, command, channels, pattens)
+				//lastStep = step
+				//}
 			}
 		}
 	}
+}
+
+func playStep(step common.Step, command common.Sequence, channels []chan common.Event, pattens map[string]common.Patten) {
+	if command.Run {
+
+		//step := pattens[command.Patten.Name].Steps
+		// Start the color counter.
+		currentColor := 0
+
+		for fixture := range step.Fixtures {
+			// Listen on the command channel which controls the sequence.
+			// command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
+			// if command.Stop {
+			// 	fmt.Printf("Seq: Stop is %t\n", command.Stop)
+			// }
+			//tolalColors := len(step[stepCount].Fixtures[fixture].Colors)
+
+			R := step.Fixtures[fixture].Colors[currentColor].R
+			G := step.Fixtures[fixture].Colors[currentColor].G
+			B := step.Fixtures[fixture].Colors[currentColor].B
+
+			//fmt.Printf("Step is %d Fixture is %d Green is %d\n", stepCount, fixture, G)
+
+			// Now trigger the fixture by sending an event.
+			event := common.Event{
+				Fadeup: true,
+				Color: common.Color{
+					R: R,
+					G: G,
+					B: B,
+				},
+				FadeTime: command.CurrentSpeed / 4,
+			}
+			channels[fixture] <- event
+
+			// time.Sleep(10 * time.Microsecond)
+
+			// event.Shift = 1
+
+			// event = common.Event{
+			// 	Fadedown: true,
+			// 	Color: common.Color{
+			// 		R: R,
+			// 		G: G,
+			// 		B: B,
+			// 	},
+			// 	FadeTime: command.CurrentSpeed,
+			// 	Shift:    event.Shift,
+			// }
+			// channels[fixture] <- event
+		}
+	}
+}
+
+func calcSteps(lastStep common.Step, nextStep common.Step) []common.Step {
+
+	finalSteps := []common.Step{}
+
+	for newStep := 0; newStep < 4; newStep++ {
+
+		step := common.Step{}
+
+		for fixture := 0; fixture < len(lastStep.Fixtures); fixture++ {
+			//for lastStep.Fixtures[fixture].Colors[0].G < nextStep.Fixtures[fixture].Colors[0].G {
+			out := calcNextStepFixtureValue(lastStep.Fixtures[fixture].Colors[0], nextStep.Fixtures[fixture].Colors[0])
+			fmt.Printf("out is %+v\n", out)
+			newFixture := common.Fixture{}
+			newFixture.Colors = append(newFixture.Colors, out)
+			step.Fixtures = append(step.Fixtures, newFixture)
+			lastStep.Fixtures[fixture].Colors[0].G = out.G
+			//}
+		}
+
+		finalSteps = append(finalSteps, step)
+	}
+	return finalSteps
+}
+
+func calcNextStepFixtureValue(in common.Color, wanted common.Color) (out common.Color) {
+
+	// Fade up.
+	if in.G < wanted.G {
+		switch in.G {
+		case 0:
+			out.G = 1
+
+		case 1:
+			out.G = 2
+
+		case 2:
+			out.G = 3
+		}
+	}
+	// Fade down.
+	if in.G > wanted.G {
+		switch in.G {
+		case 3:
+			out.G = 2
+
+		case 2:
+			out.G = 1
+
+		case 1:
+			out.G = 0
+		}
+	}
+	fmt.Printf("in %d  wanted %d   out %d \n", in.G, wanted.G, out.G)
+	return out
 }
