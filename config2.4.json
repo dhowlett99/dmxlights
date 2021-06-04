@@ -10,7 +10,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 1,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -2767,7 +2767,7 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 0,
+  "X": 2,
   "Y": 4
  },
  {
@@ -2781,7 +2781,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 2,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -5538,7 +5538,7 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 0,
+  "X": 2,
   "Y": 4
  },
  {
@@ -5552,7 +5552,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 3,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -8309,7 +8309,7 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 0,
+  "X": 2,
   "Y": 4
  },
  {
@@ -8323,7 +8323,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 4,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -11080,7 +11080,7 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 0,
+  "X": 2,
   "Y": 4
  }
 ]

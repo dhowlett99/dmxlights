@@ -34,7 +34,7 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 		fmt.Printf("Received update pattten %s\n", savePattenName)
 		command = currentCommand
 		command.Patten.Name = savePattenName
-		command.UpdatePatten = true
+		command.UpdatePatten = false
 	}
 
 	if command.UpdateFade {
@@ -48,9 +48,8 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 	if command.Start {
 		fmt.Printf("Received Start Command\n")
 		command = currentCommand
-		command.Start = false
-		command.Stop = false
 		command.Run = true
+		command.Start = false
 	}
 
 	if command.Stop {
