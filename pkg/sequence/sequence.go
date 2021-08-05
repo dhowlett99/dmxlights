@@ -9,10 +9,16 @@ import (
 	"github.com/rakyll/launchpad/mk2"
 )
 
-func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, commandChannel chan common.Sequence, replyChannel chan common.Sequence, pattens map[string]common.Patten) {
+func CreateSequence(
+	mySequenceNumber int,
+	pad *mk2.Launchpad,
+	eventsForLauchpad chan common.ALight,
+	commandChannel chan common.Command,
+	replyChannel chan common.Command,
+	pattens map[string]common.Patten) {
 
 	// set default values.
-	command := common.Sequence{
+	sequence := common.Sequence{
 		Name:     "cans",
 		Number:   mySequenceNumber,
 		FadeTime: 0 * time.Millisecond,
@@ -39,16 +45,17 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 	channels := []chan common.Event{}
 	// Create a channel for every fixture.
-	for fixture := 0; fixture < command.Patten.Fixtures; fixture++ {
+	for fixture := 0; fixture < sequence.Patten.Fixtures; fixture++ {
 		channel := make(chan common.Event)
 		channels = append(channels, channel)
 	}
 
 	// Now start the fixture threads listening.
 	for thisFixture, channel := range channels {
-		go fixture.FixtureReceiver(channel,
+		go fixture.FixtureReceiver(
+			channel,
 			thisFixture,
-			command,
+			sequence,
 			commandChannel,
 			mySequenceNumber,
 			eventsForLauchpad)
@@ -58,7 +65,7 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
+		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber)
 
 		// Start the color counter.
 		// currentColor := 0
@@ -67,12 +74,15 @@ func CreateSequence(mySequenceNumber int, pad *mk2.Launchpad, eventsForLauchpad 
 
 		// lastColor := make(map[int]common.Color)
 
-		if command.Run {
-			for _, step := range pattens[command.Patten.Name].Steps {
+		if sequence.Run {
+			for _, step := range pattens[sequence.Patten.Name].Steps {
+				// for fixture := range step.Fixtures {
+				// 	fmt.Printf("Step is %v\n", fixture)
+				// }
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
-				command = commands.ListenCommandChannelAndWait(command, commandChannel, replyChannel, command.CurrentSpeed, mySequenceNumber)
-				playStep(step, command, channels, pattens)
+				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber)
+				playStep(step, sequence, channels, pattens)
 			}
 		}
 	}

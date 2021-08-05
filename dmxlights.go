@@ -73,26 +73,26 @@ func main() {
 	// Build the default set of Pattens.
 	Pattens := patten.MakePatterns()
 
-	// Make a channel to communicate with each sequence.
-	// Create a channel for par cans.
-	sequence1 := make(chan common.Sequence)
-	sequence2 := make(chan common.Sequence)
-	sequence3 := make(chan common.Sequence)
-	sequence4 := make(chan common.Sequence)
+	// Make a channel to send commands to each sequence.
+	sequence1 := make(chan common.Command)
+	sequence2 := make(chan common.Command)
+	sequence3 := make(chan common.Command)
+	sequence4 := make(chan common.Command)
 
-	sequences := []chan common.Sequence{}
+	// Add command channels to an array.
+	sequences := []chan common.Command{}
 	sequences = append(sequences, sequence1)
 	sequences = append(sequences, sequence2)
 	sequences = append(sequences, sequence3)
 	sequences = append(sequences, sequence4)
 
 	// Make channels for each sequence to talk back to us on.
-	readSequence1 := make(chan common.Sequence)
-	readSequence2 := make(chan common.Sequence)
-	readSequence3 := make(chan common.Sequence)
-	readSequence4 := make(chan common.Sequence)
+	readSequence1 := make(chan common.Command)
+	readSequence2 := make(chan common.Command)
+	readSequence3 := make(chan common.Command)
+	readSequence4 := make(chan common.Command)
 
-	readSequences := []chan common.Sequence{}
+	readSequences := []chan common.Command{}
 	readSequences = append(readSequences, readSequence1)
 	readSequences = append(readSequences, readSequence2)
 	readSequences = append(readSequences, readSequence3)
@@ -163,6 +163,16 @@ func main() {
 						fmt.Printf(" OK \n")
 						clearAll(pad, eventsForLauchpad, sequences)
 						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
+						// Stop everything so that we start the recalled config in sync.
+						cmd := common.Command{
+							Stop: true,
+						}
+						sequence1 <- cmd
+						sequence2 <- cmd
+						sequence3 <- cmd
+						sequence4 <- cmd
+						time.Sleep(850 * time.Millisecond)
+						// Load the config.
 						config.AskToLoadConfig(sequences, hit.X, hit.Y)
 						// Reset flash buttons
 						for x := 0; x < 9; x++ {
@@ -178,7 +188,7 @@ func main() {
 
 			// Select standard Patten.
 			if hit.X == 2 && hit.Y == 7 {
-				cmd := common.Sequence{
+				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
 						Name: "standard",
@@ -200,7 +210,7 @@ func main() {
 			}
 			// Select pairs Patten.
 			if hit.X == 3 && hit.Y == 7 {
-				cmd := common.Sequence{
+				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
 
@@ -229,7 +239,7 @@ func main() {
 					sequenceSpeed = 1
 				}
 				fmt.Printf("Seq Speed %d\n", sequenceSpeed)
-				cmd := common.Sequence{
+				cmd := common.Command{
 					Speed:       sequenceSpeed,
 					UpdateSpeed: true,
 				}
@@ -255,7 +265,7 @@ func main() {
 				if sequenceSpeed > 12 {
 					sequenceSpeed = 12
 				}
-				cmd := common.Sequence{
+				cmd := common.Command{
 					Speed:       sequenceSpeed,
 					UpdateSpeed: true,
 				}
@@ -305,7 +315,7 @@ func main() {
 
 			// Start sequence.
 			if hit.X == 8 && hit.Y == 5 {
-				cmd := common.Sequence{
+				cmd := common.Command{
 					Start: true,
 				}
 				if selectedSequence == 1 {
@@ -323,7 +333,7 @@ func main() {
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
-				cmd := common.Sequence{
+				cmd := common.Command{
 					Stop: true,
 				}
 				if selectedSequence == 1 {
@@ -348,10 +358,9 @@ func main() {
 				}
 				fmt.Printf("Fade down speed:%d", fadeSpeed)
 				fadeTime := commands.SetFade(fadeSpeed)
-				cmd := common.Sequence{
+				cmd := common.Command{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
-					Number:     selectedSequence,
 				}
 				if selectedSequence == 1 {
 					sequence1 <- cmd
@@ -377,7 +386,7 @@ func main() {
 				}
 				fmt.Printf("Fade up speed:%d", fadeSpeed)
 				fadeTime := commands.SetSpeed(fadeSpeed)
-				cmd := common.Sequence{
+				cmd := common.Command{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
 				}
@@ -412,10 +421,10 @@ func main() {
 	}
 }
 
-func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, sequences []chan common.Sequence) {
+func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
 	fmt.Printf("C L E A R\n")
 	pad.Reset()
-	cmd := common.Sequence{
+	cmd := common.Command{
 		Stop: true,
 	}
 	for _, seq := range sequences {

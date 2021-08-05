@@ -1,12 +1,5 @@
 [
  {
-  "Start": false,
-  "Stop": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
   "FadeTime": 0,
   "Name": "cans",
   "Number": 1,
@@ -2767,17 +2760,10 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 1,
-  "Y": 4
+  "X": 0,
+  "Y": 0
  },
  {
-  "Start": false,
-  "Stop": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
   "FadeTime": 0,
   "Name": "cans",
   "Number": 2,
@@ -5535,20 +5521,13 @@
     "B": 0
    }
   ],
-  "Speed": 9,
+  "Speed": 3,
   "Shift": 2,
-  "CurrentSpeed": 150000000,
-  "X": 1,
-  "Y": 4
+  "CurrentSpeed": 100000000,
+  "X": 0,
+  "Y": 0
  },
  {
-  "Start": false,
-  "Stop": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
   "FadeTime": 0,
   "Name": "cans",
   "Number": 3,
@@ -8309,17 +8288,10 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 1,
-  "Y": 4
+  "X": 0,
+  "Y": 0
  },
  {
-  "Start": false,
-  "Stop": false,
-  "ReadConfig": false,
-  "LoadConfig": false,
-  "UpdateSpeed": false,
-  "UpdatePatten": false,
-  "UpdateFade": false,
   "FadeTime": 0,
   "Name": "cans",
   "Number": 4,
@@ -11080,7 +11052,7 @@
   "Speed": 3,
   "Shift": 2,
   "CurrentSpeed": 50000000,
-  "X": 1,
-  "Y": 4
+  "X": 0,
+  "Y": 0
  }
 ]

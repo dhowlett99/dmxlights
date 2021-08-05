@@ -26,21 +26,32 @@ type Patten struct {
 	Steps    []Step
 }
 
-type Sequence struct {
-	// commands
+// Command tells sequences what to do.
+type Command struct {
+	Name         string
+	Number       int
 	Start        bool
 	Stop         bool
 	ReadConfig   bool
+	Sequence     Sequence
 	LoadConfig   bool
 	UpdateSpeed  bool
+	Speed        int
 	UpdatePatten bool
+	Patten       Patten
 	UpdateFade   bool
-	// parameters
+	FadeTime     time.Duration
+	X            int
+	Y            int
+}
+
+// Sequence describes sequences.
+type Sequence struct {
 	FadeTime     time.Duration
 	Name         string
 	Number       int
 	Run          bool
-	Patten       Patten
+	Patten       Patten // Contains fixtures and steps info.
 	Colors       []Color
 	Speed        int
 	Shift        int

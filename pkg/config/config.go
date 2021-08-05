@@ -10,7 +10,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func WriteConfig(config []common.Sequence, filename string) {
+func SaveConfig(config []common.Sequence, filename string) {
 
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
@@ -46,8 +46,9 @@ func ReadConfig(filename string) []common.Sequence {
 	return config
 }
 
-func AskToLoadConfig(sequences []chan common.Sequence, X int, Y int) {
-	cmd := common.Sequence{
+func AskToLoadConfig(sequences []chan common.Command, X int, Y int) {
+	fmt.Printf("AskToLoadConfig\n")
+	cmd := common.Command{
 		LoadConfig: true,
 		X:          X,
 		Y:          Y,
@@ -57,7 +58,7 @@ func AskToLoadConfig(sequences []chan common.Sequence, X int, Y int) {
 	}
 }
 
-func AskToSaveConfig(sequences []chan common.Sequence, replyChannel []chan common.Sequence, X int, Y int) {
+func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Command, X int, Y int) {
 
 	fmt.Printf("askToSaveConfig: Save Preset in X:%d Y:%d \n", X, Y)
 	config := []common.Sequence{}
@@ -68,12 +69,13 @@ func AskToSaveConfig(sequences []chan common.Sequence, replyChannel []chan commo
 		for _, replyChannel := range replyChannel {
 			config = append(config, WaitForConfig(replyChannel))
 		}
+
 		// write to config file.
-		WriteConfig(config, fmt.Sprintf("config%d.%d.json", config[0].X, config[0].Y))
+		SaveConfig(config, fmt.Sprintf("config%d.%d.json", X, Y))
 	}()
 
 	// ask for all the sequencers for their config.
-	cmd := common.Sequence{
+	cmd := common.Command{
 		ReadConfig: true,
 		X:          X,
 		Y:          Y,
@@ -84,8 +86,8 @@ func AskToSaveConfig(sequences []chan common.Sequence, replyChannel []chan commo
 }
 
 // waitForConfig
-func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
-	command := common.Sequence{}
+func WaitForConfig(replyChannel chan common.Command) common.Sequence {
+	command := common.Command{}
 	select {
 	case command = <-replyChannel:
 		fmt.Printf("Config Received for seq: %s\n", command.Name)
@@ -94,5 +96,5 @@ func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
 		//fmt.Printf("Config TIMEOUT for seq: %s\n", command.Name)
 		break
 	}
-	return command
+	return command.Sequence
 }

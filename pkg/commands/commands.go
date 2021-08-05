@@ -9,9 +9,17 @@ import (
 )
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan common.Sequence, replyChannel chan common.Sequence, CurrentSpeed time.Duration, mySequenceNumber int) common.Sequence {
+func ListenCommandChannelAndWait(
+	sequence common.Sequence,
+	commandChannel chan common.Command,
+	replyChannel chan common.Command,
+	CurrentSpeed time.Duration,
+	mySequenceNumber int) common.Sequence {
 
-	currentCommand := command
+	// Create an empty command.
+	command := common.Command{}
+
+	currentSequence := sequence
 	select {
 	case command = <-commandChannel:
 		//fmt.Printf("COMMAND\n")
@@ -21,66 +29,64 @@ func ListenCommandChannelAndWait(command common.Sequence, commandChannel chan co
 		break
 	}
 	if command.UpdateSpeed {
-		saveSpeed := command.Speed
+		saveSpeed := sequence.Speed
 		fmt.Printf("Received update speed %d\n", saveSpeed)
 		CurrentSpeed = SetSpeed(command.Speed)
-		command = currentCommand
-		command.CurrentSpeed = CurrentSpeed
-		command.Speed = saveSpeed
+		sequence = currentSequence
+		sequence.CurrentSpeed = CurrentSpeed
+		sequence.Speed = saveSpeed
 	}
 
 	if command.UpdatePatten {
 		savePattenName := command.Patten.Name
 		fmt.Printf("Received update pattten %s\n", savePattenName)
-		command = currentCommand
-		command.Patten.Name = savePattenName
-		command.UpdatePatten = false
+		sequence = currentSequence
+		sequence.Patten.Name = savePattenName
 	}
 
 	if command.UpdateFade {
 		fadeTime := command.FadeTime
 		fmt.Printf("Received new fade time of %v\n", fadeTime)
-		command = currentCommand
-		command.FadeTime = fadeTime
-		command.UpdateFade = true
+		sequence = currentSequence
+		sequence.FadeTime = fadeTime
 	}
 
 	if command.Start {
 		fmt.Printf("Received Start Command\n")
-		command = currentCommand
-		command.Run = true
-		command.Start = false
+		sequence = currentSequence
+		sequence.Run = true
 	}
 
 	if command.Stop {
 		fmt.Printf("Received Stop Command\n")
-		command = currentCommand
-		command.Stop = false
-		command.Start = false
-		command.Run = false
+		sequence.Run = false
 	}
 
+	// If we are being asked for our config we must replay with
+	// the sequence inside our command.
 	if command.ReadConfig {
-		fmt.Printf("Sending Reply on %d\n", currentCommand.Number)
-		currentCommand.X = command.X
-		currentCommand.Y = command.Y
-		replyChannel <- currentCommand
-		command = currentCommand
+		replayCommand := common.Command{}
+		fmt.Printf("Sending Reply on %d\n", replayCommand.Number)
+		replayCommand.X = command.X
+		replayCommand.Y = command.Y
+		replayCommand.Sequence = sequence
+		replyChannel <- replayCommand
 	}
 
 	if command.LoadConfig {
 		X := command.X
 		Y := command.Y
+		fmt.Printf("LoadConfig: Seq No %d, Load Config %d.%d.json\n", sequence.Number, X, Y)
 		config := config.ReadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
 
 		for _, seq := range config {
 			if seq.Number == mySequenceNumber {
-				command = seq
+				sequence = seq
 			}
 		}
-		//command.LoadConfig = true
+		return sequence
 	}
-	return command
+	return sequence
 }
 
 func SetSpeed(commandSpeed int) (Speed time.Duration) {

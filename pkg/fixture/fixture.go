@@ -4,10 +4,11 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func FixtureReceiver(channel chan common.Event,
+func FixtureReceiver(
+	channel chan common.Event,
 	fixture int,
 	command common.Sequence,
-	commandChannel chan common.Sequence,
+	commandChannel chan common.Command,
 	mySequenceNumber int,
 	eventsForLauchpad chan common.ALight) {
 
