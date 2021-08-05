@@ -10,7 +10,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 1,
-  "Run": false,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -2781,7 +2781,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 2,
-  "Run": false,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -5552,7 +5552,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 3,
-  "Run": false,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -8323,7 +8323,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 4,
-  "Run": false,
+  "Run": true,
   "Patten": {
    "Name": "standard",
    "Length": 2,
