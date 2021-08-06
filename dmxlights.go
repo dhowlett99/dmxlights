@@ -435,8 +435,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
+				dmx.Fixtures(dmxController, hit.X, red, green, blue)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
+				dmx.Fixtures(dmxController, hit.X, 0, 0, 0)
 			}
 
 			// // common.Light a button is pressed.

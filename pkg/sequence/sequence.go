@@ -5,6 +5,7 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk2"
@@ -111,72 +112,7 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 			}
 			channels[fixture] <- event
 
-			R = convertToDMXValues(R)
-			G = convertToDMXValues(G)
-			B = convertToDMXValues(B)
-
-			// Now ask DMX to actually light the real fixture.
-			if fixture == 0 {
-				dmxController.SetChannel(1, byte(R))
-				dmxController.SetChannel(2, byte(G))
-				dmxController.SetChannel(3, byte(B))
-			}
-			if fixture == 1 {
-				dmxController.SetChannel(4, byte(R))
-				dmxController.SetChannel(5, byte(G))
-				dmxController.SetChannel(6, byte(B))
-			}
-			if fixture == 2 {
-				dmxController.SetChannel(7, byte(R))
-				dmxController.SetChannel(8, byte(G))
-				dmxController.SetChannel(9, byte(B))
-			}
-			if fixture == 3 {
-				dmxController.SetChannel(10, byte(R))
-				dmxController.SetChannel(11, byte(G))
-				dmxController.SetChannel(12, byte(B))
-			}
-			dmxController.SetChannel(13, 20)
-			if fixture == 4 {
-				dmxController.SetChannel(14, byte(R))
-				dmxController.SetChannel(15, byte(G))
-				dmxController.SetChannel(16, byte(B))
-			}
-			if fixture == 5 {
-				dmxController.SetChannel(17, byte(R))
-				dmxController.SetChannel(18, byte(G))
-				dmxController.SetChannel(19, byte(B))
-			}
-			if fixture == 6 {
-				dmxController.SetChannel(20, byte(R))
-				dmxController.SetChannel(21, byte(G))
-				dmxController.SetChannel(22, byte(B))
-			}
-			if fixture == 7 {
-				dmxController.SetChannel(23, byte(R))
-				dmxController.SetChannel(24, byte(G))
-				dmxController.SetChannel(25, byte(B))
-			}
-			dmxController.SetChannel(26, 20)
-
+			dmx.Fixtures(dmxController, fixture, R, G, B)
 		}
 	}
-}
-
-func convertToDMXValues(input int) (output int) {
-
-	if input == 0 {
-		output = 0
-	}
-	if input == 1 {
-		output = 85
-	}
-	if input == 2 {
-		output = 170
-	}
-	if input == 3 {
-		output = 255
-	}
-
-	return output
 }
