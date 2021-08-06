@@ -14,6 +14,42 @@ func MakePatterns() map[string]common.Patten {
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 2, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
