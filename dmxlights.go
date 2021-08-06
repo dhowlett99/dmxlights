@@ -12,6 +12,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
@@ -24,15 +25,15 @@ const (
 
 var sequenceSpeed int
 var fadeSpeed int
-var presetsStore map[string]bool
 var savePreset bool
-var flashButtons [][]bool
 
 // main thread is used to get commands from the lauchpad.
 func main() {
 
+	var flashButtons [][]bool
+
 	selectedSequence := 0
-	presetsStore = make(map[string]bool)
+	presetsStore := make(map[string]bool)
 
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -62,7 +63,7 @@ func main() {
 	eventsForLauchpad := make(chan common.ALight)
 
 	// Now create a thread to handle those events.
-	go listenAndSendToLaunchPad(eventsForLauchpad, pad)
+	go launchpad.ListenAndSendToLaunchPad(eventsForLauchpad, pad)
 
 	// Start off by turning off all of the Lights
 	pad.Reset()
@@ -129,7 +130,7 @@ func main() {
 			// fmt.Printf("Pad X:%d Y:%d\n", hit.X, hit.Y)
 
 			if hit.X == 0 && hit.Y == -1 {
-				clearAll(pad, eventsForLauchpad, sequences)
+				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, sequences)
 				continue
 			}
 
@@ -141,7 +142,7 @@ func main() {
 					continue
 				}
 				flashButtons[8][4] = true
-				flashButton(pad, 8, 4, eventsForLauchpad, 1, 3, 0, 0)
+				launchpad.FlashButton(pad, flashButtons, 8, 4, eventsForLauchpad, 1, 3, 0, 0)
 				savePreset = true
 			}
 
@@ -161,7 +162,7 @@ func main() {
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
 						fmt.Printf("Read Config:")
 						fmt.Printf(" OK \n")
-						clearAll(pad, eventsForLauchpad, sequences)
+						launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, sequences)
 						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 						// Stop everything so that we start the recalled config in sync.
 						cmd := common.Command{
@@ -181,7 +182,7 @@ func main() {
 							}
 						}
 						flashButtons[hit.X][hit.Y] = true
-						flashButton(pad, hit.X, hit.Y, eventsForLauchpad, 1, 0, 3, 0)
+						launchpad.FlashButton(pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 3, 0)
 					}
 				}
 			}
@@ -419,89 +420,4 @@ func main() {
 		}
 
 	}
-}
-
-func clearAll(pad *mk2.Launchpad, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
-	fmt.Printf("C L E A R\n")
-	pad.Reset()
-	cmd := common.Command{
-		Stop: true,
-	}
-	for _, seq := range sequences {
-		seq <- cmd
-	}
-
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
-			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: full, Red: 3, Green: 0, Blue: 0})
-			}
-		}
-	}
-}
-
-// listenAndSendToLaunchPad is the thread that listens for events to send to
-// the launch pad.  It is thread safe and is the only thread talking to the
-// launch pad. A channel is used to queue the events to be sent.
-func listenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Launchpad) {
-	var green int
-	var red int
-	var blue int
-
-	for {
-		event := <-eventsForLauchpad
-		switch event.Green {
-		case 0:
-			green = 0
-		case 1:
-			green = 19
-		case 2:
-			green = 22
-		case 3:
-			green = 21
-		}
-
-		switch event.Red {
-		case 0:
-			red = 0
-		case 1:
-			red = 7
-		case 2:
-			red = 6
-		case 3:
-			red = 5
-		}
-
-		switch event.Blue {
-		case 0:
-			blue = 0
-		case 1:
-			blue = 37
-		case 2:
-			blue = 38
-		case 3:
-			blue = 79
-		}
-
-		pad.Light(event.X, event.Y, red+green+blue)
-	}
-}
-
-func flashButton(pad *mk2.Launchpad, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
-	go func(pad *mk2.Launchpad, x int, y int) {
-
-		for {
-			// fmt.Printf("Flash X:%d Y:%d is %t\n", x, y, flashButtons[x][y])
-			if !flashButtons[x][y] {
-				break
-			}
-			event := common.ALight{X: x, Y: y, Brightness: full, Red: red, Green: green, Blue: blue}
-			eventsForLauchpad <- event
-
-			time.Sleep(500 * time.Millisecond)
-			event = common.ALight{X: x, Y: y, Brightness: full, Red: 0, Green: 0, Blue: 0}
-			eventsForLauchpad <- event
-			time.Sleep(500 * time.Millisecond)
-		}
-	}(pad, x, y)
 }
