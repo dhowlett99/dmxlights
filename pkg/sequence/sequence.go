@@ -169,15 +169,12 @@ func convertToDMXValues(input int) (output int) {
 		output = 0
 	}
 	if input == 1 {
-		output = 64
+		output = 85
 	}
 	if input == 2 {
-		output = 128
+		output = 170
 	}
 	if input == 3 {
-		output = 168
-	}
-	if input == 4 {
 		output = 255
 	}
 
