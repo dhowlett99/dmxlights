@@ -101,6 +101,21 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 			G := step.Fixtures[fixture].Colors[currentColor].G
 			B := step.Fixtures[fixture].Colors[currentColor].B
 
+			// Now trigger the fixture lamp on the launch pad by sending an event.
+			event := common.Event{
+				Color: common.Color{
+					R: R,
+					G: G,
+					B: B,
+				},
+			}
+			channels[fixture] <- event
+
+			R = convertToDMXValues(R)
+			G = convertToDMXValues(G)
+			B = convertToDMXValues(B)
+
+			// Now ask DMX to actually light the real fixture.
 			if fixture == 0 {
 				dmxController.SetChannel(1, byte(R))
 				dmxController.SetChannel(2, byte(G))
@@ -144,15 +159,27 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 			}
 			dmxController.SetChannel(26, 255)
 
-			// Now trigger the fixture lamp on the launch pad by sending an event.
-			event := common.Event{
-				Color: common.Color{
-					R: R,
-					G: G,
-					B: B,
-				},
-			}
-			channels[fixture] <- event
 		}
 	}
+}
+
+func convertToDMXValues(input int) (output int) {
+
+	if input == 0 {
+		output = 0
+	}
+	if input == 1 {
+		output = 64
+	}
+	if input == 2 {
+		output = 128
+	}
+	if input == 3 {
+		output = 168
+	}
+	if input == 4 {
+		output = 255
+	}
+
+	return output
 }
