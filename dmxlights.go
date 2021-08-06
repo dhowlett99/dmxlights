@@ -125,6 +125,8 @@ func main() {
 	// Light the logo blue.
 	pad.Light(8, -1, 79)
 
+	//var button [][]bool
+
 	for {
 		select {
 
@@ -197,7 +199,7 @@ func main() {
 				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
-						Name: "standard",
+						Name: "colors",
 					},
 				}
 				if selectedSequence == 1 {
@@ -412,13 +414,38 @@ func main() {
 
 				continue
 			}
+
+			// Light the flash buttons based on current patten.
+			fmt.Printf("X=%d Y=%d\n", hit.X, hit.Y)
+			sequence := common.Sequence{
+				Patten: common.Patten{
+					Name:  "colors",
+					Steps: Pattens["colors"].Steps,
+				},
+			}
+			if hit.X >= 0 && hit.X < 8 {
+				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
+				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
+				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+				common.LightOn(eventsForLauchpad, common.ALight{
+					X:          hit.X,
+					Y:          hit.Y,
+					Brightness: full,
+					Red:        red,
+					Green:      green,
+					Blue:       blue,
+				})
+				time.Sleep(200 * time.Millisecond)
+				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
+			}
+
 			// // common.Light a button is pressed.
 			// if !button[hit.X][hit.Y] {
-			// 	event := common.ALight{hit.X, hit.Y, 0, 3}
+			// 	event := common.ALight{hit.X, hit.Y, 0, 0, 3, 0}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = true
 			// } else {
-			// 	event := common.ALight{hit.X, hit.Y, 0, 0}
+			// 	event := common.ALight{hit.X, hit.Y, 0, 0, 0, 0}
 			// 	eventsForLauchpad <- event
 			// 	button[hit.X][hit.Y] = false
 			// }

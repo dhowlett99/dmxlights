@@ -26,14 +26,14 @@ func CreateSequence(
 		FadeTime: 0 * time.Millisecond,
 		Run:      true,
 		Patten: common.Patten{
-			Name:     "standard",
+			Name:     "colors",
 			Length:   2,
 			Size:     2,
 			Fixtures: 8,
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
-			Steps:    pattens["standard"].Steps,
+			Steps:    pattens["colors"].Steps,
 		},
-		CurrentSpeed: 50 * time.Millisecond,
+		CurrentSpeed: 250 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -136,7 +136,7 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 				dmxController.SetChannel(11, byte(G))
 				dmxController.SetChannel(12, byte(B))
 			}
-			dmxController.SetChannel(13, 255)
+			dmxController.SetChannel(13, 20)
 			if fixture == 4 {
 				dmxController.SetChannel(14, byte(R))
 				dmxController.SetChannel(15, byte(G))
@@ -157,7 +157,7 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 				dmxController.SetChannel(24, byte(G))
 				dmxController.SetChannel(25, byte(B))
 			}
-			dmxController.SetChannel(26, 255)
+			dmxController.SetChannel(26, 20)
 
 		}
 	}

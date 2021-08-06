@@ -5,7 +5,7 @@
   "Number": 1,
   "Run": true,
   "Patten": {
-   "Name": "standard",
+   "Name": "colors",
    "Length": 2,
    "Size": 2,
    "Fixtures": 8,
@@ -2767,7 +2767,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 2,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
@@ -8295,7 +8295,7 @@
   "FadeTime": 0,
   "Name": "cans",
   "Number": 4,
-  "Run": true,
+  "Run": false,
   "Patten": {
    "Name": "standard",
    "Length": 2,
