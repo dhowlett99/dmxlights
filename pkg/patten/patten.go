@@ -521,7 +521,7 @@ func MakePatterns() map[string]common.Patten {
 		Steps: []common.Step{
 			{ // Fixture 1 - Dark Red
 				Fixtures: []common.Fixture{
-					{Brightness: full, Colors: []common.Color{{R: 3, G: 2, B: 1}}},
+					{Brightness: full, Colors: []common.Color{{R: 0, G: 3, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},

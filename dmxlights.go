@@ -416,7 +416,6 @@ func main() {
 			}
 
 			// Light the flash buttons based on current patten.
-			fmt.Printf("X=%d Y=%d\n", hit.X, hit.Y)
 			sequence := common.Sequence{
 				Patten: common.Patten{
 					Name:  "colors",
@@ -440,17 +439,6 @@ func main() {
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
 				dmx.Fixtures(dmxController, hit.X, 0, 0, 0)
 			}
-
-			// // common.Light a button is pressed.
-			// if !button[hit.X][hit.Y] {
-			// 	event := common.ALight{hit.X, hit.Y, 0, 0, 3, 0}
-			// 	eventsForLauchpad <- event
-			// 	button[hit.X][hit.Y] = true
-			// } else {
-			// 	event := common.ALight{hit.X, hit.Y, 0, 0, 0, 0}
-			// 	eventsForLauchpad <- event
-			// 	button[hit.X][hit.Y] = false
-			// }
 		}
 	}
 }

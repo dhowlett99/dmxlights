@@ -77,7 +77,7 @@ func Fixtures(dmxController ft232.DMXController, fixture int, R int, G int, B in
 		dmxController.SetChannel(11, byte(G))
 		dmxController.SetChannel(12, byte(B))
 	}
-	dmxController.SetChannel(13, 20)
+	dmxController.SetChannel(13, 255)
 	if fixture == 4 {
 		dmxController.SetChannel(14, byte(R))
 		dmxController.SetChannel(15, byte(G))
@@ -98,7 +98,7 @@ func Fixtures(dmxController ft232.DMXController, fixture int, R int, G int, B in
 		dmxController.SetChannel(24, byte(G))
 		dmxController.SetChannel(25, byte(B))
 	}
-	dmxController.SetChannel(26, 20)
+	dmxController.SetChannel(26, 255)
 }
 
 func convertToDMXValues(input int) (output int) {
