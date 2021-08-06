@@ -12,6 +12,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
@@ -48,6 +49,9 @@ func main() {
 	fmt.Println("Loading Presets")
 	presetsStore = presets.LoadPresets()
 	fmt.Println("Loading Presets Done")
+
+	// Setup DMX card.
+	dmxController := dmx.NewDmXController()
 
 	// Setup a connection to the launchpad.
 	pad, err := mk2.Open()
@@ -100,10 +104,10 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens)
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens)
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens)
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens)
+	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController)
+	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController)
+	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController)
+	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
