@@ -54,6 +54,7 @@ func ListenCommandChannelAndWait(
 	if command.Start {
 		fmt.Printf("Received Start Command\n")
 		sequence = currentSequence
+		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
 	}
 

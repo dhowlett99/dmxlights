@@ -323,6 +323,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 5 {
 				cmd := common.Command{
 					Start: true,
+					Speed: 11,
 				}
 				if selectedSequence == 1 {
 					sequence1 <- cmd
