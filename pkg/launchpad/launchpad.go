@@ -5,6 +5,7 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/rakyll/launchpad/mk2"
 )
 
@@ -74,10 +75,10 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Lau
 	}
 }
 
-func FlashButton(pad *mk2.Launchpad, flashButtons [][]bool, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
+func FlashButton(presetsStore map[string]bool, pad *mk2.Launchpad, flashButtons [][]bool, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
 	go func(pad *mk2.Launchpad, x int, y int) {
-
 		for {
+			presets.InitPresets(eventsForLauchpad, presetsStore)
 			// fmt.Printf("Flash X:%d Y:%d is %t\n", x, y, flashButtons[x][y])
 			if !flashButtons[x][y] {
 				break

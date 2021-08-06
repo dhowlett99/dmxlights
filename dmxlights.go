@@ -146,7 +146,7 @@ func main() {
 					continue
 				}
 				flashButtons[8][4] = true
-				launchpad.FlashButton(pad, flashButtons, 8, 4, eventsForLauchpad, 1, 3, 0, 0)
+				launchpad.FlashButton(presetsStore, pad, flashButtons, 8, 4, eventsForLauchpad, 1, 3, 0, 0)
 				savePreset = true
 			}
 
@@ -161,6 +161,7 @@ func main() {
 					config.AskToSaveConfig(sequences, readSequences, hit.X, hit.Y)
 					savePreset = false
 					flashButtons[8][4] = false
+					presets.SavePresets(presetsStore)
 				} else {
 					// Load config, but only if it exists in the presets map.
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
@@ -186,7 +187,7 @@ func main() {
 							}
 						}
 						flashButtons[hit.X][hit.Y] = true
-						launchpad.FlashButton(pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 3, 0)
+						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 3, 0)
 					}
 				}
 			}
@@ -410,7 +411,6 @@ func main() {
 
 				continue
 			}
-
 			// // common.Light a button is pressed.
 			// if !button[hit.X][hit.Y] {
 			// 	event := common.ALight{hit.X, hit.Y, 0, 3}
@@ -422,6 +422,5 @@ func main() {
 			// 	button[hit.X][hit.Y] = false
 			// }
 		}
-
 	}
 }
