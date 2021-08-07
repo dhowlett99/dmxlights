@@ -99,6 +99,9 @@ func Fixtures(dmxController ft232.DMXController, fixture int, R int, G int, B in
 		dmxController.SetChannel(25, byte(B))
 	}
 	dmxController.SetChannel(26, 255)
+	// Controller how long the fixture remains on, smaller numbers
+	// Give a more dramatic show.
+	time.Sleep(20 * time.Millisecond)
 }
 
 func convertToDMXValues(input int) (output int) {

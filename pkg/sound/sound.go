@@ -24,7 +24,8 @@ func NewSoundTrigger(trigger []chan common.Command) *Sound {
 
 		portaudio.Initialize()
 		defer portaudio.Terminate()
-		in := make([]int32, 64)
+		// Making the buffer bigger makes the music trigger have less latency.
+		in := make([]int32, 256)
 		stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
 		if err != nil {
 			fmt.Printf("failed to initialise portaudio\n")
