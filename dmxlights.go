@@ -93,7 +93,7 @@ func main() {
 	soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel4)
 
 	// Create a sound trigger object and give it the channel name.
-	sound.NewSoundTrigger(soundTriggerChannels)
+	soundTriggerControls := sound.NewSoundTrigger(soundTriggerChannels)
 
 	// Make a channel to send commands to each sequence.
 	sequence1 := make(chan common.Command)
@@ -121,10 +121,10 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0])
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1])
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2])
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3])
+	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls)
+	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls)
+	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls)
+	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -141,8 +141,6 @@ func main() {
 
 	// Light the logo blue.
 	pad.Light(8, -1, 79)
-
-	//var button [][]bool
 
 	for {
 		select {
@@ -310,6 +308,38 @@ func main() {
 				continue
 			}
 
+			// Select Music Trigger.
+			if hit.X == 7 && hit.Y == -1 {
+				if selectedSequence == 1 {
+					if soundTriggerControls.SendSoundToSequence1 {
+						soundTriggerControls.SendSoundToSequence1 = false
+					} else {
+						soundTriggerControls.SendSoundToSequence1 = true
+					}
+				}
+				if selectedSequence == 2 {
+					if soundTriggerControls.SendSoundToSequence2 {
+						soundTriggerControls.SendSoundToSequence2 = false
+					} else {
+						soundTriggerControls.SendSoundToSequence2 = true
+					}
+				}
+				if selectedSequence == 3 {
+					if soundTriggerControls.SendSoundToSequence3 {
+						soundTriggerControls.SendSoundToSequence3 = false
+					} else {
+						soundTriggerControls.SendSoundToSequence3 = true
+					}
+				}
+				if selectedSequence == 4 {
+					if soundTriggerControls.SendSoundToSequence4 {
+						soundTriggerControls.SendSoundToSequence4 = false
+					} else {
+						soundTriggerControls.SendSoundToSequence4 = true
+					}
+				}
+			}
+
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
@@ -440,6 +470,7 @@ func main() {
 				},
 			}
 			if hit.X >= 0 && hit.X < 8 {
+				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B

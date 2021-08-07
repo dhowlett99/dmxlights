@@ -8,9 +8,18 @@ import (
 	"github.com/gordonklaus/portaudio"
 )
 
-func NewSoundTrigger(trigger []chan common.Command) {
+type Sound struct {
+	SendSoundToSequence1 bool
+	SendSoundToSequence2 bool
+	SendSoundToSequence3 bool
+	SendSoundToSequence4 bool
+}
 
+func NewSoundTrigger(trigger []chan common.Command) *Sound {
+
+	s := Sound{}
 	go func() {
+
 		fmt.Println("Starting Sound System")
 
 		portaudio.Initialize()
@@ -31,26 +40,48 @@ func NewSoundTrigger(trigger []chan common.Command) {
 
 		for {
 			stream.Read()
-			//fmt.Printf("Read Sound\n")
 			if err != nil {
 				fmt.Printf("failed to read audio stream\n")
 			}
 
 			if in[0] > 1000000000 {
 				if !fired {
-					fmt.Printf("TRIGGER\n")
-					time.Sleep(100 * time.Millisecond)
+					// Trigger
+					time.Sleep(10 * time.Millisecond)
 					cmd := common.Command{
 						// Start: true,
 					}
-					for seq := range trigger {
-						trigger[seq] <- cmd
+					if s.SendSoundToSequence1 {
+						trigger[0] <- cmd
 					}
-
+					if s.SendSoundToSequence2 {
+						trigger[1] <- cmd
+					}
+					if s.SendSoundToSequence3 {
+						trigger[2] <- cmd
+					}
+					if s.SendSoundToSequence4 {
+						trigger[3] <- cmd
+					}
 					fired = false
 				}
-				// fired = true
 			}
 		}
 	}()
+	return &s
+}
+
+func (s *Sound) SetSoundTrigger(seq int) {
+	if seq == 1 {
+		s.SendSoundToSequence1 = true
+	}
+	if seq == 1 {
+		s.SendSoundToSequence2 = true
+	}
+	if seq == 1 {
+		s.SendSoundToSequence3 = true
+	}
+	if seq == 1 {
+		s.SendSoundToSequence4 = true
+	}
 }

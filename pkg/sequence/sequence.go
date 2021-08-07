@@ -7,6 +7,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk2"
 )
@@ -19,7 +20,8 @@ func CreateSequence(
 	replyChannel chan common.Command,
 	pattens map[string]common.Patten,
 	dmxController ft232.DMXController,
-	soundTriggerChannel chan common.Command) {
+	soundTriggerChannel chan common.Command,
+	soundTriggerControls *sound.Sound) {
 
 	// set default values.
 	sequence := common.Sequence{
@@ -47,15 +49,15 @@ func CreateSequence(
 		Shift: 2,
 	}
 
-	channels := []chan common.Event{}
+	fixtureChannels := []chan common.Event{}
 	// Create a channel for every fixture.
 	for fixture := 0; fixture < sequence.Patten.Fixtures; fixture++ {
-		channel := make(chan common.Event)
-		channels = append(channels, channel)
+		thisFixtureChannel := make(chan common.Event)
+		fixtureChannels = append(fixtureChannels, thisFixtureChannel)
 	}
 
 	// Now start the fixture threads listening.
-	for thisFixture, channel := range channels {
+	for thisFixture, channel := range fixtureChannels {
 		go fixture.FixtureReceiver(
 			channel,
 			thisFixture,
@@ -69,7 +71,7 @@ func CreateSequence(
 
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel)
+		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel, soundTriggerControls)
 
 		// Start the color counter.
 		// currentColor := 0
@@ -85,14 +87,14 @@ func CreateSequence(
 				// }
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
-				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel)
-				playStep(step, sequence, channels, pattens, dmxController)
+				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel, soundTriggerControls)
+				playStep(step, sequence, fixtureChannels, pattens, dmxController)
 			}
 		}
 	}
 }
 
-func playStep(step common.Step, command common.Sequence, channels []chan common.Event, pattens map[string]common.Patten, dmxController ft232.DMXController) {
+func playStep(step common.Step, command common.Sequence, fixtureChannels []chan common.Event, pattens map[string]common.Patten, dmxController ft232.DMXController) {
 	if command.Run {
 		// Start the color counter.
 		currentColor := 0
@@ -111,7 +113,7 @@ func playStep(step common.Step, command common.Sequence, channels []chan common.
 					B: B,
 				},
 			}
-			channels[fixture] <- event
+			fixtureChannels[fixture] <- event
 
 			dmx.Fixtures(dmxController, fixture, R, G, B)
 		}

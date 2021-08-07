@@ -6,6 +6,7 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
 )
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -15,23 +16,36 @@ func ListenCommandChannelAndWait(
 	replyChannel chan common.Command,
 	CurrentSpeed time.Duration,
 	mySequenceNumber int,
-	soundTriggerChannel chan common.Command) common.Sequence {
+	soundTriggerChannel chan common.Command,
+	soundTriggerControls *sound.Sound) common.Sequence {
 
 	// Create an empty command.
 	command := common.Command{}
 
 	currentSequence := sequence
+
+	if mySequenceNumber == 1 && soundTriggerControls.SendSoundToSequence1 {
+		CurrentSpeed = time.Duration(12 * time.Hour)
+	}
+	if mySequenceNumber == 2 && soundTriggerControls.SendSoundToSequence2 {
+		CurrentSpeed = time.Duration(12 * time.Hour)
+	}
+	if mySequenceNumber == 3 && soundTriggerControls.SendSoundToSequence3 {
+		CurrentSpeed = time.Duration(12 * time.Hour)
+	}
+	if mySequenceNumber == 4 && soundTriggerControls.SendSoundToSequence4 {
+		CurrentSpeed = time.Duration(12 * time.Hour)
+	}
+
 	select {
 	case command = <-soundTriggerChannel:
-		fmt.Printf("BEAT\n")
 		break
 	case command = <-commandChannel:
-		//fmt.Printf("COMMAND\n")
 		break
-		// case <-time.After(CurrentSpeed):
-		// 	//fmt.Printf("TIMEOUT\n")
-		// 	break
+	case <-time.After(CurrentSpeed):
+		break
 	}
+
 	if command.UpdateSpeed {
 		saveSpeed := sequence.Speed
 		fmt.Printf("Received update speed %d\n", saveSpeed)
