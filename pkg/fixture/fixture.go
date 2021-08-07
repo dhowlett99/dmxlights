@@ -20,12 +20,12 @@ type Group struct {
 }
 
 type Fixture struct {
-	Address  int       `yaml:"startaddress"`
+	Address  int16     `yaml:"startaddress"`
 	Channels []Channel `yaml:"channels"`
 }
 
 type Channel struct {
-	Number int    `yaml:"number"`
+	Number int16  `yaml:"number"`
 	Name   string `yaml:"name"`
 }
 

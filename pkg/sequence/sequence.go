@@ -21,7 +21,8 @@ func CreateSequence(
 	pattens map[string]common.Patten,
 	dmxController ft232.DMXController,
 	soundTriggerChannel chan common.Command,
-	soundTriggerControls *sound.Sound) {
+	soundTriggerControls *sound.Sound,
+	groups *fixture.Groups) {
 
 	// set default values.
 	sequence := common.Sequence{
@@ -88,13 +89,20 @@ func CreateSequence(
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
 				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel, soundTriggerControls)
-				playStep(step, sequence, fixtureChannels, pattens, dmxController)
+				playStep(mySequenceNumber, step, sequence, fixtureChannels, pattens, dmxController, groups)
 			}
 		}
 	}
 }
 
-func playStep(step common.Step, command common.Sequence, fixtureChannels []chan common.Event, pattens map[string]common.Patten, dmxController ft232.DMXController) {
+func playStep(mySequenceNumber int,
+	step common.Step,
+	command common.Sequence,
+	fixtureChannels []chan common.Event,
+	pattens map[string]common.Patten,
+	dmxController ft232.DMXController,
+	groups *fixture.Groups) {
+
 	if command.Run {
 		// Start the color counter.
 		currentColor := 0
@@ -115,7 +123,7 @@ func playStep(step common.Step, command common.Sequence, fixtureChannels []chan 
 			}
 			fixtureChannels[fixture] <- event
 
-			dmx.Fixtures(dmxController, fixture, R, G, B)
+			dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups)
 		}
 	}
 }

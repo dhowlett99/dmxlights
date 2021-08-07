@@ -30,33 +30,31 @@ groups:
       name: Blue4
     - number: 13
       name: Master
-  - startaddress: 14
-    channels:
-    - number: 1
-      name: Red1
-    - number: 2
-      name: Green1
-    - number: 3
-      name: Blue1
-    - number: 4
-      name: Red2
-    - number: 5
-      name: Green2
-    - number: 6
-      name: Blue23
-    - number: 7
-      name: Red3
-    - number: 8
-      name: Green3
-    - number: 9
-      name: Blue3
-    - number: 10
-      name: Red4
-    - number: 11
-      name: Green4
-    - number: 12
-      name: Blue4
-    - number: 13
+    - number: 14
+      name: Red5
+    - number: 15
+      name: Green5
+    - number: 16
+      name: Blue5
+    - number: 17
+      name: Red6
+    - number: 18
+      name: Green6
+    - number: 19
+      name: Blue6
+    - number: 20
+      name: Red7
+    - number: 21
+      name: Green7
+    - number: 22
+      name: Blue7
+    - number: 23
+      name: Red8
+    - number: 24
+      name: Green8
+    - number: 25
+      name: Blue8
+    - number: 26
       name: MasterDimmer
 - name: Uplighers
   desription: Chauvet Color Rail IRC

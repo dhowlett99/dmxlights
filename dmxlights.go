@@ -68,7 +68,7 @@ func main() {
 
 	// Get a list of all the fixtures in the groups.
 	groups := fixture.LoadFixtures()
-	fmt.Printf("Fixtures :%+v\n", groups)
+	//fmt.Printf("Fixtures :%+v\n", groups)
 
 	// Create a channel to send events to the launchpad.
 	eventsForLauchpad := make(chan common.ALight)
@@ -127,10 +127,10 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls)
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls)
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls)
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls)
+	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls, groups)
+	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls, groups)
+	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls, groups)
+	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls, groups)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -488,10 +488,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(dmxController, hit.X, red, green, blue)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, groups)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(dmxController, hit.X, 0, 0, 0)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups)
 			}
 		}
 	}
