@@ -13,6 +13,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
@@ -63,6 +65,10 @@ func main() {
 
 	fmt.Println("Set Programmers Mode")
 	pad.Program()
+
+	// Get a list of all the fixtures in the groups.
+	groups := fixture.LoadFixtures()
+	fmt.Printf("Fixtures :%+v\n", groups)
 
 	// Create a channel to send events to the launchpad.
 	eventsForLauchpad := make(chan common.ALight)
