@@ -18,7 +18,8 @@ func CreateSequence(
 	commandChannel chan common.Command,
 	replyChannel chan common.Command,
 	pattens map[string]common.Patten,
-	dmxController ft232.DMXController) {
+	dmxController ft232.DMXController,
+	soundTriggerChannel chan common.Command) {
 
 	// set default values.
 	sequence := common.Sequence{
@@ -68,7 +69,7 @@ func CreateSequence(
 
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber)
+		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel)
 
 		// Start the color counter.
 		// currentColor := 0
@@ -84,7 +85,7 @@ func CreateSequence(
 				// }
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
-				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber)
+				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel)
 				playStep(step, sequence, channels, pattens, dmxController)
 			}
 		}

@@ -14,19 +14,23 @@ func ListenCommandChannelAndWait(
 	commandChannel chan common.Command,
 	replyChannel chan common.Command,
 	CurrentSpeed time.Duration,
-	mySequenceNumber int) common.Sequence {
+	mySequenceNumber int,
+	soundTriggerChannel chan common.Command) common.Sequence {
 
 	// Create an empty command.
 	command := common.Command{}
 
 	currentSequence := sequence
 	select {
+	case command = <-soundTriggerChannel:
+		fmt.Printf("BEAT\n")
+		break
 	case command = <-commandChannel:
 		//fmt.Printf("COMMAND\n")
 		break
-	case <-time.After(CurrentSpeed):
-		//fmt.Printf("TIMEOUT\n")
-		break
+		// case <-time.After(CurrentSpeed):
+		// 	//fmt.Printf("TIMEOUT\n")
+		// 	break
 	}
 	if command.UpdateSpeed {
 		saveSpeed := sequence.Speed

@@ -2,6 +2,8 @@ github.com/BurntSushi/toml v0.4.1 h1:GaI7EiDXDRfa8VshkTj7Fym7ha+y8/XxIgD2okUIjLw
 github.com/BurntSushi/toml v0.4.1/go.mod h1:CxXYINrC8qIiEnFrOxCa7Jy5BFHlXnUU2pbicEuybxQ=
 github.com/google/gousb v1.1.1 h1:2sjwXlc0PIBgDnXtNxUrHcD/RRFOmAtRq4QgnFBE6xc=
 github.com/google/gousb v1.1.1/go.mod h1:b3uU8itc6dHElt063KJobuVtcKHWEfFOysOqBNzHhLY=
+github.com/gordonklaus/portaudio v0.0.0-20200911161147-bb74aa485641 h1:B7ADnac3Yy6Vtcp2mstnsjUtarYcjy4AL0R6eNEhZAk=
+github.com/gordonklaus/portaudio v0.0.0-20200911161147-bb74aa485641/go.mod h1:HfYnZi/ARQKG0dwH5HNDmPCHdLiFiBf+SI7DbhW7et4=
 github.com/oliread/usbdmx v0.0.0-20200510141510-3b43952fa44b h1:pnFqbbaiHhPDRFzmDd5bwhvK8+GuVcAKYm16Hx3GGiU=
 github.com/oliread/usbdmx v0.0.0-20200510141510-3b43952fa44b/go.mod h1:kukZUsMNoFg0Yreqbw5b0PySBGw/E9nq992WaBuOCbc=
 github.com/rakyll/launchpad v0.0.0-20200512213241-400be720e7b7 h1:glQhjM2sWMM/b6Pl1/xXOuWzfV1u847v+K+AxVRERnw=

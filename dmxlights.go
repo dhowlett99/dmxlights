@@ -17,6 +17,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/rakyll/launchpad/mk2"
 )
 
@@ -78,6 +79,22 @@ func main() {
 	// Build the default set of Pattens.
 	Pattens := patten.MakePatterns()
 
+	// Make a channel to send sound trigger commands to each sequence.
+	soundTriggerChannel1 := make(chan common.Command)
+	soundTriggerChannel2 := make(chan common.Command)
+	soundTriggerChannel3 := make(chan common.Command)
+	soundTriggerChannel4 := make(chan common.Command)
+
+	// Add sound trigger channels to an array.
+	soundTriggerChannels := []chan common.Command{}
+	soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel1)
+	soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel2)
+	soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel3)
+	soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel4)
+
+	// Create a sound trigger object and give it the channel name.
+	sound.NewSoundTrigger(soundTriggerChannels)
+
 	// Make a channel to send commands to each sequence.
 	sequence1 := make(chan common.Command)
 	sequence2 := make(chan common.Command)
@@ -104,10 +121,10 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController)
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController)
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController)
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController)
+	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0])
+	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1])
+	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2])
+	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3])
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
