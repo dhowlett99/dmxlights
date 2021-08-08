@@ -93,52 +93,9 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 		}
 	}
 
-	// Now ask DMX to actually light the real fixture.
-	// if fixture == 0 {
-	// 	dmxController.SetChannel(1, byte(R))
-	// 	dmxController.SetChannel(2, byte(G))
-	// 	dmxController.SetChannel(3, byte(B))
-	// }
-	// if fixture == 1 {
-	// 	dmxController.SetChannel(4, byte(R))
-	// 	dmxController.SetChannel(5, byte(G))
-	// 	dmxController.SetChannel(6, byte(B))
-	// }
-	// if fixture == 2 {
-	// 	dmxController.SetChannel(7, byte(R))
-	// 	dmxController.SetChannel(8, byte(G))
-	// 	dmxController.SetChannel(9, byte(B))
-	// }
-	// if fixture == 3 {
-	// 	dmxController.SetChannel(10, byte(R))
-	// 	dmxController.SetChannel(11, byte(G))
-	// 	dmxController.SetChannel(12, byte(B))
-	// }
-	// dmxController.SetChannel(13, 255)
-	// if fixture == 4 {
-	// 	dmxController.SetChannel(14, byte(R))
-	// 	dmxController.SetChannel(15, byte(G))
-	// 	dmxController.SetChannel(16, byte(B))
-	// }
-	// if fixture == 5 {
-	// 	dmxController.SetChannel(17, byte(R))
-	// 	dmxController.SetChannel(18, byte(G))
-	// 	dmxController.SetChannel(19, byte(B))
-	// }
-	// if fixture == 6 {
-	// 	dmxController.SetChannel(20, byte(R))
-	// 	dmxController.SetChannel(21, byte(G))
-	// 	dmxController.SetChannel(22, byte(B))
-	// }
-	// if fixture == 7 {
-	// 	dmxController.SetChannel(23, byte(R))
-	// 	dmxController.SetChannel(24, byte(G))
-	// 	dmxController.SetChannel(25, byte(B))
-	// }
-	// dmxController.SetChannel(26, 255)
 	// Controller how long the fixture remains on, smaller numbers
 	// Give a more dramatic show.
-	time.Sleep(20 * time.Millisecond)
+	// time.Sleep(20 * time.Millisecond)
 }
 
 func convertToDMXValues(input int) (output int) {

@@ -310,8 +310,8 @@ func main() {
 			// Increase speed of selected sequence.
 			if hit.X == 1 && hit.Y == 7 {
 				sequenceSpeed++
-				if sequenceSpeed > 12 {
-					sequenceSpeed = 12
+				if sequenceSpeed > 20 {
+					sequenceSpeed = 20
 				}
 				cmd := common.Command{
 					Speed:       sequenceSpeed,
@@ -513,7 +513,7 @@ func main() {
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
 				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups, blackout)
 			}
-			//Blackout button.
+			// Blackout button.
 			if hit.X == 8 && hit.Y == 7 {
 				if !blackout {
 					fmt.Printf("B L A C K O U T \n")
