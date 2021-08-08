@@ -27,7 +27,7 @@ const (
 	full = 3
 )
 
-var sequenceSpeed int
+var sequenceSpeed int = 12
 var fadeSpeed int
 var savePreset bool
 var selectedPatten = 0
@@ -395,7 +395,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 5 {
 				cmd := common.Command{
 					Start: true,
-					Speed: 11,
+					Speed: sequenceSpeed,
 				}
 				if selectedSequence == 1 {
 					sequence1 <- cmd
@@ -413,7 +413,8 @@ func main() {
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
 				cmd := common.Command{
-					Stop: true,
+					Stop:  true,
+					Speed: sequenceSpeed,
 				}
 				if selectedSequence == 1 {
 					sequence1 <- cmd

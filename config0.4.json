@@ -151,7 +151,22 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 3,
+         "G": 0,
          "B": 0
         }
        ],
@@ -166,8 +181,271 @@
        "Colors": [
         {
          "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
+         "G": 0,
+         "B": 3
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
          "G": 1,
-         "B": 0
+         "B": 1
         }
        ],
        "SaveColor": {
@@ -182,1276 +460,6 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
          "B": 0
         }
        ],
@@ -1699,36 +707,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -1743,103 +721,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -1962,21 +846,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -1993,116 +862,7 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
+         "B": 3
         }
        ],
        "SaveColor": {
@@ -2225,40 +985,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -2273,471 +999,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -2757,11 +1021,11 @@
     "B": 0
    }
   ],
-  "Speed": 3,
   "Shift": 2,
-  "CurrentSpeed": 50000000,
+  "CurrentSpeed": 43200000000000,
   "X": 0,
-  "Y": 0
+  "Y": 0,
+  "MusicTrigger": true
  },
  {
   "FadeTime": 0,
@@ -2769,7 +1033,7 @@
   "Number": 2,
   "Run": false,
   "Patten": {
-   "Name": "standard",
+   "Name": "colors",
    "Length": 2,
    "Size": 2,
    "Fixtures": 8,
@@ -2915,7 +1179,22 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 3,
+         "G": 0,
          "B": 0
         }
        ],
@@ -2930,8 +1209,271 @@
        "Colors": [
         {
          "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
+         "G": 0,
+         "B": 3
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
          "G": 1,
-         "B": 0
+         "B": 1
         }
        ],
        "SaveColor": {
@@ -2946,1276 +1488,6 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
          "B": 0
         }
        ],
@@ -4463,36 +1735,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -4507,103 +1749,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -4726,21 +1874,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -4757,116 +1890,7 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
+         "B": 3
         }
        ],
        "SaveColor": {
@@ -4989,40 +2013,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -5037,471 +2027,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -5521,19 +2049,19 @@
     "B": 0
    }
   ],
-  "Speed": 3,
   "Shift": 2,
-  "CurrentSpeed": 50000000,
+  "CurrentSpeed": 250000000,
   "X": 0,
-  "Y": 0
+  "Y": 0,
+  "MusicTrigger": false
  },
  {
   "FadeTime": 0,
   "Name": "cans",
   "Number": 3,
-  "Run": true,
+  "Run": false,
   "Patten": {
-   "Name": "standard",
+   "Name": "colors",
    "Length": 2,
    "Size": 2,
    "Fixtures": 8,
@@ -5679,7 +2207,22 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 3,
+         "G": 0,
          "B": 0
         }
        ],
@@ -5694,8 +2237,271 @@
        "Colors": [
         {
          "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
+         "G": 0,
+         "B": 3
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
          "G": 1,
-         "B": 0
+         "B": 1
         }
        ],
        "SaveColor": {
@@ -5710,1276 +2516,6 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
          "B": 0
         }
        ],
@@ -7227,36 +2763,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -7271,103 +2777,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -7490,21 +2902,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -7521,116 +2918,7 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
+         "B": 3
         }
        ],
        "SaveColor": {
@@ -7753,40 +3041,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -7801,471 +3055,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -8285,11 +3077,11 @@
     "B": 0
    }
   ],
-  "Speed": 3,
   "Shift": 2,
-  "CurrentSpeed": 50000000,
+  "CurrentSpeed": 250000000,
   "X": 0,
-  "Y": 0
+  "Y": 0,
+  "MusicTrigger": false
  },
  {
   "FadeTime": 0,
@@ -8297,7 +3089,7 @@
   "Number": 4,
   "Run": false,
   "Patten": {
-   "Name": "standard",
+   "Name": "colors",
    "Length": 2,
    "Size": 2,
    "Fixtures": 8,
@@ -8443,7 +3235,22 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 3,
+         "G": 0,
          "B": 0
         }
        ],
@@ -8458,8 +3265,271 @@
        "Colors": [
         {
          "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
+         "G": 0,
+         "B": 3
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      }
+     ]
+    },
+    {
+     "Fixtures": [
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 0,
+         "G": 0,
+         "B": 0
+        }
+       ],
+       "SaveColor": {
+        "R": 0,
+        "G": 0,
+        "B": 0
+       }
+      },
+      {
+       "Brightness": 3,
+       "Colors": [
+        {
+         "R": 2,
          "G": 1,
-         "B": 0
+         "B": 1
         }
        ],
        "SaveColor": {
@@ -8474,1276 +3544,6 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
          "B": 0
         }
        ],
@@ -9991,36 +3791,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -10035,103 +3805,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -10254,21 +3930,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -10285,116 +3946,7 @@
         {
          "R": 0,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
+         "B": 3
         }
        ],
        "SaveColor": {
@@ -10517,40 +4069,6 @@
        "Colors": [
         {
          "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
          "G": 0,
          "B": 0
         }
@@ -10565,471 +4083,9 @@
        "Brightness": 3,
        "Colors": [
         {
-         "R": 0,
+         "R": 2,
          "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 1,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 2,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      }
-     ]
-    },
-    {
-     "Fixtures": [
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 0,
-         "B": 0
-        }
-       ],
-       "SaveColor": {
-        "R": 0,
-        "G": 0,
-        "B": 0
-       }
-      },
-      {
-       "Brightness": 3,
-       "Colors": [
-        {
-         "R": 0,
-         "G": 3,
-         "B": 0
+         "B": 2
         }
        ],
        "SaveColor": {
@@ -11049,10 +4105,10 @@
     "B": 0
    }
   ],
-  "Speed": 3,
   "Shift": 2,
-  "CurrentSpeed": 50000000,
+  "CurrentSpeed": 250000000,
   "X": 0,
-  "Y": 0
+  "Y": 0,
+  "MusicTrigger": false
  }
 ]

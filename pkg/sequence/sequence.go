@@ -46,7 +46,6 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Speed: 3,
 		Shift: 2,
 	}
 
@@ -72,7 +71,7 @@ func CreateSequence(
 
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel, soundTriggerControls)
+		sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 
 		// Start the color counter.
 		// currentColor := 0
@@ -88,7 +87,10 @@ func CreateSequence(
 				// }
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
-				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, sequence.CurrentSpeed, mySequenceNumber, soundTriggerChannel, soundTriggerControls)
+				// fmt.Printf("Seq No %d   Currrent Speed %v   State %t\n", sequence.Number, sequence.CurrentSpeed, sequence.Run)
+				// fmt.Printf("soundTriggerControls %v\n", soundTriggerControls)
+				// fmt.Printf("Seq No %d   SoundTrigger %t \n", sequence.Number, sequence.MusicTrigger)
+				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 				playStep(mySequenceNumber, step, sequence, fixtureChannels, pattens, dmxController, groups)
 			}
 		}

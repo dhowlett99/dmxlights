@@ -14,8 +14,6 @@ func ListenCommandChannelAndWait(
 	sequence common.Sequence,
 	commandChannel chan common.Command,
 	replyChannel chan common.Command,
-	CurrentSpeed time.Duration,
-	mySequenceNumber int,
 	soundTriggerChannel chan common.Command,
 	soundTriggerControls *sound.Sound) common.Sequence {
 
@@ -24,17 +22,21 @@ func ListenCommandChannelAndWait(
 
 	currentSequence := sequence
 
-	if mySequenceNumber == 1 && soundTriggerControls.SendSoundToSequence1 {
-		CurrentSpeed = time.Duration(12 * time.Hour)
+	if sequence.Number == 1 && soundTriggerControls.SendSoundToSequence1 {
+		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		sequence.MusicTrigger = true
 	}
-	if mySequenceNumber == 2 && soundTriggerControls.SendSoundToSequence2 {
-		CurrentSpeed = time.Duration(12 * time.Hour)
+	if sequence.Number == 2 && soundTriggerControls.SendSoundToSequence2 {
+		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		sequence.MusicTrigger = true
 	}
-	if mySequenceNumber == 3 && soundTriggerControls.SendSoundToSequence3 {
-		CurrentSpeed = time.Duration(12 * time.Hour)
+	if sequence.Number == 3 && soundTriggerControls.SendSoundToSequence3 {
+		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		sequence.MusicTrigger = true
 	}
-	if mySequenceNumber == 4 && soundTriggerControls.SendSoundToSequence4 {
-		CurrentSpeed = time.Duration(12 * time.Hour)
+	if sequence.Number == 4 && soundTriggerControls.SendSoundToSequence4 {
+		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		sequence.MusicTrigger = true
 	}
 
 	select {
@@ -42,17 +44,16 @@ func ListenCommandChannelAndWait(
 		break
 	case command = <-commandChannel:
 		break
-	case <-time.After(CurrentSpeed):
+	case <-time.After(sequence.CurrentSpeed):
 		break
 	}
 
 	if command.UpdateSpeed {
-		saveSpeed := sequence.Speed
-		fmt.Printf("Received update speed %d\n", saveSpeed)
-		CurrentSpeed = SetSpeed(command.Speed)
+		fmt.Printf("Received update speed command %d\n", command.Speed)
 		sequence = currentSequence
-		sequence.CurrentSpeed = CurrentSpeed
-		sequence.Speed = saveSpeed
+		sequence.CurrentSpeed = SetSpeed(command.Speed)
+		sequence.Run = true
+		return sequence
 	}
 
 	if command.UpdatePatten {
@@ -60,6 +61,7 @@ func ListenCommandChannelAndWait(
 		fmt.Printf("Received update pattten %s\n", savePattenName)
 		sequence = currentSequence
 		sequence.Patten.Name = savePattenName
+		return sequence
 	}
 
 	if command.UpdateFade {
@@ -67,6 +69,7 @@ func ListenCommandChannelAndWait(
 		fmt.Printf("Received new fade time of %v\n", fadeTime)
 		sequence = currentSequence
 		sequence.FadeTime = fadeTime
+		return sequence
 	}
 
 	if command.Start {
@@ -74,11 +77,13 @@ func ListenCommandChannelAndWait(
 		sequence = currentSequence
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
+		return sequence
 	}
 
 	if command.Stop {
 		fmt.Printf("Received Stop Command\n")
 		sequence.Run = false
+		return sequence
 	}
 
 	// If we are being asked for our config we must replay with
@@ -90,6 +95,7 @@ func ListenCommandChannelAndWait(
 		replayCommand.Y = command.Y
 		replayCommand.Sequence = sequence
 		replyChannel <- replayCommand
+		return sequence
 	}
 
 	if command.LoadConfig {
@@ -99,7 +105,20 @@ func ListenCommandChannelAndWait(
 		config := config.ReadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
 
 		for _, seq := range config {
-			if seq.Number == mySequenceNumber {
+			if seq.Number == sequence.Number {
+				if seq.Number == 1 {
+					soundTriggerControls.SendSoundToSequence1 = seq.MusicTrigger
+				}
+				if seq.Number == 2 {
+					soundTriggerControls.SendSoundToSequence2 = seq.MusicTrigger
+				}
+				if seq.Number == 3 {
+					soundTriggerControls.SendSoundToSequence3 = seq.MusicTrigger
+				}
+				if seq.Number == 4 {
+					soundTriggerControls.SendSoundToSequence4 = seq.MusicTrigger
+				}
+
 				sequence = seq
 			}
 		}
@@ -145,6 +164,9 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	if commandSpeed == 11 {
 		Speed = 50
 	}
+	if commandSpeed == 12 {
+		Speed = 25
+	}
 	return Speed * time.Millisecond
 }
 
@@ -184,6 +206,9 @@ func SetFade(commandSpeed int) (Speed time.Duration) {
 	}
 	if commandSpeed == 11 {
 		Speed = 50
+	}
+	if commandSpeed == 12 {
+		Speed = 25
 	}
 	return Speed * time.Millisecond
 }

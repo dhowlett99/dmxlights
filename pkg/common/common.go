@@ -47,17 +47,18 @@ type Command struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	FadeTime     time.Duration
-	Name         string
-	Number       int
-	Run          bool
-	Patten       Patten // Contains fixtures and steps info.
-	Colors       []Color
-	Speed        int
+	FadeTime time.Duration
+	Name     string
+	Number   int
+	Run      bool
+	Patten   Patten // Contains fixtures and steps info.
+	Colors   []Color
+	//Speed        int
 	Shift        int
 	CurrentSpeed time.Duration
 	X            int
 	Y            int
+	MusicTrigger bool
 }
 
 type Hit struct {
