@@ -187,6 +187,7 @@ func main() {
 					savePreset = false
 					flashButtons[8][4] = false
 					presets.SavePresets(presetsStore)
+					presets.InitPresets(eventsForLauchpad, presetsStore)
 				} else {
 					// Load config, but only if it exists in the presets map.
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
@@ -513,7 +514,7 @@ func main() {
 				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups, blackout)
 			}
 			//Blackout button.
-			if hit.X >= 8 && hit.Y < 8 {
+			if hit.X == 8 && hit.Y == 7 {
 				if !blackout {
 					fmt.Printf("B L A C K O U T \n")
 					blackout = true
