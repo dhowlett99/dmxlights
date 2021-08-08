@@ -46,7 +46,8 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift: 2,
+		Shift:    2,
+		Blackout: false,
 	}
 
 	fixtureChannels := []chan common.Event{}
@@ -87,11 +88,11 @@ func CreateSequence(
 				// }
 				// This is the inner loop, when we are playing a sequence, we listen for commands here that affect the way the
 				// Sequence is performed, and also the way we STOP a sequence.
-				// fmt.Printf("Seq No %d   Currrent Speed %v   State %t\n", sequence.Number, sequence.CurrentSpeed, sequence.Run)
+				//fmt.Printf("Seq No %d   Currrent Speed %v   State %t  Blackout %t\n", sequence.Number, sequence.CurrentSpeed, sequence.Run, sequence.Blackout)
 				// fmt.Printf("soundTriggerControls %v\n", soundTriggerControls)
 				// fmt.Printf("Seq No %d   SoundTrigger %t \n", sequence.Number, sequence.MusicTrigger)
 				sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
-				playStep(mySequenceNumber, step, sequence, fixtureChannels, pattens, dmxController, groups)
+				playStep(mySequenceNumber, step, sequence, fixtureChannels, pattens, dmxController, groups, sequence.Blackout)
 			}
 		}
 	}
@@ -103,7 +104,8 @@ func playStep(mySequenceNumber int,
 	fixtureChannels []chan common.Event,
 	pattens map[string]common.Patten,
 	dmxController ft232.DMXController,
-	groups *fixture.Groups) {
+	groups *fixture.Groups,
+	blackout bool) {
 
 	if command.Run {
 		// Start the color counter.
@@ -125,7 +127,7 @@ func playStep(mySequenceNumber int,
 			}
 			fixtureChannels[fixture] <- event
 
-			dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups)
+			dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups, blackout)
 		}
 	}
 }

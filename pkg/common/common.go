@@ -43,6 +43,8 @@ type Command struct {
 	FadeTime     time.Duration
 	X            int
 	Y            int
+	Blackout     bool
+	Normal       bool
 }
 
 // Sequence describes sequences.
@@ -59,6 +61,7 @@ type Sequence struct {
 	X            int
 	Y            int
 	MusicTrigger bool
+	Blackout     bool
 }
 
 type Hit struct {

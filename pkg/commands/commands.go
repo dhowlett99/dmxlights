@@ -86,6 +86,17 @@ func ListenCommandChannelAndWait(
 		return sequence
 	}
 
+	if command.Blackout {
+		fmt.Printf("Received Blackout Command\n")
+		sequence.Blackout = true
+		return sequence
+	}
+	if command.Normal {
+		fmt.Printf("Received Normal Command\n")
+		sequence.Blackout = false
+		return sequence
+	}
+
 	// If we are being asked for our config we must replay with
 	// the sequence inside our command.
 	if command.ReadConfig {

@@ -31,6 +31,7 @@ var sequenceSpeed int = 12
 var fadeSpeed int
 var savePreset bool
 var selectedPatten = 0
+var blackout bool = false
 
 // main thread is used to get commands from the lauchpad.
 func main() {
@@ -506,10 +507,37 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, groups)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, groups, blackout)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups, blackout)
+			}
+			//Blackout button.
+			if hit.X >= 8 && hit.Y < 8 {
+				if !blackout {
+					fmt.Printf("B L A C K O U T \n")
+					blackout = true
+					cmd := common.Command{
+						Blackout: true,
+					}
+					sequence1 <- cmd
+					sequence2 <- cmd
+					sequence3 <- cmd
+					sequence4 <- cmd
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 3})
+				} else {
+					fmt.Printf("NORMAL\n")
+					blackout = false
+
+					cmd := common.Command{
+						Normal: true,
+					}
+					sequence1 <- cmd
+					sequence2 <- cmd
+					sequence3 <- cmd
+					sequence4 <- cmd
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
+				}
 			}
 		}
 	}

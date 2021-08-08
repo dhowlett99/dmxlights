@@ -52,7 +52,7 @@ func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {
 	controller.SetChannel(channel, value)
 }
 
-func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, groups *fixture.Groups) {
+func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, groups *fixture.Groups, blackout bool) {
 	R = convertToDMXValues(R)
 	G = convertToDMXValues(G)
 	B = convertToDMXValues(B)
@@ -82,7 +82,11 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 					}
 					if strings.Contains(channel.Name, "Master") {
 						//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), 255)
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), 255)
+						if blackout {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
+						} else {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(255))
+						}
 					}
 				}
 			}
