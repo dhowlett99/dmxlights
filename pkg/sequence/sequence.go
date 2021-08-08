@@ -58,8 +58,10 @@ func CreateSequence(
 
 		if sequence.Run {
 			for _, step := range pattens[sequence.Patten.Name].Steps {
+
 				for fixture := range step.Fixtures {
 					for color := range step.Fixtures[fixture].Colors {
+						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 						R := step.Fixtures[fixture].Colors[color].R
 						G := step.Fixtures[fixture].Colors[color].G
 						B := step.Fixtures[fixture].Colors[color].B

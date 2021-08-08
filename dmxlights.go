@@ -224,7 +224,7 @@ func main() {
 			availablePatten = append(availablePatten, "pairs")
 			availablePatten = append(availablePatten, "colors")
 
-			// Select standard Patten.
+			// Increment Patten.
 			if hit.X == 2 && hit.Y == 7 {
 				if selectedPatten < 3 {
 					selectedPatten = selectedPatten + 1
@@ -232,6 +232,22 @@ func main() {
 
 				fmt.Printf("Selecting Patten %d selectedPatten %s\n", selectedPatten, availablePatten[selectedPatten])
 				cmd := common.Command{
+					Stop: true,
+				}
+				if selectedSequence == 1 {
+					sequence1 <- cmd
+				}
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
+
+				cmd = common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
 						Name: availablePatten[selectedPatten],
@@ -249,9 +265,27 @@ func main() {
 				if selectedSequence == 4 {
 					sequence4 <- cmd
 				}
+
+				cmd = common.Command{
+					Start: true,
+					Speed: sequenceSpeed,
+				}
+				if selectedSequence == 1 {
+					sequence1 <- cmd
+				}
+				if selectedSequence == 2 {
+					sequence2 <- cmd
+				}
+				if selectedSequence == 3 {
+					sequence3 <- cmd
+				}
+				if selectedSequence == 4 {
+					sequence4 <- cmd
+				}
+
 				continue
 			}
-			// Select pairs Patten.
+			// Decrement Patten.
 			if hit.X == 3 && hit.Y == 7 {
 				if selectedPatten > 0 {
 					selectedPatten = selectedPatten - 1

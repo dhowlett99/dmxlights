@@ -44,7 +44,7 @@ func ListenCommandChannelAndWait(
 		break
 	case command = <-commandChannel:
 		break
-	case <-time.After(sequence.CurrentSpeed):
+	case <-time.After(sequence.CurrentSpeed / 2):
 		break
 	}
 
