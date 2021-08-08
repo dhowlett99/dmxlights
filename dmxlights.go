@@ -30,6 +30,7 @@ const (
 var sequenceSpeed int
 var fadeSpeed int
 var savePreset bool
+var selectedPatten = 0
 
 // main thread is used to get commands from the lauchpad.
 func main() {
@@ -215,12 +216,23 @@ func main() {
 				}
 			}
 
+			availablePatten := []string{}
+			availablePatten = append(availablePatten, "standard")
+			availablePatten = append(availablePatten, "rgbchase")
+			availablePatten = append(availablePatten, "pairs")
+			availablePatten = append(availablePatten, "colors")
+
 			// Select standard Patten.
 			if hit.X == 2 && hit.Y == 7 {
+				if selectedPatten < 3 {
+					selectedPatten = selectedPatten + 1
+				}
+
+				fmt.Printf("Selecting Patten %d selectedPatten %s\n", selectedPatten, availablePatten[selectedPatten])
 				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
-						Name: "colors",
+						Name: availablePatten[selectedPatten],
 					},
 				}
 				if selectedSequence == 1 {
@@ -239,11 +251,16 @@ func main() {
 			}
 			// Select pairs Patten.
 			if hit.X == 3 && hit.Y == 7 {
+				if selectedPatten > 0 {
+					selectedPatten = selectedPatten - 1
+				}
+
+				fmt.Printf("Selecting Patten %d selectedPatten %s\n", selectedPatten, availablePatten[selectedPatten])
+
 				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
-
-						Name: "pairs",
+						Name: availablePatten[selectedPatten],
 					},
 				}
 				if selectedSequence == 1 {

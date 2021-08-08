@@ -29,7 +29,7 @@ func CreateSequence(
 		Name:     "cans",
 		Number:   mySequenceNumber,
 		FadeTime: 0 * time.Millisecond,
-		Run:      true,
+		Run:      false,
 		Patten: common.Patten{
 			Name:     "colors",
 			Length:   2,
