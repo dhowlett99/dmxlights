@@ -69,7 +69,7 @@ func CreateSequence(
 						e := common.ALight{
 							X:          fixture,
 							Y:          mySequenceNumber - 1,
-							Brightness: 3,
+							Brightness: 255,
 							Red:        R,
 							Green:      G,
 							Blue:       B,

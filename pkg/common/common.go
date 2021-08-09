@@ -49,13 +49,12 @@ type Command struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	FadeTime time.Duration
-	Name     string
-	Number   int
-	Run      bool
-	Patten   Patten // Contains fixtures and steps info.
-	Colors   []Color
-	//Speed        int
+	FadeTime     time.Duration
+	Name         string
+	Number       int
+	Run          bool
+	Patten       Patten // Contains fixtures and steps info.
+	Colors       []Color
 	Shift        int
 	CurrentSpeed time.Duration
 	X            int
@@ -73,10 +72,16 @@ type Step struct {
 	Fixtures []Fixture
 }
 
+// A fixture can have any or some of the
+// following, depending if its a light or
+// a scanner.
 type Fixture struct {
-	Brightness int
-	Colors     []Color
-	SaveColor  Color
+	MasterDimmer int
+	Colors       []Color
+	Pan          int
+	Tilt         int
+	Shutter      int
+	Gobo         int
 }
 
 type ButtonPresets struct {
@@ -99,7 +104,7 @@ type Event struct {
 
 // LightOn Turn on a common.Light.
 func LightOn(eventsForLauchpad chan ALight, Light ALight) {
-	event := ALight{X: Light.X, Y: Light.Y, Brightness: 3, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
+	event := ALight{X: Light.X, Y: Light.Y, Brightness: 255, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
 	eventsForLauchpad <- event
 }
 
@@ -109,14 +114,12 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 	eventsForLauchpad <- event
 }
 
-// LightOn Turn on a common.Light.
 func SequenceSelect(eventsForLauchpad chan ALight, sequenceNumber int) {
-
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
 		LightOff(eventsForLauchpad, 8, seq)
 	}
 	// Now turn blue the selected seq light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: sequenceNumber - 1, Brightness: 3, Red: 0, Green: 0, Blue: 3})
+	LightOn(eventsForLauchpad, ALight{X: 8, Y: sequenceNumber - 1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
 
 }

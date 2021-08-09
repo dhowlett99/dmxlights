@@ -53,10 +53,6 @@ func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {
 }
 
 func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, groups *fixture.Groups, blackout bool) {
-	R = convertToDMXValues(R)
-	G = convertToDMXValues(G)
-	B = convertToDMXValues(B)
-
 	// The sequence number passed in is directly mapped to the groups.
 	for groupNumber, group := range groups.Groups {
 		if mySequenceNumber-1 == groupNumber {
@@ -96,22 +92,4 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 	// Controller how long the fixture remains on, smaller numbers
 	// Give a more dramatic show.
 	// time.Sleep(20 * time.Millisecond)
-}
-
-func convertToDMXValues(input int) (output int) {
-
-	if input == 0 {
-		output = 0
-	}
-	if input == 1 {
-		output = 85
-	}
-	if input == 2 {
-		output = 170
-	}
-	if input == 3 {
-		output = 255
-	}
-
-	return output
 }

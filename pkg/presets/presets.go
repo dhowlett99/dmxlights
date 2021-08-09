@@ -13,7 +13,7 @@ func InitPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) 
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 3, Red: 3, Green: 0, Blue: 0})
+				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
 			}
 		}
 	}

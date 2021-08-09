@@ -24,7 +24,7 @@ import (
 )
 
 const (
-	full = 3
+	full = 255
 )
 
 var sequenceSpeed int = 12
@@ -148,15 +148,12 @@ func main() {
 	}
 
 	// Light the logo blue.
-	pad.Light(8, -1, 79)
+	pad.Light(8, -1, 0, 0, 255)
 
 	for {
 		select {
 
 		case hit := <-buttonChannel:
-
-			// pad.Light(hit.X, hit.Y, 79)
-			// fmt.Printf("Pad X:%d Y:%d\n", hit.X, hit.Y)
 
 			if hit.X == 0 && hit.Y == -1 {
 				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, sequences)
@@ -171,7 +168,7 @@ func main() {
 					continue
 				}
 				flashButtons[8][4] = true
-				launchpad.FlashButton(presetsStore, pad, flashButtons, 8, 4, eventsForLauchpad, 1, 3, 0, 0)
+				launchpad.FlashButton(presetsStore, pad, flashButtons, 8, 4, eventsForLauchpad, 1, 255, 0, 0)
 				savePreset = true
 			}
 
@@ -181,7 +178,7 @@ func main() {
 					fmt.Printf("Write Config\n")
 					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
 					common.LightOn(eventsForLauchpad, common.ALight{
-						X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
+						X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
 					config.AskToSaveConfig(sequences, readSequences, hit.X, hit.Y)
 					savePreset = false
@@ -213,7 +210,7 @@ func main() {
 							}
 						}
 						flashButtons[hit.X][hit.Y] = true
-						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 3, 0)
+						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
 					}
 				}
 			}
@@ -559,7 +556,7 @@ func main() {
 					sequence2 <- cmd
 					sequence3 <- cmd
 					sequence4 <- cmd
-					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 3})
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
 				} else {
 					fmt.Printf("NORMAL\n")
 					blackout = false

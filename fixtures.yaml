@@ -113,3 +113,18 @@ groups:
       name: Blue8
     - number: 26
       name: Strobe
+- name: Scanner
+  desription: American DJ Comscan LED
+  fixtures:
+  - startaddress: 53
+    channels:
+    - number: 1
+      name: Pan
+    - number: 2
+      name: Tilt
+    - number: 3
+      name: Shutter
+    - number: 4
+      name: GoboWheel
+    - number: 5
+      name: Master      
