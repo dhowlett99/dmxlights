@@ -38,7 +38,7 @@ func CreateSequence(
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    pattens["color"].Steps,
 		},
-		CurrentSpeed: 10 * time.Millisecond,
+		CurrentSpeed: 50 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
