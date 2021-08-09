@@ -26,10 +26,11 @@ func CreateSequence(
 
 	// set default values.
 	sequence := common.Sequence{
-		Name:     "cans",
-		Number:   mySequenceNumber,
-		FadeTime: 0 * time.Millisecond,
-		Run:      true,
+		Name:         "cans",
+		Number:       mySequenceNumber,
+		FadeTime:     0 * time.Millisecond,
+		MusicTrigger: true,
+		Run:          true,
 		Patten: common.Patten{
 			Name:     "colors",
 			Length:   2,
@@ -59,6 +60,32 @@ func CreateSequence(
 		if sequence.Run {
 			for _, step := range pattens[sequence.Patten.Name].Steps {
 
+				for fixture := range step.Fixtures {
+					for color := range step.Fixtures[fixture].Colors {
+						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
+						R := step.Fixtures[fixture].Colors[color].R
+						G := step.Fixtures[fixture].Colors[color].G
+						B := step.Fixtures[fixture].Colors[color].B
+						// Now trigger the fixture lamp on the launch pad by sending an event.
+						e := common.ALight{
+							X:          fixture,
+							Y:          mySequenceNumber - 1,
+							Brightness: 255,
+							Red:        R,
+							Green:      G,
+							Blue:       B,
+						}
+						eventsForLauchpad <- e
+
+						// Now ask DMX to actually light the real fixture.
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups, sequence.Blackout)
+						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
+					}
+				}
+			}
+
+			for index := len(pattens[sequence.Patten.Name].Steps) - 1; index >= 0; index-- {
+				step := pattens[sequence.Patten.Name].Steps[index]
 				for fixture := range step.Fixtures {
 					for color := range step.Fixtures[fixture].Colors {
 						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
