@@ -129,10 +129,11 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence(1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls, groups)
-	go sequence.CreateSequence(2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls, groups)
-	go sequence.CreateSequence(3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls, groups)
-	go sequence.CreateSequence(4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls, groups)
+	go sequence.CreateSequence("colors", 1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls, groups)
+	go sequence.CreateSequence("standard", 2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls, groups)
+	go sequence.CreateSequence("scanner", 3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls, groups)
+	// Scanner Sequence.
+	go sequence.CreateSequence("colors", 4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls, groups)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -519,18 +520,25 @@ func main() {
 				continue
 			}
 
+			var sequence common.Sequence
 			// Light the flash buttons based on current patten.
-			sequence := common.Sequence{
+
+			sequence = common.Sequence{
 				Patten: common.Patten{
 					Name:  "colors",
 					Steps: Pattens["colors"].Steps,
 				},
 			}
+
 			if hit.X >= 0 && hit.X < 8 {
 				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+				pan := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Pan
+				tilt := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Tilt
+				shutter := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Shutter
+				gobo := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Gobo
 				common.LightOn(eventsForLauchpad, common.ALight{
 					X:          hit.X,
 					Y:          hit.Y,
@@ -539,10 +547,11 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, groups, blackout)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, groups, blackout)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, groups, blackout)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, groups, blackout)
+
 			}
 			// Blackout button.
 			if hit.X == 8 && hit.Y == 7 {

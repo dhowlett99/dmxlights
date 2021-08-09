@@ -125,6 +125,6 @@ groups:
     - number: 3
       name: Shutter
     - number: 4
-      name: GoboWheel
+      name: Gobo
     - number: 5
       name: Master      

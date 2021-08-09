@@ -13,6 +13,7 @@ import (
 )
 
 func CreateSequence(
+	FixtureType string,
 	mySequenceNumber int,
 	pad *mk2.Launchpad,
 	eventsForLauchpad chan common.ALight,
@@ -26,18 +27,18 @@ func CreateSequence(
 
 	// set default values.
 	sequence := common.Sequence{
-		Name:         "cans",
+		Name:         FixtureType,
 		Number:       mySequenceNumber,
 		FadeTime:     0 * time.Millisecond,
-		MusicTrigger: true,
-		Run:          true,
+		MusicTrigger: false,
+		Run:          false,
 		Patten: common.Patten{
-			Name:     "colors",
+			Name:     FixtureType,
 			Length:   2,
 			Size:     2,
 			Fixtures: 8,
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
-			Steps:    pattens["color"].Steps,
+			Steps:    pattens[FixtureType].Steps,
 		},
 		CurrentSpeed: 50 * time.Millisecond,
 		Colors: []common.Color{
@@ -66,6 +67,10 @@ func CreateSequence(
 						R := step.Fixtures[fixture].Colors[color].R
 						G := step.Fixtures[fixture].Colors[color].G
 						B := step.Fixtures[fixture].Colors[color].B
+						Pan := step.Fixtures[fixture].Pan
+						Tilt := step.Fixtures[fixture].Tilt
+						Shutter := step.Fixtures[fixture].Shutter
+						Gobo := step.Fixtures[fixture].Gobo
 						// Now trigger the fixture lamp on the launch pad by sending an event.
 						e := common.ALight{
 							X:          fixture,
@@ -78,7 +83,7 @@ func CreateSequence(
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, groups, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 					}
 				}
@@ -92,6 +97,10 @@ func CreateSequence(
 						R := step.Fixtures[fixture].Colors[color].R
 						G := step.Fixtures[fixture].Colors[color].G
 						B := step.Fixtures[fixture].Colors[color].B
+						Pan := step.Fixtures[fixture].Pan
+						Tilt := step.Fixtures[fixture].Tilt
+						Shutter := step.Fixtures[fixture].Shutter
+						Gobo := step.Fixtures[fixture].Tilt
 						// Now trigger the fixture lamp on the launch pad by sending an event.
 						e := common.ALight{
 							X:          fixture,
@@ -104,7 +113,7 @@ func CreateSequence(
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, groups, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, groups, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 					}
 				}

@@ -78,10 +78,10 @@ type Step struct {
 type Fixture struct {
 	MasterDimmer int
 	Colors       []Color
-	// Pan          int
-	// Tilt         int
-	// Shutter      int
-	// Gobo         int
+	Pan          int
+	Tilt         int
+	Shutter      int
+	Gobo         int
 }
 
 type ButtonPresets struct {

@@ -52,7 +52,7 @@ func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {
 	controller.SetChannel(channel, value)
 }
 
-func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, groups *fixture.Groups, blackout bool) {
+func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int, groups *fixture.Groups, blackout bool) {
 	// The sequence number passed in is directly mapped to the groups.
 	for groupNumber, group := range groups.Groups {
 		if mySequenceNumber-1 == groupNumber {
@@ -62,8 +62,27 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 
 				//fmt.Printf("found fixture %d\n", fixtureNumber)
 				for channelNumber, channel := range fixture.Channels {
-					//fmt.Printf("No %d\n", channel.Number)
-					//fmt.Printf("Name %s Display Fixture %d\n", channel.Name, displayFixture+1)
+					//fmt.Printf("found channel %s\n", channel.Name)
+					// Scanner channels
+					if strings.Contains(channel.Name, "Pan") {
+						//fmt.Printf("DMX debug Pan Channel %d Value %d\n", fixture.Address+int16(channelNumber), Pan)
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
+					}
+					if strings.Contains(channel.Name, "Tilt") {
+						//fmt.Printf("Tilt is %d\n", Tilt)
+						//fmt.Printf("DMX debug Tilt Channel %d Value %d\n", fixture.Address+int16(channelNumber), Tilt)
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
+					}
+					if strings.Contains(channel.Name, "Shutter") {
+						//fmt.Printf("DMX debug Shutter Channel %d Value %d\n", fixture.Address+int16(channelNumber), Shutter)
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
+					}
+					if strings.Contains(channel.Name, "Gobo") {
+						//fmt.Printf("DMX debug Gobo Channel %d Value %d\n", fixture.Address+int16(channelNumber), Gobo)
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Gobo))
+					}
+
+					// Fixture channels.
 					if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
 						//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), R)
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(R))
