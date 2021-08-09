@@ -519,9 +519,9 @@ func MakePatterns() map[string]common.Patten {
 
 	colors := common.Patten{
 		Steps: []common.Step{
-			{ // Fixture 85, - Dark Red
+			{ // Fixture 85, - Red
 				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 117, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -531,10 +531,10 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Fixture 2 - Red
+			{ // Fixture 2 - Orange
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 166, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -543,11 +543,11 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Fixture 255 - Orange
+			{ // Fixture 255 - Yellow
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 170, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -555,21 +555,8 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Fixture 4 - Yellow
+			{ // Fixture 4 - Green
 				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 170, G: 85, B: 85}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{ // Fixture 5 - Green
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -577,21 +564,34 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Fixture 6 - Sky Blue
+			{ // Fixture 5 - Pastel Green
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 1740}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{ // Fixture 6 - Cyan Blue
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 170, G: 0, B: 2}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 251}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Fixture 7 - Dark Blue
+			{ // Fixture 7 - Blue
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -612,7 +612,7 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 170, G: 0, B: 2}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
 				},
 			},
 		},
