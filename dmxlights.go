@@ -69,7 +69,7 @@ func main() {
 	pad.Program()
 
 	// Get a list of all the fixtures in the groups.
-	groups := fixture.LoadFixtures()
+	fixtures := fixture.LoadFixtures()
 	//fmt.Printf("Fixtures :%+v\n", groups)
 
 	// Create a channel to send events to the launchpad.
@@ -129,11 +129,11 @@ func main() {
 	readSequences = append(readSequences, readSequence4)
 
 	// Start threads for each sequence.
-	go sequence.CreateSequence("colors", 1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls, groups)
-	go sequence.CreateSequence("standard", 2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls, groups)
-	go sequence.CreateSequence("scanner", 3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls, groups)
+	go sequence.CreateSequence("colors", 1, pad, eventsForLauchpad, sequence1, readSequence1, Pattens, dmxController, soundTriggerChannels[0], soundTriggerControls, fixtures)
+	go sequence.CreateSequence("standard", 2, pad, eventsForLauchpad, sequence2, readSequence2, Pattens, dmxController, soundTriggerChannels[1], soundTriggerControls, fixtures)
+	go sequence.CreateSequence("scanner", 3, pad, eventsForLauchpad, sequence3, readSequence3, Pattens, dmxController, soundTriggerChannels[2], soundTriggerControls, fixtures)
 	// Scanner Sequence.
-	go sequence.CreateSequence("colors", 4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls, groups)
+	go sequence.CreateSequence("colors", 4, pad, eventsForLauchpad, sequence4, readSequence4, Pattens, dmxController, soundTriggerChannels[3], soundTriggerControls, fixtures)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -547,10 +547,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, groups, blackout)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixtures, blackout)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, groups, blackout)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixtures, blackout)
 
 			}
 			// Blackout button.

@@ -23,7 +23,7 @@ func CreateSequence(
 	dmxController ft232.DMXController,
 	soundTriggerChannel chan common.Command,
 	soundTriggerControls *sound.Sound,
-	groups *fixture.Groups) {
+	fixtures *fixture.Fixtures) {
 
 	// set default values.
 	sequence := common.Sequence{
@@ -83,7 +83,7 @@ func CreateSequence(
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, groups, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 					}
 				}
@@ -113,7 +113,7 @@ func CreateSequence(
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, groups, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(sequence, commandChannel, replyChannel, soundTriggerChannel, soundTriggerControls)
 					}
 				}
