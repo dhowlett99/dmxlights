@@ -218,13 +218,14 @@ func main() {
 
 			availablePatten := []string{}
 			availablePatten = append(availablePatten, "standard")
+			availablePatten = append(availablePatten, "inverted")
 			availablePatten = append(availablePatten, "rgbchase")
 			availablePatten = append(availablePatten, "pairs")
 			availablePatten = append(availablePatten, "colors")
 
 			// Increment Patten.
 			if hit.X == 2 && hit.Y == 7 {
-				if selectedPatten < 3 {
+				if selectedPatten < 4 {
 					selectedPatten = selectedPatten + 1
 				}
 
