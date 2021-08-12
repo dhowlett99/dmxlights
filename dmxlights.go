@@ -409,7 +409,7 @@ func main() {
 				},
 			}
 			if hit.X >= 0 && hit.X < 8 {
-				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
+				// fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
@@ -458,7 +458,6 @@ func main() {
 }
 
 func sendCommandToSequence(selectedSequence int, command common.Command, commandChannels []chan common.Command) {
-	fmt.Printf("Send Command %+v\n", command)
 	commandChannels[selectedSequence-1] <- command
 }
 
