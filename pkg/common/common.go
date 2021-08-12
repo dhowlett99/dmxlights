@@ -1,6 +1,8 @@
 package common
 
-import "time"
+import (
+	"time"
+)
 
 type ALight struct {
 	X          int
@@ -28,27 +30,29 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
-	Name         string
-	Number       int
-	Start        bool
-	Stop         bool
-	ReadConfig   bool
-	Sequence     Sequence
-	LoadConfig   bool
-	UpdateSpeed  bool
-	Speed        int
-	UpdatePatten bool
-	Patten       Patten
-	UpdateFade   bool
-	FadeTime     time.Duration
-	X            int
-	Y            int
-	Blackout     bool
-	Normal       bool
+	Name            string
+	Number          int
+	Start           bool
+	Stop            bool
+	ReadConfig      bool
+	LoadConfig      bool
+	UpdateSpeed     bool
+	Speed           int
+	UpdatePatten    bool
+	Patten          Patten
+	UpdateFade      bool
+	FadeTime        time.Duration
+	X               int
+	Y               int
+	Blackout        bool
+	Normal          bool
+	MusicTrigger    bool
+	MusicTriggerOff bool
 }
 
 // Sequence describes sequences.
 type Sequence struct {
+	Type         string
 	FadeTime     time.Duration
 	Name         string
 	Number       int
@@ -61,6 +65,12 @@ type Sequence struct {
 	Y            int
 	MusicTrigger bool
 	Blackout     bool
+}
+
+type Channels struct {
+	CommmandChannels     []chan Command
+	ReplyChannels        []chan Sequence
+	SoundTriggerChannels []chan Command
 }
 
 type Hit struct {

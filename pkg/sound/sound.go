@@ -8,16 +8,8 @@ import (
 	"github.com/gordonklaus/portaudio"
 )
 
-type Sound struct {
-	SendSoundToSequence1 bool
-	SendSoundToSequence2 bool
-	SendSoundToSequence3 bool
-	SendSoundToSequence4 bool
-}
+func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 
-func NewSoundTrigger(trigger []chan common.Command) *Sound {
-
-	s := Sound{}
 	go func() {
 
 		fmt.Println("Starting Sound System")
@@ -31,7 +23,7 @@ func NewSoundTrigger(trigger []chan common.Command) *Sound {
 			fmt.Printf("failed to initialise portaudio\n")
 		}
 
-		var fired bool
+		// Start listening on the microphone input.
 		stream.Start()
 		if err != nil {
 			fmt.Printf("failed to start stream\n")
@@ -46,43 +38,14 @@ func NewSoundTrigger(trigger []chan common.Command) *Sound {
 			}
 
 			if in[0] > 1000000000 {
-				if !fired {
-					// Trigger
-					time.Sleep(10 * time.Millisecond)
-					cmd := common.Command{
-						// Start: true,
-					}
-					if s.SendSoundToSequence1 {
-						trigger[0] <- cmd
-					}
-					if s.SendSoundToSequence2 {
-						trigger[1] <- cmd
-					}
-					if s.SendSoundToSequence3 {
-						trigger[2] <- cmd
-					}
-					if s.SendSoundToSequence4 {
-						trigger[3] <- cmd
-					}
-					fired = false
-				}
+				// Trigger
+				time.Sleep(10 * time.Millisecond)
+				cmd := common.Command{}
+				channels.SoundTriggerChannels[0] <- cmd
+				channels.SoundTriggerChannels[1] <- cmd
+				channels.SoundTriggerChannels[2] <- cmd
+				channels.SoundTriggerChannels[3] <- cmd
 			}
 		}
 	}()
-	return &s
-}
-
-func (s *Sound) SetSoundTrigger(seq int) {
-	if seq == 1 {
-		s.SendSoundToSequence1 = true
-	}
-	if seq == 1 {
-		s.SendSoundToSequence2 = true
-	}
-	if seq == 1 {
-		s.SendSoundToSequence3 = true
-	}
-	if seq == 1 {
-		s.SendSoundToSequence4 = true
-	}
 }

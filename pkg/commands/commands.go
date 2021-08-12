@@ -6,51 +6,65 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
-	"github.com/dhowlett99/dmxlights/pkg/sound"
 )
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(
-	sequence common.Sequence,
-	commandChannel chan common.Command,
-	replyChannel chan common.Command,
-	soundTriggerChannel chan common.Command,
-	soundTriggerControls *sound.Sound) common.Sequence {
+func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence, channels common.Channels) common.Sequence {
+
+	// Setup channels.
+	commandChannel := channels.CommmandChannels[mySequenceNumber-1]
+	replyChannel := channels.ReplyChannels[mySequenceNumber-1]
+	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber-1]
 
 	// Create an empty command.
 	command := common.Command{}
 
-	currentSequence := sequence
+	// If we have set the Music trigger we disable the timer by setting it to 12 hours.
+	// if sequence.MusicTrigger {
+	// 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+	// }
+	// } else {
+	// 	sequence.CurrentSpeed = SetSpeed(command.Speed)
+	// }
 
-	if sequence.Number == 1 && soundTriggerControls.SendSoundToSequence1 {
-		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		sequence.MusicTrigger = true
-	}
-	if sequence.Number == 2 && soundTriggerControls.SendSoundToSequence2 {
-		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		sequence.MusicTrigger = true
-	}
-	if sequence.Number == 3 && soundTriggerControls.SendSoundToSequence3 {
-		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		sequence.MusicTrigger = true
-	}
-	if sequence.Number == 4 && soundTriggerControls.SendSoundToSequence4 {
-		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		sequence.MusicTrigger = true
+	var run bool = true
+	for run {
+		select {
+		case command = <-soundTriggerChannel:
+			if sequence.MusicTrigger {
+				run = false
+			}
+		case command = <-commandChannel:
+			run = false
+		case <-time.After(sequence.CurrentSpeed / 2):
+			run = false
+		}
 	}
 
-	select {
-	case command = <-soundTriggerChannel:
-		break
-	case command = <-commandChannel:
-		break
-	case <-time.After(sequence.CurrentSpeed / 2):
-		break
+	// if command.Wakeup {
+	// 	fmt.Printf("Received Wakeup Command on Seq No %d\n", sequence.Number)
+	// 	return sequence
+	// }
+
+	if command.MusicTrigger {
+		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number)
+		sequence.MusicTrigger = true
+		if sequence.MusicTrigger {
+			sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		}
+		return sequence
+	}
+	if command.MusicTriggerOff {
+		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number)
+		sequence.MusicTrigger = false
+		fmt.Printf("Speed is %d\n", command.Speed)
+		sequence.CurrentSpeed = SetSpeed(command.Speed)
+
+		return sequence
 	}
 
 	if command.UpdateSpeed {
 		fmt.Printf("Received update speed command %d\n", command.Speed)
-		sequence = currentSequence
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
 		return sequence
@@ -59,7 +73,6 @@ func ListenCommandChannelAndWait(
 	if command.UpdatePatten {
 		savePattenName := command.Patten.Name
 		fmt.Printf("Received update pattten %s\n", savePattenName)
-		sequence = currentSequence
 		sequence.Patten.Name = savePattenName
 		return sequence
 	}
@@ -67,21 +80,19 @@ func ListenCommandChannelAndWait(
 	if command.UpdateFade {
 		fadeTime := command.FadeTime
 		fmt.Printf("Received new fade time of %v\n", fadeTime)
-		sequence = currentSequence
 		sequence.FadeTime = fadeTime
 		return sequence
 	}
 
 	if command.Start {
-		fmt.Printf("Received Start Command\n")
-		sequence = currentSequence
+		fmt.Printf("Received Start Command on Seq No %d\n", sequence.Number)
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
 		return sequence
 	}
 
 	if command.Stop {
-		fmt.Printf("Received Stop Command\n")
+		fmt.Printf("Received Stop Command on Seq No %d\n", sequence.Number)
 		sequence.Run = false
 		return sequence
 	}
@@ -97,43 +108,24 @@ func ListenCommandChannelAndWait(
 		return sequence
 	}
 
-	// If we are being asked for our config we must replay with
-	// the sequence inside our command.
+	// If we are being asked for our config we must reply with our sequence.
 	if command.ReadConfig {
-		replayCommand := common.Command{}
-		fmt.Printf("Sending Reply on %d\n", replayCommand.Number)
-		replayCommand.X = command.X
-		replayCommand.Y = command.Y
-		replayCommand.Sequence = sequence
-		replyChannel <- replayCommand
+		fmt.Printf("Sending Reply on %d\n", sequence.Number)
+		replyChannel <- sequence
 		return sequence
 	}
 
 	if command.LoadConfig {
 		X := command.X
 		Y := command.Y
-		fmt.Printf("LoadConfig: Seq No %d, Load Config %d.%d.json\n", sequence.Number, X, Y)
-		config := config.ReadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
-
-		for _, seq := range config {
+		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
+		seq := common.Sequence{}
+		for _, seq = range config {
 			if seq.Number == sequence.Number {
-				if seq.Number == 1 {
-					soundTriggerControls.SendSoundToSequence1 = seq.MusicTrigger
-				}
-				if seq.Number == 2 {
-					soundTriggerControls.SendSoundToSequence2 = seq.MusicTrigger
-				}
-				if seq.Number == 3 {
-					soundTriggerControls.SendSoundToSequence3 = seq.MusicTrigger
-				}
-				if seq.Number == 4 {
-					soundTriggerControls.SendSoundToSequence4 = seq.MusicTrigger
-				}
-
 				sequence = seq
+				return sequence
 			}
 		}
-		return sequence
 	}
 	return sequence
 }

@@ -28,7 +28,7 @@ func SaveConfig(config []common.Sequence, filename string) {
 
 }
 
-func ReadConfig(filename string) []common.Sequence {
+func LoadConfig(filename string) []common.Sequence {
 
 	config := []common.Sequence{}
 
@@ -42,23 +42,22 @@ func ReadConfig(filename string) []common.Sequence {
 	if err != nil {
 		log.Fatalf("Error reading config: %v from file:%s", err, filename)
 	}
-
 	return config
 }
 
-func AskToLoadConfig(sequences []chan common.Command, X int, Y int) {
+func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
 	fmt.Printf("AskToLoadConfig\n")
 	cmd := common.Command{
 		LoadConfig: true,
 		X:          X,
 		Y:          Y,
 	}
-	for _, seq := range sequences {
+	for _, seq := range commandChannels {
 		seq <- cmd
 	}
 }
 
-func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Command, X int, Y int) {
+func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Sequence, X int, Y int) {
 
 	fmt.Printf("askToSaveConfig: Save Preset in X:%d Y:%d \n", X, Y)
 	config := []common.Sequence{}
@@ -86,15 +85,14 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 }
 
 // waitForConfig
-func WaitForConfig(replyChannel chan common.Command) common.Sequence {
-	command := common.Command{}
+func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
+	sequence := common.Sequence{}
 	select {
-	case command = <-replyChannel:
-		fmt.Printf("Config Received for seq: %s\n", command.Name)
+	case sequence = <-replyChannel:
+		fmt.Printf("Config Received for seq: %s\n", sequence.Name)
 		break
 	case <-time.After(500 * time.Millisecond):
-		//fmt.Printf("Config TIMEOUT for seq: %s\n", command.Name)
 		break
 	}
-	return command.Sequence
+	return sequence
 }
