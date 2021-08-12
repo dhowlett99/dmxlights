@@ -216,6 +216,9 @@ func main() {
 						}
 						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
+						// Clear all the fixtures down ready for the next scene.
+						allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+
 						time.Sleep(850 * time.Millisecond)
 						// Load the config.
 						config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
@@ -228,11 +231,6 @@ func main() {
 						}
 						flashButtons[hit.X][hit.Y] = true
 						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
-
-						cmd = common.Command{
-							Start: true,
-						}
-						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					}
 				}
 			}
