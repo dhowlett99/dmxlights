@@ -14,6 +14,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/oliread/usbdmx/ft232"
 
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
@@ -163,6 +164,7 @@ func main() {
 			// Clear all the lights on the launchpad.
 			if hit.X == 0 && hit.Y == -1 {
 				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
+				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 				continue
 			}
 
@@ -453,6 +455,15 @@ func main() {
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
 				}
 			}
+		}
+	}
+}
+
+func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 4; y++ {
+			common.LightOff(eventsForLauchpad, x, y)
+			dmx.Fixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true)
 		}
 	}
 }
