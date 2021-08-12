@@ -156,6 +156,9 @@ func main() {
 	availablePatten = append(availablePatten, "pairs")
 	availablePatten = append(availablePatten, "colors")
 
+	// Clear the pad.
+	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+
 	for {
 		select {
 
@@ -165,6 +168,7 @@ func main() {
 			if hit.X == 0 && hit.Y == -1 {
 				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+				presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
 				continue
 			}
 
@@ -201,10 +205,10 @@ func main() {
 						launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 						// Stop everything so that we start the recalled config in sync.
-						// cmd := common.Command{
-						// 	Stop: true,
-						// }
-						// sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+						cmd := common.Command{
+							Stop: true,
+						}
+						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 						time.Sleep(850 * time.Millisecond)
 						// Load the config.
@@ -219,7 +223,7 @@ func main() {
 						flashButtons[hit.X][hit.Y] = true
 						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
 
-						cmd := common.Command{
+						cmd = common.Command{
 							Start: true,
 						}
 						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)

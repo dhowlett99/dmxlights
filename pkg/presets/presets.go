@@ -19,6 +19,17 @@ func InitPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) 
 	}
 }
 
+func ClearPresets(eventsForLauchpad chan common.ALight, presets map[string]bool, flashButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 8; y++ {
+			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
+				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 0, Green: 0, Blue: 0})
+				flashButtons[x][y] = false
+			}
+		}
+	}
+}
+
 func SavePresets(presets map[string]bool) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")
