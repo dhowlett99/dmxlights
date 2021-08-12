@@ -38,6 +38,7 @@ var blackout bool = false
 func main() {
 
 	var flashButtons [][]bool
+	var functionButtons [][]bool
 
 	presetsStore := make(map[string]bool)
 
@@ -335,6 +336,8 @@ func main() {
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
+				hideFunctionButtons(eventsForLauchpad, functionButtons)
+				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
@@ -342,6 +345,8 @@ func main() {
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
+				hideFunctionButtons(eventsForLauchpad, functionButtons)
+				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
@@ -349,6 +354,8 @@ func main() {
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
+				hideFunctionButtons(eventsForLauchpad, functionButtons)
+				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
@@ -356,6 +363,8 @@ func main() {
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
+				hideFunctionButtons(eventsForLauchpad, functionButtons)
+				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
@@ -485,4 +494,18 @@ func sendCommandToAllSequence(selectedSequence int, command common.Command, comm
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+}
+
+func showFunctionButtons(selectedSequence int, eventsForLauchpad chan common.ALight, functionButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: selectedSequence - 1, Brightness: full, Red: 3, Green: 255, Blue: 255})
+	}
+}
+
+func hideFunctionButtons(eventsForLauchpad chan common.ALight, functionButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 4; y++ {
+			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+		}
+	}
 }
