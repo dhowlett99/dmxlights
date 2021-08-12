@@ -136,10 +136,16 @@ func main() {
 
 	// Initialize a ten length slice of empty slices
 	flashButtons = make([][]bool, 9)
+	functionButtons = make([][]bool, 9)
 
 	// Initialize those 10 empty slices
 	for i := 0; i < 9; i++ {
 		flashButtons[i] = make([]bool, 9)
+	}
+
+	// Initialize those 10 empty slices
+	for i := 0; i < 9; i++ {
+		functionButtons[i] = make([]bool, 9)
 	}
 
 	// Light the logo blue.
@@ -336,8 +342,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				hideFunctionButtons(eventsForLauchpad, functionButtons)
-				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
 				continue
 			}
 
@@ -345,8 +350,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				hideFunctionButtons(eventsForLauchpad, functionButtons)
-				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
 				continue
 			}
 
@@ -354,8 +358,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				hideFunctionButtons(eventsForLauchpad, functionButtons)
-				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
 				continue
 			}
 
@@ -363,8 +366,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
 				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				hideFunctionButtons(eventsForLauchpad, functionButtons)
-				showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
 				continue
 			}
 
@@ -496,6 +498,16 @@ func sendCommandToAllSequence(selectedSequence int, command common.Command, comm
 	commandChannels[3] <- command
 }
 
+func makeFunctionButtons(selectedSequence int, eventsForLauchpad chan common.ALight, functionButtons [][]bool, X int, Y int) {
+	if !functionButtons[X][Y] {
+		functionButtons[X][Y] = true
+		hideFunctionButtons(eventsForLauchpad, functionButtons)
+		showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+	} else {
+		hideFunctionButtons(eventsForLauchpad, functionButtons)
+		functionButtons[X][Y] = false
+	}
+}
 func showFunctionButtons(selectedSequence int, eventsForLauchpad chan common.ALight, functionButtons [][]bool) {
 	for x := 0; x < 8; x++ {
 		common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: selectedSequence - 1, Brightness: full, Red: 3, Green: 255, Blue: 255})
