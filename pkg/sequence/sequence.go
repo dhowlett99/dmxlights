@@ -65,7 +65,6 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.Run {
 
 			for _, step := range pattens[sequence.Patten.Name].Steps {
-
 				for fixture := range step.Fixtures {
 					for color := range step.Fixtures[fixture].Colors {
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
@@ -79,19 +78,21 @@ func PlaySequence(sequence common.Sequence,
 						Tilt := step.Fixtures[fixture].Tilt
 						Shutter := step.Fixtures[fixture].Shutter
 						Gobo := step.Fixtures[fixture].Gobo
+
+						newColor := mapColors(R, G, B, sequence.Color)
 						// Now trigger the fixture lamp on the launch pad by sending an event.
 						e := common.ALight{
 							X:          fixture,
 							Y:          mySequenceNumber - 1,
 							Brightness: 255,
-							Red:        R,
-							Green:      G,
-							Blue:       B,
+							Red:        newColor.R,
+							Green:      newColor.G,
+							Blue:       newColor.B,
 						}
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
 						if !sequence.Run {
 							continue
@@ -116,19 +117,21 @@ func PlaySequence(sequence common.Sequence,
 						Tilt := step.Fixtures[fixture].Tilt
 						Shutter := step.Fixtures[fixture].Shutter
 						Gobo := step.Fixtures[fixture].Tilt
+
+						newColor := mapColors(R, G, B, sequence.Color)
 						// Now trigger the fixture lamp on the launch pad by sending an event.
 						e := common.ALight{
 							X:          fixture,
 							Y:          mySequenceNumber - 1,
 							Brightness: 255,
-							Red:        R,
-							Green:      G,
-							Blue:       B,
+							Red:        newColor.R,
+							Green:      newColor.G,
+							Blue:       newColor.B,
 						}
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout)
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
 						if !sequence.Run {
 							continue
@@ -138,4 +141,44 @@ func PlaySequence(sequence common.Sequence,
 			}
 		}
 	}
+}
+
+func mapColors(R int, G int, B int, colorSelector int) common.Color {
+
+	colorOut := common.Color{}
+	intensity := findLargest(R, G, B)
+
+	if colorSelector == 0 {
+		colorOut = common.Color{R: intensity, G: intensity, B: 0}
+	}
+	if colorSelector == 1 {
+		colorOut = common.Color{R: intensity, G: 0, B: 0}
+	}
+	if colorSelector == 2 {
+		colorOut = common.Color{R: 0, G: intensity, B: 0}
+	}
+	if colorSelector == 3 {
+		colorOut = common.Color{R: 0, G: intensity, B: intensity}
+	}
+	if colorSelector == 4 {
+		colorOut = common.Color{R: 0, G: 0, B: intensity}
+	}
+	if colorSelector == 5 {
+		colorOut = common.Color{R: intensity, G: 0, B: intensity}
+	}
+	return colorOut
+}
+
+func findLargest(R int, G int, B int) (answer int) {
+	/* check the boolean condition using if statement */
+	if R >= G && R >= B {
+		return R
+	}
+	if G >= R && G >= B {
+		return G
+	}
+	if B >= R && B >= G {
+		return B
+	}
+	return 0
 }

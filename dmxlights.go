@@ -30,6 +30,7 @@ const (
 
 var sequenceSpeed int = 12
 var fadeSpeed int
+var color int
 var savePreset bool
 var selectedPatten = 0
 var blackout bool = false
@@ -415,6 +416,38 @@ func main() {
 				cmd := common.Command{
 					UpdateFade: true,
 					FadeTime:   fadeTime,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				continue
+			}
+
+			// Color decrease.
+			if hit.X == 6 && hit.Y == 7 {
+				color--
+				if color < 0 {
+					color = 0
+				}
+				fmt.Printf("color down:%d", color)
+				cmd := common.Command{
+					UpdateColor: true,
+					Color:       color,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				continue
+			}
+
+			// Color increase.
+			if hit.X == 7 && hit.Y == 7 {
+				color++
+				if color > 5 {
+					color = 5
+				}
+				fmt.Printf("Color up :%d", color)
+				cmd := common.Command{
+					UpdateColor: true,
+					Color:       color,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 

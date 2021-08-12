@@ -48,6 +48,8 @@ type Command struct {
 	Normal          bool
 	MusicTrigger    bool
 	MusicTriggerOff bool
+	UpdateColor     bool
+	Color           int
 }
 
 // Sequence describes sequences.
@@ -65,6 +67,7 @@ type Sequence struct {
 	Y            int
 	MusicTrigger bool
 	Blackout     bool
+	Color        int
 }
 
 type Channels struct {
