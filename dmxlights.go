@@ -217,10 +217,10 @@ func main() {
 						flashButtons[hit.X][hit.Y] = true
 						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
 
-						// cmd := common.Command{
-						// 	Wakeup: true,
-						// }
-						// sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+						cmd := common.Command{
+							Start: true,
+						}
+						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					}
 				}
 			}
