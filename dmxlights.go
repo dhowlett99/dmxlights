@@ -187,14 +187,20 @@ func main() {
 			// Ask all sequences for their current config and save in a file.
 			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
 				if savePreset {
-					fmt.Printf("Write Config\n")
-					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-					common.LightOn(eventsForLauchpad, common.ALight{
-						X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
-					config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
-					savePreset = false
-					flashButtons[8][4] = false
+					// If its already set, then clear it.
+					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
+						presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = false
+					} else {
+						// Not already set then set it.
+						fmt.Printf("Write Config\n")
+						presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
+						common.LightOn(eventsForLauchpad, common.ALight{
+							X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+						fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
+						config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
+						savePreset = false
+						flashButtons[8][4] = false
+					}
 					presets.SavePresets(presetsStore)
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 				} else {
@@ -414,7 +420,7 @@ func main() {
 					Steps: pattens["colors"].Steps,
 				},
 			}
-			if hit.X >= 0 && hit.X < 8 {
+			if hit.X >= 0 && hit.X < 4 {
 				// fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
