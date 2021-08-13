@@ -149,7 +149,7 @@ func mapColors(R int, G int, B int, colorSelector int) common.Color {
 	intensity := findLargest(R, G, B)
 
 	if colorSelector == 0 {
-		colorOut = common.Color{R: intensity, G: intensity, B: 0}
+		colorOut = common.Color{R: R, G: G, B: B}
 	}
 	if colorSelector == 1 {
 		colorOut = common.Color{R: intensity, G: 0, B: 0}
