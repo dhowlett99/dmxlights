@@ -112,7 +112,7 @@ func main() {
 	sequence1 := sequence.CreateSequence("colors", 1, pattens, channels)
 	sequence2 := sequence.CreateSequence("standard", 2, pattens, channels)
 	sequence3 := sequence.CreateSequence("scanner", 3, pattens, channels)
-	sequence4 := sequence.CreateSequence("colors", 4, pattens, channels)
+	sequence4 := sequence.CreateSequence("fade", 4, pattens, channels)
 
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
