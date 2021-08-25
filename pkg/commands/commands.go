@@ -78,14 +78,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 	}
 
 	if command.UpdateFade {
-		fadeTime := command.FadeTime
-		fmt.Printf("Received new fade time of %v\n", fadeTime)
-		sequence.FadeTime = fadeTime
+		fadeSpeed := command.FadeSpeed
+		fmt.Printf("Received new fade time of %v\n", fadeSpeed)
+		sequence.FadeSpeed = command.FadeSpeed
 		return sequence
 	}
 	if command.UpdateColor {
 		color := command.Color
-		fmt.Printf("Received new fade time of %v\n", color)
+		fmt.Printf("Received new color value of %v\n", color)
 		sequence.Color = color
 		return sequence
 	}

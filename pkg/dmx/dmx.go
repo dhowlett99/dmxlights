@@ -52,7 +52,7 @@ func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {
 	controller.SetChannel(channel, value)
 }
 
-func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int, fixtures *fixture.Fixtures, blackout bool) {
+func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int, fixtures *fixture.Fixtures, blackout bool, brightness int) {
 
 	for _, fixture := range fixtures.Fixtures {
 
@@ -101,7 +101,7 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 					if blackout {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
 					} else {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(255))
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(brightness))
 					}
 				}
 			}

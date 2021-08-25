@@ -42,6 +42,7 @@ type Command struct {
 	Patten          Patten
 	UpdateFade      bool
 	FadeTime        time.Duration
+	FadeSpeed       int
 	X               int
 	Y               int
 	Blackout        bool
@@ -63,11 +64,13 @@ type Sequence struct {
 	Colors       []Color
 	Shift        int
 	CurrentSpeed time.Duration
+	FadeSpeed    int
 	X            int
 	Y            int
 	MusicTrigger bool
 	Blackout     bool
 	Color        int
+	Master       int // Master Brightness
 }
 
 type Channels struct {
