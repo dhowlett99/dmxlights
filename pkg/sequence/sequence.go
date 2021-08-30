@@ -1,7 +1,6 @@
 package sequence
 
 import (
-	"math"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -23,7 +22,8 @@ func CreateSequence(
 
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
-		FadeTime:     0 * time.Millisecond,
+		FadeSpeed:    4,
+		FadeTime:     500 * time.Millisecond,
 		MusicTrigger: false,
 		Run:          true,
 		Patten: common.Patten{
@@ -62,14 +62,14 @@ func PlaySequence(sequence common.Sequence,
 
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 
 		if sequence.Run {
 
-			for _, step := range pattens[sequence.Patten.Name].Steps {
+			for _, step := range translatePatten(pattens[sequence.Patten.Name].Steps, sequence.FadeSpeed) {
 				for fixture := range step.Fixtures {
 					for color := range step.Fixtures[fixture].Colors {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 						if !sequence.Run {
 							continue
 						}
@@ -94,8 +94,8 @@ func PlaySequence(sequence common.Sequence,
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master)
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
+						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 						if !sequence.Run {
 							continue
 						}
@@ -103,12 +103,89 @@ func PlaySequence(sequence common.Sequence,
 				}
 			}
 
-			for index := len(pattens[sequence.Patten.Name].Steps) - 1; index >= 0; index-- {
-				step := pattens[sequence.Patten.Name].Steps[index]
-				for fixture := range step.Fixtures {
-					for color := range step.Fixtures[fixture].Colors {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
+			// for index := len(pattens[sequence.Patten.Name].Steps) - 1; index >= 0; index-- {
+			// 	step := pattens[sequence.Patten.Name].Steps[index]
+			// 	for fixture := range step.Fixtures {
+			// 		for color := range step.Fixtures[fixture].Colors {
+			// 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+			// 			if !sequence.Run {
+			// 				continue
+			// 			}
+			// 			R := step.Fixtures[fixture].Colors[color].R
+			// 			G := step.Fixtures[fixture].Colors[color].G
+			// 			B := step.Fixtures[fixture].Colors[color].B
+			// 			Pan := step.Fixtures[fixture].Pan
+			// 			Tilt := step.Fixtures[fixture].Tilt
+			// 			Shutter := step.Fixtures[fixture].Shutter
+			// 			Gobo := step.Fixtures[fixture].Tilt
 
+			// 			newColor := mapColors(R, G, B, sequence.Color)
+			// 			// Now trigger the fixture lamp on the launch pad by sending an event.
+			// 			e := common.ALight{
+			// 				X:          fixture,
+			// 				Y:          mySequenceNumber - 1,
+			// 				Brightness: 255,
+			// 				Red:        newColor.R,
+			// 				Green:      newColor.G,
+			// 				Blue:       newColor.B,
+			// 			}
+			// 			eventsForLauchpad <- e
+
+			// 			// Now ask DMX to actually light the real fixture.
+			// 			dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+			// 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+			// 			if !sequence.Run {
+			// 				continue
+			// 			}
+			// 		}
+			// 	}
+			// }
+		}
+	}
+}
+
+func PlayNewSequence(sequence common.Sequence,
+	mySequenceNumber int,
+	pad *mk2.Launchpad,
+	eventsForLauchpad chan common.ALight,
+	pattens map[string]common.Patten,
+	dmxController ft232.DMXController,
+	fixtures *fixture.Fixtures,
+	channels common.Channels) common.Sequence {
+
+	fixtureCommandChannels := []chan common.FixtureCommand{}
+	fadeChannel0 := make(chan common.FixtureCommand)
+	fadeChannel1 := make(chan common.FixtureCommand)
+	fadeChannel2 := make(chan common.FixtureCommand)
+	fadeChannel3 := make(chan common.FixtureCommand)
+	fadeChannel4 := make(chan common.FixtureCommand)
+	fadeChannel5 := make(chan common.FixtureCommand)
+	fadeChannel6 := make(chan common.FixtureCommand)
+	fadeChannel7 := make(chan common.FixtureCommand)
+
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel0)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel1)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel2)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel3)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel4)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel5)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel6)
+	fixtureCommandChannels = append(fixtureCommandChannels, fadeChannel7)
+
+	for {
+
+		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
+		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+
+		if sequence.Run {
+			for _, step := range pattens[sequence.Patten.Name].Steps {
+				//fmt.Printf("Step %d\n", stepIndex)
+				for fixture := range step.Fixtures {
+					//fmt.Printf("Fixture %d\n", fixture)
+					for color := range step.Fixtures[fixture].Colors {
+						//fmt.Printf("Color %d\n", color)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 						if !sequence.Run {
 							continue
 						}
@@ -118,279 +195,111 @@ func PlaySequence(sequence common.Sequence,
 						Pan := step.Fixtures[fixture].Pan
 						Tilt := step.Fixtures[fixture].Tilt
 						Shutter := step.Fixtures[fixture].Shutter
-						Gobo := step.Fixtures[fixture].Tilt
+						Gobo := step.Fixtures[fixture].Gobo
 
-						newColor := mapColors(R, G, B, sequence.Color)
-						// Now trigger the fixture lamp on the launch pad by sending an event.
-						e := common.ALight{
-							X:          fixture,
-							Y:          mySequenceNumber - 1,
-							Brightness: 255,
-							Red:        newColor.R,
-							Green:      newColor.G,
-							Blue:       newColor.B,
-						}
-						eventsForLauchpad <- e
+						go func() {
+							newColor := mapColors(R, G, B, sequence.Color)
+							if R > 0 || G > 0 || B > 0 {
+								// fade up.
+								nums := []int{0, 66, 127, 180, 220, 246, 255}
 
-						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master)
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-						if !sequence.Run {
-							continue
-						}
+								for _, stepIndex := range nums {
+									// Light the lauch pad lamp.
+									fireLaunchPadLamp(mySequenceNumber, fixture, stepIndex, eventsForLauchpad, sequence, R, G, B, newColor)
+
+									// Now ask DMX to actually light the real fixture.
+									dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, stepIndex, sequence.Master)
+
+									// Fade up time is set here.
+									sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.FadeTime, sequence, channels)
+									if !sequence.Run {
+										break
+									}
+								}
+
+								// Send a message to say we are at the top of the fade.
+								fixtureSignal := common.FixtureCommand{
+									FadeUp: true,
+								}
+								fixtureCommandChannels[fixture] <- fixtureSignal
+
+								// Fade on time is set here.
+								sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.FadeTime, sequence, channels)
+								if !sequence.Run {
+									return
+								}
+							} else {
+								// Now fade down.
+								nums := []int{255, 246, 220, 180, 127, 66, 0}
+
+								for _, stepIndex := range nums {
+									// Light the lauch pad lamp.
+									fireLaunchPadLamp(mySequenceNumber, fixture, stepIndex, eventsForLauchpad, sequence, R, G, B, newColor)
+
+									// Now ask DMX to actually light the real fixture.
+									dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, stepIndex, sequence.Master)
+
+									// Fade down time is set here.
+									sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.FadeTime, sequence, channels)
+									if !sequence.Run {
+										break
+									}
+								}
+
+								// Fade off time is set here.
+								sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.FadeTime, sequence, channels)
+								if !sequence.Run {
+									return
+								}
+
+								// Send a message to say we are at the bottom of the fade.
+								//fmt.Printf("send we're done\n")
+								fixtureSignal := common.FixtureCommand{
+									FadeDown: true,
+								}
+								fixtureCommandChannels[fixture] <- fixtureSignal
+							}
+
+						}()
+						//time.Sleep(50 * time.Millisecond)
+						//c := common.FixtureCommand{}
+
+						//fmt.Printf("c is %+v\n", c)
+
+						// var run bool
+						// command := common.FixtureCommand{}
+						// for run {
+
+						// 	command = <-fixtureCommandChannels[fixture]
+						// 	if command.FadeUp {
+						// 		run = false
+						// 	}
+						// }
+
+						// Now we wait before the bounce happens.
+						// sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+						// if !sequence.Run {
+						// 	continue
+						// }
 					}
+
+					<-fixtureCommandChannels[fixture]
 				}
 			}
 		}
 	}
 }
 
-func PlayShiftableSequence(sequence common.Sequence,
-	mySequenceNumber int,
-	pad *mk2.Launchpad,
-	eventsForLauchpad chan common.ALight,
-	pattens map[string]common.Patten,
-	dmxController ft232.DMXController,
-	fixtures *fixture.Fixtures,
-	channels common.Channels) common.Sequence {
-
-	for {
-
-		// So this is the outer loop where sequence thread waits for commands and processes them if we're not playing a sequence.
-		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-		if sequence.Run {
-
-			// Create an array of steps.
-			steps := []common.Step{}
-
-			steps = fade(steps)
-
-			for s := 0; s < len(steps); s++ {
-
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-				if !sequence.Run {
-					continue
-				}
-
-				f := calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-
-					playFixture(mySequenceNumber, 0, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-
-					playFixture(mySequenceNumber, 1, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-					playFixture(mySequenceNumber, 2, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-					playFixture(mySequenceNumber, 3, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-					playFixture(mySequenceNumber, 4, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-
-					playFixture(mySequenceNumber, 5, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-
-					playFixture(mySequenceNumber, 6, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-
-				s = calcFade(s, len(steps)-1, sequence.FadeSpeed)
-				f = calcFade(0, len(fixtures.Fixtures)-1, sequence.FadeSpeed)
-
-				for _, color := range steps[s].Fixtures[f].Colors {
-					R := color.R
-					G := color.G
-					B := color.B
-					Pan := steps[0].Fixtures[0].Pan
-					Tilt := steps[0].Fixtures[0].Tilt
-					Shutter := steps[0].Fixtures[0].Shutter
-					Gobo := steps[0].Fixtures[0].Gobo
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence, channels)
-					if !sequence.Run {
-						break
-					}
-
-					playFixture(mySequenceNumber, 7, 255, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-				}
-			}
-		}
-	}
-}
-
-func radians(input float64) float64 {
-	result := input * math.Pi / 180
-	return result
-}
-
-func fade(steps []common.Step) []common.Step {
-
-	nums := []int{0, 0, 0, 66, 127, 180, 220, 246, 255, 255, 255, 255, 246, 220, 180, 127, 66}
-	//nums := []int{0, 0, 0, 66, 86, 97, 127, 155, 180, 220, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255, 246, 220, 180, 155, 127, 97, 86, 66}
-	//nums := []int{0, 0, 0, 10, 25, 45, 66, 70, 85, 90, 127, 145, 165, 180, 195, 220, 225, 232, 246, 255, 255, 255, 255, 255, 255, 255, 255, 255, 232, 225, 220, 195, 180, 165, 145, 127, 90, 85, 70, 66, 45, 25, 10}
-
-	//nums := []int{0, 255}
-	// degrees := []float64{0, 15, 30, 45, 60, 75, 90}
-	// for _, x := range degrees {
-	// 	fmt.Printf("radians %.00f\n", math.Sin(radians(x))*100)
-	// }
-
-	for _, stepIndex := range nums {
-
-		//fmt.Printf("stepIndex is %d\n", stepIndex)
-		// Create a step
-		step := common.Step{}
-
-		// Populate the fixtures.
-		for fixtureIndex := 0; fixtureIndex < 8; fixtureIndex++ {
-
-			// Create an array of Fixtures for this step.
-			fixture := common.Fixture{
-				MasterDimmer: 255,
-				Colors: []common.Color{
-					{
-						R: stepIndex,
-						G: 0,
-						B: 0,
-					},
-				},
-			}
-
-			// Add fixtures to step.
-			step.Fixtures = append(step.Fixtures, fixture)
-		}
-
-		// Add step to steps array.
-		steps = append(steps, step)
-	}
-	return steps
-}
-
-//playFixture(mySequenceNumber, fixture, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence, eventsForLauchpad, dmxController)
-func playFixture(
+func fireLaunchPadLamp(
 	mySequenceNumber int,
 	fixture int,
 	brightness int,
+	eventsForLauchpad chan common.ALight,
+	sequence common.Sequence,
 	R int,
 	G int,
 	B int,
-	Pan int,
-	Tilt int,
-	Shutter int,
-	Gobo int,
-	fixtures *fixture.Fixtures,
-	sequence common.Sequence,
-	eventsForLauchpad chan common.ALight,
-	dmxController ft232.DMXController) {
-
-	newColor := mapColors(R, G, B, sequence.Color)
+	newColor common.Color) {
 
 	e := common.ALight{
 		X:          fixture,
@@ -401,20 +310,6 @@ func playFixture(
 		Blue:       newColor.B,
 	}
 	eventsForLauchpad <- e
-
-	// Now ask DMX to actually light the real fixture.
-	dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, brightness)
-
-}
-
-func calcFade(index, max, fade int) int {
-
-	out := index + fade
-	if out > max {
-		out = 0
-	}
-	///fmt.Printf("index %d  max %d fade %d out %d\n", index, max, fade, out)
-	return out
 }
 
 func mapColors(R int, G int, B int, colorSelector int) common.Color {
@@ -455,4 +350,216 @@ func findLargest(R int, G int, B int) (answer int) {
 		return B
 	}
 	return 0
+}
+
+func translatePatten(steps []common.Step, shift int) []common.Step {
+
+	var newStep common.Step
+	var newFixture common.Fixture
+	//var newColor common.Color
+
+	fadeUp := []int{0, 66, 127, 180, 220, 246, 255}
+	fadeDown := []int{255, 246, 220, 189, 127, 66, 0}
+
+	outputSteps := []common.Step{}
+	lastStep := common.Step{}
+	fadeDownFlag := false
+
+	for _, stepOriginal := range steps {
+
+		//fmt.Printf("working on stepIndex %d  stepOriginal %+v \n", stepIndex, stepOriginal)
+
+		if !fadeDownFlag {
+
+			// Loop around creating new steps for fixture values for fade up.
+			for _, newFixtureValue := range fadeUp {
+
+				//fmt.Printf("FADE UP working on newStepIndex %d\n", newFixtureValue)
+
+				// Create a new step.
+				newStep = common.Step{}
+
+				// OK we found a fixture in this step, so we now add a bunch of new steps for each of the fade up values.
+				for newFixtureIndex, fixture := range stepOriginal.Fixtures {
+
+					//fmt.Printf("working on new newFixtureIndex %d  fixture %+v\n", newFixtureIndex, fixture)
+
+					// Create new fixture.
+					newFixture = common.Fixture{}
+
+					// Set the Master Dimmer.
+					newFixture.MasterDimmer = fixture.MasterDimmer
+					newFixture.Pan = fixture.Pan
+					newFixture.Tilt = fixture.Tilt
+					newFixture.Shutter = fixture.Shutter
+					newFixture.Gobo = fixture.Gobo
+
+					// Add the new fixture.
+					newStep.Fixtures = append(newStep.Fixtures, newFixture)
+
+					// // Now we have to match the values from the original fixture to the new fixture and
+					// // make the necessary increments.
+					for _, color := range fixture.Colors {
+
+						//fmt.Printf("last step %+v\n", lastStep)
+
+						// OK in our last step, look through the fixtures,
+						for lastStepFixtureIndex := range lastStep.Fixtures {
+							if lastStep.Fixtures != nil {
+								if lastStep.Fixtures[lastStepFixtureIndex].Colors != nil {
+									for colorIndex := range lastStep.Fixtures[lastStepFixtureIndex].Colors {
+										//fmt.Printf("last step colorIndex Red is %+v\n", lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex])
+										// If we reached full brightness on the last step and we are requesting zero brightness
+										// Then we are in a fade down situation and not a fade up.
+										// fmt.Printf("UP last %d,  want %d \n", lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex].R, color.R)
+										if lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex].R == 255 && color.R == 0 {
+											//fmt.Printf("Whoops we should be fading down instead !!!\n")
+											// Lets set the fade down flag.
+											fadeDownFlag = true
+										} else {
+											fadeDownFlag = false
+										}
+									}
+								}
+							}
+						}
+
+						// if color.R == 0 { //|| color.G == 0 || color.B == 0 {
+						newColors := []common.Color{}
+						newColor := common.Color{}
+						// 	newColors = append(newColors, newColor)
+						// 	newStep.Fixtures[newFixtureIndex].Colors = newColors
+						// } else {
+
+						// newFixtureValue is essentially a percentage express as 0-255
+						if color.R != 0 {
+							newColor.R = newFixtureValue
+						}
+						if color.G != 0 {
+							newColor.G = newFixtureValue
+						}
+						if color.B != 0 {
+							newColor.B = newFixtureValue
+						}
+						newColors = append(newColors, newColor)
+						newStep.Fixtures[newFixtureIndex].Colors = newColors
+
+						if fadeDownFlag {
+							break
+						}
+
+						// Save the state of the step so we can use it to calc if we need to fade up or fade down.
+						lastStep = newStep
+					}
+					if fadeDownFlag {
+						break
+					}
+				}
+				if fadeDownFlag {
+					continue
+				}
+
+				// Add new step to outputSteps.
+				outputSteps = append(outputSteps, newStep)
+			}
+
+			if fadeDownFlag {
+				// Loop around creating new steps for fixture values for fade down.
+				for _, newFixtureValue := range fadeDown {
+					//fmt.Printf("FADE DOWN working on newStepIndex %d\n", newFixtureValue)
+
+					// Create a new step.
+					newStep = common.Step{}
+
+					// OK we found a fixture in this step, so we now add a bunch of new steps for each of the fade up values.
+					for newFixtureIndex, fixture := range stepOriginal.Fixtures {
+
+						//fmt.Printf("working on new newFixtureIndex %d  fixture %+v\n", newFixtureIndex, fixture)
+
+						// Create new fixture.
+						newFixture = common.Fixture{}
+
+						// Set the Master Dimmer.
+						newFixture.MasterDimmer = fixture.MasterDimmer
+						newFixture.Pan = fixture.Pan
+						newFixture.Tilt = fixture.Tilt
+						newFixture.Shutter = fixture.Shutter
+						newFixture.Gobo = fixture.Gobo
+
+						// Add the new fixture.
+						newStep.Fixtures = append(newStep.Fixtures, newFixture)
+
+						// // Now we have to match the values from the original fixture to the new fixture and
+						// // make the necessary increments.
+						for _, color := range fixture.Colors {
+							//fmt.Printf("color is %+v\n", color)
+							// OK in our last step, look through the fixtures,
+							for lastStepFixtureIndex := range lastStep.Fixtures {
+								if lastStep.Fixtures != nil {
+									if lastStep.Fixtures[lastStepFixtureIndex].Colors != nil {
+										for colorIndex := range lastStep.Fixtures[lastStepFixtureIndex].Colors {
+											//fmt.Printf("last step colorIndex Red is %+v\n", lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex])
+											// If we reached full brightness on the last step and we are requesting zero brightness
+											// Then we are in a fade down situation and not a fade up.
+											//fmt.Printf("DOWN last %d,  want %d \n", lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex].R, color.R)
+											if lastStep.Fixtures[lastStepFixtureIndex].Colors[colorIndex].R == 0 && color.R == 255 {
+												//fmt.Printf("Whoops we should be fading up instead !!!\n")
+												// Lets set the fade up flag.
+												fadeDownFlag = false
+											} else {
+												fadeDownFlag = true
+											}
+										}
+									}
+								}
+							}
+
+							// if lastStep.Fixtures[newFixtureIndex].Colors[colorIndex].R == 255 && color.R == 0 {
+							// 	fmt.Printf("Fade up\n")
+							// }
+
+							//fmt.Printf("working on new colors %d  color %+v\n", colorIndex, color)
+							// Map the color.
+
+							if color.R == 0 && color.G == 0 && color.B == 0 {
+								newColors := []common.Color{}
+								newColor := common.Color{}
+								newColors = append(newColors, newColor)
+								newStep.Fixtures[newFixtureIndex].Colors = newColors
+							} else {
+								newColors := []common.Color{}
+								newColor := common.Color{}
+								// newFixtureValue is essentially a percentage express as 0-255
+								//newColor.R = newFixtureValue
+								if color.R > 0 {
+									newColor.R = newFixtureValue
+								}
+
+								if color.G > 0 {
+									newColor.G = newFixtureValue
+								}
+								if color.B > 0 {
+									newColor.B = newFixtureValue
+								}
+								newColors = append(newColors, newColor)
+								newStep.Fixtures[newFixtureIndex].Colors = newColors
+							}
+
+							if !fadeDownFlag {
+								continue
+							}
+
+							// Save the state of the step so we can use it to calc if we need to fade up or fade down.
+							lastStep = newStep
+						}
+					}
+
+					// Add new step to outputSteps.
+					outputSteps = append(outputSteps, newStep)
+				}
+			}
+			fadeDownFlag = false
+		}
+	}
+	return outputSteps
 }

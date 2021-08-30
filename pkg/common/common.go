@@ -57,6 +57,8 @@ type Command struct {
 type Sequence struct {
 	Type         string
 	FadeTime     time.Duration
+	FadeOnTime   time.Duration
+	FadeOffTime  time.Duration
 	Name         string
 	Number       int
 	Run          bool
@@ -65,6 +67,7 @@ type Sequence struct {
 	Shift        int
 	CurrentSpeed time.Duration
 	FadeSpeed    int
+
 	X            int
 	Y            int
 	MusicTrigger bool
@@ -86,6 +89,14 @@ type Hit struct {
 
 type Step struct {
 	Fixtures []Fixture
+}
+
+// Fixture Command.
+type FixtureCommand struct {
+	FadeUp   bool
+	FadeOn   bool
+	FadeDown bool
+	FadeOff  bool
 }
 
 // A fixture can have any or some of the

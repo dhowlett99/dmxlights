@@ -52,7 +52,13 @@ func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {
 	controller.SetChannel(channel, value)
 }
 
-func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int, fixtures *fixture.Fixtures, blackout bool, brightness int) {
+func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int, fixtures *fixture.Fixtures, blackout bool, brightness int, master int) {
+
+	// We control the brightness of each color with the brightness value.
+	// The overall fixture brightness is set from the master value.
+	Red := (float64(R) / 100) * (float64(brightness) / 2.55)
+	Green := (float64(G) / 100) * (float64(brightness) / 2.55)
+	Blue := (float64(B) / 100) * (float64(brightness) / 2.55)
 
 	for _, fixture := range fixtures.Fixtures {
 
@@ -86,22 +92,22 @@ func Fixtures(mySequenceNumber int, dmxController ft232.DMXController, displayFi
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
 					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), R)
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(R))
+					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)))
 				}
 				if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
 					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), G)
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(G))
+					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Green)))
 				}
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
 					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), B)
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(B))
+					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)))
 				}
 				if strings.Contains(channel.Name, "Master") {
 					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), 255)
 					if blackout {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
 					} else {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(brightness))
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(master))
 					}
 				}
 			}

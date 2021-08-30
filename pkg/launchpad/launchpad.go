@@ -35,8 +35,11 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Lau
 
 	for {
 		event := <-eventsForLauchpad
-
-		pad.Light(event.X, event.Y, event.Red/2, event.Green/2, event.Blue/2)
+		// For the math to work we need to convert our ints to floats and then back again.
+		Red := ((float64(event.Red) / 2) / 100) * (float64(event.Brightness) / 2.55)
+		Green := ((float64(event.Green) / 2) / 100) * (float64(event.Brightness) / 2.55)
+		Blue := ((float64(event.Blue) / 2) / 100) * (float64(event.Brightness) / 2.55)
+		pad.Light(event.X, event.Y, int(Red), int(Green), int(Blue))
 	}
 }
 

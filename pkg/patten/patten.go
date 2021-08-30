@@ -630,6 +630,47 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
+	singlestep := common.Patten{
+		Steps: []common.Step{
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+					{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+					{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			// {
+			// 	Fixtures: []common.Fixture{
+			// 		{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 		// {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+			// 	},
+			// },
+		},
+	}
+
 	fade := common.Patten{
 		Steps: []common.Step{
 			{
@@ -868,6 +909,7 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
+	Pattens["singlestep"] = singlestep
 	Pattens["inverted"] = inverted
 	Pattens["fade"] = fade
 	Pattens["scanner"] = scanner

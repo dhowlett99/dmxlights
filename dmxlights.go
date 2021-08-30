@@ -127,7 +127,7 @@ func main() {
 	go sequence.PlaySequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 	go sequence.PlaySequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 	go sequence.PlaySequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlayShiftableSequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlaySequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -167,6 +167,7 @@ func main() {
 	// Clear the pad.
 	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 
+	// Main loop reading commands from the Novation Launchpad.
 	for {
 		select {
 
@@ -304,7 +305,6 @@ func main() {
 					UpdateSpeed: true,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -319,7 +319,6 @@ func main() {
 					UpdateSpeed: true,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -398,24 +397,30 @@ func main() {
 					fadeSpeed = 0
 				}
 				fmt.Printf("Fade down speed:%d", fadeSpeed)
-				//fadeTime := commands.SetFade(fadeSpeed)
+
+				// Send Update Fade Speed.
 				cmd := common.Command{
 					UpdateFade: true,
 					FadeSpeed:  fadeSpeed,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
 			// Fade time increase.
 			if hit.X == 5 && hit.Y == 7 {
 				fadeSpeed++
-				if fadeSpeed > 8 {
-					fadeSpeed = 8
+				if fadeSpeed > 100 {
+					fadeSpeed = 100
 				}
 				fmt.Printf("Fade up speed:%d", fadeSpeed)
-				//fadeTime := commands.SetSpeed(fadeSpeed)
+				// // Stop everything.
+				// cmd := common.Command{
+				// 	Stop: true,
+				// }
+				// sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+				// Send fade update command.
 				cmd := common.Command{
 					UpdateFade: true,
 					FadeSpeed:  fadeSpeed,
@@ -465,7 +470,7 @@ func main() {
 					Steps: pattens["colors"].Steps,
 				},
 			}
-			if hit.X >= 0 && hit.X < 4 {
+			if hit.X >= 0 && hit.X < 8 {
 				// fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
@@ -482,10 +487,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255)
+				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 
 			}
 
@@ -518,7 +523,7 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DM
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 4; y++ {
 			common.LightOff(eventsForLauchpad, x, y)
-			dmx.Fixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0)
+			dmx.Fixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0)
 		}
 	}
 }

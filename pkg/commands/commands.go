@@ -9,7 +9,7 @@ import (
 )
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence, channels common.Channels) common.Sequence {
+func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
 
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber-1]
@@ -36,7 +36,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 			}
 		case command = <-commandChannel:
 			run = false
-		case <-time.After(sequence.CurrentSpeed / 2):
+		//case <-time.After(sequence.CurrentSpeed / 2):
+		case <-time.After(speed):
 			run = false
 		}
 	}
@@ -47,7 +48,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 	// }
 
 	if command.MusicTrigger {
-		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number)
+		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
 		sequence.MusicTrigger = true
 		if sequence.MusicTrigger {
 			sequence.CurrentSpeed = time.Duration(12 * time.Hour)
@@ -55,7 +56,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 		return sequence
 	}
 	if command.MusicTriggerOff {
-		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number)
+		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
 		sequence.MusicTrigger = false
 		fmt.Printf("Speed is %d\n", command.Speed)
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
@@ -80,9 +81,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 	if command.UpdateFade {
 		fadeSpeed := command.FadeSpeed
 		fmt.Printf("Received new fade time of %v\n", fadeSpeed)
-		sequence.FadeSpeed = command.FadeSpeed
+		sequence.FadeTime = (sequence.CurrentSpeed / 4) * time.Duration(sequence.FadeSpeed)
 		return sequence
 	}
+
 	if command.UpdateColor {
 		color := command.Color
 		fmt.Printf("Received new color value of %v\n", color)
@@ -108,6 +110,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, sequence common.Sequence,
 		sequence.Blackout = true
 		return sequence
 	}
+
 	if command.Normal {
 		fmt.Printf("Received Normal Command\n")
 		sequence.Blackout = false
