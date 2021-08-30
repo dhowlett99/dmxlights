@@ -49,6 +49,8 @@ type Command struct {
 	Normal          bool
 	MusicTrigger    bool
 	MusicTriggerOff bool
+	SoftFadeOn      bool
+	SoftFadeOff     bool
 	UpdateColor     bool
 	Color           int
 }
@@ -59,6 +61,7 @@ type Sequence struct {
 	FadeTime     time.Duration
 	FadeOnTime   time.Duration
 	FadeOffTime  time.Duration
+	SoftFade     bool
 	Name         string
 	Number       int
 	Run          bool
