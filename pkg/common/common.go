@@ -116,6 +116,7 @@ type FixtureCommand struct {
 	FadeOnTime      time.Duration
 	FadeDownTime    time.Duration
 	FadeOffTime     time.Duration
+	Blackout        bool
 }
 
 type Position struct {

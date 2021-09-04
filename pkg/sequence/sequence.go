@@ -121,6 +121,7 @@ func PlayNewSequence(sequence common.Sequence,
 					Size:            sequence.Size,
 					CurrentSpeed:    sequence.CurrentSpeed,
 					Speed:           sequence.Speed,
+					Blackout:        sequence.Blackout,
 					CurrentPosition: step,
 				}
 				fixtureChannel1 <- cmd
@@ -200,7 +201,7 @@ func makeFixture(sequence common.Sequence,
 									Gobo := position.Gobo
 									lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
 									// Now ask DMX to actually light the real fixture.
-									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
 								}
 								for x := 0; x < cmd.Size; x++ {
 									time.Sleep(cmd.CurrentSpeed * 5)
@@ -215,7 +216,7 @@ func makeFixture(sequence common.Sequence,
 									Shutter := position.Shutter
 									Gobo := position.Gobo
 									lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
 									time.Sleep(cmd.FadeTime / 4)
 								}
 								time.Sleep(cmd.FadeTime / 4)
