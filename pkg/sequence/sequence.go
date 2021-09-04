@@ -201,7 +201,7 @@ func makeFixture(sequence common.Sequence, mySequenceNumber int, myFixtureNumber
 						//fmt.Printf("Fixture %d FADE DOWN\n", myFixtureNumber)
 						for _, value := range fadeDown {
 							lightLamp(mySequenceNumber, myFixtureNumber, value, 0, 0, eventsForLauchpad)
-							time.Sleep(sequence.FadeTime / 3)
+							time.Sleep(cmd.FadeTime / 3)
 						}
 						time.Sleep(cmd.FadeTime / 3)
 					}()

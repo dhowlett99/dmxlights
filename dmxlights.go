@@ -41,6 +41,7 @@ func main() {
 
 	var flashButtons [][]bool
 	var functionButtons [][]bool
+	fadeSpeed = 11 // Default start at 50ms.
 
 	presetsStore := make(map[string]bool)
 

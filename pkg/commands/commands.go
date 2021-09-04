@@ -19,14 +19,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	// Create an empty command.
 	command := common.Command{}
 
-	// If we have set the Music trigger we disable the timer by setting it to 12 hours.
-	// if sequence.MusicTrigger {
-	// 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-	// }
-	// } else {
-	// 	sequence.CurrentSpeed = SetSpeed(command.Speed)
-	// }
-
 	var run bool = true
 	for run {
 		select {
@@ -42,11 +34,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			run = false
 		}
 	}
-
-	// if command.Wakeup {
-	// 	fmt.Printf("Received Wakeup Command on Seq No %d\n", sequence.Number)
-	// 	return sequence
-	// }
 
 	if command.MusicTrigger {
 		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
@@ -93,14 +80,27 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	if command.UpdateSize {
 		fmt.Printf("Received update size%v\n", command.Size)
-		//sequence.Size = SetSpeed(command.FadeSpeed)
 		sequence.Size = command.Size
 		return sequence
 	}
 
 	if command.UpdateFade {
 		fmt.Printf("Received new fade time of %v\n", command.FadeSpeed)
-		sequence.FadeTime = SetSpeed(command.FadeSpeed)
+
+		oldFadeTime := sequence.FadeTime
+		newFadeTime := SetSpeed(command.FadeSpeed)
+
+		// Adjust speed to take into account the fade time.
+		if oldFadeTime < newFadeTime {
+			// Fade slows down.
+			diffFadeSpeed := sequence.FadeTime - newFadeTime
+			sequence.CurrentSpeed = sequence.CurrentSpeed - diffFadeSpeed
+		} else {
+			// Fade speeds up.
+			diffFadeSpeed := sequence.FadeTime - newFadeTime
+			sequence.CurrentSpeed = sequence.CurrentSpeed + diffFadeSpeed
+		}
+		sequence.FadeTime = newFadeTime
 		sequence.FadeSpeed = command.FadeSpeed
 		return sequence
 	}
@@ -197,10 +197,10 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 		Speed = 50
 	}
 	if commandSpeed == 12 {
-		Speed = 25
+		Speed = 45
 	}
 	if commandSpeed == 13 {
-		Speed = 25
+		Speed = 35
 	}
 	if commandSpeed == 14 {
 		Speed = 25
