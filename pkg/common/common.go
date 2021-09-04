@@ -43,6 +43,8 @@ type Command struct {
 	UpdateFade      bool
 	FadeTime        time.Duration
 	FadeSpeed       int
+	UpdateSize      bool
+	Size            int
 	X               int
 	Y               int
 	Blackout        bool
@@ -69,8 +71,9 @@ type Sequence struct {
 	Colors       []Color
 	Shift        int
 	CurrentSpeed time.Duration
+	Speed        int
 	FadeSpeed    int
-
+	Size         int
 	X            int
 	Y            int
 	MusicTrigger bool
@@ -96,10 +99,25 @@ type Step struct {
 
 // Fixture Command.
 type FixtureCommand struct {
-	FadeUp   bool
-	FadeOn   bool
-	FadeDown bool
-	FadeOff  bool
+	Tick            bool
+	Config          bool // Configure fixture.
+	Start           bool
+	StartPosition   int
+	CurrentPosition int
+	CurrentSpeed    time.Duration
+	Speed           int
+	Shift           int
+	Size            int
+	FadeSpeed       int
+	FadeTime        time.Duration
+	FadeUpTime      time.Duration
+	FadeOnTime      time.Duration
+	FadeDownTime    time.Duration
+	FadeOffTime     time.Duration
+}
+
+type Position struct {
+	StartPosition int
 }
 
 // A fixture can have any or some of the

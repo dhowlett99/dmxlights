@@ -29,7 +29,9 @@ const (
 
 var sequenceSpeed int = 12
 var fadeSpeed int
-var color int
+var size int
+
+//var color int
 var savePreset bool
 var selectedPatten = 0
 var blackout bool = false
@@ -124,7 +126,7 @@ func main() {
 	sound.NewSoundTrigger(sequences, channels)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlayNewSequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 	go sequence.PlaySequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 	go sequence.PlaySequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 	go sequence.PlaySequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
@@ -268,6 +270,12 @@ func main() {
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				cmd = common.Command{
+					Stop:  true,
+					Speed: sequenceSpeed,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				cmd = common.Command{
 					Start: true,
 					Speed: sequenceSpeed,
 				}
@@ -291,6 +299,18 @@ func main() {
 					},
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				cmd = common.Command{
+					Stop:  true,
+					Speed: sequenceSpeed,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				cmd = common.Command{
+					Start: true,
+					Speed: sequenceSpeed,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 				continue
 			}
 
@@ -407,35 +427,49 @@ func main() {
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 
-			// Fade time decrease.
+			// Size decrease.
 			if hit.X == 4 && hit.Y == 7 {
-				fadeSpeed--
-				if fadeSpeed < 0 {
-					fadeSpeed = 0
+				size--
+				if size < 0 {
+					size = 0
 				}
-				fmt.Printf("Fade down speed:%d", fadeSpeed)
+				fmt.Printf("size:%d", size)
 
 				// Send Update Fade Speed.
 				cmd := common.Command{
-					UpdateFade: true,
-					FadeSpeed:  fadeSpeed,
+					UpdateSize: true,
+					Size:       size,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
 
-			// Fade time increase.
+			// Size increase.
 			if hit.X == 5 && hit.Y == 7 {
-				fadeSpeed++
-				if fadeSpeed > 100 {
-					fadeSpeed = 100
+				size++
+				if size > 20 {
+					size = 20
 				}
-				fmt.Printf("Fade up speed:%d", fadeSpeed)
-				// // Stop everything.
-				// cmd := common.Command{
-				// 	Stop: true,
-				// }
-				// sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+				fmt.Printf("Size up :%d", size)
+
+				// Send size update.
+				cmd := common.Command{
+					UpdateSize: true,
+					Size:       size,
+				}
+				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				continue
+			}
+
+			// Fade time decrease.
+			if hit.X == 6 && hit.Y == 7 {
+
+				fadeSpeed--
+				if fadeSpeed < 0 {
+					fadeSpeed = 0
+				}
+				fmt.Printf("Fade down speed:%d", fadeSpeed)
 
 				// Send fade update command.
 				cmd := common.Command{
@@ -447,39 +481,57 @@ func main() {
 				continue
 			}
 
-			// Color decrease.
-			if hit.X == 6 && hit.Y == 7 {
-				color--
-				if color < 0 {
-					color = 0
-				}
-				fmt.Printf("color down:%d", color)
-				cmd := common.Command{
-					UpdateColor: true,
-					Color:       color,
-				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				continue
-			}
-
-			// Color increase.
+			// Fade time increase.
 			if hit.X == 7 && hit.Y == 7 {
-				color++
-				if color > 5 {
-					color = 5
+				fadeSpeed++
+				if fadeSpeed > 20 {
+					fadeSpeed = 20
 				}
-				fmt.Printf("Color up :%d", color)
+				fmt.Printf("Fade up speed:%d", fadeSpeed)
+
+				// Send fade update command.
 				cmd := common.Command{
-					UpdateColor: true,
-					Color:       color,
+					UpdateFade: true,
+					FadeSpeed:  fadeSpeed,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				continue
 			}
 
-			// Light the flash buttons based on current patten.
+			// // Color decrease.
+			// if hit.X == 6 && hit.Y == 7 {
+			// 	color--
+			// 	if color < 0 {
+			// 		color = 0
+			// 	}
+			// 	fmt.Printf("color down:%d", color)
+			// 	cmd := common.Command{
+			// 		UpdateColor: true,
+			// 		Color:       color,
+			// 	}
+			// 	sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// 	continue
+			// }
+
+			// // Color increase.
+			// if hit.X == 7 && hit.Y == 7 {
+			// 	color++
+			// 	if color > 5 {
+			// 		color = 5
+			// 	}
+			// 	fmt.Printf("Color up :%d", color)
+			// 	cmd := common.Command{
+			// 		UpdateColor: true,
+			// 		Color:       color,
+			// 	}
+			// 	sendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// 	continue
+			// }
+
+			// FLASH BUTTONS - Light the flash buttons based on current patten.
 			var sequence common.Sequence
 			sequence = common.Sequence{
 				Patten: common.Patten{

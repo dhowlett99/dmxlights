@@ -1,6 +1,7 @@
 package sequence
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -22,8 +23,8 @@ func CreateSequence(
 
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
-		FadeSpeed:    4,
-		FadeTime:     500 * time.Millisecond,
+		FadeSpeed:    11,
+		FadeTime:     50 * time.Millisecond,
 		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
@@ -35,6 +36,7 @@ func CreateSequence(
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    pattens[sequenceType].Steps,
 		},
+		Speed:        11,
 		CurrentSpeed: 50 * time.Millisecond,
 		Colors: []common.Color{
 			{
@@ -50,6 +52,179 @@ func CreateSequence(
 	return sequence
 }
 
+func PlayNewSequence(sequence common.Sequence,
+	mySequenceNumber int,
+	pad *mk2.Launchpad,
+	eventsForLauchpad chan common.ALight,
+	pattens map[string]common.Patten,
+	dmxController ft232.DMXController,
+	fixtures *fixture.Fixtures,
+	channels common.Channels) {
+
+	// Create eight fixtures.
+
+	// Create eight channels to control the fixtures.
+	fixtureChannel1 := make(chan common.FixtureCommand)
+	fixtureChannel2 := make(chan common.FixtureCommand)
+	fixtureChannel3 := make(chan common.FixtureCommand)
+	fixtureChannel4 := make(chan common.FixtureCommand)
+	fixtureChannel5 := make(chan common.FixtureCommand)
+	fixtureChannel6 := make(chan common.FixtureCommand)
+	fixtureChannel7 := make(chan common.FixtureCommand)
+	fixtureChannel8 := make(chan common.FixtureCommand)
+
+	fixtureChannels := []chan common.FixtureCommand{}
+	fixtureChannels = append(fixtureChannels, fixtureChannel1)
+	fixtureChannels = append(fixtureChannels, fixtureChannel2)
+	fixtureChannels = append(fixtureChannels, fixtureChannel3)
+	fixtureChannels = append(fixtureChannels, fixtureChannel4)
+	fixtureChannels = append(fixtureChannels, fixtureChannel5)
+	fixtureChannels = append(fixtureChannels, fixtureChannel6)
+	fixtureChannels = append(fixtureChannels, fixtureChannel7)
+	fixtureChannels = append(fixtureChannels, fixtureChannel8)
+
+	go makeFixture(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad)
+	go makeFixture(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad)
+
+	for {
+
+		//steps := pattens[sequence.Patten.Name].Steps
+		//steps := translatePatten(pattens[sequence.Patten.Name].Steps, sequence.FadeSpeed)
+
+		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
+		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
+
+		if sequence.Run {
+
+			// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
+			// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+			if !sequence.Run {
+				break
+			}
+
+			// Calulate positions for fixtures based on patten.
+			positions := calculatePositions(sequence, pattens[sequence.Patten.Name])
+
+			// Now we have calculates the positions for the fixtures we must config each fixture.
+			for index, position := range positions {
+				cmd := common.FixtureCommand{
+					Config:        true,
+					StartPosition: position.StartPosition,
+				}
+				fixtureChannels[index] <- cmd
+			}
+
+			noSteps := 8 * 14
+
+			// Run the sequence through.
+			for step := 0; step < noSteps; step++ {
+
+				cmd := common.FixtureCommand{
+					Tick:            true,
+					FadeSpeed:       sequence.FadeSpeed,
+					FadeTime:        sequence.FadeTime,
+					Size:            sequence.Size,
+					CurrentSpeed:    sequence.CurrentSpeed,
+					Speed:           sequence.Speed,
+					CurrentPosition: step,
+				}
+				fixtureChannel1 <- cmd
+				fixtureChannel2 <- cmd
+				fixtureChannel3 <- cmd
+				fixtureChannel4 <- cmd
+				fixtureChannel5 <- cmd
+				fixtureChannel6 <- cmd
+				fixtureChannel7 <- cmd
+				fixtureChannel8 <- cmd
+
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+				if !sequence.Run {
+					break
+				}
+			}
+		}
+	}
+}
+
+func calculatePositions(sequence common.Sequence, patten common.Patten) (positions []common.Position) {
+
+	position := common.Position{}
+	var counter int
+	counter = 0
+	for x := 0; x < 8; x++ {
+		// It takes 7 steps to fade up and 7 steps to fade down so 14 for each fixture.
+		position.StartPosition = counter
+		positions = append(positions, position)
+		counter = counter + 14
+	}
+	return positions
+}
+
+func makeFixture(sequence common.Sequence, mySequenceNumber int, myFixtureNumber int, channels []chan common.FixtureCommand, eventsForLauchpad chan common.ALight) {
+
+	cmd := common.FixtureCommand{}
+	fadeUp := []int{0, 66, 127, 180, 220, 246, 255}
+	fadeDown := []int{255, 246, 220, 189, 127, 66, 0}
+
+	var startPosition int
+
+	for {
+		select {
+		case cmd = <-channels[myFixtureNumber]:
+			if cmd.Config {
+				startPosition = cmd.StartPosition
+			}
+			if cmd.Tick {
+				if cmd.CurrentPosition == startPosition {
+
+					// Now kick off the back end which drives the fixture.
+					go func() {
+						//fmt.Printf("Fixture %d FADE UP at Positions %d\n", myFixtureNumber, cmd.CurrentPosition)
+						for _, value := range fadeUp {
+							time.Sleep(cmd.FadeTime / 3)
+							//fmt.Printf("----> current speed /3 == %d(%d)  fade speed /3 %d(%d)\n", cmd.CurrentSpeed/3, cmd.Speed, cmd.FadeTime/3, cmd.FadeSpeed)
+							lightLamp(mySequenceNumber, myFixtureNumber, value, 0, 0, eventsForLauchpad)
+						}
+						//fmt.Printf("-----> Size %d\n", cmd.Size)
+						for x := 0; x < cmd.Size; x++ {
+							time.Sleep(cmd.CurrentSpeed * 5)
+						}
+						time.Sleep(cmd.FadeTime / 3)
+						//fmt.Printf("Fixture %d FADE DOWN\n", myFixtureNumber)
+						for _, value := range fadeDown {
+							lightLamp(mySequenceNumber, myFixtureNumber, value, 0, 0, eventsForLauchpad)
+							time.Sleep(sequence.FadeTime / 3)
+						}
+						time.Sleep(cmd.FadeTime / 3)
+					}()
+				}
+			}
+		}
+	}
+}
+
+func lightLamp(X, Y, R, G, B int, eventsForLauchpad chan common.ALight) {
+
+	// Now trigger the fixture lamp on the launch pad by sending an event.
+	e := common.ALight{
+		X:          Y,
+		Y:          X - 1,
+		Brightness: 255,
+		Red:        R,
+		Green:      G,
+		Blue:       B,
+	}
+	eventsForLauchpad <- e
+}
+
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
 	pad *mk2.Launchpad,
@@ -61,24 +236,32 @@ func PlaySequence(sequence common.Sequence,
 
 	for {
 
+		steps := pattens[sequence.Patten.Name].Steps
+		//steps := translatePatten(pattens[sequence.Patten.Name].Steps, sequence.FadeSpeed)
+
 		// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 		// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-		var steps []common.Step
+
 		if sequence.Run {
 
-			if sequence.SoftFade {
-				steps = translatePatten(pattens[sequence.Patten.Name].Steps, sequence.FadeSpeed)
-			} else {
+			// if sequence.SoftFade {
+
+			// 	sequence.CurrentSpeed = sequence.CurrentSpeed * 50
+			// } else {
+			// 	steps = pattens[sequence.Patten.Name].Steps
+			// }
+
+			if sequence.Patten.Name == "scanner" {
 				steps = pattens[sequence.Patten.Name].Steps
 			}
 
 			for _, step := range steps {
 				for fixture := range step.Fixtures {
 					for color := range step.Fixtures[fixture].Colors {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 						if !sequence.Run {
-							continue
+							break
 						}
 						R := step.Fixtures[fixture].Colors[color].R
 						G := step.Fixtures[fixture].Colors[color].G
@@ -102,51 +285,63 @@ func PlaySequence(sequence common.Sequence,
 
 						// Now ask DMX to actually light the real fixture.
 						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 						if !sequence.Run {
-							continue
+							break
 						}
 					}
+					if !sequence.Run {
+						break
+					}
+				}
+				if !sequence.Run {
+					break
 				}
 			}
 
-			for index := len(steps) - 1; index >= 0; index-- {
-				step := steps[index]
-				for fixture := range step.Fixtures {
-					for color := range step.Fixtures[fixture].Colors {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-						if !sequence.Run {
-							continue
-						}
-						R := step.Fixtures[fixture].Colors[color].R
-						G := step.Fixtures[fixture].Colors[color].G
-						B := step.Fixtures[fixture].Colors[color].B
-						Pan := step.Fixtures[fixture].Pan
-						Tilt := step.Fixtures[fixture].Tilt
-						Shutter := step.Fixtures[fixture].Shutter
-						Gobo := step.Fixtures[fixture].Tilt
+			// for index := len(steps) - 1; index >= 0; index-- {
+			// 	step := steps[index]
+			// 	for fixture := range step.Fixtures {
+			// 		for color := range step.Fixtures[fixture].Colors {
+			// 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+			// 			if !sequence.Run {
+			// 				break
+			// 			}
+			// 			R := step.Fixtures[fixture].Colors[color].R
+			// 			G := step.Fixtures[fixture].Colors[color].G
+			// 			B := step.Fixtures[fixture].Colors[color].B
+			// 			Pan := step.Fixtures[fixture].Pan
+			// 			Tilt := step.Fixtures[fixture].Tilt
+			// 			Shutter := step.Fixtures[fixture].Shutter
+			// 			Gobo := step.Fixtures[fixture].Tilt
 
-						newColor := mapColors(R, G, B, sequence.Color)
-						// Now trigger the fixture lamp on the launch pad by sending an event.
-						e := common.ALight{
-							X:          fixture,
-							Y:          mySequenceNumber - 1,
-							Brightness: 255,
-							Red:        newColor.R,
-							Green:      newColor.G,
-							Blue:       newColor.B,
-						}
-						eventsForLauchpad <- e
+			// 			newColor := mapColors(R, G, B, sequence.Color)
+			// 			// Now trigger the fixture lamp on the launch pad by sending an event.
+			// 			e := common.ALight{
+			// 				X:          fixture,
+			// 				Y:          mySequenceNumber - 1,
+			// 				Brightness: 255,
+			// 				Red:        newColor.R,
+			// 				Green:      newColor.G,
+			// 				Blue:       newColor.B,
+			// 			}
+			// 			eventsForLauchpad <- e
 
-						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-						if !sequence.Run {
-							continue
-						}
-					}
-				}
-			}
+			// 			// Now ask DMX to actually light the real fixture.
+			// 			dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+			// 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+			// 			if !sequence.Run {
+			// 				break
+			// 			}
+			// 		}
+			// 		if !sequence.Run {
+			// 			break
+			// 		}
+			// 	}
+			// 	if !sequence.Run {
+			// 		break
+			// 	}
+			// }
 		}
 	}
 }
@@ -381,4 +576,250 @@ func translatePatten(steps []common.Step, shift int) []common.Step {
 		}
 	}
 	return outputSteps
+}
+
+type NewFixture struct {
+	colors []common.Color
+}
+
+func shiftPatten(steps []common.Step, shift int) []common.Step {
+
+	fixture1 := []common.Color{}
+	fixture2 := []common.Color{}
+	fixture3 := []common.Color{}
+	fixture4 := []common.Color{}
+	fixture5 := []common.Color{}
+	fixture6 := []common.Color{}
+	fixture7 := []common.Color{}
+	fixture8 := []common.Color{}
+
+	// Find the values of all the fixtures.
+	for _, step := range steps {
+		//fmt.Printf("Step no:%d \n", stepIndex)
+		for fixtureIndex, fixture := range step.Fixtures {
+
+			if fixtureIndex == 0 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture1 = append(fixture1, newColor)
+				}
+			}
+			if fixtureIndex == 1 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture2 = append(fixture2, newColor)
+				}
+			}
+			if fixtureIndex == 2 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture3 = append(fixture3, newColor)
+				}
+			}
+			if fixtureIndex == 3 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture4 = append(fixture4, newColor)
+				}
+			}
+			if fixtureIndex == 4 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture5 = append(fixture5, newColor)
+				}
+			}
+			if fixtureIndex == 5 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture6 = append(fixture6, newColor)
+				}
+			}
+			if fixtureIndex == 6 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture7 = append(fixture7, newColor)
+				}
+			}
+			if fixtureIndex == 7 {
+
+				//fmt.Printf("\tFixture Number %d, value %+v\n", fixtureIndex, fixture)
+
+				for _, color := range fixture.Colors {
+					//fmt.Printf("\t\tcolorIndex:%d color:%+v\n", colorIndex, color.R)
+					newColor := common.Color{}
+					newColor.R = color.R
+					newColor.G = color.G
+					newColor.B = color.B
+					fixture8 = append(fixture8, newColor)
+				}
+			}
+		}
+	}
+	//fmt.Printf("values %v\n", fixture1)
+	//fmt.Printf("values %v\n", fixture2)
+
+	// Create an array of all the new fixture values.
+	NewFixturesValues := []NewFixture{}
+	newF1 := NewFixture{colors: fixture1}
+	newF2 := NewFixture{colors: fixture2}
+	newF3 := NewFixture{colors: fixture3}
+	newF4 := NewFixture{colors: fixture4}
+	newF5 := NewFixture{colors: fixture5}
+	newF6 := NewFixture{colors: fixture6}
+	newF7 := NewFixture{colors: fixture7}
+	newF8 := NewFixture{colors: fixture8}
+	NewFixturesValues = append(NewFixturesValues, newF1)
+	NewFixturesValues = append(NewFixturesValues, newF2)
+	NewFixturesValues = append(NewFixturesValues, newF3)
+	NewFixturesValues = append(NewFixturesValues, newF4)
+	NewFixturesValues = append(NewFixturesValues, newF5)
+	NewFixturesValues = append(NewFixturesValues, newF6)
+	NewFixturesValues = append(NewFixturesValues, newF7)
+	NewFixturesValues = append(NewFixturesValues, newF8)
+
+	// Write out the values of the fixture applying the shift.
+	stepsOut := []common.Step{}
+
+	// Now using the original step list to recreate the modified shifted fixture list.
+	for stepIndex, step := range steps {
+
+		//fmt.Printf("step no %d\n", stepIndex)
+		newStep := common.Step{}
+
+		for fixtureIndex, fixture := range step.Fixtures {
+
+			//fmt.Printf("\tfixture no %d\n", fixtureIndex)
+
+			newFixture := common.Fixture{}
+			newFixture.MasterDimmer = fixture.MasterDimmer
+
+			// Add colors.
+			for _ = range fixture.Colors {
+				var actualShift int
+				//fmt.Printf("\t\tcolor no %d\n", colorIndex)
+				newColor := common.Color{}
+				//newColor.R = NewFixturesValues[fixtureIndex].values[stepIndex]
+				if fixtureIndex == 0 {
+					actualShift = 0
+				} else {
+					actualShift = shift
+				}
+				// c := range NewFixturesValues[fixtureIndex].colors{
+
+				// }
+				shiftedValues := calculateShift(NewFixturesValues[fixtureIndex].colors, actualShift)
+				newColor.R = shiftedValues[stepIndex].R
+				newColor.G = shiftedValues[stepIndex].G
+				newColor.B = shiftedValues[stepIndex].B
+				newFixture.Colors = append(newFixture.Colors, newColor)
+
+				// shiftedValues := calculateShift(NewFixturesValues[fixtureIndex].colors, actualShift)
+				// for _, newShiftedColor := range shiftedValues {
+				// 	newColor.R = newShiftedColor.R
+				// 	newColor.G = newShiftedColor.G
+				// 	newColor.B = newShiftedColor.B
+				// 	newFixture.Colors = append(newFixture.Colors, newColor)
+				// }
+
+			}
+			newStep.Fixtures = append(newStep.Fixtures, newFixture)
+		}
+
+		stepsOut = append(stepsOut, newStep)
+
+	}
+
+	//printSteps(stepsOut)
+	return stepsOut
+}
+
+// calculateShift - Takes a array of colors and a number to shift by.
+func calculateShift(colors []common.Color, shift int) []common.Color {
+
+	out := make([]common.Color, len(colors))
+
+	//fmt.Printf("\t\t\tshift is %d\n", shift)
+	//fmt.Printf("\t\t\tin %+v\n", values)
+
+	var counter int
+	for x := 0; x < len(colors); x++ {
+		y := x + shift
+		if y > len(colors)-1 {
+			y = 0 + counter
+			counter++
+		}
+		//fmt.Printf("\t\t\tx is %d   y is %d\n", x, y)
+
+		out[y].R = colors[x].R
+		out[y].G = colors[x].G
+		out[y].B = colors[x].B
+
+	}
+
+	//fmt.Printf("\t\t\tout %+v\n", out)
+	//fmt.Println("----------")
+	return out
+}
+
+func printSteps(steps []common.Step) {
+
+	fmt.Println()
+	for stepIndex, step := range steps {
+		fmt.Printf("Step No:%d\n", stepIndex)
+		for fixtureIndex, fixture := range step.Fixtures {
+			fmt.Printf("\t\tFixture No:%d\n", fixtureIndex)
+			for _, color := range fixture.Colors {
+				fmt.Printf("\t\t\tColor   R:%d G:%d B:%d\n", color.R, color.G, color.B)
+			}
+		}
+	}
 }

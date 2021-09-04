@@ -32,11 +32,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		select {
 		case command = <-soundTriggerChannel:
 			if sequence.MusicTrigger {
+				// fmt.Printf("BEAT!\n")
 				run = false
 			}
 		case command = <-commandChannel:
 			run = false
-		//case <-time.After(sequence.CurrentSpeed / 2):
+
 		case <-time.After(speed):
 			run = false
 		}
@@ -77,6 +78,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	if command.UpdateSpeed {
 		fmt.Printf("Received update speed command %d\n", command.Speed)
+		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
 		return sequence
@@ -89,10 +91,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	if command.UpdateSize {
+		fmt.Printf("Received update size%v\n", command.Size)
+		//sequence.Size = SetSpeed(command.FadeSpeed)
+		sequence.Size = command.Size
+		return sequence
+	}
+
 	if command.UpdateFade {
-		fadeSpeed := command.FadeSpeed
-		fmt.Printf("Received new fade time of %v\n", fadeSpeed)
-		sequence.FadeTime = (sequence.CurrentSpeed / 4) * time.Duration(sequence.FadeSpeed)
+		fmt.Printf("Received new fade time of %v\n", command.FadeSpeed)
+		sequence.FadeTime = SetSpeed(command.FadeSpeed)
+		sequence.FadeSpeed = command.FadeSpeed
 		return sequence
 	}
 
@@ -161,7 +170,7 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 		Speed = 2500
 	}
 	if commandSpeed == 3 {
-		Speed = 1000
+		Speed = 1800
 	}
 	if commandSpeed == 4 {
 		Speed = 1500

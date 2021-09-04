@@ -1,7 +1,6 @@
 package sequence
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -284,7 +283,7 @@ func Test_translatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := translatePatten(tt.args.steps); !reflect.DeepEqual(got, tt.want) {
+			if got := translatePatten(tt.args.steps, 1); !reflect.DeepEqual(got, tt.want) {
 				printSteps(got)
 				t.Errorf("got= %+v", got)
 				//printSteps(tt.want)
@@ -294,16 +293,282 @@ func Test_translatePatten(t *testing.T) {
 	}
 }
 
-func printSteps(steps []common.Step) {
+// func printSteps(steps []common.Step) {
 
-	fmt.Println()
-	for stepIndex, step := range steps {
-		fmt.Printf("Step No:%d\n", stepIndex)
-		for fixtureIndex, fixture := range step.Fixtures {
-			fmt.Printf("\t\tFixture No:%d\n", fixtureIndex)
-			for _, color := range fixture.Colors {
-				fmt.Printf("\t\t\tColor   R:%d G:%d B:%d\n", color.R, color.G, color.B)
+// 	fmt.Println()
+// 	for stepIndex, step := range steps {
+// 		fmt.Printf("Step No:%d\n", stepIndex)
+// 		for fixtureIndex, fixture := range step.Fixtures {
+// 			fmt.Printf("\t\tFixture No:%d\n", fixtureIndex)
+// 			for _, color := range fixture.Colors {
+// 				fmt.Printf("\t\t\tColor   R:%d G:%d B:%d\n", color.R, color.G, color.B)
+// 			}
+// 		}
+// 	}
+// }
+
+func Test_shiftPatten(t *testing.T) {
+	type args struct {
+		steps []common.Step
+		shift int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []common.Step
+	}{
+		{
+			name: "First a simple no shift i.e a shift of 0",
+			args: args{
+				shift: 0,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						},
+					},
+				},
+			},
+
+			want: []common.Step{
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+					},
+				},
+			},
+		},
+		{
+			name: "Now a shift of 1",
+			args: args{
+				shift: 1,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						},
+					},
+				},
+			},
+
+			want: []common.Step{
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						{MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{MasterDimmer: 255, Colors: []common.Color{{R: 127, G: 0, B: 0}}},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := shiftPatten(tt.args.steps, tt.args.shift); !reflect.DeepEqual(got, tt.want) {
+				// printSteps(got)
+				// printSteps(tt.want)
+				t.Errorf("got= %+v", got)
+
+				t.Errorf("want %+v", tt.want)
 			}
-		}
+		})
+	}
+}
+
+func Test_calculateShift(t *testing.T) {
+	type args struct {
+		values []common.Color
+		shift  int
+	}
+	tests := []struct {
+		name string
+		args args
+		want []common.Color
+	}{
+		{
+			name: "simple no shift",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  0,
+			},
+			want: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+		},
+		{
+			name: "shift of 1",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  1,
+			},
+			want: []common.Color{{R: 5}, {R: 1}, {R: 2}, {R: 3}, {R: 4}},
+		},
+		{
+			name: "shift of 2",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  2,
+			},
+			want: []common.Color{{R: 4}, {R: 5}, {R: 1}, {R: 2}, {R: 3}},
+		},
+		{
+			name: "shift of 3",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  3,
+			},
+			want: []common.Color{{R: 3}, {R: 4}, {R: 5}, {R: 1}, {R: 2}},
+		},
+		{
+			name: "shift of 4",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  4,
+			},
+			want: []common.Color{{R: 2}, {R: 3}, {R: 4}, {R: 5}, {R: 1}},
+		},
+		{
+			name: "shift of 5",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  5,
+			},
+			want: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+		},
+		{
+			name: "shift of 6 - error case",
+			args: args{
+				values: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+				shift:  5,
+			},
+			want: []common.Color{{R: 1}, {R: 2}, {R: 3}, {R: 4}, {R: 5}},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := calculateShift(tt.args.values, tt.args.shift); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("calculateShift() = %v, want %v", got, tt.want)
+			}
+		})
 	}
 }
