@@ -111,7 +111,7 @@ func main() {
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
 
-	sequence1 := sequence.CreateSequence("colors", 1, pattens, channels)
+	sequence1 := sequence.CreateSequence("standard", 1, pattens, channels)
 	sequence2 := sequence.CreateSequence("standard", 2, pattens, channels)
 	sequence3 := sequence.CreateSequence("scanner", 3, pattens, channels)
 	sequence4 := sequence.CreateSequence("fade", 4, pattens, channels)

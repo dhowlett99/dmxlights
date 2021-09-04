@@ -102,8 +102,9 @@ type FixtureCommand struct {
 	Tick            bool
 	Config          bool // Configure fixture.
 	Start           bool
+	Positions       []Position
 	StartPosition   int
-	CurrentPosition Position
+	CurrentPosition int
 	CurrentSpeed    time.Duration
 	Color           Color
 	Speed           int
@@ -118,6 +119,7 @@ type FixtureCommand struct {
 }
 
 type Position struct {
+	Fixture       int
 	StartPosition int
 	Color         Color
 }
