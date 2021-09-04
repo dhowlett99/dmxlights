@@ -122,6 +122,10 @@ type Position struct {
 	Fixture       int
 	StartPosition int
 	Color         Color
+	Pan           int
+	Tilt          int
+	Shutter       int
+	Gobo          int
 }
 
 // A fixture can have any or some of the
