@@ -23,8 +23,8 @@ func CreateSequence(
 
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
-		FadeSpeed:    11,
-		FadeTime:     50 * time.Millisecond,
+		FadeSpeed:    9,
+		FadeTime:     150 * time.Millisecond,
 		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
@@ -36,8 +36,8 @@ func CreateSequence(
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    pattens[sequenceType].Steps,
 		},
-		Speed:        11,
-		CurrentSpeed: 50 * time.Millisecond,
+		Speed:        14,
+		CurrentSpeed: 25 * time.Millisecond,
 		Colors: []common.Color{
 			{
 				R: 0,
@@ -103,8 +103,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 		if sequence.Run {
 
-			// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
-			// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 			if !sequence.Run {
 				break
@@ -118,6 +116,7 @@ func PlayNewSequence(sequence common.Sequence,
 				cmd := common.FixtureCommand{
 					Config:        true,
 					StartPosition: position.StartPosition,
+					Color:         position.Color,
 				}
 				fixtureChannels[index] <- cmd
 			}
@@ -128,13 +127,15 @@ func PlayNewSequence(sequence common.Sequence,
 			for step := 0; step < noSteps; step++ {
 
 				cmd := common.FixtureCommand{
-					Tick:            true,
-					FadeSpeed:       sequence.FadeSpeed,
-					FadeTime:        sequence.FadeTime,
-					Size:            sequence.Size,
-					CurrentSpeed:    sequence.CurrentSpeed,
-					Speed:           sequence.Speed,
-					CurrentPosition: step,
+					Tick:         true,
+					FadeSpeed:    sequence.FadeSpeed,
+					FadeTime:     sequence.FadeTime,
+					Size:         sequence.Size,
+					CurrentSpeed: sequence.CurrentSpeed,
+					Speed:        sequence.Speed,
+					CurrentPosition: common.Position{
+						StartPosition: step,
+					},
 				}
 				fixtureChannel1 <- cmd
 				fixtureChannel2 <- cmd
@@ -162,6 +163,9 @@ func calculatePositions(sequence common.Sequence, patten common.Patten) (positio
 	for x := 0; x < 8; x++ {
 		// It takes 7 steps to fade up and 7 steps to fade down so 14 for each fixture.
 		position.StartPosition = counter
+		position.Color.R = 0
+		position.Color.G = 255
+		position.Color.B = 0
 		positions = append(positions, position)
 		counter = counter + 14
 	}
@@ -175,23 +179,27 @@ func makeFixture(sequence common.Sequence, mySequenceNumber int, myFixtureNumber
 	fadeDown := []int{255, 246, 220, 189, 127, 66, 0}
 
 	var startPosition int
+	var color common.Color
 
 	for {
 		select {
 		case cmd = <-channels[myFixtureNumber]:
 			if cmd.Config {
+				// Configure the position this fixture will light
 				startPosition = cmd.StartPosition
+				color = cmd.Color
 			}
 			if cmd.Tick {
-				if cmd.CurrentPosition == startPosition {
-
+				if cmd.CurrentPosition.StartPosition == startPosition {
 					// Now kick off the back end which drives the fixture.
 					go func() {
 						//fmt.Printf("Fixture %d FADE UP at Positions %d\n", myFixtureNumber, cmd.CurrentPosition)
 						for _, value := range fadeUp {
 							time.Sleep(cmd.FadeTime / 3)
-							//fmt.Printf("----> current speed /3 == %d(%d)  fade speed /3 %d(%d)\n", cmd.CurrentSpeed/3, cmd.Speed, cmd.FadeTime/3, cmd.FadeSpeed)
-							lightLamp(mySequenceNumber, myFixtureNumber, value, 0, 0, eventsForLauchpad)
+							R := int((float64(color.R) / 100) * (float64(value) / 2.55))
+							G := int((float64(color.G) / 100) * (float64(value) / 2.55))
+							B := int((float64(color.B) / 100) * (float64(value) / 2.55))
+							lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
 						}
 						//fmt.Printf("-----> Size %d\n", cmd.Size)
 						for x := 0; x < cmd.Size; x++ {
@@ -200,7 +208,10 @@ func makeFixture(sequence common.Sequence, mySequenceNumber int, myFixtureNumber
 						time.Sleep(cmd.FadeTime / 3)
 						//fmt.Printf("Fixture %d FADE DOWN\n", myFixtureNumber)
 						for _, value := range fadeDown {
-							lightLamp(mySequenceNumber, myFixtureNumber, value, 0, 0, eventsForLauchpad)
+							R := int((float64(cmd.CurrentPosition.Color.R) / 100) * (float64(value) / 2.55))
+							G := int((float64(cmd.CurrentPosition.Color.G) / 100) * (float64(value) / 2.55))
+							B := int((float64(cmd.CurrentPosition.Color.B) / 100) * (float64(value) / 2.55))
+							lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
 							time.Sleep(cmd.FadeTime / 3)
 						}
 						time.Sleep(cmd.FadeTime / 3)

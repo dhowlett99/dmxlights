@@ -103,8 +103,9 @@ type FixtureCommand struct {
 	Config          bool // Configure fixture.
 	Start           bool
 	StartPosition   int
-	CurrentPosition int
+	CurrentPosition Position
 	CurrentSpeed    time.Duration
+	Color           Color
 	Speed           int
 	Shift           int
 	Size            int
@@ -118,6 +119,7 @@ type FixtureCommand struct {
 
 type Position struct {
 	StartPosition int
+	Color         Color
 }
 
 // A fixture can have any or some of the
