@@ -5,7 +5,6 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk2"
@@ -27,6 +26,7 @@ func CreateSequence(
 		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
+		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     sequenceType,
 			Length:   2,
@@ -81,15 +81,15 @@ func PlayNewSequence(sequence common.Sequence,
 	fixtureChannels = append(fixtureChannels, fixtureChannel7)
 	fixtureChannels = append(fixtureChannels, fixtureChannel8)
 
-	// Create eight fixtures.
-	go makeFixture(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go makeFixture(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	// Create eight fixture threads for this sequence.
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -108,7 +108,7 @@ func PlayNewSequence(sequence common.Sequence,
 			positions := calculatePositions(pattens[sequence.Patten.Name].Steps)
 
 			// TODO actually caluclate the number of steps required based on the calc above.
-			noSteps := 8 * 14
+			noSteps := sequence.Steps
 
 			// Run the sequence through.
 			for step := 0; step < noSteps; step++ {
@@ -119,6 +119,7 @@ func PlayNewSequence(sequence common.Sequence,
 					FadeSpeed:       sequence.FadeSpeed,
 					FadeTime:        sequence.FadeTime,
 					Size:            sequence.Size,
+					Steps:           sequence.Steps,
 					CurrentSpeed:    sequence.CurrentSpeed,
 					Speed:           sequence.Speed,
 					Blackout:        sequence.Blackout,
@@ -142,6 +143,8 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
+// calculatePositions takes the steps defined in the patten and
+// turns them into positions used by the sequencer.
 func calculatePositions(steps []common.Step) []common.Position {
 
 	position := common.Position{}
@@ -169,80 +172,6 @@ func calculatePositions(steps []common.Step) []common.Position {
 	return positions
 }
 
-func makeFixture(sequence common.Sequence,
-	mySequenceNumber int,
-	myFixtureNumber int,
-	channels []chan common.FixtureCommand,
-	eventsForLauchpad chan common.ALight,
-	dmxController ft232.DMXController,
-	fixtures *fixture.Fixtures) {
-
-	cmd := common.FixtureCommand{}
-	fadeUp := []int{0, 66, 127, 180, 220, 246, 255}
-	fadeDown := []int{255, 246, 220, 189, 127, 66, 0}
-
-	for {
-		select {
-		case cmd = <-channels[myFixtureNumber]:
-			if cmd.Tick {
-				for _, position := range cmd.Positions {
-					if cmd.CurrentPosition == position.StartPosition {
-						if position.Fixture == myFixtureNumber {
-							// Now kick off the back end which drives the fixture.
-							go func() {
-								for _, value := range fadeUp {
-									time.Sleep(cmd.FadeTime / 4)
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									Pan := position.Pan
-									Tilt := position.Tilt
-									Shutter := position.Shutter
-									Gobo := position.Gobo
-									lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									// Now ask DMX to actually light the real fixture.
-									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-								}
-								for x := 0; x < cmd.Size; x++ {
-									time.Sleep(cmd.CurrentSpeed * 5)
-								}
-								time.Sleep(cmd.FadeTime / 4)
-								for _, value := range fadeDown {
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									Pan := position.Pan
-									Tilt := position.Tilt
-									Shutter := position.Shutter
-									Gobo := position.Gobo
-									lightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									dmx.Fixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-									time.Sleep(cmd.FadeTime / 4)
-								}
-								time.Sleep(cmd.FadeTime / 4)
-							}()
-						}
-					}
-				}
-			}
-		}
-	}
-}
-
-func lightLamp(X, Y, R, G, B int, eventsForLauchpad chan common.ALight) {
-
-	// Now trigger the fixture lamp on the launch pad by sending an event.
-	e := common.ALight{
-		X:          Y,
-		Y:          X - 1,
-		Brightness: 255,
-		Red:        R,
-		Green:      G,
-		Blue:       B,
-	}
-	eventsForLauchpad <- e
-}
-
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
 	pad *mk2.Launchpad,
@@ -268,24 +197,24 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			for _, step := range steps {
-				for fixture := range step.Fixtures {
-					for color := range step.Fixtures[fixture].Colors {
+				for fixtureNo := range step.Fixtures {
+					for color := range step.Fixtures[fixtureNo].Colors {
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 						if !sequence.Run {
 							break
 						}
-						R := step.Fixtures[fixture].Colors[color].R
-						G := step.Fixtures[fixture].Colors[color].G
-						B := step.Fixtures[fixture].Colors[color].B
-						Pan := step.Fixtures[fixture].Pan
-						Tilt := step.Fixtures[fixture].Tilt
-						Shutter := step.Fixtures[fixture].Shutter
-						Gobo := step.Fixtures[fixture].Gobo
+						R := step.Fixtures[fixtureNo].Colors[color].R
+						G := step.Fixtures[fixtureNo].Colors[color].G
+						B := step.Fixtures[fixtureNo].Colors[color].B
+						Pan := step.Fixtures[fixtureNo].Pan
+						Tilt := step.Fixtures[fixtureNo].Tilt
+						Shutter := step.Fixtures[fixtureNo].Shutter
+						Gobo := step.Fixtures[fixtureNo].Gobo
 
 						newColor := mapColors(R, G, B, sequence.Color)
 						// Now trigger the fixture lamp on the launch pad by sending an event.
 						e := common.ALight{
-							X:          fixture,
+							X:          fixtureNo,
 							Y:          mySequenceNumber - 1,
 							Brightness: 255,
 							Red:        newColor.R,
@@ -295,7 +224,7 @@ func PlaySequence(sequence common.Sequence,
 						eventsForLauchpad <- e
 
 						// Now ask DMX to actually light the real fixture.
-						dmx.Fixtures(mySequenceNumber, dmxController, fixture, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+						fixture.MapFixtures(mySequenceNumber, dmxController, fixtureNo, newColor.R, newColor.G, newColor.B, Pan, Tilt, Shutter, Gobo, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 						if !sequence.Run {
 							break

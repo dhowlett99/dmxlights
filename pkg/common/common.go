@@ -40,7 +40,8 @@ type Command struct {
 	Speed           int
 	UpdatePatten    bool
 	Patten          Patten
-	UpdateFade      bool
+	IncreaseFade    bool
+	DecreaseFade    bool
 	FadeTime        time.Duration
 	FadeSpeed       int
 	UpdateSize      bool
@@ -67,6 +68,7 @@ type Sequence struct {
 	Name         string
 	Number       int
 	Run          bool
+	Steps        int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten       Patten // Contains fixtures and steps info.
 	Colors       []Color
 	Shift        int
@@ -102,6 +104,7 @@ type FixtureCommand struct {
 	Tick            bool
 	Config          bool // Configure fixture.
 	Start           bool
+	Steps           int
 	Positions       []Position
 	StartPosition   int
 	CurrentPosition int

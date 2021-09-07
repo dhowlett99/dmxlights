@@ -465,20 +465,17 @@ func main() {
 
 			// Fade time decrease.
 			if hit.X == 6 && hit.Y == 7 {
-
 				fadeSpeed--
 				if fadeSpeed < 0 {
 					fadeSpeed = 0
 				}
 				fmt.Printf("Fade down speed:%d", fadeSpeed)
-
 				// Send fade update command.
 				cmd := common.Command{
-					UpdateFade: true,
-					FadeSpeed:  fadeSpeed,
+					DecreaseFade: true,
+					FadeSpeed:    fadeSpeed,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -489,14 +486,12 @@ func main() {
 					fadeSpeed = 20
 				}
 				fmt.Printf("Fade up speed:%d", fadeSpeed)
-
 				// Send fade update command.
 				cmd := common.Command{
-					UpdateFade: true,
-					FadeSpeed:  fadeSpeed,
+					IncreaseFade: true,
+					FadeSpeed:    fadeSpeed,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -557,11 +552,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				dmx.Fixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
-
+				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 			}
 
 			// Blackout button.
@@ -593,7 +587,7 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DM
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 4; y++ {
 			common.LightOff(eventsForLauchpad, x, y)
-			dmx.Fixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0)
+			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0)
 		}
 	}
 }
