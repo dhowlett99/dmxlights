@@ -19,20 +19,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	// Create an empty command.
 	command := common.Command{}
 
-	var run bool = true
-	for run {
-		select {
-		case command = <-soundTriggerChannel:
-			if sequence.MusicTrigger {
-				// fmt.Printf("BEAT!\n")
-				run = false
-			}
-		case command = <-commandChannel:
-			run = false
+	//var run bool = true
 
-		case <-time.After(speed):
-			run = false
+	select {
+	case command = <-soundTriggerChannel:
+		if sequence.MusicTrigger {
+			break
 		}
+	case command = <-commandChannel:
+		break
+
+	case <-time.After(speed):
+		break
 	}
 
 	if command.MusicTrigger {

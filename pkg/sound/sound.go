@@ -42,10 +42,11 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 				// Trigger
 				time.Sleep(10 * time.Millisecond)
 				cmd := common.Command{}
-				channels.SoundTriggerChannels[0] <- cmd
-				channels.SoundTriggerChannels[1] <- cmd
-				channels.SoundTriggerChannels[2] <- cmd
-				channels.SoundTriggerChannels[3] <- cmd
+				for seqNo, seq := range sequences {
+					if seq.MusicTrigger {
+						channels.SoundTriggerChannels[seqNo] <- cmd
+					}
+				}
 			}
 		}
 	}()

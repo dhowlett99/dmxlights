@@ -72,40 +72,52 @@ func FixtureReceiver(sequence common.Sequence,
 			if cmd.Tick {
 				for _, position := range cmd.Positions {
 					if cmd.CurrentPosition == position.StartPosition {
-						if position.Fixture == myFixtureNumber {
-							// Now kick off the back end which drives the fixture.
-							go func() {
-								for _, value := range fadeUp {
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									Pan := position.Pan
-									Tilt := position.Tilt
-									Shutter := position.Shutter
-									Gobo := position.Gobo
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									// Now ask DMX to actually light the real fixture.
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade up Time.
-								}
-								for x := 0; x < cmd.Size; x++ {
-									time.Sleep(cmd.CurrentSpeed * 5)
-								}
-								time.Sleep(cmd.FadeTime / 4) // Fade on time.
-								for _, value := range fadeDown {
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									Pan := position.Pan
-									Tilt := position.Tilt
-									Shutter := position.Shutter
-									Gobo := position.Gobo
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, Pan, Tilt, Shutter, Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
-								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
-							}()
+						// Short ciruit the soft fade if we are a scanner.
+						if cmd.Type == "scanner" {
+							if position.Fixture == myFixtureNumber {
+
+								//fmt.Printf("Type %s\n", cmd.Type)
+
+								//fmt.Printf("Pos %d   fixture %d  Pan is %d  Tilt is %d  Shutter is %d,   Gobo is  %d  Color is %v\n", position.StartPosition, myFixtureNumber, position.Pan, position.Tilt, position.Shutter, position.Gobo, position.Color)
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+								launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
+							}
+						} else {
+							if position.Fixture == myFixtureNumber {
+								// Now kick off the back end which drives the RGB fixture.
+								go func() {
+									for _, value := range fadeUp {
+										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+										// Pan := position.Pan
+										// Tilt := position.Tilt
+										// Shutter := position.Shutter
+										// Gobo := position.Gobo
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										// Now ask DMX to actually light the real fixture.
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										time.Sleep(cmd.FadeTime / 4) // Fade up Time.
+									}
+									for x := 0; x < cmd.Size; x++ {
+										time.Sleep(cmd.CurrentSpeed * 5)
+									}
+									time.Sleep(cmd.FadeTime / 4) // Fade on time.
+									for _, value := range fadeDown {
+										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+										// Pan := position.Pan
+										// Tilt := position.Tilt
+										// Shutter := position.Shutter
+										// Gobo := position.Gobo
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									}
+									time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								}()
+							}
 						}
 					}
 				}

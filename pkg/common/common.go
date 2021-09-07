@@ -106,6 +106,7 @@ type FixtureCommand struct {
 	Start           bool
 	Steps           int
 	Positions       []Position
+	Type            string
 	StartPosition   int
 	CurrentPosition int
 	CurrentSpeed    time.Duration

@@ -128,9 +128,9 @@ func main() {
 
 	// Start threads for each sequence.
 	go sequence.PlayNewSequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlaySequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlaySequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlaySequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlayNewSequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlayNewSequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlayNewSequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
