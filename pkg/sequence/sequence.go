@@ -26,7 +26,8 @@ func CreateSequence(
 		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
-		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
+		Bounce:       true,
+		Steps:        8 * 14 * 2, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     sequenceType,
 			Length:   2,
@@ -179,7 +180,29 @@ func calculatePositions(steps []common.Step) []common.Position {
 			}
 		}
 	}
+	for index := len(steps) - 1; index >= 0; index-- {
+		step := steps[index]
+		for fixtureIndex, fixture := range step.Fixtures {
+			for _, color := range fixture.Colors {
+				// Preserve the scanner commands.
+				position.Gobo = fixture.Gobo
+				position.Pan = fixture.Pan
+				position.Tilt = fixture.Tilt
+				position.Shutter = fixture.Shutter
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					position.StartPosition = counter
+					position.Fixture = fixtureIndex
+					position.Color.R = color.R
+					position.Color.G = color.G
+					position.Color.B = color.B
 
+					positions = append(positions, position)
+					// TODO calc actual size based on fade steps.
+					counter = counter + 14
+				}
+			}
+		}
+	}
 	return positions
 }
 

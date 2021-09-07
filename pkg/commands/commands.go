@@ -85,8 +85,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	if command.IncreaseFade {
 		fmt.Printf("Received increase fade time of %v\n", command.FadeSpeed)
 		newFadeTime := SetSpeed(command.FadeSpeed)
-		diffFadeSpeed := sequence.FadeTime - newFadeTime
-		sequence.CurrentSpeed = sequence.CurrentSpeed + diffFadeSpeed
+		//diffFadeSpeed := sequence.FadeTime - newFadeTime
+		//sequence.CurrentSpeed = sequence.CurrentSpeed + diffFadeSpeed
 		sequence.Steps = sequence.Steps + 1
 		sequence.FadeTime = newFadeTime
 		sequence.FadeSpeed = command.FadeSpeed
@@ -95,8 +95,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	if command.DecreaseFade {
 		fmt.Printf("Received decrease fade time of %v\n", command.FadeSpeed)
 		newFadeTime := SetSpeed(command.FadeSpeed)
-		diffFadeSpeed := sequence.FadeTime - newFadeTime
-		sequence.CurrentSpeed = sequence.CurrentSpeed - diffFadeSpeed
+		//diffFadeSpeed := sequence.FadeTime - newFadeTime
+		//sequence.CurrentSpeed = sequence.CurrentSpeed - diffFadeSpeed
 		sequence.Steps = sequence.Steps - 1
 		sequence.FadeTime = newFadeTime
 		sequence.FadeSpeed = command.FadeSpeed

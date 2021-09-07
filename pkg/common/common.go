@@ -68,6 +68,7 @@ type Sequence struct {
 	Name         string
 	Number       int
 	Run          bool
+	Bounce       bool
 	Steps        int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten       Patten // Contains fixtures and steps info.
 	Colors       []Color
