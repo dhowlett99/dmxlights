@@ -106,7 +106,7 @@ type FixtureCommand struct {
 	Config          bool // Configure fixture.
 	Start           bool
 	Steps           int
-	Positions       []Position
+	Positions       map[int]Position
 	Type            string
 	StartPosition   int
 	CurrentPosition int
