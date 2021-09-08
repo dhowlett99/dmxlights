@@ -112,7 +112,7 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 
 			// Calulate positions for fixtures based on patten.
-			positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps)
+			positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, true)
 
 			// Run the sequence through.
 			for step := 0; step < sequence.Steps; step++ {
@@ -149,7 +149,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 // calculatePositions takes the steps defined in the patten and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step) ([]common.Position, int) {
+func calculatePositions(steps []common.Step, bounce bool) ([]common.Position, int) {
 
 	position := common.Position{}
 
@@ -179,25 +179,28 @@ func calculatePositions(steps []common.Step) ([]common.Position, int) {
 			}
 		}
 	}
-	for index := len(steps) - 1; index >= 0; index-- {
-		step := steps[index]
-		for fixtureIndex, fixture := range step.Fixtures {
-			for _, color := range fixture.Colors {
-				// Preserve the scanner commands.
-				position.Gobo = fixture.Gobo
-				position.Pan = fixture.Pan
-				position.Tilt = fixture.Tilt
-				position.Shutter = fixture.Shutter
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					position.StartPosition = counter
-					position.Fixture = fixtureIndex
-					position.Color.R = color.R
-					position.Color.G = color.G
-					position.Color.B = color.B
 
-					positions = append(positions, position)
-					// TODO calc actual size based on fade steps.
-					counter = counter + 14
+	if bounce {
+		for index := len(steps) - 1; index >= 0; index-- {
+			step := steps[index]
+			for fixtureIndex, fixture := range step.Fixtures {
+				for _, color := range fixture.Colors {
+					// Preserve the scanner commands.
+					position.Gobo = fixture.Gobo
+					position.Pan = fixture.Pan
+					position.Tilt = fixture.Tilt
+					position.Shutter = fixture.Shutter
+					if color.R > 0 || color.G > 0 || color.B > 0 {
+						position.StartPosition = counter
+						position.Fixture = fixtureIndex
+						position.Color.R = color.R
+						position.Color.G = color.G
+						position.Color.B = color.B
+
+						positions = append(positions, position)
+						// TODO calc actual size based on fade steps.
+						counter = counter + 14
+					}
 				}
 			}
 		}

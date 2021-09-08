@@ -11,7 +11,8 @@ func Test_calculatePositions(t *testing.T) {
 
 	full := 255
 	type args struct {
-		steps []common.Step
+		steps  []common.Step
+		bounce bool
 	}
 	tests := []struct {
 		name string
@@ -315,7 +316,7 @@ func Test_calculatePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := calculatePositions(tt.args.steps); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := calculatePositions(tt.args.steps, tt.args.bounce); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %v", got)
 				t.Errorf("want =%v", tt.want)
 			}
