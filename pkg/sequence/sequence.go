@@ -27,7 +27,7 @@ func CreateSequence(
 		MusicTrigger: false,
 		Run:          true,
 		Bounce:       true,
-		Steps:        8 * 14 * 2, // Eight lamps and 14 steps to fade up and down.
+		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     sequenceType,
 			Length:   2,
@@ -60,6 +60,8 @@ func PlayNewSequence(sequence common.Sequence,
 	dmxController ft232.DMXController,
 	fixtures *fixture.Fixtures,
 	channels common.Channels) {
+
+	positions := []common.Position{}
 
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
@@ -110,13 +112,10 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 
 			// Calulate positions for fixtures based on patten.
-			positions := calculatePositions(pattens[sequence.Patten.Name].Steps)
-
-			// TODO actually caluclate the number of steps required based on the calc above.
-			noSteps := sequence.Steps
+			positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps)
 
 			// Run the sequence through.
-			for step := 0; step < noSteps; step++ {
+			for step := 0; step < sequence.Steps; step++ {
 				cmd := common.FixtureCommand{
 					Tick:            true,
 					Positions:       positions,
@@ -150,7 +149,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 // calculatePositions takes the steps defined in the patten and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step) []common.Position {
+func calculatePositions(steps []common.Step) ([]common.Position, int) {
 
 	position := common.Position{}
 
@@ -203,45 +202,45 @@ func calculatePositions(steps []common.Step) []common.Position {
 			}
 		}
 	}
-	return positions
+	return positions, counter
 }
 
-func mapColors(R int, G int, B int, colorSelector int) common.Color {
+// func mapColors(R int, G int, B int, colorSelector int) common.Color {
 
-	colorOut := common.Color{}
-	intensity := findLargest(R, G, B)
+// 	colorOut := common.Color{}
+// 	intensity := findLargest(R, G, B)
 
-	if colorSelector == 0 {
-		colorOut = common.Color{R: R, G: G, B: B}
-	}
-	if colorSelector == 1 {
-		colorOut = common.Color{R: intensity, G: 0, B: 0}
-	}
-	if colorSelector == 2 {
-		colorOut = common.Color{R: 0, G: intensity, B: 0}
-	}
-	if colorSelector == 3 {
-		colorOut = common.Color{R: 0, G: intensity, B: intensity}
-	}
-	if colorSelector == 4 {
-		colorOut = common.Color{R: 0, G: 0, B: intensity}
-	}
-	if colorSelector == 5 {
-		colorOut = common.Color{R: intensity, G: 0, B: intensity}
-	}
-	return colorOut
-}
+// 	if colorSelector == 0 {
+// 		colorOut = common.Color{R: R, G: G, B: B}
+// 	}
+// 	if colorSelector == 1 {
+// 		colorOut = common.Color{R: intensity, G: 0, B: 0}
+// 	}
+// 	if colorSelector == 2 {
+// 		colorOut = common.Color{R: 0, G: intensity, B: 0}
+// 	}
+// 	if colorSelector == 3 {
+// 		colorOut = common.Color{R: 0, G: intensity, B: intensity}
+// 	}
+// 	if colorSelector == 4 {
+// 		colorOut = common.Color{R: 0, G: 0, B: intensity}
+// 	}
+// 	if colorSelector == 5 {
+// 		colorOut = common.Color{R: intensity, G: 0, B: intensity}
+// 	}
+// 	return colorOut
+// }
 
-func findLargest(R int, G int, B int) (answer int) {
-	/* check the boolean condition using if statement */
-	if R >= G && R >= B {
-		return R
-	}
-	if G >= R && G >= B {
-		return G
-	}
-	if B >= R && B >= G {
-		return B
-	}
-	return 0
-}
+// func findLargest(R int, G int, B int) (answer int) {
+// 	/* check the boolean condition using if statement */
+// 	if R >= G && R >= B {
+// 		return R
+// 	}
+// 	if G >= R && G >= B {
+// 		return G
+// 	}
+// 	if B >= R && B >= G {
+// 		return B
+// 	}
+// 	return 0
+// }

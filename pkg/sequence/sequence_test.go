@@ -182,35 +182,42 @@ func Test_calculatePositions(t *testing.T) {
 					{
 						Fixtures: []common.Fixture{
 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
 							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
 						},
 					},
 					{
 						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 							{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 						},
 					},
@@ -224,39 +231,82 @@ func Test_calculatePositions(t *testing.T) {
 					Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
 				},
 				{
-					Fixture:       0,
+					Fixture:       1,
 					StartPosition: 14,
+					Color:         common.Color{R: 0, G: 0, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
+				},
+				{
+					Fixture:       0,
+					StartPosition: 28,
+					Color:         common.Color{R: 255, G: 0, B: 0},
+					Gobo:          36,
+					Shutter:       255, Pan: 50, Tilt: 200,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 42,
 					Color:         common.Color{R: 255, G: 0, B: 0},
 					Gobo:          36,
 					Shutter:       255, Pan: 50, Tilt: 200,
 				},
 				{
 					Fixture:       0,
-					StartPosition: 28,
+					StartPosition: 56,
+					Color:         common.Color{R: 255, G: 0, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 100, Tilt: 150,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 70,
 					Color:         common.Color{R: 255, G: 0, B: 255},
 					Gobo:          36, Shutter: 255, Pan: 100, Tilt: 150,
 				},
 				{
 					Fixture:       0,
-					StartPosition: 42,
+					StartPosition: 84,
+					Color:         common.Color{R: 0, G: 255, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 150, Tilt: 100,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 98,
 					Color:         common.Color{R: 0, G: 255, B: 255},
 					Gobo:          36, Shutter: 255, Pan: 150, Tilt: 100,
 				},
 				{
 					Fixture:       0,
-					StartPosition: 56,
+					StartPosition: 112,
+					Color:         common.Color{R: 100, G: 0, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 126,
 					Color:         common.Color{R: 100, G: 0, B: 255},
 					Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
 				},
 				{
 					Fixture:       0,
-					StartPosition: 70,
+					StartPosition: 140,
+					Color:         common.Color{R: 0, G: 190, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 154,
 					Color:         common.Color{R: 0, G: 190, B: 255},
 					Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
 				},
 				{
 					Fixture:       0,
-					StartPosition: 84,
+					StartPosition: 168,
+					Color:         common.Color{R: 145, G: 0, B: 255},
+					Gobo:          36, Shutter: 255, Pan: 0, Tilt: 0,
+				},
+				{
+					Fixture:       1,
+					StartPosition: 182,
 					Color:         common.Color{R: 145, G: 0, B: 255},
 					Gobo:          36, Shutter: 255, Pan: 0, Tilt: 0,
 				},
