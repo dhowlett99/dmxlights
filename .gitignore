@@ -1,3 +1,2 @@
 dmxlights
-config*
-presets.json
+*.json
