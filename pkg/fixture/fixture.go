@@ -70,53 +70,44 @@ func FixtureReceiver(sequence common.Sequence,
 		select {
 		case cmd = <-channels[myFixtureNumber]:
 			if cmd.Tick {
-				position := cmd.Positions[cmd.CurrentPosition]
-				if cmd.CurrentPosition == position.StartPosition {
-					// Short ciruit the soft fade if we are a scanner.
-					if cmd.Type == "scanner" {
-						if position.Fixture == myFixtureNumber {
-
-							//fmt.Printf("Type %s\n", cmd.Type)
-
-							//fmt.Printf("Pos %d   fixture %d  Pan is %d  Tilt is %d  Shutter is %d,   Gobo is  %d  Color is %v\n", position.StartPosition, myFixtureNumber, position.Pan, position.Tilt, position.Shutter, position.Gobo, position.Color)
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-							launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
-						}
-					} else {
-						if position.Fixture == myFixtureNumber {
-							// Now kick off the back end which drives the RGB fixture.
-							go func() {
-								for _, value := range fadeUp {
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									// Pan := position.Pan
-									// Tilt := position.Tilt
-									// Shutter := position.Shutter
-									// Gobo := position.Gobo
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									// Now ask DMX to actually light the real fixture.
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade up Time.
-								}
-								for x := 0; x < cmd.Size; x++ {
-									time.Sleep(cmd.CurrentSpeed * 5)
-								}
-								time.Sleep(cmd.FadeTime / 4) // Fade on time.
-								for _, value := range fadeDown {
-									R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-									G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-									B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-									// Pan := position.Pan
-									// Tilt := position.Tilt
-									// Shutter := position.Shutter
-									// Gobo := position.Gobo
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
-								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
-							}()
+				// positions can have many fixtures play at the same time.
+				positions := cmd.Positions[cmd.CurrentPosition]
+				for _, position := range positions {
+					if cmd.CurrentPosition == position.StartPosition {
+						// Short ciruit the soft fade if we are a scanner.
+						if cmd.Type == "scanner" {
+							if position.Fixture == myFixtureNumber {
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+								launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
+							}
+						} else {
+							if position.Fixture == myFixtureNumber {
+								// Now kick off the back end which drives the RGB fixture.
+								go func() {
+									for _, value := range fadeUp {
+										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										// Now ask DMX to actually light the real fixture.
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										time.Sleep(cmd.FadeTime / 4) // Fade up Time.
+									}
+									for x := 0; x < cmd.Size; x++ {
+										time.Sleep(cmd.CurrentSpeed * 5)
+									}
+									time.Sleep(cmd.FadeTime / 4) // Fade on time.
+									for _, value := range fadeDown {
+										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									}
+									time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								}()
+							}
 						}
 					}
 				}
@@ -141,13 +132,7 @@ func MapFixtures(mySequenceNumber int,
 	for _, fixture := range fixtures.Fixtures {
 
 		if fixture.Group == mySequenceNumber {
-
-			//fmt.Printf("fixture  %+v\n\n", fixture)
-			//fmt.Printf("fixture.Group %d   mySequenceNumber %d\n\n", fixture.Group, mySequenceNumber)
-
-			//fmt.Printf("found fixture %d\n", fixtureNumber)
 			for channelNumber, channel := range fixture.Channels {
-				//fmt.Printf("found channel %s\n", channel.Name)
 				// Scanner channels
 				if strings.Contains(channel.Name, "Pan") {
 					//fmt.Printf("DMX debug Pan Channel %d Value %d\n", fixture.Address+int16(channelNumber), Pan)

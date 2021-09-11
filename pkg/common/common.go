@@ -98,6 +98,7 @@ type Hit struct {
 
 type Step struct {
 	Fixtures []Fixture
+	Type     string
 }
 
 // Fixture Command.
@@ -106,7 +107,7 @@ type FixtureCommand struct {
 	Config          bool // Configure fixture.
 	Start           bool
 	Steps           int
-	Positions       map[int]Position
+	Positions       map[int][]Position
 	Type            string
 	StartPosition   int
 	CurrentPosition int
@@ -138,6 +139,7 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	Type         string
 	MasterDimmer int
 	Colors       []Color
 	Pan          int

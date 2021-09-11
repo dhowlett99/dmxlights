@@ -61,7 +61,7 @@ func PlayNewSequence(sequence common.Sequence,
 	fixtures *fixture.Fixtures,
 	channels common.Channels) {
 
-	positions := map[int]common.Position{}
+	positions := map[int][]common.Position{}
 
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
@@ -149,14 +149,13 @@ func PlayNewSequence(sequence common.Sequence,
 
 // calculatePositions takes the steps defined in the patten and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step, bounce bool) (map[int]common.Position, int) {
+func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Position, int) {
 
 	position := common.Position{}
 
 	// We have multiple positions for each fixture.
 	var counter int
-	positions := make(map[int]common.Position)
-	//positions := []common.Position{}
+	positionsOut := make(map[int][]common.Position)
 
 	for _, step := range steps {
 		for fixtureIndex, fixture := range step.Fixtures {
@@ -172,10 +171,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int]common.Positi
 					position.Color.R = color.R
 					position.Color.G = color.G
 					position.Color.B = color.B
-
-					//positions = append(positions, position)
-					positions[counter] = position
-					// TODO calc actual size based on fade steps.
+					positionsOut[counter] = append(positionsOut[counter], position)
 					counter = counter + 14
 				}
 			}
@@ -198,17 +194,14 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int]common.Positi
 						position.Color.R = color.R
 						position.Color.G = color.G
 						position.Color.B = color.B
-
-						//positions = append(positions, position)
-						positions[counter] = position
-						// TODO calc actual size based on fade steps.
+						positionsOut[counter] = append(positionsOut[counter], position)
 						counter = counter + 14
 					}
 				}
 			}
 		}
 	}
-	return positions, counter
+	return positionsOut, counter
 }
 
 // func mapColors(R int, G int, B int, colorSelector int) common.Color {
