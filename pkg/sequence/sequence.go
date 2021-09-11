@@ -172,9 +172,15 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 					position.Color.G = color.G
 					position.Color.B = color.B
 					positionsOut[counter] = append(positionsOut[counter], position)
-					counter = counter + 14
+					if fixture.Type != "scanner" {
+						//positionsOut[counter] = append(positionsOut[counter], position)
+						counter = counter + 14
+					}
 				}
 			}
+		}
+		if step.Type == "scanner" {
+			counter = counter + 14
 		}
 	}
 

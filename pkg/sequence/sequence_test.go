@@ -256,109 +256,97 @@ func Test_calculatePositions(t *testing.T) {
 						Color:         common.Color{R: 0, G: 0, B: 255},
 						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
 					},
+					{
+						Fixture:       1,
+						StartPosition: 0,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
+					},
 				},
 				14: {
 					{
+						Fixture:       0,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          36, Shutter: 255, Pan: 50, Tilt: 200,
+					},
+					{
 						Fixture:       1,
 						StartPosition: 14,
-						Color:         common.Color{R: 0, G: 0, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          36, Shutter: 255, Pan: 50, Tilt: 200,
 					},
 				},
 				28: {
 					{
 						Fixture:       0,
 						StartPosition: 28,
-						Color:         common.Color{R: 255, G: 0, B: 0},
+						Color:         common.Color{R: 255, G: 0, B: 255},
 						Gobo:          36,
-						Shutter:       255, Pan: 50, Tilt: 200,
+						Shutter:       255, Pan: 100, Tilt: 150,
+					},
+					{
+						Fixture:       1,
+						StartPosition: 28,
+						Color:         common.Color{R: 255, G: 0, B: 255},
+						Gobo:          36,
+						Shutter:       255, Pan: 100, Tilt: 150,
 					},
 				},
 				42: {
 					{
+						Fixture:       0,
+						StartPosition: 42,
+						Color:         common.Color{R: 0, G: 255, B: 255},
+						Gobo:          36,
+						Shutter:       255, Pan: 150, Tilt: 100,
+					},
+					{
 						Fixture:       1,
 						StartPosition: 42,
-						Color:         common.Color{R: 255, G: 0, B: 0},
+						Color:         common.Color{R: 0, G: 255, B: 255},
 						Gobo:          36,
-						Shutter:       255, Pan: 50, Tilt: 200,
+						Shutter:       255, Pan: 150, Tilt: 100,
 					},
 				},
 				56: {
 					{
 						Fixture:       0,
 						StartPosition: 56,
-						Color:         common.Color{R: 255, G: 0, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 100, Tilt: 150,
+						Color:         common.Color{R: 100, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
+					},
+					{
+						Fixture:       1,
+						StartPosition: 56,
+						Color:         common.Color{R: 100, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
 					},
 				},
 				70: {
 					{
+						Fixture:       0,
+						StartPosition: 70,
+						Color:         common.Color{R: 0, G: 190, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
+					},
+					{
 						Fixture:       1,
 						StartPosition: 70,
-						Color:         common.Color{R: 255, G: 0, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 100, Tilt: 150,
+						Color:         common.Color{R: 0, G: 190, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
 					},
 				},
 				84: {
 					{
 						Fixture:       0,
 						StartPosition: 84,
-						Color:         common.Color{R: 0, G: 255, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 150, Tilt: 100,
-					},
-				},
-				98: {
-					{
-						Fixture:       1,
-						StartPosition: 98,
-						Color:         common.Color{R: 0, G: 255, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 150, Tilt: 100,
-					},
-				},
-				112: {
-					{
-						Fixture:       0,
-						StartPosition: 112,
-						Color:         common.Color{R: 100, G: 0, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
-					},
-				},
-				126: {
-					{
-						Fixture:       1,
-						StartPosition: 126,
-						Color:         common.Color{R: 100, G: 0, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 200, Tilt: 50,
-					},
-				},
-				140: {
-					{
-						Fixture:       0,
-						StartPosition: 140,
-						Color:         common.Color{R: 0, G: 190, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
-					},
-				},
-				154: {
-					{
-						Fixture:       1,
-						StartPosition: 154,
-						Color:         common.Color{R: 0, G: 190, B: 255},
-						Gobo:          36, Shutter: 255, Pan: 255, Tilt: 0,
-					},
-				},
-				168: {
-					{
-						Fixture:       0,
-						StartPosition: 168,
 						Color:         common.Color{R: 145, G: 0, B: 255},
 						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 0,
 					},
-				},
-				182: {
 					{
 						Fixture:       1,
-						StartPosition: 182,
+						StartPosition: 84,
 						Color:         common.Color{R: 145, G: 0, B: 255},
 						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 0,
 					},
