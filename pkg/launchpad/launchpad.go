@@ -47,7 +47,6 @@ func FlashButton(presetsStore map[string]bool, pad *mk2.Launchpad, flashButtons 
 	go func(pad *mk2.Launchpad, x int, y int) {
 		for {
 			presets.InitPresets(eventsForLauchpad, presetsStore)
-			// fmt.Printf("Flash X:%d Y:%d is %t\n", x, y, flashButtons[x][y])
 			if !flashButtons[x][y] {
 				break
 			}

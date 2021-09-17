@@ -136,7 +136,7 @@ func main() {
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	// Light the function buttons at the top and bottom.
-	showFunctionButtons(0, eventsForLauchpad, functionButtons)
+	showFunctionButtons(-1, eventsForLauchpad, functionButtons)
 	showFunctionButtons(8, eventsForLauchpad, functionButtons)
 
 	fmt.Println("Setup Presets Done")
