@@ -135,6 +135,10 @@ func main() {
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
+	// Light the function buttons at the top and bottom.
+	showFunctionButtons(0, eventsForLauchpad, functionButtons)
+	showFunctionButtons(8, eventsForLauchpad, functionButtons)
+
 	fmt.Println("Setup Presets Done")
 
 	// Initialize a ten length slice of empty slices
@@ -536,7 +540,7 @@ func main() {
 				},
 			}
 			if hit.X >= 0 && hit.X < 8 {
-				// fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
+				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
