@@ -185,6 +185,7 @@ func main() {
 				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 				presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
+				presets.InitPresets(eventsForLauchpad, presetsStore)
 				continue
 			}
 
