@@ -425,9 +425,11 @@ func main() {
 
 			// Start sequence.
 			if hit.X == 8 && hit.Y == 5 {
+				musicSequence = false
 				cmd := common.Command{
-					Start: true,
-					Speed: sequenceSpeed,
+					Start:        true,
+					Speed:        sequenceSpeed,
+					MusicTrigger: false,
 				}
 				sendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
