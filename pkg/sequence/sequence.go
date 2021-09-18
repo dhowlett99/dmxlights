@@ -130,12 +130,19 @@ func PlayNewSequence(sequence common.Sequence,
 					CurrentPosition: step,
 				}
 				fixtureChannel1 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel2 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel3 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel4 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel5 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel6 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel7 <- cmd
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				fixtureChannel8 <- cmd
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)

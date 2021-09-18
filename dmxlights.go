@@ -42,6 +42,7 @@ func main() {
 	var flashButtons [][]bool
 	var functionButtons [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
+	var musicSequence bool
 
 	presetsStore := make(map[string]bool)
 
@@ -322,35 +323,40 @@ func main() {
 
 			// Decrease speed of selected sequence.
 			if hit.X == 0 && hit.Y == 7 {
-				sequenceSpeed--
-				if sequenceSpeed < 0 {
-					sequenceSpeed = 1
+				if !musicSequence {
+					sequenceSpeed--
+					if sequenceSpeed < 0 {
+						sequenceSpeed = 1
+					}
+					cmd := common.Command{
+						Speed:       sequenceSpeed,
+						UpdateSpeed: true,
+					}
+					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					continue
 				}
-				cmd := common.Command{
-					Speed:       sequenceSpeed,
-					UpdateSpeed: true,
-				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
 			}
 
 			// Increase speed of selected sequence.
 			if hit.X == 1 && hit.Y == 7 {
-				sequenceSpeed++
-				if sequenceSpeed > 20 {
-					sequenceSpeed = 20
+				if !musicSequence {
+					sequenceSpeed++
+					if sequenceSpeed > 20 {
+						sequenceSpeed = 20
+					}
+					cmd := common.Command{
+						Speed:       sequenceSpeed,
+						UpdateSpeed: true,
+					}
+					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					continue
 				}
-				cmd := common.Command{
-					Speed:       sequenceSpeed,
-					UpdateSpeed: true,
-				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
 			}
 
 			// Set or unset music trigger on this sequence.
 			if hit.X == 7 && hit.Y == -1 {
 				if sequences[selectedSequence-1].MusicTrigger {
+					musicSequence = false
 					sequences[selectedSequence-1].MusicTrigger = false
 					cmd := common.Command{
 						MusicTriggerOff: true,
@@ -358,6 +364,7 @@ func main() {
 					}
 					sendCommandToSequence(selectedSequence, cmd, commandChannels)
 				} else {
+					musicSequence = true
 					sequences[selectedSequence-1].MusicTrigger = true
 					cmd := common.Command{
 						MusicTrigger: true,
