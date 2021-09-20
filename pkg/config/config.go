@@ -17,9 +17,6 @@ func SaveConfig(config []common.Sequence, filename string) {
 	if err != nil {
 		log.Fatalf("Error marshalling config: %v", err)
 	}
-
-	//fmt.Println(string(data))
-
 	// Write to file
 	err = ioutil.WriteFile(filename, data, 0644)
 	if err != nil {
