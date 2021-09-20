@@ -113,10 +113,10 @@ func main() {
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
 
-	sequence1 := sequence.CreateSequence("rgbchase", 1, pattens, channels)
+	sequence1 := sequence.CreateSequence("standard", 1, pattens, channels)
 	sequence2 := sequence.CreateSequence("standard", 2, pattens, channels)
 	sequence3 := sequence.CreateSequence("scanner", 3, pattens, channels)
-	sequence4 := sequence.CreateSequence("fade", 4, pattens, channels)
+	sequence4 := sequence.CreateSequence("standard", 4, pattens, channels)
 
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
@@ -169,7 +169,7 @@ func main() {
 
 	// Light the first sequence as the default selected.
 	selectedSequence := 1
-	common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// Initialise the pattens.
 	availablePatten := []string{}
@@ -404,9 +404,10 @@ func main() {
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				if selectButtons[8][0] {
 					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					common.HideSequence(sequences, selectedSequence, commandChannels, true)
 					selectButtons[8][0] = false
 				}
 				selectButtons[8][0] = true
@@ -420,9 +421,10 @@ func main() {
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				if selectButtons[8][1] {
 					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					common.HideSequence(sequences, selectedSequence, commandChannels, true)
 					selectButtons[8][1] = false
 				}
 				selectButtons[8][0] = false
@@ -436,9 +438,10 @@ func main() {
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				if selectButtons[8][2] {
 					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					common.HideSequence(sequences, selectedSequence, commandChannels, true)
 					selectButtons[8][2] = false
 				}
 				selectButtons[8][0] = false
@@ -452,9 +455,10 @@ func main() {
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				common.SequenceSelect(eventsForLauchpad, selectedSequence)
 				if selectButtons[8][3] {
 					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					common.HideSequence(sequences, selectedSequence, commandChannels, true)
 					selectButtons[8][3] = false
 				}
 				selectButtons[8][0] = false

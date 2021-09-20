@@ -182,33 +182,13 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 	eventsForLauchpad <- event
 }
 
-func SequenceSelect(sequences []*Sequence, eventsForLauchpad chan ALight, selectedSequence int, commandChannels []chan Command) {
-
-	cmd := Command{}
-	// Set the selected flag inside the sequence.
-	for _, sequence := range sequences {
-		//fmt.Printf("seq no %d   selected %d \n", sequence.Number, sequenceNumber)
-		if sequence.Number == selectedSequence {
-			sequence.Hide = true
-			cmd = Command{
-				Hide: true,
-			}
-			SendCommandToSequence(selectedSequence, cmd, commandChannels)
-		} else {
-			cmd = Command{
-				UnHide: true,
-			}
-			sequence.Hide = false
-			SendCommandToAllSequenceExcept(selectedSequence, cmd, commandChannels)
-		}
-
-	}
+func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
 
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
 		LightOff(eventsForLauchpad, 8, seq)
 	}
-	// Now turn blue the selected seq light.
+	// Now turn blue the selected sequence select light.
 	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence - 1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
 }
 
@@ -244,6 +224,8 @@ func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, co
 			UnHide: true,
 		}
 		SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+		// Wait for the sequence to end
+		time.Sleep(700 * time.Millisecond)
 	}
 }
 func ShowFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
@@ -265,6 +247,31 @@ func HideFunctionButtonsExcept(selectedSequence int, eventsForLauchpad chan ALig
 		for y := 0; y < 4; y++ {
 			if y != selectedSequence-1 {
 				LightOn(eventsForLauchpad, ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+			}
+		}
+	}
+}
+
+func HideSequence(sequences []*Sequence, selectedSequence int, commandChannels []chan Command, sendMesg bool) {
+	cmd := Command{}
+	// Set the selected flag inside the sequence.
+	for _, sequence := range sequences {
+		//fmt.Printf("seq no %d   selected %d \n", sequence.Number, sequenceNumber)
+		if sequence.Number == selectedSequence {
+			sequence.Hide = true
+			cmd = Command{
+				Hide: true,
+			}
+			if sendMesg {
+				SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			}
+		} else {
+			cmd = Command{
+				UnHide: true,
+			}
+			sequence.Hide = false
+			if sendMesg {
+				SendCommandToAllSequenceExcept(selectedSequence, cmd, commandChannels)
 			}
 		}
 	}
