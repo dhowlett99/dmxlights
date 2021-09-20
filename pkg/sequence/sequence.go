@@ -18,7 +18,7 @@ func CreateSequence(
 
 	// set default values.
 	sequence := common.Sequence{
-
+		Hide:         false,
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
 		FadeSpeed:    9,
@@ -116,7 +116,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 			// Run the sequence through.
 			for step := 0; step < sequence.Steps; step++ {
+				//fmt.Printf("Seq %d  Selected is %t\n", mySequenceNumber, sequence.Selected)
 				cmd := common.FixtureCommand{
+					Hide:            sequence.Hide,
 					Tick:            true,
 					Positions:       positions,
 					Type:            sequence.Type,

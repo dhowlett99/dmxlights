@@ -33,6 +33,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 
 	// Now process any command.
+	if command.Hide {
+		fmt.Printf("Received select this sequence set to %t on Seq No %d\n", command.Hide, sequence.Number-1)
+		sequence.Hide = true
+		return sequence
+	}
+	if command.UnHide {
+		fmt.Printf("Received unselect this sequence set to %t on Seq No %d\n", command.Hide, sequence.Number-1)
+		sequence.Hide = false
+		return sequence
+	}
 	if command.MusicTrigger {
 		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
 		sequence.MusicTrigger = true

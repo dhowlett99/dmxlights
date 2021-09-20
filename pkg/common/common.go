@@ -30,6 +30,8 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
+	UnHide          bool
+	Hide            bool
 	Name            string
 	Number          int
 	Start           bool
@@ -60,6 +62,7 @@ type Command struct {
 
 // Sequence describes sequences.
 type Sequence struct {
+	Hide         bool
 	Type         string
 	FadeTime     time.Duration
 	FadeOnTime   time.Duration
@@ -103,6 +106,7 @@ type Step struct {
 
 // Fixture Command.
 type FixtureCommand struct {
+	Hide            bool
 	Tick            bool
 	Config          bool // Configure fixture.
 	Start           bool
@@ -178,12 +182,90 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 	eventsForLauchpad <- event
 }
 
-func SequenceSelect(eventsForLauchpad chan ALight, sequenceNumber int) {
+func SequenceSelect(sequences []*Sequence, eventsForLauchpad chan ALight, selectedSequence int, commandChannels []chan Command) {
+
+	cmd := Command{}
+	// Set the selected flag inside the sequence.
+	for _, sequence := range sequences {
+		//fmt.Printf("seq no %d   selected %d \n", sequence.Number, sequenceNumber)
+		if sequence.Number == selectedSequence {
+			sequence.Hide = true
+			cmd = Command{
+				Hide: true,
+			}
+			SendCommandToSequence(selectedSequence, cmd, commandChannels)
+		} else {
+			cmd = Command{
+				UnHide: true,
+			}
+			sequence.Hide = false
+			SendCommandToAllSequenceExcept(selectedSequence, cmd, commandChannels)
+		}
+
+	}
+
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
 		LightOff(eventsForLauchpad, 8, seq)
 	}
 	// Now turn blue the selected seq light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: sequenceNumber - 1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
+	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence - 1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
+}
 
+func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
+	commandChannels[selectedSequence-1] <- command
+}
+
+func SendCommandToAllSequence(selectedSequence int, command Command, commandChannels []chan Command) {
+	commandChannels[0] <- command
+	commandChannels[1] <- command
+	commandChannels[2] <- command
+	commandChannels[3] <- command
+}
+
+func SendCommandToAllSequenceExcept(selectedSequence int, command Command, commandChannels []chan Command) {
+	for index := range commandChannels {
+		if index != selectedSequence-1 {
+			commandChannels[index] <- command
+		}
+	}
+}
+
+func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, commandChannels []chan Command, functionButtons [][]bool, X int, Y int) {
+	if !functionButtons[X][Y] {
+		functionButtons[X][Y] = true
+		HideFunctionButtons(eventsForLauchpad, functionButtons)
+		ShowFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+	} else {
+		HideFunctionButtons(eventsForLauchpad, functionButtons)
+		functionButtons[X][Y] = false
+		// unhide the sequence
+		cmd := Command{
+			UnHide: true,
+		}
+		SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+	}
+}
+func ShowFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+	}
+}
+
+func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 4; y++ {
+			LightOn(eventsForLauchpad, ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+		}
+	}
+}
+
+func HideFunctionButtonsExcept(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 4; y++ {
+			if y != selectedSequence-1 {
+				LightOn(eventsForLauchpad, ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+			}
+		}
+	}
 }

@@ -78,7 +78,9 @@ func FixtureReceiver(sequence common.Sequence,
 						if cmd.Type == "scanner" {
 							if position.Fixture == myFixtureNumber {
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
-								launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
+								if !cmd.Hide {
+									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
+								}
 							}
 						} else {
 							if position.Fixture == myFixtureNumber {
@@ -88,7 +90,9 @@ func FixtureReceiver(sequence common.Sequence,
 										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										if !cmd.Hide {
+											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										}
 										// Now ask DMX to actually light the real fixture.
 										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
 										time.Sleep(cmd.FadeTime / 4) // Fade up Time.
@@ -101,7 +105,9 @@ func FixtureReceiver(sequence common.Sequence,
 										R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										if !cmd.Hide {
+											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+										}
 										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
 										time.Sleep(cmd.FadeTime / 4) // Fade down time.
 									}

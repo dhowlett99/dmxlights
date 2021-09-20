@@ -41,6 +41,7 @@ func main() {
 
 	var flashButtons [][]bool
 	var functionButtons [][]bool
+	var selectButtons [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
 	var musicSequence bool
 
@@ -137,23 +138,30 @@ func main() {
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	// Light the function buttons at the top and bottom.
-	showFunctionButtons(0, eventsForLauchpad, functionButtons)
-	showFunctionButtons(8, eventsForLauchpad, functionButtons)
+	common.ShowFunctionButtons(0, eventsForLauchpad, functionButtons)
+	common.ShowFunctionButtons(8, eventsForLauchpad, functionButtons)
 
 	fmt.Println("Setup Presets Done")
 
-	// Initialize a ten length slice of empty slices
+	// Initialize a ten length slice of empty slices for flash buttons.
 	flashButtons = make([][]bool, 9)
-	functionButtons = make([][]bool, 9)
-
-	// Initialize those 10 empty slices
+	// Initialize those 10 empty flash button slices.
 	for i := 0; i < 9; i++ {
 		flashButtons[i] = make([]bool, 9)
 	}
 
-	// Initialize those 10 empty slices
+	// Initialize a ten length slice of empty slices for function buttons.
+	functionButtons = make([][]bool, 9)
+	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
 		functionButtons[i] = make([]bool, 9)
+	}
+
+	// Initialize a ten length slice of empty slices for select buttons.
+	selectButtons = make([][]bool, 9)
+	// Initialize those 10 empty function button slices
+	for i := 0; i < 9; i++ {
+		selectButtons[i] = make([]bool, 9)
 	}
 
 	// Light the logo blue.
@@ -161,7 +169,7 @@ func main() {
 
 	// Light the first sequence as the default selected.
 	selectedSequence := 1
-	common.SequenceSelect(eventsForLauchpad, selectedSequence)
+	common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
 
 	// Initialise the pattens.
 	availablePatten := []string{}
@@ -232,7 +240,7 @@ func main() {
 						cmd := common.Command{
 							Stop: true,
 						}
-						sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 						// Clear all the fixtures down ready for the next scene.
 						allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
@@ -266,7 +274,7 @@ func main() {
 				cmd := common.Command{
 					Stop: true,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				cmd = common.Command{
 					UpdatePatten: true,
@@ -274,19 +282,19 @@ func main() {
 						Name: availablePatten[selectedPatten],
 					},
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				cmd = common.Command{
 					Stop:  true,
 					Speed: sequenceSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				cmd = common.Command{
 					Start: true,
 					Speed: sequenceSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				continue
 			}
@@ -305,18 +313,18 @@ func main() {
 						Name: availablePatten[selectedPatten],
 					},
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				cmd = common.Command{
 					Stop:  true,
 					Speed: sequenceSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				cmd = common.Command{
 					Start: true,
 					Speed: sequenceSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				continue
 			}
@@ -332,7 +340,7 @@ func main() {
 						Speed:       sequenceSpeed,
 						UpdateSpeed: true,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 					continue
 				}
 			}
@@ -348,7 +356,7 @@ func main() {
 						Speed:       sequenceSpeed,
 						UpdateSpeed: true,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 					continue
 				}
 			}
@@ -362,7 +370,7 @@ func main() {
 						MusicTriggerOff: true,
 						Speed:           sequenceSpeed,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				} else {
 					musicSequence = true
 					sequences[selectedSequence-1].MusicTrigger = true
@@ -370,7 +378,7 @@ func main() {
 						MusicTrigger: true,
 						Speed:        sequenceSpeed,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 
@@ -381,45 +389,77 @@ func main() {
 					cmd := common.Command{
 						SoftFadeOff: true,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				} else {
 					sequences[selectedSequence-1].SoftFade = true
 					cmd := common.Command{
 						SoftFadeOn: true,
 					}
-					sendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
+				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				if selectButtons[8][0] {
+					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					selectButtons[8][0] = false
+				}
+				selectButtons[8][0] = true
+				selectButtons[8][1] = false
+				selectButtons[8][2] = false
+				selectButtons[8][3] = false
+				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
+				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				if selectButtons[8][1] {
+					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					selectButtons[8][1] = false
+				}
+				selectButtons[8][0] = false
+				selectButtons[8][1] = true
+				selectButtons[8][2] = false
+				selectButtons[8][3] = false
+				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
+				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				if selectButtons[8][2] {
+					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					selectButtons[8][2] = false
+				}
+				selectButtons[8][0] = false
+				selectButtons[8][1] = false
+				selectButtons[8][2] = true
+				selectButtons[8][3] = false
+				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				makeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, hit.X, hit.Y)
+				common.SequenceSelect(sequences, eventsForLauchpad, selectedSequence, commandChannels)
+				if selectButtons[8][3] {
+					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
+					selectButtons[8][3] = false
+				}
+				selectButtons[8][0] = false
+				selectButtons[8][1] = false
+				selectButtons[8][2] = false
+				selectButtons[8][3] = true
+				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
 				continue
 			}
 
@@ -431,7 +471,7 @@ func main() {
 					Speed:        sequenceSpeed,
 					MusicTrigger: false,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
@@ -439,7 +479,7 @@ func main() {
 					Stop:  true,
 					Speed: sequenceSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 
 			// Size decrease.
@@ -455,7 +495,7 @@ func main() {
 					UpdateSize: true,
 					Size:       size,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
 
@@ -472,7 +512,7 @@ func main() {
 					UpdateSize: true,
 					Size:       size,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				continue
 			}
@@ -489,7 +529,7 @@ func main() {
 					DecreaseFade: true,
 					FadeSpeed:    fadeSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
 
@@ -505,7 +545,7 @@ func main() {
 					IncreaseFade: true,
 					FadeSpeed:    fadeSpeed,
 				}
-				sendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
 
@@ -580,7 +620,7 @@ func main() {
 					cmd := common.Command{
 						Blackout: true,
 					}
-					sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
 				} else {
 					fmt.Printf("NORMAL\n")
@@ -589,7 +629,7 @@ func main() {
 					cmd := common.Command{
 						Normal: true,
 					}
-					sendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
 				}
 			}
@@ -602,41 +642,6 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DM
 		for y := 0; y < 4; y++ {
 			common.LightOff(eventsForLauchpad, x, y)
 			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0)
-		}
-	}
-}
-
-func sendCommandToSequence(selectedSequence int, command common.Command, commandChannels []chan common.Command) {
-	commandChannels[selectedSequence-1] <- command
-}
-
-func sendCommandToAllSequence(selectedSequence int, command common.Command, commandChannels []chan common.Command) {
-	commandChannels[0] <- command
-	commandChannels[1] <- command
-	commandChannels[2] <- command
-	commandChannels[3] <- command
-}
-
-func makeFunctionButtons(selectedSequence int, eventsForLauchpad chan common.ALight, functionButtons [][]bool, X int, Y int) {
-	if !functionButtons[X][Y] {
-		functionButtons[X][Y] = true
-		hideFunctionButtons(eventsForLauchpad, functionButtons)
-		showFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
-	} else {
-		hideFunctionButtons(eventsForLauchpad, functionButtons)
-		functionButtons[X][Y] = false
-	}
-}
-func showFunctionButtons(selectedSequence int, eventsForLauchpad chan common.ALight, functionButtons [][]bool) {
-	for x := 0; x < 8; x++ {
-		common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: selectedSequence - 1, Brightness: full, Red: 3, Green: 255, Blue: 255})
-	}
-}
-
-func hideFunctionButtons(eventsForLauchpad chan common.ALight, functionButtons [][]bool) {
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 4; y++ {
-			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
 		}
 	}
 }
