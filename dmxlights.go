@@ -228,7 +228,9 @@ func main() {
 						flashButtons[8][4] = false
 					}
 					presets.SavePresets(presetsStore)
-					presets.InitPresets(eventsForLauchpad, presetsStore)
+					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
+					flashButtons[hit.X][hit.Y] = true
+					launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
 				} else {
 					// Load config, but only if it exists in the presets map.
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
