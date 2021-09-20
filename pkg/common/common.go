@@ -86,6 +86,13 @@ type Sequence struct {
 	Blackout     bool
 	Color        int
 	Master       int // Master Brightness
+	Functions    []Function
+}
+
+type Function struct {
+	Name   string
+	Number int
+	State  bool
 }
 
 type Channels struct {
@@ -183,7 +190,6 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 }
 
 func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
-
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
 		LightOff(eventsForLauchpad, 8, seq)
@@ -211,7 +217,7 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, commandChannels []chan Command, functionButtons [][]bool, X int, Y int) {
+func ToggleFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, commandChannels []chan Command, functionButtons [][]bool, X int, Y int) {
 	if !functionButtons[X][Y] {
 		functionButtons[X][Y] = true
 		HideFunctionButtons(eventsForLauchpad, functionButtons)
@@ -219,19 +225,13 @@ func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, co
 	} else {
 		HideFunctionButtons(eventsForLauchpad, functionButtons)
 		functionButtons[X][Y] = false
-		// unhide the sequence
-		cmd := Command{
-			UnHide: true,
-		}
-		SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-		// Wait for the sequence to end
-		time.Sleep(700 * time.Millisecond)
 	}
 }
-func ShowFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
-	for x := 0; x < 8; x++ {
-		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
-	}
+
+func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, X int, Y int) {
+	functionButtons[X][Y] = true
+	HideFunctionButtons(eventsForLauchpad, functionButtons)
+	ShowFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
 }
 
 func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool) {
@@ -242,21 +242,23 @@ func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool
 	}
 }
 
-func HideFunctionButtonsExcept(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
+func ShowFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
 	for x := 0; x < 8; x++ {
-		for y := 0; y < 4; y++ {
-			if y != selectedSequence-1 {
-				LightOn(eventsForLauchpad, ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0})
-			}
-		}
+		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 	}
+}
+
+func RevealSequence(sequences []*Sequence, selectedSequence int, commandChannels []chan Command, sendMesg bool) {
+	cmd := Command{
+		UnHide: true,
+	}
+	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 }
 
 func HideSequence(sequences []*Sequence, selectedSequence int, commandChannels []chan Command, sendMesg bool) {
 	cmd := Command{}
 	// Set the selected flag inside the sequence.
 	for _, sequence := range sequences {
-		//fmt.Printf("seq no %d   selected %d \n", sequence.Number, sequenceNumber)
 		if sequence.Number == selectedSequence {
 			sequence.Hide = true
 			cmd = Command{
@@ -274,5 +276,71 @@ func HideSequence(sequences []*Sequence, selectedSequence int, commandChannels [
 				SendCommandToAllSequenceExcept(selectedSequence, cmd, commandChannels)
 			}
 		}
+	}
+}
+
+func HandleSelect(sequences []*Sequence,
+	selectedSequence int,
+	X int,
+	Y int,
+	eventsForLauchpad chan ALight,
+	selectButtons [][]bool,
+	functionButtons [][]bool,
+	functionMode [][]bool,
+	commandChannels []chan Command) {
+
+	// Light the sequence selector button.
+	SequenceSelect(eventsForLauchpad, selectedSequence)
+
+	if functionMode[X][Y] && !selectButtons[X][Y] {
+		// Turn off function mode. Remove the function pads.
+		HideFunctionButtons(eventsForLauchpad, functionButtons)
+		// And reveal the sequence on the launchpad keys
+		RevealSequence(sequences, selectedSequence, commandChannels, true)
+		// Turn off the function mode flag.
+		functionMode[X][Y] = false
+		// Now forget we pressed twice and start again.
+		selectButtons[X][Y] = true
+		return
+	}
+	// This the first time we have pressed the select button.
+	if !selectButtons[X][Y] {
+		// assume everything else is off.
+		selectButtons[X][0] = false
+		selectButtons[X][1] = false
+		selectButtons[X][2] = false
+		selectButtons[X][3] = false
+		// But remember we have pressed this select button once.
+		functionMode[X][Y] = false
+		selectButtons[X][Y] = true
+		return
+	}
+
+	// Are we in function mode ?
+	if functionMode[X][Y] {
+		// Turn off function mode. Remove the function pads.
+		HideFunctionButtons(eventsForLauchpad, functionButtons)
+		// And reveal the sequence on the launchpad keys
+		RevealSequence(sequences, selectedSequence, commandChannels, true)
+		// Turn off the function mode flag.
+		functionMode[X][Y] = false
+		// Now forget we pressed twice and start again.
+		selectButtons[X][Y] = false
+		return
+	}
+
+	// We're not in function mode for this sequence.
+	if !functionMode[X][Y] {
+		// Set function mode.
+		functionMode[X][Y] = true
+
+		// And hide the sequence so we can only see the function buttons.
+		HideSequence(sequences, selectedSequence, commandChannels, true)
+
+		// Create the function buttons.
+		MakeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, X, Y)
+		// Now forget we pressed twice and start again.
+		selectButtons[X][Y] = false
+		return
 	}
 }

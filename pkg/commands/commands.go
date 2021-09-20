@@ -34,17 +34,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	// Now process any command.
 	if command.Hide {
-		fmt.Printf("Received select this sequence set to %t on Seq No %d\n", command.Hide, sequence.Number-1)
 		sequence.Hide = true
 		return sequence
 	}
 	if command.UnHide {
-		fmt.Printf("Received unselect this sequence set to %t on Seq No %d\n", command.Hide, sequence.Number-1)
+
 		sequence.Hide = false
 		return sequence
 	}
 	if command.MusicTrigger {
-		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
 		sequence.MusicTrigger = true
 		if sequence.MusicTrigger {
 			sequence.CurrentSpeed = time.Duration(12 * time.Hour)
@@ -52,24 +50,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.MusicTriggerOff {
-		fmt.Printf("Received Music Trigger set to %t on Seq No %d\n", command.MusicTrigger, sequence.Number-1)
 		sequence.MusicTrigger = false
-		fmt.Printf("Speed is %d\n", command.Speed)
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		return sequence
 	}
 	if command.SoftFadeOn {
-		fmt.Printf("Received SoftFadeOn set to %t on Seq No %d\n", command.SoftFadeOn, sequence.Number-1)
 		sequence.SoftFade = true
 		return sequence
 	}
 	if command.SoftFadeOff {
-		fmt.Printf("Received SoftFadeOff set to %t on Seq No %d\n", command.SoftFadeOff, sequence.Number-1)
 		sequence.SoftFade = false
 		return sequence
 	}
 	if command.UpdateSpeed {
-		fmt.Printf("Received update speed command %d\n", command.Speed)
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
@@ -77,17 +70,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdatePatten {
 		savePattenName := command.Patten.Name
-		fmt.Printf("Received update pattten %s\n", savePattenName)
 		sequence.Patten.Name = savePattenName
 		return sequence
 	}
 	if command.UpdateSize {
-		fmt.Printf("Received update size%v\n", command.Size)
 		sequence.Size = command.Size
 		return sequence
 	}
 	if command.IncreaseFade {
-		fmt.Printf("Received increase fade time of %v\n", command.FadeSpeed)
 		newFadeTime := SetSpeed(command.FadeSpeed)
 		sequence.Steps = sequence.Steps + 1
 		sequence.FadeTime = newFadeTime
@@ -95,7 +85,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.DecreaseFade {
-		fmt.Printf("Received decrease fade time of %v\n", command.FadeSpeed)
 		newFadeTime := SetSpeed(command.FadeSpeed)
 		sequence.Steps = sequence.Steps - 1
 		sequence.FadeTime = newFadeTime
@@ -104,35 +93,29 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdateColor {
 		color := command.Color
-		fmt.Printf("Received new color value of %v\n", color)
 		sequence.Color = color
 		return sequence
 	}
 	if command.Start {
-		fmt.Printf("Received Start Command on Seq No %d\n", sequence.Number)
 		sequence.MusicTrigger = command.MusicTrigger
 		sequence.Run = true
 		return sequence
 	}
 	if command.Stop {
-		fmt.Printf("Received Stop Command on Seq No %d\n", sequence.Number)
 		sequence.Run = false
 		return sequence
 	}
 	if command.Blackout {
-		fmt.Printf("Received Blackout Command\n")
 		sequence.Blackout = true
 		return sequence
 	}
 	if command.Normal {
-		fmt.Printf("Received Normal Command\n")
 		sequence.Blackout = false
 		return sequence
 	}
 
 	// If we are being asked for our config we must reply with our current sequence.
 	if command.ReadConfig {
-		fmt.Printf("Sending Reply on %d\n", sequence.Number)
 		replyChannel <- sequence
 		return sequence
 	}

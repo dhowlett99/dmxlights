@@ -16,7 +16,7 @@ func CreateSequence(
 	pattens map[string]common.Patten,
 	channels common.Channels) common.Sequence {
 
-	// set default values.
+	// Set default values.
 	sequence := common.Sequence{
 		Hide:         false,
 		Name:         sequenceType,
@@ -116,7 +116,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 			// Run the sequence through.
 			for step := 0; step < sequence.Steps; step++ {
-				//fmt.Printf("Seq %d  Selected is %t\n", mySequenceNumber, sequence.Selected)
 				cmd := common.FixtureCommand{
 					Hide:            sequence.Hide,
 					Tick:            true,

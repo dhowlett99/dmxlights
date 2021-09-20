@@ -41,6 +41,7 @@ func main() {
 
 	var flashButtons [][]bool
 	var functionButtons [][]bool
+	var functionMode [][]bool
 	var selectButtons [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
 	var musicSequence bool
@@ -162,6 +163,13 @@ func main() {
 	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
 		selectButtons[i] = make([]bool, 9)
+	}
+
+	// Initialize a ten length slice of empty slices for function mode state.
+	functionMode = make([][]bool, 9)
+	// Initialize those 10 empty function button slices
+	for i := 0; i < 9; i++ {
+		functionMode[i] = make([]bool, 9)
 	}
 
 	// Light the logo blue.
@@ -401,71 +409,36 @@ func main() {
 				}
 			}
 
+			// S E L E C T    S E Q U E N C E.
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				if selectButtons[8][0] {
-					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
-					common.HideSequence(sequences, selectedSequence, commandChannels, true)
-					selectButtons[8][0] = false
-				}
-				selectButtons[8][0] = true
-				selectButtons[8][1] = false
-				selectButtons[8][2] = false
-				selectButtons[8][3] = false
-				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
+				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+					selectButtons, functionButtons, functionMode, commandChannels)
 				continue
 			}
 
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				if selectButtons[8][1] {
-					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
-					common.HideSequence(sequences, selectedSequence, commandChannels, true)
-					selectButtons[8][1] = false
-				}
-				selectButtons[8][0] = false
-				selectButtons[8][1] = true
-				selectButtons[8][2] = false
-				selectButtons[8][3] = false
-				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
+				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+					selectButtons, functionButtons, functionMode, commandChannels)
 				continue
 			}
 
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				if selectButtons[8][2] {
-					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
-					common.HideSequence(sequences, selectedSequence, commandChannels, true)
-					selectButtons[8][2] = false
-				}
-				selectButtons[8][0] = false
-				selectButtons[8][1] = false
-				selectButtons[8][2] = true
-				selectButtons[8][3] = false
-				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
+				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+					selectButtons, functionButtons, functionMode, commandChannels)
 				continue
 			}
 
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
-				common.SequenceSelect(eventsForLauchpad, selectedSequence)
-				if selectButtons[8][3] {
-					common.MakeFunctionButtons(selectedSequence, eventsForLauchpad, commandChannels, functionButtons, hit.X, hit.Y)
-					common.HideSequence(sequences, selectedSequence, commandChannels, true)
-					selectButtons[8][3] = false
-				}
-				selectButtons[8][0] = false
-				selectButtons[8][1] = false
-				selectButtons[8][2] = false
-				selectButtons[8][3] = true
-				common.HideFunctionButtonsExcept(selectedSequence, eventsForLauchpad, functionButtons)
+				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+					selectButtons, functionButtons, functionMode, commandChannels)
 				continue
 			}
 
@@ -587,6 +560,16 @@ func main() {
 			// 	continue
 			// }
 
+			// Function buttons
+			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence-1] {
+				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
+				for _, s := range sequences {
+					for _, f := range s.Functions {
+						fmt.Printf("f: %t\n", f.State)
+					}
+				}
+			}
+
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
 			var sequence common.Sequence
 			sequence = common.Sequence{
@@ -595,7 +578,7 @@ func main() {
 					Steps: pattens["colors"].Steps,
 				},
 			}
-			if hit.X >= 0 && hit.X < 8 {
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] {
 				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
