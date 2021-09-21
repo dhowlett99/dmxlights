@@ -113,6 +113,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Blackout = false
 		return sequence
 	}
+	if command.UpdateFunctions {
+		sequence.Functions = command.Functions
+		return sequence
+	}
 
 	// If we are being asked for our config we must reply with our current sequence.
 	if command.ReadConfig {

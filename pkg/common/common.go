@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -58,6 +59,8 @@ type Command struct {
 	SoftFadeOff     bool
 	UpdateColor     bool
 	Color           int
+	UpdateFunctions bool
+	Functions       []Function
 }
 
 // Sequence describes sequences.
@@ -90,9 +93,10 @@ type Sequence struct {
 }
 
 type Function struct {
-	Name   string
-	Number int
-	State  bool
+	Name           string
+	SequenceNumber int
+	Number         int
+	State          bool
 }
 
 type Channels struct {
@@ -217,21 +221,21 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func ToggleFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, commandChannels []chan Command, functionButtons [][]bool, X int, Y int) {
-	if !functionButtons[X][Y] {
-		functionButtons[X][Y] = true
-		HideFunctionButtons(eventsForLauchpad, functionButtons)
-		ShowFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
-	} else {
-		HideFunctionButtons(eventsForLauchpad, functionButtons)
-		functionButtons[X][Y] = false
-	}
-}
-
-func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, X int, Y int) {
-	functionButtons[X][Y] = true
+func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, channels Channels) {
 	HideFunctionButtons(eventsForLauchpad, functionButtons)
-	ShowFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons)
+	// get an upto date copy of the sequence.
+	cmd := Command{
+		ReadConfig: true,
+	}
+	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
+
+	replyChannel := channels.ReplyChannels[selectedSequence-1]
+	sequence = <-replyChannel
+	fmt.Printf("Got seq\n")
+	for _, f := range sequence.Functions {
+		fmt.Printf("f:%d state:%t\n", f.Number, f.State)
+	}
+	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, functionButtons)
 }
 
 func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool) {
@@ -242,9 +246,15 @@ func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool
 	}
 }
 
-func ShowFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
-	for x := 0; x < 8; x++ {
-		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
+
+	for index, function := range sequence.Functions {
+		// fmt.Printf("show buttons   X %d   Y %d \n", index, selectedSequence)
+		if function.State {
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+		} else {
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+		}
 	}
 }
 
@@ -287,7 +297,8 @@ func HandleSelect(sequences []*Sequence,
 	selectButtons [][]bool,
 	functionButtons [][]bool,
 	functionMode [][]bool,
-	commandChannels []chan Command) {
+	commandChannels []chan Command,
+	channels Channels) {
 
 	// Light the sequence selector button.
 	SequenceSelect(eventsForLauchpad, selectedSequence)
@@ -338,7 +349,7 @@ func HandleSelect(sequences []*Sequence,
 		HideSequence(sequences, selectedSequence, commandChannels, true)
 
 		// Create the function buttons.
-		MakeFunctionButtons(selectedSequence, eventsForLauchpad, functionButtons, X, Y)
+		MakeFunctionButtons(*sequences[selectedSequence-1], selectedSequence, eventsForLauchpad, functionButtons, channels)
 		// Now forget we pressed twice and start again.
 		selectButtons[X][Y] = false
 		return

@@ -139,8 +139,8 @@ func main() {
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	// Light the function buttons at the top and bottom.
-	common.ShowFunctionButtons(0, eventsForLauchpad, functionButtons)
-	common.ShowFunctionButtons(8, eventsForLauchpad, functionButtons)
+	common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
+	common.ShowFunctionButtons(sequence1, 8, eventsForLauchpad, functionButtons)
 
 	fmt.Println("Setup Presets Done")
 
@@ -414,7 +414,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels)
+					selectButtons, functionButtons, functionMode, commandChannels, channels)
 				continue
 			}
 
@@ -422,7 +422,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels)
+					selectButtons, functionButtons, functionMode, commandChannels, channels)
 				continue
 			}
 
@@ -430,7 +430,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels)
+					selectButtons, functionButtons, functionMode, commandChannels, channels)
 				continue
 			}
 
@@ -438,7 +438,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels)
+					selectButtons, functionButtons, functionMode, commandChannels, channels)
 				continue
 			}
 
@@ -562,12 +562,44 @@ func main() {
 
 			// Function buttons
 			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence-1] {
-				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
-				for _, s := range sequences {
-					for _, f := range s.Functions {
-						fmt.Printf("f: %t\n", f.State)
+				fmt.Printf("FUNCTIONS X=%d   Y=%d\n", hit.X, hit.Y)
+
+				// get an upto date copy of the sequence.
+				cmd := common.Command{
+					ReadConfig: true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				sequence := common.Sequence{}
+				replyChannel := channels.ReplyChannels[selectedSequence-1]
+				sequence = <-replyChannel
+				fmt.Printf("Got seq\n")
+				for _, f := range sequence.Functions {
+					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
+				}
+
+				for _, functions := range sequence.Functions {
+					fmt.Printf("Y is %d  Func seq no is %d\n", hit.Y, functions.SequenceNumber)
+					if hit.Y == functions.SequenceNumber {
+						fmt.Printf("state is %t\n", sequence.Functions[hit.X].State)
+						if !sequence.Functions[hit.X].State {
+							sequence.Functions[hit.X].State = true
+							break
+						}
+						if sequence.Functions[hit.X].State {
+							sequence.Functions[hit.X].State = false
+							break
+						}
 					}
 				}
+				common.ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, functionButtons)
+				// Send update functions command.
+				cmd = common.Command{
+					UpdateFunctions: true,
+					Functions:       sequence.Functions,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				continue
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
@@ -579,7 +611,7 @@ func main() {
 				},
 			}
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] {
-				fmt.Printf("X=%d   Y=%d\n", hit.X, hit.Y)
+				fmt.Printf("FLASH X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B

@@ -22,7 +22,6 @@ func SaveConfig(config []common.Sequence, filename string) {
 	if err != nil {
 		log.Fatalf("Error writing config: %v to file:%s", err, filename)
 	}
-
 }
 
 func LoadConfig(filename string) []common.Sequence {

@@ -1,6 +1,7 @@
 package sequence
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -48,6 +49,17 @@ func CreateSequence(
 		Shift:    2,
 		Blackout: false,
 		Master:   255,
+	}
+
+	// Make functions for each of the sequences.
+	for function := 0; function < 8; function++ {
+		newFunction := common.Function{
+			Name:           fmt.Sprintf("function %d", function),
+			SequenceNumber: mySequenceNumber - 1,
+			Number:         function,
+			State:          true,
+		}
+		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 	return sequence
 }
