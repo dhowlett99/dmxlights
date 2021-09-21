@@ -562,8 +562,6 @@ func main() {
 
 			// Function buttons
 			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence-1] {
-				fmt.Printf("FUNCTIONS X=%d   Y=%d\n", hit.X, hit.Y)
-
 				// get an upto date copy of the sequence.
 				cmd := common.Command{
 					ReadConfig: true,
@@ -573,7 +571,7 @@ func main() {
 				sequence := common.Sequence{}
 				replyChannel := channels.ReplyChannels[selectedSequence-1]
 				sequence = <-replyChannel
-				fmt.Printf("Got seq\n")
+
 				for _, f := range sequence.Functions {
 					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
 				}
@@ -611,7 +609,6 @@ func main() {
 				},
 			}
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] {
-				fmt.Printf("FLASH X=%d   Y=%d\n", hit.X, hit.Y)
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B

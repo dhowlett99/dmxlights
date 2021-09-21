@@ -183,7 +183,7 @@ type Event struct {
 
 // LightOn Turn on a common.Light.
 func LightOn(eventsForLauchpad chan ALight, Light ALight) {
-	event := ALight{X: Light.X, Y: Light.Y, Brightness: 255, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
+	event := ALight{X: Light.X, Y: Light.Y, Brightness: Light.Brightness, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
 	eventsForLauchpad <- event
 }
 
@@ -251,9 +251,9 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	for index, function := range sequence.Functions {
 		// fmt.Printf("show buttons   X %d   Y %d \n", index, selectedSequence)
 		if function.State {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 		}
 	}
 }

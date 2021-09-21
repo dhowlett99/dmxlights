@@ -27,7 +27,7 @@ func CreateSequence(
 		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
-		Bounce:       true,
+		Bounce:       false,
 		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     sequenceType,
@@ -57,7 +57,7 @@ func CreateSequence(
 			Name:           fmt.Sprintf("function %d", function),
 			SequenceNumber: mySequenceNumber - 1,
 			Number:         function,
-			State:          true,
+			State:          false,
 		}
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
@@ -114,6 +114,13 @@ func PlayNewSequence(sequence common.Sequence,
 
 		if sequence.Run {
 
+			// Map function keys 0-7 to sequencer functions.
+			sequence.Bounce = sequence.Functions[6].State
+			sequence.MusicTrigger = sequence.Functions[7].State
+			if sequence.MusicTrigger {
+				sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+			}
+
 			if sequence.Patten.Name == "scanner" {
 				sequence.Type = "scanner"
 			}
@@ -124,7 +131,7 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 
 			// Calulate positions for fixtures based on patten.
-			positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, true)
+			positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
 
 			// Run the sequence through.
 			for step := 0; step < sequence.Steps; step++ {
