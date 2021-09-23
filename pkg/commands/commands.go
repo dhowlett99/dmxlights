@@ -103,6 +103,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.Stop {
 		sequence.Run = false
+		sequence.Static = false
 		return sequence
 	}
 	if command.Blackout {
