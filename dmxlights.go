@@ -44,10 +44,11 @@ func main() {
 	var functionMode [][]bool
 	var selectButtons [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
-	var musicSequence bool
 
+	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
 
+	// Save the presets on exit.
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
@@ -57,7 +58,6 @@ func main() {
 	}()
 
 	fmt.Println("Derek Lighting")
-
 	fmt.Println("Loading Presets")
 	presetsStore = presets.LoadPresets()
 	fmt.Println("Loading Presets Done")
@@ -72,6 +72,7 @@ func main() {
 	}
 	defer pad.Close()
 
+	// We need to be in programmers mode to use the launchpad.
 	fmt.Println("Set Programmers Mode")
 	pad.Program()
 
@@ -280,7 +281,6 @@ func main() {
 							newSequence := common.Sequence{}
 							replyChannel := channels.ReplyChannels[s-1]
 							newSequence = <-replyChannel
-							fmt.Printf("found newSeq %d\n", newSequence.Number)
 
 							// Make sure the music trigger is set.
 							if newSequence.Functions[common.Function8_Music_Trigger].State {
@@ -369,7 +369,7 @@ func main() {
 
 			// Decrease speed of selected sequence.
 			if hit.X == 0 && hit.Y == 7 {
-				if !musicSequence {
+				if !sequences[selectedSequence-1].MusicTrigger {
 					sequenceSpeed--
 					if sequenceSpeed < 0 {
 						sequenceSpeed = 1
@@ -385,7 +385,7 @@ func main() {
 
 			// Increase speed of selected sequence.
 			if hit.X == 1 && hit.Y == 7 {
-				if !musicSequence {
+				if !sequences[selectedSequence-1].MusicTrigger {
 					sequenceSpeed++
 					if sequenceSpeed > 20 {
 						sequenceSpeed = 20
@@ -396,27 +396,6 @@ func main() {
 					}
 					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 					continue
-				}
-			}
-
-			// Set or unset music trigger on this sequence.
-			if hit.X == 7 && hit.Y == -1 {
-				if sequences[selectedSequence-1].MusicTrigger {
-					musicSequence = false
-					sequences[selectedSequence-1].MusicTrigger = false
-					cmd := common.Command{
-						MusicTriggerOff: true,
-						Speed:           sequenceSpeed,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				} else {
-					musicSequence = true
-					sequences[selectedSequence-1].MusicTrigger = true
-					cmd := common.Command{
-						MusicTrigger: true,
-						Speed:        sequenceSpeed,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 
@@ -472,7 +451,7 @@ func main() {
 
 			// Start sequence.
 			if hit.X == 8 && hit.Y == 5 {
-				musicSequence = false
+				sequences[selectedSequence-1].MusicTrigger = false
 				cmd := common.Command{
 					Start:        true,
 					Speed:        sequenceSpeed,
