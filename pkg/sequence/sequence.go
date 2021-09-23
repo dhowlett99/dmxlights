@@ -115,9 +115,9 @@ func PlayNewSequence(sequence common.Sequence,
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
 
-		//fmt.Printf("Static colors %+v\n", sequence.StaticColors)
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
+		// Sequence in Static Mode.
 		if sequence.Static {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
@@ -127,6 +127,8 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 			continue
 		}
+
+		// Sequence in Normal Running Mode.
 		if sequence.Run {
 
 			// Map function keys 0-7 to sequencer functions.

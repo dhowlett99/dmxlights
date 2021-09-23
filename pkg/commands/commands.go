@@ -38,20 +38,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.UnHide {
-
 		sequence.Hide = false
 		return sequence
 	}
 	if command.MusicTrigger {
 		sequence.MusicTrigger = true
-		if sequence.MusicTrigger {
-			sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		}
+		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		sequence.Run = true
 		return sequence
 	}
 	if command.MusicTriggerOff {
 		sequence.MusicTrigger = false
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
+		sequence.Run = true
 		return sequence
 	}
 	if command.SoftFadeOn {
@@ -121,14 +120,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	if command.UpdateStatic {
 		sequence.Static = command.Static
-		sequence.Run = false
 		return sequence
 	}
 
 	if command.UpdateStaticColor {
+		fmt.Printf("Update StaticColor to %t\n", command.Static)
 		sequence.Static = command.Static
 		sequence.StaticColors[command.StaticLamp] = command.StaticColor
-		sequence.Run = false
 		return sequence
 	}
 

@@ -92,10 +92,10 @@ func main() {
 	}
 
 	// Now add them all to a handy channels struct.
-	channels := common.Channels{}
-	channels.CommmandChannels = commandChannels
-	channels.ReplyChannels = replyChannels
-	channels.SoundTriggerChannels = soundTriggerChannels
+	sequenceChannels := common.Channels{}
+	sequenceChannels.CommmandChannels = commandChannels
+	sequenceChannels.ReplyChannels = replyChannels
+	sequenceChannels.SoundTriggerChannels = soundTriggerChannels
 
 	// Get a list of all the fixtures in the groups.
 	fixturesConfig := fixture.LoadFixtures()
@@ -115,10 +115,10 @@ func main() {
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
 
-	sequence1 := sequence.CreateSequence("standard", 1, pattens, channels)
-	sequence2 := sequence.CreateSequence("standard", 2, pattens, channels)
-	sequence3 := sequence.CreateSequence("scanner", 3, pattens, channels)
-	sequence4 := sequence.CreateSequence("standard", 4, pattens, channels)
+	sequence1 := sequence.CreateSequence("standard", 1, pattens, sequenceChannels)
+	sequence2 := sequence.CreateSequence("standard", 2, pattens, sequenceChannels)
+	sequence3 := sequence.CreateSequence("scanner", 3, pattens, sequenceChannels)
+	sequence4 := sequence.CreateSequence("standard", 4, pattens, sequenceChannels)
 
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
@@ -128,13 +128,13 @@ func main() {
 	sequences = append(sequences, &sequence4)
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	sound.NewSoundTrigger(sequences, channels)
+	sound.NewSoundTrigger(sequences, sequenceChannels)
 
 	// Start threads for each sequence.
-	go sequence.PlayNewSequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlayNewSequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlayNewSequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
-	go sequence.PlayNewSequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, channels)
+	go sequence.PlayNewSequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -285,18 +285,20 @@ func main() {
 
 							// Listen for the reply and set the newSequence with the values.
 							newSequence := common.Sequence{}
-							replyChannel := channels.ReplyChannels[s-1]
+							replyChannel := sequenceChannels.ReplyChannels[s-1]
 							newSequence = <-replyChannel
 
 							// Make sure the music trigger is set.
 							if newSequence.Functions[common.Function8_Music_Trigger].State {
 								sequences[s-1].MusicTrigger = true
+								cmd := common.Command{
+									MusicTrigger: true,
+								}
+								common.SendCommandToSequence(s, cmd, commandChannels)
 							} else {
 								sequences[s-1].MusicTrigger = false
-								sequenceSpeed = sequences[s-1].Speed // Put the speed back.
 								cmd := common.Command{
-									Speed:       sequenceSpeed,
-									UpdateSpeed: true,
+									MusicTriggerOff: true,
 								}
 								common.SendCommandToSequence(s, cmd, commandChannels)
 							}
@@ -437,7 +439,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 0 {
 				selectedSequence = 1
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, channels)
+					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
 			}
 
@@ -445,7 +447,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 1 {
 				selectedSequence = 2
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, channels)
+					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
 			}
 
@@ -453,7 +455,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 2 {
 				selectedSequence = 3
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, channels)
+					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
 			}
 
@@ -461,7 +463,7 @@ func main() {
 			if hit.X == 8 && hit.Y == 3 {
 				selectedSequence = 4
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, channels)
+					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
 			}
 
@@ -592,7 +594,7 @@ func main() {
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				newSequence := common.Sequence{}
-				replyChannel := channels.ReplyChannels[selectedSequence-1]
+				replyChannel := sequenceChannels.ReplyChannels[selectedSequence-1]
 				newSequence = <-replyChannel
 
 				for _, f := range newSequence.Functions {
@@ -624,10 +626,19 @@ func main() {
 				// Make sure the music trigger is set.
 				if newSequence.Functions[common.Function8_Music_Trigger].State {
 					sequences[selectedSequence-1].MusicTrigger = true
+					cmd := common.Command{
+						MusicTrigger: true,
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				} else {
+					cmd := common.Command{
+						MusicTriggerOff: true,
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 					sequences[selectedSequence-1].MusicTrigger = false
 					sequenceSpeed = 14 //Default to 25 Millisecond
-					cmd := common.Command{
+					cmd = common.Command{
 						UpdateSpeed: true,
 						Speed:       sequenceSpeed,
 					}
@@ -731,3 +742,21 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DM
 		}
 	}
 }
+
+// func refreshSequence(sequences []*common.Sequence, sequenceChannels common.Channels, commandChannels []chan common.Command) (newSequences []*common.Sequence) {
+
+// 	for selectedSequence := range sequences {
+// 		cmd := common.Command{
+// 			ReadConfig: true,
+// 		}
+// 		common.SendCommandToSequence(selectedSequence+1, cmd, commandChannels)
+
+// 		newSequence := common.Sequence{}
+// 		replyChannel := sequenceChannels.ReplyChannels[selectedSequence]
+// 		newSequence = <-replyChannel
+
+// 		newSequences = append(newSequences, &newSequence)
+// 	}
+
+// 	return newSequences
+// }
