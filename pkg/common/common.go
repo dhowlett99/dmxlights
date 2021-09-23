@@ -181,6 +181,18 @@ type Event struct {
 	Color     Color
 }
 
+// Define the function keys.
+const (
+	Function1_Forward_Chase = 0
+	Function2_Undef         = 1
+	Function3_Undef         = 2
+	Function4_Undef         = 3
+	Function5_Undef         = 4
+	Function6_Undef         = 5
+	Function7_Bounce        = 6
+	Function8_Music_Trigger = 7
+)
+
 // LightOn Turn on a common.Light.
 func LightOn(eventsForLauchpad chan ALight, Light ALight) {
 	event := ALight{X: Light.X, Y: Light.Y, Brightness: Light.Brightness, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}

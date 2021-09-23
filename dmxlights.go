@@ -267,6 +267,34 @@ func main() {
 						}
 						flashButtons[hit.X][hit.Y] = true
 						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
+
+						// Get a copy of the function button settings for all the sequences.
+						for s := 1; s < len(sequences)+1; s++ {
+							// Get an upto date copy of the sequence.
+							cmd = common.Command{
+								ReadConfig: true,
+							}
+							common.SendCommandToSequence(s, cmd, commandChannels)
+
+							// Listen for the reply and set the newSequence with the values.
+							newSequence := common.Sequence{}
+							replyChannel := channels.ReplyChannels[s-1]
+							newSequence = <-replyChannel
+							fmt.Printf("found newSeq %d\n", newSequence.Number)
+
+							// Make sure the music trigger is set.
+							if newSequence.Functions[common.Function8_Music_Trigger].State {
+								sequences[s-1].MusicTrigger = true
+							} else {
+								sequences[s-1].MusicTrigger = false
+								sequenceSpeed = sequences[s-1].Speed // Put the speed back.
+								cmd := common.Command{
+									Speed:       sequenceSpeed,
+									UpdateSpeed: true,
+								}
+								common.SendCommandToSequence(s, cmd, commandChannels)
+							}
+						}
 					}
 				}
 			}
@@ -568,35 +596,49 @@ func main() {
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-				sequence := common.Sequence{}
+				newSequence := common.Sequence{}
 				replyChannel := channels.ReplyChannels[selectedSequence-1]
-				sequence = <-replyChannel
+				newSequence = <-replyChannel
 
-				for _, f := range sequence.Functions {
+				for _, f := range newSequence.Functions {
 					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
 				}
 
-				for _, functions := range sequence.Functions {
+				for _, functions := range newSequence.Functions {
 					fmt.Printf("Y is %d  Func seq no is %d\n", hit.Y, functions.SequenceNumber)
 					if hit.Y == functions.SequenceNumber {
-						fmt.Printf("state is %t\n", sequence.Functions[hit.X].State)
-						if !sequence.Functions[hit.X].State {
-							sequence.Functions[hit.X].State = true
+						fmt.Printf("state is %t\n", newSequence.Functions[hit.X].State)
+						if !newSequence.Functions[hit.X].State {
+							newSequence.Functions[hit.X].State = true
 							break
 						}
-						if sequence.Functions[hit.X].State {
-							sequence.Functions[hit.X].State = false
+						if newSequence.Functions[hit.X].State {
+							newSequence.Functions[hit.X].State = false
 							break
 						}
 					}
 				}
-				common.ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, functionButtons)
+				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
 				// Send update functions command.
 				cmd = common.Command{
 					UpdateFunctions: true,
-					Functions:       sequence.Functions,
+					Functions:       newSequence.Functions,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				// Make sure the music trigger is set.
+				if newSequence.Functions[common.Function8_Music_Trigger].State {
+					sequences[selectedSequence-1].MusicTrigger = true
+				} else {
+					sequences[selectedSequence-1].MusicTrigger = false
+					sequenceSpeed = 14 //Default to 25 Millisecond
+					cmd := common.Command{
+						Speed:       sequenceSpeed,
+						UpdateSpeed: true,
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				}
+
 				continue
 			}
 

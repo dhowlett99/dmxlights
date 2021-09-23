@@ -115,8 +115,8 @@ func PlayNewSequence(sequence common.Sequence,
 		if sequence.Run {
 
 			// Map function keys 0-7 to sequencer functions.
-			sequence.Bounce = sequence.Functions[6].State
-			sequence.MusicTrigger = sequence.Functions[7].State
+			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
+			sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 			if sequence.MusicTrigger {
 				sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 			}
