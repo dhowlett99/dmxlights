@@ -634,15 +634,19 @@ func main() {
 					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 
-				if newSequence.Functions[common.Function6_Static].State {
-					// Make sure Static is set correctly
-					cmd = common.Command{
-						UpdateStatic: true,
-						Static:       true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-					fmt.Printf("no %d ===> I sent a static command.\n", selectedSequence-1)
+				// If we're unsetting static, then drop any presets as they would no longer apply.
+				if !newSequence.Functions[common.Function6_Static].State {
+					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
+					presets.InitPresets(eventsForLauchpad, presetsStore)
 				}
+				// Always make sure Static is set correctly
+				cmd = common.Command{
+					UpdateStatic: true,
+					Static:       newSequence.Functions[common.Function6_Static].State,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				fmt.Printf("no %d ===> set static to %t .\n", selectedSequence-1, newSequence.Functions[common.Function6_Static].State)
+				//}
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.

@@ -120,15 +120,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 
 	if command.UpdateStatic {
-		//fmt.Printf("received UpdateStatic command.\n")
-		sequence.Static = true
+		sequence.Static = command.Static
 		sequence.Run = false
 		return sequence
 	}
 
 	if command.UpdateStaticColor {
 		sequence.Static = command.Static
-		//fmt.Printf("Command colors %+v\n", command.StaticColor)
 		sequence.StaticColors[command.StaticLamp] = command.StaticColor
 		sequence.Run = false
 		return sequence

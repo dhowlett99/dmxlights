@@ -250,7 +250,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 
 	replyChannel := channels.ReplyChannels[selectedSequence-1]
 	sequence = <-replyChannel
-	fmt.Printf("Got seq\n")
+
 	for _, f := range sequence.Functions {
 		fmt.Printf("f:%d state:%t\n", f.Number, f.State)
 	}

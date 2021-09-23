@@ -120,7 +120,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 		if sequence.Static {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
-				launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
+				if !sequence.Hide {
+					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
+				}
 				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 			continue
