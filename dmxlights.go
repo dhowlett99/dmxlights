@@ -204,6 +204,11 @@ func main() {
 				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 				presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
 				presets.InitPresets(eventsForLauchpad, presetsStore)
+				// Make sure we stop all sequences.
+				cmd := common.Command{
+					Stop: true,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
 
@@ -257,6 +262,7 @@ func main() {
 						allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 
 						time.Sleep(850 * time.Millisecond)
+
 						// Load the config.
 						config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
 
@@ -293,6 +299,16 @@ func main() {
 									UpdateSpeed: true,
 								}
 								common.SendCommandToSequence(s, cmd, commandChannels)
+							}
+
+							// Make sure Static is set correctly
+							if newSequence.Functions[common.Function6_Static].State {
+								sequences[s-1].Static = newSequence.Functions[common.Function6_Static].State
+								cmd = common.Command{
+									UpdateStatic: true,
+									Static:       newSequence.Functions[common.Function6_Static].State,
+								}
+								common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 							}
 						}
 					}
@@ -612,13 +628,21 @@ func main() {
 					sequences[selectedSequence-1].MusicTrigger = false
 					sequenceSpeed = 14 //Default to 25 Millisecond
 					cmd := common.Command{
-						Speed:       sequenceSpeed,
 						UpdateSpeed: true,
+						Speed:       sequenceSpeed,
 					}
 					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 
-				continue
+				if newSequence.Functions[common.Function6_Static].State {
+					// Make sure Static is set correctly
+					cmd = common.Command{
+						UpdateStatic: true,
+						Static:       true,
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+					fmt.Printf("no %d ===> I sent a static command.\n", selectedSequence-1)
+				}
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
@@ -629,7 +653,8 @@ func main() {
 					Steps: pattens["colors"].Steps,
 				},
 			}
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] {
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
+				!sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
 				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
 				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
@@ -649,6 +674,24 @@ func main() {
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
 				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+			}
+
+			// S E T    S T A T I C   C O L O R
+			// Static is set to true in the functions.
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
+				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
+
+				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
+				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
+				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+
+				cmd := common.Command{
+					UpdateStaticColor: true,
+					Static:            true,
+					StaticLamp:        hit.X,
+					StaticColor:       common.Color{R: red, G: green, B: blue},
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 
 			// Blackout button.

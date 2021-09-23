@@ -7,6 +7,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk2"
 )
@@ -17,9 +18,13 @@ func CreateSequence(
 	pattens map[string]common.Patten,
 	channels common.Channels) common.Sequence {
 
+	// Make a map to hold static colors.
+	staticColors := make(map[int]common.Color)
+
 	// Set default values.
 	sequence := common.Sequence{
 		Hide:         false,
+		StaticColors: staticColors,
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
 		FadeSpeed:    9,
@@ -70,7 +75,7 @@ func PlayNewSequence(sequence common.Sequence,
 	eventsForLauchpad chan common.ALight,
 	pattens map[string]common.Patten,
 	dmxController ft232.DMXController,
-	fixtures *fixture.Fixtures,
+	fixtureConfig *fixture.Fixtures,
 	channels common.Channels) {
 
 	positions := map[int][]common.Position{}
@@ -97,21 +102,29 @@ func PlayNewSequence(sequence common.Sequence,
 	fixtureChannels = append(fixtureChannels, fixtureChannel8)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixtures)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
 
+		//fmt.Printf("Static colors %+v\n", sequence.StaticColors)
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
+		if sequence.Static {
+			for myFixtureNumber, lamp := range sequence.StaticColors {
+				launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
+			}
+			continue
+		}
 		if sequence.Run {
 
 			// Map function keys 0-7 to sequencer functions.

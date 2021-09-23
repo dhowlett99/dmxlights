@@ -31,40 +31,47 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
-	UnHide          bool
-	Hide            bool
-	Name            string
-	Number          int
-	Start           bool
-	Stop            bool
-	ReadConfig      bool
-	LoadConfig      bool
-	UpdateSpeed     bool
-	Speed           int
-	UpdatePatten    bool
-	Patten          Patten
-	IncreaseFade    bool
-	DecreaseFade    bool
-	FadeTime        time.Duration
-	FadeSpeed       int
-	UpdateSize      bool
-	Size            int
-	X               int
-	Y               int
-	Blackout        bool
-	Normal          bool
-	MusicTrigger    bool
-	MusicTriggerOff bool
-	SoftFadeOn      bool
-	SoftFadeOff     bool
-	UpdateColor     bool
-	Color           int
-	UpdateFunctions bool
-	Functions       []Function
+	Static            bool
+	UpdateStatic      bool
+	UpdateStaticColor bool
+	StaticColor       Color
+	StaticLamp        int
+	UnHide            bool
+	Hide              bool
+	Name              string
+	Number            int
+	Start             bool
+	Stop              bool
+	ReadConfig        bool
+	LoadConfig        bool
+	UpdateSpeed       bool
+	Speed             int
+	UpdatePatten      bool
+	Patten            Patten
+	IncreaseFade      bool
+	DecreaseFade      bool
+	FadeTime          time.Duration
+	FadeSpeed         int
+	UpdateSize        bool
+	Size              int
+	X                 int
+	Y                 int
+	Blackout          bool
+	Normal            bool
+	MusicTrigger      bool
+	MusicTriggerOff   bool
+	SoftFadeOn        bool
+	SoftFadeOff       bool
+	UpdateColor       bool
+	Color             int
+	UpdateFunctions   bool
+	Functions         []Function
 }
 
 // Sequence describes sequences.
 type Sequence struct {
+	Static       bool
+	StaticColors map[int]Color
 	Hide         bool
 	Type         string
 	FadeTime     time.Duration
@@ -188,7 +195,7 @@ const (
 	Function3_Undef         = 2
 	Function4_Undef         = 3
 	Function5_Undef         = 4
-	Function6_Undef         = 5
+	Function6_Static        = 5 // Static Colors.
 	Function7_Bounce        = 6
 	Function8_Music_Trigger = 7
 )

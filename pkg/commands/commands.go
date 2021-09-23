@@ -65,7 +65,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	if command.UpdateSpeed {
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
-		sequence.Run = true
 		return sequence
 	}
 	if command.UpdatePatten {
@@ -98,6 +97,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.Start {
 		sequence.MusicTrigger = command.MusicTrigger
+		sequence.Static = false
 		sequence.Run = true
 		return sequence
 	}
@@ -115,6 +115,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdateFunctions {
 		sequence.Functions = command.Functions
+		return sequence
+	}
+
+	if command.UpdateStatic {
+		//fmt.Printf("received UpdateStatic command.\n")
+		sequence.Static = true
+		sequence.Run = false
+		return sequence
+	}
+
+	if command.UpdateStaticColor {
+		sequence.Static = command.Static
+		//fmt.Printf("Command colors %+v\n", command.StaticColor)
+		sequence.StaticColors[command.StaticLamp] = command.StaticColor
+		sequence.Run = false
 		return sequence
 	}
 
