@@ -261,6 +261,7 @@ func main() {
 						// Clear all the fixtures down ready for the next scene.
 						allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 
+						// Wait for all the sequences to stop.
 						time.Sleep(850 * time.Millisecond)
 
 						// Load the config.
@@ -587,24 +588,22 @@ func main() {
 
 			// Function buttons
 			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence-1] {
-				// get an upto date copy of the sequence.
+				// Get an upto date copy of the sequence.
 				cmd := common.Command{
 					ReadConfig: true,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
+				// Create a temporary sequence.
 				newSequence := common.Sequence{}
 				replyChannel := sequenceChannels.ReplyChannels[selectedSequence-1]
+
+				// Wait for sequence.
 				newSequence = <-replyChannel
 
-				for _, f := range newSequence.Functions {
-					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
-				}
-
+				// We've pushed a function key, this is where we set the value inside the temporary sequence.
 				for _, functions := range newSequence.Functions {
-					fmt.Printf("Y is %d  Func seq no is %d\n", hit.Y, functions.SequenceNumber)
 					if hit.Y == functions.SequenceNumber {
-						fmt.Printf("state is %t\n", newSequence.Functions[hit.X].State)
 						if !newSequence.Functions[hit.X].State {
 							newSequence.Functions[hit.X].State = true
 							break
@@ -615,8 +614,9 @@ func main() {
 						}
 					}
 				}
-				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
-				// Send update functions command.
+
+				// Send update functions command. This sets the temporary representation of
+				// the function keys in the real sequence.
 				cmd = common.Command{
 					UpdateFunctions: true,
 					Functions:       newSequence.Functions,
@@ -650,33 +650,43 @@ func main() {
 					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 				}
-				// Always make sure Static is set correctly
+				// Always make sure Static flag is set correctly
 				cmd = common.Command{
 					UpdateStatic: true,
 					Static:       newSequence.Functions[common.Function6_Static].State,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				fmt.Printf("no %d ===> set static to %t .\n", selectedSequence-1, newSequence.Functions[common.Function6_Static].State)
-				//}
+
+				// If we are setting static then stop all the sequences and clear the launchpad.
+				cmd = common.Command{
+					Stop: true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+
+				// Light the correct function key.
+				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
-			var sequence common.Sequence
-			sequence = common.Sequence{
-				Patten: common.Patten{
-					Name:  "colors",
-					Steps: pattens["colors"].Steps,
-				},
-			}
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
 				!sequences[selectedSequence-1].Functions[common.Function6_Static].State {
-				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
-				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
-				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
-				pan := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Pan
-				tilt := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Tilt
-				shutter := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Shutter
-				gobo := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Gobo
+
+				flashSequence := common.Sequence{
+					Patten: common.Patten{
+						Name:  "colors",
+						Steps: pattens["colors"].Steps,
+					},
+				}
+
+				red := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
+				green := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
+				blue := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+				pan := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Pan
+				tilt := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Tilt
+				shutter := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Shutter
+				gobo := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Gobo
+
 				common.LightOn(eventsForLauchpad, common.ALight{
 					X:          hit.X,
 					Y:          hit.Y,
@@ -696,9 +706,16 @@ func main() {
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
 				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
-				red := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
-				green := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
-				blue := sequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+				staticSequence := common.Sequence{
+					Patten: common.Patten{
+						Name:  "colors",
+						Steps: pattens["colors"].Steps,
+					},
+				}
+
+				red := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
+				green := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
+				blue := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
 
 				cmd := common.Command{
 					UpdateStaticColor: true,
@@ -709,7 +726,7 @@ func main() {
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 
-			// Blackout button.
+			// B L A C K O U T   B U T T O N.
 			if hit.X == 8 && hit.Y == 7 {
 				if !blackout {
 					fmt.Printf("B L A C K O U T \n")
