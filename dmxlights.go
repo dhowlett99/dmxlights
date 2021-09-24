@@ -127,6 +127,17 @@ func main() {
 	sequences = append(sequences, &sequence3)
 	sequences = append(sequences, &sequence4)
 
+	staticButtons := []common.StaticColorButtons{}
+	staticButton1 := common.StaticColorButtons{}
+	staticButton2 := common.StaticColorButtons{}
+	staticButton3 := common.StaticColorButtons{}
+	staticButton4 := common.StaticColorButtons{}
+
+	staticButtons = append(staticButtons, staticButton1)
+	staticButtons = append(staticButtons, staticButton2)
+	staticButtons = append(staticButtons, staticButton3)
+	staticButtons = append(staticButtons, staticButton4)
+
 	// Create a sound trigger object and give it the sequences so it can access their configs.
 	sound.NewSoundTrigger(sequences, sequenceChannels)
 
@@ -140,7 +151,7 @@ func main() {
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	// Light the function buttons at the top and bottom.
-	common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
+	//common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
 	common.ShowFunctionButtons(sequence1, 8, eventsForLauchpad, functionButtons)
 
 	fmt.Println("Setup Presets Done")
@@ -164,9 +175,7 @@ func main() {
 	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
 		selectButtons[i] = make([]bool, 9)
-	}
-
-	// Initialize a ten length slice of empty slices for function mode state.
+	} // Initialize a ten length slice of empty slices for function mode state.
 	functionMode = make([][]bool, 9)
 	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
@@ -669,7 +678,7 @@ func main() {
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y >= 0 &&
 				!sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
 				flashSequence := common.Sequence{
@@ -701,22 +710,45 @@ func main() {
 				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 			}
 
+			// C H O O S E   S T A T I C    C O L O R
+			if hit.X == 1 && hit.Y == -1 {
+				if staticButtons[selectedSequence-1].Color.R > 254 {
+					staticButtons[selectedSequence-1].Color.R = 0
+				} else {
+					staticButtons[selectedSequence-1].Color.R = staticButtons[selectedSequence-1].Color.R + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence-1].Color.R, Green: 0, Blue: 0})
+			}
+
+			if hit.X == 2 && hit.Y == -1 {
+				if staticButtons[selectedSequence-1].Color.G > 254 {
+					staticButtons[selectedSequence-1].Color.G = 0
+				} else {
+					staticButtons[selectedSequence-1].Color.G = staticButtons[selectedSequence-1].Color.G + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence-1].Color.G, Blue: 0})
+			}
+
+			if hit.X == 3 && hit.Y == -1 {
+
+				if staticButtons[selectedSequence-1].Color.B > 254 {
+					staticButtons[selectedSequence-1].Color.B = 0
+				} else {
+					staticButtons[selectedSequence-1].Color.B = staticButtons[selectedSequence-1].Color.B + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence-1].Color.B})
+			}
+
 			// S E T    S T A T I C   C O L O R
-			// Static is set to true in the functions.
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
 				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
-				staticSequence := common.Sequence{
-					Patten: common.Patten{
-						Name:  "colors",
-						Steps: pattens["colors"].Steps,
-					},
-				}
+				red := staticButtons[selectedSequence-1].Color.R
+				green := staticButtons[selectedSequence-1].Color.G
+				blue := staticButtons[selectedSequence-1].Color.B
 
-				red := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
-				green := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
-				blue := staticSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
-
+				// Static is set to true in the functions and this key is set to
+				// the selected color.
 				cmd := common.Command{
 					UpdateStaticColor: true,
 					Static:            true,
@@ -750,6 +782,28 @@ func main() {
 		}
 	}
 }
+
+// func showStaticButtons(staticButtons [][]int, sequences []*common.Sequence) {
+
+// 	// for each row of eight buttons.
+// 	for _, sequence := range sequences {
+// 		if sequence.Static {
+// 			red := StaticRed
+// 			green := StaticGreen
+// 			blue := StaticBlue
+
+// 			// Static is set to true in the functions and this key is set to
+// 			// the selected color.
+// 			cmd := common.Command{
+// 				UpdateStaticColor: true,
+// 				Static:            true,
+// 				StaticLamp:        hit.X,
+// 				StaticColor:       common.Color{R: red, G: green, B: blue},
+// 			}
+// 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+// 		}
+// 	}
+// }
 
 func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DMXController, fixturesConfig *fixture.Fixtures) {
 	for x := 0; x < 8; x++ {

@@ -20,6 +20,12 @@ type Color struct {
 	B int
 }
 
+type StaticColorButtons struct {
+	X     int
+	Y     int
+	Color Color
+}
+
 type Patten struct {
 	Name     string
 	Length   int // 8, 4 or 2
