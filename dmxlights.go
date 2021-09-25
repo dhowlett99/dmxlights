@@ -718,6 +718,7 @@ func main() {
 					staticButtons[selectedSequence-1].Color.R = staticButtons[selectedSequence-1].Color.R + 10
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence-1].Color.R, Green: 0, Blue: 0})
+				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			if hit.X == 2 && hit.Y == -1 {
@@ -727,6 +728,7 @@ func main() {
 					staticButtons[selectedSequence-1].Color.G = staticButtons[selectedSequence-1].Color.G + 10
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence-1].Color.G, Blue: 0})
+				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			if hit.X == 3 && hit.Y == -1 {
@@ -737,6 +739,7 @@ func main() {
 					staticButtons[selectedSequence-1].Color.B = staticButtons[selectedSequence-1].Color.B + 10
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence-1].Color.B})
+				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			// S E T    S T A T I C   C O L O R
@@ -798,6 +801,29 @@ func main() {
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
 				}
 			}
+		}
+	}
+}
+
+func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorButtons, staticLamps [][]bool, commandChannels []chan common.Command) {
+
+	// Remember which color we are setting in this sequence.
+	red := staticButtons[selectedSequence-1].Color.R
+	green := staticButtons[selectedSequence-1].Color.G
+	blue := staticButtons[selectedSequence-1].Color.B
+
+	for X := 0; X < 8; X++ {
+		fmt.Printf("X:%d selectedSequence:%d \n", X, selectedSequence-1)
+		if staticLamps[X][selectedSequence-1] {
+			// Static is set to true in the functions and this key is set to
+			// the selected color.
+			cmd := common.Command{
+				UpdateStaticColor: true,
+				Static:            true,
+				StaticLamp:        X,
+				StaticColor:       common.Color{R: red, G: green, B: blue},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 		}
 	}
 }
