@@ -29,7 +29,6 @@ func CreateSequence(
 		Number:       mySequenceNumber,
 		FadeSpeed:    9,
 		FadeTime:     150 * time.Millisecond,
-		SoftFade:     true,
 		MusicTrigger: false,
 		Run:          true,
 		Bounce:       false,

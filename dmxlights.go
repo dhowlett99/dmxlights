@@ -427,23 +427,6 @@ func main() {
 				}
 			}
 
-			// Set or unset soft fade on this sequence.
-			if hit.X == 6 && hit.Y == -1 {
-				if sequences[selectedSequence-1].SoftFade {
-					sequences[selectedSequence-1].SoftFade = false
-					cmd := common.Command{
-						SoftFadeOff: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				} else {
-					sequences[selectedSequence-1].SoftFade = true
-					cmd := common.Command{
-						SoftFadeOn: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				}
-			}
-
 			// S E L E C T    S E Q U E N C E.
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {

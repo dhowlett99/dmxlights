@@ -83,7 +83,6 @@ type Sequence struct {
 	FadeTime     time.Duration
 	FadeOnTime   time.Duration
 	FadeOffTime  time.Duration
-	SoftFade     bool
 	Name         string
 	Number       int
 	Run          bool

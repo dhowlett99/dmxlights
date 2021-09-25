@@ -53,14 +53,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Run = true
 		return sequence
 	}
-	if command.SoftFadeOn {
-		sequence.SoftFade = true
-		return sequence
-	}
-	if command.SoftFadeOff {
-		sequence.SoftFade = false
-		return sequence
-	}
 	if command.UpdateSpeed {
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
