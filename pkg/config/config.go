@@ -59,17 +59,17 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 	config := []common.Sequence{}
 
 	go func() {
-		// wait for responses from sequences.
+		// Wait for responses from sequences.
 		time.Sleep(100 * time.Millisecond)
 		for _, replyChannel := range replyChannel {
 			config = append(config, WaitForConfig(replyChannel))
 		}
 
-		// write to config file.
+		// Write to config file.
 		SaveConfig(config, fmt.Sprintf("config%d.%d.json", X, Y))
 	}()
 
-	// ask for all the sequencers for their config.
+	// Ask for all the sequencers for their config.
 	cmd := common.Command{
 		ReadConfig: true,
 		X:          X,
@@ -80,7 +80,6 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 	}
 }
 
-// waitForConfig
 func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
 	sequence := common.Sequence{}
 	select {

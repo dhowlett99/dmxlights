@@ -246,7 +246,7 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 
 func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, channels Channels) {
 	HideFunctionButtons(eventsForLauchpad, functionButtons)
-	// get an upto date copy of the sequence.
+	// Get an upto date copy of the sequence.
 	cmd := Command{
 		ReadConfig: true,
 	}
@@ -255,9 +255,6 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	replyChannel := channels.ReplyChannels[selectedSequence-1]
 	sequence = <-replyChannel
 
-	// for _, f := range sequence.Functions {
-	// 	fmt.Printf("f:%d state:%t\n", f.Number, f.State)
-	// }
 	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, functionButtons)
 }
 

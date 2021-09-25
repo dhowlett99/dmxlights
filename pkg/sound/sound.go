@@ -38,7 +38,6 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 			}
 
 			if in[0] > 1000000000 {
-				//if in[0] > 100000000 {
 				// Trigger
 				time.Sleep(10 * time.Millisecond)
 				cmd := common.Command{}

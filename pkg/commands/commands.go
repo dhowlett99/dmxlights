@@ -23,7 +23,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			//fmt.Printf("Music Trigger on seq %d\n", mySequenceNumber)
 			break
 		}
 	case command = <-commandChannel:
@@ -40,7 +39,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.UnHide {
-		fmt.Printf("Command UNHide\n")
+		fmt.Printf("Command UnHide\n")
 		sequence.Hide = false
 		return sequence
 	}

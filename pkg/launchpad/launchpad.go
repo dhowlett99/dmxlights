@@ -15,8 +15,8 @@ func ClearAll(pad *mk2.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 	cmd := common.Command{
 		Stop: true,
 	}
-	for _, seq := range sequences {
-		seq <- cmd
+	for _, sequence := range sequences {
+		sequence <- cmd
 	}
 
 	for x := 0; x < 8; x++ {
