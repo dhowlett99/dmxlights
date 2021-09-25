@@ -132,7 +132,7 @@ func PlayNewSequence(sequence common.Sequence,
 		// Sequence in Normal Running Mode.
 		if sequence.Run {
 
-			fmt.Printf("Running %t speed %d music trigger is %t   static flag is %t\n", sequence.Run, sequence.CurrentSpeed, sequence.MusicTrigger, sequence.Static)
+			//fmt.Printf("Running %t speed %d music trigger is %t   static flag is %t\n", sequence.Run, sequence.CurrentSpeed, sequence.MusicTrigger, sequence.Static)
 
 			// Map function keys 0-7 to sequencer functions.
 			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State

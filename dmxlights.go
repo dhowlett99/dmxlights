@@ -245,20 +245,14 @@ func main() {
 			// Ask all sequences for their current config and save in a file.
 			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
 				if savePreset {
-					// If its already set, then clear it.
-					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
-						presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = false
-					} else {
-						// Not already set then set it.
-						fmt.Printf("Write Config\n")
-						presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-						common.LightOn(eventsForLauchpad, common.ALight{
-							X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-						fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
-						config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
-						savePreset = false
-						flashButtons[8][4] = false
-					}
+					fmt.Printf("Write Config\n")
+					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
+					common.LightOn(eventsForLauchpad, common.ALight{
+						X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
+					config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
+					savePreset = false
+					flashButtons[8][4] = false // turn off the save button from flashing.
 					presets.SavePresets(presetsStore)
 					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
 					flashButtons[hit.X][hit.Y] = true
@@ -314,19 +308,7 @@ func main() {
 							newSequence = <-replyChannel
 
 							// Make sure the music trigger is set.
-							if newSequence.Functions[common.Function8_Music_Trigger].State {
-								sequences[s-1].MusicTrigger = true
-								cmd := common.Command{
-									MusicTrigger: true,
-								}
-								common.SendCommandToSequence(s, cmd, commandChannels)
-							} else {
-								sequences[s-1].MusicTrigger = false
-								cmd := common.Command{
-									MusicTriggerOff: true,
-								}
-								common.SendCommandToSequence(s, cmd, commandChannels)
-							}
+							checkMusicTrigger(selectedSequence, newSequence, sequences, commandChannels)
 
 							// Make sure Static is set correctly
 							if newSequence.Functions[common.Function6_Static].State {
@@ -637,26 +619,7 @@ func main() {
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				// Make sure the music trigger is set.
-				if newSequence.Functions[common.Function8_Music_Trigger].State {
-					sequences[selectedSequence-1].MusicTrigger = true
-					cmd := common.Command{
-						MusicTrigger: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				} else {
-					cmd := common.Command{
-						MusicTriggerOff: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-					sequences[selectedSequence-1].MusicTrigger = false
-					sequenceSpeed = 14 //Default to 25 Millisecond
-					cmd = common.Command{
-						UpdateSpeed: true,
-						Speed:       sequenceSpeed,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				}
+				checkMusicTrigger(selectedSequence, newSequence, sequences, commandChannels)
 
 				// If we're unsetting static, then drop any presets as they would no longer apply.
 				if !newSequence.Functions[common.Function6_Static].State {
@@ -808,6 +771,26 @@ func main() {
 				}
 			}
 		}
+	}
+}
+
+func checkMusicTrigger(selectedSequence int, newSequence common.Sequence, sequences []*common.Sequence, commandChannels []chan common.Command) {
+
+	// Make sure the music trigger is set.
+	if newSequence.Functions[common.Function8_Music_Trigger].State {
+		sequences[selectedSequence-1].MusicTrigger = true
+		cmd := common.Command{
+			MusicTrigger: true,
+		}
+		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	} else {
+		sequences[selectedSequence-1].MusicTrigger = false
+		sequenceSpeed = 14 //Default to 25 Millisecond
+		cmd := common.Command{
+			MusicTriggerOff: true,
+			Speed:           sequenceSpeed,
+		}
+		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	}
 }
 

@@ -43,6 +43,8 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Lau
 	}
 }
 
+// FlashButton creates a thread which loops forever flash a position X Y
+// until the flashButton flag for that location is cleared.
 func FlashButton(presetsStore map[string]bool, pad *mk2.Launchpad, flashButtons [][]bool, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
 	go func(pad *mk2.Launchpad, x int, y int) {
 		for {
