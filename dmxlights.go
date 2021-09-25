@@ -731,7 +731,7 @@ func main() {
 			}
 
 			// S E T    S T A T I C   C O L O R
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] &&
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y != -1 &&
 				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
 				red := staticButtons[selectedSequence-1].Color.R
@@ -773,28 +773,6 @@ func main() {
 		}
 	}
 }
-
-// func showStaticButtons(staticButtons [][]int, sequences []*common.Sequence) {
-
-// 	// for each row of eight buttons.
-// 	for _, sequence := range sequences {
-// 		if sequence.Static {
-// 			red := StaticRed
-// 			green := StaticGreen
-// 			blue := StaticBlue
-
-// 			// Static is set to true in the functions and this key is set to
-// 			// the selected color.
-// 			cmd := common.Command{
-// 				UpdateStaticColor: true,
-// 				Static:            true,
-// 				StaticLamp:        hit.X,
-// 				StaticColor:       common.Color{R: red, G: green, B: blue},
-// 			}
-// 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-// 		}
-// 	}
-// }
 
 func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DMXController, fixturesConfig *fixture.Fixtures) {
 	for x := 0; x < 8; x++ {
