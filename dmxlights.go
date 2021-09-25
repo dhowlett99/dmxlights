@@ -678,7 +678,7 @@ func main() {
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y >= 0 &&
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y >= 0 && hit.Y < 4 &&
 				!sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
 				flashSequence := common.Sequence{
