@@ -43,6 +43,7 @@ func main() {
 	var functionButtons [][]bool
 	var functionMode [][]bool
 	var selectButtons [][]bool
+	var staticLamps [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
 
 	// Make an empty presets store.
@@ -175,11 +176,19 @@ func main() {
 	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
 		selectButtons[i] = make([]bool, 9)
-	} // Initialize a ten length slice of empty slices for function mode state.
+	}
+	// Initialize a ten length slice of empty slices for function mode state.
 	functionMode = make([][]bool, 9)
 	// Initialize those 10 empty function button slices
 	for i := 0; i < 9; i++ {
 		functionMode[i] = make([]bool, 9)
+	}
+
+	// Initialize a ten length slice of empty slices for static lamps.
+	staticLamps = make([][]bool, 9)
+	// Initialize those 10 empty function button slices
+	for i := 0; i < 9; i++ {
+		staticLamps[i] = make([]bool, 9)
 	}
 
 	// Light the logo blue.
@@ -734,6 +743,9 @@ func main() {
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y != -1 &&
 				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
 
+				fmt.Printf("Static X:%d  Y:%d\n", hit.X, hit.Y)
+
+				// Remember which color we are setting in this sequence.
 				red := staticButtons[selectedSequence-1].Color.R
 				green := staticButtons[selectedSequence-1].Color.G
 				blue := staticButtons[selectedSequence-1].Color.B
@@ -745,6 +757,22 @@ func main() {
 					Static:            true,
 					StaticLamp:        hit.X,
 					StaticColor:       common.Color{R: red, G: green, B: blue},
+				}
+
+				// Toggle the state of the lamp.
+				if staticLamps[hit.X][hit.Y] {
+					staticLamps[hit.X][hit.Y] = false
+					// Turn the lamp off
+					fmt.Printf("Turn the lamp off X:%d  Y:%d\n", hit.X, hit.Y)
+					cmd = common.Command{
+						UpdateStaticColor: true,
+						Static:            true,
+						StaticLamp:        hit.X,
+						StaticColor:       common.Color{R: 0, G: 0, B: 0},
+					}
+				} else {
+					// Remember which static lamp we just set.
+					staticLamps[hit.X][hit.Y] = true
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}

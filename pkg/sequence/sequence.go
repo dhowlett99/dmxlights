@@ -118,8 +118,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.Static {
-			fmt.Printf("Seq %d is now in Static Mode\n", sequence.Number)
+			//fmt.Printf("Seq %d is now in Static Mode\n", sequence.Number)
 			for myFixtureNumber, lamp := range sequence.StaticColors {
+				//fmt.Printf("Lamp Color   R:%d  G:%d  B:%d\n", lamp.R, lamp.G, lamp.B)
 				if !sequence.Hide {
 					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
 				}
