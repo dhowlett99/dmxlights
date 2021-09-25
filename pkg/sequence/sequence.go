@@ -172,18 +172,46 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 				fixtureChannel1 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel2 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel3 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel4 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel5 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel6 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel7 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
+					break
+				}
 				fixtureChannel8 <- cmd
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
