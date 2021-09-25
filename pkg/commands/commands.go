@@ -23,6 +23,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
+			fmt.Printf("Music Trigger on seq %d\n", mySequenceNumber)
 			break
 		}
 	case command = <-commandChannel:
@@ -34,40 +35,48 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	// Now process any command.
 	if command.Hide {
+		fmt.Printf("Command Hide\n")
 		sequence.Hide = true
 		return sequence
 	}
 	if command.UnHide {
+		fmt.Printf("Command UNHide\n")
 		sequence.Hide = false
 		return sequence
 	}
 	if command.MusicTrigger {
+		fmt.Printf("Command Music Trigger\n")
 		sequence.MusicTrigger = true
 		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 		sequence.Run = true
 		return sequence
 	}
 	if command.MusicTriggerOff {
+		fmt.Printf("Command Music Trigger Off\n")
 		sequence.MusicTrigger = false
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		sequence.Run = true
 		return sequence
 	}
 	if command.UpdateSpeed {
+		fmt.Printf("Command Update Speed\n")
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
 		return sequence
 	}
 	if command.UpdatePatten {
+		fmt.Printf("Command Update Patten\n")
 		savePattenName := command.Patten.Name
 		sequence.Patten.Name = savePattenName
 		return sequence
 	}
 	if command.UpdateSize {
+		fmt.Printf("Command Update Size\n")
 		sequence.Size = command.Size
 		return sequence
 	}
 	if command.IncreaseFade {
+		fmt.Printf("Command Increase Fade\n")
 		newFadeTime := SetSpeed(command.FadeSpeed)
 		sequence.Steps = sequence.Steps + 1
 		sequence.FadeTime = newFadeTime
@@ -75,6 +84,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.DecreaseFade {
+		fmt.Printf("Command Decrease Fade\n")
 		newFadeTime := SetSpeed(command.FadeSpeed)
 		sequence.Steps = sequence.Steps - 1
 		sequence.FadeTime = newFadeTime
@@ -82,40 +92,48 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	if command.UpdateColor {
+		fmt.Printf("Command Update Color\n")
 		color := command.Color
 		sequence.Color = color
 		return sequence
 	}
 	if command.Start {
+		fmt.Printf("Command Start\n")
 		sequence.MusicTrigger = command.MusicTrigger
 		sequence.Static = false
 		sequence.Run = true
 		return sequence
 	}
 	if command.Stop {
+		fmt.Printf("Command Stop\n")
 		sequence.Run = false
 		sequence.Static = false
 		return sequence
 	}
 	if command.Blackout {
+		fmt.Printf("Command Blackout\n")
 		sequence.Blackout = true
 		return sequence
 	}
 	if command.Normal {
+		fmt.Printf("Command Normal\n")
 		sequence.Blackout = false
 		return sequence
 	}
 	if command.UpdateFunctions {
+		fmt.Printf("Command Update Functions\n")
 		sequence.Functions = command.Functions
 		return sequence
 	}
 
 	if command.UpdateStatic {
+		fmt.Printf("Command Update Static\n")
 		sequence.Static = command.Static
 		return sequence
 	}
 
 	if command.UpdateStaticColor {
+		fmt.Printf("Command Update Static Color\n")
 		sequence.Static = command.Static
 		sequence.StaticColors[command.StaticLamp] = command.StaticColor
 		return sequence
@@ -123,12 +141,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	// If we are being asked for our config we must reply with our current sequence.
 	if command.ReadConfig {
+		fmt.Printf("Command Read Config\n")
 		replyChannel <- sequence
 		return sequence
 	}
 
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
+		fmt.Printf("Command Load Config\n")
 		X := command.X
 		Y := command.Y
 		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", X, Y))

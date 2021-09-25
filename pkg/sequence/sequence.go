@@ -118,6 +118,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.Static {
+			fmt.Printf("Seq %d is now in Static Mode\n", sequence.Number)
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
 					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
@@ -129,6 +130,8 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Sequence in Normal Running Mode.
 		if sequence.Run {
+
+			fmt.Printf("Running %t speed %d music trigger is %t   static flag is %t\n", sequence.Run, sequence.CurrentSpeed, sequence.MusicTrigger, sequence.Static)
 
 			// Map function keys 0-7 to sequencer functions.
 			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
@@ -143,6 +146,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 			if !sequence.Run {
+				fmt.Printf("Not Running 1\n")
 				break
 			}
 
@@ -183,6 +187,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 				if !sequence.Run {
+					fmt.Printf("Not Running 1\n")
 					break
 				}
 			}

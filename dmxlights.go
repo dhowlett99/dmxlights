@@ -502,7 +502,7 @@ func main() {
 				if size > 20 {
 					size = 20
 				}
-				fmt.Printf("Size up :%d", size)
+				fmt.Printf("Size up :%d\n", size)
 
 				// Send size update.
 				cmd := common.Command{
@@ -592,6 +592,7 @@ func main() {
 
 				// Wait for sequence.
 				newSequence = <-replyChannel
+				fmt.Printf("Got it\n")
 
 				// We've pushed a function key, this is where we set the value inside the temporary sequence.
 				for _, functions := range newSequence.Functions {
@@ -606,6 +607,11 @@ func main() {
 						}
 					}
 				}
+				for _, f := range newSequence.Functions {
+					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
+				}
+
+				fmt.Printf("Music Trigger Func Key is %t\n", newSequence.Functions[common.Function8_Music_Trigger].State)
 
 				// Send update functions command. This sets the temporary representation of
 				// the function keys in the real sequence.
@@ -650,11 +656,13 @@ func main() {
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				// If we are setting static then stop all the sequences and clear the launchpad.
-				cmd = common.Command{
-					Stop: true,
+				if newSequence.Functions[common.Function6_Static].State {
+					cmd = common.Command{
+						Stop: true,
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+					allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 
 				// Light the correct function key.
 				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)

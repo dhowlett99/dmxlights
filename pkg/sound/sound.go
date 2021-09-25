@@ -44,6 +44,7 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 				cmd := common.Command{}
 				for seqNo, seq := range sequences {
 					if seq.MusicTrigger {
+						//fmt.Printf("Music Trigger set on seq %d\n", seqNo)
 						channels.SoundTriggerChannels[seqNo] <- cmd
 					}
 				}
