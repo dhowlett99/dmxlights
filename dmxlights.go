@@ -39,7 +39,6 @@ var blackout bool = false
 // main thread is used to get commands from the lauchpad.
 func main() {
 
-	var flashButtons [][]bool
 	var functionButtons [][]bool
 	var functionMode [][]bool
 	var selectButtons [][]bool
@@ -152,13 +151,6 @@ func main() {
 	//common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
 	common.ShowFunctionButtons(sequence1, 8, eventsForLauchpad, functionButtons)
 
-	// Initialize a ten length slice of empty slices for flash buttons.
-	flashButtons = make([][]bool, 9)
-	// Initialize those 10 empty flash button slices.
-	for i := 0; i < 9; i++ {
-		flashButtons[i] = make([]bool, 9)
-	}
-
 	// Initialize a ten length slice of empty slices for function buttons.
 	functionButtons = make([][]bool, 9)
 	// Initialize those 10 empty function button slices
@@ -215,7 +207,7 @@ func main() {
 			if hit.X == 0 && hit.Y == -1 {
 				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
-				presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
+				presets.ClearPresets(eventsForLauchpad, presetsStore)
 				presets.InitPresets(eventsForLauchpad, presetsStore)
 				// Make sure we stop all sequences.
 				cmd := common.Command{
@@ -229,11 +221,12 @@ func main() {
 			if hit.X == 8 && hit.Y == 4 {
 				if savePreset {
 					savePreset = false
-					flashButtons[8][4] = false
+					presets.InitPresets(eventsForLauchpad, presetsStore)
+					launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
 					continue
 				}
-				flashButtons[8][4] = true
-				launchpad.FlashButton(presetsStore, pad, flashButtons, 8, 4, eventsForLauchpad, 1, 255, 0, 0)
+				presets.InitPresets(eventsForLauchpad, presetsStore)
+				launchpad.FlashLight(8, 4, 0x0d, 0x78, eventsForLauchpad)
 				savePreset = true
 			}
 
@@ -244,11 +237,11 @@ func main() {
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 					config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
 					savePreset = false
-					flashButtons[8][4] = false // turn off the save button from flashing.
+					launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
 					presets.SavePresets(presetsStore)
-					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
-					flashButtons[hit.X][hit.Y] = true
-					launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
+					presets.ClearPresets(eventsForLauchpad, presetsStore)
+					presets.InitPresets(eventsForLauchpad, presetsStore)
+					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 				} else {
 					// Load config, but only if it exists in the presets map.
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
@@ -275,14 +268,8 @@ func main() {
 						}
 						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
-						// Reset flash buttons
-						for x := 0; x < 9; x++ {
-							for y := 0; y < 9; y++ {
-								flashButtons[x][y] = false
-							}
-						}
-						flashButtons[hit.X][hit.Y] = true
-						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
+						presets.InitPresets(eventsForLauchpad, presetsStore)
+						launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 
 						// Get a copy of the function button settings for all the sequences.
 						for sequence := 0; sequence < len(sequences); sequence++ {
@@ -564,7 +551,7 @@ func main() {
 
 				// If we're unsetting static, then drop any presets as they would no longer apply.
 				if !newSequence.Functions[common.Function6_Static].State {
-					presets.ClearPresets(eventsForLauchpad, presetsStore, flashButtons)
+					presets.ClearPresets(eventsForLauchpad, presetsStore)
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 				}
 				// Always make sure Static flag is set correctly
@@ -587,7 +574,7 @@ func main() {
 				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
 			}
 
-			// FLASH BUTTONS - Light the flash buttons based on current patten.
+			// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
 				!sequences[selectedSequence].Functions[common.Function6_Static].State {
 

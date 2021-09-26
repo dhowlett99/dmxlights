@@ -20,13 +20,12 @@ func InitPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) 
 	}
 }
 
-func ClearPresets(eventsForLauchpad chan common.ALight, presets map[string]bool, flashButtons [][]bool) {
+func ClearPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
 			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
 				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
-				flashButtons[x][y] = false
 			}
 		}
 	}

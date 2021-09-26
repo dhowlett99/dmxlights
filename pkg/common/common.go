@@ -11,6 +11,9 @@ type ALight struct {
 	Red        int
 	Green      int
 	Blue       int
+	Flash      bool
+	OnColor    int
+	OffColor   int
 }
 
 type Color struct {

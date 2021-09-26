@@ -2,10 +2,8 @@ package launchpad
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/rakyll/launchpad/mk2"
 )
 
@@ -34,40 +32,38 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Lau
 
 	for {
 		event := <-eventsForLauchpad
-		// For the math to work we need to convert our ints to floats and then back again.
-		Red := ((float64(event.Red) / 2) / 100) * (float64(event.Brightness) / 2.55)
-		Green := ((float64(event.Green) / 2) / 100) * (float64(event.Brightness) / 2.55)
-		Blue := ((float64(event.Blue) / 2) / 100) * (float64(event.Brightness) / 2.55)
-		pad.Light(event.X, event.Y, int(Red), int(Green), int(Blue))
+
+		if event.Flash {
+			pad.FlashLight(event.X, event.Y, event.OnColor, event.OffColor)
+		} else {
+			// For the math to work we need to convert our ints to floats and then back again.
+			Red := ((float64(event.Red) / 2) / 100) * (float64(event.Brightness) / 2.55)
+			Green := ((float64(event.Green) / 2) / 100) * (float64(event.Brightness) / 2.55)
+			Blue := ((float64(event.Blue) / 2) / 100) * (float64(event.Brightness) / 2.55)
+			pad.Light(event.X, event.Y, int(Red), int(Green), int(Blue))
+		}
 	}
 }
 
-// FlashButton creates a thread which loops forever flash a position X Y
-// until the flashButton flag for that location is cleared.
-func FlashButton(presetsStore map[string]bool, pad *mk2.Launchpad, flashButtons [][]bool, x int, y int, eventsForLauchpad chan common.ALight, seqNumber int, green int, red int, blue int) {
-	go func(pad *mk2.Launchpad, x int, y int) {
-		for {
-			presets.InitPresets(eventsForLauchpad, presetsStore)
-			if !flashButtons[x][y] {
-				break
-			}
-			event := common.ALight{X: x, Y: y, Brightness: 255, Red: red, Green: green, Blue: blue}
-			eventsForLauchpad <- event
+func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan common.ALight) {
 
-			time.Sleep(500 * time.Millisecond)
-			event = common.ALight{X: x, Y: y, Brightness: 255, Red: 0, Green: 0, Blue: 0}
-			eventsForLauchpad <- event
-			time.Sleep(500 * time.Millisecond)
-		}
-	}(pad, x, y)
+	// Now ask the fixture lamp to flash on the launch pad by sending an event.
+	e := common.ALight{
+		Flash:    true,
+		X:        X,
+		Y:        Y,
+		OnColor:  onColor,
+		OffColor: offColor,
+	}
+	eventsForLauchpad <- e
 }
 
-func LightLamp(X, Y, R, G, B int, eventsForLauchpad chan common.ALight) {
+func LightLamp(Y, X, R, G, B int, eventsForLauchpad chan common.ALight) {
 
 	// Now trigger the fixture lamp on the launch pad by sending an event.
 	e := common.ALight{
-		X:          Y,
-		Y:          X,
+		X:          X,
+		Y:          Y,
 		Brightness: 255,
 		Red:        R,
 		Green:      G,
