@@ -137,7 +137,7 @@ func MapFixtures(mySequenceNumber int,
 
 	for _, fixture := range fixtures.Fixtures {
 
-		if fixture.Group == mySequenceNumber {
+		if fixture.Group-1 == mySequenceNumber {
 			for channelNumber, channel := range fixture.Channels {
 				// Scanner channels
 				if strings.Contains(channel.Name, "Pan") {
