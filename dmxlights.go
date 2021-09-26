@@ -287,6 +287,12 @@ func main() {
 							// Make sure the music trigger is set.
 							checkMusicTrigger(sequence, newSequence, sequences, commandChannels)
 
+							// Keep track of the new run setting.
+							sequences[selectedSequence].Run = newSequence.Run
+
+							// Keep track of bounce setting.
+							sequences[selectedSequence].Bounce = newSequence.Bounce
+
 							// Make sure Static is set correctly
 							if newSequence.Functions[common.Function6_Static].State {
 								sequences[sequence].Static = newSequence.Functions[common.Function6_Static].State
@@ -548,6 +554,12 @@ func main() {
 
 				// Make sure the music trigger is set.
 				checkMusicTrigger(selectedSequence, newSequence, sequences, commandChannels)
+
+				// Keep track of the new run setting.
+				sequences[selectedSequence].Run = newSequence.Run
+
+				// Keep track of bounce setting.
+				sequences[selectedSequence].Bounce = newSequence.Bounce
 
 				// If we're unsetting static, then drop any presets as they would no longer apply.
 				if !newSequence.Functions[common.Function6_Static].State {

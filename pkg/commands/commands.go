@@ -55,7 +55,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.MusicTrigger = true
 		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		sequence.Run = true
 		return sequence
 	}
 	if command.MusicTriggerOff {
@@ -65,7 +64,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.MusicTrigger = false
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
-		sequence.Run = true
 		return sequence
 	}
 	if command.UpdateSpeed {
