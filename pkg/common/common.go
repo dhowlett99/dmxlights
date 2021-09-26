@@ -269,7 +269,6 @@ func HideFunctionButtons(eventsForLauchpad chan ALight, functionButtons [][]bool
 func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool) {
 
 	for index, function := range sequence.Functions {
-		// fmt.Printf("show buttons   X %d   Y %d \n", index, selectedSequence)
 		if function.State {
 			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {

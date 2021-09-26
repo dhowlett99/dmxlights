@@ -58,10 +58,8 @@ func main() {
 		os.Exit(1)
 	}()
 
-	fmt.Println("Derek Lighting")
-	fmt.Println("Loading Presets")
+	fmt.Println("DMX Lighting")
 	presetsStore = presets.LoadPresets()
-	fmt.Println("Loading Presets Done")
 
 	// Setup DMX card.
 	dmxController := dmx.NewDmXController()
@@ -69,12 +67,11 @@ func main() {
 	// Setup a connection to the launchpad.
 	pad, err := mk2.Open()
 	if err != nil {
-		log.Fatalf("Error initializing launchpad: %v", err)
+		log.Fatalf("error initializing launchpad: %v", err)
 	}
 	defer pad.Close()
 
 	// We need to be in programmers mode to use the launchpad.
-	fmt.Println("Set Programmers Mode")
 	pad.Program()
 
 	// Create all the channels I need.
@@ -154,8 +151,6 @@ func main() {
 	// Light the function buttons at the top and bottom.
 	//common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
 	common.ShowFunctionButtons(sequence1, 8, eventsForLauchpad, functionButtons)
-
-	fmt.Println("Setup Presets Done")
 
 	// Initialize a ten length slice of empty slices for flash buttons.
 	flashButtons = make([][]bool, 9)
@@ -245,11 +240,8 @@ func main() {
 			// Ask all sequences for their current config and save in a file.
 			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
 				if savePreset {
-					fmt.Printf("Write Config\n")
 					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-					common.LightOn(eventsForLauchpad, common.ALight{
-						X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-					fmt.Printf("Save Preset in X:%d Y:%d \n", hit.X, hit.Y)
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 					config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
 					savePreset = false
 					flashButtons[8][4] = false // turn off the save button from flashing.
@@ -260,8 +252,6 @@ func main() {
 				} else {
 					// Load config, but only if it exists in the presets map.
 					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
-						fmt.Printf("Read Config:")
-						fmt.Printf(" OK \n")
 						launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 						// Stop everything so that we start the recalled config in sync.
@@ -332,8 +322,6 @@ func main() {
 				if selectedPatten > 5 {
 					selectedPatten = 5
 				}
-
-				fmt.Printf("Selecting Patten %d selectedPatten %s\n", selectedPatten, availablePatten[selectedPatten])
 				cmd := common.Command{
 					Stop: true,
 				}
@@ -367,9 +355,6 @@ func main() {
 				if selectedPatten > 0 {
 					selectedPatten = selectedPatten - 1
 				}
-
-				fmt.Printf("Selecting Patten %d selectedPatten %s\n", selectedPatten, availablePatten[selectedPatten])
-
 				cmd := common.Command{
 					UpdatePatten: true,
 					Patten: common.Patten{
@@ -482,8 +467,6 @@ func main() {
 				if size < 0 {
 					size = 0
 				}
-				fmt.Printf("size:%d", size)
-
 				// Send Update Fade Speed.
 				cmd := common.Command{
 					UpdateSize: true,
@@ -499,8 +482,6 @@ func main() {
 				if size > 20 {
 					size = 20
 				}
-				fmt.Printf("Size up :%d\n", size)
-
 				// Send size update.
 				cmd := common.Command{
 					UpdateSize: true,
@@ -517,7 +498,6 @@ func main() {
 				if fadeSpeed < 0 {
 					fadeSpeed = 0
 				}
-				fmt.Printf("Fade down speed:%d", fadeSpeed)
 				// Send fade update command.
 				cmd := common.Command{
 					DecreaseFade: true,
@@ -533,7 +513,6 @@ func main() {
 				if fadeSpeed > 20 {
 					fadeSpeed = 20
 				}
-				fmt.Printf("Fade up speed:%d", fadeSpeed)
 				// Send fade update command.
 				cmd := common.Command{
 					IncreaseFade: true,
@@ -542,38 +521,6 @@ func main() {
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				continue
 			}
-
-			// // Color decrease.
-			// if hit.X == 6 && hit.Y == 7 {
-			// 	color--
-			// 	if color < 0 {
-			// 		color = 0
-			// 	}
-			// 	fmt.Printf("color down:%d", color)
-			// 	cmd := common.Command{
-			// 		UpdateColor: true,
-			// 		Color:       color,
-			// 	}
-			// 	sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			// 	continue
-			// }
-
-			// // Color increase.
-			// if hit.X == 7 && hit.Y == 7 {
-			// 	color++
-			// 	if color > 5 {
-			// 		color = 5
-			// 	}
-			// 	fmt.Printf("Color up :%d", color)
-			// 	cmd := common.Command{
-			// 		UpdateColor: true,
-			// 		Color:       color,
-			// 	}
-			// 	sendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			// 	continue
-			// }
 
 			// Function buttons
 			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence] {
@@ -589,7 +536,6 @@ func main() {
 
 				// Wait for sequence.
 				newSequence = <-replyChannel
-				fmt.Printf("Got it\n")
 
 				// We've pushed a function key, this is where we set the value inside the temporary sequence.
 				for _, functions := range newSequence.Functions {
@@ -604,11 +550,6 @@ func main() {
 						}
 					}
 				}
-				for _, f := range newSequence.Functions {
-					fmt.Printf("f:%d state:%t\n", f.Number, f.State)
-				}
-
-				fmt.Printf("Music Trigger Func Key is %t\n", newSequence.Functions[common.Function8_Music_Trigger].State)
 
 				// Send update functions command. This sets the temporary representation of
 				// the function keys in the real sequence.
@@ -715,8 +656,6 @@ func main() {
 			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y != -1 &&
 				sequences[selectedSequence].Functions[common.Function6_Static].State {
 
-				fmt.Printf("Static X:%d  Y:%d\n", hit.X, hit.Y)
-
 				// Remember which color we are setting in this sequence.
 				red := staticButtons[selectedSequence].Color.R
 				green := staticButtons[selectedSequence].Color.G
@@ -735,7 +674,6 @@ func main() {
 				if staticLamps[hit.X][hit.Y] {
 					staticLamps[hit.X][hit.Y] = false
 					// Turn the lamp off
-					fmt.Printf("Turn the lamp off X:%d  Y:%d\n", hit.X, hit.Y)
 					cmd = common.Command{
 						UpdateStaticColor: true,
 						Static:            true,
@@ -752,7 +690,6 @@ func main() {
 			// B L A C K O U T   B U T T O N.
 			if hit.X == 8 && hit.Y == 7 {
 				if !blackout {
-					fmt.Printf("B L A C K O U T \n")
 					blackout = true
 					cmd := common.Command{
 						Blackout: true,
@@ -760,9 +697,7 @@ func main() {
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
 				} else {
-					fmt.Printf("NORMAL\n")
 					blackout = false
-
 					cmd := common.Command{
 						Normal: true,
 					}
@@ -802,7 +737,6 @@ func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorB
 	blue := staticButtons[selectedSequence].Color.B
 
 	for X := 0; X < 8; X++ {
-		fmt.Printf("X:%d selectedSequence:%d \n", X, selectedSequence)
 		if staticLamps[X][selectedSequence] {
 			// Static is set to true in the functions and this key is set to
 			// the selected color.

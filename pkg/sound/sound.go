@@ -20,13 +20,13 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 		in := make([]int32, 128)
 		stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
 		if err != nil {
-			fmt.Printf("failed to initialise portaudio\n")
+			fmt.Printf("error: failed to initialise portaudio\n")
 		}
 
 		// Start listening on the microphone input.
 		stream.Start()
 		if err != nil {
-			fmt.Printf("failed to start stream\n")
+			fmt.Printf("error: failed to start stream\n")
 		}
 
 		defer stream.Close()
@@ -34,7 +34,7 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 		for {
 			stream.Read()
 			if err != nil {
-				fmt.Printf("failed to read audio stream\n")
+				fmt.Printf("error: failed to read audio stream\n")
 			}
 
 			if in[0] > 1000000000 {
@@ -43,7 +43,6 @@ func NewSoundTrigger(sequences []*common.Sequence, channels common.Channels) {
 				cmd := common.Command{}
 				for seqNo, seq := range sequences {
 					if seq.MusicTrigger {
-						//fmt.Printf("Music Trigger set on seq %d\n", seqNo)
 						channels.SoundTriggerChannels[seqNo] <- cmd
 					}
 				}

@@ -10,7 +10,6 @@ import (
 )
 
 func ClearAll(pad *mk2.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
-	fmt.Printf("C L E A R\n")
 	pad.Reset()
 	cmd := common.Command{
 		Stop: true,

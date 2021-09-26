@@ -36,17 +36,17 @@ func LoadFixtures() *Fixtures {
 
 	_, err := os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
-		fmt.Printf("error loading fixtures.yaml file\n")
+		fmt.Printf("error: loading fixtures.yaml file\n")
 	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("error writing yaml file\n")
+		fmt.Printf("error: writing yaml file\n")
 	}
 
 	fixtures := &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		fmt.Printf("error marshalling fixtures: %s\n", err.Error())
+		fmt.Printf("error: marshalling fixtures: %s\n", err.Error())
 	}
 	return fixtures
 }
@@ -141,38 +141,29 @@ func MapFixtures(mySequenceNumber int,
 			for channelNumber, channel := range fixture.Channels {
 				// Scanner channels
 				if strings.Contains(channel.Name, "Pan") {
-					//fmt.Printf("DMX debug Pan Channel %d Value %d\n", fixture.Address+int16(channelNumber), Pan)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
 				}
 				if strings.Contains(channel.Name, "Tilt") {
-					//fmt.Printf("Tilt is %d\n", Tilt)
-					//fmt.Printf("DMX debug Tilt Channel %d Value %d\n", fixture.Address+int16(channelNumber), Tilt)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
 				}
 				if strings.Contains(channel.Name, "Shutter") {
-					//fmt.Printf("DMX debug Shutter Channel %d Value %d\n", fixture.Address+int16(channelNumber), Shutter)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
 				}
 				if strings.Contains(channel.Name, "Gobo") {
-					//fmt.Printf("DMX debug Gobo Channel %d Value %d\n", fixture.Address+int16(channelNumber), Gobo)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Gobo))
 				}
 
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
-					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), R)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)))
 				}
 				if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
-					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), G)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Green)))
 				}
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
-					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), B)
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)))
 				}
 				if strings.Contains(channel.Name, "Master") {
-					//fmt.Printf("DMX debug Channel %d Value %d\n", fixture.Address+int16(channelNumber), 255)
 					if blackout {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
 					} else {

@@ -118,9 +118,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.Static {
-			//fmt.Printf("Seq %d is now in Static Mode\n", sequence.Number)
 			for myFixtureNumber, lamp := range sequence.StaticColors {
-				//fmt.Printf("Lamp Color   R:%d  G:%d  B:%d\n", lamp.R, lamp.G, lamp.B)
 				if !sequence.Hide {
 					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
 				}
@@ -131,8 +129,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Sequence in Normal Running Mode.
 		if sequence.Run {
-
-			//fmt.Printf("Running %t speed %d music trigger is %t   static flag is %t\n", sequence.Run, sequence.CurrentSpeed, sequence.MusicTrigger, sequence.Static)
 
 			// Map function keys 0-7 to sequencer functions.
 			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
@@ -147,7 +143,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 			if !sequence.Run {
-				fmt.Printf("Not Running 1\n")
 				break
 			}
 
@@ -173,50 +168,42 @@ func PlayNewSequence(sequence common.Sequence,
 				fixtureChannel1 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel2 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel3 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel4 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel5 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel6 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel7 <- cmd
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 				fixtureChannel8 <- cmd
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 				if !sequence.Run {
-					fmt.Printf("Not Running 1\n")
 					break
 				}
 			}
@@ -290,43 +277,3 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	}
 	return positionsOut, counter
 }
-
-// func mapColors(R int, G int, B int, colorSelector int) common.Color {
-
-// 	colorOut := common.Color{}
-// 	intensity := findLargest(R, G, B)
-
-// 	if colorSelector == 0 {
-// 		colorOut = common.Color{R: R, G: G, B: B}
-// 	}
-// 	if colorSelector == 1 {
-// 		colorOut = common.Color{R: intensity, G: 0, B: 0}
-// 	}
-// 	if colorSelector == 2 {
-// 		colorOut = common.Color{R: 0, G: intensity, B: 0}
-// 	}
-// 	if colorSelector == 3 {
-// 		colorOut = common.Color{R: 0, G: intensity, B: intensity}
-// 	}
-// 	if colorSelector == 4 {
-// 		colorOut = common.Color{R: 0, G: 0, B: intensity}
-// 	}
-// 	if colorSelector == 5 {
-// 		colorOut = common.Color{R: intensity, G: 0, B: intensity}
-// 	}
-// 	return colorOut
-// }
-
-// func findLargest(R int, G int, B int) (answer int) {
-// 	/* check the boolean condition using if statement */
-// 	if R >= G && R >= B {
-// 		return R
-// 	}
-// 	if G >= R && G >= B {
-// 		return G
-// 	}
-// 	if B >= R && B >= G {
-// 		return B
-// 	}
-// 	return 0
-// }

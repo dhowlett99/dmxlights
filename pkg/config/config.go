@@ -15,12 +15,12 @@ func SaveConfig(config []common.Sequence, filename string) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
 	if err != nil {
-		log.Fatalf("Error marshalling config: %v", err)
+		log.Fatalf("error: marshalling config: %v", err)
 	}
 	// Write to file
 	err = ioutil.WriteFile(filename, data, 0644)
 	if err != nil {
-		log.Fatalf("Error writing config: %v to file:%s", err, filename)
+		log.Fatalf("error: writing config: %v to file:%s", err, filename)
 	}
 }
 
@@ -31,18 +31,17 @@ func LoadConfig(filename string) []common.Sequence {
 	// Read the file.
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		log.Fatalf("Error reading config: %v from file:%s", err, filename)
+		log.Fatalf("error: reading config: %v from file:%s", err, filename)
 	}
 
 	err = json.Unmarshal(data, &config)
 	if err != nil {
-		log.Fatalf("Error reading config: %v from file:%s", err, filename)
+		log.Fatalf("error:  reading config: %v from file:%s", err, filename)
 	}
 	return config
 }
 
 func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
-	fmt.Printf("AskToLoadConfig\n")
 	cmd := common.Command{
 		LoadConfig: true,
 		X:          X,
@@ -55,7 +54,6 @@ func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
 
 func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Sequence, X int, Y int) {
 
-	fmt.Printf("askToSaveConfig: Save Preset in X:%d Y:%d \n", X, Y)
 	config := []common.Sequence{}
 
 	go func() {
@@ -84,7 +82,6 @@ func WaitForConfig(replyChannel chan common.Sequence) common.Sequence {
 	sequence := common.Sequence{}
 	select {
 	case sequence = <-replyChannel:
-		fmt.Printf("Config Received for seq: %s\n", sequence.Name)
 		break
 	case <-time.After(500 * time.Millisecond):
 		break

@@ -36,13 +36,13 @@ func SavePresets(presets map[string]bool) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")
 	if err != nil {
-		log.Fatalf("Error marshalling config: %v", err)
+		log.Fatalf("error: marshalling config: %v", err)
 	}
 
 	// Write to file
 	err = ioutil.WriteFile("presets.json", data, 0644)
 	if err != nil {
-		log.Fatalf("Error writing config: %v to file:%s", err, "presets.json")
+		log.Fatalf("error: writing config: %v to file:%s", err, "presets.json")
 	}
 }
 
@@ -53,13 +53,13 @@ func LoadPresets() map[string]bool {
 	// Read the file.
 	data, err := ioutil.ReadFile("presets.json")
 	if err != nil {
-		fmt.Printf("Error reading prests: %v from file:%s", err, "presets.json")
+		fmt.Printf("error reading prests: %v from file:%s", err, "presets.json")
 		return presets
 	}
 
 	err = json.Unmarshal(data, &presets)
 	if err != nil {
-		log.Fatalf("Error unmashalling presets: %v from file:%s", err, "presets.json")
+		log.Fatalf("error unmashalling presets: %v from file:%s", err, "presets.json")
 	}
 
 	return presets
