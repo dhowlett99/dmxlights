@@ -59,7 +59,7 @@ func CreateSequence(
 	for function := 0; function < 8; function++ {
 		newFunction := common.Function{
 			Name:           fmt.Sprintf("function %d", function),
-			SequenceNumber: mySequenceNumber - 1,
+			SequenceNumber: mySequenceNumber,
 			Number:         function,
 			State:          false,
 		}

@@ -116,10 +116,10 @@ func main() {
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
 
-	sequence1 := sequence.CreateSequence("standard", 1, pattens, sequenceChannels)
-	sequence2 := sequence.CreateSequence("standard", 2, pattens, sequenceChannels)
-	sequence3 := sequence.CreateSequence("scanner", 3, pattens, sequenceChannels)
-	sequence4 := sequence.CreateSequence("standard", 4, pattens, sequenceChannels)
+	sequence1 := sequence.CreateSequence("standard", 0, pattens, sequenceChannels)
+	sequence2 := sequence.CreateSequence("standard", 1, pattens, sequenceChannels)
+	sequence3 := sequence.CreateSequence("scanner", 2, pattens, sequenceChannels)
+	sequence4 := sequence.CreateSequence("standard", 3, pattens, sequenceChannels)
 
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
@@ -143,10 +143,10 @@ func main() {
 	sound.NewSoundTrigger(sequences, sequenceChannels)
 
 	// Start threads for each sequence.
-	go sequence.PlayNewSequence(sequence1, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence2, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence3, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence4, 4, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -195,7 +195,7 @@ func main() {
 	pad.Light(8, -1, 0, 0, 255)
 
 	// Light the first sequence as the default selected.
-	selectedSequence := 1
+	selectedSequence := 0
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// Initialise the pattens.
@@ -295,16 +295,16 @@ func main() {
 						launchpad.FlashButton(presetsStore, pad, flashButtons, hit.X, hit.Y, eventsForLauchpad, 1, 0, 255, 0)
 
 						// Get a copy of the function button settings for all the sequences.
-						for s := 1; s < len(sequences)+1; s++ {
+						for sequence := 0; sequence < len(sequences); sequence++ {
 							// Get an upto date copy of the sequence.
 							cmd = common.Command{
 								ReadConfig: true,
 							}
-							common.SendCommandToSequence(s, cmd, commandChannels)
+							common.SendCommandToSequence(sequence, cmd, commandChannels)
 
 							// Listen for the reply and set the newSequence with the values.
 							newSequence := common.Sequence{}
-							replyChannel := sequenceChannels.ReplyChannels[s-1]
+							replyChannel := sequenceChannels.ReplyChannels[sequence]
 							newSequence = <-replyChannel
 
 							// Make sure the music trigger is set.
@@ -312,7 +312,7 @@ func main() {
 
 							// Make sure Static is set correctly
 							if newSequence.Functions[common.Function6_Static].State {
-								sequences[s-1].Static = newSequence.Functions[common.Function6_Static].State
+								sequences[sequence].Static = newSequence.Functions[common.Function6_Static].State
 								cmd = common.Command{
 									UpdateStatic: true,
 									Static:       newSequence.Functions[common.Function6_Static].State,
@@ -394,7 +394,7 @@ func main() {
 
 			// Decrease speed of selected sequence.
 			if hit.X == 0 && hit.Y == 7 {
-				if !sequences[selectedSequence-1].MusicTrigger {
+				if !sequences[selectedSequence].MusicTrigger {
 					sequenceSpeed--
 					if sequenceSpeed < 0 {
 						sequenceSpeed = 1
@@ -410,7 +410,7 @@ func main() {
 
 			// Increase speed of selected sequence.
 			if hit.X == 1 && hit.Y == 7 {
-				if !sequences[selectedSequence-1].MusicTrigger {
+				if !sequences[selectedSequence].MusicTrigger {
 					sequenceSpeed++
 					if sequenceSpeed > 20 {
 						sequenceSpeed = 20
@@ -427,7 +427,7 @@ func main() {
 			// S E L E C T    S E Q U E N C E.
 			// Select sequence 1.
 			if hit.X == 8 && hit.Y == 0 {
-				selectedSequence = 1
+				selectedSequence = 0
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
 					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
@@ -435,7 +435,7 @@ func main() {
 
 			// Select sequence 2.
 			if hit.X == 8 && hit.Y == 1 {
-				selectedSequence = 2
+				selectedSequence = 1
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
 					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
@@ -443,7 +443,7 @@ func main() {
 
 			// Select sequence 3.
 			if hit.X == 8 && hit.Y == 2 {
-				selectedSequence = 3
+				selectedSequence = 2
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
 					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
@@ -451,7 +451,7 @@ func main() {
 
 			// Select sequence 4.
 			if hit.X == 8 && hit.Y == 3 {
-				selectedSequence = 4
+				selectedSequence = 3
 				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
 					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
 				continue
@@ -459,7 +459,7 @@ func main() {
 
 			// Start sequence.
 			if hit.X == 8 && hit.Y == 5 {
-				sequences[selectedSequence-1].MusicTrigger = false
+				sequences[selectedSequence].MusicTrigger = false
 				cmd := common.Command{
 					Start:        true,
 					Speed:        sequenceSpeed,
@@ -576,7 +576,7 @@ func main() {
 			// }
 
 			// Function buttons
-			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence-1] {
+			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence] {
 				// Get an upto date copy of the sequence.
 				cmd := common.Command{
 					ReadConfig: true,
@@ -585,7 +585,7 @@ func main() {
 
 				// Create a temporary sequence.
 				newSequence := common.Sequence{}
-				replyChannel := sequenceChannels.ReplyChannels[selectedSequence-1]
+				replyChannel := sequenceChannels.ReplyChannels[selectedSequence]
 
 				// Wait for sequence.
 				newSequence = <-replyChannel
@@ -647,8 +647,8 @@ func main() {
 			}
 
 			// FLASH BUTTONS - Light the flash buttons based on current patten.
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y >= 0 && hit.Y < 4 &&
-				!sequences[selectedSequence-1].Functions[common.Function6_Static].State {
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
+				!sequences[selectedSequence].Functions[common.Function6_Static].State {
 
 				flashSequence := common.Sequence{
 					Patten: common.Patten{
@@ -681,46 +681,46 @@ func main() {
 
 			// C H O O S E   S T A T I C    C O L O R
 			if hit.X == 1 && hit.Y == -1 {
-				if staticButtons[selectedSequence-1].Color.R > 254 {
-					staticButtons[selectedSequence-1].Color.R = 0
+				if staticButtons[selectedSequence].Color.R > 254 {
+					staticButtons[selectedSequence].Color.R = 0
 				} else {
-					staticButtons[selectedSequence-1].Color.R = staticButtons[selectedSequence-1].Color.R + 10
+					staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
 				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence-1].Color.R, Green: 0, Blue: 0})
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			if hit.X == 2 && hit.Y == -1 {
-				if staticButtons[selectedSequence-1].Color.G > 254 {
-					staticButtons[selectedSequence-1].Color.G = 0
+				if staticButtons[selectedSequence].Color.G > 254 {
+					staticButtons[selectedSequence].Color.G = 0
 				} else {
-					staticButtons[selectedSequence-1].Color.G = staticButtons[selectedSequence-1].Color.G + 10
+					staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
 				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence-1].Color.G, Blue: 0})
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			if hit.X == 3 && hit.Y == -1 {
 
-				if staticButtons[selectedSequence-1].Color.B > 254 {
-					staticButtons[selectedSequence-1].Color.B = 0
+				if staticButtons[selectedSequence].Color.B > 254 {
+					staticButtons[selectedSequence].Color.B = 0
 				} else {
-					staticButtons[selectedSequence-1].Color.B = staticButtons[selectedSequence-1].Color.B + 10
+					staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
 				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence-1].Color.B})
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
 			}
 
 			// S E T    S T A T I C   C O L O R
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence-1] && hit.Y != -1 &&
-				sequences[selectedSequence-1].Functions[common.Function6_Static].State {
+			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y != -1 &&
+				sequences[selectedSequence].Functions[common.Function6_Static].State {
 
 				fmt.Printf("Static X:%d  Y:%d\n", hit.X, hit.Y)
 
 				// Remember which color we are setting in this sequence.
-				red := staticButtons[selectedSequence-1].Color.R
-				green := staticButtons[selectedSequence-1].Color.G
-				blue := staticButtons[selectedSequence-1].Color.B
+				red := staticButtons[selectedSequence].Color.R
+				green := staticButtons[selectedSequence].Color.G
+				blue := staticButtons[selectedSequence].Color.B
 
 				// Static is set to true in the functions and this key is set to
 				// the selected color.
@@ -778,13 +778,13 @@ func checkMusicTrigger(selectedSequence int, newSequence common.Sequence, sequen
 
 	// Make sure the music trigger is set.
 	if newSequence.Functions[common.Function8_Music_Trigger].State {
-		sequences[selectedSequence-1].MusicTrigger = true
+		sequences[selectedSequence].MusicTrigger = true
 		cmd := common.Command{
 			MusicTrigger: true,
 		}
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	} else {
-		sequences[selectedSequence-1].MusicTrigger = false
+		sequences[selectedSequence].MusicTrigger = false
 		sequenceSpeed = 14 //Default to 25 Millisecond
 		cmd := common.Command{
 			MusicTriggerOff: true,
@@ -797,13 +797,13 @@ func checkMusicTrigger(selectedSequence int, newSequence common.Sequence, sequen
 func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorButtons, staticLamps [][]bool, commandChannels []chan common.Command) {
 
 	// Remember which color we are setting in this sequence.
-	red := staticButtons[selectedSequence-1].Color.R
-	green := staticButtons[selectedSequence-1].Color.G
-	blue := staticButtons[selectedSequence-1].Color.B
+	red := staticButtons[selectedSequence].Color.R
+	green := staticButtons[selectedSequence].Color.G
+	blue := staticButtons[selectedSequence].Color.B
 
 	for X := 0; X < 8; X++ {
-		fmt.Printf("X:%d selectedSequence:%d \n", X, selectedSequence-1)
-		if staticLamps[X][selectedSequence-1] {
+		fmt.Printf("X:%d selectedSequence:%d \n", X, selectedSequence)
+		if staticLamps[X][selectedSequence] {
 			// Static is set to true in the functions and this key is set to
 			// the selected color.
 			cmd := common.Command{

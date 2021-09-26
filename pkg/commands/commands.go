@@ -12,9 +12,9 @@ import (
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
 
 	// Setup channels.
-	commandChannel := channels.CommmandChannels[mySequenceNumber-1]
-	replyChannel := channels.ReplyChannels[mySequenceNumber-1]
-	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber-1]
+	commandChannel := channels.CommmandChannels[mySequenceNumber]
+	replyChannel := channels.ReplyChannels[mySequenceNumber]
+	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber]
 
 	// Create an empty command.
 	command := common.Command{}

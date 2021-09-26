@@ -68,7 +68,7 @@ func LightLamp(X, Y, R, G, B int, eventsForLauchpad chan common.ALight) {
 	// Now trigger the fixture lamp on the launch pad by sending an event.
 	e := common.ALight{
 		X:          Y,
-		Y:          X - 1,
+		Y:          X,
 		Brightness: 255,
 		Red:        R,
 		Green:      G,

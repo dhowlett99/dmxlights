@@ -222,11 +222,11 @@ func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
 		LightOff(eventsForLauchpad, 8, seq)
 	}
 	// Now turn blue the selected sequence select light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence - 1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
+	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 0, Green: 0, Blue: 255})
 }
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
-	commandChannels[selectedSequence-1] <- command
+	commandChannels[selectedSequence] <- command
 }
 
 func SendCommandToAllSequence(selectedSequence int, command Command, commandChannels []chan Command) {
@@ -238,7 +238,7 @@ func SendCommandToAllSequence(selectedSequence int, command Command, commandChan
 
 func SendCommandToAllSequenceExcept(selectedSequence int, command Command, commandChannels []chan Command) {
 	for index := range commandChannels {
-		if index != selectedSequence-1 {
+		if index != selectedSequence {
 			commandChannels[index] <- command
 		}
 	}
@@ -252,7 +252,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	}
 	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
 
-	replyChannel := channels.ReplyChannels[selectedSequence-1]
+	replyChannel := channels.ReplyChannels[selectedSequence]
 	sequence = <-replyChannel
 
 	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, functionButtons)
@@ -271,9 +271,9 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	for index, function := range sequence.Functions {
 		// fmt.Printf("show buttons   X %d   Y %d \n", index, selectedSequence)
 		if function.State {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 200, Green: 0, Blue: 255})
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence - 1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 		}
 	}
 }
@@ -369,7 +369,7 @@ func HandleSelect(sequences []*Sequence,
 		HideSequence(sequences, selectedSequence, commandChannels, true)
 
 		// Create the function buttons.
-		MakeFunctionButtons(*sequences[selectedSequence-1], selectedSequence, eventsForLauchpad, functionButtons, channels)
+		MakeFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad, functionButtons, channels)
 		// Now forget we pressed twice and start again.
 		selectButtons[X][Y] = false
 		return
