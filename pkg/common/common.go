@@ -66,7 +66,7 @@ type Command struct {
 	Y                 int
 	Blackout          bool
 	Normal            bool
-	MusicTrigger      bool
+	MusicTriggerOn    bool
 	MusicTriggerOff   bool
 	SoftFadeOn        bool
 	SoftFadeOff       bool

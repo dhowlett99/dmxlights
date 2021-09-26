@@ -49,7 +49,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Hide = false
 		return sequence
 	}
-	if command.MusicTrigger {
+	if command.MusicTriggerOn {
 		if debug {
 			fmt.Printf("%d: Command Music Trigger On\n", mySequenceNumber)
 		}
@@ -123,7 +123,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
-		sequence.MusicTrigger = command.MusicTrigger
+		sequence.MusicTrigger = command.MusicTriggerOn
 		sequence.Static = false
 		sequence.Run = true
 		return sequence

@@ -285,7 +285,7 @@ func main() {
 							newSequence = <-replyChannel
 
 							// Make sure the music trigger is set.
-							checkMusicTrigger(selectedSequence, newSequence, sequences, commandChannels)
+							checkMusicTrigger(sequence, newSequence, sequences, commandChannels)
 
 							// Make sure Static is set correctly
 							if newSequence.Functions[common.Function6_Static].State {
@@ -433,9 +433,9 @@ func main() {
 			if hit.X == 8 && hit.Y == 5 {
 				sequences[selectedSequence].MusicTrigger = false
 				cmd := common.Command{
-					Start:        true,
-					Speed:        sequenceSpeed,
-					MusicTrigger: false,
+					Start:          true,
+					Speed:          sequenceSpeed,
+					MusicTriggerOn: false,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
@@ -702,7 +702,7 @@ func checkMusicTrigger(selectedSequence int, newSequence common.Sequence, sequen
 	if newSequence.Functions[common.Function8_Music_Trigger].State {
 		sequences[selectedSequence].MusicTrigger = true
 		cmd := common.Command{
-			MusicTrigger: true,
+			MusicTriggerOn: true,
 		}
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	} else {

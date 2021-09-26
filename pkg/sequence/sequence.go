@@ -137,6 +137,8 @@ func PlayNewSequence(sequence common.Sequence,
 				sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 			}
 
+			sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
+
 			if sequence.Patten.Name == "scanner" {
 				sequence.Type = "scanner"
 			}
