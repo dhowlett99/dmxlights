@@ -149,7 +149,7 @@ func main() {
 
 	// Light the function buttons at the top and bottom.
 	//common.ShowFunctionButtons(sequence1, 0, eventsForLauchpad, functionButtons)
-	common.ShowFunctionButtons(sequence1, 8, eventsForLauchpad, functionButtons)
+	common.ShowFunctionButtons(sequence1, 7, eventsForLauchpad, functionButtons)
 
 	// Initialize a ten length slice of empty slices for function buttons.
 	functionButtons = make([][]bool, 9)
