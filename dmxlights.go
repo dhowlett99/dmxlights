@@ -572,6 +572,8 @@ func main() {
 					Static:       newSequence.Functions[common.Function6_Static].State,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				// And locally.
+				sequences[selectedSequence].Functions[common.Function6_Static].State = newSequence.Functions[common.Function6_Static].State
 
 				// If we are setting static then stop all the sequences and clear the launchpad.
 				if newSequence.Functions[common.Function6_Static].State {
@@ -613,10 +615,10 @@ func main() {
 					Green:      green,
 					Blue:       blue,
 				})
-				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+				fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				fixture.MapFixtures(hit.Y+1, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+				fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
 			}
 
 			// C H O O S E   S T A T I C    C O L O R

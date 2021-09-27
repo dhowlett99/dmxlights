@@ -158,7 +158,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	if command.UpdateStatic {
 		if debug {
-			fmt.Printf("%d: Command Update Static\n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
 		}
 		sequence.Static = command.Static
 		return sequence

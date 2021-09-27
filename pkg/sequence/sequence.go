@@ -124,6 +124,9 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
+			// Only play once, we don't want to flood the DMX universe with
+			// continual commands.
+			sequence.Static = false
 			continue
 		}
 
