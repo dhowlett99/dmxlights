@@ -111,6 +111,11 @@ func (l *Launchpad) Light(x, y, color int) error {
     return l.outputStream.WriteSysExBytes(portmidi.Time(), []byte{0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x03, 0x00, byte(led), byte(color), 0xF7})
 }
 
+func (l *Launchpad) FlashLight(x int, y int, onColor int, offColor int) error {
+	// TODO(jbd): Support top row.
+	led := int64((8-y)*10 + x + 1)
+	return l.outputStream.WriteSysExBytes(portmidi.Time(), []byte{0xF0, 0x00, 0x20, 0x29, 0x02, 0x0D, 0x03, 0x01, byte(led), byte(onColor), byte(offColor), 0xF7})
+}
 
 // Light lights the button at x,y with the given red, green, and blue values.
 // x and y are [0, 7]. Color is [0, 128).
