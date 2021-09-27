@@ -222,10 +222,11 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
-		LightOff(eventsForLauchpad, 8, seq)
+		//LightOff(eventsForLauchpad, 8, seq)
+		LightOn(eventsForLauchpad, ALight{X: 8, Y: seq, Brightness: 255, Red: 255, Green: 255, Blue: 255})
 	}
 	// Now turn blue the selected sequence select light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 0, Green: 0, Blue: 255})
+	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255})
 }
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {

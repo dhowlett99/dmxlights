@@ -195,7 +195,8 @@ func main() {
 	common.LightOn(eventsForLauchpad, common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 	common.LightOn(eventsForLauchpad, common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 
-	// Light the start, stop and blackout buttons.
+	// Light the save, start, stop and blackout buttons.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 5, Brightness: full, Red: 255, Green: 255, Blue: 255})
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 6, Brightness: full, Red: 255, Green: 255, Blue: 255})
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 7, Brightness: full, Red: 255, Green: 255, Blue: 255})
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 8, Brightness: full, Red: 255, Green: 255, Blue: 255})
@@ -241,11 +242,12 @@ func main() {
 				if savePreset {
 					savePreset = false
 					presets.InitPresets(eventsForLauchpad, presetsStore)
-					launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
+					//launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
+					common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255})
 					continue
 				}
 				presets.InitPresets(eventsForLauchpad, presetsStore)
-				launchpad.FlashLight(8, 4, 0x0d, 0x78, eventsForLauchpad)
+				launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
 				savePreset = true
 			}
 
