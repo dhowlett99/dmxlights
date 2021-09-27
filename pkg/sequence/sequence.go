@@ -9,7 +9,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk2"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 func CreateSequence(
@@ -70,7 +70,7 @@ func CreateSequence(
 
 func PlayNewSequence(sequence common.Sequence,
 	mySequenceNumber int,
-	pad *mk2.Launchpad,
+	pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
 	pattens map[string]common.Patten,
 	dmxController ft232.DMXController,

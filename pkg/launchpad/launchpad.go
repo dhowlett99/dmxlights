@@ -4,10 +4,10 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/rakyll/launchpad/mk2"
+	"github.com/rakyll/launchpad/mk3"
 )
 
-func ClearAll(pad *mk2.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
+func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
 	pad.Reset()
 	cmd := common.Command{
 		Stop: true,
@@ -28,7 +28,7 @@ func ClearAll(pad *mk2.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk2.Launchpad) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad) {
 
 	for {
 		event := <-eventsForLauchpad

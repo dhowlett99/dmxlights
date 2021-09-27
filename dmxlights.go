@@ -20,7 +20,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/rakyll/launchpad/mk2"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 const (
@@ -64,7 +64,7 @@ func main() {
 	dmxController := dmx.NewDmXController()
 
 	// Setup a connection to the launchpad.
-	pad, err := mk2.Open()
+	pad, err := mk3.Open()
 	if err != nil {
 		log.Fatalf("error initializing launchpad: %v", err)
 	}
