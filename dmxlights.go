@@ -181,6 +181,25 @@ func main() {
 	// Light the logo blue.
 	pad.Light(8, -1, 0, 0, 255)
 
+	// Light the clear button purple.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255})
+
+	// Light the static color buttons.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255})
+
+	// Light top functions.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+
+	// Light the start, stop and blackout buttons.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 6, Brightness: full, Red: 255, Green: 255, Blue: 255})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 7, Brightness: full, Red: 255, Green: 255, Blue: 255})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 8, Brightness: full, Red: 255, Green: 255, Blue: 255})
+
 	// Light the first sequence as the default selected.
 	selectedSequence := 0
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
@@ -444,6 +463,9 @@ func main() {
 					MusicTriggerOn: false,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(100 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
@@ -452,6 +474,9 @@ func main() {
 					Speed: sequenceSpeed,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(100 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 			}
 
 			// Size decrease.
@@ -703,7 +728,7 @@ func main() {
 						Normal: true,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 				}
 			}
 		}
