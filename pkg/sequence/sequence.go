@@ -147,6 +147,7 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+			pad.BlockKeys(false)
 			if !sequence.Run {
 				break
 			}
@@ -211,6 +212,7 @@ func PlayNewSequence(sequence common.Sequence,
 				if !sequence.Run {
 					break
 				}
+				pad.BlockKeys(false)
 			}
 		}
 	}

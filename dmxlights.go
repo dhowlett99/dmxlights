@@ -219,9 +219,14 @@ func main() {
 
 	// Main loop reading commands from the Novation Launchpad.
 	for {
+
+		pad.BlockKeys(false)
+
 		select {
 
 		case hit := <-buttonChannel:
+
+			fmt.Printf("Hit X:%d  Y:%d\n", hit.X, hit.Y)
 
 			// Clear all the lights on the launchpad.
 			if hit.X == 0 && hit.Y == -1 {
@@ -253,7 +258,8 @@ func main() {
 			}
 
 			// Ask all sequences for their current config and save in a file.
-			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
+			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) && !pad.IsBlocked() {
+				pad.BlockKeys(true)
 				if savePreset {
 					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
