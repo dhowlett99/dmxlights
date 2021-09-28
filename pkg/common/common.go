@@ -66,14 +66,14 @@ type Command struct {
 	Y                 int
 	Blackout          bool
 	Normal            bool
-	MusicTriggerOn    bool
-	MusicTriggerOff   bool
-	SoftFadeOn        bool
-	SoftFadeOff       bool
-	UpdateColor       bool
-	Color             int
-	UpdateFunctions   bool
-	Functions         []Function
+	// MusicTriggerOn    bool
+	// MusicTriggerOff   bool
+	SoftFadeOn      bool
+	SoftFadeOff     bool
+	UpdateColor     bool
+	Color           int
+	UpdateFunctions bool
+	Functions       []Function
 }
 
 // Sequence describes sequences.

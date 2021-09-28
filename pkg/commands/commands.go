@@ -49,23 +49,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Hide = false
 		return sequence
 	}
-	if command.MusicTriggerOn {
-		if debug {
-			fmt.Printf("%d: Command Music Trigger On\n", mySequenceNumber)
-		}
-		sequence.MusicTrigger = true
-		sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		return sequence
-	}
-	if command.MusicTriggerOff {
-		if debug {
-			fmt.Printf("%d: Command Music Trigger Off\n", mySequenceNumber)
-		}
-		sequence.MusicTrigger = false
-		sequence.Speed = command.Speed
-		sequence.CurrentSpeed = SetSpeed(command.Speed)
-		return sequence
-	}
 	if command.UpdateSpeed {
 		if debug {
 			fmt.Printf("%d: Command Update Speed\n", mySequenceNumber)
@@ -121,7 +104,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
-		sequence.MusicTrigger = command.MusicTriggerOn
 		sequence.Static = false
 		sequence.Run = true
 		return sequence

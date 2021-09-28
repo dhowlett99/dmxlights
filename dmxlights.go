@@ -135,14 +135,17 @@ func main() {
 	staticButtons = append(staticButtons, staticButton3)
 	staticButtons = append(staticButtons, staticButton4)
 
+	// soundTriggers is a an array of switches which control which sequence gets a music trigger.
+	soundTriggers := make(map[int]bool, 4)
+
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	sound.NewSoundTrigger(sequences, sequenceChannels)
+	sound.NewSoundTrigger(&soundTriggers, sequenceChannels)
 
 	// Start threads for each sequence.
-	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
-	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels)
+	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
+	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
+	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
+	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -220,557 +223,479 @@ func main() {
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 
-		pad.BlockKeys(false)
+		//pad.BlockKeys(false)
 
-		select {
+		hit := <-buttonChannel
 
-		case hit := <-buttonChannel:
+		fmt.Printf("Hit X:%d  Y:%d\n", hit.X, hit.Y)
 
-			fmt.Printf("Hit X:%d  Y:%d\n", hit.X, hit.Y)
+		// Clear all the lights on the launchpad.
+		if hit.X == 0 && hit.Y == -1 {
+			launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
+			allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+			presets.ClearPresets(eventsForLauchpad, presetsStore)
+			presets.InitPresets(eventsForLauchpad, presetsStore)
+			// Make sure we stop all sequences.
+			cmd := common.Command{
+				Stop: true,
+			}
+			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
 
-			// Clear all the lights on the launchpad.
-			if hit.X == 0 && hit.Y == -1 {
-				launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
-				allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+		// Save mode.
+		if hit.X == 8 && hit.Y == 4 {
+			if savePreset {
+				savePreset = false
+				presets.InitPresets(eventsForLauchpad, presetsStore)
+				//launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
+				common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255})
+				continue
+			}
+			presets.InitPresets(eventsForLauchpad, presetsStore)
+			launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
+			savePreset = true
+			continue
+		}
+
+		// Ask all sequences for their current config and save in a file.
+		//if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) && !pad.IsBlocked() {
+		if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
+			//pad.BlockKeys(true)
+			if savePreset {
+				presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
+				savePreset = false
+				launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+				presets.SavePresets(presetsStore)
 				presets.ClearPresets(eventsForLauchpad, presetsStore)
 				presets.InitPresets(eventsForLauchpad, presetsStore)
-				// Make sure we stop all sequences.
-				cmd := common.Command{
-					Stop: true,
-				}
-				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
+				launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
+			} else {
+				// Load config, but only if it exists in the presets map.
+				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
 
-			// Save mode.
-			if hit.X == 8 && hit.Y == 4 {
-				if savePreset {
-					savePreset = false
-					presets.InitPresets(eventsForLauchpad, presetsStore)
-					//launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
-					common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255})
-					continue
-				}
-				presets.InitPresets(eventsForLauchpad, presetsStore)
-				launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
-				savePreset = true
-				continue
-			}
+					// Load the config.
+					config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
 
-			// Ask all sequences for their current config and save in a file.
-			if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) && !pad.IsBlocked() {
-				pad.BlockKeys(true)
-				if savePreset {
-					presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
-					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-					config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
-					savePreset = false
-					launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
-					presets.SavePresets(presetsStore)
-					presets.ClearPresets(eventsForLauchpad, presetsStore)
+					// Turn the selected preset light red.
+					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
-				} else {
-					// Load config, but only if it exists in the presets map.
-					if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
-						launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
-						common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
-						// Stop everything so that we start the recalled config in sync.
-						cmd := common.Command{
-							Stop: true,
-						}
-						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
-						// Clear all the fixtures down ready for the next scene.
-						allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
-
-						// Wait for all the sequences to stop.
-						time.Sleep(850 * time.Millisecond)
-
-						// Load the config.
-						config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
-
-						// Restore the blackout setting.
-						cmd = common.Command{
-							Blackout: blackout,
-						}
-						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-
-						presets.InitPresets(eventsForLauchpad, presetsStore)
-						launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
-
-						// Get a copy of the function button settings for all the sequences.
-						for sequence := 0; sequence < len(sequences); sequence++ {
-							// Get an upto date copy of the sequence.
-							cmd = common.Command{
-								ReadConfig: true,
-							}
-							common.SendCommandToSequence(sequence, cmd, commandChannels)
-
-							// Listen for the reply and set the newSequence with the values.
-							newSequence := common.Sequence{}
-							replyChannel := sequenceChannels.ReplyChannels[sequence]
-							newSequence = <-replyChannel
-
-							// Make sure the music trigger is set.
-							checkMusicTrigger(sequence, newSequence, sequences, commandChannels)
-
-							// Keep track of the new run setting.
-							sequences[selectedSequence].Run = newSequence.Run
-
-							// Keep track of bounce setting.
-							sequences[selectedSequence].Bounce = newSequence.Bounce
-
-							// Make sure Static is set correctly
-							if newSequence.Functions[common.Function6_Static].State {
-								sequences[sequence].Static = newSequence.Functions[common.Function6_Static].State
-								cmd = common.Command{
-									UpdateStatic: true,
-									Static:       newSequence.Functions[common.Function6_Static].State,
-								}
-								common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-							}
-						}
-					}
-				}
-				continue
-			}
-
-			// Increment Patten.
-			if hit.X == 2 && hit.Y == 7 {
-				if selectedPatten < 5 {
-					selectedPatten = selectedPatten + 1
-				}
-				if selectedPatten > 5 {
-					selectedPatten = 5
-				}
-				cmd := common.Command{
-					Stop: true,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				cmd = common.Command{
-					UpdatePatten: true,
-					Patten: common.Patten{
-						Name: availablePatten[selectedPatten],
-					},
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				cmd = common.Command{
-					Stop:  true,
-					Speed: sequenceSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				cmd = common.Command{
-					Start: true,
-					Speed: sequenceSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Decrement Patten.
-			if hit.X == 3 && hit.Y == 7 {
-				if selectedPatten > 0 {
-					selectedPatten = selectedPatten - 1
-				}
-				cmd := common.Command{
-					UpdatePatten: true,
-					Patten: common.Patten{
-						Name: availablePatten[selectedPatten],
-					},
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				cmd = common.Command{
-					Stop:  true,
-					Speed: sequenceSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				cmd = common.Command{
-					Start: true,
-					Speed: sequenceSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Decrease speed of selected sequence.
-			if hit.X == 0 && hit.Y == 7 {
-				if !sequences[selectedSequence].MusicTrigger {
-					sequenceSpeed--
-					if sequenceSpeed < 0 {
-						sequenceSpeed = 1
-					}
 					cmd := common.Command{
-						Speed:       sequenceSpeed,
+						Speed:       sequences[selectedSequence].Speed,
 						UpdateSpeed: true,
 					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				}
-				continue
 			}
+			continue
+		}
 
-			// Increase speed of selected sequence.
-			if hit.X == 1 && hit.Y == 7 {
-				if !sequences[selectedSequence].MusicTrigger {
-					sequenceSpeed++
-					if sequenceSpeed > 20 {
-						sequenceSpeed = 20
+		// Increment Patten.
+		if hit.X == 2 && hit.Y == 7 {
+			if selectedPatten < 5 {
+				selectedPatten = selectedPatten + 1
+			}
+			if selectedPatten > 5 {
+				selectedPatten = 5
+			}
+			cmd := common.Command{
+				Stop: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				UpdatePatten: true,
+				Patten: common.Patten{
+					Name: availablePatten[selectedPatten],
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Stop:  true,
+				Speed: sequenceSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Start: true,
+				Speed: sequenceSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Decrement Patten.
+		if hit.X == 3 && hit.Y == 7 {
+			if selectedPatten > 0 {
+				selectedPatten = selectedPatten - 1
+			}
+			cmd := common.Command{
+				UpdatePatten: true,
+				Patten: common.Patten{
+					Name: availablePatten[selectedPatten],
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			cmd = common.Command{
+				Stop:  true,
+				Speed: sequenceSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Start: true,
+				Speed: sequenceSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Decrease speed of selected sequence.
+		if hit.X == 0 && hit.Y == 7 {
+			if !sequences[selectedSequence].MusicTrigger {
+				sequenceSpeed--
+				if sequenceSpeed < 0 {
+					sequenceSpeed = 1
+				}
+				cmd := common.Command{
+					Speed:       sequenceSpeed,
+					UpdateSpeed: true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			}
+			continue
+		}
+
+		// Increase speed of selected sequence.
+		if hit.X == 1 && hit.Y == 7 {
+			if !sequences[selectedSequence].MusicTrigger {
+				sequenceSpeed++
+				if sequenceSpeed > 20 {
+					sequenceSpeed = 20
+				}
+				cmd := common.Command{
+					Speed:       sequenceSpeed,
+					UpdateSpeed: true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			}
+			continue
+		}
+
+		// S E L E C T    S E Q U E N C E.
+		// Select sequence 1.
+		if hit.X == 8 && hit.Y == 0 {
+			selectedSequence = 0
+			common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+				selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
+			continue
+		}
+
+		// Select sequence 2.
+		if hit.X == 8 && hit.Y == 1 {
+			selectedSequence = 1
+			common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+				selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
+			continue
+		}
+
+		// Select sequence 3.
+		if hit.X == 8 && hit.Y == 2 {
+			selectedSequence = 2
+			common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+				selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
+			continue
+		}
+
+		// Select sequence 4.
+		if hit.X == 8 && hit.Y == 3 {
+			selectedSequence = 3
+			common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
+				selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
+			continue
+		}
+
+		// Start sequence.
+		if hit.X == 8 && hit.Y == 5 {
+			sequences[selectedSequence].MusicTrigger = false
+			cmd := common.Command{
+				Start: true,
+				Speed: sequenceSpeed,
+				//MusicTriggerOn: false,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+			time.Sleep(100 * time.Millisecond)
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+			continue
+		}
+		// Stop sequence.
+		if hit.X == 8 && hit.Y == 6 {
+			cmd := common.Command{
+				Stop:  true,
+				Speed: sequenceSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+			time.Sleep(100 * time.Millisecond)
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+			continue
+		}
+
+		// Size decrease.
+		if hit.X == 4 && hit.Y == 7 {
+			size--
+			if size < 0 {
+				size = 0
+			}
+			// Send Update Fade Speed.
+			cmd := common.Command{
+				UpdateSize: true,
+				Size:       size,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Size increase.
+		if hit.X == 5 && hit.Y == 7 {
+			size++
+			if size > 20 {
+				size = 20
+			}
+			// Send size update.
+			cmd := common.Command{
+				UpdateSize: true,
+				Size:       size,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Fade time decrease.
+		if hit.X == 6 && hit.Y == 7 {
+			fadeSpeed--
+			if fadeSpeed < 0 {
+				fadeSpeed = 0
+			}
+			// Send fade update command.
+			cmd := common.Command{
+				DecreaseFade: true,
+				FadeSpeed:    fadeSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Fade time increase.
+		if hit.X == 7 && hit.Y == 7 {
+			fadeSpeed++
+			if fadeSpeed > 20 {
+				fadeSpeed = 20
+			}
+			// Send fade update command.
+			cmd := common.Command{
+				IncreaseFade: true,
+				FadeSpeed:    fadeSpeed,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Function buttons.
+		if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence] {
+
+			// We've pushed a function key, this is where we set the value inside the temporary sequence.
+			for _, functions := range sequences[selectedSequence].Functions {
+				if hit.Y == functions.SequenceNumber {
+					if !sequences[selectedSequence].Functions[hit.X].State {
+						sequences[selectedSequence].Functions[hit.X].State = true
+						break
 					}
-					cmd := common.Command{
-						Speed:       sequenceSpeed,
-						UpdateSpeed: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				}
-				continue
-			}
-
-			// S E L E C T    S E Q U E N C E.
-			// Select sequence 1.
-			if hit.X == 8 && hit.Y == 0 {
-				selectedSequence = 0
-				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
-				continue
-			}
-
-			// Select sequence 2.
-			if hit.X == 8 && hit.Y == 1 {
-				selectedSequence = 1
-				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
-				continue
-			}
-
-			// Select sequence 3.
-			if hit.X == 8 && hit.Y == 2 {
-				selectedSequence = 2
-				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
-				continue
-			}
-
-			// Select sequence 4.
-			if hit.X == 8 && hit.Y == 3 {
-				selectedSequence = 3
-				common.HandleSelect(sequences, selectedSequence, hit.X, hit.Y, eventsForLauchpad,
-					selectButtons, functionButtons, functionMode, commandChannels, sequenceChannels)
-				continue
-			}
-
-			// Start sequence.
-			if hit.X == 8 && hit.Y == 5 {
-				sequences[selectedSequence].MusicTrigger = false
-				cmd := common.Command{
-					Start:          true,
-					Speed:          sequenceSpeed,
-					MusicTriggerOn: false,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-				time.Sleep(100 * time.Millisecond)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
-				continue
-			}
-			// Stop sequence.
-			if hit.X == 8 && hit.Y == 6 {
-				cmd := common.Command{
-					Stop:  true,
-					Speed: sequenceSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
-				time.Sleep(100 * time.Millisecond)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
-				continue
-			}
-
-			// Size decrease.
-			if hit.X == 4 && hit.Y == 7 {
-				size--
-				if size < 0 {
-					size = 0
-				}
-				// Send Update Fade Speed.
-				cmd := common.Command{
-					UpdateSize: true,
-					Size:       size,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Size increase.
-			if hit.X == 5 && hit.Y == 7 {
-				size++
-				if size > 20 {
-					size = 20
-				}
-				// Send size update.
-				cmd := common.Command{
-					UpdateSize: true,
-					Size:       size,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Fade time decrease.
-			if hit.X == 6 && hit.Y == 7 {
-				fadeSpeed--
-				if fadeSpeed < 0 {
-					fadeSpeed = 0
-				}
-				// Send fade update command.
-				cmd := common.Command{
-					DecreaseFade: true,
-					FadeSpeed:    fadeSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Fade time increase.
-			if hit.X == 7 && hit.Y == 7 {
-				fadeSpeed++
-				if fadeSpeed > 20 {
-					fadeSpeed = 20
-				}
-				// Send fade update command.
-				cmd := common.Command{
-					IncreaseFade: true,
-					FadeSpeed:    fadeSpeed,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
-			}
-
-			// Function buttons
-			if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence] {
-				// Get an upto date copy of the sequence.
-				cmd := common.Command{
-					ReadConfig: true,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				// Create a temporary sequence.
-				newSequence := common.Sequence{}
-				replyChannel := sequenceChannels.ReplyChannels[selectedSequence]
-
-				// Wait for sequence.
-				newSequence = <-replyChannel
-
-				// We've pushed a function key, this is where we set the value inside the temporary sequence.
-				for _, functions := range newSequence.Functions {
-					if hit.Y == functions.SequenceNumber {
-						if !newSequence.Functions[hit.X].State {
-							newSequence.Functions[hit.X].State = true
-							break
-						}
-						if newSequence.Functions[hit.X].State {
-							newSequence.Functions[hit.X].State = false
-							break
-						}
+					if sequences[selectedSequence].Functions[hit.X].State {
+						sequences[selectedSequence].Functions[hit.X].State = false
+						break
 					}
 				}
+			}
 
-				// Send update functions command. This sets the temporary representation of
-				// the function keys in the real sequence.
+			// Send update functions command. This sets the temporary representation of
+			// the function keys in the real sequence.
+			cmd := common.Command{
+				UpdateFunctions: true,
+				Functions:       sequences[selectedSequence].Functions,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// Light the correct function key.
+			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad, functionButtons)
+
+			continue
+
+			// // If we're unsetting static, then drop any presets as they would no longer apply.
+			// if !sequences[selectedSequence].Functions[common.Function6_Static].State {
+			// 	presets.ClearPresets(eventsForLauchpad, presetsStore)
+			// 	presets.InitPresets(eventsForLauchpad, presetsStore)
+			// }
+
+			// // If we are setting static then clear the launchpad.
+			// if sequences[selectedSequence].Functions[common.Function6_Static].State {
+			// 	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+			// }
+
+		}
+
+		// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
+		if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
+			!sequences[selectedSequence].Functions[common.Function6_Static].State {
+
+			flashSequence := common.Sequence{
+				Patten: common.Patten{
+					Name:  "colors",
+					Steps: pattens["colors"].Steps,
+				},
+			}
+
+			red := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
+			green := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
+			blue := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
+			pan := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Pan
+			tilt := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Tilt
+			shutter := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Shutter
+			gobo := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Gobo
+
+			common.LightOn(eventsForLauchpad, common.ALight{
+				X:          hit.X,
+				Y:          hit.Y,
+				Brightness: full,
+				Red:        red,
+				Green:      green,
+				Blue:       blue,
+			})
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+			time.Sleep(200 * time.Millisecond)
+			common.LightOff(eventsForLauchpad, hit.X, hit.Y)
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+			continue
+		}
+
+		// C H O O S E   S T A T I C    C O L O R
+		if hit.X == 1 && hit.Y == -1 {
+			if staticButtons[selectedSequence].Color.R > 254 {
+				staticButtons[selectedSequence].Color.R = 0
+			} else {
+				staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
+			}
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
+			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+			continue
+		}
+
+		if hit.X == 2 && hit.Y == -1 {
+			if staticButtons[selectedSequence].Color.G > 254 {
+				staticButtons[selectedSequence].Color.G = 0
+			} else {
+				staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
+			}
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
+			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+			continue
+		}
+
+		if hit.X == 3 && hit.Y == -1 {
+
+			if staticButtons[selectedSequence].Color.B > 254 {
+				staticButtons[selectedSequence].Color.B = 0
+			} else {
+				staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
+			}
+			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
+			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+			continue
+		}
+
+		// S E T    S T A T I C   C O L O R
+		if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y != -1 &&
+			sequences[selectedSequence].Functions[common.Function6_Static].State {
+
+			// Remember which color we are setting in this sequence.
+			red := staticButtons[selectedSequence].Color.R
+			green := staticButtons[selectedSequence].Color.G
+			blue := staticButtons[selectedSequence].Color.B
+
+			// Static is set to true in the functions and this key is set to
+			// the selected color.
+			cmd := common.Command{
+				UpdateStaticColor: true,
+				Static:            true,
+				StaticLamp:        hit.X,
+				StaticColor:       common.Color{R: red, G: green, B: blue},
+			}
+
+			// Toggle the state of the lamp.
+			if staticLamps[hit.X][hit.Y] {
+				staticLamps[hit.X][hit.Y] = false
+				// Turn the lamp off
 				cmd = common.Command{
-					UpdateFunctions: true,
-					Functions:       newSequence.Functions,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-				// Make sure the music trigger is set.
-				checkMusicTrigger(selectedSequence, newSequence, sequences, commandChannels)
-
-				// Keep track of the new run setting.
-				sequences[selectedSequence].Run = newSequence.Run
-
-				// Keep track of bounce setting.
-				sequences[selectedSequence].Bounce = newSequence.Bounce
-
-				// If we're unsetting static, then drop any presets as they would no longer apply.
-				if !newSequence.Functions[common.Function6_Static].State {
-					presets.ClearPresets(eventsForLauchpad, presetsStore)
-					presets.InitPresets(eventsForLauchpad, presetsStore)
-				}
-				// Always make sure Static flag is set correctly
-				cmd = common.Command{
-					UpdateStatic: true,
-					Static:       newSequence.Functions[common.Function6_Static].State,
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				// And locally.
-				sequences[selectedSequence].Functions[common.Function6_Static].State = newSequence.Functions[common.Function6_Static].State
-
-				// If we are setting static then stop all the sequences and clear the launchpad.
-				if newSequence.Functions[common.Function6_Static].State {
-					cmd = common.Command{
-						Stop: true,
-					}
-					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-					allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
-				}
-
-				// Light the correct function key.
-				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
-
-				continue
-			}
-
-			// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
-				!sequences[selectedSequence].Functions[common.Function6_Static].State {
-
-				flashSequence := common.Sequence{
-					Patten: common.Patten{
-						Name:  "colors",
-						Steps: pattens["colors"].Steps,
-					},
-				}
-
-				red := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].R
-				green := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].G
-				blue := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Colors[0].B
-				pan := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Pan
-				tilt := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Tilt
-				shutter := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Shutter
-				gobo := flashSequence.Patten.Steps[hit.X].Fixtures[hit.X].Gobo
-
-				common.LightOn(eventsForLauchpad, common.ALight{
-					X:          hit.X,
-					Y:          hit.Y,
-					Brightness: full,
-					Red:        red,
-					Green:      green,
-					Blue:       blue,
-				})
-				fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
-				time.Sleep(200 * time.Millisecond)
-				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-				fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
-				continue
-			}
-
-			// C H O O S E   S T A T I C    C O L O R
-			if hit.X == 1 && hit.Y == -1 {
-				if staticButtons[selectedSequence].Color.R > 254 {
-					staticButtons[selectedSequence].Color.R = 0
-				} else {
-					staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
-				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
-				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-				continue
-			}
-
-			if hit.X == 2 && hit.Y == -1 {
-				if staticButtons[selectedSequence].Color.G > 254 {
-					staticButtons[selectedSequence].Color.G = 0
-				} else {
-					staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
-				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
-				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-				continue
-			}
-
-			if hit.X == 3 && hit.Y == -1 {
-
-				if staticButtons[selectedSequence].Color.B > 254 {
-					staticButtons[selectedSequence].Color.B = 0
-				} else {
-					staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
-				}
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
-				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-				continue
-			}
-
-			// S E T    S T A T I C   C O L O R
-			if hit.X >= 0 && hit.X < 8 && !functionMode[8][selectedSequence] && hit.Y != -1 &&
-				sequences[selectedSequence].Functions[common.Function6_Static].State {
-
-				// Remember which color we are setting in this sequence.
-				red := staticButtons[selectedSequence].Color.R
-				green := staticButtons[selectedSequence].Color.G
-				blue := staticButtons[selectedSequence].Color.B
-
-				// Static is set to true in the functions and this key is set to
-				// the selected color.
-				cmd := common.Command{
 					UpdateStaticColor: true,
 					Static:            true,
 					StaticLamp:        hit.X,
-					StaticColor:       common.Color{R: red, G: green, B: blue},
+					StaticColor:       common.Color{R: 0, G: 0, B: 0},
 				}
-
-				// Toggle the state of the lamp.
-				if staticLamps[hit.X][hit.Y] {
-					staticLamps[hit.X][hit.Y] = false
-					// Turn the lamp off
-					cmd = common.Command{
-						UpdateStaticColor: true,
-						Static:            true,
-						StaticLamp:        hit.X,
-						StaticColor:       common.Color{R: 0, G: 0, B: 0},
-					}
-				} else {
-					// Remember which static lamp we just set.
-					staticLamps[hit.X][hit.Y] = true
-				}
-				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-				continue
+			} else {
+				// Remember which static lamp we just set.
+				staticLamps[hit.X][hit.Y] = true
 			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
 
-			// B L A C K O U T   B U T T O N.
-			if hit.X == 8 && hit.Y == 7 {
-				if !blackout {
-					blackout = true
-					cmd := common.Command{
-						Blackout: true,
-					}
-					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
-				} else {
-					blackout = false
-					cmd := common.Command{
-						Normal: true,
-					}
-					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+		// B L A C K O U T   B U T T O N.
+		if hit.X == 8 && hit.Y == 7 {
+			if !blackout {
+				blackout = true
+				cmd := common.Command{
+					Blackout: true,
 				}
-				continue
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
+			} else {
+				blackout = false
+				cmd := common.Command{
+					Normal: true,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 			}
+			continue
 		}
 	}
 }
 
-func checkMusicTrigger(selectedSequence int, newSequence common.Sequence, sequences []*common.Sequence, commandChannels []chan common.Command) {
-
-	// Make sure the music trigger is set.
-	if newSequence.Functions[common.Function8_Music_Trigger].State {
-		sequences[selectedSequence].MusicTrigger = true
-		cmd := common.Command{
-			MusicTriggerOn: true,
-		}
-		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-	} else {
-		sequences[selectedSequence].MusicTrigger = false
-		sequenceSpeed = 14 //Default to 25 Millisecond
-		cmd := common.Command{
-			MusicTriggerOff: true,
-			Speed:           sequenceSpeed,
-		}
-		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-	}
-}
+// // checkMusicTrigger sets or unsets the Musictrigger flag inside the sequence based on the state of the function key.
+// func setMusicTrigger(selectedSequence int, sequence common.Sequence, sequences []*common.Sequence, commandChannels []chan common.Command) {
+// 	// Make sure the music trigger is set.
+// 	if sequence.Functions[common.Function8_Music_Trigger].State {
+// 		sequences[selectedSequence].MusicTrigger = true
+// 		cmd := common.Command{
+// 			MusicTriggerOn: true,
+// 		}
+// 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+// 	} else {
+// 		sequences[selectedSequence].MusicTrigger = false
+// 		sequenceSpeed = 14 //Default to 25 Millisecond
+// 		cmd := common.Command{
+// 			MusicTriggerOff: true,
+// 			Speed:           sequenceSpeed,
+// 		}
+// 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+// 	}
+// }
 
 func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorButtons, staticLamps [][]bool, commandChannels []chan common.Command) {
 
@@ -802,21 +727,3 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController ft232.DM
 		}
 	}
 }
-
-// func refreshSequence(sequences []*common.Sequence, sequenceChannels common.Channels, commandChannels []chan common.Command) (newSequences []*common.Sequence) {
-
-// 	for selectedSequence := range sequences {
-// 		cmd := common.Command{
-// 			ReadConfig: true,
-// 		}
-// 		common.SendCommandToSequence(selectedSequence+1, cmd, commandChannels)
-
-// 		newSequence := common.Sequence{}
-// 		replyChannel := sequenceChannels.ReplyChannels[selectedSequence]
-// 		newSequence = <-replyChannel
-
-// 		newSequences = append(newSequences, &newSequence)
-// 	}
-
-// 	return newSequences
-// }
