@@ -249,6 +249,7 @@ func main() {
 				presets.InitPresets(eventsForLauchpad, presetsStore)
 				launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
 				savePreset = true
+				continue
 			}
 
 			// Ask all sequences for their current config and save in a file.
@@ -326,6 +327,7 @@ func main() {
 						}
 					}
 				}
+				continue
 			}
 
 			// Increment Patten.
@@ -360,7 +362,6 @@ func main() {
 					Speed: sequenceSpeed,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -387,7 +388,6 @@ func main() {
 					Speed: sequenceSpeed,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -403,8 +403,8 @@ func main() {
 						UpdateSpeed: true,
 					}
 					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-					continue
 				}
+				continue
 			}
 
 			// Increase speed of selected sequence.
@@ -419,8 +419,8 @@ func main() {
 						UpdateSpeed: true,
 					}
 					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-					continue
 				}
+				continue
 			}
 
 			// S E L E C T    S E Q U E N C E.
@@ -468,6 +468,7 @@ func main() {
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 				time.Sleep(100 * time.Millisecond)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+				continue
 			}
 			// Stop sequence.
 			if hit.X == 8 && hit.Y == 6 {
@@ -479,6 +480,7 @@ func main() {
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 				time.Sleep(100 * time.Millisecond)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+				continue
 			}
 
 			// Size decrease.
@@ -508,7 +510,6 @@ func main() {
 					Size:       size,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 				continue
 			}
 
@@ -613,6 +614,8 @@ func main() {
 
 				// Light the correct function key.
 				common.ShowFunctionButtons(newSequence, selectedSequence, eventsForLauchpad, functionButtons)
+
+				continue
 			}
 
 			// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
@@ -646,6 +649,7 @@ func main() {
 				time.Sleep(200 * time.Millisecond)
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
 				fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+				continue
 			}
 
 			// C H O O S E   S T A T I C    C O L O R
@@ -657,6 +661,7 @@ func main() {
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+				continue
 			}
 
 			if hit.X == 2 && hit.Y == -1 {
@@ -667,6 +672,7 @@ func main() {
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+				continue
 			}
 
 			if hit.X == 3 && hit.Y == -1 {
@@ -678,6 +684,7 @@ func main() {
 				}
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
 				updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
+				continue
 			}
 
 			// S E T    S T A T I C   C O L O R
@@ -713,6 +720,7 @@ func main() {
 					staticLamps[hit.X][hit.Y] = true
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				continue
 			}
 
 			// B L A C K O U T   B U T T O N.
@@ -732,6 +740,7 @@ func main() {
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 				}
+				continue
 			}
 		}
 	}
