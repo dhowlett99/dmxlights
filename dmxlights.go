@@ -223,11 +223,7 @@ func main() {
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 
-		//pad.BlockKeys(false)
-
 		hit := <-buttonChannel
-
-		fmt.Printf("Hit X:%d  Y:%d\n", hit.X, hit.Y)
 
 		// Clear all the lights on the launchpad.
 		if hit.X == 0 && hit.Y == -1 {
@@ -536,18 +532,6 @@ func main() {
 			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad, functionButtons)
 
 			continue
-
-			// // If we're unsetting static, then drop any presets as they would no longer apply.
-			// if !sequences[selectedSequence].Functions[common.Function6_Static].State {
-			// 	presets.ClearPresets(eventsForLauchpad, presetsStore)
-			// 	presets.InitPresets(eventsForLauchpad, presetsStore)
-			// }
-
-			// // If we are setting static then clear the launchpad.
-			// if sequences[selectedSequence].Functions[common.Function6_Static].State {
-			// 	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
-			// }
-
 		}
 
 		// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
@@ -676,26 +660,6 @@ func main() {
 		}
 	}
 }
-
-// // checkMusicTrigger sets or unsets the Musictrigger flag inside the sequence based on the state of the function key.
-// func setMusicTrigger(selectedSequence int, sequence common.Sequence, sequences []*common.Sequence, commandChannels []chan common.Command) {
-// 	// Make sure the music trigger is set.
-// 	if sequence.Functions[common.Function8_Music_Trigger].State {
-// 		sequences[selectedSequence].MusicTrigger = true
-// 		cmd := common.Command{
-// 			MusicTriggerOn: true,
-// 		}
-// 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-// 	} else {
-// 		sequences[selectedSequence].MusicTrigger = false
-// 		sequenceSpeed = 14 //Default to 25 Millisecond
-// 		cmd := common.Command{
-// 			MusicTriggerOff: true,
-// 			Speed:           sequenceSpeed,
-// 		}
-// 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-// 	}
-// }
 
 func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorButtons, staticLamps [][]bool, commandChannels []chan common.Command) {
 
