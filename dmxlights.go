@@ -506,6 +506,14 @@ func main() {
 		// Function buttons.
 		if hit.X >= 0 && hit.X < 8 && functionMode[8][selectedSequence] {
 
+			// Get an upto date copy of the sequence.
+			cmd := common.Command{
+				ReadConfig: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			newSequence := <-replyChannels[selectedSequence]
+			sequences[selectedSequence] = &newSequence
+
 			// We've pushed a function key, this is where we set the value inside the temporary sequence.
 			for _, functions := range sequences[selectedSequence].Functions {
 				if hit.Y == functions.SequenceNumber {
@@ -522,7 +530,7 @@ func main() {
 
 			// Send update functions command. This sets the temporary representation of
 			// the function keys in the real sequence.
-			cmd := common.Command{
+			cmd = common.Command{
 				UpdateFunctions: true,
 				Functions:       sequences[selectedSequence].Functions,
 			}
