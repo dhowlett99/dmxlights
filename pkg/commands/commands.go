@@ -187,6 +187,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		for _, seq = range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
+				// Assume we're blacked out.
+				sequence.Blackout = true
 				return sequence
 			}
 		}

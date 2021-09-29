@@ -295,11 +295,20 @@ func main() {
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 
+					// Update speed wakes the sequence up.
 					cmd = common.Command{
 						Speed:       sequences[selectedSequence].Speed,
 						UpdateSpeed: true,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+					// Preserve blackout.
+					if !blackout {
+						cmd := common.Command{
+							Normal: true,
+						}
+						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+					}
 				}
 			}
 			continue
