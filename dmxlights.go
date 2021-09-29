@@ -281,6 +281,7 @@ func main() {
 			} else {
 				// Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
+					// Stop all sequences, so we start in sync.
 					cmd := common.Command{
 						Stop: true,
 					}
@@ -299,11 +300,6 @@ func main() {
 						UpdateSpeed: true,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-
-					// cmd = common.Command{
-					// 	Start: true,
-					// }
-					// common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 			continue
