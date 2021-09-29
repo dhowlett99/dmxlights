@@ -17,6 +17,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
 	replyChannel := channels.ReplyChannels[mySequenceNumber]
 	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber]
+	updateChannel := channels.UpdateChannels[mySequenceNumber]
 
 	// Create an empty command.
 	command := common.Command{}
@@ -162,6 +163,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Read Config\n", mySequenceNumber)
 		}
 		replyChannel <- sequence
+		return sequence
+	}
+
+	// If we are being asked for our config we must reply with our current sequence.
+	if command.UpdateSequence {
+		if debug {
+			fmt.Printf("%d: Command Update Sequence\n", mySequenceNumber)
+		}
+		updateChannel <- sequence
 		return sequence
 	}
 

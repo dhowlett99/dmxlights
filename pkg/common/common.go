@@ -74,6 +74,7 @@ type Command struct {
 	Color           int
 	UpdateFunctions bool
 	Functions       []Function
+	UpdateSequence  bool
 }
 
 // Sequence describes sequences.
@@ -117,6 +118,7 @@ type Channels struct {
 	CommmandChannels     []chan Command
 	ReplyChannels        []chan Sequence
 	SoundTriggerChannels []chan Command
+	UpdateChannels       []chan Sequence
 }
 
 type Hit struct {

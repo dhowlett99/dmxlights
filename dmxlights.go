@@ -77,6 +77,7 @@ func main() {
 	commandChannels := []chan common.Command{}
 	replyChannels := []chan common.Sequence{}
 	soundTriggerChannels := []chan common.Command{}
+	updateChannels := []chan common.Sequence{}
 
 	// Make channels for commands.
 	for sequence := 0; sequence < 4; sequence++ {
@@ -86,6 +87,8 @@ func main() {
 		replyChannels = append(replyChannels, replyChannel)
 		soundTriggerChannel := make(chan common.Command)
 		soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel)
+		updateChannel := make(chan common.Sequence)
+		updateChannels = append(updateChannels, updateChannel)
 	}
 
 	// Now add them all to a handy channels struct.
@@ -93,6 +96,7 @@ func main() {
 	sequenceChannels.CommmandChannels = commandChannels
 	sequenceChannels.ReplyChannels = replyChannels
 	sequenceChannels.SoundTriggerChannels = soundTriggerChannels
+	sequenceChannels.UpdateChannels = updateChannels
 
 	// Get a list of all the fixtures in the groups.
 	fixturesConfig := fixture.LoadFixtures()
@@ -508,10 +512,10 @@ func main() {
 
 			// Get an upto date copy of the sequence.
 			cmd := common.Command{
-				ReadConfig: true,
+				UpdateSequence: true,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-			newSequence := <-replyChannels[selectedSequence]
+			newSequence := <-updateChannels[selectedSequence]
 			sequences[selectedSequence] = &newSequence
 
 			// We've pushed a function key, this is where we set the value inside the temporary sequence.
