@@ -8,7 +8,7 @@ import (
 	"github.com/gordonklaus/portaudio"
 )
 
-func NewSoundTrigger(soundTriggers *map[int]bool, channels common.Channels) {
+func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) {
 
 	go func() {
 
@@ -41,10 +41,11 @@ func NewSoundTrigger(soundTriggers *map[int]bool, channels common.Channels) {
 				// Trigger
 				time.Sleep(10 * time.Millisecond)
 				cmd := common.Command{}
-				triggers := *soundTriggers
-				for index, value := range triggers {
-					if value {
-						channels.SoundTriggerChannels[index] <- cmd
+				for index, trigger := range soundTriggers {
+					if trigger.SequenceNumber == index {
+						if trigger.State {
+							channels.SoundTriggerChannels[index] <- cmd
+						}
 					}
 				}
 			}

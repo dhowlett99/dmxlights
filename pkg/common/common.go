@@ -197,6 +197,11 @@ type Event struct {
 	Color     Color
 }
 
+type Trigger struct {
+	SequenceNumber int
+	State          bool
+}
+
 // Define the function keys.
 const (
 	Function1_Forward_Chase = 0

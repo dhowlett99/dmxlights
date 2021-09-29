@@ -57,7 +57,6 @@ func CreateSequence(
 	// Make functions for each of the sequences.
 	for function := 0; function < 8; function++ {
 		newFunction := common.Function{
-			//Name:           fmt.Sprintf("function %d", function),
 			SequenceNumber: mySequenceNumber,
 			Number:         function,
 			State:          false,
@@ -75,9 +74,9 @@ func PlayNewSequence(sequence common.Sequence,
 	dmxController ft232.DMXController,
 	fixtureConfig *fixture.Fixtures,
 	channels common.Channels,
-	soundTriggers *map[int]bool) {
+	soundTriggers []*common.Trigger) {
 
-	positions := map[int][]common.Position{}
+	var positions map[int][]common.Position
 
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
@@ -119,13 +118,34 @@ func PlayNewSequence(sequence common.Sequence,
 		// 	sequence.Run = false
 		// }
 
-		sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
+		// sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
 
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
+		// // Map bounce function to sequence bounce setting.
+		// sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
+
+		// // Map music trigger function.
+		// sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+
+		// // Map static function.
+		// //sequence.Static = sequence.Functions[common.Function6_Static].State
+
+		// // If the music trigger is being used then the timer is disabled.
+		// // if sequence.MusicTrigger {
+		// // 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+		// // 	triggers := *soundTriggers
+		// // 	triggers[sequence.Number] = true
+		// // } else {
+		// // 	triggers := *soundTriggers
+		// // 	triggers[sequence.Number] = false
+		// // 	sequence.CurrentSpeed = 25 * time.Millisecond
+		// // }
+
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*100, sequence, channels)
+
+		//fmt.Printf("Seq %d   Run %t   MusicTrigger %t    Static %t\n", sequence.Number, sequence.Run, sequence.MusicTrigger, sequence.Static)
 
 		// Sequence in Static Mode.
 		if sequence.Static {
-			//fmt.Printf("Play Seq %d\n", mySequenceNumber)
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
 					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
@@ -138,8 +158,11 @@ func PlayNewSequence(sequence common.Sequence,
 			continue
 		}
 
+		// This is the inner loop where the sequence runs.
 		// Sequence in Normal Running Mode.
-		if sequence.Run {
+		for sequence.Run {
+
+			sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
 
 			// Map bounce function to sequence bounce setting.
 			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
@@ -147,15 +170,22 @@ func PlayNewSequence(sequence common.Sequence,
 			// Map music trigger function.
 			sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
+			// Map static function.
+			//sequence.Static = sequence.Functions[common.Function6_Static].State
+
 			// If the music trigger is being used then the timer is disabled.
-			if sequence.MusicTrigger {
-				sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-				triggers := *soundTriggers
-				triggers[sequence.Number] = true
-			} else {
-				triggers := *soundTriggers
-				triggers[sequence.Number] = false
-				sequence.CurrentSpeed = 25 * time.Millisecond
+			for _, trigger := range soundTriggers {
+				if sequence.MusicTrigger {
+					sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+					if trigger.SequenceNumber == mySequenceNumber {
+						trigger.State = true
+					}
+				} else {
+					if trigger.SequenceNumber == mySequenceNumber {
+						trigger.State = false
+					}
+					sequence.CurrentSpeed = 25 * time.Millisecond
+				}
 			}
 
 			if sequence.Patten.Name == "scanner" {

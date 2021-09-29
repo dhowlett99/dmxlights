@@ -140,16 +140,20 @@ func main() {
 	staticButtons = append(staticButtons, staticButton4)
 
 	// soundTriggers is a an array of switches which control which sequence gets a music trigger.
-	soundTriggers := make(map[int]bool, 4)
+	soundTriggers := []*common.Trigger{}
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 0, State: false})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 1, State: false})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 2, State: false})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 3, State: false})
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	sound.NewSoundTrigger(&soundTriggers, sequenceChannels)
+	sound.NewSoundTrigger(soundTriggers, sequenceChannels)
 
 	// Start threads for each sequence.
-	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
-	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
-	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
-	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, &soundTriggers)
+	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
 
 	// common.Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -240,6 +244,10 @@ func main() {
 				Stop: true,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+			cmd = common.Command{
+				UpdateStatic: false,
+			}
+			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 			continue
 		}
 
@@ -248,7 +256,6 @@ func main() {
 			if savePreset {
 				savePreset = false
 				presets.InitPresets(eventsForLauchpad, presetsStore)
-				//launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad)
 				common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255})
 				continue
 			}
@@ -261,7 +268,6 @@ func main() {
 		// Ask all sequences for their current config and save in a file.
 		//if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) && !pad.IsBlocked() {
 		if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
-			//pad.BlockKeys(true)
 			if savePreset {
 				presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
@@ -275,6 +281,10 @@ func main() {
 			} else {
 				// Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
+					cmd := common.Command{
+						Stop: true,
+					}
+					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 					// Load the config.
 					config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
@@ -284,9 +294,14 @@ func main() {
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 
-					cmd := common.Command{
+					cmd = common.Command{
 						Speed:       sequences[selectedSequence].Speed,
 						UpdateSpeed: true,
+					}
+					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+					cmd = common.Command{
+						Start: true,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				}
