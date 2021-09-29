@@ -300,10 +300,10 @@ func main() {
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
-					cmd = common.Command{
-						Start: true,
-					}
-					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+					// cmd = common.Command{
+					// 	Start: true,
+					// }
+					// common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 			continue
