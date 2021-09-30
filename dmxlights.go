@@ -289,11 +289,10 @@ func main() {
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 					allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+					time.Sleep(300 * time.Millisecond)
 
 					// Load the config.
 					config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
-
-					time.Sleep(300 * time.Millisecond)
 
 					// Turn the selected preset light red.
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
