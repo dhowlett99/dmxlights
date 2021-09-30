@@ -281,11 +281,16 @@ func main() {
 			} else {
 				// Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
+
 					// Stop all sequences, so we start in sync.
 					cmd := common.Command{
 						Stop: true,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+					allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
+
+					time.Sleep(300 * time.Millisecond)
 
 					// Load the config.
 					config.AskToLoadConfig(commandChannels, hit.X, hit.Y)

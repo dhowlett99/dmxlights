@@ -113,39 +113,10 @@ func PlayNewSequence(sequence common.Sequence,
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
 
-		// If we're static the sequence has to stop.
-		// if sequence.Functions[common.Function6_Static].State {
-		// 	sequence.Run = false
-		// }
-
-		// sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
-
-		// // Map bounce function to sequence bounce setting.
-		// sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
-
-		// // Map music trigger function.
-		// sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
-
-		// // Map static function.
-		// //sequence.Static = sequence.Functions[common.Function6_Static].State
-
-		// // If the music trigger is being used then the timer is disabled.
-		// // if sequence.MusicTrigger {
-		// // 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-		// // 	triggers := *soundTriggers
-		// // 	triggers[sequence.Number] = true
-		// // } else {
-		// // 	triggers := *soundTriggers
-		// // 	triggers[sequence.Number] = false
-		// // 	sequence.CurrentSpeed = 25 * time.Millisecond
-		// // }
-
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*100, sequence, channels)
 
-		//fmt.Printf("Seq %d   Run %t   MusicTrigger %t    Static %t\n", sequence.Number, sequence.Run, sequence.MusicTrigger, sequence.Static)
-
 		// Sequence in Static Mode.
-		if sequence.Static {
+		if sequence.PlayStaticOnce && sequence.Static {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
 					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
@@ -154,7 +125,7 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 			// Only play once, we don't want to flood the DMX universe with
 			// continual commands.
-			sequence.Static = false
+			sequence.PlayStaticOnce = false
 			continue
 		}
 
@@ -171,7 +142,10 @@ func PlayNewSequence(sequence common.Sequence,
 			sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 			// Map static function.
-			//sequence.Static = sequence.Functions[common.Function6_Static].State
+			sequence.Static = sequence.Functions[common.Function6_Static].State
+			if sequence.Functions[common.Function6_Static].State {
+				sequence.PlayStaticOnce = true
+			}
 
 			// If the music trigger is being used then the timer is disabled.
 			for _, trigger := range soundTriggers {

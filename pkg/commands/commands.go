@@ -121,6 +121,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)
 		}
+		sequence.PlayStaticOnce = true
 		sequence.Blackout = true
 		return sequence
 	}
@@ -128,6 +129,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)
 		}
+		sequence.PlayStaticOnce = true
 		sequence.Blackout = false
 		return sequence
 	}
@@ -143,6 +145,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
 		}
+		sequence.PlayStaticOnce = true
 		sequence.Static = command.Static
 		return sequence
 	}
@@ -152,6 +155,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
 			fmt.Printf("Lamp Color   R:%d  G:%d  B:%d\n", command.StaticColor.R, command.StaticColor.G, command.StaticColor.B)
 		}
+		sequence.PlayStaticOnce = true
 		sequence.Static = command.Static
 		sequence.StaticColors[command.StaticLamp] = command.StaticColor
 		return sequence
@@ -186,9 +190,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		seq := common.Sequence{}
 		for _, seq = range config {
 			if seq.Number == sequence.Number {
+				fmt.Printf("Seq %d is Static %t\n", sequence.Number, sequence.Static)
 				sequence = seq
 				// Assume we're blacked out.
 				sequence.Blackout = true
+				sequence.PlayStaticOnce = true
 				return sequence
 			}
 		}
