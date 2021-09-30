@@ -190,7 +190,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		seq := common.Sequence{}
 		for _, seq = range config {
 			if seq.Number == sequence.Number {
-				fmt.Printf("Seq %d is Static %t\n", sequence.Number, sequence.Static)
 				sequence = seq
 				// Assume we're blacked out.
 				sequence.Blackout = true

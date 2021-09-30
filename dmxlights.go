@@ -290,22 +290,15 @@ func main() {
 
 					allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 
-					time.Sleep(300 * time.Millisecond)
-
 					// Load the config.
 					config.AskToLoadConfig(commandChannels, hit.X, hit.Y)
+
+					time.Sleep(300 * time.Millisecond)
 
 					// Turn the selected preset light red.
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					presets.InitPresets(eventsForLauchpad, presetsStore)
 					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
-
-					// Update speed wakes the sequence up.
-					cmd = common.Command{
-						Speed:       sequences[selectedSequence].Speed,
-						UpdateSpeed: true,
-					}
-					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 					// Preserve blackout.
 					if !blackout {
