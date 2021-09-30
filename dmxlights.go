@@ -30,6 +30,7 @@ const (
 var sequenceSpeed int = 12
 var fadeSpeed int
 var size int
+var masterBrightness int
 
 //var color int
 var savePreset bool
@@ -44,6 +45,7 @@ func main() {
 	var selectButtons [][]bool
 	var staticLamps [][]bool
 	fadeSpeed = 11 // Default start at 50ms.
+	masterBrightness = 255
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -246,6 +248,36 @@ func main() {
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 			cmd = common.Command{
 				UpdateStatic: false,
+			}
+			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Master brightness down.
+		if hit.X == 6 && hit.Y == -1 {
+			//fmt.Printf("Master Brightness Down %d\n", masterBrightness)
+			masterBrightness = masterBrightness - 10
+			if masterBrightness < 0 {
+				masterBrightness = 0
+			}
+			cmd := common.Command{
+				MasterBrightness: true,
+				Master:           masterBrightness,
+			}
+			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+			continue
+		}
+
+		// Master brightness up.
+		if hit.X == 7 && hit.Y == -1 {
+			//fmt.Printf("Master Brightness Up %d\n", masterBrightness)
+			masterBrightness = masterBrightness + 10
+			if masterBrightness > 255 {
+				masterBrightness = 255
+			}
+			cmd := common.Command{
+				MasterBrightness: true,
+				Master:           masterBrightness,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 			continue
@@ -585,19 +617,20 @@ func main() {
 			common.LightOn(eventsForLauchpad, common.ALight{
 				X:          hit.X,
 				Y:          hit.Y,
-				Brightness: full,
+				Brightness: masterBrightness,
 				Red:        red,
 				Green:      green,
 				Blue:       blue,
 			})
-			fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, fixturesConfig, blackout, masterBrightness, masterBrightness)
 			time.Sleep(200 * time.Millisecond)
 			common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-			fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, 255, 255)
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, fixturesConfig, blackout, masterBrightness, masterBrightness)
 			continue
 		}
 
 		// C H O O S E   S T A T I C    C O L O R
+		// Red
 		if hit.X == 1 && hit.Y == -1 {
 			if staticButtons[selectedSequence].Color.R > 254 {
 				staticButtons[selectedSequence].Color.R = 0
@@ -609,6 +642,7 @@ func main() {
 			continue
 		}
 
+		// Green
 		if hit.X == 2 && hit.Y == -1 {
 			if staticButtons[selectedSequence].Color.G > 254 {
 				staticButtons[selectedSequence].Color.G = 0
@@ -620,6 +654,7 @@ func main() {
 			continue
 		}
 
+		// Blue
 		if hit.X == 3 && hit.Y == -1 {
 
 			if staticButtons[selectedSequence].Color.B > 254 {

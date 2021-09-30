@@ -77,9 +77,9 @@ func FixtureReceiver(sequence common.Sequence,
 						// Short ciruit the soft fade if we are a scanner.
 						if cmd.Type == "scanner" {
 							if position.Fixture == myFixtureNumber {
-								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								if !cmd.Hide {
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, eventsForLauchpad)
+									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
 								}
 							}
 						} else {
@@ -91,10 +91,10 @@ func FixtureReceiver(sequence common.Sequence,
 										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
 										if !cmd.Hide {
-											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 										}
 										// Now ask DMX to actually light the real fixture.
-										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 										time.Sleep(cmd.FadeTime / 4) // Fade up Time.
 									}
 									for x := 0; x < cmd.Size; x++ {
@@ -106,9 +106,9 @@ func FixtureReceiver(sequence common.Sequence,
 										G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 										B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
 										if !cmd.Hide {
-											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, eventsForLauchpad)
+											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 										}
-										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, sequence.Master, sequence.Master)
+										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 										time.Sleep(cmd.FadeTime / 4) // Fade down time.
 									}
 									time.Sleep(cmd.FadeTime / 4) // Fade off time.

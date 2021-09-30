@@ -119,7 +119,7 @@ func PlayNewSequence(sequence common.Sequence,
 		if sequence.PlayStaticOnce && sequence.Static {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
-					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, eventsForLauchpad)
+					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, sequence.Master, eventsForLauchpad)
 				}
 				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
@@ -177,6 +177,7 @@ func PlayNewSequence(sequence common.Sequence,
 			// Run the sequence through.
 			for step := 0; step < sequence.Steps; step++ {
 				cmd := common.FixtureCommand{
+					Master:          sequence.Master,
 					Hide:            sequence.Hide,
 					Tick:            true,
 					Positions:       positions,

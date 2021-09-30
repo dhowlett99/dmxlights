@@ -39,6 +39,8 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
+	MasterBrightness  bool
+	Master            int
 	Static            bool
 	UpdateStatic      bool
 	UpdateStaticColor bool
@@ -134,6 +136,7 @@ type Step struct {
 
 // Fixture Command.
 type FixtureCommand struct {
+	Master          int
 	Hide            bool
 	Tick            bool
 	Config          bool // Configure fixture.

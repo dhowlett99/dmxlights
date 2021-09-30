@@ -58,13 +58,13 @@ func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan 
 	eventsForLauchpad <- e
 }
 
-func LightLamp(Y, X, R, G, B int, eventsForLauchpad chan common.ALight) {
+func LightLamp(Y, X, R, G, B, Master int, eventsForLauchpad chan common.ALight) {
 
 	// Now trigger the fixture lamp on the launch pad by sending an event.
 	e := common.ALight{
 		X:          X,
 		Y:          Y,
-		Brightness: 255,
+		Brightness: Master,
 		Red:        R,
 		Green:      G,
 		Blue:       B,

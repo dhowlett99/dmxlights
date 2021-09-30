@@ -170,6 +170,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	// We are setting the Master brightness in this sequence.
+	if command.MasterBrightness {
+		if debug {
+			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, sequence.Master)
+		}
+		sequence.PlayStaticOnce = true
+		sequence.Master = command.Master
+		return sequence
+	}
+
 	// If we are being asked for our config we must reply with our current sequence.
 	if command.UpdateSequence {
 		if debug {
