@@ -59,7 +59,7 @@ func FixtureReceiver(sequence common.Sequence,
 	myFixtureNumber int,
 	channels []chan common.FixtureCommand,
 	eventsForLauchpad chan common.ALight,
-	dmxController ft232.DMXController,
+	dmxController *ft232.DMXController,
 	fixtures *Fixtures) {
 
 	cmd := common.FixtureCommand{}
@@ -125,7 +125,7 @@ func FixtureReceiver(sequence common.Sequence,
 // When want to light a DMX fixture we need for find it in our fuxture.yaml configuration file.
 // This function maps the requested fixture into a DMX address.
 func MapFixtures(mySequenceNumber int,
-	dmxController ft232.DMXController,
+	dmxController *ft232.DMXController,
 	displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int,
 	fixtures *Fixtures, blackout bool, brightness int, master int) {
 

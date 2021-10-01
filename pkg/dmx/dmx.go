@@ -1,6 +1,7 @@
 package dmx
 
 import (
+	"errors"
 	"log"
 	"time"
 
@@ -8,7 +9,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func NewDmXController() (controller ft232.DMXController) {
+func NewDmXController() (controller *ft232.DMXController, err error) {
 	// Constants, these should really be defined in the module and will be
 	// as of the next release
 	vid := uint16(0x0403)
@@ -24,9 +25,11 @@ func NewDmXController() (controller ft232.DMXController) {
 	config.GetUSBContext()
 
 	// Create a controller and connect to it
-	controller = ft232.NewDMXController(config)
-	if err := controller.Connect(); err != nil {
-		log.Fatalf("Failed to connect DMX Controller: %s", err)
+	c := ft232.NewDMXController(config)
+	controller = &c
+	err = controller.Connect()
+	if err != nil {
+		return nil, errors.New("Failed to connect DMX Controller: " + err.Error())
 	}
 
 	// Create a go routine that will ensure our controller keeps sending data
@@ -40,9 +43,9 @@ func NewDmXController() (controller ft232.DMXController) {
 
 			time.Sleep(30 * time.Millisecond)
 		}
-	}(&controller)
+	}(controller)
 
-	return controller
+	return controller, nil
 }
 
 func SetDMXChannel(controller ft232.DMXController, channel int16, value byte) {

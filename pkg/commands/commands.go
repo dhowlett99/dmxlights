@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -47,6 +47,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
+		sequence.PlayStaticOnce = true
 		sequence.Hide = false
 		return sequence
 	}
@@ -105,6 +106,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
+		sequence.Mode = "Sequence"
 		sequence.Static = false
 		sequence.Run = true
 		return sequence
@@ -141,12 +143,36 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	if command.SetEditColors {
+		if debug {
+			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Static)
+		}
+		sequence.PlayStaticOnce = true
+		sequence.EditColors = command.EditColors
+		return sequence
+	}
+
 	if command.UpdateStatic {
 		if debug {
 			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
 		}
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Static
+		if sequence.Mode == "Static" {
+			sequence.Static = true
+		}
+		return sequence
+	}
+
+	if command.UpdateMode {
+		if debug {
+			fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Mode)
+		}
+		sequence.Mode = command.Mode
+		if sequence.Mode == "Static" {
+			fmt.Printf("Setting Run to %t\n", sequence.Run)
+			sequence.Run = false
+		}
 		return sequence
 	}
 
@@ -186,6 +212,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
+		return sequence
+	}
+
+	// Update function mode for the current sequence.
+	if command.UpdateFunctionMode {
+		if debug {
+			fmt.Printf("%d: Command Update Function Mode %t\n", mySequenceNumber, command.FunctionMode)
+		}
+		sequence.FunctionMode = command.FunctionMode
 		return sequence
 	}
 
