@@ -119,6 +119,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Static = false
 		return sequence
 	}
+
+	if command.PlayStaticOnce {
+		if debug {
+			fmt.Printf("%d: Command PlayStaticOnce\n", mySequenceNumber)
+		}
+		sequence.PlayStaticOnce = true
+		return sequence
+	}
+
 	if command.Blackout {
 		if debug {
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)

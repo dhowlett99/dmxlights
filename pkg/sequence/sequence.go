@@ -123,7 +123,9 @@ func PlayNewSequence(sequence common.Sequence,
 		sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 		// Map static function.
-		sequence.Static = sequence.Functions[common.Function6_Static].State
+		if sequence.Functions[common.Function6_Static].State {
+			sequence.Static = true
+		}
 
 		// We are in static color editing mode flash this rows buttons.
 		// if sequence.EditColors && sequence.Static {

@@ -41,7 +41,7 @@ var blackout bool = false
 func main() {
 
 	var functionButtons [][]bool   // Function buttons.
-	var FunctionSelectMode []bool  // Which sequence is in function selection mode.
+	var functionSelectMode []bool  // Which sequence is in function selection mode.
 	var selectButtonPressed []bool // Which sequence has its Select button pressed.
 	var staticLamps [][]bool       // Static color lamps.
 	var colorEditModeDone []bool   // This sequence is done color editing mode.
@@ -181,7 +181,7 @@ func main() {
 	selectButtonPressed = make([]bool, 9)
 
 	// Initialize a ten length slice of empty slices for function mode state.
-	FunctionSelectMode = make([]bool, 9)
+	functionSelectMode = make([]bool, 9)
 
 	// Initialize a ten length slice of empty slices for static lamps.
 	staticLamps = make([][]bool, 9)
@@ -444,8 +444,14 @@ func main() {
 		if hit.X == 8 && hit.Y == 0 {
 			selectedSequence = 0
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
-				FunctionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
-			setColorEditMode(selectedSequence, sequences, FunctionSelectMode, colorEditModeDone, commandChannels, eventsForLauchpad)
+				functionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
+			setColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditModeDone, selectButtonPressed, commandChannels, eventsForLauchpad)
+
+			fmt.Printf("Seq %d  Static %t\n", selectedSequence, sequences[selectedSequence].Static)
+			cmd := common.Command{
+				PlayStaticOnce: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
@@ -454,8 +460,13 @@ func main() {
 		if hit.X == 8 && hit.Y == 1 {
 			selectedSequence = 1
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
-				FunctionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
-			setColorEditMode(selectedSequence, sequences, FunctionSelectMode, colorEditModeDone, commandChannels, eventsForLauchpad)
+				functionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
+			setColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditModeDone, selectButtonPressed, commandChannels, eventsForLauchpad)
+
+			cmd := common.Command{
+				PlayStaticOnce: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
@@ -464,8 +475,13 @@ func main() {
 		if hit.X == 8 && hit.Y == 2 {
 			selectedSequence = 2
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
-				FunctionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
-			setColorEditMode(selectedSequence, sequences, FunctionSelectMode, colorEditModeDone, commandChannels, eventsForLauchpad)
+				functionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
+			setColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditModeDone, selectButtonPressed, commandChannels, eventsForLauchpad)
+
+			cmd := common.Command{
+				PlayStaticOnce: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
@@ -474,8 +490,13 @@ func main() {
 		if hit.X == 8 && hit.Y == 3 {
 			selectedSequence = 3
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
-				FunctionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
-			setColorEditMode(selectedSequence, sequences, FunctionSelectMode, colorEditModeDone, commandChannels, eventsForLauchpad)
+				functionSelectMode, colorEditModeDone, commandChannels, sequenceChannels)
+			setColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditModeDone, selectButtonPressed, commandChannels, eventsForLauchpad)
+
+			cmd := common.Command{
+				PlayStaticOnce: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
@@ -568,7 +589,7 @@ func main() {
 		}
 
 		// F U N C T I O N  K E Y S
-		if hit.X >= 0 && hit.X < 8 && FunctionSelectMode[selectedSequence] {
+		if hit.X >= 0 && hit.X < 8 && functionSelectMode[selectedSequence] {
 
 			// Get an upto date copy of the sequence.
 			cmd := common.Command{
@@ -607,7 +628,7 @@ func main() {
 		}
 
 		// FLASH BUTTONS - Briefly light (flash) the fixtures based on current patten.
-		if hit.X >= 0 && hit.X < 8 && !FunctionSelectMode[selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
 			!sequences[selectedSequence].Functions[common.Function6_Static].State {
 
 			flashSequence := common.Sequence{
@@ -682,7 +703,7 @@ func main() {
 		}
 
 		// S E T    S T A T I C   C O L O R
-		if hit.X >= 0 && hit.X < 8 && !FunctionSelectMode[selectedSequence] && hit.Y != -1 &&
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] && hit.Y != -1 &&
 			sequences[selectedSequence].Functions[common.Function6_Static].State {
 
 			// Remember which color we are setting in this sequence.
@@ -764,18 +785,23 @@ func updateStaticLamps(selectedSequence int, staticButtons []common.StaticColorB
 func HandleSelect(sequences []*common.Sequence,
 	selectedSequence int,
 	eventsForLauchpad chan common.ALight,
-	selectButtons []bool,
+	selectButtonPressed []bool,
 	functionButtons [][]bool,
-	functionSelectionMode []bool,
-	colorEditMode []bool,
+	functionSelectMode []bool,
+	colorEditModeDone []bool,
 	commandChannels []chan common.Command,
 	channels common.Channels) {
+
+	// fmt.Printf("HANDLE: selectButtons[%d] = %t \n", selectedSequence, selectButtonPressed[selectedSequence])
+	// fmt.Printf("HANDLE: colorEditModeDone[%d] = %t \n", selectedSequence, colorEditModeDone[selectedSequence])
+	// fmt.Printf("HANDLE: functionSelectMode[%d] = %t \n", selectedSequence, functionSelectMode[selectedSequence])
+	// fmt.Printf("HANDLE: Func Static[%d] = %t\n", selectedSequence, sequences[selectedSequence].Functions[common.Function6_Static].State)
 
 	// Light the sequence selector button.
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// First time into function mode we head back to normal mode.
-	if functionSelectionMode[selectedSequence] && !selectButtons[selectedSequence] {
+	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] {
 
 		fmt.Printf("Handle 1 Function Bar off\n")
 
@@ -789,49 +815,49 @@ func HandleSelect(sequences []*common.Sequence,
 		// And reveal the sequence on the launchpad keys
 		common.RevealSequence(selectedSequence, commandChannels)
 		// Turn off the function mode flag.
-		functionSelectionMode[selectedSequence] = false
+		functionSelectMode[selectedSequence] = false
 		// Now forget we pressed twice and start again.
-		selectButtons[selectedSequence] = true
+		selectButtonPressed[selectedSequence] = true
 
 		return
 	}
 
 	// This the first time we have pressed the select button.
-	if !selectButtons[selectedSequence] {
-		fmt.Printf("Handle 2\n")
+	if !selectButtonPressed[selectedSequence] {
+		//fmt.Printf("Handle 2\n")
 		// assume everything else is off.
-		selectButtons[0] = false
-		selectButtons[1] = false
-		selectButtons[2] = false
-		selectButtons[3] = false
+		selectButtonPressed[0] = false
+		selectButtonPressed[1] = false
+		selectButtonPressed[2] = false
+		selectButtonPressed[3] = false
 		// But remember we have pressed this select button once.
-		functionSelectionMode[selectedSequence] = false
-		selectButtons[selectedSequence] = true
+		functionSelectMode[selectedSequence] = false
+		selectButtonPressed[selectedSequence] = true
 		return
 	}
 
 	// Are we in function mode ?
-	if functionSelectionMode[selectedSequence] {
-		fmt.Printf("Handle 3\n")
+	if functionSelectMode[selectedSequence] {
+		//fmt.Printf("Handle 3\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 		// And reveal the sequence on the launchpad keys
 		common.RevealSequence(selectedSequence, commandChannels)
 		// Turn off the function mode flag.
-		functionSelectionMode[selectedSequence] = false
+		functionSelectMode[selectedSequence] = false
 		// Now forget we pressed twice and start again.
-		selectButtons[selectedSequence] = false
+		selectButtonPressed[selectedSequence] = false
 		return
 	}
 
 	// We are in function mode for this sequence.
-	if !functionSelectionMode[selectedSequence] {
-		fmt.Printf("Handle 4 - Function Bar On!\n")
+	if !functionSelectMode[selectedSequence] {
+		// fmt.Printf("Handle 4 - Function Bar On!\n")
 
-		fmt.Printf("Color Edit Mode set for %t\n", colorEditMode[selectedSequence])
+		// fmt.Printf("Color Edit Mode Done set for %t\n", colorEditModeDone[selectedSequence])
 
 		// Set function mode.
-		functionSelectionMode[selectedSequence] = true
+		functionSelectMode[selectedSequence] = true
 
 		// And hide the sequence so we can only see the function buttons.
 		common.HideSequence(selectedSequence, commandChannels)
@@ -839,25 +865,22 @@ func HandleSelect(sequences []*common.Sequence,
 		// Create the function buttons.
 		common.MakeFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad, functionButtons, channels)
 		// Now forget we pressed twice and start again.
-		selectButtons[selectedSequence] = false
+		selectButtonPressed[selectedSequence] = false
 		return
 	}
 }
 
 func setColorEditMode(selectedSequence int,
 	sequences []*common.Sequence,
-	FunctionSelectMode []bool,
+	functionSelectMode []bool,
 	colorEditModeDone []bool,
+	selectButtonPressed []bool,
 	commandChannels []chan common.Command,
 	eventsForLauchpad chan common.ALight) {
 
-	fmt.Printf("colorEditModeDone[%d] = %t \n", selectedSequence, colorEditModeDone[selectedSequence])
-	fmt.Printf("FunctionSelectMode[%d] = %t \n", selectedSequence, FunctionSelectMode[selectedSequence])
-	fmt.Printf("Func Static[%d] = %t\n", selectedSequence, sequences[selectedSequence].Functions[common.Function6_Static].State)
+	if functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && colorEditModeDone[selectedSequence] {
 
-	if FunctionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && colorEditModeDone[selectedSequence] {
-
-		fmt.Printf("Hide Edit Color Buttons.\n")
+		// fmt.Printf("Hide Edit Color Buttons.\n")
 		showEditColorButtons(selectedSequence, eventsForLauchpad, false)
 
 		cmd := common.Command{
@@ -867,17 +890,21 @@ func setColorEditMode(selectedSequence int,
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 		colorEditModeDone[selectedSequence] = false
+		selectButtonPressed[selectedSequence] = false
+		functionSelectMode[selectedSequence] = false
+		sequences[selectedSequence].Functions[common.Function6_Static].State = false
+
 		common.RevealSequence(selectedSequence, commandChannels)
 	}
 
-	if !FunctionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && !colorEditModeDone[selectedSequence] {
+	if !functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && !colorEditModeDone[selectedSequence] {
 		cmd := common.Command{
 			SetEditColors: true,
 			EditColors:    false,
 		}
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 		if !colorEditModeDone[selectedSequence] {
-			fmt.Printf("Show Edit Color Buttons.\n")
+			//fmt.Printf("Show Edit Color Buttons.\n")
 			showEditColorButtons(selectedSequence, eventsForLauchpad, true)
 		}
 	}

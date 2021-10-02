@@ -47,6 +47,7 @@ type Command struct {
 	Static             bool
 	UpdateStatic       bool
 	UpdateStaticColor  bool
+	PlayStaticOnce     bool
 	SetEditColors      bool
 	EditColors         bool
 	StaticColor        Color
