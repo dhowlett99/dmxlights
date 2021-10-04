@@ -427,8 +427,8 @@ func main() {
 		if hit.X == 1 && hit.Y == 7 {
 			if !sequences[selectedSequence].MusicTrigger {
 				sequenceSpeed++
-				if sequenceSpeed > 20 {
-					sequenceSpeed = 20
+				if sequenceSpeed > 21 {
+					sequenceSpeed = 21
 				}
 				cmd := common.Command{
 					Speed:       sequenceSpeed,

@@ -1,11 +1,11 @@
 fixtures:
-- name: FOH PARs
-  desription: Pair of Stairville Xbricks
+- name: FOH PAR
+  desription: Stairville Xbrick
   address: 1
   group: 1
   channels:
   - number: 1
-    name: Red1
+    name: Red
   - number: 2
     name: Green1
   - number: 3
@@ -30,31 +30,36 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-  - number: 14
+- name: FOH PAR
+  desription: Stairville Xbrick
+  address: 14
+  group: 1
+  channels: 
+  - number: 1
     name: Red5
-  - number: 15
+  - number: 2
     name: Green5
-  - number: 16
+  - number: 3
     name: Blue5
-  - number: 17
+  - number: 4
     name: Red6
-  - number: 18
+  - number: 5
     name: Green6
-  - number: 19
+  - number: 6
     name: Blue6
-  - number: 20
+  - number: 7
     name: Red7
-  - number: 21
+  - number: 8
     name: Green7
-  - number: 22
+  - number: 9
     name: Blue7
-  - number: 23
+  - number: 10
     name: Red8
-  - number: 24
+  - number: 11
     name: Green8
-  - number: 25
+  - number: 12
     name: Blue8
-  - number: 26
+  - number: 13
     name: MasterDimmer
 - name: Uplighers
   desription: Chauvet Color Rail IRC

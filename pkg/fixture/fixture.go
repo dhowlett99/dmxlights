@@ -27,8 +27,10 @@ type Fixture struct {
 }
 
 type Channel struct {
-	Number int16  `yaml:"number"`
-	Name   string `yaml:"name"`
+	Number  int16  `yaml:"number"`
+	Name    string `yaml:"name"`
+	Value   int16  `yaml:"value"`
+	Comment string `yaml:"comment"`
 }
 
 func LoadFixtures() *Fixtures {
@@ -152,7 +154,10 @@ func MapFixtures(mySequenceNumber int,
 				if strings.Contains(channel.Name, "Gobo") {
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Gobo))
 				}
-
+				// Static value.
+				if strings.Contains(channel.Name, "Static") {
+					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(channel.Value))
+				}
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)))
@@ -163,7 +168,7 @@ func MapFixtures(mySequenceNumber int,
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)))
 				}
-				if strings.Contains(channel.Name, "Master") {
+				if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
 					if blackout {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
 					} else {

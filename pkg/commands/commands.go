@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = true
+const debug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -53,7 +53,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdateSpeed {
 		if debug {
-			fmt.Printf("%d: Command Update Speed\n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Speed to %d\n", mySequenceNumber, command.Speed)
 		}
 		sequence.Speed = command.Speed
 		sequence.CurrentSpeed = SetSpeed(command.Speed)
@@ -61,7 +61,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdatePatten {
 		if debug {
-			fmt.Printf("%d: Command Update Patten\n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Patten.Name)
 		}
 		savePattenName := command.Patten.Name
 		sequence.Patten.Name = savePattenName
@@ -69,34 +69,31 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.UpdateSize {
 		if debug {
-			fmt.Printf("%d: Command Update Size\n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Size)
 		}
 		sequence.Size = command.Size
 		return sequence
 	}
 	if command.IncreaseFade {
 		if debug {
-			fmt.Printf("%d: Command Increase Fade\n", mySequenceNumber)
+			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.FadeSpeed)
 		}
-		newFadeTime := SetSpeed(command.FadeSpeed)
-		sequence.Steps = sequence.Steps + 1
-		sequence.FadeTime = newFadeTime
+		//sequence.Steps = sequence.Steps + 1
 		sequence.FadeSpeed = command.FadeSpeed
+		sequence.FadeTime = SetSpeed(command.FadeSpeed)
 		return sequence
 	}
 	if command.DecreaseFade {
 		if debug {
-			fmt.Printf("%d: Command Decrease Fade\n", mySequenceNumber)
+			fmt.Printf("%d: Command Decrease Fade to %d\n", mySequenceNumber, command.FadeSpeed)
 		}
-		newFadeTime := SetSpeed(command.FadeSpeed)
-		sequence.Steps = sequence.Steps - 1
-		sequence.FadeTime = newFadeTime
 		sequence.FadeSpeed = command.FadeSpeed
+		sequence.FadeTime = SetSpeed(command.FadeSpeed)
 		return sequence
 	}
 	if command.UpdateColor {
 		if debug {
-			fmt.Printf("%d: Command Update Color\n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Color to %d\n", mySequenceNumber, command.Color)
 		}
 		color := command.Color
 		sequence.Color = color
@@ -319,6 +316,9 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	}
 	if commandSpeed == 20 {
 		Speed = 3
+	}
+	if commandSpeed == 21 {
+		Speed = 1
 	}
 	return Speed * time.Millisecond
 }
