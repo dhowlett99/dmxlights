@@ -5,7 +5,7 @@ fixtures:
   group: 1
   channels:
   - number: 1
-    name: Red
+    name: Red1
   - number: 2
     name: Green1
   - number: 3
