@@ -23,10 +23,11 @@ type Color struct {
 	B int
 }
 
-type StaticColorButtons struct {
-	X     int
-	Y     int
-	Color Color
+type StaticColorButton struct {
+	X             int
+	Y             int
+	Color         Color
+	SelectedColor int
 }
 
 type Patten struct {
@@ -47,6 +48,7 @@ type Command struct {
 	Static             bool
 	UpdateStatic       bool
 	UpdateStaticColor  bool
+	SelectedColor      int
 	PlayStaticOnce     bool
 	SetEditColors      bool
 	EditColors         bool
@@ -90,7 +92,7 @@ type Sequence struct {
 	Mode           string // Sequence or Static
 	Static         bool
 	PlayStaticOnce bool
-	StaticColors   map[int]Color
+	StaticColors   []StaticColorButton
 	EditColors     bool
 	Hide           bool
 	Type           string
@@ -322,4 +324,33 @@ func HideSequence(selectedSequence int, commandChannels []chan Command) {
 		Hide: true,
 	}
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+}
+
+// Colors are selected from a pallete of 8 colors, this function takes 1-8 and
+// returns the color array
+func GetColorButtonsArray(color int) Color {
+
+	switch color {
+	case 0:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 1:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 2:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 3:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 4:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 5:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 6:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 7:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 8:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 9:
+		return Color{R: 0, G: 0, B: 0} // Black
+	}
+	return Color{}
 }

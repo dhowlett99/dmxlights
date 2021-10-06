@@ -17,14 +17,14 @@ func CreateSequence(
 	pattens map[string]common.Patten,
 	channels common.Channels) common.Sequence {
 
-	// Make a map to hold static colors.
-	staticColors := make(map[int]common.Color)
+	// Populate the static colors for this sequence with the defaults.
+	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
 
 	// Set default values.
 	sequence := common.Sequence{
 		Hide:         false,
 		Mode:         "Sequence",
-		StaticColors: staticColors,
+		StaticColors: staticColorsButtons,
 		Name:         sequenceType,
 		Number:       mySequenceNumber,
 		FadeSpeed:    9,
@@ -139,9 +139,9 @@ func PlayNewSequence(sequence common.Sequence,
 		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
-					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.R, lamp.G, lamp.B, sequence.Master, eventsForLauchpad)
+					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 				}
-				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 			// Only play once, we don't want to flood the DMX universe with
 			// continual commands.
@@ -312,4 +312,22 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 		}
 	}
 	return positionsOut, counter
+}
+
+// Sets the static colors to default values.
+func setDefaultStaticColorButtons(selectedSequence int) []common.StaticColorButton {
+
+	// Make an array to hold static colors.
+	staticColorsButtons := []common.StaticColorButton{}
+
+	for X := 0; X < 8; X++ {
+		staticColorButton := common.StaticColorButton{}
+		staticColorButton.X = X
+		staticColorButton.Y = selectedSequence
+		staticColorButton.SelectedColor = X
+		staticColorButton.Color = common.GetColorButtonsArray(X)
+		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+	}
+
+	return staticColorsButtons
 }

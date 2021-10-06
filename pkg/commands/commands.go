@@ -186,10 +186,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
 			fmt.Printf("Lamp Color   R:%d  G:%d  B:%d\n", command.StaticColor.R, command.StaticColor.G, command.StaticColor.B)
+			fmt.Printf("Selected Color:%d \n", command.SelectedColor)
 		}
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Static
-		sequence.StaticColors[command.StaticLamp] = command.StaticColor
+		sequence.StaticColors[command.StaticLamp].SelectedColor = command.SelectedColor
+		sequence.StaticColors[command.StaticLamp].Color = command.StaticColor
 		return sequence
 	}
 
