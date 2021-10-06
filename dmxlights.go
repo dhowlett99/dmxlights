@@ -47,7 +47,8 @@ func main() {
 	var colorEditModeDone []bool   // This sequence is done color editing mode.
 	fadeSpeed = 11                 // Default start at 50ms.
 	masterBrightness = 255         // Affects all DMX fixtures and launchpad lamps.
-
+	var lastStaticColorButtonX int // Which Static Color button did we change last.
+	var lastStaticColorButtonY int // Which Static Color button did we change last.
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
 
@@ -140,6 +141,10 @@ func main() {
 	staticButton2 := common.StaticColorButton{}
 	staticButton3 := common.StaticColorButton{}
 	staticButton4 := common.StaticColorButton{}
+	staticButton5 := common.StaticColorButton{}
+	staticButton6 := common.StaticColorButton{}
+	staticButton7 := common.StaticColorButton{}
+	staticButton8 := common.StaticColorButton{}
 
 	// Add the color buttons to an array.
 	staticButtons := []common.StaticColorButton{}
@@ -147,6 +152,10 @@ func main() {
 	staticButtons = append(staticButtons, staticButton2)
 	staticButtons = append(staticButtons, staticButton3)
 	staticButtons = append(staticButtons, staticButton4)
+	staticButtons = append(staticButtons, staticButton5)
+	staticButtons = append(staticButtons, staticButton6)
+	staticButtons = append(staticButtons, staticButton7)
+	staticButtons = append(staticButtons, staticButton8)
 
 	// soundTriggers is a an array of switches which control which sequence gets a music trigger.
 	soundTriggers := []*common.Trigger{}
@@ -664,32 +673,46 @@ func main() {
 		// C H O O S E   S T A T I C    C O L O R
 		// Red
 		if hit.X == 1 && hit.Y == -1 {
+
+			staticButtons[selectedSequence].X = lastStaticColorButtonX
+			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+			fmt.Printf("Updating Red in Static Color for X:%d Y%d\n", staticButtons[selectedSequence].X, staticButtons[selectedSequence].Y)
+
 			if staticButtons[selectedSequence].Color.R > 254 {
 				staticButtons[selectedSequence].Color.R = 0
 			} else {
 				staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
 			}
 			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
-			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-			colorEditModeDone[selectedSequence] = true
+			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+			//colorEditModeDone[selectedSequence] = true
 			continue
 		}
 
 		// Green
 		if hit.X == 2 && hit.Y == -1 {
+
+			staticButtons[selectedSequence].X = lastStaticColorButtonX
+			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+			fmt.Printf("Updating Green in Static Color for X:%d Y%d\n", staticButtons[selectedSequence].X, staticButtons[selectedSequence].Y)
+
 			if staticButtons[selectedSequence].Color.G > 254 {
 				staticButtons[selectedSequence].Color.G = 0
 			} else {
 				staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
 			}
 			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
-			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-			colorEditModeDone[selectedSequence] = true
+			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+			//colorEditModeDone[selectedSequence] = true
 			continue
 		}
 
 		// Blue
 		if hit.X == 3 && hit.Y == -1 {
+
+			staticButtons[selectedSequence].X = lastStaticColorButtonX
+			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+			fmt.Printf("Updating Blue in Static Color for X:%d Y%d\n", staticButtons[selectedSequence].X, staticButtons[selectedSequence].Y)
 
 			if staticButtons[selectedSequence].Color.B > 254 {
 				staticButtons[selectedSequence].Color.B = 0
@@ -697,8 +720,8 @@ func main() {
 				staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
 			}
 			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
-			updateStaticLamps(selectedSequence, staticButtons, staticLamps, commandChannels)
-			colorEditModeDone[selectedSequence] = true
+			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+			//colorEditModeDone[selectedSequence] = true
 			continue
 		}
 
@@ -717,6 +740,12 @@ func main() {
 			}
 			sequences[selectedSequence].StaticColors[hit.X].Color = common.GetColorButtonsArray(sequences[selectedSequence].StaticColors[hit.X].SelectedColor)
 
+			// Store the color data to allow for editing of static colors.
+			staticButtons[selectedSequence].X = hit.X
+			staticButtons[selectedSequence].Y = hit.Y
+			staticButtons[selectedSequence].Color = sequences[selectedSequence].StaticColors[hit.X].Color
+			staticButtons[selectedSequence].SelectedColor = sequences[selectedSequence].StaticColors[hit.X].SelectedColor
+
 			// Tell the sequence about the new color and where we are in the
 			// color cycle.
 			cmd := common.Command{
@@ -727,7 +756,9 @@ func main() {
 				StaticColor:       sequences[selectedSequence].StaticColors[hit.X].Color,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
+			lastStaticColorButtonX = hit.X
+			lastStaticColorButtonY = hit.Y
+			fmt.Printf("LastStaticColorButton X:%d Y:%d\n", lastStaticColorButtonX, lastStaticColorButtonY)
 			continue
 		}
 
@@ -753,26 +784,23 @@ func main() {
 	}
 }
 
-func updateStaticLamps(selectedSequence int, staticColorButtons []common.StaticColorButton, staticLamps [][]bool, commandChannels []chan common.Command) {
+func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColorButton, commandChannels []chan common.Command) {
 
-	// Remember which color we are setting in this sequence.
-	red := staticColorButtons[selectedSequence].Color.R
-	green := staticColorButtons[selectedSequence].Color.G
-	blue := staticColorButtons[selectedSequence].Color.B
-
-	for X := 0; X < 8; X++ {
-		if staticLamps[X][selectedSequence] {
-			// Static is set to true in the functions and this key is set to
-			// the selected color.
-			cmd := common.Command{
-				UpdateStaticColor: true,
-				Static:            true,
-				StaticLamp:        X,
-				StaticColor:       common.Color{R: red, G: green, B: blue},
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-		}
+	// Static is set to true in the functions and this key is set to
+	// the selected color.
+	cmd := common.Command{
+		UpdateStaticColor: true,
+		Static:            true,
+		StaticLamp:        staticColorButtons.X,
+		SelectedColor:     staticColorButtons.SelectedColor,
+		StaticColor: common.Color{
+			R: staticColorButtons.Color.R,
+			G: staticColorButtons.Color.G,
+			B: staticColorButtons.Color.B,
+		},
 	}
+	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 }
 
 func HandleSelect(sequences []*common.Sequence,
