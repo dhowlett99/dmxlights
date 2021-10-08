@@ -28,6 +28,7 @@ type StaticColorButton struct {
 	Y             int
 	Color         Color
 	SelectedColor int
+	Flash         bool
 }
 
 type Patten struct {
@@ -48,6 +49,7 @@ type Command struct {
 	Static             bool
 	UpdateStatic       bool
 	UpdateStaticColor  bool
+	StaticLampFlash    bool
 	SelectedColor      int
 	PlayStaticOnce     bool
 	SetEditColors      bool
@@ -231,7 +233,17 @@ const (
 
 // LightOn Turn on a common.Light.
 func LightOn(eventsForLauchpad chan ALight, Light ALight) {
-	event := ALight{X: Light.X, Y: Light.Y, Brightness: Light.Brightness, Red: Light.Red, Green: Light.Green, Blue: Light.Blue}
+	event := ALight{
+		X:          Light.X,
+		Y:          Light.Y,
+		Brightness: Light.Brightness,
+		Red:        Light.Red,
+		Green:      Light.Green,
+		Blue:       Light.Blue,
+		Flash:      Light.Flash,
+		OnColor:    22,
+		OffColor:   18,
+	}
 	eventsForLauchpad <- event
 }
 
@@ -353,4 +365,34 @@ func GetColorButtonsArray(color int) Color {
 		return Color{R: 0, G: 0, B: 0} // Black
 	}
 	return Color{}
+}
+func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
+	if red == 255 && green == 0 && blue == 0 {
+		return 0x78
+	} // Red
+	if red == 255 && green == 111 && blue == 0 {
+		return 0x60
+	} // Orange
+	if red == 255 && green == 255 && blue == 0 {
+		return 0x7c
+	} // Yellow
+	if red == 0 && green == 255 && blue == 0 {
+		return 0x15
+	} // Green
+	if red == 0 && green == 255 && blue == 255 {
+		return 0x25
+	} // Cyan
+	if red == 0 && green == 0 && blue == 255 {
+		return 0x42
+	} // Blue
+	if red == 100 && green == 0 && blue == 255 {
+		return 0x2d
+	} // Purple
+	if red == 255 && green == 0 && blue == 255 {
+		return 0x35
+	} // Pink
+	if red == 255 && green == 255 && blue == 255 {
+		return 0x03
+	} // White
+	return 0
 }

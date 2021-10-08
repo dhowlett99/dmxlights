@@ -1,6 +1,7 @@
 package sequence
 
 import (
+	"fmt"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -139,7 +140,14 @@ func PlayNewSequence(sequence common.Sequence,
 		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
-					launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+					if lamp.Flash {
+						fmt.Printf("FlashLight X:%d Y:%d\n", lamp.X, lamp.Y)
+						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
+						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
+					} else {
+						fmt.Printf("LightLamp X:%d Y:%d\n", lamp.X, lamp.Y)
+						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+					}
 				}
 				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}

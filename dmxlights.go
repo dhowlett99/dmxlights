@@ -304,7 +304,7 @@ func main() {
 				continue
 			}
 			presets.InitPresets(eventsForLauchpad, presetsStore)
-			launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
+			launchpad.FlashLight(4, 8, 0x03, 0x5f, eventsForLauchpad)
 			savePreset = true
 			continue
 		}
@@ -317,11 +317,11 @@ func main() {
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 				config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
 				savePreset = false
-				launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+				launchpad.FlashLight(4, 8, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
 				presets.SavePresets(presetsStore)
 				presets.ClearPresets(eventsForLauchpad, presetsStore)
 				presets.InitPresets(eventsForLauchpad, presetsStore)
-				launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
+				launchpad.FlashLight(hit.Y, hit.X, 0x0d, 0x78, eventsForLauchpad)
 			} else {
 				// Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
@@ -341,7 +341,7 @@ func main() {
 					// Turn the selected preset light red.
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					presets.InitPresets(eventsForLauchpad, presetsStore)
-					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
+					launchpad.FlashLight(hit.Y, hit.X, 0x0d, 0x78, eventsForLauchpad)
 
 					// Preserve blackout.
 					if !blackout {
@@ -752,6 +752,7 @@ func main() {
 				UpdateStaticColor: true,
 				Static:            true,
 				StaticLamp:        hit.X,
+				StaticLampFlash:   false,
 				SelectedColor:     sequences[selectedSequence].StaticColors[hit.X].SelectedColor,
 				StaticColor:       sequences[selectedSequence].StaticColors[hit.X].Color,
 			}
@@ -759,6 +760,7 @@ func main() {
 			lastStaticColorButtonX = hit.X
 			lastStaticColorButtonY = hit.Y
 			fmt.Printf("LastStaticColorButton X:%d Y:%d\n", lastStaticColorButtonX, lastStaticColorButtonY)
+
 			continue
 		}
 
