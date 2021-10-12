@@ -1,6 +1,7 @@
 fixtures:
 - name: FOH PAR
   desription: Stairville Xbrick
+  type: rgb
   address: 1
   group: 1
   channels:
@@ -32,6 +33,7 @@ fixtures:
     name: Master
 - name: FOH PAR
   desription: Stairville Xbrick
+  type: rgb
   address: 14
   group: 1
   channels: 
@@ -63,6 +65,7 @@ fixtures:
     name: MasterDimmer
 - name: Uplighers
   desription: Chauvet Color Rail IRC
+  type: rgb
   address: 27
   fixtures:
   group: 2
@@ -121,6 +124,7 @@ fixtures:
     name: Strobe
 - name: Scanner
   desription: American DJ Comscan LED
+  type: scanner
   address: 53
   group: 3
   channels:
@@ -133,5 +137,28 @@ fixtures:
   - number: 4
     name: Gobo
   - number: 5
-    name: Master      
+    name: Master
+- name: Switch Box
+  description: Switches
+  type: switch
+  group: 4
+  switches:
+  - name: switch
+    number: 1
+    description: Projector
+    values:
+    - name: On
+      channel: 137
+      value: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
+    - name: Off
+      channel: 137
+      value: 0
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 0    
 

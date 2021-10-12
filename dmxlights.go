@@ -124,10 +124,10 @@ func main() {
 
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
-	sequence1 := sequence.CreateSequence("standard", 0, pattens, sequenceChannels)
-	sequence2 := sequence.CreateSequence("standard", 1, pattens, sequenceChannels)
-	sequence3 := sequence.CreateSequence("scanner", 2, pattens, sequenceChannels)
-	sequence4 := sequence.CreateSequence("standard", 3, pattens, sequenceChannels)
+	sequence1 := sequence.CreateSequence("rgb", 0, pattens, fixturesConfig, sequenceChannels)
+	sequence2 := sequence.CreateSequence("rgb", 1, pattens, fixturesConfig, sequenceChannels)
+	sequence3 := sequence.CreateSequence("scanner", 2, pattens, fixturesConfig, sequenceChannels)
+	sequence4 := sequence.CreateSequence("switch", 3, pattens, fixturesConfig, sequenceChannels)
 
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}

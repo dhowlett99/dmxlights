@@ -23,6 +23,27 @@ type Color struct {
 	B int
 }
 
+type Channel struct {
+	Number  int16  `yaml:"number"`
+	Name    string `yaml:"name"`
+	Value   int16  `yaml:"value"`
+	Comment string `yaml:"comment"`
+}
+
+type Value struct {
+	Name        string `yaml:"name"`
+	Channel     int16  `yaml:"channel"`
+	Value       int16  `yaml:"value"`
+	ButtonColor Color  `yaml:"color"`
+}
+
+type Switch struct {
+	Name        string  `yaml:"name"`
+	Number      int16   `yaml:"number"`
+	Description string  `yaml:"desrciption"`
+	Values      []Value `yaml:"value"`
+}
+
 type StaticColorButton struct {
 	X             int
 	Y             int
@@ -121,6 +142,7 @@ type Sequence struct {
 	Master         int // Master Brightness
 	Functions      []Function
 	FunctionMode   bool
+	Switches       []Switch
 }
 
 type Function struct {

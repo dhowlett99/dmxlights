@@ -18,12 +18,34 @@ type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
 }
 
+type Color struct {
+	R int `yaml:"red"`
+	G int `yaml:"green"`
+	B int `yaml:"blue"`
+}
+
+type Value struct {
+	Name        string `yaml:"name"`
+	Channel     int16  `yaml:"channel"`
+	Value       int16  `yaml:"value"`
+	ButtonColor Color  `yaml:"buttoncolor"`
+}
+
+type Switch struct {
+	Name        string  `yaml:"name"`
+	Number      int16   `yaml:"number"`
+	Description string  `yaml:"description"`
+	Values      []Value `yaml:"values"`
+}
+
 type Fixture struct {
 	Name        string    `yaml:"name"`
-	Description string    `yaml:"desrciption"`
+	Description string    `yaml:"description"`
+	Type        string    `yaml:"type"`
 	Group       int       `yaml:"group"`
 	Address     int16     `yaml:"address"`
 	Channels    []Channel `yaml:"channels"`
+	Switches    []Switch  `yaml:"switches"`
 }
 
 type Channel struct {
