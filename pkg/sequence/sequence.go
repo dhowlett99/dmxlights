@@ -122,6 +122,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Map music trigger function.
 		sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+		if sequence.MusicTrigger {
+			sequence.Run = true
+		}
 
 		// Map static function.
 		if sequence.Functions[common.Function6_Static].State {

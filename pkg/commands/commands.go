@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = true
+const debug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -144,6 +144,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	if command.UpdateFunctions {
 		if debug {
 			fmt.Printf("%d: Command Update Functions\n", mySequenceNumber)
+			for _, function := range command.Functions {
+				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
+			}
 		}
 		sequence.Functions = command.Functions
 		return sequence
