@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -319,14 +318,12 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 }
 
 func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight) {
-	fmt.Printf("HideFunctionButtons\n")
 	for x := 0; x < 8; x++ {
 		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
 	}
 }
 
 func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight) {
-	fmt.Printf("ShowFunctionButtons\n")
 	for index, function := range sequence.Functions {
 		if function.State {
 			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
@@ -345,7 +342,6 @@ func SetMode(selectedSequence int, commandChannels []chan Command, mode string) 
 }
 
 func RevealSequence(selectedSequence int, commandChannels []chan Command) {
-	fmt.Printf("RevealSequence\n")
 	cmd := Command{
 		UnHide: true,
 	}
@@ -353,7 +349,6 @@ func RevealSequence(selectedSequence int, commandChannels []chan Command) {
 }
 
 func HideSequence(selectedSequence int, commandChannels []chan Command) {
-	fmt.Printf("HideSequence\n")
 	cmd := Command{
 		Hide: true,
 	}

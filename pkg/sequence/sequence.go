@@ -83,13 +83,9 @@ func CreateSequence(
 		// A new group of switches.
 		newSwitchList := []common.Switch{}
 		for _, fixture := range fixtureConfig.Fixtures {
-			fmt.Printf("fixture group is %d   myseq is %d\n", fixture.Group, mySequenceNumber+1)
 			if fixture.Group == mySequenceNumber+1 {
-				fmt.Printf("the fixture name is %s\n", fixture.Name)
-				fmt.Printf("the data is %+v\n", fixture.Switches)
 				// find switch data.
 				for _, swiTch := range fixture.Switches {
-					fmt.Printf("data is %+v\n", swiTch)
 					newSwitch := common.Switch{}
 					newSwitch.Name = swiTch.Name
 					newSwitch.Number = swiTch.Number
@@ -109,7 +105,6 @@ func CreateSequence(
 				}
 			}
 		}
-		fmt.Printf("Switch Data is %+v\n", newSwitchList)
 		sequence.Type = sequenceType
 		sequence.Switches = newSwitchList
 	}
@@ -166,6 +161,12 @@ func PlayNewSequence(sequence common.Sequence,
 	for {
 
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
+
+		if sequence.Type == "switch" {
+			// Show initial state of switches
+			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad)
+			continue
+		}
 
 		// Map bounce function to sequence bounce setting.
 		sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
@@ -308,24 +309,21 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 			}
 		}
-
-		if sequence.Type == "switch" {
-
-			// Show initial state of switches
-			fmt.Printf("show initial state\n")
-
-			showSwitches(sequence.Switches)
-		}
 	}
 }
 
-func showSwitches(switches []common.Switch) {
+func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight) {
 
-	for _, swiTch := range switches {
-		fmt.Printf("swiTch: name %s\n", swiTch.Name)
-		fmt.Printf("swiTch: no %d\n", swiTch.Number)
-		fmt.Printf("swiTch: description %s\n", swiTch.Description)
-		fmt.Printf("swiTch: values %+v\n", swiTch.Values)
+	for myFixtureNumber, swiTch := range switches {
+		// fmt.Printf("swiTch: name %s\n", swiTch.Name)
+		// fmt.Printf("swiTch: no %d\n", swiTch.Number)
+		// fmt.Printf("swiTch: description %s\n", swiTch.Description)
+		// fmt.Printf("swiTch: values %+v\n", swiTch.Values)
+		for _, value := range swiTch.Values {
+			if value.Name == "Off" {
+				launchpad.LightLamp(mySequenceNumber, myFixtureNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
+			}
+		}
 	}
 }
 
