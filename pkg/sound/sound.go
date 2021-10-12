@@ -41,7 +41,8 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 				fmt.Printf("error: portaudio: failed to read audio stream\n")
 			}
 
-			if in[0] > 1000000000 {
+			//if in[0] > 1000000000 {
+			if in[0] > 10000000 {
 				// Trigger
 				time.Sleep(10 * time.Millisecond)
 				cmd := common.Command{}
