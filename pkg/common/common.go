@@ -22,25 +22,26 @@ type Color struct {
 	B int
 }
 
-type Channel struct {
-	Number  int16  `yaml:"number"`
-	Name    string `yaml:"name"`
-	Value   int16  `yaml:"value"`
-	Comment string `yaml:"comment"`
-}
+// type Channel struct {
+// 	Number  int16  `yaml:"number"`
+// 	Name    string `yaml:"name"`
+// 	Value   int16  `yaml:"value"`
+// 	Comment string `yaml:"comment"`
+// }
 
 type Value struct {
-	Name        string `yaml:"name"`
-	Channel     int16  `yaml:"channel"`
-	Value       int16  `yaml:"value"`
-	ButtonColor Color  `yaml:"color"`
+	Name        string
+	Channel     int16
+	Value       int16
+	ButtonColor Color
 }
 
 type Switch struct {
-	Name        string  `yaml:"name"`
-	Number      int16   `yaml:"number"`
-	Description string  `yaml:"desrciption"`
-	Values      []Value `yaml:"value"`
+	Name            string
+	Number          int16
+	CurrentPosition int
+	Description     string
+	Values          []Value
 }
 
 type StaticColorButton struct {
