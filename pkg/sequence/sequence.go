@@ -17,7 +17,7 @@ func CreateSequence(
 	mySequenceNumber int,
 	pattens map[string]common.Patten,
 	fixtureConfig *fixture.Fixtures,
-	channels common.Channels) (sequence common.Sequence) {
+	channels common.Channels) common.Sequence {
 
 	var initialPatten string
 
@@ -25,58 +25,55 @@ func CreateSequence(
 	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
 
 	// Set default values
-	if sequenceType == "rgb" || sequenceType == "scanner" {
+	if sequenceType == "rgb" {
+		initialPatten = "standard"
+	}
+	if sequenceType == "scanner" {
+		initialPatten = "scanner"
+	}
 
-		if sequenceType == "rgb" {
-			initialPatten = "standard"
-		}
-		if sequenceType == "scanner" {
-			initialPatten = "scanner"
-		}
-
-		sequence = common.Sequence{
-			Type:         sequenceType,
-			Hide:         false,
-			Mode:         "Sequence",
-			StaticColors: staticColorsButtons,
-			Name:         sequenceType,
-			Number:       mySequenceNumber,
-			FadeSpeed:    9,
-			FadeTime:     150 * time.Millisecond,
-			MusicTrigger: false,
-			Run:          true,
-			Bounce:       false,
-			Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
-			Patten: common.Patten{
-				Name:     initialPatten,
-				Length:   2,
-				Size:     2,
-				Fixtures: 8,
-				Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
-				Steps:    pattens[initialPatten].Steps,
+	sequence := common.Sequence{
+		Type:         sequenceType,
+		Hide:         false,
+		Mode:         "Sequence",
+		StaticColors: staticColorsButtons,
+		Name:         sequenceType,
+		Number:       mySequenceNumber,
+		FadeSpeed:    9,
+		FadeTime:     150 * time.Millisecond,
+		MusicTrigger: false,
+		Run:          true,
+		Bounce:       false,
+		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
+		Patten: common.Patten{
+			Name:     initialPatten,
+			Length:   2,
+			Size:     2,
+			Fixtures: 8,
+			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
+			Steps:    pattens[initialPatten].Steps,
+		},
+		Speed:        14,
+		CurrentSpeed: 25 * time.Millisecond,
+		Colors: []common.Color{
+			{
+				R: 0,
+				G: 0,
+				B: 0,
 			},
-			Speed:        14,
-			CurrentSpeed: 25 * time.Millisecond,
-			Colors: []common.Color{
-				{
-					R: 0,
-					G: 0,
-					B: 0,
-				},
-			},
-			Shift:    2,
-			Blackout: false,
-			Master:   255,
+		},
+		Shift:    2,
+		Blackout: false,
+		Master:   255,
+	}
+	// Make functions for each of the sequences.
+	for function := 0; function < 8; function++ {
+		newFunction := common.Function{
+			SequenceNumber: mySequenceNumber,
+			Number:         function,
+			State:          false,
 		}
-		// Make functions for each of the sequences.
-		for function := 0; function < 8; function++ {
-			newFunction := common.Function{
-				SequenceNumber: mySequenceNumber,
-				Number:         function,
-				State:          false,
-			}
-			sequence.Functions = append(sequence.Functions, newFunction)
-		}
+		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 
 	if sequenceType == "switch" {
@@ -113,10 +110,8 @@ func CreateSequence(
 			}
 		}
 		fmt.Printf("Switch Data is %+v\n", newSwitchList)
-		sequence = common.Sequence{
-			Type:     sequenceType,
-			Switches: newSwitchList,
-		}
+		sequence.Type = sequenceType
+		sequence.Switches = newSwitchList
 	}
 
 	return sequence
@@ -167,158 +162,160 @@ func PlayNewSequence(sequence common.Sequence,
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-	if sequence.Type == "rgb" || sequence.Type == "scanner" {
-		for {
 
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
+	for {
 
-			// Map bounce function to sequence bounce setting.
-			sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
-			// Map music trigger function.
-			sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
-			if sequence.MusicTrigger {
-				sequence.Run = true
-			}
+		// Map bounce function to sequence bounce setting.
+		sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
 
-			// Map static function.
-			if sequence.Functions[common.Function6_Static].State {
-				sequence.Static = true
-			}
+		// Map music trigger function.
+		sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+		if sequence.MusicTrigger {
+			sequence.Run = true
+		}
 
-			// We are in static color editing mode flash this rows buttons.
-			// if sequence.EditColors && sequence.Static {
-			// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, true)
-			// }
-			// if !sequence.EditColors && !sequence.FunctionMode {
-			// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, false)
-			// }
+		// Map static function.
+		if sequence.Functions[common.Function6_Static].State {
+			sequence.Static = true
+		}
 
-			// Sequence in Static Mode.
-			if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
-				for myFixtureNumber, lamp := range sequence.StaticColors {
-					if !sequence.Hide {
-						if lamp.Flash {
-							fmt.Printf("FlashLight X:%d Y:%d\n", lamp.X, lamp.Y)
-							onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-							launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
-						} else {
-							fmt.Printf("LightLamp X:%d Y:%d\n", lamp.X, lamp.Y)
-							launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
-						}
+		// We are in static color editing mode flash this rows buttons.
+		// if sequence.EditColors && sequence.Static {
+		// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, true)
+		// }
+		// if !sequence.EditColors && !sequence.FunctionMode {
+		// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, false)
+		// }
+
+		// Sequence in Static Mode.
+		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
+			for myFixtureNumber, lamp := range sequence.StaticColors {
+				if !sequence.Hide {
+					if lamp.Flash {
+						fmt.Printf("FlashLight X:%d Y:%d\n", lamp.X, lamp.Y)
+						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
+						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
+					} else {
+						fmt.Printf("LightLamp X:%d Y:%d\n", lamp.X, lamp.Y)
+						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 					}
-					fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 				}
-				// Only play once, we don't want to flood the DMX universe with
-				// continual commands.
-				sequence.PlayStaticOnce = false
-				continue
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
+			// Only play once, we don't want to flood the DMX universe with
+			// continual commands.
+			sequence.PlayStaticOnce = false
+			continue
+		}
 
-			// This is the inner loop where the sequence runs.
-			// Sequence in Normal Running Mode.
-			if sequence.Mode == "Sequence" {
-				for sequence.Run {
+		// This is the inner loop where the sequence runs.
+		// Sequence in Normal Running Mode.
+		if sequence.Mode == "Sequence" {
+			for sequence.Run {
 
-					sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
+				sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
 
-					// If the music trigger is being used then the timer is disabled.
-					for _, trigger := range soundTriggers {
-						if sequence.MusicTrigger {
-							sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-							if trigger.SequenceNumber == mySequenceNumber {
-								trigger.State = true
-							}
-						} else {
-							if trigger.SequenceNumber == mySequenceNumber {
-								trigger.State = false
-							}
-							sequence.CurrentSpeed = 25 * time.Millisecond
+				// Map music trigger function.
+				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+
+				// If the music trigger is being used then the timer is disabled.
+				for _, trigger := range soundTriggers {
+					if sequence.MusicTrigger {
+						sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+						if trigger.SequenceNumber == mySequenceNumber {
+							trigger.State = true
 						}
+					} else {
+						if trigger.SequenceNumber == mySequenceNumber {
+							trigger.State = false
+						}
+						sequence.CurrentSpeed = 25 * time.Millisecond
 					}
+				}
 
-					if sequence.Patten.Name == "scanner" {
-						sequence.Type = "scanner"
+				if sequence.Patten.Name == "scanner" {
+					sequence.Type = "scanner"
+				}
+
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+				if !sequence.Run {
+					break
+				}
+
+				// Calulate positions for fixtures based on patten.
+				positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
+
+				// Run the sequence through.
+				for step := 0; step < sequence.Steps; step++ {
+					cmd := common.FixtureCommand{
+						Master:          sequence.Master,
+						Hide:            sequence.Hide,
+						Tick:            true,
+						Positions:       positions,
+						Type:            sequence.Type,
+						FadeSpeed:       sequence.FadeSpeed,
+						FadeTime:        sequence.FadeTime,
+						Size:            sequence.Size,
+						Steps:           sequence.Steps,
+						CurrentSpeed:    sequence.CurrentSpeed,
+						Speed:           sequence.Speed,
+						Blackout:        sequence.Blackout,
+						CurrentPosition: step,
 					}
+					fixtureChannel1 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel2 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel3 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel4 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel5 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel6 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel7 <- cmd
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					if !sequence.Run {
+						break
+					}
+					fixtureChannel8 <- cmd
 
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 					if !sequence.Run {
 						break
 					}
-
-					// Calulate positions for fixtures based on patten.
-					positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
-
-					// Run the sequence through.
-					for step := 0; step < sequence.Steps; step++ {
-						cmd := common.FixtureCommand{
-							Master:          sequence.Master,
-							Hide:            sequence.Hide,
-							Tick:            true,
-							Positions:       positions,
-							Type:            sequence.Type,
-							FadeSpeed:       sequence.FadeSpeed,
-							FadeTime:        sequence.FadeTime,
-							Size:            sequence.Size,
-							Steps:           sequence.Steps,
-							CurrentSpeed:    sequence.CurrentSpeed,
-							Speed:           sequence.Speed,
-							Blackout:        sequence.Blackout,
-							CurrentPosition: step,
-						}
-						fixtureChannel1 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel2 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel3 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel4 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel5 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel6 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel7 <- cmd
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-						fixtureChannel8 <- cmd
-
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-						if !sequence.Run {
-							break
-						}
-					}
 				}
 			}
 		}
-	}
 
-	if sequence.Type == "switch" {
+		if sequence.Type == "switch" {
 
-		// Show initial state of switches
-		fmt.Printf("show initial state\n")
+			// Show initial state of switches
+			fmt.Printf("show initial state\n")
 
-		showSwitches(sequence.Switches)
+			showSwitches(sequence.Switches)
+		}
 	}
 }
 

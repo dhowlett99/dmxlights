@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -26,6 +26,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
+			}
 			break
 		}
 	case command = <-commandChannel:
