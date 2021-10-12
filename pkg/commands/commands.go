@@ -112,6 +112,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
+		sequence.Functions[common.Function8_Music_Trigger].State = false
+		sequence.Functions[common.Function6_Static].State = false
+		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Static = false
 		return sequence
