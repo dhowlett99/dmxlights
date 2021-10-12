@@ -637,8 +637,11 @@ func main() {
 		}
 
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
-		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] && hit.Y >= 0 && hit.Y < 4 &&
-			!sequences[selectedSequence].Functions[common.Function6_Static].State {
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
+			hit.Y >= 0 &&
+			hit.Y < 4 &&
+			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
+			sequences[hit.Y].Type != "switch" {
 
 			flashSequence := common.Sequence{
 				Patten: common.Patten{
