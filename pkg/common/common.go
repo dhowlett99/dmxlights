@@ -22,13 +22,6 @@ type Color struct {
 	B int
 }
 
-// type Channel struct {
-// 	Number  int16  `yaml:"number"`
-// 	Name    string `yaml:"name"`
-// 	Value   int16  `yaml:"value"`
-// 	Comment string `yaml:"comment"`
-// }
-
 type Value struct {
 	Name        string
 	Channel     int16
