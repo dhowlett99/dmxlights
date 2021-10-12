@@ -2,11 +2,12 @@ package sound
 
 import (
 	"fmt"
-	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/gordonklaus/portaudio"
 )
+
+const sampleRate = 44100
 
 func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) {
 
@@ -21,8 +22,9 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 		defer portaudio.Terminate()
 		// Making the buffer bigger makes the music trigger have less latency.
-		in := make([]int32, 128)
-		stream, err := portaudio.OpenDefaultStream(1, 0, 44100, len(in), in)
+		in := make([]float32, 128)
+		out := make([]float32, 128)
+		stream, err := portaudio.OpenDefaultStream(1, 0, sampleRate, len(in), in)
 		if err != nil {
 			fmt.Printf("error: portaudio: failed to open default stream \n")
 		}
@@ -35,25 +37,40 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 		defer stream.Close()
 
+		//var out []int32
+		numSamples := 10
 		for {
 			stream.Read()
 			if err != nil {
 				fmt.Printf("error: portaudio: failed to read audio stream\n")
 			}
 
-			//if in[0] > 1000000000 {
-			if in[0] > 10000000 {
-				// Trigger
-				time.Sleep(10 * time.Millisecond)
-				cmd := common.Command{}
-				for index, trigger := range soundTriggers {
-					if trigger.SequenceNumber == index {
-						if trigger.State {
-							channels.SoundTriggerChannels[index] <- cmd
+			// Implenent a 800Hz low pass filter.
+			cutoff := float32(800)
+
+			for i := 1; i < numSamples; i++ {
+				out[i] = in[i-1] + filter(cutoff)*in[i] - in[i-1]
+
+				if out[i] > 0.09 {
+					cmd := common.Command{}
+					for index, trigger := range soundTriggers {
+						if trigger.SequenceNumber == index {
+							if trigger.State {
+								channels.SoundTriggerChannels[index] <- cmd
+							}
 						}
 					}
 				}
 			}
 		}
 	}()
+}
+
+func filter(cutofFreq float32) float32 {
+	M_PI := float32(3.14159265358979323846264338327950288)
+	RC := float32(1.0 / (cutofFreq * 2 * M_PI))
+	dt := float32(1.0 / sampleRate) // SAMPLE_RATE
+	alpha := dt / (RC + dt)
+
+	return alpha
 }
