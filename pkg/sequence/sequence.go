@@ -200,11 +200,9 @@ func PlayNewSequence(sequence common.Sequence,
 			for myFixtureNumber, lamp := range sequence.StaticColors {
 				if !sequence.Hide {
 					if lamp.Flash {
-						fmt.Printf("FlashLight X:%d Y:%d\n", lamp.X, lamp.Y)
 						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
 						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
 					} else {
-						fmt.Printf("LightLamp X:%d Y:%d\n", lamp.X, lamp.Y)
 						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 					}
 				}
