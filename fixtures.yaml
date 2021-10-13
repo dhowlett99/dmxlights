@@ -145,20 +145,38 @@ fixtures:
   switches:
   - name: switch
     number: 1
-    description: Projector
+    description: Projector1
     values:
+    - name: Off
+      channel: 127
+      value: 0
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
     - name: On
       channel: 137
       value: 255
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0 
+        blue: 0  
+  - name: switch
+    number: 2
+    description: Projector2
+    values:
     - name: Off
       channel: 137
       value: 0
       buttoncolor: 
         red: 0
         green: 255
-        blue: 128    
+        blue: 0
+    - name: On
+      channel: 137
+      value: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
 

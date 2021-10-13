@@ -44,11 +44,13 @@ func main() {
 	var functionSelectMode []bool  // Which sequence is in function selection mode.
 	var selectButtonPressed []bool // Which sequence has its Select button pressed.
 	var staticLamps [][]bool       // Static color lamps.
+	var switchPositions [9][9]int  // Sorage for switch positions.
 	var colorEditModeDone []bool   // This sequence is done color editing mode.
 	fadeSpeed = 11                 // Default start at 50ms.
 	masterBrightness = 255         // Affects all DMX fixtures and launchpad lamps.
 	var lastStaticColorButtonX int // Which Static Color button did we change last.
 	var lastStaticColorButtonY int // Which Static Color button did we change last.
+
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
 
@@ -634,6 +636,33 @@ func main() {
 			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad)
 
 			continue
+		}
+
+		// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
+			hit.Y >= 0 &&
+			hit.Y < 4 &&
+			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
+			sequences[hit.Y].Type == "switch" {
+
+			switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
+			fmt.Printf("X:%d Y:%d n", hit.X, hit.Y)
+			valuesLength := len(sequences[hit.Y].Switches[hit.X].Values)
+			fmt.Printf("Length of Values %d\n", valuesLength)
+			if switchPositions[hit.Y][hit.X] == valuesLength {
+				switchPositions[hit.Y][hit.X] = 0
+			}
+
+			// Send a message to the sequence for it to toggle the selected switch.
+			// hit.Y is the sequence.
+			// hit.X is the switch.
+			cmd := common.Command{
+				UpdateSwitch:   true,
+				SwitchNumber:   hit.X,
+				SwitchPosition: switchPositions[hit.Y][hit.X],
+			}
+			common.SendCommandToSequence(hit.Y, cmd, commandChannels)
+
 		}
 
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.

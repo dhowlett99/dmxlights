@@ -107,6 +107,7 @@ func CreateSequence(
 		}
 		sequence.Type = sequenceType
 		sequence.Switches = newSwitchList
+		sequence.PlaySwitchOnce = true
 	}
 
 	return sequence
@@ -162,9 +163,10 @@ func PlayNewSequence(sequence common.Sequence,
 
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
-		if sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad)
+			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixtureConfig, sequence.Blackout, sequence.Master)
+			sequence.PlaySwitchOnce = false
 			continue
 		}
 
@@ -312,16 +314,12 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
-func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight) {
-
-	for myFixtureNumber, swiTch := range switches {
-		// fmt.Printf("swiTch: name %s\n", swiTch.Name)
-		// fmt.Printf("swiTch: no %d\n", swiTch.Number)
-		// fmt.Printf("swiTch: description %s\n", swiTch.Description)
-		// fmt.Printf("swiTch: values %+v\n", swiTch.Values)
-		for _, value := range swiTch.Values {
-			if value.Name == "Off" {
-				launchpad.LightLamp(mySequenceNumber, myFixtureNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
+func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, blackout bool, master int) {
+	for switchNumber, switchData := range switches {
+		for valuePosition, value := range switchData.Values {
+			if valuePosition == switchData.CurrentPosition {
+				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, blackout, master, master)
 			}
 		}
 	}

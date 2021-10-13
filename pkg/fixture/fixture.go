@@ -198,6 +198,29 @@ func MapFixtures(mySequenceNumber int,
 					}
 				}
 			}
+
+		}
+	}
+}
+
+func MapSwitchFixture(mySequenceNumber int,
+	dmxController *ft232.DMXController,
+	displayFixture int, selectedSwitch int,
+	fixtures *Fixtures, blackout bool, brightness int, master int) {
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == mySequenceNumber {
+			for _, swiTch := range fixture.Switches {
+				for valueNumber, value := range swiTch.Values {
+					if valueNumber == selectedSwitch {
+						if blackout {
+							dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
+						} else {
+							dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Value))
+						}
+					}
+				}
+			}
 		}
 	}
 }

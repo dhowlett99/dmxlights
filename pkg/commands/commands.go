@@ -51,6 +51,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
 		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
 		sequence.Hide = false
 		return sequence
 	}
@@ -136,6 +137,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)
 		}
 		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
 		sequence.Blackout = true
 		return sequence
 	}
@@ -144,6 +146,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)
 		}
 		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
 		sequence.Blackout = false
 		return sequence
 	}
@@ -220,6 +223,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, sequence.Master)
 		}
 		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
 		sequence.Master = command.Master
 		return sequence
 	}
@@ -242,6 +246,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	// Update function mode for the current sequence.
+	if command.UpdateSwitch {
+		if debug {
+			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.SwitchNumber, command.SwitchPosition)
+		}
+		sequence.Switches[command.SwitchNumber].CurrentPosition = command.SwitchPosition
+		sequence.PlaySwitchOnce = true
+		return sequence
+	}
+
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {
@@ -257,6 +271,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				// Assume we're blacked out.
 				sequence.Blackout = true
 				sequence.PlayStaticOnce = true
+				sequence.PlaySwitchOnce = true
 				return sequence
 			}
 		}

@@ -66,6 +66,7 @@ type Command struct {
 	StaticLampFlash    bool
 	SelectedColor      int
 	PlayStaticOnce     bool
+	PlaySwitchOnce     bool
 	SetEditColors      bool
 	EditColors         bool
 	StaticColor        Color
@@ -101,6 +102,9 @@ type Command struct {
 	UpdateFunctions    bool
 	Functions          []Function
 	UpdateSequence     bool
+	UpdateSwitch       bool
+	SwitchNumber       int
+	SwitchPosition     int
 }
 
 // Sequence describes sequences.
@@ -108,6 +112,7 @@ type Sequence struct {
 	Mode           string // Sequence or Static
 	Static         bool
 	PlayStaticOnce bool
+	PlaySwitchOnce bool
 	StaticColors   []StaticColorButton
 	EditColors     bool
 	Hide           bool
