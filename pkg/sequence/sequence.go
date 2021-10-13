@@ -24,6 +24,9 @@ func CreateSequence(
 	// Populate the static colors for this sequence with the defaults.
 	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
 
+	// Populate the edit sequence colors for this sequence with the defaults.
+	sequenceColorButtons := setDefaultStaticColorButtons(mySequenceNumber)
+
 	// Set default values
 	if sequenceType == "rgb" {
 		initialPatten = "standard"
@@ -33,18 +36,19 @@ func CreateSequence(
 	}
 
 	sequence := common.Sequence{
-		Type:         sequenceType,
-		Hide:         false,
-		Mode:         "Sequence",
-		StaticColors: staticColorsButtons,
-		Name:         sequenceType,
-		Number:       mySequenceNumber,
-		FadeSpeed:    9,
-		FadeTime:     150 * time.Millisecond,
-		MusicTrigger: false,
-		Run:          true,
-		Bounce:       false,
-		Steps:        8 * 14, // Eight lamps and 14 steps to fade up and down.
+		Type:           sequenceType,
+		Hide:           false,
+		Mode:           "Sequence",
+		StaticColors:   staticColorsButtons,
+		SequenceColors: sequenceColorButtons,
+		Name:           sequenceType,
+		Number:         mySequenceNumber,
+		FadeSpeed:      9,
+		FadeTime:       150 * time.Millisecond,
+		MusicTrigger:   false,
+		Run:            true,
+		Bounce:         false,
+		Steps:          8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     initialPatten,
 			Length:   2,
@@ -184,13 +188,12 @@ func PlayNewSequence(sequence common.Sequence,
 			sequence.Static = true
 		}
 
-		// We are in static color editing mode flash this rows buttons.
-		// if sequence.EditColors && sequence.Static {
-		// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, true)
-		// }
-		// if !sequence.EditColors && !sequence.FunctionMode {
-		// 	showEditColorButtons(mySequenceNumber, eventsForLauchpad, false)
-		// }
+		// Map set sequence color function.
+		if sequence.Functions[common.Function5_Color].State {
+			//fmt.Printf("setting color edit mode !\n")
+			sequence.PlayStaticOnce = true
+			sequence.EditSeqColors = true
+		}
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
@@ -209,6 +212,26 @@ func PlayNewSequence(sequence common.Sequence,
 			}
 			// Only play once, we don't want to flood the DMX universe with
 			// continual commands.
+			sequence.PlayStaticOnce = false
+			continue
+		}
+
+		// Sequence in edit sequnence color mode.
+		if sequence.PlayStaticOnce && sequence.EditSeqColors {
+			for myFixtureNumber, lamp := range sequence.SequenceColors {
+				if !sequence.Hide {
+					if lamp.Flash {
+						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
+						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
+					} else {
+						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+					}
+				}
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
+			}
+			// Only play once, we don't want to flood the DMX universe with
+			// continual commands.
+			sequence.EditSeqColors = false
 			sequence.PlayStaticOnce = false
 			continue
 		}

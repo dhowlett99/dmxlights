@@ -111,9 +111,11 @@ type Command struct {
 type Sequence struct {
 	Mode           string // Sequence or Static
 	Static         bool
+	EditSeqColors  bool
 	PlayStaticOnce bool
 	PlaySwitchOnce bool
 	StaticColors   []StaticColorButton
+	SequenceColors []StaticColorButton
 	EditColors     bool
 	Hide           bool
 	Type           string
@@ -245,10 +247,10 @@ const (
 	Function2_Undef         = 1
 	Function3_Undef         = 2
 	Function4_Undef         = 3
-	Function5_Undef         = 4
-	Function6_Static        = 5 // Static Colors.
-	Function7_Bounce        = 6
-	Function8_Music_Trigger = 7
+	Function5_Color         = 4 // Set chase color.
+	Function6_Static        = 5 // Set static colors.
+	Function7_Bounce        = 6 // Sequence auto reverses.
+	Function8_Music_Trigger = 7 // Music trigger on and off.
 )
 
 // LightOn Turn on a common.Light.
