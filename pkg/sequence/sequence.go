@@ -188,11 +188,11 @@ func PlayNewSequence(sequence common.Sequence,
 		}
 
 		// Map set sequence color function.
-		if sequence.Functions[common.Function5_Color].State {
-			sequence.PlayStaticOnce = true
-			sequence.EditSeqColors = true
-			sequence.Run = false
-		}
+		// if sequence.Functions[common.Function5_Color].State {
+		// 	sequence.PlayStaticOnce = true
+		// 	sequence.EditSeqColors = true
+		// 	sequence.Run = false
+		// }
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
@@ -213,26 +213,6 @@ func PlayNewSequence(sequence common.Sequence,
 			continue
 		}
 
-		// Sequence in edit sequnence color mode.
-		if sequence.PlayStaticOnce && sequence.EditSeqColors {
-			for myFixtureNumber, lamp := range sequence.SequenceColors {
-				if !sequence.Hide {
-					if lamp.Flash {
-						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
-					} else {
-						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
-					}
-				}
-				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
-			}
-			// Only play once, we don't want to flood the DMX universe with
-			// continual commands.
-			sequence.EditSeqColors = false
-			sequence.PlayStaticOnce = false
-			continue
-		}
-
 		// This is the inner loop where the sequence runs.
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
@@ -242,17 +222,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
-
-				// Map set sequence color function.
-				if sequence.Functions[common.Function5_Color].State {
-					sequence.PlayStaticOnce = true
-					sequence.EditSeqColors = true
-					sequence.Run = false
-				}
-
-				if !sequence.Run {
-					break
-				}
 
 				// If the music trigger is being used then the timer is disabled.
 				for _, trigger := range soundTriggers {
@@ -284,19 +253,21 @@ func PlayNewSequence(sequence common.Sequence,
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
 					cmd := common.FixtureCommand{
-						Master:          sequence.Master,
-						Hide:            sequence.Hide,
-						Tick:            true,
-						Positions:       positions,
-						Type:            sequence.Type,
-						FadeSpeed:       sequence.FadeSpeed,
-						FadeTime:        sequence.FadeTime,
-						Size:            sequence.Size,
-						Steps:           sequence.Steps,
-						CurrentSpeed:    sequence.CurrentSpeed,
-						Speed:           sequence.Speed,
-						Blackout:        sequence.Blackout,
-						CurrentPosition: step,
+						Master:              sequence.Master,
+						Hide:                sequence.Hide,
+						Tick:                true,
+						Positions:           positions,
+						Type:                sequence.Type,
+						FadeSpeed:           sequence.FadeSpeed,
+						FadeTime:            sequence.FadeTime,
+						Size:                sequence.Size,
+						Steps:               sequence.Steps,
+						CurrentSpeed:        sequence.CurrentSpeed,
+						Speed:               sequence.Speed,
+						Blackout:            sequence.Blackout,
+						CurrentPosition:     step,
+						UpdateSequenceColor: sequence.UpdateSequenceColor,
+						SequenceColor:       sequence.SequenceColor,
 					}
 					fixtureChannel1 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)

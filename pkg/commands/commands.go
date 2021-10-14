@@ -157,6 +157,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
 			}
 		}
+		if sequence.Functions[common.Function5_Color].State {
+			sequence.PlayStaticOnce = true
+			sequence.EditSeqColors = true
+			sequence.Run = false
+		}
 		sequence.Functions = command.Functions
 		return sequence
 	}
@@ -205,6 +210,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.StaticColors[command.StaticLamp].SelectedColor = command.SelectedColor
 		sequence.StaticColors[command.StaticLamp].Color = command.StaticColor
 		sequence.StaticColors[command.StaticLamp].Flash = command.StaticLampFlash
+		return sequence
+	}
+
+	if command.UpdateSequenceColor {
+		if debug {
+			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
+		}
+		sequence.UpdateSequenceColor = true
+		sequence.SequenceColor = common.GetColorButtonsArray(command.SelectedColor)
 		return sequence
 	}
 
