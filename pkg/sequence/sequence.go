@@ -162,7 +162,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-
 	for {
 
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
@@ -190,9 +189,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 		// Map set sequence color function.
 		if sequence.Functions[common.Function5_Color].State {
-			//fmt.Printf("setting color edit mode !\n")
 			sequence.PlayStaticOnce = true
 			sequence.EditSeqColors = true
+			sequence.Run = false
 		}
 
 		// Sequence in Static Mode.
@@ -243,6 +242,17 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+
+				// Map set sequence color function.
+				if sequence.Functions[common.Function5_Color].State {
+					sequence.PlayStaticOnce = true
+					sequence.EditSeqColors = true
+					sequence.Run = false
+				}
+
+				if !sequence.Run {
+					break
+				}
 
 				// If the music trigger is being used then the timer is disabled.
 				for _, trigger := range soundTriggers {
@@ -324,7 +334,6 @@ func PlayNewSequence(sequence common.Sequence,
 						break
 					}
 					fixtureChannel8 <- cmd
-
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 					if !sequence.Run {
 						break
