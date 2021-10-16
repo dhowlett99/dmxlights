@@ -649,7 +649,6 @@ func main() {
 			sequences[hit.Y].Type == "switch" {
 
 			switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
-			fmt.Printf("X:%d Y:%d n", hit.X, hit.Y)
 			valuesLength := len(sequences[hit.Y].Switches[hit.X].Values)
 			fmt.Printf("Length of Values %d\n", valuesLength)
 			if switchPositions[hit.Y][hit.X] == valuesLength {

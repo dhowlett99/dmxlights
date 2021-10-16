@@ -234,7 +234,7 @@ func PlayNewSequence(sequence common.Sequence,
 						if trigger.SequenceNumber == mySequenceNumber {
 							trigger.State = false
 						}
-						sequence.CurrentSpeed = 25 * time.Millisecond
+						sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
 					}
 				}
 
@@ -252,6 +252,10 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
+
+					// This is were we set the speed of the sequence to current speed.
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+
 					cmd := common.FixtureCommand{
 						Master:              sequence.Master,
 						Hide:                sequence.Hide,
@@ -270,42 +274,42 @@ func PlayNewSequence(sequence common.Sequence,
 						SequenceColor:       sequence.SequenceColor,
 					}
 					fixtureChannel1 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel2 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel3 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel4 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel5 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel6 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel7 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Millisecond, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
 					fixtureChannel8 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
 					if !sequence.Run {
 						break
 					}
