@@ -232,6 +232,8 @@ func PlayNewSequence(sequence common.Sequence,
 				// Calulate positions for fixtures based on patten.
 				positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
 
+				howManyColors(positions)
+
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
 
@@ -380,7 +382,24 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 			}
 		}
 	}
+
 	return positionsOut, counter
+}
+
+func howManyColors(positionsMap map[int][]common.Position) {
+
+	fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
+
+	colorMap := make(map[common.Color]bool)
+	for index, positions := range positionsMap {
+		for _, position := range positions {
+			fmt.Printf("Position:%d Color %+v\n", index, position.Color)
+			colorMap[position.Color] = true
+		}
+	}
+
+	fmt.Printf("There are %d colors in this patten \n", len(colorMap))
+
 }
 
 // Sets the static colors to default values.
