@@ -353,6 +353,93 @@ func Test_calculatePositions(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Pairs case",
+			args: args{
+				bounce: false,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+
+				0: {
+					{
+						Fixture:       0,
+						StartPosition: 0,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       2,
+						StartPosition: 0,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       4,
+						StartPosition: 0,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       6,
+						StartPosition: 0,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+				},
+				14: {
+					{
+						Fixture:       1,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       3,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       5,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+					{
+						Fixture:       7,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          0, Shutter: 0, Pan: 0, Tilt: 0,
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
