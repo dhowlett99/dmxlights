@@ -232,13 +232,14 @@ func main() {
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// Initialise the pattens.
-	availablePatten := []string{}
-	availablePatten = append(availablePatten, "standard")
-	availablePatten = append(availablePatten, "inverted")
-	availablePatten = append(availablePatten, "rgbchase")
-	availablePatten = append(availablePatten, "pairs")
-	availablePatten = append(availablePatten, "colors")
-	availablePatten = append(availablePatten, "fade")
+	availablePattens := []string{}
+	availablePattens = append(availablePattens, "standard")
+	availablePattens = append(availablePattens, "inverted")
+	availablePattens = append(availablePattens, "rgbchase")
+	availablePattens = append(availablePattens, "pairs")
+	availablePattens = append(availablePattens, "center")
+	availablePattens = append(availablePattens, "colors")
+	availablePattens = append(availablePattens, "fade")
 
 	// Clear the pad.
 	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
@@ -357,27 +358,19 @@ func main() {
 			continue
 		}
 
-		// Increment Patten.
+		// Decrement Patten.
 		if hit.X == 2 && hit.Y == 7 {
-			if selectedPatten < 5 {
-				selectedPatten = selectedPatten + 1
-			}
-			if selectedPatten > 5 {
-				selectedPatten = 5
+			selectedPatten = selectedPatten - 1
+			if selectedPatten < 0 {
+				selectedPatten = 0
 			}
 			cmd := common.Command{
-				Stop: true,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			cmd = common.Command{
 				UpdatePatten: true,
 				Patten: common.Patten{
-					Name: availablePatten[selectedPatten],
+					Name: availablePattens[selectedPatten],
 				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 			cmd = common.Command{
 				Stop:  true,
 				Speed: sequenceSpeed,
@@ -392,18 +385,25 @@ func main() {
 			continue
 		}
 
-		// Decrement Patten.
+		// Increment Patten.
 		if hit.X == 3 && hit.Y == 7 {
-			if selectedPatten > 0 {
-				selectedPatten = selectedPatten - 1
+			selectedPatten = selectedPatten + 1
+			if selectedPatten > len(availablePattens)-1 {
+				selectedPatten = len(availablePattens) - 1
 			}
 			cmd := common.Command{
+				Stop: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
 				UpdatePatten: true,
 				Patten: common.Patten{
-					Name: availablePatten[selectedPatten],
+					Name: availablePattens[selectedPatten],
 				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 			cmd = common.Command{
 				Stop:  true,
 				Speed: sequenceSpeed,

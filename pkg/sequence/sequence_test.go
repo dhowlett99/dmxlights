@@ -193,6 +193,69 @@ func Test_calculatePositions(t *testing.T) {
 			},
 		},
 		{
+			name: "multiple colors case",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}, {R: 0, G: 255, B: 0}, {R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}, {R: 0, G: 255, B: 0}, {R: 0, G: 0, B: 255}}},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0: {
+					{
+						Fixture:       0,
+						StartPosition: 0,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+					},
+				},
+				14: {
+					{
+						Fixture:       0,
+						StartPosition: 14,
+						Color:         common.Color{R: 0, G: 255, B: 0},
+					},
+				},
+				28: {
+					{
+						Fixture:       0,
+						StartPosition: 28,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+					},
+				},
+				42: {
+					{
+						Fixture:       1,
+						StartPosition: 42,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+					},
+				},
+				56: {
+					{
+						Fixture:       1,
+						StartPosition: 56,
+						Color:         common.Color{R: 0, G: 255, B: 0},
+					},
+				},
+				70: {
+					{
+						Fixture:       1,
+						StartPosition: 70,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+					},
+				},
+			},
+		},
+		{
 			name: "Scanner case",
 			args: args{
 				bounce: false,
