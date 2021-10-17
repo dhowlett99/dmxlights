@@ -106,6 +106,7 @@ type Command struct {
 	UpdateSwitch        bool
 	SwitchNumber        int
 	SwitchPosition      int
+	Inverted            bool
 }
 
 // Sequence describes sequences.
@@ -146,6 +147,7 @@ type Sequence struct {
 	Switches            []Switch
 	UpdateSequenceColor bool
 	SequenceColor       Color
+	Inverted            bool
 }
 
 type Function struct {
@@ -198,6 +200,7 @@ type FixtureCommand struct {
 	Blackout            bool
 	UpdateSequenceColor bool
 	SequenceColor       Color
+	Inverted            bool
 }
 
 type Position struct {
@@ -249,12 +252,12 @@ type Trigger struct {
 // Define the function keys.
 const (
 	Function1_Forward_Chase = 0
-	Function2_Undef         = 1
-	Function3_Undef         = 2
-	Function4_Undef         = 3
+	Function2_Pairs_Chase   = 1
+	Function3_Inward_Chase  = 2
+	Function4_Bounce        = 3 // Sequence auto reverses.
 	Function5_Color         = 4 // Set chase color.
 	Function6_Static        = 5 // Set static colors.
-	Function7_Bounce        = 6 // Sequence auto reverses.
+	Function7_Invert        = 6
 	Function8_Music_Trigger = 7 // Music trigger on and off.
 )
 
@@ -418,4 +421,70 @@ func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
 		return 0x03
 	} // White
 	return 0
+}
+
+func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
+
+	if sequence.Functions[Function1_Forward_Chase].State {
+		functions[Function2_Pairs_Chase].State = false
+		functions[Function3_Inward_Chase].State = false
+		return sequence
+	}
+
+	// Set pairs chase.
+	if sequence.Functions[Function2_Pairs_Chase].State {
+		sequence.Functions[Function1_Forward_Chase].State = false
+		sequence.Functions[Function3_Inward_Chase].State = false
+		return sequence
+	}
+
+	// Set inward chase.
+	if sequence.Functions[Function3_Inward_Chase].State {
+		sequence.Functions[Function1_Forward_Chase].State = false
+		sequence.Functions[Function2_Pairs_Chase].State = false
+		return sequence
+	}
+
+	return sequence
+}
+
+func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
+
+	if sequence.Functions[Function1_Forward_Chase].State {
+		sequence.Patten.Name = "standard"
+	}
+
+	if sequence.Functions[Function2_Pairs_Chase].State {
+		sequence.Patten.Name = "pairs"
+	}
+
+	if sequence.Functions[Function3_Inward_Chase].State {
+		sequence.Patten.Name = "inward"
+	}
+
+	// Map bounce function to sequence bounce setting.
+	sequence.Bounce = sequence.Functions[Function4_Bounce].State
+
+	// Map color selection function.
+	if sequence.Functions[Function5_Color].State {
+		sequence.PlayStaticOnce = true
+		sequence.EditSeqColors = true
+		sequence.Run = false
+	}
+
+	// Map static function.
+	sequence.Static = sequence.Functions[Function6_Static].State
+
+	// Map invert function.
+	sequence.Inverted = sequence.Functions[Function7_Invert].State
+
+	// Map music trigger function.
+	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
+	if sequence.Functions[Function8_Music_Trigger].State {
+		sequence.Run = true
+	}
+
+	sequence.Functions = functions
+
+	return sequence
 }

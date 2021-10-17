@@ -123,6 +123,107 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
+	inverted := common.Patten{
+		Steps: []common.Step{
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+		},
+	}
+
 	rgbchase := common.Patten{
 		Steps: []common.Step{
 			{
@@ -325,7 +426,7 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
-	center := common.Patten{
+	inward := common.Patten{
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -689,94 +790,6 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
-	inverted := common.Patten{
-		Steps: []common.Step{
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-				},
-			},
-			{
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-					{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-				},
-			},
-		},
-	}
-
 	Pattens["singlestep"] = singlestep
 	Pattens["inverted"] = inverted
 	Pattens["fade"] = fade
@@ -784,7 +797,7 @@ func MakePatterns() map[string]common.Patten {
 	Pattens["standard"] = standard
 	Pattens["rgbchase"] = rgbchase
 	Pattens["pairs"] = pairs
-	Pattens["center"] = center
+	Pattens["inward"] = inward
 	Pattens["colors"] = colors
 
 	return Pattens

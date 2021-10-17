@@ -70,6 +70,7 @@ func CreateSequence(
 		Blackout: false,
 		Master:   255,
 	}
+
 	// Make functions for each of the sequences.
 	for function := 0; function < 8; function++ {
 		newFunction := common.Function{
@@ -79,6 +80,9 @@ func CreateSequence(
 		}
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
+
+	// We start in forward chase.
+	sequence.Functions[common.Function1_Forward_Chase].State = true
 
 	if sequenceType == "switch" {
 
@@ -166,33 +170,13 @@ func PlayNewSequence(sequence common.Sequence,
 
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
+		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
 			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixtureConfig, sequence.Blackout, sequence.Master)
 			sequence.PlaySwitchOnce = false
 			continue
 		}
-
-		// Map bounce function to sequence bounce setting.
-		sequence.Bounce = sequence.Functions[common.Function7_Bounce].State
-
-		// Map music trigger function.
-		sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
-		if sequence.MusicTrigger {
-			sequence.Run = true
-		}
-
-		// Map static function.
-		if sequence.Functions[common.Function6_Static].State {
-			sequence.Static = true
-		}
-
-		// Map set sequence color function.
-		// if sequence.Functions[common.Function5_Color].State {
-		// 	sequence.PlayStaticOnce = true
-		// 	sequence.EditSeqColors = true
-		// 	sequence.Run = false
-		// }
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
@@ -217,8 +201,6 @@ func PlayNewSequence(sequence common.Sequence,
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
 			for sequence.Run {
-
-				sequence.Functions[common.Function1_Forward_Chase].State = sequence.Run
 
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
@@ -257,6 +239,7 @@ func PlayNewSequence(sequence common.Sequence,
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 
 					cmd := common.FixtureCommand{
+						Inverted:            sequence.Inverted,
 						Master:              sequence.Master,
 						Hide:                sequence.Hide,
 						Tick:                true,
@@ -362,7 +345,6 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 						waitForColors = true
 					}
 				}
-
 			}
 		}
 		if !waitForColors {
@@ -417,4 +399,27 @@ func setDefaultStaticColorButtons(selectedSequence int) []common.StaticColorButt
 	}
 
 	return staticColorsButtons
+}
+
+func invertColor(color common.Color) (out common.Color) {
+
+	out.R = reverse_dmx(color.R)
+	out.G = reverse_dmx(color.G)
+	out.B = reverse_dmx(color.B)
+
+	return out
+
+}
+
+func reverse_dmx(n int) int {
+
+	in := make(map[int]int, 255)
+	var y = 255
+
+	for x := 0; x <= 255; x++ {
+
+		in[x] = y
+		y--
+	}
+	return in[n]
 }

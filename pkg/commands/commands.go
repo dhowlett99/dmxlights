@@ -157,12 +157,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
 			}
 		}
-		if sequence.Functions[common.Function5_Color].State {
-			sequence.PlayStaticOnce = true
-			sequence.EditSeqColors = true
-			sequence.Run = false
-		}
-		sequence.Functions = command.Functions
+		// Setup the actions based on the state of the function keys.
+		sequence := common.SetFunctionKeyActions(command.Functions, sequence)
 		return sequence
 	}
 

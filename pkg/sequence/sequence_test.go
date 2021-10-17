@@ -513,3 +513,52 @@ func Test_calculatePositions(t *testing.T) {
 		})
 	}
 }
+
+func Test_invertColor(t *testing.T) {
+	type args struct {
+		color common.Color
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut common.Color
+	}{
+		{
+			name: "golden path",
+			args: args{
+				color: common.Color{
+					R: 255,
+					G: 255,
+					B: 255,
+				},
+			},
+			wantOut: common.Color{
+				R: 0,
+				G: 0,
+				B: 0,
+			},
+		},
+		{
+			name: "golden path",
+			args: args{
+				color: common.Color{
+					R: 0,
+					G: 0,
+					B: 0,
+				},
+			},
+			wantOut: common.Color{
+				R: 255,
+				G: 255,
+				B: 255,
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOut := invertColor(tt.args.color); !reflect.DeepEqual(gotOut, tt.wantOut) {
+				t.Errorf("invertColor() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}

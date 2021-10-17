@@ -612,7 +612,14 @@ func main() {
 			newSequence := <-updateChannels[selectedSequence]
 			sequences[selectedSequence] = &newSequence
 
-			// We've pushed a function key, this is where we set the value inside the temporary sequence.
+			// We clear first three function keys first. So that the toggle of the
+			// chase modes will work.
+			if hit.X < 3 {
+				sequences[selectedSequence].Functions[common.Function1_Forward_Chase].State = false
+				sequences[selectedSequence].Functions[common.Function2_Pairs_Chase].State = false
+				sequences[selectedSequence].Functions[common.Function3_Inward_Chase].State = false
+			}
+
 			for _, functions := range sequences[selectedSequence].Functions {
 				if hit.Y == functions.SequenceNumber {
 					if !sequences[selectedSequence].Functions[hit.X].State {
@@ -633,6 +640,9 @@ func main() {
 				Functions:       sequences[selectedSequence].Functions,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// For the chase functions we only allow one at a time.
+			common.SetFunctionKeys(sequences[selectedSequence].Functions, *sequences[selectedSequence])
 
 			// Light the correct function key.
 			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad)

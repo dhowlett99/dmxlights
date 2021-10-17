@@ -114,8 +114,26 @@ func FixtureReceiver(sequence common.Sequence,
 									var G int
 									var B int
 
+									if cmd.Inverted {
+										for _, value := range fadeDown {
+											if cmd.UpdateSequenceColor {
+												R = int((float64(cmd.SequenceColor.R) / 100) * (float64(value) / 2.55))
+												G = int((float64(cmd.SequenceColor.G) / 100) * (float64(value) / 2.55))
+												B = int((float64(cmd.SequenceColor.B) / 100) * (float64(value) / 2.55))
+											} else {
+												R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+												G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+												B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+											}
+											if !cmd.Hide {
+												launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
+											}
+											MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+											time.Sleep(cmd.FadeTime / 4) // Fade down time.
+										}
+										time.Sleep(cmd.FadeTime / 4) // Fade off time.
+									}
 									for _, value := range fadeUp {
-
 										if cmd.UpdateSequenceColor {
 											R = int((float64(cmd.SequenceColor.R) / 100) * (float64(value) / 2.55))
 											G = int((float64(cmd.SequenceColor.G) / 100) * (float64(value) / 2.55))
@@ -137,23 +155,25 @@ func FixtureReceiver(sequence common.Sequence,
 										time.Sleep(cmd.CurrentSpeed * 5)
 									}
 									time.Sleep(cmd.FadeTime / 4) // Fade on time.
-									for _, value := range fadeDown {
-										if cmd.UpdateSequenceColor {
-											R = int((float64(cmd.SequenceColor.R) / 100) * (float64(value) / 2.55))
-											G = int((float64(cmd.SequenceColor.G) / 100) * (float64(value) / 2.55))
-											B = int((float64(cmd.SequenceColor.B) / 100) * (float64(value) / 2.55))
-										} else {
-											R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-											G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-											B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+									if !cmd.Inverted {
+										for _, value := range fadeDown {
+											if cmd.UpdateSequenceColor {
+												R = int((float64(cmd.SequenceColor.R) / 100) * (float64(value) / 2.55))
+												G = int((float64(cmd.SequenceColor.G) / 100) * (float64(value) / 2.55))
+												B = int((float64(cmd.SequenceColor.B) / 100) * (float64(value) / 2.55))
+											} else {
+												R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+												G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+												B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+											}
+											if !cmd.Hide {
+												launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
+											}
+											MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+											time.Sleep(cmd.FadeTime / 4) // Fade down time.
 										}
-										if !cmd.Hide {
-											launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
-										}
-										MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-										time.Sleep(cmd.FadeTime / 4) // Fade down time.
+										time.Sleep(cmd.FadeTime / 4) // Fade off time.
 									}
-									time.Sleep(cmd.FadeTime / 4) // Fade off time.
 								}()
 							}
 						}
