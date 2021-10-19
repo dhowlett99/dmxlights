@@ -64,6 +64,7 @@ type Command struct {
 	UpdateStatic        bool
 	UpdateStaticColor   bool
 	UpdateSequenceColor bool
+	ClearSequenceColor  bool
 	StaticLampFlash     bool
 	SelectedColor       int
 	PlayStaticOnce      bool
@@ -111,43 +112,43 @@ type Command struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	Mode                string // Sequence or Static
-	Static              bool
-	EditSeqColors       bool
-	PlayStaticOnce      bool
-	PlaySwitchOnce      bool
-	StaticColors        []StaticColorButton
-	SequenceColors      []StaticColorButton
-	EditColors          bool
-	Hide                bool
-	Type                string
-	FadeTime            time.Duration
-	FadeOnTime          time.Duration
-	FadeOffTime         time.Duration
-	Name                string
-	Number              int
-	Run                 bool
-	Bounce              bool
-	Steps               int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	Patten              Patten // Contains fixtures and steps info.
-	Colors              []Color
-	Shift               int
-	CurrentSpeed        time.Duration
-	Speed               int
-	FadeSpeed           int
-	Size                int
-	X                   int
-	Y                   int
-	MusicTrigger        bool
-	Blackout            bool
-	Color               int
-	Master              int // Master Brightness
-	Functions           []Function
-	FunctionMode        bool
-	Switches            []Switch
-	UpdateSequenceColor bool
-	SequenceColor       Color
-	Inverted            bool
+	Mode                    string // Sequence or Static
+	Static                  bool
+	EditSeqColors           bool
+	PlayStaticOnce          bool
+	PlaySwitchOnce          bool
+	StaticColors            []StaticColorButton
+	AvailableSequenceColors []StaticColorButton
+	EditColors              bool
+	Hide                    bool
+	Type                    string
+	FadeTime                time.Duration
+	FadeOnTime              time.Duration
+	FadeOffTime             time.Duration
+	Name                    string
+	Number                  int
+	Run                     bool
+	Bounce                  bool
+	Steps                   int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	Patten                  Patten // Contains fixtures and steps info.
+	Colors                  []Color
+	Shift                   int
+	CurrentSpeed            time.Duration
+	Speed                   int
+	FadeSpeed               int
+	Size                    int
+	X                       int
+	Y                       int
+	MusicTrigger            bool
+	Blackout                bool
+	Color                   int
+	Master                  int // Master Brightness
+	Functions               []Function
+	FunctionMode            bool
+	Switches                []Switch
+	UpdateSequenceColor     bool
+	SequenceColor           []Color
+	Inverted                bool
 }
 
 type Function struct {

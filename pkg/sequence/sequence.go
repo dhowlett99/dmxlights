@@ -36,19 +36,19 @@ func CreateSequence(
 	}
 
 	sequence := common.Sequence{
-		Type:           sequenceType,
-		Hide:           false,
-		Mode:           "Sequence",
-		StaticColors:   staticColorsButtons,
-		SequenceColors: sequenceColorButtons,
-		Name:           sequenceType,
-		Number:         mySequenceNumber,
-		FadeSpeed:      9,
-		FadeTime:       150 * time.Millisecond,
-		MusicTrigger:   false,
-		Run:            true,
-		Bounce:         false,
-		Steps:          8 * 14, // Eight lamps and 14 steps to fade up and down.
+		Type:                    sequenceType,
+		Hide:                    false,
+		Mode:                    "Sequence",
+		StaticColors:            staticColorsButtons,
+		AvailableSequenceColors: sequenceColorButtons,
+		Name:                    sequenceType,
+		Number:                  mySequenceNumber,
+		FadeSpeed:               9,
+		FadeTime:                150 * time.Millisecond,
+		MusicTrigger:            false,
+		Run:                     true,
+		Bounce:                  false,
+		Steps:                   8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     initialPatten,
 			Length:   2,
@@ -232,7 +232,10 @@ func PlayNewSequence(sequence common.Sequence,
 				// Calulate positions for fixtures based on patten.
 				positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
 
-				howManyColors(positions)
+				if sequence.UpdateSequenceColor {
+					//howManyColors(positions)
+					positions = replaceColors(positions, sequence.SequenceColor)
+				}
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
@@ -241,22 +244,20 @@ func PlayNewSequence(sequence common.Sequence,
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 
 					cmd := common.FixtureCommand{
-						Inverted:            sequence.Inverted,
-						Master:              sequence.Master,
-						Hide:                sequence.Hide,
-						Tick:                true,
-						Positions:           positions,
-						Type:                sequence.Type,
-						FadeSpeed:           sequence.FadeSpeed,
-						FadeTime:            sequence.FadeTime,
-						Size:                sequence.Size,
-						Steps:               sequence.Steps,
-						CurrentSpeed:        sequence.CurrentSpeed,
-						Speed:               sequence.Speed,
-						Blackout:            sequence.Blackout,
-						CurrentPosition:     step,
-						UpdateSequenceColor: sequence.UpdateSequenceColor,
-						SequenceColor:       sequence.SequenceColor,
+						Inverted:        sequence.Inverted,
+						Master:          sequence.Master,
+						Hide:            sequence.Hide,
+						Tick:            true,
+						Positions:       positions,
+						Type:            sequence.Type,
+						FadeSpeed:       sequence.FadeSpeed,
+						FadeTime:        sequence.FadeTime,
+						Size:            sequence.Size,
+						Steps:           sequence.Steps,
+						CurrentSpeed:    sequence.CurrentSpeed,
+						Speed:           sequence.Speed,
+						Blackout:        sequence.Blackout,
+						CurrentPosition: step,
 					}
 					fixtureChannel1 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
@@ -343,10 +344,15 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 					position.Color.B = color.B
 					positionsOut[counter] = append(positionsOut[counter], position)
 					if noColors > 1 {
-						counter = counter + 14
-						waitForColors = true
+						if fixture.Type != "scanner" {
+							counter = counter + 14
+							waitForColors = true
+						}
 					}
 				}
+			}
+			if step.Type == "scanner" {
+				counter = counter + 14
 			}
 		}
 		if !waitForColors {
@@ -358,6 +364,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 		for index := len(steps) - 1; index >= 0; index-- {
 			step := steps[index]
 			for fixtureIndex, fixture := range step.Fixtures {
+				noColors := len(fixture.Colors)
 				for _, color := range fixture.Colors {
 					// Preserve the scanner commands.
 					position.Gobo = fixture.Gobo
@@ -371,8 +378,11 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 						position.Color.G = color.G
 						position.Color.B = color.B
 						positionsOut[counter] = append(positionsOut[counter], position)
-						if fixture.Type != "scanner" {
-							counter = counter + 14
+						if noColors > 1 {
+							if fixture.Type != "scanner" {
+								counter = counter + 14
+								waitForColors = true
+							}
 						}
 					}
 				}
@@ -381,25 +391,50 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 				counter = counter + 14
 			}
 		}
+		if !waitForColors {
+			counter = counter + 14
+		}
 	}
 
 	return positionsOut, counter
 }
 
-func howManyColors(positionsMap map[int][]common.Position) {
+// func howManyColors(positionsMap map[int][]common.Position) (int, int) {
 
-	fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
+// 	fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
 
-	colorMap := make(map[common.Color]bool)
-	for index, positions := range positionsMap {
+// 	colorMap := make(map[common.Color]bool)
+// 	for index, positions := range positionsMap {
+// 		for _, position := range positions {
+// 			fmt.Printf("Position:%d Color %+v\n", index, position.Color)
+// 			colorMap[position.Color] = true
+// 		}
+// 	}
+
+// 	fmt.Printf("There are %d colors in this patten \n", len(colorMap))
+
+// 	return len(positionsMap), len(colorMap)
+// }
+
+func replaceColors(positionsMap map[int][]common.Position, colors []common.Color) map[int][]common.Position {
+
+	var insetColor int
+	numberColors := len(colors)
+
+	replace := make(map[int][]common.Position)
+	for currentPosition, positions := range positionsMap {
 		for _, position := range positions {
-			fmt.Printf("Position:%d Color %+v\n", index, position.Color)
-			colorMap[position.Color] = true
+			if insetColor >= numberColors {
+				insetColor = 0
+			}
+			position.Color = colors[insetColor]
+			insetColor++
+
+			replace[currentPosition] = append(replace[currentPosition], position)
 		}
 	}
 
-	fmt.Printf("There are %d colors in this patten \n", len(colorMap))
-
+	return replace
 }
 
 // Sets the static colors to default values.

@@ -214,7 +214,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
 		}
 		sequence.UpdateSequenceColor = true
-		sequence.SequenceColor = common.GetColorButtonsArray(command.SelectedColor)
+		sequence.SequenceColor = append(sequence.SequenceColor, common.GetColorButtonsArray(command.SelectedColor))
+		return sequence
+	}
+
+	if command.ClearSequenceColor {
+		if debug {
+			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
+		}
+		sequence.UpdateSequenceColor = false
+		sequence.SequenceColor = []common.Color{}
 		return sequence
 	}
 

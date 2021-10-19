@@ -255,16 +255,26 @@ func main() {
 			allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 			presets.ClearPresets(eventsForLauchpad, presetsStore)
 			presets.InitPresets(eventsForLauchpad, presetsStore)
+
 			// Make sure we stop all sequences.
 			cmd := common.Command{
 				Stop: true,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+			// Swicth off any static colors.
 			cmd = common.Command{
 				UpdateStatic: false,
 				Static:       false,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+			// Clear the sequence colors.
+			cmd = common.Command{
+				ClearSequenceColor: true,
+			}
+			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
 			continue
 		}
 
@@ -1024,16 +1034,18 @@ func showEditColorButtons(sequence *common.Sequence, selectedSequence int, event
 	}
 }
 
+// For the given sequence show the available sequence colors on the relevant buttons.
 func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
 	fmt.Printf("ShowColorSelectionButtons\n")
-	for myFixtureNumber, lamp := range sequence.SequenceColors {
+	for myFixtureNumber, lamp := range sequence.AvailableSequenceColors {
 		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 	}
 }
 
+// For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
 	fmt.Printf("ShowColorSelectionButtons\n")
-	for myFixtureNumber := range sequence.SequenceColors {
+	for myFixtureNumber := range sequence.AvailableSequenceColors {
 		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 	}
 }
