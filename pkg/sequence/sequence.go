@@ -230,11 +230,11 @@ func PlayNewSequence(sequence common.Sequence,
 				// Calulate positions for fixtures based on patten.
 				sequence.Positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
 				if sequence.UpdateSequenceColor {
-					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColor)
+					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
 
 				// Set the current colors in the sequence.
-				sequence.CurrentSequenceColors = howManyColors(sequence.Positions)
+				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
 				//fmt.Printf("Colors %+v\n", sequence.CurrentSequenceColors)
 
 				// Run the sequence through.
@@ -397,28 +397,6 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	}
 
 	return positionsOut, counter
-}
-
-func howManyColors(positionsMap map[int][]common.Position) (colors []common.Color) {
-
-	// fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
-
-	colorMap := make(map[common.Color]bool)
-	for _, positions := range positionsMap {
-		for _, position := range positions {
-			//fmt.Printf("Position:%d Color %+v\n", index, position.Color)
-			colorMap[position.Color] = true
-		}
-	}
-
-	// fmt.Printf("There are %d colors in this patten \n", len(colorMap))
-	// fmt.Printf("colors : %+v \n", colorMap)
-
-	for color := range colorMap {
-		colors = append(colors, color)
-	}
-
-	return colors
 }
 
 func replaceColors(positionsMap map[int][]common.Position, colors []common.Color) map[int][]common.Position {

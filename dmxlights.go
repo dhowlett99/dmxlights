@@ -792,6 +792,19 @@ func main() {
 
 			colorEditMode[selectedSequence] = true
 
+			// Get an upto date copy of the sequence.
+			cmd = common.Command{
+				UpdateSequence: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+			newSequence := <-updateChannels[selectedSequence]
+			sequences[selectedSequence] = &newSequence
+
+			sequences[selectedSequence].CurrentSequenceColors = sequences[selectedSequence].SequenceColors
+
+			// We call ShowColorSelectionButtons here so the selections will flash as you press them.
+			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+
 			continue
 		}
 
@@ -1078,7 +1091,6 @@ func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, s
 		} else {
 			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
-
 	}
 }
 

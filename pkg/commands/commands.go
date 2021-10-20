@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -214,7 +214,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
 		}
 		sequence.UpdateSequenceColor = true
-		sequence.SequenceColor = append(sequence.SequenceColor, common.GetColorButtonsArray(command.SelectedColor))
+		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
 		return sequence
 	}
 
@@ -223,7 +223,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
 		}
 		sequence.UpdateSequenceColor = false
-		sequence.SequenceColor = []common.Color{}
+		sequence.SequenceColors = []common.Color{}
 		return sequence
 	}
 
