@@ -149,6 +149,8 @@ type Sequence struct {
 	UpdateSequenceColor     bool
 	SequenceColor           []Color
 	Inverted                bool
+	Positions               map[int][]Position
+	CurrentSequenceColors   []Color
 }
 
 type Function struct {
@@ -156,6 +158,7 @@ type Function struct {
 	SequenceNumber int
 	Number         int
 	State          bool
+	Flash          bool
 }
 
 type Channels struct {
@@ -335,6 +338,7 @@ func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight) {
 
 func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight) {
 	for index, function := range sequence.Functions {
+
 		if function.State {
 			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {
@@ -393,6 +397,34 @@ func GetColorButtonsArray(color int) Color {
 	}
 	return Color{}
 }
+
+func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
+
+	switch color {
+	case Color{R: 255, G: 0, B: 0}:
+		return 0x48 // Red
+	case Color{R: 255, G: 111, B: 0}:
+		return 0x60 // Orange
+	case Color{R: 255, G: 255, B: 0}:
+		return 0x0d // Yellow
+	case Color{R: 0, G: 255, B: 0}:
+		return 0x15 // Green
+	case Color{R: 0, G: 255, B: 255}:
+		return 0x25 // Cyan
+	case Color{R: 0, G: 0, B: 255}:
+		return 0x4f // Blue
+	case Color{R: 100, G: 0, B: 255}:
+		return 0x51 // Purple
+	case Color{R: 255, G: 0, B: 255}:
+		return 0x34 // Pink
+	case Color{R: 255, G: 255, B: 255}:
+		return 0x03 // White
+	case Color{R: 0, G: 0, B: 0}:
+		return 0x00 // Black
+	}
+	return code
+}
+
 func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
 	if red == 255 && green == 0 && blue == 0 {
 		return 0x78

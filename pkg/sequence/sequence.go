@@ -131,8 +131,6 @@ func PlayNewSequence(sequence common.Sequence,
 	channels common.Channels,
 	soundTriggers []*common.Trigger) {
 
-	var positions map[int][]common.Position
-
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
 	fixtureChannel2 := make(chan common.FixtureCommand)
@@ -230,12 +228,14 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 
 				// Calulate positions for fixtures based on patten.
-				positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
-
+				sequence.Positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
 				if sequence.UpdateSequenceColor {
-					//howManyColors(positions)
-					positions = replaceColors(positions, sequence.SequenceColor)
+					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColor)
 				}
+
+				// Set the current colors in the sequence.
+				sequence.CurrentSequenceColors = howManyColors(sequence.Positions)
+				//fmt.Printf("Colors %+v\n", sequence.CurrentSequenceColors)
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
@@ -248,7 +248,7 @@ func PlayNewSequence(sequence common.Sequence,
 						Master:          sequence.Master,
 						Hide:            sequence.Hide,
 						Tick:            true,
-						Positions:       positions,
+						Positions:       sequence.Positions,
 						Type:            sequence.Type,
 						FadeSpeed:       sequence.FadeSpeed,
 						FadeTime:        sequence.FadeTime,
@@ -399,22 +399,27 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	return positionsOut, counter
 }
 
-// func howManyColors(positionsMap map[int][]common.Position) (int, int) {
+func howManyColors(positionsMap map[int][]common.Position) (colors []common.Color) {
 
-// 	fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
+	// fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
 
-// 	colorMap := make(map[common.Color]bool)
-// 	for index, positions := range positionsMap {
-// 		for _, position := range positions {
-// 			fmt.Printf("Position:%d Color %+v\n", index, position.Color)
-// 			colorMap[position.Color] = true
-// 		}
-// 	}
+	colorMap := make(map[common.Color]bool)
+	for _, positions := range positionsMap {
+		for _, position := range positions {
+			//fmt.Printf("Position:%d Color %+v\n", index, position.Color)
+			colorMap[position.Color] = true
+		}
+	}
 
-// 	fmt.Printf("There are %d colors in this patten \n", len(colorMap))
+	// fmt.Printf("There are %d colors in this patten \n", len(colorMap))
+	// fmt.Printf("colors : %+v \n", colorMap)
 
-// 	return len(positionsMap), len(colorMap)
-// }
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
+}
 
 func replaceColors(positionsMap map[int][]common.Position, colors []common.Color) map[int][]common.Position {
 

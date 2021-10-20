@@ -791,6 +791,7 @@ func main() {
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			colorEditMode[selectedSequence] = true
+
 			continue
 		}
 
@@ -1058,9 +1059,26 @@ func showEditColorButtons(sequence *common.Sequence, selectedSequence int, event
 
 // For the given sequence show the available sequence colors on the relevant buttons.
 func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
-	fmt.Printf("ShowColorSelectionButtons\n")
+
+	// Check if we need to flash this button.
 	for myFixtureNumber, lamp := range sequence.AvailableSequenceColors {
-		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+		for index, availableColor := range sequence.AvailableSequenceColors {
+			for _, sequenceColor := range sequence.CurrentSequenceColors {
+				if availableColor.Color == sequenceColor {
+					if myFixtureNumber == index {
+						lamp.Flash = true
+						fmt.Printf("fixture %d : We need to flash button %d color %+v\n", myFixtureNumber, index, sequenceColor)
+					}
+				}
+			}
+		}
+		if lamp.Flash {
+			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
+			launchpad.FlashLight(mySequenceNumber, myFixtureNumber, int(code), 0x0, eventsForLauchpad)
+		} else {
+			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+		}
+
 	}
 }
 
