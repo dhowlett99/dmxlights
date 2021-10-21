@@ -251,6 +251,7 @@ type Event struct {
 type Trigger struct {
 	SequenceNumber int
 	State          bool
+	Gain           int
 }
 
 // Define the function keys.

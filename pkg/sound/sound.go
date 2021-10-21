@@ -13,6 +13,8 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 	go func() {
 
+		gain := []float32{0.05, 0.06, 0.07, 0.08, 0.09, .1, .11, .12, .13, .14}
+
 		fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
 
 		err := portaudio.Initialize()
@@ -39,6 +41,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 		//var out []int32
 		numSamples := 10
+		gainSelected := 4
 		for {
 			stream.Read()
 			if err != nil {
@@ -51,9 +54,12 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 			for i := 1; i < numSamples; i++ {
 				out[i] = in[i-1] + filter(cutoff)*in[i] - in[i-1]
 
-				if out[i] > 0.09 {
+				// fmt.Printf("gain selected is %d\n", gainSelected)
+				// fmt.Printf("sound: current gain is %f\n", gain[gainSelected])
+				if out[i] > gain[gainSelected] {
 					cmd := common.Command{}
 					for index, trigger := range soundTriggers {
+						gainSelected = trigger.Gain
 						if trigger.SequenceNumber == index {
 							if trigger.State {
 								channels.SoundTriggerChannels[index] <- cmd

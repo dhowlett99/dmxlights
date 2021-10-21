@@ -50,6 +50,7 @@ func main() {
 	masterBrightness = 255         // Affects all DMX fixtures and launchpad lamps.
 	var lastStaticColorButtonX int // Which Static Color button did we change last.
 	var lastStaticColorButtonY int // Which Static Color button did we change last.
+	var soundGain = 4              // Default gain of 0.09
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -161,10 +162,10 @@ func main() {
 
 	// soundTriggers is a an array of switches which control which sequence gets a music trigger.
 	soundTriggers := []*common.Trigger{}
-	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 0, State: false})
-	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 1, State: false})
-	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 2, State: false})
-	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 3, State: false})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 0, State: false, Gain: soundGain})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 1, State: false, Gain: soundGain})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 2, State: false, Gain: soundGain})
+	soundTriggers = append(soundTriggers, &common.Trigger{SequenceNumber: 3, State: false, Gain: soundGain})
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
 	sound.NewSoundTrigger(soundTriggers, sequenceChannels)
@@ -276,6 +277,30 @@ func main() {
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 			continue
+		}
+
+		// Sound sensitity up.
+		if hit.X == 5 && hit.Y == -1 {
+			fmt.Printf("Sound Up\n")
+			soundGain = soundGain - 1
+			if soundGain < 0 {
+				soundGain = 0
+			}
+			for _, trigger := range soundTriggers {
+				trigger.Gain = soundGain
+			}
+		}
+
+		// Sound sensitity down.
+		if hit.X == 4 && hit.Y == -1 {
+			fmt.Printf("Sound Down\n")
+			soundGain = soundGain + 1
+			if soundGain > 9 {
+				soundGain = 9
+			}
+			for _, trigger := range soundTriggers {
+				trigger.Gain = soundGain
+			}
 		}
 
 		// Master brightness down.
