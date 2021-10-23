@@ -697,23 +697,25 @@ func main() {
 			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
 			sequences[hit.Y].Type == "switch" {
 
-			switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
-			valuesLength := len(sequences[hit.Y].Switches[hit.X].Values)
-			//fmt.Printf("Length of Values %d\n", valuesLength)
-			if switchPositions[hit.Y][hit.X] == valuesLength {
-				switchPositions[hit.Y][hit.X] = 0
-			}
+			// We have a valid switch.
+			if hit.X < len(sequences[hit.Y].Switches) {
+				switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
+				valuesLength := len(sequences[hit.Y].Switches[hit.X].Values)
+				//fmt.Printf("Length of Values %d\n", valuesLength)
+				if switchPositions[hit.Y][hit.X] == valuesLength {
+					switchPositions[hit.Y][hit.X] = 0
+				}
 
-			// Send a message to the sequence for it to toggle the selected switch.
-			// hit.Y is the sequence.
-			// hit.X is the switch.
-			cmd := common.Command{
-				UpdateSwitch:   true,
-				SwitchNumber:   hit.X,
-				SwitchPosition: switchPositions[hit.Y][hit.X],
+				// Send a message to the sequence for it to toggle the selected switch.
+				// hit.Y is the sequence.
+				// hit.X is the switch.
+				cmd := common.Command{
+					UpdateSwitch:   true,
+					SwitchNumber:   hit.X,
+					SwitchPosition: switchPositions[hit.Y][hit.X],
+				}
+				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(hit.Y, cmd, commandChannels)
-
 		}
 
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
