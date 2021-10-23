@@ -484,16 +484,18 @@ func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
 
 func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
-	if sequence.Functions[Function1_Forward_Chase].State {
-		sequence.Patten.Name = "standard"
-	}
+	if sequence.Type != "scanner" {
+		if sequence.Functions[Function1_Forward_Chase].State {
+			sequence.Patten.Name = "standard"
+		}
 
-	if sequence.Functions[Function2_Pairs_Chase].State {
-		sequence.Patten.Name = "pairs"
-	}
+		if sequence.Functions[Function2_Pairs_Chase].State {
+			sequence.Patten.Name = "pairs"
+		}
 
-	if sequence.Functions[Function3_Inward_Chase].State {
-		sequence.Patten.Name = "inward"
+		if sequence.Functions[Function3_Inward_Chase].State {
+			sequence.Patten.Name = "inward"
+		}
 	}
 
 	// Map bounce function to sequence bounce setting.
