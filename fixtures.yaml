@@ -146,17 +146,19 @@ fixtures:
   - name: switch
     number: 1
     description: Projector1
-    values:
+    states:
     - name: Off
-      channel: 127
-      value: 0
+      values:
+        - channel: 127
+          setting: 0
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
     - name: On
-      channel: 137
-      value: 255
+      values: 
+        - channel: 137
+          setting: 255
       buttoncolor: 
         red: 255
         green: 0
@@ -164,17 +166,19 @@ fixtures:
   - name: switch
     number: 2
     description: Projector2
-    values:
+    states:
     - name: Off
-      channel: 137
-      value: 0
+      values:
+        - channel: 137
+          setting: 0
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
     - name: On
-      channel: 137
-      value: 255
+      values: 
+        - channel: 137
+          setting: 255
       buttoncolor: 
         red: 255
         green: 0
@@ -182,24 +186,33 @@ fixtures:
   - name: switch
     number: 3
     description: Red Par ON
-    values:
+    states:
     - name: Off
-      channel: 2
-      value: 0
+      values:
+      - channel: 2
+        setting: 0
+      - channel: 7
+        setting: 255
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
     - name: Half
-      channel: 2
-      value: 128
+      values:
+      - channel: 2
+        setting: 128
+      - channel: 7
+        setting: 255
       buttoncolor: 
         red: 0
         green: 0
         blue: 255
     - name: On
-      channel: 2
-      value: 255
+      values:
+      - channel: 2
+        setting: 255
+      - channel: 7
+        setting: 255
       buttoncolor: 
         red: 255
         green: 0

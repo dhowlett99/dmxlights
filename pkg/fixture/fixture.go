@@ -25,17 +25,21 @@ type Color struct {
 }
 
 type Value struct {
-	Name        string `yaml:"name"`
-	Channel     int16  `yaml:"channel"`
-	Value       int16  `yaml:"value"`
-	ButtonColor Color  `yaml:"buttoncolor"`
+	Channel int16 `yaml:"channel"`
+	Setting int16 `yaml:"setting"`
+}
+
+type State struct {
+	Name        string  `yaml:"name"`
+	Values      []Value `yaml:"values"`
+	ButtonColor Color   `yaml:"buttoncolor"`
 }
 
 type Switch struct {
 	Name        string  `yaml:"name"`
 	Number      int16   `yaml:"number"`
 	Description string  `yaml:"description"`
-	Values      []Value `yaml:"values"`
+	States      []State `yaml:"states"`
 }
 
 type Fixture struct {
@@ -230,12 +234,14 @@ func MapSwitchFixture(mySequenceNumber int,
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, swiTch := range fixture.Switches {
-				for valueNumber, value := range swiTch.Values {
-					if valueNumber == selectedSwitch {
-						if blackout {
-							dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
-						} else {
-							dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Value))
+				for stateNumber, state := range swiTch.States {
+					if stateNumber == selectedSwitch {
+						for _, value := range state.Values {
+							if blackout {
+								dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
+							} else {
+								dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
+							}
 						}
 					}
 				}

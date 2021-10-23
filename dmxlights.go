@@ -700,8 +700,7 @@ func main() {
 			// We have a valid switch.
 			if hit.X < len(sequences[hit.Y].Switches) {
 				switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
-				valuesLength := len(sequences[hit.Y].Switches[hit.X].Values)
-				//fmt.Printf("Length of Values %d\n", valuesLength)
+				valuesLength := len(sequences[hit.Y].Switches[hit.X].States)
 				if switchPositions[hit.Y][hit.X] == valuesLength {
 					switchPositions[hit.Y][hit.X] = 0
 				}

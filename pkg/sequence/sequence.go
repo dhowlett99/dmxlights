@@ -98,15 +98,24 @@ func CreateSequence(
 					newSwitch.Name = swiTch.Name
 					newSwitch.Number = swiTch.Number
 					newSwitch.Description = swiTch.Description
-					for _, value := range swiTch.Values {
-						newValue := common.Value{}
-						newValue.Name = value.Name
-						newValue.Value = value.Value
-						newValue.ButtonColor.R = value.ButtonColor.R
-						newValue.ButtonColor.G = value.ButtonColor.G
-						newValue.ButtonColor.B = value.ButtonColor.B
-						newValue.Channel = value.Channel
-						newSwitch.Values = append(newSwitch.Values, newValue)
+
+					newSwitch.States = []common.State{}
+					for _, state := range swiTch.States {
+						newState := common.State{}
+						newState.Name = state.Name
+						newState.ButtonColor.R = state.ButtonColor.R
+						newState.ButtonColor.G = state.ButtonColor.G
+						newState.ButtonColor.B = state.ButtonColor.B
+
+						newState.Values = []common.Value{}
+						for _, value := range state.Values {
+							newValue := common.Value{}
+							newValue.Channel = value.Channel
+							newValue.Setting = value.Setting
+							newState.Values = append(newState.Values, newValue)
+						}
+
+						newSwitch.States = append(newSwitch.States, newState)
 					}
 					// Add new switch to the list.
 					newSwitchList = append(newSwitchList, newSwitch)
@@ -307,7 +316,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, blackout bool, master int) {
 	for switchNumber, switchData := range switches {
-		for valuePosition, value := range switchData.Values {
+		for valuePosition, value := range switchData.States {
 			if valuePosition == switchData.CurrentPosition {
 				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, blackout, master, master)

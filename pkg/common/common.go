@@ -23,9 +23,13 @@ type Color struct {
 }
 
 type Value struct {
+	Channel int16
+	Setting int16
+}
+
+type State struct {
 	Name        string
-	Channel     int16
-	Value       int16
+	Values      []Value
 	ButtonColor Color
 }
 
@@ -34,7 +38,7 @@ type Switch struct {
 	Number          int16
 	CurrentPosition int
 	Description     string
-	Values          []Value
+	States          []State
 }
 
 type StaticColorButton struct {
