@@ -272,6 +272,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Switches[command.SwitchNumber].CurrentPosition = command.SwitchPosition
 		sequence.PlaySwitchOnce = true
+		sequence.Run = false
+		sequence.Type = "switch"
 		return sequence
 	}
 
