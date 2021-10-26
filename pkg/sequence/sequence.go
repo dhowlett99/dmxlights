@@ -337,7 +337,6 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	var waitForColors bool
 	for _, step := range steps {
 		for fixtureIndex, fixture := range step.Fixtures {
-
 			noColors := len(fixture.Colors)
 			for _, color := range fixture.Colors {
 				// Preserve the scanner commands.
@@ -395,13 +394,13 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 						}
 					}
 				}
+				if step.Type == "scanner" {
+					counter = counter + 14
+				}
 			}
-			if step.Type == "scanner" {
+			if !waitForColors {
 				counter = counter + 14
 			}
-		}
-		if !waitForColors {
-			counter = counter + 14
 		}
 	}
 
