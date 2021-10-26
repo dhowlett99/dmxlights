@@ -39,8 +39,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 		defer stream.Close()
 
-		//var out []int32
-		numSamples := 10
+		numSamples := 100
 		gainSelected := 4
 		for {
 			stream.Read()
