@@ -1,16 +1,51 @@
 package sequence
 
 import (
+	"errors"
 	"fmt"
+	"io/ioutil"
+	"os"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
+	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
 )
+
+type SequencesConfig struct {
+	Sequences []SequenceConfig `yaml:"sequences"`
+}
+
+type SequenceConfig struct {
+	Name        string `yaml:"name"`
+	Description string `yaml:"description"`
+	Type        string `yaml:"type"`
+	Group       int    `yaml:"group"`
+}
+
+func LoadSequences() (sequences *SequencesConfig, err error) {
+	filename := "sequences.yaml"
+
+	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, errors.New("error: loading sequences.yaml file: " + err.Error())
+	}
+	data, err := ioutil.ReadFile(filename)
+	if err != nil {
+		return nil, errors.New("error: reading sequences.yaml file: " + err.Error())
+	}
+
+	sequences = &SequencesConfig{}
+	err = yaml.Unmarshal(data, sequences)
+	if err != nil {
+		return nil, errors.New("error: unmarshalling sequences config: " + err.Error())
+	}
+	return sequences, nil
+}
 
 func CreateSequence(
 	sequenceType string,

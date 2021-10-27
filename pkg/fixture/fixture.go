@@ -68,13 +68,13 @@ func LoadFixtures() (fixtures *Fixtures, err error) {
 	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		return nil, errors.New("error: reading yaml file: " + err.Error())
+		return nil, errors.New("error: reading fixtures.yaml file: " + err.Error())
 	}
 
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		return nil, errors.New("error: marshalling fixtures: " + err.Error())
+		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
 	}
 	return fixtures, nil
 }

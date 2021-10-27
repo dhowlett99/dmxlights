@@ -1,0 +1,17 @@
+sequences:
+- name: sequence1
+  description: Front of House Main Par Cans
+  group: 1
+  type: rgb
+- name: sequence2
+  description: Uplighters
+  group: 2
+  type: rgb
+- name: sequence3
+  description: Scanners
+  group: 3
+  type: scanner
+- name: sequence4
+  description: Switch Box
+  group: 4
+  type: switch

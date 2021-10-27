@@ -110,6 +110,13 @@ func main() {
 	sequenceChannels.SoundTriggerChannels = soundTriggerChannels
 	sequenceChannels.UpdateChannels = updateChannels
 
+	// Read sequences config file
+	sequencesConfig, err := sequence.LoadSequences()
+	if err != nil {
+		fmt.Printf("dmxlights: error failed to load sequences config: %s\n", err.Error())
+		os.Exit(1)
+	}
+
 	// Get a list of all the fixtures in the groups.
 	fixturesConfig, err := fixture.LoadFixtures()
 	if err != nil {
@@ -118,7 +125,7 @@ func main() {
 	}
 
 	for _, fixture := range fixturesConfig.Fixtures {
-		fmt.Printf("Found fixture: %s, type: %d, desc: %s\n", fixture.Name, fixture.Group, fixture.Description)
+		fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", fixture.Name, fixture.Group, fixture.Description)
 	}
 
 	// Create a channel to send events to the launchpad.
@@ -135,17 +142,15 @@ func main() {
 
 	// Build the default set of Pattens.
 	pattens := patten.MakePatterns()
-	sequence1 := sequence.CreateSequence("rgb", 0, pattens, fixturesConfig, sequenceChannels)
-	sequence2 := sequence.CreateSequence("rgb", 1, pattens, fixturesConfig, sequenceChannels)
-	sequence3 := sequence.CreateSequence("scanner", 2, pattens, fixturesConfig, sequenceChannels)
-	sequence4 := sequence.CreateSequence("switch", 3, pattens, fixturesConfig, sequenceChannels)
 
+	// Create the sequences from config file.
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
-	sequences = append(sequences, &sequence1)
-	sequences = append(sequences, &sequence2)
-	sequences = append(sequences, &sequence3)
-	sequences = append(sequences, &sequence4)
+	for index, sequenceConf := range sequencesConfig.Sequences {
+		fmt.Printf("Found sequence: %s, desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Description, sequenceConf.Type)
+		tempSequence := sequence.CreateSequence(sequenceConf.Type, index, pattens, fixturesConfig, sequenceChannels)
+		sequences = append(sequences, &tempSequence)
+	}
 
 	// Create storage for the static color buttons.
 	staticButton1 := common.StaticColorButton{}
@@ -179,16 +184,16 @@ func main() {
 	sound.NewSoundTrigger(soundTriggers, sequenceChannels)
 
 	// Start threads for each sequence.
-	go sequence.PlayNewSequence(sequence1, 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
-	go sequence.PlayNewSequence(sequence2, 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
-	go sequence.PlayNewSequence(sequence3, 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
-	go sequence.PlayNewSequence(sequence4, 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(*sequences[0], 0, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(*sequences[1], 1, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(*sequences[2], 2, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
+	go sequence.PlayNewSequence(*sequences[3], 3, pad, eventsForLauchpad, pattens, dmxController, fixturesConfig, sequenceChannels, soundTriggers)
 
 	// Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, presetsStore)
 
 	// Light the function buttons at the bottom.
-	common.ShowFunctionButtons(sequence1, 7, eventsForLauchpad)
+	common.ShowFunctionButtons(*sequences[1], 7, eventsForLauchpad)
 
 	// Initialize a ten length slice of empty slices for function buttons.
 	functionButtons = make([][]bool, 9)
