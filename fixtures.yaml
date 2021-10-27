@@ -1,6 +1,6 @@
 fixtures:
 - name: FOH PAR
-  desription: Stairville Xbrick
+  description: Stairville Xbrick
   type: rgb
   address: 1
   group: 1
@@ -32,7 +32,7 @@ fixtures:
   - number: 13
     name: Master
 - name: FOH PAR
-  desription: Stairville Xbrick
+  description: Stairville Xbrick
   type: rgb
   address: 14
   group: 1
@@ -63,8 +63,8 @@ fixtures:
     name: Blue8
   - number: 13
     name: MasterDimmer
-- name: Uplighers
-  desription: Chauvet Color Rail IRC
+- name: Uplighters
+  description: Chauvet Color Rail IRC
   type: rgb
   address: 27
   fixtures:
@@ -123,7 +123,7 @@ fixtures:
   - number: 26
     name: Strobe
 - name: Scanner
-  desription: American DJ Comscan LED
+  description: American DJ Comscan LED
   type: scanner
   address: 53
   group: 3

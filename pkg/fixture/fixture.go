@@ -1,7 +1,7 @@
 package fixture
 
 import (
-	"fmt"
+	"errors"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -59,24 +59,24 @@ type Channel struct {
 	Comment string `yaml:"comment"`
 }
 
-func LoadFixtures() *Fixtures {
+func LoadFixtures() (fixtures *Fixtures, err error) {
 	filename := "fixtures.yaml"
 
-	_, err := os.OpenFile(filename, os.O_RDONLY, 0644)
+	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
-		fmt.Printf("error: loading fixtures.yaml file\n")
+		return nil, errors.New("error: loading fixtures.yaml file: " + err.Error())
 	}
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
-		fmt.Printf("error: writing yaml file\n")
+		return nil, errors.New("error: reading yaml file: " + err.Error())
 	}
 
-	fixtures := &Fixtures{}
+	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		fmt.Printf("error: marshalling fixtures: %s\n", err.Error())
+		return nil, errors.New("error: marshalling fixtures: " + err.Error())
 	}
-	return fixtures
+	return fixtures, nil
 }
 
 // FixtureReceivers are created by the sequence and are used to receive step instructions.

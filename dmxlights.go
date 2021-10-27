@@ -111,7 +111,15 @@ func main() {
 	sequenceChannels.UpdateChannels = updateChannels
 
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig := fixture.LoadFixtures()
+	fixturesConfig, err := fixture.LoadFixtures()
+	if err != nil {
+		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	for _, fixture := range fixturesConfig.Fixtures {
+		fmt.Printf("Found fixture: %s, type: %d, desc: %s\n", fixture.Name, fixture.Group, fixture.Description)
+	}
 
 	// Create a channel to send events to the launchpad.
 	eventsForLauchpad := make(chan common.ALight)
