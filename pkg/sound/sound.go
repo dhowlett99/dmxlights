@@ -86,11 +86,6 @@ func gainCheckerer() {
 	for {
 		timer1 := time.NewTimer(2 * time.Second)
 		<-timer1.C
-		// fmt.Println("Timer 1 fired")
-
-		// for index, counter := range gainCounters {
-		// 	fmt.Printf("%d counter=%d\n", index, counter)
-		// }
 
 		// Calculate and the gain.
 		gain := findGain(gainCounters)
@@ -100,7 +95,6 @@ func gainCheckerer() {
 			gainCounters[index] = 0
 		}
 		gainSelected = gain
-		//fmt.Printf("Gain is now %d\n", gain)
 	}
 }
 
