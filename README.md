@@ -22,8 +22,9 @@ FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface 
 ## Notes on getting the FTDI interface working.
 
 If you see the following error:
+```
 2021/08/08 17:29:33 Failed to connect DMX Controller: failed to select interface #0 alternate setting 0 of config 1 of device vid=0403,pid=6001,bus=38,addr=1: failed to claim interface 0 on vid=0403,pid=6001,bus=38,addr=1,config=1: libusb: bad access [code -3]
-Dereks-iMac:dmxlights derek$ 
+```
 
 Stop the USB driver grabbing the device.
 
