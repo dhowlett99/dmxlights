@@ -1168,7 +1168,7 @@ func CircleGenerator(size int) (out []coordinate) {
 	var theta float64
 	for theta = 0; theta <= 360; theta += 10 {
 		n := coordinate{}
-		n.x, n.y = circleXY(float64(126), theta)
+		n.x, n.y = circleXY(float64(size), theta)
 		out = append(out, n)
 	}
 	return out

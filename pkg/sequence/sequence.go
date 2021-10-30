@@ -68,7 +68,7 @@ func CreateSequence(
 		initialPatten = "standard"
 	}
 	if sequenceType == "scanner" {
-		initialPatten = "scanner"
+		initialPatten = "circle"
 	}
 
 	sequence := common.Sequence{
@@ -265,9 +265,18 @@ func PlayNewSequence(sequence common.Sequence,
 
 				steps := pattens[sequence.Patten.Name].Steps
 
-				if sequence.Patten.Name == "scanner" {
-					sequence.Type = "scanner"
-					coordinates := patten.CircleGenerator(128)
+				if sequence.Patten.Name == "circle" {
+					coordinates := patten.CircleGenerator(126)
+					scannerPatten := patten.GeneratePatten(coordinates)
+					steps = scannerPatten.Steps
+				}
+				if sequence.Patten.Name == "leftandright" {
+					coordinates := patten.CircleGenerator(60)
+					scannerPatten := patten.GeneratePatten(coordinates)
+					steps = scannerPatten.Steps
+				}
+				if sequence.Patten.Name == "upanddown" {
+					coordinates := patten.CircleGenerator(10)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}
