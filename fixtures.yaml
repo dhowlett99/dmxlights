@@ -125,7 +125,7 @@ fixtures:
 - name: Scanner
   description: American DJ Comscan LED
   type: scanner
-  address: 53
+  address: 62
   group: 3
   channels:
   - number: 1

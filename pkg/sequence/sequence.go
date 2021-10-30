@@ -11,6 +11,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
+	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
@@ -262,8 +263,13 @@ func PlayNewSequence(sequence common.Sequence,
 					}
 				}
 
+				steps := pattens[sequence.Patten.Name].Steps
+
 				if sequence.Patten.Name == "scanner" {
 					sequence.Type = "scanner"
+					coordinates := patten.CircleGenerator(128)
+					scannerPatten := patten.GeneratePatten(coordinates)
+					steps = scannerPatten.Steps
 				}
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
@@ -272,7 +278,7 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 
 				// Calulate positions for fixtures based on patten.
-				sequence.Positions, sequence.Steps = calculatePositions(pattens[sequence.Patten.Name].Steps, sequence.Bounce)
+				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
 				if sequence.UpdateSequenceColor {
 					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
@@ -285,7 +291,7 @@ func PlayNewSequence(sequence common.Sequence,
 				for step := 0; step < sequence.Steps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 
 					cmd := common.FixtureCommand{
 						Inverted:        sequence.Inverted,
@@ -304,9 +310,17 @@ func PlayNewSequence(sequence common.Sequence,
 						CurrentPosition: step,
 					}
 					fixtureChannel1 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
+					if sequence.Type == "scanner" {
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
+					} else {
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
+					}
 					if !sequence.Run {
 						break
+					}
+
+					if sequence.Type == "scanner" {
+						continue
 					}
 					fixtureChannel2 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
@@ -393,9 +407,6 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 						}
 					}
 				}
-			}
-			if step.Type == "scanner" {
-				counter = counter + 14
 			}
 		}
 		if !waitForColors {
