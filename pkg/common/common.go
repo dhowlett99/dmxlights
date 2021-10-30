@@ -550,3 +550,14 @@ func HowManyColors(positionsMap map[int][]Position) (colors []Color) {
 
 	return colors
 }
+
+func RefreshSequence(selectedSequence int, commandChannels []chan Command, updateChannels []chan Sequence) *Sequence {
+
+	// Get an upto date copy of the sequence.
+	cmd := Command{
+		UpdateSequence: true,
+	}
+	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	newSequence := <-updateChannels[selectedSequence]
+	return &newSequence
+}

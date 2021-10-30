@@ -468,6 +468,9 @@ func main() {
 
 		// Decrease speed of selected sequence.
 		if hit.X == 0 && hit.Y == 7 {
+			// Get an upto date copy of the sequence.
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
+
 			if !sequences[selectedSequence].MusicTrigger {
 				sequenceSpeed--
 				if sequenceSpeed < 0 {
@@ -484,6 +487,9 @@ func main() {
 
 		// Increase speed of selected sequence.
 		if hit.X == 1 && hit.Y == 7 {
+			// Get an upto date copy of the sequence.
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
+
 			if !sequences[selectedSequence].MusicTrigger {
 				sequenceSpeed++
 				if sequenceSpeed > 21 {
@@ -657,12 +663,7 @@ func main() {
 			!sequences[selectedSequence].Functions[common.Function5_Color].State {
 
 			// Get an upto date copy of the sequence.
-			cmd := common.Command{
-				UpdateSequence: true,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-			newSequence := <-updateChannels[selectedSequence]
-			sequences[selectedSequence] = &newSequence
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
 
 			// We clear first three function keys first. So that the toggle of the
 			// chase modes will work.
@@ -687,7 +688,7 @@ func main() {
 
 			// Send update functions command. This sets the temporary representation of
 			// the function keys in the real sequence.
-			cmd = common.Command{
+			cmd := common.Command{
 				UpdateFunctions: true,
 				Functions:       sequences[selectedSequence].Functions,
 			}
@@ -832,13 +833,9 @@ func main() {
 			colorEditMode[selectedSequence] = true
 
 			// Get an upto date copy of the sequence.
-			cmd = common.Command{
-				UpdateSequence: true,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-			newSequence := <-updateChannels[selectedSequence]
-			sequences[selectedSequence] = &newSequence
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
 
+			// Set the colors.
 			sequences[selectedSequence].CurrentSequenceColors = sequences[selectedSequence].SequenceColors
 
 			// We call ShowColorSelectionButtons here so the selections will flash as you press them.
