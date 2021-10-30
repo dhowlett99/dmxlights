@@ -1132,7 +1132,7 @@ func GeneratePatten(coordinates []coordinate) common.Patten {
 				{
 					R: int(coordinate.y),
 					G: int(coordinate.x),
-					B: 0,
+					B: makeBlue(int(coordinate.y), int(coordinate.x)),
 				},
 			},
 			Pan:     int(coordinate.y),
@@ -1152,6 +1152,11 @@ func GeneratePatten(coordinates []coordinate) common.Patten {
 
 	return patten
 
+}
+
+func makeBlue(red, green int) int {
+
+	return red + green/2
 }
 
 type coordinate struct {
