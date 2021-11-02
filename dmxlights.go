@@ -50,7 +50,7 @@ func main() {
 	masterBrightness = 255         // Affects all DMX fixtures and launchpad lamps.
 	var lastStaticColorButtonX int // Which Static Color button did we change last.
 	var lastStaticColorButtonY int // Which Static Color button did we change last.
-	var soundGain = 4              // Default gain of 0.09
+	var soundGain float32 = 0      // Fine gain -0.09 -> 0.09
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -295,9 +295,9 @@ func main() {
 		// Sound sensitity up.
 		if hit.X == 5 && hit.Y == -1 {
 			fmt.Printf("Sound Up\n")
-			soundGain = soundGain - 1
-			if soundGain < 0 {
-				soundGain = 0
+			soundGain = soundGain - 0.01
+			if soundGain < -0.9 {
+				soundGain = -0.9
 			}
 			for _, trigger := range soundTriggers {
 				trigger.Gain = soundGain
@@ -307,9 +307,9 @@ func main() {
 		// Sound sensitity down.
 		if hit.X == 4 && hit.Y == -1 {
 			fmt.Printf("Sound Down\n")
-			soundGain = soundGain + 1
-			if soundGain > 9 {
-				soundGain = 9
+			soundGain = soundGain + 0.01
+			if soundGain > 0.9 {
+				soundGain = 0.9
 			}
 			for _, trigger := range soundTriggers {
 				trigger.Gain = soundGain

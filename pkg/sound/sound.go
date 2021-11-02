@@ -46,7 +46,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 		numSamples := 100
 
 		// Start the thread that reports the gain.
-		go gainCheckerer()
+		go gainChecker()
 
 		for {
 			stream.Read()
@@ -62,10 +62,12 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 				out[i] = in[i-1] + filter(cutoff)*in[i] - in[i-1]
 
 				// Tell the automatic gain control what level we're at.
-				reportLevels(out[i])
+				reportLevels(out[i], soundTriggers)
 
-				if out[i] > gain[gainSelected] {
+				// Allow fine adjustment.
+				actualGain := gain[gainSelected] + soundTriggers[0].Gain
 
+				if out[i] > actualGain {
 					cmd := common.Command{}
 					for index, trigger := range soundTriggers {
 						if trigger.SequenceNumber == index {
@@ -80,7 +82,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 	}()
 }
 
-func gainCheckerer() {
+func gainChecker() {
 	for {
 		timer1 := time.NewTimer(2 * time.Second)
 		<-timer1.C
@@ -119,20 +121,21 @@ func findGain(values []int) int {
 	return 0
 }
 
-func reportLevels(level float32) {
+func reportLevels(level float32, soundTriggers []*common.Trigger) {
 
 	gain := []float32{
-		0.11,
-		0.12,
-		0.13,
-		0.14,
-		0.15,
-		0.16,
-		0.17,
-		0.18,
-		0.19,
-		0.20,
-		0.21,
+		// Peak  Gain Set.
+		0.11, // 0.05
+		0.12, // 0.06
+		0.13, // 0.07
+		0.14, // 0.08
+		0.15, // 0.09
+		0.16, // 0.10
+		0.17, // 0.11
+		0.18, // 0.12
+		0.19, // 0.13
+		0.20, // 0.14
+		0.21, // 0.15
 	}
 
 	if level > gain[9] {
