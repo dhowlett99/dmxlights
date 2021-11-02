@@ -19,7 +19,7 @@ func Test_circleGenerator(t *testing.T) {
 		{
 			name: "standard circle",
 			args: args{
-				size: 128,
+				size: 126,
 			},
 			wantOut: []coordinate{
 				{128, 254},

@@ -266,17 +266,17 @@ func PlayNewSequence(sequence common.Sequence,
 				steps := pattens[sequence.Patten.Name].Steps
 
 				if sequence.Patten.Name == "circle" {
-					coordinates := patten.CircleGenerator(126)
+					coordinates := patten.CircleGenerator(sequence.Size * 10)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "leftandright" {
-					coordinates := patten.CircleGenerator(60)
+					coordinates := patten.ScanGeneratorLeftRight(128)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "upanddown" {
-					coordinates := patten.CircleGenerator(10)
+					coordinates := patten.ScanGeneratorUpDown(128)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}

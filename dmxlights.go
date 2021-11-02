@@ -615,8 +615,8 @@ func main() {
 		// Size increase.
 		if hit.X == 5 && hit.Y == 7 {
 			size++
-			if size > 20 {
-				size = 20
+			if size > 25 {
+				size = 25
 			}
 			// Send size update.
 			cmd := common.Command{

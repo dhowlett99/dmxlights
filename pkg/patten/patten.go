@@ -1174,6 +1174,28 @@ func CircleGenerator(size int) (out []coordinate) {
 	return out
 }
 
+func ScanGeneratorUpDown(size int) (out []coordinate) {
+	pan := 128
+	for tilt := 0; tilt < 255; tilt++ {
+		n := coordinate{}
+		n.x = tilt
+		n.y = pan
+		out = append(out, n)
+	}
+	return out
+}
+
+func ScanGeneratorLeftRight(size int) (out []coordinate) {
+	tilt := 128
+	for pan := 0; pan < 255; pan++ {
+		n := coordinate{}
+		n.x = tilt
+		n.y = pan
+		out = append(out, n)
+	}
+	return out
+}
+
 func circleXY(r float64, theta float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
