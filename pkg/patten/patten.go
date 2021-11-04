@@ -1176,7 +1176,7 @@ func CircleGenerator(size int) (out []coordinate) {
 
 func ScanGeneratorUpDown(size int) (out []coordinate) {
 	pan := 128
-	for tilt := 0; tilt < 255; tilt++ {
+	for tilt := 0; tilt < 255; tilt += 10 {
 		n := coordinate{}
 		n.x = tilt
 		n.y = pan
@@ -1187,7 +1187,7 @@ func ScanGeneratorUpDown(size int) (out []coordinate) {
 
 func ScanGeneratorLeftRight(size int) (out []coordinate) {
 	tilt := 128
-	for pan := 0; pan < 255; pan++ {
+	for pan := 0; pan < 255; pan += 10 {
 		n := coordinate{}
 		n.x = tilt
 		n.y = pan

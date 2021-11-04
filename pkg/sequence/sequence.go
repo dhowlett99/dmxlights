@@ -93,6 +93,7 @@ func CreateSequence(
 			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    pattens[initialPatten].Steps,
 		},
+		SequenceSize: 60,
 		Speed:        14,
 		CurrentSpeed: 25 * time.Millisecond,
 		Colors: []common.Color{
@@ -266,7 +267,8 @@ func PlayNewSequence(sequence common.Sequence,
 				steps := pattens[sequence.Patten.Name].Steps
 
 				if sequence.Patten.Name == "circle" {
-					coordinates := patten.CircleGenerator(sequence.Size * 10)
+					fmt.Printf("----->Seq Size %d\n", sequence.SequenceSize)
+					coordinates := patten.CircleGenerator(sequence.SequenceSize)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}

@@ -78,6 +78,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Size = command.Size
 		return sequence
 	}
+	if command.UpdateSequenceSize {
+		if debug {
+			fmt.Printf("%d: Command Update Sequence Size to %d\n", mySequenceNumber, command.SequenceSize)
+		}
+		sequence.SequenceSize = command.SequenceSize
+		return sequence
+	}ß
 	if command.IncreaseFade {
 		if debug {
 			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.FadeSpeed)

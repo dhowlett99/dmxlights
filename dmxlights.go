@@ -30,6 +30,7 @@ const (
 var sequenceSpeed int = 12
 var fadeSpeed int
 var size int
+var sequenceSize int = 60
 var masterBrightness int
 
 //var color int
@@ -609,21 +610,45 @@ func main() {
 				Size:       size,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			sequenceSize = sequenceSize - 10
+			if sequenceSize < 0 {
+				sequenceSize = 0
+			}
+			// Send Update Fade Speed.
+			cmd = common.Command{
+				UpdateSequenceSize: true,
+				SequenceSize:       sequenceSize,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 			continue
 		}
 
 		// Size increase.
 		if hit.X == 5 && hit.Y == 7 {
+			// Update the PAR can size.
 			size++
 			if size > 25 {
 				size = 25
 			}
-			// Send size update.
 			cmd := common.Command{
 				UpdateSize: true,
 				Size:       size,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// Update the Scanner size.
+			sequenceSize = sequenceSize + 10
+			if sequenceSize > 120 {
+				sequenceSize = 120
+			}
+			cmd = common.Command{
+				UpdateSequenceSize: true,
+				SequenceSize:       sequenceSize,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 			continue
 		}
 
