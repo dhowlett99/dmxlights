@@ -52,11 +52,18 @@ type Fixture struct {
 	Switches    []Switch  `yaml:"switches"`
 }
 
-type Channel struct {
-	Number  int16  `yaml:"number"`
+type Setting struct {
 	Name    string `yaml:"name"`
-	Value   int16  `yaml:"value"`
-	Comment string `yaml:"comment"`
+	Number  int    `yaml:"number"`
+	Setting int    `yaml:"setting"`
+}
+
+type Channel struct {
+	Number   int16     `yaml:"number"`
+	Name     string    `yaml:"name"`
+	Value    int16     `yaml:"value"`
+	Comment  string    `yaml:"comment"`
+	Settings []Setting `yaml:"settings"`
 }
 
 func LoadFixtures() (fixtures *Fixtures, err error) {

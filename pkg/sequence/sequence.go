@@ -267,7 +267,6 @@ func PlayNewSequence(sequence common.Sequence,
 				steps := pattens[sequence.Patten.Name].Steps
 
 				if sequence.Patten.Name == "circle" {
-					fmt.Printf("----->Seq Size %d\n", sequence.SequenceSize)
 					coordinates := patten.CircleGenerator(sequence.SequenceSize)
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
@@ -296,7 +295,6 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Set the current colors in the sequence.
 				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
-				//fmt.Printf("Colors %+v\n", sequence.CurrentSequenceColors)
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {

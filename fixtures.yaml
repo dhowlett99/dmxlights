@@ -134,8 +134,43 @@ fixtures:
     name: Tilt
   - number: 3
     name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
   - number: 4
     name: Gobo
+    settings:
+      - name: White Circle
+        number: 1
+        setting: 0
+      - name: Yellow Cluster
+        setting: 8
+        number: 2
+      - name: Red Swirl
+        setting: 15
+        number: 3
+      - name: Green Strips
+        setting: 22
+        number: 4
+      - name: Blue Star
+        setting: 28
+        number: 5
+      - name: MultiColor Commas
+        setting: 36
+        number: 6
+      - name: Purple Bubbles
+        setting: 43
+        number: 7
+      - name: Cyan World
+        setting: 50
+        number: 8
+      - name: Blue / Puple Circle
+        setting: 57
+        number: 9
   - number: 5
     name: Master
 - name: Switch Box
@@ -143,75 +178,199 @@ fixtures:
   type: switch
   group: 4
   switches:
+  # - name: switch
+  #   number: 1
+  #   description: Projector1
+  #   states:
+  #   - name: Off
+  #     values:
+  #       - channel: 127
+  #         setting: 0
+  #     buttoncolor: 
+  #       red: 0
+  #       green: 255
+  #       blue: 0
+  #   - name: On
+  #     values: 
+  #       - channel: 137
+  #         setting: 255
+  #     buttoncolor: 
+  #       red: 255
+  #       green: 0
+  #       blue: 0  
+  # - name: switch
+  #   number: 2
+  #   description: Projector2
+  #   states:
+  #   - name: Off
+  #     values:
+  #       - channel: 137
+  #         setting: 0
+  #     buttoncolor: 
+  #       red: 0
+  #       green: 255
+  #       blue: 0
+  #   - name: On
+  #     values: 
+  #       - channel: 137
+  #         setting: 255
+  #     buttoncolor: 
+  #       red: 255
+  #       green: 0
+  #       blue: 0
+  # - name: switch
+  #   number: 3
+  #   description: Red Par ON
+  #   states:
+  #   - name: Off
+  #     values:
+  #     - channel: 2
+  #       setting: 0
+  #     - channel: 7
+  #       setting: 255
+  #     buttoncolor: 
+  #       red: 0
+  #       green: 255
+  #       blue: 0
+  #   - name: Half
+  #     values:
+  #     - channel: 2
+  #       setting: 128
+  #     - channel: 7
+  #       setting: 255
+  #     buttoncolor: 
+  #       red: 0
+  #       green: 0
+  #       blue: 255
+  #   - name: On
+  #     values:
+  #     - channel: 2
+  #       setting: 255
+  #     - channel: 7
+  #       setting: 255
+  #     buttoncolor: 
+  #       red: 255
+  #       green: 0
+  #       blue: 0
   - name: switch
-    number: 1
-    description: Projector1
+    number: 4
+    description: Select Gobo
     states:
-    - name: Off
+    - name: STROBE
       values:
-        - channel: 127
-          setting: 0
-      buttoncolor: 
-        red: 0
-        green: 255
-        blue: 0
-    - name: On
-      values: 
-        - channel: 137
-          setting: 255
+      - channel: 64
+        setting: 100
+      - channel: 65
+        setting: 00
+      - channel: 66
+        setting: 255
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0  
-  - name: switch
-    number: 2
-    description: Projector2
-    states:
-    - name: Off
-      values:
-        - channel: 137
-          setting: 0
-      buttoncolor: 
-        red: 0
-        green: 255
         blue: 0
-    - name: On
-      values: 
-        - channel: 137
-          setting: 255
+    - name: OPEN
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 00
+      - channel: 66
+        setting: 255
       buttoncolor: 
         red: 255
         green: 0
         blue: 0
-  - name: switch
-    number: 3
-    description: Red Par ON
-    states:
-    - name: Off
+    - name: Gobo1
       values:
-      - channel: 2
-        setting: 0
-      - channel: 7
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 8
+      - channel: 66
         setting: 255
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
-    - name: Half
+    - name: Gobo2
       values:
-      - channel: 2
-        setting: 128
-      - channel: 7
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 15
+      - channel: 66
         setting: 255
       buttoncolor: 
         red: 0
         green: 0
         blue: 255
-    - name: On
+    - name: Gobo3
       values:
-      - channel: 2
+      - channel: 64
         setting: 255
-      - channel: 7
+      - channel: 65
+        setting: 22
+      - channel: 66
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+    - name: Gobo4
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 29
+      - channel: 66
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+    - name: Gobo5
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 36
+      - channel: 66
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+    - name: Gobo6
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 43
+      - channel: 66
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+    - name: Gobo7
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 50
+      - channel: 66
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+    - name: Gobo8
+      values:
+      - channel: 64
+        setting: 255
+      - channel: 65
+        setting: 57
+      - channel: 66
         setting: 255
       buttoncolor: 
         red: 255
