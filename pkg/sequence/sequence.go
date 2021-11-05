@@ -52,7 +52,7 @@ func CreateSequence(
 	sequenceType string,
 	mySequenceNumber int,
 	pattens map[string]common.Patten,
-	fixtureConfig *fixture.Fixtures,
+	fixturesConfig *fixture.Fixtures,
 	channels common.Channels) common.Sequence {
 
 	var initialPatten string
@@ -67,8 +67,18 @@ func CreateSequence(
 	if sequenceType == "rgb" {
 		initialPatten = "standard"
 	}
+
+	var gobos = []common.Gobo{}
 	if sequenceType == "scanner" {
 		initialPatten = "circle"
+
+		// Initilaise Gobo's
+		for _, f := range fixturesConfig.Fixtures {
+			fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
+			if f.Type == "scanner" {
+				gobos = fixture.HowManyGobos(fixturesConfig, f)
+			}
+		}
 	}
 
 	sequence := common.Sequence{
@@ -103,9 +113,11 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift:    2,
-		Blackout: false,
-		Master:   255,
+		Shift:        2,
+		Blackout:     false,
+		Master:       255,
+		Gobo:         gobos,
+		SelectedGobo: 1,
 	}
 
 	// Make functions for each of the sequences.
@@ -127,7 +139,7 @@ func CreateSequence(
 		// Load the switch information in from the fixtures.yaml file.
 		// A new group of switches.
 		newSwitchList := []common.Switch{}
-		for _, fixture := range fixtureConfig.Fixtures {
+		for _, fixture := range fixturesConfig.Fixtures {
 			if fixture.Group == mySequenceNumber+1 {
 				// find switch data.
 				for _, swiTch := range fixture.Switches {
@@ -173,7 +185,7 @@ func PlayNewSequence(sequence common.Sequence,
 	eventsForLauchpad chan common.ALight,
 	pattens map[string]common.Patten,
 	dmxController *ft232.DMXController,
-	fixtureConfig *fixture.Fixtures,
+	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
 	soundTriggers []*common.Trigger) {
 
@@ -199,14 +211,14 @@ func PlayNewSequence(sequence common.Sequence,
 	fixtureChannels = append(fixtureChannels, fixtureChannel8)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixtureConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -217,7 +229,7 @@ func PlayNewSequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixtureConfig, sequence.Blackout, sequence.Master)
+			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixturesConfig, sequence.Blackout, sequence.Master)
 			sequence.PlaySwitchOnce = false
 			continue
 		}
@@ -233,7 +245,7 @@ func PlayNewSequence(sequence common.Sequence,
 						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 					}
 				}
-				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixtureConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 			// Only play once, we don't want to flood the DMX universe with
 			// continual commands.
@@ -317,6 +329,7 @@ func PlayNewSequence(sequence common.Sequence,
 						Speed:           sequence.Speed,
 						Blackout:        sequence.Blackout,
 						CurrentPosition: step,
+						SelectedGobo:    sequence.SelectedGobo,
 					}
 					fixtureChannel1 <- cmd
 					if sequence.Type == "scanner" {

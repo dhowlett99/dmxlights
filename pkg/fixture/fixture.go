@@ -2,6 +2,7 @@ package fixture
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"os"
 	"strconv"
@@ -112,7 +113,7 @@ func FixtureReceiver(sequence common.Sequence,
 						// Short ciruit the soft fade if we are a scanner.
 						if cmd.Type == "scanner" {
 							if position.Fixture == myFixtureNumber {
-								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, position.Gobo, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, cmd.SelectedGobo, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								if !cmd.Hide {
 									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
 								}
@@ -180,7 +181,7 @@ func FixtureReceiver(sequence common.Sequence,
 // This function maps the requested fixture into a DMX address.
 func MapFixtures(mySequenceNumber int,
 	dmxController *ft232.DMXController,
-	displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Gobo int,
+	displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, selectedGobo int,
 	fixtures *Fixtures, blackout bool, brightness int, master int) {
 
 	// We control the brightness of each color with the brightness value.
@@ -204,7 +205,11 @@ func MapFixtures(mySequenceNumber int,
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
 				}
 				if strings.Contains(channel.Name, "Gobo") {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Gobo))
+					for _, setting := range channel.Settings {
+						if setting.Number == selectedGobo {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+						}
+					}
 				}
 				// Static value.
 				if strings.Contains(channel.Name, "Static") {
@@ -228,7 +233,6 @@ func MapFixtures(mySequenceNumber int,
 					}
 				}
 			}
-
 		}
 	}
 }
@@ -255,4 +259,26 @@ func MapSwitchFixture(mySequenceNumber int,
 			}
 		}
 	}
+}
+
+func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
+	gobos := []common.Gobo{}
+	for _, f := range fixturesConfig.Fixtures {
+		fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
+		if f.Type == "scanner" {
+			for _, channel := range f.Channels {
+				if channel.Name == "Gobo" {
+					newGobo := common.Gobo{}
+					for _, setting := range channel.Settings {
+						newGobo.Name = setting.Name
+						newGobo.Number = setting.Number
+						newGobo.Setting = setting.Setting
+						gobos = append(gobos, newGobo)
+						fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
+					}
+				}
+			}
+		}
+	}
+	return gobos
 }

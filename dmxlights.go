@@ -125,8 +125,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	for _, fixture := range fixturesConfig.Fixtures {
-		fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", fixture.Name, fixture.Group, fixture.Description)
+	for _, f := range fixturesConfig.Fixtures {
+		fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
+		if f.Type == "scanner" {
+			gobos := fixture.HowManyGobos(fixturesConfig, f)
+			for _, gobo := range gobos {
+				fmt.Printf("Fixture %s Number of Gobos %s\n", f.Name, gobo.Name)
+			}
+		}
 	}
 
 	// Create a channel to send events to the launchpad.
@@ -845,13 +851,41 @@ func main() {
 
 		// S E T    S E Q U E N C E   C O L O R
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
-			sequences[selectedSequence].Functions[common.Function5_Color].State {
+			sequences[selectedSequence].Functions[common.Function5_Color].State &&
+			sequences[selectedSequence].Type != "scanner" {
 
 			fmt.Printf("S E T    S E Q E N C E   C O L O R for X:%d Y%d\n", hit.X, hit.Y)
 			// Add the selected color to the sequence.
 			cmd := common.Command{
 				UpdateSequenceColor: true,
 				SelectedColor:       hit.X,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			colorEditMode[selectedSequence] = true
+
+			// Get an upto date copy of the sequence.
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
+
+			// Set the colors.
+			sequences[selectedSequence].CurrentSequenceColors = sequences[selectedSequence].SequenceColors
+
+			// We call ShowColorSelectionButtons here so the selections will flash as you press them.
+			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+
+			continue
+		}
+
+		// S E T    S C A N N E R   G O B O
+		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
+			sequences[selectedSequence].Functions[common.Function5_Color].State &&
+			sequences[selectedSequence].Type == "scanner" {
+
+			fmt.Printf("S E T    S C A N N E R   G O B O for X:%d Y%d\n", hit.X, hit.Y)
+			// Add the selected color to the sequence.
+			cmd := common.Command{
+				UpdateGobo:   true,
+				SelectedGobo: hit.X,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 

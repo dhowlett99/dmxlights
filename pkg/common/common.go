@@ -114,6 +114,14 @@ type Command struct {
 	SwitchNumber        int
 	SwitchPosition      int
 	Inverted            bool
+	UpdateGobo          bool
+	SelectedGobo        int
+}
+
+type Gobo struct {
+	Name    string
+	Number  int
+	Setting int
 }
 
 // Sequence describes sequences.
@@ -149,6 +157,8 @@ type Sequence struct {
 	MusicTrigger            bool
 	Blackout                bool
 	Color                   int
+	Gobo                    []Gobo
+	SelectedGobo            int
 	Master                  int // Master Brightness
 	Functions               []Function
 	FunctionMode            bool
@@ -212,6 +222,7 @@ type FixtureCommand struct {
 	UpdateSequenceColor bool
 	SequenceColor       Color
 	Inverted            bool
+	SelectedGobo        int
 }
 
 type Position struct {
