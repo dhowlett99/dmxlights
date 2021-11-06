@@ -272,6 +272,26 @@ func main() {
 
 		// Clear all the lights on the launchpad.
 		if hit.X == 0 && hit.Y == -1 {
+
+			// We want to clear a color selection.
+			if sequences[selectedSequence].Functions[common.Function5_Color].State &&
+				sequences[selectedSequence].Type != "scanner" {
+
+				// Clear the sequence colors for this sequence.
+				cmd := common.Command{
+					ClearSequenceColor: true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+				// Get an upto date copy of the sequence.
+				sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
+
+				// Flash the correct function buttons
+				ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
+
+				continue
+			}
+
 			launchpad.ClearAll(pad, presetsStore, eventsForLauchpad, commandChannels)
 			allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
 			presets.ClearPresets(eventsForLauchpad, presetsStore)
@@ -871,7 +891,7 @@ func main() {
 			sequences[selectedSequence].CurrentSequenceColors = sequences[selectedSequence].SequenceColors
 
 			// We call ShowColorSelectionButtons here so the selections will flash as you press them.
-			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 
 			continue
 		}
@@ -898,7 +918,7 @@ func main() {
 			sequences[selectedSequence].CurrentSequenceColors = sequences[selectedSequence].SequenceColors
 
 			// We call ShowColorSelectionButtons here so the selections will flash as you press them.
-			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 
 			continue
 		}
@@ -1001,7 +1021,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// First time into function mode we head back to normal mode.
 	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] && !colorEditMode[selectedSequence] {
-		//fmt.Printf("Handle 1 Function Bar off\n")
+		fmt.Printf("Handle 1 Function Bar off\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 
@@ -1010,7 +1030,7 @@ func HandleSelect(sequences []*common.Sequence,
 		}
 
 		if sequences[selectedSequence].Functions[common.Function5_Color].State {
-			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+			ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 		} else {
 			// And reveal the sequence on the launchpad keys
 			common.RevealSequence(selectedSequence, commandChannels)
@@ -1024,7 +1044,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// This the first time we have pressed the select button.
 	if !selectButtonPressed[selectedSequence] {
-		//fmt.Printf("Handle 2\n")
+		fmt.Printf("Handle 2\n")
 		// assume everything else is off.
 		selectButtonPressed[0] = false
 		selectButtonPressed[1] = false
@@ -1038,7 +1058,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// Are we in function mode ?
 	if functionSelectMode[selectedSequence] {
-		//fmt.Printf("Handle 3\n")
+		fmt.Printf("Handle 3\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 		// And reveal the sequence on the launchpad keys
@@ -1052,7 +1072,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// We are in function mode for this sequence.
 	if !functionSelectMode[selectedSequence] {
-		//fmt.Printf("Handle 4 - Function Bar On!\n")
+		fmt.Printf("Handle 4 - Function Bar On!\n")
 
 		// fmt.Printf("Color Edit Mode Done set for %t\n", colorEditMode[selectedSequence])
 
@@ -1166,8 +1186,7 @@ func showEditColorButtons(sequence *common.Sequence, selectedSequence int, event
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
-func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
-
+func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight) {
 	// Check if we need to flash this button.
 	for myFixtureNumber, lamp := range sequence.AvailableSequenceColors {
 		for index, availableColor := range sequence.AvailableSequenceColors {
