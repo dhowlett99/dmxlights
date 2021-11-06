@@ -49,12 +49,18 @@ fixtures:
     name: Blue1
 ```
 
-The name is arbitrary and is only used as a label.
-The decription is arbitrary and only used to record extra info on the fixture.
-The type defines the sequence type.  Valid values are rgb, scanner, switch.
-The address is the DMX start address you have programed your fixture at.
-The group defines which sequence this lamp belongs too.
-The channels is now a list of the fixtures available DMX channels, the name is used to decide which number in the Sequence and what color it will be. Valid names are
+| Field |  Function |
+|-|-|
+| name | The name is arbitrary and is only used as a label.
+| description | The description is arbitrary and only used to record extra info on the fixture.
+| type | The type defines the sequence type.  Valid values are rgb, scanner, switch.
+| address | The address is the DMX start address you have programed your fixture at.
+| group | The group defines which sequence this fixture belongs too.
+| channels | The channels is the list of the fixtures available DMX traits, these have a number and a name. See below. 
+
+
+
+Channels Names, the name is used to decide which number in the Sequence and what color it will be. Valid names are
 
 |Sequence Number | Color | Name|
 |-|-|-|
