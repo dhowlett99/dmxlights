@@ -165,7 +165,7 @@ func FixtureReceiver(sequence common.Sequence,
 											MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 											time.Sleep(cmd.FadeTime / 4) // Fade down time.
 										}
-										time.Sleep(cmd.FadeTime / 4) // Fade off time.
+										//time.Sleep(cmd.FadeTime / 4) // Fade off time.
 									}
 								}()
 							}
