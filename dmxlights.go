@@ -13,13 +13,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/oliread/usbdmx/ft232"
-
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
 )
 
@@ -1021,7 +1020,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// First time into function mode we head back to normal mode.
 	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] && !colorEditMode[selectedSequence] {
-		fmt.Printf("Handle 1 Function Bar off\n")
+		//fmt.Printf("Handle 1 Function Bar off\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 
@@ -1044,7 +1043,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// This the first time we have pressed the select button.
 	if !selectButtonPressed[selectedSequence] {
-		fmt.Printf("Handle 2\n")
+		//fmt.Printf("Handle 2\n")
 		// assume everything else is off.
 		selectButtonPressed[0] = false
 		selectButtonPressed[1] = false
@@ -1058,7 +1057,7 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// Are we in function mode ?
 	if functionSelectMode[selectedSequence] {
-		fmt.Printf("Handle 3\n")
+		//fmt.Printf("Handle 3\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 		// And reveal the sequence on the launchpad keys
@@ -1071,8 +1070,10 @@ func HandleSelect(sequences []*common.Sequence,
 	}
 
 	// We are in function mode for this sequence.
-	if !functionSelectMode[selectedSequence] {
-		fmt.Printf("Handle 4 - Function Bar On!\n")
+	if !functionSelectMode[selectedSequence] &&
+		sequences[selectedSequence].Type != "switch" { // Don't alow functions in switch mode.
+
+		//fmt.Printf("Handle 4 - Function Bar On!\n")
 
 		// fmt.Printf("Color Edit Mode Done set for %t\n", colorEditMode[selectedSequence])
 

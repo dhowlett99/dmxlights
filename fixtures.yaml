@@ -178,80 +178,80 @@ fixtures:
   type: switch
   group: 4
   switches:
-  # - name: switch
-  #   number: 1
-  #   description: Projector1
-  #   states:
-  #   - name: Off
-  #     values:
-  #       - channel: 127
-  #         setting: 0
-  #     buttoncolor: 
-  #       red: 0
-  #       green: 255
-  #       blue: 0
-  #   - name: On
-  #     values: 
-  #       - channel: 137
-  #         setting: 255
-  #     buttoncolor: 
-  #       red: 255
-  #       green: 0
-  #       blue: 0  
-  # - name: switch
-  #   number: 2
-  #   description: Projector2
-  #   states:
-  #   - name: Off
-  #     values:
-  #       - channel: 137
-  #         setting: 0
-  #     buttoncolor: 
-  #       red: 0
-  #       green: 255
-  #       blue: 0
-  #   - name: On
-  #     values: 
-  #       - channel: 137
-  #         setting: 255
-  #     buttoncolor: 
-  #       red: 255
-  #       green: 0
-  #       blue: 0
-  # - name: switch
-  #   number: 3
-  #   description: Red Par ON
-  #   states:
-  #   - name: Off
-  #     values:
-  #     - channel: 2
-  #       setting: 0
-  #     - channel: 7
-  #       setting: 255
-  #     buttoncolor: 
-  #       red: 0
-  #       green: 255
-  #       blue: 0
-  #   - name: Half
-  #     values:
-  #     - channel: 2
-  #       setting: 128
-  #     - channel: 7
-  #       setting: 255
-  #     buttoncolor: 
-  #       red: 0
-  #       green: 0
-  #       blue: 255
-  #   - name: On
-  #     values:
-  #     - channel: 2
-  #       setting: 255
-  #     - channel: 7
-  #       setting: 255
-  #     buttoncolor: 
-  #       red: 255
-  #       green: 0
-  #       blue: 0
+  - name: switch
+    number: 1
+    description: Projector1
+    states:
+    - name: Off
+      values:
+        - channel: 127
+          setting: 0
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+    - name: On
+      values: 
+        - channel: 137
+          setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0  
+  - name: switch
+    number: 2
+    description: Projector2
+    states:
+    - name: Off
+      values:
+        - channel: 137
+          setting: 0
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+    - name: On
+      values: 
+        - channel: 137
+          setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+  - name: switch
+    number: 3
+    description: Red Par ON
+    states:
+    - name: Off
+      values:
+      - channel: 2
+        setting: 0
+      - channel: 7
+        setting: 255
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+    - name: Half
+      values:
+      - channel: 2
+        setting: 128
+      - channel: 7
+        setting: 255
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+    - name: On
+      values:
+      - channel: 2
+        setting: 255
+      - channel: 7
+        setting: 255
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
   - name: switch
     number: 4
     description: Select Gobo
