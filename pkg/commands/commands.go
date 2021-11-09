@@ -171,6 +171,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if sequence.Type == "scanner" && sequence.Patten.Name != "circle" {
 			sequence.Bounce = true
 		}
+		if sequence.Type == "scanner" && sequence.Patten.Name == "circle" {
+			sequence.Bounce = false
+		}
 		return sequence
 	}
 
