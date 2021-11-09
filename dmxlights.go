@@ -733,7 +733,6 @@ func main() {
 			for _, functions := range sequences[selectedSequence].Functions {
 				if hit.Y == functions.SequenceNumber {
 					if !sequences[selectedSequence].Functions[hit.X].State {
-						fmt.Printf(" we are a scanner and we are settomg button X:%d Y:%d to true\n", hit.X, hit.Y)
 						sequences[selectedSequence].Functions[hit.X].State = true
 						break
 					}
