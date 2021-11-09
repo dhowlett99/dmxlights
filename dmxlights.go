@@ -723,9 +723,17 @@ func main() {
 				sequences[selectedSequence].Functions[common.Function3_Inward_Chase].State = false
 			}
 
+			if hit.X < 4 && sequences[selectedSequence].Type == "scanner" {
+				sequences[selectedSequence].Functions[common.Function1_Forward_Chase].State = false
+				sequences[selectedSequence].Functions[common.Function2_Pairs_Chase].State = false
+				sequences[selectedSequence].Functions[common.Function3_Inward_Chase].State = false
+				sequences[selectedSequence].Functions[common.Function4_Bounce].State = false
+			}
+
 			for _, functions := range sequences[selectedSequence].Functions {
 				if hit.Y == functions.SequenceNumber {
 					if !sequences[selectedSequence].Functions[hit.X].State {
+						fmt.Printf(" we are a scanner and we are settomg button X:%d Y:%d to true\n", hit.X, hit.Y)
 						sequences[selectedSequence].Functions[hit.X].State = true
 						break
 					}
@@ -741,6 +749,16 @@ func main() {
 			cmd := common.Command{
 				UpdateFunctions: true,
 				Functions:       sequences[selectedSequence].Functions,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Stop: true,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			cmd = common.Command{
+				Start: true,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 

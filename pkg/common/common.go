@@ -277,7 +277,7 @@ const (
 	Function1_Forward_Chase = 0
 	Function2_Pairs_Chase   = 1
 	Function3_Inward_Chase  = 2
-	Function4_Bounce        = 3 // Sequence auto reverses.
+	Function4_Bounce        = 3 // Sequence auto reverses. or Sinewave pattern in scanners.
 	Function5_Color         = 4 // Set chase color.
 	Function6_Static        = 5 // Set static colors.
 	Function7_Invert        = 6
@@ -477,9 +477,13 @@ func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
 
 func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
 
+	// Set normal chase.
 	if sequence.Functions[Function1_Forward_Chase].State {
 		functions[Function2_Pairs_Chase].State = false
 		functions[Function3_Inward_Chase].State = false
+		if sequence.Type == "scanner" {
+			sequence.Functions[Function4_Bounce].State = false
+		}
 		return sequence
 	}
 
@@ -487,6 +491,9 @@ func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
 	if sequence.Functions[Function2_Pairs_Chase].State {
 		sequence.Functions[Function1_Forward_Chase].State = false
 		sequence.Functions[Function3_Inward_Chase].State = false
+		if sequence.Type == "scanner" {
+			sequence.Functions[Function4_Bounce].State = false
+		}
 		return sequence
 	}
 
@@ -494,7 +501,19 @@ func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
 	if sequence.Functions[Function3_Inward_Chase].State {
 		sequence.Functions[Function1_Forward_Chase].State = false
 		sequence.Functions[Function2_Pairs_Chase].State = false
+		if sequence.Type == "scanner" {
+			sequence.Functions[Function4_Bounce].State = false
+		}
 		return sequence
+	}
+
+	if sequence.Type == "scanner" {
+		if sequence.Functions[Function4_Bounce].State {
+			sequence.Functions[Function1_Forward_Chase].State = false
+			sequence.Functions[Function2_Pairs_Chase].State = false
+			sequence.Functions[Function3_Inward_Chase].State = false
+			return sequence
+		}
 	}
 
 	return sequence
@@ -528,10 +547,16 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 		if sequence.Functions[Function3_Inward_Chase].State {
 			sequence.Patten.Name = "upanddown"
 		}
+
+		if sequence.Functions[Function4_Bounce].State {
+			sequence.Patten.Name = "sinewave"
+		}
 	}
 
 	// Map bounce function to sequence bounce setting.
-	sequence.Bounce = sequence.Functions[Function4_Bounce].State
+	if sequence.Type != "scanner" {
+		sequence.Bounce = sequence.Functions[Function4_Bounce].State
+	}
 
 	// Map color selection function.
 	if sequence.Functions[Function5_Color].State {

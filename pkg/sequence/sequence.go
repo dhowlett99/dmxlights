@@ -293,6 +293,11 @@ func PlayNewSequence(sequence common.Sequence,
 					scannerPatten := patten.GeneratePatten(coordinates)
 					steps = scannerPatten.Steps
 				}
+				if sequence.Patten.Name == "sinewave" {
+					coordinates := patten.ScanGenerateSineWave(255, 5000)
+					scannerPatten := patten.GeneratePatten(coordinates)
+					steps = scannerPatten.Steps
+				}
 
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 				if !sequence.Run {

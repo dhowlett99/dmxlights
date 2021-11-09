@@ -1174,6 +1174,19 @@ func CircleGenerator(size int) (out []coordinate) {
 	return out
 }
 
+func ScanGenerateSineWave(size int, frequency int) (out []coordinate) {
+	var t float64
+	T := float64(size)
+	for t = 1; t < T-1; t += 10 {
+		n := coordinate{}
+		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
+		n.x = int(x)
+		n.y = int(t)
+		out = append(out, n)
+	}
+	return out
+}
+
 func ScanGeneratorUpDown(size int) (out []coordinate) {
 	pan := 128
 	for tilt := 0; tilt < 255; tilt += 10 {
