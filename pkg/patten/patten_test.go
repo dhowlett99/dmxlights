@@ -138,7 +138,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 		wantOut []coordinate
 	}{
 		{
-			name: "50hz sawtooth",
+			name: "5000hz sawtooth",
 			args: args{
 				size:      255,
 				frequency: 5000,
