@@ -798,11 +798,9 @@ func main() {
 				// hit.Y is the sequence.
 				// hit.X is the switch.
 				cmd := common.Command{
-					UpdateSwitch: true,
-					// If there's a flood command in here. Let all sequence know who's in flood mode.
-					SelectedFloodSequence: selectedSequence,
-					SwitchNumber:          hit.X,
-					SwitchPosition:        switchPositions[hit.Y][hit.X],
+					UpdateSwitch:   true,
+					SwitchNumber:   hit.X,
+					SwitchPosition: switchPositions[hit.Y][hit.X],
 				}
 				// Send a message to the switch sequence.
 				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
