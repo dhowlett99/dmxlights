@@ -61,62 +61,63 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
-	UpdateMode          bool
-	Mode                string
-	MasterBrightness    bool
-	Master              int
-	Static              bool
-	UpdateStatic        bool
-	UpdateStaticColor   bool
-	UpdateSequenceColor bool
-	ClearSequenceColor  bool
-	StaticLampFlash     bool
-	SelectedColor       int
-	PlayStaticOnce      bool
-	PlaySwitchOnce      bool
-	SetEditColors       bool
-	EditColors          bool
-	StaticColor         Color
-	StaticLamp          int
-	UnHide              bool
-	Hide                bool
-	Name                string
-	Number              int
-	Start               bool
-	Stop                bool
-	ReadConfig          bool
-	LoadConfig          bool
-	UpdateSpeed         bool
-	Speed               int
-	UpdatePatten        bool
-	Patten              Patten
-	IncreaseFade        bool
-	DecreaseFade        bool
-	FadeTime            time.Duration
-	FadeSpeed           int
-	UpdateSize          bool
-	Size                int
-	UpdateSequenceSize  bool
-	SequenceSize        int
-	X                   int
-	Y                   int
-	Blackout            bool
-	Normal              bool
-	SoftFadeOn          bool
-	SoftFadeOff         bool
-	UpdateColor         bool
-	Color               int
-	UpdateFunctionMode  bool
-	FunctionMode        bool
-	UpdateFunctions     bool
-	Functions           []Function
-	UpdateSequence      bool
-	UpdateSwitch        bool
-	SwitchNumber        int
-	SwitchPosition      int
-	Inverted            bool
-	UpdateGobo          bool
-	SelectedGobo        int
+	UpdateMode            bool
+	Mode                  string
+	MasterBrightness      bool
+	Master                int
+	Static                bool
+	UpdateStatic          bool
+	UpdateStaticColor     bool
+	UpdateSequenceColor   bool
+	ClearSequenceColor    bool
+	StaticLampFlash       bool
+	SelectedColor         int
+	PlayStaticOnce        bool
+	PlaySwitchOnce        bool
+	SetEditColors         bool
+	EditColors            bool
+	StaticColor           Color
+	StaticLamp            int
+	UnHide                bool
+	Hide                  bool
+	Name                  string
+	Number                int
+	Start                 bool
+	Stop                  bool
+	ReadConfig            bool
+	LoadConfig            bool
+	UpdateSpeed           bool
+	Speed                 int
+	UpdatePatten          bool
+	Patten                Patten
+	IncreaseFade          bool
+	DecreaseFade          bool
+	FadeTime              time.Duration
+	FadeSpeed             int
+	UpdateSize            bool
+	Size                  int
+	UpdateSequenceSize    bool
+	SequenceSize          int
+	X                     int
+	Y                     int
+	Blackout              bool
+	Normal                bool
+	SoftFadeOn            bool
+	SoftFadeOff           bool
+	UpdateColor           bool
+	Color                 int
+	UpdateFunctionMode    bool
+	FunctionMode          bool
+	UpdateFunctions       bool
+	Functions             []Function
+	UpdateSequence        bool
+	UpdateSwitch          bool
+	SwitchNumber          int
+	SwitchPosition        int
+	UpdateSwitchPositions bool
+	Inverted              bool
+	UpdateGobo            bool
+	SelectedGobo          int
 }
 
 type Gobo struct {
@@ -328,6 +329,15 @@ func SendCommandToAllSequence(selectedSequence int, command Command, commandChan
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+}
+
+func SendCommandToAllSequenceOfType(sequences []*Sequence, selectedSequence int, command Command, commandChannels []chan Command, Type string) {
+
+	for index, s := range sequences {
+		if s.Type == Type {
+			commandChannels[index] <- command
+		}
+	}
 }
 
 func SendCommandToAllSequenceExcept(selectedSequence int, command Command, commandChannels []chan Command) {

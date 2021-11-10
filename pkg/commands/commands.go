@@ -191,6 +191,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
 		}
 		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
 		sequence.Static = command.Static
 		if sequence.Mode == "Static" {
 			sequence.Static = true
@@ -281,12 +282,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
-	// Update function mode for the current sequence.
+	// Update the named switch position for the current sequence.
 	if command.UpdateSwitch {
 		if debug {
 			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.SwitchNumber, command.SwitchPosition)
 		}
 		sequence.Switches[command.SwitchNumber].CurrentPosition = command.SwitchPosition
+		sequence.PlaySwitchOnce = true
+		sequence.Run = false
+		sequence.Type = "switch"
+		return sequence
+	}
+
+	// Update switch positions so they get displayed.
+	if command.UpdateSwitchPositions {
+		if debug {
+			fmt.Printf("%d: Command Update Switch Positions \n", mySequenceNumber)
+		}
 		sequence.PlaySwitchOnce = true
 		sequence.Run = false
 		sequence.Type = "switch"

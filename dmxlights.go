@@ -316,6 +316,12 @@ func main() {
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
+			// refesh the switch positions.
+			cmd = common.Command{
+				UpdateSwitchPositions: true,
+			}
+			common.SendCommandToAllSequenceOfType(sequences, selectedSequence, cmd, commandChannels, "switch")
+
 			// Clear the sequence colors.
 			cmd = common.Command{
 				ClearSequenceColor: true,

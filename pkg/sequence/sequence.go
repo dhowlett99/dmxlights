@@ -242,7 +242,6 @@ func PlayNewSequence(sequence common.Sequence,
 						}
 						fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 					}
-					sequence.Run = false
 				}
 			} else {
 				for myFixtureNumber := range fixtureChannels {
@@ -252,7 +251,6 @@ func PlayNewSequence(sequence common.Sequence,
 						}
 						fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 					}
-					sequence.Run = true
 				}
 			}
 
