@@ -376,4 +376,46 @@ fixtures:
         red: 255
         green: 0
         blue: 0
+  - name: switch
+    number: 5
+    states:
+    - name: Off
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0 
+  - name: switch
+    number: 6
+    states:
+    - name: Off
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0 
+  - name: switch
+    number: 7
+    states:
+    - name: Off
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0 
+  - name: switch
+    number: 8
+    description: Flood
+    states:
+    - name: Off
+      values:
+      command: NoFlood
+      buttoncolor: 
+        red: 10
+        green: 10
+        blue: 10
+    - name: On
+      values: 
+      command: Flood
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 255  
 

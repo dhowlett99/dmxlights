@@ -34,6 +34,7 @@ type State struct {
 	Name        string  `yaml:"name"`
 	Values      []Value `yaml:"values"`
 	ButtonColor Color   `yaml:"buttoncolor"`
+	Command     string  `yaml:"command"`
 }
 
 type Switch struct {

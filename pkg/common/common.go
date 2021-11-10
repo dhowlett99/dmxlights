@@ -31,6 +31,7 @@ type State struct {
 	Name        string
 	Values      []Value
 	ButtonColor Color
+	Command     string // Command which can be excuted from switches.
 }
 
 type Switch struct {
@@ -131,6 +132,7 @@ type Sequence struct {
 	EditSeqColors           bool
 	PlayStaticOnce          bool
 	PlaySwitchOnce          bool
+	Flood                   bool
 	StaticColors            []StaticColorButton
 	AvailableSequenceColors []StaticColorButton
 	EditColors              bool
@@ -168,6 +170,7 @@ type Sequence struct {
 	Inverted                bool
 	Positions               map[int][]Position
 	CurrentSequenceColors   []Color
+	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
 }
 
 type Function struct {

@@ -55,6 +55,9 @@ func main() {
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
 
+	// Make a store for which sequences can be flood light.
+	selectedFloodMap := make(map[int]bool, 4)
+
 	// Save the presets on exit.
 	c := make(chan os.Signal)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
@@ -155,7 +158,10 @@ func main() {
 	sequences := []*common.Sequence{}
 	for index, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence: %s, desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Description, sequenceConf.Type)
-		tempSequence := sequence.CreateSequence(sequenceConf.Type, index, pattens, fixturesConfig, sequenceChannels)
+		if sequenceConf.Type == "rgb" {
+			selectedFloodMap[index] = true // This sequence is flood able because it's a rgb.
+		}
+		tempSequence := sequence.CreateSequence(sequenceConf.Type, index, pattens, fixturesConfig, sequenceChannels, selectedFloodMap)
 		sequences = append(sequences, &tempSequence)
 	}
 
@@ -751,21 +757,23 @@ func main() {
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-			cmd = common.Command{
-				Stop: true,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			cmd = common.Command{
-				Start: true,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 			// For the chase functions we only allow one at a time.
 			common.SetFunctionKeys(sequences[selectedSequence].Functions, *sequences[selectedSequence])
 
 			// Light the correct function key.
 			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad)
+
+			// TODO find a way to get instant patten changes
+			// without stopping and starting sequences.
+			// cmd = common.Command{
+			// 	Stop: true,
+			// }
+			// common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// cmd = common.Command{
+			// 	Start: true,
+			// }
+			// common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
@@ -790,10 +798,13 @@ func main() {
 				// hit.Y is the sequence.
 				// hit.X is the switch.
 				cmd := common.Command{
-					UpdateSwitch:   true,
-					SwitchNumber:   hit.X,
-					SwitchPosition: switchPositions[hit.Y][hit.X],
+					UpdateSwitch: true,
+					// If there's a flood command in here. Let all sequence know who's in flood mode.
+					SelectedFloodSequence: selectedSequence,
+					SwitchNumber:          hit.X,
+					SwitchPosition:        switchPositions[hit.Y][hit.X],
 				}
+				// Send a message to the switch sequence.
 				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
 			}
 		}

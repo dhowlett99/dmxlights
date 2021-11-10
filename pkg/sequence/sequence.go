@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strconv"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -53,7 +54,8 @@ func CreateSequence(
 	mySequenceNumber int,
 	pattens map[string]common.Patten,
 	fixturesConfig *fixture.Fixtures,
-	channels common.Channels) common.Sequence {
+	channels common.Channels,
+	selectedFloodMap map[int]bool) common.Sequence {
 
 	var initialPatten string
 
@@ -112,16 +114,18 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift:        2,
-		Blackout:     false,
-		Master:       255,
-		Gobo:         gobos,
-		SelectedGobo: 1,
+		Shift:                 2,
+		Blackout:              false,
+		Master:                255,
+		Gobo:                  gobos,
+		SelectedGobo:          1,
+		SelectedFloodSequence: selectedFloodMap,
 	}
 
 	// Make functions for each of the sequences.
 	for function := 0; function < 8; function++ {
 		newFunction := common.Function{
+			Name:           strconv.Itoa(function),
 			SequenceNumber: mySequenceNumber,
 			Number:         function,
 			State:          false,
@@ -162,6 +166,7 @@ func CreateSequence(
 							newValue.Setting = value.Setting
 							newState.Values = append(newState.Values, newValue)
 						}
+						newState.Command = state.Command
 
 						newSwitch.States = append(newSwitch.States, newState)
 					}
@@ -228,7 +233,29 @@ func PlayNewSequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixturesConfig, sequence.Blackout, sequence.Master)
+			flood := showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixturesConfig, sequence.Blackout, sequence.Master)
+			if flood {
+				for myFixtureNumber := range fixtureChannels {
+					for s := range sequence.SelectedFloodSequence {
+						if !sequence.Hide {
+							launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
+						}
+						fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+					}
+					sequence.Run = false
+				}
+			} else {
+				for myFixtureNumber := range fixtureChannels {
+					for s := range sequence.SelectedFloodSequence {
+						if !sequence.Hide {
+							launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
+						}
+						fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+					}
+					sequence.Run = true
+				}
+			}
+
 			sequence.PlaySwitchOnce = false
 			continue
 		}
@@ -389,15 +416,23 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
-func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, blackout bool, master int) {
+func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, blackout bool, master int) (flood bool) {
 	for switchNumber, switchData := range switches {
 		for valuePosition, value := range switchData.States {
 			if valuePosition == switchData.CurrentPosition {
+				// Process any commands in the switch config.
+				if value.Command == "Flood" {
+					flood = true
+				}
+				if value.Command == "NoFlood" {
+					flood = false
+				}
 				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, blackout, master, master)
 			}
 		}
 	}
+	return flood
 }
 
 // calculatePositions takes the steps defined in the patten and
