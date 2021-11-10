@@ -539,7 +539,6 @@ func main() {
 				functionSelectMode, colorEditMode, commandChannels, sequenceChannels)
 			setColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditMode, selectButtonPressed, commandChannels, eventsForLauchpad)
 
-			fmt.Printf("Seq %d  Static %t\n", selectedSequence, sequences[selectedSequence].Static)
 			cmd := common.Command{
 				PlayStaticOnce: true,
 			}
@@ -1092,8 +1091,6 @@ func HandleSelect(sequences []*common.Sequence,
 		sequences[selectedSequence].Type != "switch" { // Don't alow functions in switch mode.
 
 		//fmt.Printf("Handle 4 - Function Bar On!\n")
-
-		// fmt.Printf("Color Edit Mode Done set for %t\n", colorEditMode[selectedSequence])
 
 		// Set function mode.
 		functionSelectMode[selectedSequence] = true

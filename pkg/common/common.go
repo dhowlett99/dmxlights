@@ -584,18 +584,12 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 func HowManyColors(positionsMap map[int][]Position) (colors []Color) {
 
-	// fmt.Printf("There are %d steps in this patten \n", len(positionsMap))
-
 	colorMap := make(map[Color]bool)
 	for _, positions := range positionsMap {
 		for _, position := range positions {
-			//fmt.Printf("Position:%d Color %+v\n", index, position.Color)
 			colorMap[position.Color] = true
 		}
 	}
-
-	// fmt.Printf("There are %d colors in this patten \n", len(colorMap))
-	// fmt.Printf("colors : %+v \n", colorMap)
 
 	for color := range colorMap {
 		colors = append(colors, color)

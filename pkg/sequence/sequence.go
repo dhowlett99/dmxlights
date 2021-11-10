@@ -74,7 +74,6 @@ func CreateSequence(
 
 		// Initilaise Gobo's
 		for _, f := range fixturesConfig.Fixtures {
-			// fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
 			if f.Type == "scanner" {
 				gobos = fixture.HowManyGobos(fixturesConfig, f)
 			}

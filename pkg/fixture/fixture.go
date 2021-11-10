@@ -264,7 +264,6 @@ func MapSwitchFixture(mySequenceNumber int,
 func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
 	gobos := []common.Gobo{}
 	for _, f := range fixturesConfig.Fixtures {
-		// fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
 		if f.Type == "scanner" {
 			for _, channel := range f.Channels {
 				if channel.Name == "Gobo" {
