@@ -120,6 +120,7 @@ func CreateSequence(
 		Gobo:                  gobos,
 		SelectedGobo:          1,
 		SelectedFloodSequence: selectedFloodMap,
+		Flood:                 false,
 	}
 
 	// Make functions for each of the sequences.
@@ -233,8 +234,10 @@ func PlayNewSequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			flood := showSwitches(mySequenceNumber, sequence.Switches, eventsForLauchpad, dmxController, fixturesConfig, sequence.Blackout, sequence.Master)
-			if flood {
+			showSwitches(mySequenceNumber, &sequence, eventsForLauchpad, dmxController, fixturesConfig)
+			// If flood command is found in switch, this is a flood switch.
+			if sequence.Flood {
+				sequence.Flood = true
 				for myFixtureNumber := range fixtureChannels {
 					for s := range sequence.SelectedFloodSequence {
 						if !sequence.Hide {
@@ -244,6 +247,7 @@ func PlayNewSequence(sequence common.Sequence,
 					}
 				}
 			} else {
+				sequence.Flood = false
 				for myFixtureNumber := range fixtureChannels {
 					for s := range sequence.SelectedFloodSequence {
 						if !sequence.Hide {
@@ -414,19 +418,19 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
-func showSwitches(mySequenceNumber int, switches []common.Switch, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, blackout bool, master int) (flood bool) {
-	for switchNumber, switchData := range switches {
+func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
+	for switchNumber, switchData := range sequence.Switches {
 		for valuePosition, value := range switchData.States {
 			if valuePosition == switchData.CurrentPosition {
 				// Process any commands in the switch config.
 				if value.Command == "Flood" {
-					flood = true
+					sequence.Flood = true
 				}
 				if value.Command == "NoFlood" {
-					flood = false
+					sequence.Flood = false
 				}
 				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, blackout, master, master)
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
 	}
