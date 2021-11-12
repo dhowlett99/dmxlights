@@ -119,6 +119,50 @@ func Test_generatePatten(t *testing.T) {
 				},
 			},
 		},
+		{
+			name:     "two scanners doing the same circle",
+			fixtures: 2,
+			coordinates: []coordinate{
+				{
+					x: 0,
+					y: 128,
+				},
+				{
+					x: 128,
+					y: 255,
+				},
+				{
+					x: 128,
+					y: 0,
+				},
+			},
+			want: common.Patten{
+				Name: "circle",
+				Steps: []common.Step{
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 128, G: 0, B: 128}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 128, G: 0, B: 128}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
+						},
+					},
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 128, B: 319}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 128, B: 319}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
+						},
+					},
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 128, B: 64}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 128, B: 64}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
+						},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

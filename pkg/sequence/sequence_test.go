@@ -256,7 +256,7 @@ func Test_calculatePositions(t *testing.T) {
 			},
 		},
 		{
-			name: "Scanner case",
+			name: "Scanner case, both scanners doing same things.",
 			args: args{
 				bounce: false,
 				steps: []common.Step{
@@ -412,6 +412,96 @@ func Test_calculatePositions(t *testing.T) {
 						StartPosition: 84,
 						Color:         common.Color{R: 145, G: 0, B: 255},
 						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 0,
+					},
+				},
+			},
+		},
+		{
+			name: "Scanner case, both scanners doing different things.",
+			args: args{
+				bounce: false,
+				steps: []common.Step{
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
+						},
+					},
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 200},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0: {
+					{
+						Fixture:       0,
+						StartPosition: 0,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
+					},
+					{
+						Fixture:       1,
+						StartPosition: 0,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 128, Tilt: 255,
+					},
+				},
+				14: {
+					{
+						Fixture:       0,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          36, Shutter: 255, Pan: 50, Tilt: 200,
+					},
+					{
+						Fixture:       1,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          36, Shutter: 255, Pan: 128, Tilt: 200,
+					},
+				},
+			},
+		},
+		{
+			name: "Scanner case, one set of instruction in a pattern should create one set of positions.",
+			args: args{
+				bounce: false,
+				steps: []common.Step{
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+						},
+					},
+					{
+						Type: "scanner",
+						Fixtures: []common.Fixture{
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0: {
+					{
+						Fixture:       0,
+						StartPosition: 0,
+						Color:         common.Color{R: 0, G: 0, B: 255},
+						Gobo:          36, Shutter: 255, Pan: 0, Tilt: 255,
+					},
+				},
+				14: {
+					{
+						Fixture:       0,
+						StartPosition: 14,
+						Color:         common.Color{R: 255, G: 0, B: 0},
+						Gobo:          36, Shutter: 255, Pan: 50, Tilt: 200,
 					},
 				},
 			},

@@ -741,31 +741,60 @@ func MakePatterns() map[string]common.Patten {
 
 func GeneratePatten(coordinates []coordinate, NumberFixtures int) common.Patten {
 
+	reverseCoordinates := []coordinate{}
+
+	for c := len(coordinates); c > 0; c-- {
+		coordinate := coordinates[c-1]
+		reverseCoordinates = append(reverseCoordinates, coordinate)
+	}
+
 	// First create the patten.
 	patten := common.Patten{}
 
 	steps := []common.Step{}
 
 	// Now create the steps in the patten.
-	for _, coordinate := range coordinates {
+	for index, coordinate := range coordinates {
 		fixtures := []common.Fixture{}
 		for f := 0; f < NumberFixtures; f++ {
-			newFixture := common.Fixture{
-				Type:         "scanner",
-				MasterDimmer: full,
-				Colors: []common.Color{
-					{
-						R: int(coordinate.y),
-						G: int(coordinate.x),
-						B: makeBlue(int(coordinate.y), int(coordinate.x)),
+
+			if f == 0 {
+				newFixture := common.Fixture{
+					Type:         "scanner",
+					MasterDimmer: full,
+					Colors: []common.Color{
+						{
+							R: int(coordinate.y),
+							G: int(coordinate.x),
+							B: makeBlue(int(coordinate.y), int(coordinate.x)),
+						},
 					},
-				},
-				Pan:     int(coordinate.y),
-				Tilt:    int(coordinate.x),
-				Shutter: 255,
-				Gobo:    36,
+					Pan:     int(coordinate.y),
+					Tilt:    int(coordinate.x),
+					Shutter: 255,
+					Gobo:    36,
+				}
+				fixtures = append(fixtures, newFixture)
 			}
-			fixtures = append(fixtures, newFixture)
+			if f == 1 {
+				newFixture := common.Fixture{
+					Type:         "scanner",
+					MasterDimmer: full,
+					Colors: []common.Color{
+						{
+							R: int(reverseCoordinates[index].y),
+							G: int(reverseCoordinates[index].x),
+							B: 0,
+						},
+					},
+					Pan:     int(reverseCoordinates[index].y),
+					Tilt:    int(reverseCoordinates[index].x),
+					Shutter: 255,
+					Gobo:    36,
+				}
+				fixtures = append(fixtures, newFixture)
+			}
+
 		}
 		newStep := common.Step{
 			Type:     "scanner",

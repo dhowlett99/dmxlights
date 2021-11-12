@@ -45,6 +45,7 @@ type Switch struct {
 
 type Fixture struct {
 	Name        string    `yaml:"name"`
+	Number      int       `yaml:"number"`
 	Description string    `yaml:"description"`
 	Type        string    `yaml:"type"`
 	Group       int       `yaml:"group"`
@@ -201,20 +202,23 @@ func MapFixtures(mySequenceNumber int,
 
 		if fixture.Group-1 == mySequenceNumber {
 			for channelNumber, channel := range fixture.Channels {
-				// Scanner channels
-				if strings.Contains(channel.Name, "Pan") {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
-				}
-				if strings.Contains(channel.Name, "Tilt") {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
-				}
-				if strings.Contains(channel.Name, "Shutter") {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
-				}
-				if strings.Contains(channel.Name, "Gobo") {
-					for _, setting := range channel.Settings {
-						if setting.Number == selectedGobo {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+
+				if fixture.Number-1 == displayFixture {
+					// Scanner channels
+					if strings.Contains(channel.Name, "Pan") {
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
+					}
+					if strings.Contains(channel.Name, "Tilt") {
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
+					}
+					if strings.Contains(channel.Name, "Shutter") {
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
+					}
+					if strings.Contains(channel.Name, "Gobo") {
+						for _, setting := range channel.Settings {
+							if setting.Number == selectedGobo {
+								dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+							}
 						}
 					}
 				}

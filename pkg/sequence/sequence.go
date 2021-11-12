@@ -349,18 +349,10 @@ func PlayNewSequence(sequence common.Sequence,
 					}
 
 					fixtureChannel1 <- cmd
-					if sequence.Type == "scanner" {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
-					} else {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					}
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
 					if !sequence.Run || sequence.Flood {
 						break
 					}
-
-					// if sequence.Type == "scanner" {
-					// 	continue
-					// }
 					fixtureChannel2 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
 					if !sequence.Run || sequence.Flood {
