@@ -74,11 +74,13 @@ func Test_circleGenerator(t *testing.T) {
 func Test_generatePatten(t *testing.T) {
 	tests := []struct {
 		name        string
+		fixtures    int
 		coordinates []coordinate
 		want        common.Patten
 	}{
 		{
-			name: "circle patten",
+			name:     "circle patten",
+			fixtures: 1,
 			coordinates: []coordinate{
 				{
 					x: 0,
@@ -99,19 +101,19 @@ func Test_generatePatten(t *testing.T) {
 					{
 						Type: "scanner",
 						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 128, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 128, G: 0, B: 128}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
 						},
 					},
 					{
 						Type: "scanner",
 						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 128, B: 0}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 128, B: 319}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
 						},
 					},
 					{
 						Type: "scanner",
 						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 128, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
+							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 128, B: 64}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
 						},
 					},
 				},
@@ -120,7 +122,7 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.coordinates); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePatten(tt.coordinates, tt.fixtures); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GeneratePatten() = %v, want %v", got, tt.want)
 			}
 		})
