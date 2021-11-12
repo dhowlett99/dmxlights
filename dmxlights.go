@@ -256,7 +256,7 @@ func main() {
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 8, Brightness: full, Red: 255, Green: 255, Blue: 255})
 
 	// Initialise the flood button to be green.
-	common.LightOn(eventsForLauchpad, common.ALight{X: 7, Y: 2, Brightness: full, Red: 255, Green: 0, Blue: 0})
+	common.LightOn(eventsForLauchpad, common.ALight{X: 7, Y: 3, Brightness: full, Red: 255, Green: 0, Blue: 0})
 
 	// Light the first sequence as the default selected.
 	selectedSequence := 0
@@ -346,7 +346,7 @@ func main() {
 		}
 
 		// F L O O D
-		if hit.X == 7 && hit.Y == 2 {
+		if hit.X == 7 && hit.Y == 3 {
 			if !flood {
 				cmd := common.Command{
 					UpdateFlood: true,
