@@ -220,158 +220,27 @@ fixtures:
         blue: 0
   - name: switch
     number: 3
-    description: Red Par ON
+    description: Switch3
     states:
     - name: Off
-      values:
-      - channel: 2
-        setting: 0
-      - channel: 7
-        setting: 255
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
-    - name: Half
-      values:
-      - channel: 2
-        setting: 128
-      - channel: 7
-        setting: 255
-      buttoncolor: 
-        red: 0
-        green: 0
-        blue: 255
     - name: On
-      values:
-      - channel: 2
-        setting: 255
-      - channel: 7
-        setting: 255
       buttoncolor: 
         red: 255
         green: 0
         blue: 0
   - name: switch
     number: 4
-    description: Select Gobo
     states:
-    - name: STROBE
-      values:
-      - channel: 64
-        setting: 100
-      - channel: 65
-        setting: 00
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: OPEN
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 00
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo1
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 8
-      - channel: 66
-        setting: 255
+    - name: Off
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
-    - name: Gobo2
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 15
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 0
-        green: 0
-        blue: 255
-    - name: Gobo3
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 22
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo4
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 29
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo5
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 36
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo6
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 43
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo7
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 50
-      - channel: 66
-        setting: 255
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-    - name: Gobo8
-      values:
-      - channel: 64
-        setting: 255
-      - channel: 65
-        setting: 57
-      - channel: 66
-        setting: 255
+    - name: On
       buttoncolor: 
         red: 255
         green: 0
@@ -384,6 +253,11 @@ fixtures:
         red: 0
         green: 255
         blue: 0 
+    - name: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
   - name: switch
     number: 6
     states:
@@ -391,7 +265,12 @@ fixtures:
       buttoncolor: 
         red: 0
         green: 255
-        blue: 0 
+        blue: 0
+    - name: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0  
   - name: switch
     number: 7
     states:
@@ -400,22 +279,22 @@ fixtures:
         red: 0
         green: 255
         blue: 0 
+    - name: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
   - name: switch
     number: 8
-    description: Flood
     states:
     - name: Off
-      values:
-      command: NoFlood
       buttoncolor: 
         red: 0
         green: 255
-        blue: 0
+        blue: 0 
     - name: On
-      values: 
-      command: Flood
       buttoncolor: 
         red: 255
-        green: 255
-        blue: 255  
+        green: 0
+        blue: 0
 

@@ -83,6 +83,7 @@ func CreateSequence(
 	}
 
 	sequence := common.Sequence{
+		NumberFixtures:          8,
 		Type:                    sequenceType,
 		Hide:                    false,
 		Mode:                    "Sequence",
@@ -167,8 +168,6 @@ func CreateSequence(
 							newValue.Setting = value.Setting
 							newState.Values = append(newState.Values, newValue)
 						}
-						newState.Command = state.Command
-
 						newSwitch.States = append(newSwitch.States, newState)
 					}
 					// Add new switch to the list.
@@ -193,6 +192,8 @@ func PlayNewSequence(sequence common.Sequence,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
 	soundTriggers []*common.Trigger) {
+
+	stepDelay := 10 * time.Microsecond
 
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
@@ -235,30 +236,8 @@ func PlayNewSequence(sequence common.Sequence,
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
 			showSwitches(mySequenceNumber, &sequence, eventsForLauchpad, dmxController, fixturesConfig)
-			// If flood command is found in switch, this is a flood switch.
-			if sequence.Flood {
-				sequence.Flood = true
-				for myFixtureNumber := range fixtureChannels {
-					for s := range sequence.SelectedFloodSequence {
-						if !sequence.Hide {
-							launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
-						}
-						fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-					}
-				}
-			} else {
-				sequence.Flood = false
-				for myFixtureNumber := range fixtureChannels {
-					for s := range sequence.SelectedFloodSequence {
-						if !sequence.Hide {
-							launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
-						}
-						fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-					}
-				}
-			}
-
 			sequence.PlaySwitchOnce = false
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
 		}
 
@@ -361,6 +340,7 @@ func PlayNewSequence(sequence common.Sequence,
 						CurrentSpeed:    sequence.CurrentSpeed,
 						Speed:           sequence.Speed,
 						Blackout:        sequence.Blackout,
+						Flood:           sequence.Flood,
 						CurrentPosition: step,
 						SelectedGobo:    sequence.SelectedGobo,
 					}
@@ -368,9 +348,9 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.Type == "scanner" {
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 					} else {
-						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
 					}
-					if !sequence.Run {
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 
@@ -378,38 +358,38 @@ func PlayNewSequence(sequence common.Sequence,
 						continue
 					}
 					fixtureChannel2 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel3 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel4 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel5 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel6 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel7 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 					fixtureChannel8 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Microsecond, sequence, channels)
-					if !sequence.Run {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+					if !sequence.Run || sequence.Flood {
 						break
 					}
 				}
@@ -422,13 +402,6 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 	for switchNumber, switchData := range sequence.Switches {
 		for valuePosition, value := range switchData.States {
 			if valuePosition == switchData.CurrentPosition {
-				// Process any commands in the switch config.
-				if value.Command == "Flood" {
-					sequence.Flood = true
-				}
-				if value.Command == "NoFlood" {
-					sequence.Flood = false
-				}
 				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 			}
@@ -576,4 +549,33 @@ func reverse_dmx(n int) int {
 		y--
 	}
 	return in[n]
+}
+
+func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
+	// We are asked to be in flood mode.
+	if sequence.Flood && sequence.PlayFloodOnce {
+		fmt.Printf("FUNC FLOOD ON\n")
+		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
+			for s := range sequence.SelectedFloodSequence {
+				if !sequence.Hide {
+					launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
+				}
+				fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+			}
+		}
+		sequence.PlayFloodOnce = false
+	}
+
+	if !sequence.Flood && sequence.PlayFloodOnce {
+		fmt.Printf("FUNC FLOOD OFF\n")
+		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
+			for s := range sequence.SelectedFloodSequence {
+				if !sequence.Hide {
+					launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
+				}
+				fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+			}
+		}
+		sequence.PlayFloodOnce = false
+	}
 }

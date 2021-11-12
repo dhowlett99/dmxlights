@@ -31,7 +31,6 @@ type State struct {
 	Name        string
 	Values      []Value
 	ButtonColor Color
-	Command     string // Command which can be excuted from switches.
 }
 
 type Switch struct {
@@ -118,6 +117,8 @@ type Command struct {
 	Inverted              bool
 	UpdateGobo            bool
 	SelectedGobo          int
+	UpdateFlood           bool
+	Flood                 bool
 }
 
 type Gobo struct {
@@ -128,12 +129,14 @@ type Gobo struct {
 
 // Sequence describes sequences.
 type Sequence struct {
+	NumberFixtures          int
 	Mode                    string // Sequence or Static
 	Static                  bool
 	EditSeqColors           bool
 	PlayStaticOnce          bool
 	PlaySwitchOnce          bool
 	Flood                   bool
+	PlayFloodOnce           bool
 	StaticColors            []StaticColorButton
 	AvailableSequenceColors []StaticColorButton
 	EditColors              bool
@@ -223,6 +226,8 @@ type FixtureCommand struct {
 	FadeDownTime        time.Duration
 	FadeOffTime         time.Duration
 	Blackout            bool
+	Flood               bool
+	PlayFloodOnce       bool
 	UpdateSequenceColor bool
 	SequenceColor       Color
 	Inverted            bool

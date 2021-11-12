@@ -36,6 +36,7 @@ var masterBrightness int
 var savePreset bool
 var selectedPatten = 0
 var blackout bool = false
+var flood bool = false
 
 // main thread is used to get commands from the lauchpad.
 func main() {
@@ -254,6 +255,9 @@ func main() {
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 7, Brightness: full, Red: 255, Green: 255, Blue: 255})
 	common.LightOn(eventsForLauchpad, common.ALight{X: 8, Y: 8, Brightness: full, Red: 255, Green: 255, Blue: 255})
 
+	// Initialise the flood button to be green.
+	common.LightOn(eventsForLauchpad, common.ALight{X: 7, Y: 2, Brightness: full, Red: 255, Green: 0, Blue: 0})
+
 	// Light the first sequence as the default selected.
 	selectedSequence := 0
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
@@ -278,6 +282,16 @@ func main() {
 
 		// Clear all the lights on the launchpad.
 		if hit.X == 0 && hit.Y == -1 {
+
+			// Turn off the flood
+			if flood {
+				cmd := common.Command{
+					UpdateFlood: true,
+					Flood:       false,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+				flood = false
+			}
 
 			// We want to clear a color selection.
 			if sequences[selectedSequence].Functions[common.Function5_Color].State &&
@@ -331,9 +345,44 @@ func main() {
 			continue
 		}
 
+		// F L O O D
+		if hit.X == 7 && hit.Y == 2 {
+			if !flood {
+				cmd := common.Command{
+					UpdateFlood: true,
+					Flood:       true,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+				// Wait for sequence to pause.
+				time.Sleep(500 * time.Millisecond)
+
+				flood = true
+				sequences[selectedSequence].Flood = true
+				sequences[selectedSequence].PlayFloodOnce = true
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+				sequence.Flood(sequences[selectedSequence], dmxController, eventsForLauchpad, fixturesConfig, true)
+
+				continue
+			}
+			if flood {
+				cmd := common.Command{
+					UpdateFlood: true,
+					Flood:       false,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+				flood = false
+				sequences[selectedSequence].Flood = false
+				sequences[selectedSequence].PlayFloodOnce = true
+				sequence.Flood(sequences[selectedSequence], dmxController, eventsForLauchpad, fixturesConfig, true)
+				continue
+			}
+		}
+
 		// Sound sensitity up.
 		if hit.X == 5 && hit.Y == -1 {
-			fmt.Printf("Sound Up\n")
+			fmt.Printf("Sound Up %f\n", soundGain)
 			soundGain = soundGain - 0.01
 			if soundGain < -0.9 {
 				soundGain = -0.9
@@ -343,9 +392,9 @@ func main() {
 			}
 		}
 
-		// Sound sensitity down.
+		// Sound sensitity rotate.
 		if hit.X == 4 && hit.Y == -1 {
-			fmt.Printf("Sound Down\n")
+			fmt.Printf("Sound Down%f\n", soundGain)
 			soundGain = soundGain + 0.01
 			if soundGain > 0.9 {
 				soundGain = 0.9

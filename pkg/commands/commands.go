@@ -89,7 +89,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.FadeSpeed)
 		}
-		//sequence.Steps = sequence.Steps + 1
 		sequence.FadeSpeed = command.FadeSpeed
 		sequence.FadeTime = SetSpeed(command.FadeSpeed)
 		return sequence
@@ -130,7 +129,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Static = false
 		return sequence
 	}
-
 	if command.PlayStaticOnce {
 		if debug {
 			fmt.Printf("%d: Command PlayStaticOnce\n", mySequenceNumber)
@@ -138,7 +136,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlayStaticOnce = true
 		return sequence
 	}
-
 	if command.Blackout {
 		if debug {
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)
@@ -146,6 +143,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Blackout = true
+		return sequence
+	}
+	if command.UpdateFlood {
+		if debug {
+			fmt.Printf("%d: Command Flood to %t\n", mySequenceNumber, command.Flood)
+		}
+		sequence.Flood = command.Flood
+		sequence.PlayFloodOnce = true
 		return sequence
 	}
 	if command.Normal {
@@ -176,7 +181,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
-
 	if command.SetEditColors {
 		if debug {
 			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Static)
@@ -185,7 +189,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.EditColors = command.EditColors
 		return sequence
 	}
-
 	if command.UpdateStatic {
 		if debug {
 			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
@@ -198,7 +201,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
-
 	if command.UpdateMode {
 		if debug {
 			fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Mode)
@@ -210,7 +212,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
-
 	if command.UpdateStaticColor {
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
@@ -224,7 +225,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.StaticColors[command.StaticLamp].Flash = command.StaticLampFlash
 		return sequence
 	}
-
 	if command.UpdateSequenceColor {
 		if debug {
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
@@ -233,7 +233,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
 		return sequence
 	}
-
 	if command.ClearSequenceColor {
 		if debug {
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
@@ -243,7 +242,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.CurrentSequenceColors = []common.Color{}
 		return sequence
 	}
-
 	// If we are being asked for our config we must reply with our current sequence.
 	if command.ReadConfig {
 		if debug {
@@ -252,7 +250,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		replyChannel <- sequence
 		return sequence
 	}
-
 	// We are setting the Master brightness in this sequence.
 	if command.MasterBrightness {
 		if debug {
@@ -263,8 +260,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Master = command.Master
 		return sequence
 	}
-
-	// If we are being asked for our config we must reply with our current sequence.
+	// If we are being asked for a updated config we must reply with our current sequence.
 	if command.UpdateSequence {
 		if debug {
 			fmt.Printf("%d: Command Update Sequence\n", mySequenceNumber)
@@ -272,7 +268,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		updateChannel <- sequence
 		return sequence
 	}
-
 	// Update function mode for the current sequence.
 	if command.UpdateFunctionMode {
 		if debug {
@@ -281,7 +276,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.FunctionMode = command.FunctionMode
 		return sequence
 	}
-
 	// Update the named switch position for the current sequence.
 	if command.UpdateSwitch {
 		if debug {
@@ -293,7 +287,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Type = "switch"
 		return sequence
 	}
-
 	// Update switch positions so they get displayed.
 	if command.UpdateSwitchPositions {
 		if debug {
@@ -304,7 +297,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Type = "switch"
 		return sequence
 	}
-
 	if command.UpdateGobo {
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.SelectedGobo)
@@ -312,7 +304,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.SelectedGobo = command.SelectedGobo + 1
 		return sequence
 	}
-
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {
