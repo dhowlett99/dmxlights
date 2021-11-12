@@ -344,6 +344,7 @@ func PlayNewSequence(sequence common.Sequence,
 						CurrentPosition: step,
 						SelectedGobo:    sequence.SelectedGobo,
 					}
+
 					fixtureChannel1 <- cmd
 					if sequence.Type == "scanner" {
 						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
@@ -354,9 +355,9 @@ func PlayNewSequence(sequence common.Sequence,
 						break
 					}
 
-					if sequence.Type == "scanner" {
-						continue
-					}
+					// if sequence.Type == "scanner" {
+					// 	continue
+					// }
 					fixtureChannel2 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
 					if !sequence.Run || sequence.Flood {
@@ -554,7 +555,6 @@ func reverse_dmx(n int) int {
 func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
 	// We are asked to be in flood mode.
 	if sequence.Flood && sequence.PlayFloodOnce {
-		fmt.Printf("FUNC FLOOD ON\n")
 		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
 			for s := range sequence.SelectedFloodSequence {
 				if !sequence.Hide {
@@ -567,7 +567,6 @@ func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, events
 	}
 
 	if !sequence.Flood && sequence.PlayFloodOnce {
-		fmt.Printf("FUNC FLOOD OFF\n")
 		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
 			for s := range sequence.SelectedFloodSequence {
 				if !sequence.Hide {
