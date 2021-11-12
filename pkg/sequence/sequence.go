@@ -58,6 +58,7 @@ func CreateSequence(
 	selectedFloodMap map[int]bool) common.Sequence {
 
 	var initialPatten string
+	var scanners int // Number of scanners in this sequence
 
 	// Populate the static colors for this sequence with the defaults.
 	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
@@ -77,6 +78,7 @@ func CreateSequence(
 		// Initilaise Gobo's
 		for _, f := range fixturesConfig.Fixtures {
 			if f.Type == "scanner" {
+				scanners++
 				gobos = fixture.HowManyGobos(fixturesConfig, f)
 			}
 		}
@@ -84,6 +86,7 @@ func CreateSequence(
 
 	sequence := common.Sequence{
 		NumberFixtures:          8,
+		NumberScanners:          scanners,
 		Type:                    sequenceType,
 		Hide:                    false,
 		Mode:                    "Sequence",
@@ -287,22 +290,22 @@ func PlayNewSequence(sequence common.Sequence,
 
 				if sequence.Patten.Name == "circle" {
 					coordinates := patten.CircleGenerator(sequence.SequenceSize)
-					scannerPatten := patten.GeneratePatten(coordinates)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "leftandright" {
 					coordinates := patten.ScanGeneratorLeftRight(128)
-					scannerPatten := patten.GeneratePatten(coordinates)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "upanddown" {
 					coordinates := patten.ScanGeneratorUpDown(128)
-					scannerPatten := patten.GeneratePatten(coordinates)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "sinewave" {
 					coordinates := patten.ScanGenerateSineWave(255, 5000)
-					scannerPatten := patten.GeneratePatten(coordinates)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
 					steps = scannerPatten.Steps
 				}
 

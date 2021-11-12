@@ -130,6 +130,7 @@ type Gobo struct {
 // Sequence describes sequences.
 type Sequence struct {
 	NumberFixtures          int
+	NumberScanners          int
 	Mode                    string // Sequence or Static
 	Static                  bool
 	EditSeqColors           bool

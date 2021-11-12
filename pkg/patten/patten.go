@@ -1115,7 +1115,7 @@ func MakePatterns() map[string]common.Patten {
 
 }
 
-func GeneratePatten(coordinates []coordinate) common.Patten {
+func GeneratePatten(coordinates []coordinate, NumberFixtures int) common.Patten {
 
 	// First create the patten.
 	patten := common.Patten{}
@@ -1125,22 +1125,24 @@ func GeneratePatten(coordinates []coordinate) common.Patten {
 	// Now create the steps in the patten.
 	for _, coordinate := range coordinates {
 		fixtures := []common.Fixture{}
-		newFixture := common.Fixture{
-			Type:         "scanner",
-			MasterDimmer: full,
-			Colors: []common.Color{
-				{
-					R: int(coordinate.y),
-					G: int(coordinate.x),
-					B: makeBlue(int(coordinate.y), int(coordinate.x)),
+		for f := 0; f < NumberFixtures; f++ {
+			newFixture := common.Fixture{
+				Type:         "scanner",
+				MasterDimmer: full,
+				Colors: []common.Color{
+					{
+						R: int(coordinate.y),
+						G: int(coordinate.x),
+						B: makeBlue(int(coordinate.y), int(coordinate.x)),
+					},
 				},
-			},
-			Pan:     int(coordinate.y),
-			Tilt:    int(coordinate.x),
-			Shutter: 255,
-			Gobo:    36,
+				Pan:     int(coordinate.y),
+				Tilt:    int(coordinate.x),
+				Shutter: 255,
+				Gobo:    36,
+			}
+			fixtures = append(fixtures, newFixture)
 		}
-		fixtures = append(fixtures, newFixture)
 		newStep := common.Step{
 			Type:     "scanner",
 			Fixtures: fixtures,
