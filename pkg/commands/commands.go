@@ -304,6 +304,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.SelectedGobo = command.SelectedGobo + 1
 		return sequence
 	}
+	if command.UpdateAutoColor {
+		if debug {
+			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.AutoColor)
+		}
+		sequence.AutoColor = command.AutoColor
+		sequence.SelectedGobo = 1
+		return sequence
+	}
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {

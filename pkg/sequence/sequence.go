@@ -125,6 +125,7 @@ func CreateSequence(
 		SelectedGobo:          1,
 		SelectedFloodSequence: selectedFloodMap,
 		Flood:                 false,
+		AutoColor:             false,
 	}
 
 	// Make functions for each of the sequences.
@@ -233,6 +234,7 @@ func PlayNewSequence(sequence common.Sequence,
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
 
+		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
 		// Sequence in Switch Mode.
@@ -288,27 +290,38 @@ func PlayNewSequence(sequence common.Sequence,
 
 				steps := pattens[sequence.Patten.Name].Steps
 
-				if sequence.Patten.Name == "circle" {
-					coordinates := patten.CircleGenerator(sequence.SequenceSize)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
-					steps = scannerPatten.Steps
-				}
-				if sequence.Patten.Name == "leftandright" {
-					coordinates := patten.ScanGeneratorLeftRight(128)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
-					steps = scannerPatten.Steps
-				}
-				if sequence.Patten.Name == "upanddown" {
-					coordinates := patten.ScanGeneratorUpDown(128)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
-					steps = scannerPatten.Steps
-				}
-				if sequence.Patten.Name == "sinewave" {
-					coordinates := patten.ScanGenerateSineWave(255, 5000)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
-					steps = scannerPatten.Steps
+				// Setup scanner pattens.
+				if sequence.Type == "scanner" {
+					if sequence.Patten.Name == "circle" {
+						coordinates := patten.CircleGenerator(sequence.SequenceSize)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						steps = scannerPatten.Steps
+					}
+					if sequence.Patten.Name == "leftandright" {
+						coordinates := patten.ScanGeneratorLeftRight(128)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						steps = scannerPatten.Steps
+					}
+					if sequence.Patten.Name == "upanddown" {
+						coordinates := patten.ScanGeneratorUpDown(128)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						steps = scannerPatten.Steps
+					}
+					if sequence.Patten.Name == "sinewave" {
+						coordinates := patten.ScanGenerateSineWave(255, 5000)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						steps = scannerPatten.Steps
+					}
+
+					if sequence.AutoColor {
+						sequence.SelectedGobo++
+						if sequence.SelectedGobo > 7 {
+							sequence.SelectedGobo = 0
+						}
+					}
 				}
 
+				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
 				if !sequence.Run {
 					break
@@ -348,6 +361,7 @@ func PlayNewSequence(sequence common.Sequence,
 						SelectedGobo:    sequence.SelectedGobo,
 					}
 
+					// Now tell all the fixtures what they need to do.
 					fixtureChannel1 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
 					if !sequence.Run || sequence.Flood {

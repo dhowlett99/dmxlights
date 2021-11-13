@@ -52,6 +52,7 @@ func main() {
 	var lastStaticColorButtonX int // Which Static Color button did we change last.
 	var lastStaticColorButtonY int // Which Static Color button did we change last.
 	var soundGain float32 = 0      // Fine gain -0.09 -> 0.09
+	var autocolor []bool           // Is auto color change selected for this sequence.
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -229,8 +230,11 @@ func main() {
 		staticLamps[i] = make([]bool, 9)
 	}
 
-	// Rememberwhen we've finished editing static colors.
+	// Remember when we've finished editing static colors.
 	colorEditMode = make([]bool, 4)
+
+	// Remember when we have set autocolor change for this sequence.
+	autocolor = make([]bool, 4)
 
 	// Light the logo blue.
 	pad.Light(8, -1, 0, 0, 255)
@@ -343,6 +347,34 @@ func main() {
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 			continue
+		}
+
+		// A U T O   C O L O R   M O D E
+		if hit.X == 6 && hit.Y == 3 {
+			if !autocolor[selectedSequence] {
+				autocolor[selectedSequence] = true
+				cmd := common.Command{
+					UpdateAutoColor: true,
+					AutoColor:       true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(300 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+				continue
+			}
+			if autocolor[selectedSequence] {
+				autocolor[selectedSequence] = false
+				cmd := common.Command{
+					UpdateAutoColor: true,
+					AutoColor:       false,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(300 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+				continue
+			}
 		}
 
 		// F L O O D

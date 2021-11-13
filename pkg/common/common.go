@@ -119,6 +119,8 @@ type Command struct {
 	SelectedGobo          int
 	UpdateFlood           bool
 	Flood                 bool
+	UpdateAutoColor       bool
+	AutoColor             bool
 }
 
 type Gobo struct {
@@ -176,6 +178,7 @@ type Sequence struct {
 	Positions               map[int][]Position
 	CurrentSequenceColors   []Color
 	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
+	AutoColor               bool
 }
 
 type Function struct {
@@ -284,14 +287,14 @@ type Trigger struct {
 
 // Define the function keys.
 const (
-	Function1_Forward_Chase = 0
-	Function2_Pairs_Chase   = 1
-	Function3_Inward_Chase  = 2
-	Function4_Bounce        = 3 // Sequence auto reverses. or Sinewave pattern in scanners.
-	Function5_Color         = 4 // Set chase color.
+	Function1_Forward_Chase = 0 // Forward chase in RGB, cirlce in scanner mode.
+	Function2_Pairs_Chase   = 1 // Pais chase in RGB, left and right scanner mode.
+	Function3_Inward_Chase  = 2 // Inward chase in RGB, up and down scanner mode.
+	Function4_Bounce        = 3 // Sequence auto reverses. or Sinewave pattern in scanner mode.
+	Function5_Color         = 4 // Set chase color. or select the scanner GOBO or color.
 	Function6_Static        = 5 // Set static colors.
-	Function7_Invert        = 6
-	Function8_Music_Trigger = 7 // Music trigger on and off.
+	Function7_Invert        = 6 // Invert the RGB colors or shift scanners 360 deg of each other.
+	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
 // LightOn Turn on a common.Light.
