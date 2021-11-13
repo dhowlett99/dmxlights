@@ -127,6 +127,7 @@ func CreateSequence(
 		Flood:                 false,
 		AutoColor:             false,
 		AutoPatten:            true,
+		SelectedScannerPatten: 0,
 	}
 
 	// Make functions for each of the sequences.
@@ -293,22 +294,22 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
-					if sequence.Patten.Name == "circle" {
+					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 1 {
 						coordinates := patten.CircleGenerator(sequence.SequenceSize)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "leftandright" {
+					if sequence.Patten.Name == "leftandright" || sequence.SelectedScannerPatten == 2 {
 						coordinates := patten.ScanGeneratorLeftRight(128)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "upanddown" {
+					if sequence.Patten.Name == "upanddown" || sequence.SelectedScannerPatten == 3 {
 						coordinates := patten.ScanGeneratorUpDown(128)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "sinewave" {
+					if sequence.Patten.Name == "sinewave" || sequence.SelectedScannerPatten == 4 {
 						coordinates := patten.ScanGenerateSineWave(255, 5000)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
@@ -345,6 +346,14 @@ func PlayNewSequence(sequence common.Sequence,
 						sequence.SelectedPatten = 0
 					}
 					fmt.Printf("Patten Name is %s\n", sequence.Patten.Name)
+				}
+
+				// Set the patten automatically
+				if sequence.AutoPatten && sequence.Type == "scanner" {
+					sequence.SelectedScannerPatten++
+					if sequence.SelectedScannerPatten > 4 {
+						sequence.SelectedScannerPatten = 1
+					}
 				}
 
 				// Set the current colors in the sequence.

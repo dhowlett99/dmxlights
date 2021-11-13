@@ -185,6 +185,7 @@ type Sequence struct {
 	SelectedPatten          int
 	RecoverSequenceColors   bool
 	SaveColors              bool
+	SelectedScannerPatten   int
 }
 
 type Function struct {
