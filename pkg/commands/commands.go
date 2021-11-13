@@ -230,6 +230,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
 		}
 		sequence.UpdateSequenceColor = true
+		sequence.SaveColors = true
 		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
 		return sequence
 	}
@@ -310,6 +311,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.AutoColor = command.AutoColor
 		sequence.SelectedGobo = 1
+		if !command.AutoColor {
+			sequence.RecoverSequenceColors = true
+		} else {
+			sequence.RecoverSequenceColors = false
+		}
 		return sequence
 	}
 	// If we are being asekd to load a config, use the new sequence.

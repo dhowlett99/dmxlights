@@ -329,12 +329,40 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Calulate positions for fixtures based on patten.
 				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
-				if sequence.UpdateSequenceColor {
+
+				// Set the current colors in the sequence.
+				if sequence.AutoColor {
+					fmt.Printf("--->Auto Color Mode\n")
+					// Find a new color.
+					newColor := []common.Color{}
+					newColor = append(newColor, sequence.AvailableSequenceColors[sequence.SelectedColor].Color)
+					sequence.SequenceColors = newColor
+
+					// Step through the available colors.
+					sequence.SelectedColor++
+					if sequence.SelectedColor > 7 {
+						sequence.SelectedColor = 0
+					}
+					fmt.Printf("Current Colors %+v\n", sequence.SequenceColors)
 					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
 
-				// Set the current colors in the sequence.
-				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
+				if sequence.UpdateSequenceColor {
+					if sequence.RecoverSequenceColors {
+						if sequence.CurrentSequenceColors != nil {
+							sequence.Positions = replaceColors(sequence.Positions, sequence.CurrentSequenceColors)
+							//sequence.RecoverSequenceColors = false
+							sequence.AutoColor = false
+						}
+					} else {
+						sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
+						// Save the current color selection.
+						if sequence.SaveColors {
+							sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
+							sequence.SaveColors = false
+						}
+					}
+				}
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {

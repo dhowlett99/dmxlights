@@ -166,7 +166,7 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.coordinates, tt.fixtures); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePatten(tt.coordinates, tt.fixtures, false); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GeneratePatten() = %v, want %v", got, tt.want)
 			}
 		})

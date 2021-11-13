@@ -168,6 +168,7 @@ type Sequence struct {
 	Color                   int
 	Gobo                    []Gobo
 	SelectedGobo            int
+	SelectedColor           int
 	Master                  int // Master Brightness
 	Functions               []Function
 	FunctionMode            bool
@@ -179,6 +180,8 @@ type Sequence struct {
 	CurrentSequenceColors   []Color
 	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
 	AutoColor               bool
+	RecoverSequenceColors   bool
+	SaveColors              bool
 }
 
 type Function struct {
