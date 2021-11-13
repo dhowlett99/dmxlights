@@ -333,7 +333,7 @@ func PlayNewSequence(sequence common.Sequence,
 				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
 
 				// Set the patten automatically
-				if sequence.AutoPatten && sequence.Type != "scanner" {
+				if sequence.AutoPatten && sequence.Type == "rgb" {
 					fmt.Printf("--->Auto Patten Mode\n")
 					for name, patten := range pattens {
 						if patten.Number == sequence.SelectedPatten {
@@ -357,7 +357,7 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 
 				// Set the current colors in the sequence.
-				if sequence.AutoColor {
+				if sequence.AutoColor && sequence.Type == "rgb" {
 					fmt.Printf("--->Auto Color Mode\n")
 					// Find a new color.
 					newColor := []common.Color{}
