@@ -406,7 +406,6 @@ func main() {
 
 		// Master brightness down.
 		if hit.X == 6 && hit.Y == -1 {
-			//fmt.Printf("Master Brightness Down %d\n", masterBrightness)
 			masterBrightness = masterBrightness - 10
 			if masterBrightness < 0 {
 				masterBrightness = 0
@@ -421,7 +420,6 @@ func main() {
 
 		// Master brightness up.
 		if hit.X == 7 && hit.Y == -1 {
-			//fmt.Printf("Master Brightness Up %d\n", masterBrightness)
 			masterBrightness = masterBrightness + 10
 			if masterBrightness > 255 {
 				masterBrightness = 255
@@ -981,7 +979,6 @@ func main() {
 			sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[selectedSequence].Type == "scanner" {
 
-			fmt.Printf("S E T    S C A N N E R   G O B O for X:%d Y%d\n", hit.X, hit.Y)
 			// Add the selected color to the sequence.
 			cmd := common.Command{
 				UpdateGobo:   true,
@@ -1035,7 +1032,6 @@ func main() {
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			lastStaticColorButtonX = hit.X
 			lastStaticColorButtonY = hit.Y
-			fmt.Printf("LastStaticColorButton X:%d Y:%d\n", lastStaticColorButtonX, lastStaticColorButtonY)
 
 			continue
 		}
@@ -1211,39 +1207,31 @@ func setColorEditMode(selectedSequence int,
 	eventsForLauchpad chan common.ALight) {
 
 	if !functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function5_Color].State && colorEditMode[selectedSequence] {
-		fmt.Printf("Hide Edit Color Buttons.\n")
 		unSetColorEditMode(selectedSequence, sequences, functionSelectMode, colorEditMode, selectButtonPressed, commandChannels, eventsForLauchpad)
 		return
 	}
 
 	if functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && colorEditMode[selectedSequence] {
-
-		fmt.Printf("Something else Color Buttons.\n")
 		showEditColorButtons(sequences[selectedSequence], selectedSequence, eventsForLauchpad, sequences[selectedSequence].Master)
-
 		cmd := common.Command{
 			SetEditColors: true,
 			EditColors:    true,
 		}
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
 		colorEditMode[selectedSequence] = false
 		selectButtonPressed[selectedSequence] = false
 		functionSelectMode[selectedSequence] = false
 		sequences[selectedSequence].Functions[common.Function6_Static].State = false
-
 		common.RevealSequence(selectedSequence, commandChannels)
 	}
 
 	if !functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && !colorEditMode[selectedSequence] {
-		fmt.Printf("Show Edit Color Buttons.\n")
 		cmd := common.Command{
 			SetEditColors: true,
 			EditColors:    false,
 		}
 		common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 		if !colorEditMode[selectedSequence] {
-			//fmt.Printf("Show Edit Color Buttons.\n")
 			showEditColorButtons(sequences[selectedSequence], selectedSequence, eventsForLauchpad, sequences[selectedSequence].Master)
 		}
 	}
@@ -1290,7 +1278,6 @@ func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, e
 
 // For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
-	fmt.Printf("HideColorSelectionButtons\n")
 	for myFixtureNumber := range sequence.AvailableSequenceColors {
 		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 	}
