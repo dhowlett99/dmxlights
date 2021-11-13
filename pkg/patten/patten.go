@@ -739,7 +739,7 @@ func MakePatterns() map[string]common.Patten {
 
 }
 
-func GeneratePatten(coordinates []coordinate, NumberFixtures int) common.Patten {
+func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift bool) common.Patten {
 
 	reverseCoordinates := []coordinate{}
 
@@ -758,7 +758,7 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int) common.Patten 
 		fixtures := []common.Fixture{}
 		for f := 0; f < NumberFixtures; f++ {
 
-			if f == 0 {
+			if f == 0 || !shift {
 				newFixture := common.Fixture{
 					Type:         "scanner",
 					MasterDimmer: full,
@@ -776,7 +776,7 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int) common.Patten 
 				}
 				fixtures = append(fixtures, newFixture)
 			}
-			if f == 1 {
+			if f == 1 && shift {
 				newFixture := common.Fixture{
 					Type:         "scanner",
 					MasterDimmer: full,

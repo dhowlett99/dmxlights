@@ -118,7 +118,7 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift:                 2,
+		Shift:                 false,
 		Blackout:              false,
 		Master:                255,
 		Gobo:                  gobos,
@@ -290,22 +290,22 @@ func PlayNewSequence(sequence common.Sequence,
 
 				if sequence.Patten.Name == "circle" {
 					coordinates := patten.CircleGenerator(sequence.SequenceSize)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "leftandright" {
 					coordinates := patten.ScanGeneratorLeftRight(128)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "upanddown" {
 					coordinates := patten.ScanGeneratorUpDown(128)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 					steps = scannerPatten.Steps
 				}
 				if sequence.Patten.Name == "sinewave" {
 					coordinates := patten.ScanGenerateSineWave(255, 5000)
-					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners)
+					scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 					steps = scannerPatten.Steps
 				}
 

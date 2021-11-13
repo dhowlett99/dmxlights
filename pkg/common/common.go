@@ -153,7 +153,7 @@ type Sequence struct {
 	Steps                   int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten                  Patten // Contains fixtures and steps info.
 	Colors                  []Color
-	Shift                   int
+	Shift                   bool // Used for shifting scanners patterns apart.
 	CurrentSpeed            time.Duration
 	Speed                   int
 	FadeSpeed               int
@@ -569,6 +569,12 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 		if sequence.Functions[Function4_Bounce].State {
 			sequence.Patten.Name = "sinewave"
+		}
+
+		if sequence.Functions[Function7_Invert].State {
+			sequence.Shift = true
+		} else {
+			sequence.Shift = false
 		}
 	}
 
