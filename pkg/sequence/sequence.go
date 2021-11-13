@@ -344,7 +344,7 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.SelectedPatten > len(pattens) {
 						sequence.SelectedPatten = 0
 					}
-					fmt.Printf("Patten Name is %s\n", sequence.Patten.Name)
+					//fmt.Printf("Patten Name is %s\n", sequence.Patten.Name)
 				}
 
 				// Set the patten automatically
@@ -367,7 +367,6 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.SelectedColor > 7 {
 						sequence.SelectedColor = 0
 					}
-					fmt.Printf("Current Colors %+v\n", sequence.SequenceColors)
 					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
 
