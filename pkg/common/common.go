@@ -51,6 +51,7 @@ type StaticColorButton struct {
 
 type Patten struct {
 	Name     string
+	Number   int
 	Length   int // 8, 4 or 2
 	Size     int
 	Fixtures int // 8 Fixtures
@@ -180,6 +181,8 @@ type Sequence struct {
 	CurrentSequenceColors   []Color
 	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
 	AutoColor               bool
+	AutoPatten              bool
+	SelectedPatten          int
 	RecoverSequenceColors   bool
 	SaveColors              bool
 }

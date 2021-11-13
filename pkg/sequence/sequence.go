@@ -126,6 +126,7 @@ func CreateSequence(
 		SelectedFloodSequence: selectedFloodMap,
 		Flood:                 false,
 		AutoColor:             false,
+		AutoPatten:            true,
 	}
 
 	// Make functions for each of the sequences.
@@ -329,6 +330,22 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Calulate positions for fixtures based on patten.
 				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
+
+				// Set the patten automatically
+				if sequence.AutoPatten && sequence.Type != "scanner" {
+					fmt.Printf("--->Auto Patten Mode\n")
+					for name, patten := range pattens {
+						if patten.Number == sequence.SelectedPatten {
+							sequence.Patten.Name = name
+							break
+						}
+					}
+					sequence.SelectedPatten++
+					if sequence.SelectedPatten > len(pattens) {
+						sequence.SelectedPatten = 0
+					}
+					fmt.Printf("Patten Name is %s\n", sequence.Patten.Name)
+				}
 
 				// Set the current colors in the sequence.
 				if sequence.AutoColor {
