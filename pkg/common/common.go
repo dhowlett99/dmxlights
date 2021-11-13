@@ -122,6 +122,8 @@ type Command struct {
 	Flood                 bool
 	UpdateAutoColor       bool
 	AutoColor             bool
+	UpdateAutoPatten      bool
+	AutoPatten            bool
 }
 
 type Gobo struct {

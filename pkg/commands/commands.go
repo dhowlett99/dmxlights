@@ -318,6 +318,22 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
+	if command.UpdateAutoPatten {
+		if debug {
+			fmt.Printf("%d: Command Update Auto Patten to  %t\n", mySequenceNumber, command.AutoPatten)
+		}
+		sequence.AutoPatten = command.AutoPatten
+		if !command.AutoPatten {
+			if sequence.Type == "rgb" {
+				sequence.Patten.Name = "standard"
+			}
+			if sequence.Type == "scanner" {
+				sequence.Patten.Name = "circle"
+				sequence.SelectedScannerPatten = 1
+			}
+		}
+		return sequence
+	}
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {

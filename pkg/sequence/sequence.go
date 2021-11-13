@@ -126,7 +126,7 @@ func CreateSequence(
 		SelectedFloodSequence: selectedFloodMap,
 		Flood:                 false,
 		AutoColor:             false,
-		AutoPatten:            true,
+		AutoPatten:            false,
 		SelectedScannerPatten: 0,
 	}
 

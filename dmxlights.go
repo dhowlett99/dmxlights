@@ -53,6 +53,7 @@ func main() {
 	var lastStaticColorButtonY int // Which Static Color button did we change last.
 	var soundGain float32 = 0      // Fine gain -0.09 -> 0.09
 	var autocolor []bool           // Is auto color change selected for this sequence.
+	var autopatten []bool          // Is auto patten change selected for this sequence.
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -236,6 +237,9 @@ func main() {
 	// Remember when we have set autocolor change for this sequence.
 	autocolor = make([]bool, 4)
 
+	// Remember when we have set autocolor change for this sequence.
+	autopatten = make([]bool, 4)
+
 	// Light the logo blue.
 	pad.Light(8, -1, 0, 0, 255)
 
@@ -368,6 +372,34 @@ func main() {
 				cmd := common.Command{
 					UpdateAutoColor: true,
 					AutoColor:       false,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(300 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+				continue
+			}
+		}
+
+		// A U T O   P A T T E N   M O D E
+		if hit.X == 5 && hit.Y == 3 {
+			if !autopatten[selectedSequence] {
+				autopatten[selectedSequence] = true
+				cmd := common.Command{
+					UpdateAutoPatten: true,
+					AutoPatten:       true,
+				}
+				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
+				time.Sleep(300 * time.Millisecond)
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+				continue
+			}
+			if autopatten[selectedSequence] {
+				autopatten[selectedSequence] = false
+				cmd := common.Command{
+					UpdateAutoPatten: true,
+					AutoPatten:       false,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
