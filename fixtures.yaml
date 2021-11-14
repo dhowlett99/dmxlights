@@ -240,7 +240,9 @@ fixtures:
     states:
     - name: Off
       values:
-        - channel: 127
+        - name: master dimmer
+          description: Dimmer
+          channel: 127
           setting: 0
       buttoncolor: 
         red: 0
@@ -248,7 +250,9 @@ fixtures:
         blue: 0
     - name: On
       values: 
-        - channel: 137
+        - name: master dimmer
+          description: Dimmer
+          channel: 127
           setting: 255
       buttoncolor: 
         red: 255
@@ -260,7 +264,9 @@ fixtures:
     states:
     - name: Off
       values:
-        - channel: 137
+        - name: master dimmer
+          description: Dimmer
+          channel: 137
           setting: 0
       buttoncolor: 
         red: 0
@@ -268,7 +274,9 @@ fixtures:
         blue: 0
     - name: On
       values: 
-        - channel: 137
+        - name: master dimmer
+          description: Dimmer
+          channel: 137
           setting: 255
       buttoncolor: 
         red: 255
@@ -276,18 +284,37 @@ fixtures:
         blue: 0
   - name: switch
     number: 3
-    description: Switch3
+    description: ACME Deluge
     states:
     - name: Off
+      master: 
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
+      values: 
+        - name: master dimmer
+          description: Dimmer
+          channel: 145 # Base address of Deluge Fixture
+          setting: 0 # 100% Brightness
     - name: On
       buttoncolor: 
         red: 255
         green: 0
         blue: 0
+      values: 
+        - name: master dimmer
+          description: Dimmer
+          channel: 145 # Base address of Deluge Fixture
+          setting: 255 # 100% Brightness
+        - name: effect
+          description: Rotation
+          channel: 146 # 
+          setting: 135  # Slowest Rotataion  
+        - name: color
+          description: Color Change Speed
+          channel: 147
+          setting: 135 # Slow Clockwise
   - name: switch
     number: 4
     states:

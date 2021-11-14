@@ -344,7 +344,6 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.SelectedPatten > len(pattens) {
 						sequence.SelectedPatten = 0
 					}
-					//fmt.Printf("Patten Name is %s\n", sequence.Patten.Name)
 				}
 
 				// Set the patten automatically
@@ -460,14 +459,21 @@ func PlayNewSequence(sequence common.Sequence,
 }
 
 func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
+
 	for switchNumber, switchData := range sequence.Switches {
-		for valuePosition, value := range switchData.States {
-			if valuePosition == switchData.CurrentPosition {
-				launchpad.LightLamp(mySequenceNumber, switchNumber, value.ButtonColor.R, value.ButtonColor.G, value.ButtonColor.B, 255, eventsForLauchpad)
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentPosition, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+		for stateNumber, state := range switchData.States {
+
+			// For this state.
+			if stateNumber == switchData.CurrentState {
+				// Use the button color for this state to light the correct color on the launchpad.
+				launchpad.LightLamp(mySequenceNumber, switchNumber, state.ButtonColor.R, state.ButtonColor.G, state.ButtonColor.B, 255, eventsForLauchpad)
+
+				// Now play all the values for this state.
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
 	}
+
 	return flood
 }
 

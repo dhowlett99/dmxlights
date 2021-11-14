@@ -26,19 +26,22 @@ type Color struct {
 }
 
 type Value struct {
-	Channel int16 `yaml:"channel"`
-	Setting int16 `yaml:"setting"`
+	Name        string `yaml:"name"`
+	Description string `yaml:"description"`
+	Channel     int16  `yaml:"channel"`
+	Setting     int16  `yaml:"setting"`
 }
 
 type State struct {
 	Name        string  `yaml:"name"`
 	Values      []Value `yaml:"values"`
 	ButtonColor Color   `yaml:"buttoncolor"`
+	Master      int     `yaml:"master"`
 }
 
 type Switch struct {
 	Name        string  `yaml:"name"`
-	Number      int16   `yaml:"number"`
+	Number      int     `yaml:"number"`
 	Description string  `yaml:"description"`
 	States      []State `yaml:"states"`
 }
@@ -250,19 +253,23 @@ func MapFixtures(mySequenceNumber int,
 
 func MapSwitchFixture(mySequenceNumber int,
 	dmxController *ft232.DMXController,
-	displayFixture int, selectedSwitch int,
+	switchNumber int, currentState int,
 	fixtures *Fixtures, blackout bool, brightness int, master int) {
 
+	// Step through the fixture config file looking for the group that matches mysequence number.
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, swiTch := range fixture.Switches {
-				for stateNumber, state := range swiTch.States {
-					if stateNumber == selectedSwitch {
-						for _, value := range state.Values {
-							if blackout {
-								dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
-							} else {
-								dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
+				if switchNumber+1 == swiTch.Number {
+					for stateNumber, state := range swiTch.States {
+						if stateNumber == currentState {
+
+							for _, value := range state.Values {
+								if blackout {
+									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
+								} else {
+									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
+								}
 							}
 						}
 					}
@@ -275,6 +282,7 @@ func MapSwitchFixture(mySequenceNumber int,
 func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
 	gobos := []common.Gobo{}
 	for _, f := range fixturesConfig.Fixtures {
+		fmt.Printf("Fixture Name:%s\n", f.Name)
 		if f.Type == "scanner" {
 			for _, channel := range f.Channels {
 				if channel.Name == "Gobo" {

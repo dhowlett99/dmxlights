@@ -34,11 +34,11 @@ type State struct {
 }
 
 type Switch struct {
-	Name            string
-	Number          int16
-	CurrentPosition int
-	Description     string
-	States          []State
+	Name         string
+	Number       int
+	CurrentState int
+	Description  string
+	States       []State
 }
 
 type StaticColorButton struct {

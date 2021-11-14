@@ -282,7 +282,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.SwitchNumber, command.SwitchPosition)
 		}
-		sequence.Switches[command.SwitchNumber].CurrentPosition = command.SwitchPosition
+		sequence.Switches[command.SwitchNumber].CurrentState = command.SwitchPosition
 		sequence.PlaySwitchOnce = true
 		sequence.Run = false
 		sequence.Type = "switch"
