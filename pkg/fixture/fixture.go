@@ -268,10 +268,14 @@ func MapSwitchFixture(mySequenceNumber int,
 								if blackout {
 									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
 								} else {
+									// This should be controlled by the master brightness
 									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
-										// This should be controlled by the master brightness
-										howBright := (float64(value.Setting) / 100) * (float64(brightness) / 2.55)
-										dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(howBright))
+										howBright := int((float64(value.Setting) / 100) * (float64(brightness) / 2.55))
+										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
+											dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(reverse_dmx(howBright)))
+										} else {
+											dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(howBright))
+										}
 									} else {
 										dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
 									}
@@ -283,6 +287,19 @@ func MapSwitchFixture(mySequenceNumber int,
 			}
 		}
 	}
+}
+
+func reverse_dmx(n int) int {
+
+	in := make(map[int]int, 255)
+	var y = 255
+
+	for x := 0; x <= 255; x++ {
+
+		in[x] = y
+		y--
+	}
+	return in[n]
 }
 
 func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {

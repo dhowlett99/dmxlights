@@ -322,7 +322,7 @@ fixtures:
     - name: Off
       buttoncolor: 
         red: 0
-        green: 255
+        green: 0
         blue: 0
       values: 
         - name: mode
@@ -341,10 +341,48 @@ fixtures:
           description: blue
           channel: 142
           setting: 0
-    - name: Slow Color Change
+        - name: strobe
+          description: speed / strobe
+          channel: 143
+          setting: 0
+        - name: master reverse dimmer
+          description: Dimmer
+          channel: 144
+          setting: 0
+    - name: Red
       buttoncolor: 
         red: 255
         green: 0
+        blue: 0
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 0
+        - name: red
+          description: red
+          channel: 140
+          setting: 255
+        - name: green
+          description: greeb
+          channel: 141
+          setting: 0
+        - name: blue
+          description: blue
+          channel: 142
+          setting: 0
+        - name: strobe
+          description: speed / strobe
+          channel: 143
+          setting: 0
+        - name: master reverse dimmer
+          description: Dimmer
+          channel: 144
+          setting: 255
+    - name: Slow Color Change
+      buttoncolor: 
+        red: 255
+        green: 255
         blue: 0
       values: 
         - name: mode
@@ -356,7 +394,7 @@ fixtures:
           channel: 140
           setting: 0
         - name: green
-          description: greeb
+          description: green
           channel: 141
           setting: 0
         - name: blue
@@ -364,17 +402,13 @@ fixtures:
           channel: 142
           setting: 0
         - name: speed
-          description: speed
+          description: speed / strobe
           channel: 143
           setting: 0
-        - name: strobe
-          description: strobe
-          channel: 144
-          setting: 0
-        - name: master dimmer
+        - name: master reverse dimmer
           description: Dimmer
-          channel: 145
-          setting: 0
+          channel: 144
+          setting: 255
     - name: Meduim Color Change
       buttoncolor: 
         red: 0
@@ -398,17 +432,13 @@ fixtures:
           channel: 142
           setting: 0
         - name: speed
-          description: speed
+          description: speed / strobe
           channel: 143
           setting: 100
-        - name: strobe
-          description: strobe
-          channel: 144
-          setting: 0
-        - name: master dimmer
+        - name: master reverse dimmer
           description: Dimmer
-          channel: 145
-          setting: 0
+          channel: 144
+          setting: 255
     - name: Sound Triggered Color Change
       buttoncolor: 
         red: 255
@@ -432,17 +462,13 @@ fixtures:
           channel: 142
           setting: 0
         - name: speed
-          description: speed
+          description: speed / strobe
           channel: 143
           setting: 100
-        - name: strobe
-          description: strobe
-          channel: 144
-          setting: 0
-        - name: master dimmer
+        - name: master reverse dimmer
           description: Dimmer
-          channel: 145
-          setting: 0
+          channel: 144
+          setting: 255
   - name: switch
     number: 5
     states:

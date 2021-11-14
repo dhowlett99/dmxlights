@@ -445,7 +445,7 @@ func main() {
 		}
 
 		// Sound sensitity up.
-		if hit.X == 5 && hit.Y == -1 {
+		if hit.X == 4 && hit.Y == -1 {
 			fmt.Printf("Sound Up %f\n", soundGain)
 			soundGain = soundGain - 0.01
 			if soundGain < -0.9 {
@@ -456,8 +456,8 @@ func main() {
 			}
 		}
 
-		// Sound sensitity rotate.
-		if hit.X == 4 && hit.Y == -1 {
+		// Sound sensitity down.
+		if hit.X == 5 && hit.Y == -1 {
 			fmt.Printf("Sound Down%f\n", soundGain)
 			soundGain = soundGain + 0.01
 			if soundGain > 0.9 {
