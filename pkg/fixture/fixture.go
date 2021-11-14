@@ -268,7 +268,13 @@ func MapSwitchFixture(mySequenceNumber int,
 								if blackout {
 									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
 								} else {
-									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
+									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
+										// This should be controlled by the master brightness
+										howBright := (float64(value.Setting) / 100) * (float64(brightness) / 2.55)
+										dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(howBright))
+									} else {
+										dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
+									}
 								}
 							}
 						}
