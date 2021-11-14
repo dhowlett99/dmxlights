@@ -317,17 +317,132 @@ fixtures:
           setting: 135 # Slow Clockwise
   - name: switch
     number: 4
+    description: Chauvet Vue 1.1
     states:
     - name: Off
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
-    - name: On
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 0
+        - name: red
+          description: red
+          channel: 140
+          setting: 0
+        - name: green
+          description: greeb
+          channel: 141
+          setting: 0
+        - name: blue
+          description: blue
+          channel: 142
+          setting: 0
+    - name: Slow Color Change
       buttoncolor: 
         red: 255
         green: 0
         blue: 0
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 25
+        - name: red
+          description: red
+          channel: 140
+          setting: 0
+        - name: green
+          description: greeb
+          channel: 141
+          setting: 0
+        - name: blue
+          description: blue
+          channel: 142
+          setting: 0
+        - name: speed
+          description: speed
+          channel: 143
+          setting: 0
+        - name: strobe
+          description: strobe
+          channel: 144
+          setting: 0
+        - name: master dimmer
+          description: Dimmer
+          channel: 145
+          setting: 0
+    - name: Meduim Color Change
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 25
+        - name: red
+          description: red
+          channel: 140
+          setting: 0
+        - name: green
+          description: greeb
+          channel: 141
+          setting: 0
+        - name: blue
+          description: blue
+          channel: 142
+          setting: 0
+        - name: speed
+          description: speed
+          channel: 143
+          setting: 100
+        - name: strobe
+          description: strobe
+          channel: 144
+          setting: 0
+        - name: master dimmer
+          description: Dimmer
+          channel: 145
+          setting: 0
+    - name: Sound Triggered Color Change
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 255
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 255
+        - name: red
+          description: red
+          channel: 140
+          setting: 0
+        - name: green
+          description: greeb
+          channel: 141
+          setting: 0
+        - name: blue
+          description: blue
+          channel: 142
+          setting: 0
+        - name: speed
+          description: speed
+          channel: 143
+          setting: 100
+        - name: strobe
+          description: strobe
+          channel: 144
+          setting: 0
+        - name: master dimmer
+          description: Dimmer
+          channel: 145
+          setting: 0
   - name: switch
     number: 5
     states:
