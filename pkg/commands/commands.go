@@ -207,7 +207,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Mode = command.Mode
 		if sequence.Mode == "Static" {
-			fmt.Printf("Setting Run to %t\n", sequence.Run)
 			sequence.Run = false
 		}
 		return sequence
