@@ -373,7 +373,6 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.RecoverSequenceColors {
 						if sequence.CurrentSequenceColors != nil {
 							sequence.Positions = replaceColors(sequence.Positions, sequence.CurrentSequenceColors)
-							//sequence.RecoverSequenceColors = false
 							sequence.AutoColor = false
 						}
 					} else {
