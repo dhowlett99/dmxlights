@@ -1016,7 +1016,6 @@ func main() {
 			sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[selectedSequence].Type != "scanner" {
 
-			fmt.Printf("S E T    S E Q E N C E   C O L O R for X:%d Y%d\n", hit.X, hit.Y)
 			// Add the selected color to the sequence.
 			cmd := common.Command{
 				UpdateSequenceColor: true,
@@ -1326,7 +1325,6 @@ func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, e
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
 						lamp.Flash = true
-						fmt.Printf("fixture %d : We need to flash button %d color %+v\n", myFixtureNumber, index, sequenceColor)
 					}
 				}
 			}
