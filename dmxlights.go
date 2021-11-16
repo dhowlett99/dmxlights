@@ -849,6 +849,7 @@ func main() {
 		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
 			hit.Y >= 0 &&
 			hit.Y < 4 &&
+			!sequences[selectedSequence].Functions[common.Function1_Patten].State &&
 			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
 			!sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[hit.Y].Type != "switch" {
@@ -1029,18 +1030,18 @@ func main() {
 			// Tell the sequence to change the patten
 			cmd := common.Command{
 				SelectPatten:   true,
-				SelectedPatten: hit.X + 1, // Add one because buttons start at 0
+				SelectedPatten: hit.X,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-			editPattenMode[selectedSequence] = false
+			//editPattenMode[selectedSequence] = false
 			functionSelectMode[selectedSequence] = false
 
-			// Reset the patten function key.
-			sequences[selectedSequence].Functions[common.Function1_Patten].State = false
+			// Get an upto date copy of the sequence.
+			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
 
-			// Clear the patten function keys
-			ClearPattenSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
+			// We call ShowPattenSelectionButtons here so the selections will flash as you press them.
+			ShowPattenSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 
 			continue
 		}
@@ -1116,6 +1117,7 @@ func HandleSelect(sequences []*common.Sequence,
 		if sequences[selectedSequence].Functions[common.Function1_Patten].State {
 			//fmt.Printf("Show Patten Selection Buttons\n")
 			editPattenMode[selectedSequence] = true
+			common.HideSequence(selectedSequence, commandChannels)
 			ShowPattenSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 			return
 		}
@@ -1154,6 +1156,20 @@ func HandleSelect(sequences []*common.Sequence,
 		// But remember we have pressed this select button once.
 		functionSelectMode[selectedSequence] = false
 		selectButtonPressed[selectedSequence] = true
+
+		if sequences[selectedSequence].Functions[common.Function1_Patten].State {
+			// Reset the patten function key.
+			sequences[selectedSequence].Functions[common.Function1_Patten].State = false
+
+			// Clear the patten function keys
+			ClearPattenSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
+
+			// And reveal the sequence.
+			common.RevealSequence(selectedSequence, commandChannels)
+
+			// Editing patten is over for this sequence.
+			editPattenMode[selectedSequence] = false
+		}
 		return
 	}
 
@@ -1306,7 +1322,7 @@ func ShowColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, e
 // For the given sequence clear the available pattens on the relevant buttons.
 func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight) {
 	// Check if we need to flash this button.
-	for myFixtureNumber := 0; myFixtureNumber < 8; myFixtureNumber++ {
+	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
 		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 	}
 }
@@ -1314,8 +1330,13 @@ func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 // For the given sequence show the available pattens on the relevant buttons.
 func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight) {
 	// Check if we need to flash this button.
-	for myFixtureNumber := 0; myFixtureNumber < 8; myFixtureNumber++ {
-		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
+	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
+		if myFixtureNumber == sequence.SelectedPatten {
+			code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 255, G: 255, B: 255})
+			launchpad.FlashLight(mySequenceNumber, myFixtureNumber, int(code), 0x0, eventsForLauchpad)
+		} else {
+			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
+		}
 	}
 }
 

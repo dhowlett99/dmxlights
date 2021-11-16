@@ -1,6 +1,7 @@
 package common
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -112,7 +113,7 @@ type Command struct {
 	FunctionMode          bool
 	UpdateFunctions       bool
 	Functions             []Function
-	UpdateSequence        bool
+	GetUpdatedSequence    bool
 	UpdateSwitch          bool
 	SwitchNumber          int
 	SwitchPosition        int
@@ -409,6 +410,7 @@ func SetMode(selectedSequence int, commandChannels []chan Command, mode string) 
 }
 
 func RevealSequence(selectedSequence int, commandChannels []chan Command) {
+	fmt.Printf("RevealSequence\n")
 	cmd := Command{
 		UnHide: true,
 	}
@@ -566,7 +568,7 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 
 	// Get an upto date copy of the sequence.
 	cmd := Command{
-		UpdateSequence: true,
+		GetUpdatedSequence: true,
 	}
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	newSequence := <-updateChannels[selectedSequence]

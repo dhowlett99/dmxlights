@@ -292,16 +292,16 @@ func PlayNewSequence(sequence common.Sequence,
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
 
-					if sequence.SelectedPatten == 1 {
+					if sequence.SelectedPatten == 0 {
 						sequence.Patten.Name = "standard"
 					}
-					if sequence.SelectedPatten == 2 {
+					if sequence.SelectedPatten == 1 {
 						sequence.Patten.Name = "pairs"
 					}
-					if sequence.SelectedPatten == 3 {
+					if sequence.SelectedPatten == 2 {
 						sequence.Patten.Name = "inward"
 					}
-					if sequence.SelectedPatten == 4 {
+					if sequence.SelectedPatten == 3 {
 						sequence.Patten.Name = "colors"
 					}
 
@@ -309,22 +309,22 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
-					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 1 {
+					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 0 {
 						coordinates := patten.CircleGenerator(sequence.SequenceSize)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "leftandright" || sequence.SelectedScannerPatten == 2 {
+					if sequence.Patten.Name == "leftandright" || sequence.SelectedScannerPatten == 1 {
 						coordinates := patten.ScanGeneratorLeftRight(128)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "upanddown" || sequence.SelectedScannerPatten == 3 {
+					if sequence.Patten.Name == "upanddown" || sequence.SelectedScannerPatten == 2 {
 						coordinates := patten.ScanGeneratorUpDown(128)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
 					}
-					if sequence.Patten.Name == "sinewave" || sequence.SelectedScannerPatten == 4 {
+					if sequence.Patten.Name == "sinewave" || sequence.SelectedScannerPatten == 3 {
 						coordinates := patten.ScanGenerateSineWave(255, 5000)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
 						steps = scannerPatten.Steps
@@ -364,8 +364,8 @@ func PlayNewSequence(sequence common.Sequence,
 				// Set the patten automatically
 				if sequence.AutoPatten && sequence.Type == "scanner" {
 					sequence.SelectedScannerPatten++
-					if sequence.SelectedScannerPatten > 4 {
-						sequence.SelectedScannerPatten = 1
+					if sequence.SelectedScannerPatten > 3 {
+						sequence.SelectedScannerPatten = 0
 					}
 				}
 

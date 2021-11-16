@@ -76,7 +76,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.SelectedPatten = command.SelectedPatten
 		sequence.SelectedScannerPatten = command.SelectedPatten
-		sequence.Hide = false
 		return sequence
 	}
 
@@ -271,9 +270,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 	// If we are being asked for a updated config we must reply with our current sequence.
-	if command.UpdateSequence {
+	if command.GetUpdatedSequence {
 		if debug {
-			fmt.Printf("%d: Command Update Sequence\n", mySequenceNumber)
+			fmt.Printf("%d: Command Get Updated Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
 		return sequence
