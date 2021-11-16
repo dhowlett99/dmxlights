@@ -291,7 +291,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
-
+					sequence.ChangePatten = false
 					if sequence.SelectedPatten == 0 {
 						sequence.Patten.Name = "standard"
 					}
@@ -309,6 +309,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
+					sequence.ChangePatten = false
 					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 0 {
 						coordinates := patten.CircleGenerator(sequence.SequenceSize)
 						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
@@ -340,7 +341,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run || sequence.Flood {
+				if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 					break
 				}
 
@@ -405,6 +406,9 @@ func PlayNewSequence(sequence common.Sequence,
 
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+						break
+					}
 
 					cmd := common.FixtureCommand{
 						Inverted:        sequence.Inverted,
@@ -428,42 +432,42 @@ func PlayNewSequence(sequence common.Sequence,
 					// Now tell all the fixtures what they need to do.
 					fixtureChannel1 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel2 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel3 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel4 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel5 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel6 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel7 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 					fixtureChannel8 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
 						break
 					}
 				}

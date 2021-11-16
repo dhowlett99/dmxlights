@@ -189,6 +189,7 @@ type Sequence struct {
 	AutoColor               bool
 	AutoPatten              bool
 	SelectedPatten          int
+	ChangePatten            bool
 	RecoverSequenceColors   bool
 	SaveColors              bool
 	SelectedScannerPatten   int
@@ -536,6 +537,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map invert function.
 	sequence.Inverted = sequence.Functions[Function7_Invert].State
+	sequence.Shift = sequence.Functions[Function7_Invert].State
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
