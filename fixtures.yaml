@@ -69,7 +69,7 @@ fixtures:
   number: 1
   description: Chauvet Color Rail IRC
   type: rgb
-  address: 27
+  address: 172
   fixtures:
   group: 2
   channels:
@@ -125,6 +125,33 @@ fixtures:
     name: Blue8
   - number: 26
     name: Strobe
+- name: ADJ QA PAR 38
+  number: 1
+  description: American DJ SPOT
+  type: rgb
+  address: 105
+  group: 2 
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Static
+    value: 0
+  - number: 5
+    name: Master Dimmer
+  - number: 6
+    name: Static
+    value: 0
+  - number: 7
+    name: Static
+    value: 0
+  - number: 8
+    name: Static
+    value: 0
 - name: Scanner
   number: 1
   description: American DJ Comscan LED
