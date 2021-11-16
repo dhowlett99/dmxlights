@@ -141,9 +141,6 @@ func CreateSequence(
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 
-	// We start in forward chase.
-	sequence.Functions[common.Function1_Forward_Chase].State = true
-
 	if sequenceType == "switch" {
 
 		fmt.Printf("Load switch data\n")
@@ -249,9 +246,9 @@ func PlayNewSequence(sequence common.Sequence,
 		}
 
 		// Sequence in Static Mode.
-		if sequence.PlayStaticOnce && sequence.Static && sequence.Mode == "Static" {
+		if sequence.PlayStaticOnce && sequence.Static {
 			for myFixtureNumber, lamp := range sequence.StaticColors {
-				if !sequence.Hide {
+				if sequence.Hide {
 					if lamp.Flash {
 						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
 						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
@@ -270,7 +267,7 @@ func PlayNewSequence(sequence common.Sequence,
 		// This is the inner loop where the sequence runs.
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
-			for sequence.Run {
+			for sequence.Run && !sequence.Static {
 
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
@@ -291,6 +288,24 @@ func PlayNewSequence(sequence common.Sequence,
 				}
 
 				steps := pattens[sequence.Patten.Name].Steps
+
+				// Setup rgb pattens.
+				if sequence.Type == "rgb" {
+
+					if sequence.SelectedPatten == 1 {
+						sequence.Patten.Name = "standard"
+					}
+					if sequence.SelectedPatten == 2 {
+						sequence.Patten.Name = "pairs"
+					}
+					if sequence.SelectedPatten == 3 {
+						sequence.Patten.Name = "inward"
+					}
+					if sequence.SelectedPatten == 4 {
+						sequence.Patten.Name = "colors"
+					}
+
+				}
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
@@ -325,7 +340,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run {
+				if !sequence.Run || sequence.Flood {
 					break
 				}
 
@@ -371,15 +386,15 @@ func PlayNewSequence(sequence common.Sequence,
 
 				if sequence.UpdateSequenceColor {
 					if sequence.RecoverSequenceColors {
-						if sequence.CurrentSequenceColors != nil {
-							sequence.Positions = replaceColors(sequence.Positions, sequence.CurrentSequenceColors)
+						if sequence.SavedSequenceColors != nil {
+							sequence.Positions = replaceColors(sequence.Positions, sequence.SavedSequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
 						sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
-							sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
+							sequence.SavedSequenceColors = common.HowManyColors(sequence.Positions)
 							sequence.SaveColors = false
 						}
 					}

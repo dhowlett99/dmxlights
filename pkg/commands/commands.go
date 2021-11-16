@@ -67,10 +67,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Patten.Name)
 		}
-		savePattenName := command.Patten.Name
-		sequence.Patten.Name = savePattenName
+		sequence.Patten.Name = command.Patten.Name
 		return sequence
 	}
+	if command.SelectPatten {
+		if debug {
+			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.SelectedPatten)
+		}
+		sequence.SelectedPatten = command.SelectedPatten
+		sequence.SelectedScannerPatten = command.SelectedPatten
+		sequence.Hide = false
+		return sequence
+	}
+
 	if command.UpdateSize {
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Size)
@@ -196,10 +205,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Static = command.Static
-		if sequence.Mode == "Static" {
-			sequence.Static = true
-		}
-		return sequence
+
 	}
 	if command.UpdateMode {
 		if debug {
@@ -207,7 +213,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Mode = command.Mode
 		if sequence.Mode == "Static" {
-			sequence.Run = false
+			sequence.Static = true
+		}
+		if sequence.Mode == "Sequence" {
+			sequence.Static = false
 		}
 		return sequence
 	}
@@ -219,6 +228,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Static
+		sequence.Hide = true
 		sequence.StaticColors[command.StaticLamp].SelectedColor = command.SelectedColor
 		sequence.StaticColors[command.StaticLamp].Color = command.StaticColor
 		sequence.StaticColors[command.StaticLamp].Flash = command.StaticLampFlash
@@ -235,7 +245,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	}
 	if command.ClearSequenceColor {
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
+			fmt.Printf("%d: Command Clear Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = []common.Color{}

@@ -89,6 +89,8 @@ type Command struct {
 	UpdateSpeed           bool
 	Speed                 int
 	UpdatePatten          bool
+	SelectPatten          bool
+	SelectedPatten        int
 	Patten                Patten
 	IncreaseFade          bool
 	DecreaseFade          bool
@@ -181,6 +183,7 @@ type Sequence struct {
 	Inverted                bool
 	Positions               map[int][]Position
 	CurrentSequenceColors   []Color
+	SavedSequenceColors     []Color
 	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
 	AutoColor               bool
 	AutoPatten              bool
@@ -296,10 +299,10 @@ type Trigger struct {
 
 // Define the function keys.
 const (
-	Function1_Forward_Chase = 0 // Forward chase in RGB, cirlce in scanner mode.
-	Function2_Pairs_Chase   = 1 // Pais chase in RGB, left and right scanner mode.
-	Function3_Inward_Chase  = 2 // Inward chase in RGB, up and down scanner mode.
-	Function4_Bounce        = 3 // Sequence auto reverses. or Sinewave pattern in scanner mode.
+	Function1_Patten        = 0 // Set patten mode.
+	Function2_Auto_Color    = 1 // Auto Color change.
+	Function3_Auto_Patten   = 2 // Auto Patten change
+	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
 	Function5_Color         = 4 // Set chase color. or select the scanner GOBO or color.
 	Function6_Static        = 5 // Set static colors.
 	Function7_Invert        = 6 // Invert the RGB colors or shift scanners 360 deg of each other.
@@ -506,89 +509,13 @@ func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
 	return 0
 }
 
-func SetFunctionKeys(functions []Function, sequence Sequence) Sequence {
-
-	// Set normal chase.
-	if sequence.Functions[Function1_Forward_Chase].State {
-		functions[Function2_Pairs_Chase].State = false
-		functions[Function3_Inward_Chase].State = false
-		if sequence.Type == "scanner" {
-			sequence.Functions[Function4_Bounce].State = false
-		}
-		return sequence
-	}
-
-	// Set pairs chase.
-	if sequence.Functions[Function2_Pairs_Chase].State {
-		sequence.Functions[Function1_Forward_Chase].State = false
-		sequence.Functions[Function3_Inward_Chase].State = false
-		if sequence.Type == "scanner" {
-			sequence.Functions[Function4_Bounce].State = false
-		}
-		return sequence
-	}
-
-	// Set inward chase.
-	if sequence.Functions[Function3_Inward_Chase].State {
-		sequence.Functions[Function1_Forward_Chase].State = false
-		sequence.Functions[Function2_Pairs_Chase].State = false
-		if sequence.Type == "scanner" {
-			sequence.Functions[Function4_Bounce].State = false
-		}
-		return sequence
-	}
-
-	if sequence.Type == "scanner" {
-		if sequence.Functions[Function4_Bounce].State {
-			sequence.Functions[Function1_Forward_Chase].State = false
-			sequence.Functions[Function2_Pairs_Chase].State = false
-			sequence.Functions[Function3_Inward_Chase].State = false
-			return sequence
-		}
-	}
-
-	return sequence
-}
-
 func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
-	if sequence.Type != "scanner" {
-		if sequence.Functions[Function1_Forward_Chase].State {
-			sequence.Patten.Name = "standard"
-		}
+	// Map the auto color change setting.
+	sequence.AutoColor = sequence.Functions[Function2_Auto_Color].State
 
-		if sequence.Functions[Function2_Pairs_Chase].State {
-			sequence.Patten.Name = "pairs"
-		}
-
-		if sequence.Functions[Function3_Inward_Chase].State {
-			sequence.Patten.Name = "inward"
-		}
-	}
-
-	if sequence.Type == "scanner" {
-		if sequence.Functions[Function1_Forward_Chase].State {
-			sequence.Patten.Name = "circle"
-		}
-
-		if sequence.Functions[Function2_Pairs_Chase].State {
-			sequence.Patten.Name = "leftandright"
-		}
-
-		if sequence.Functions[Function3_Inward_Chase].State {
-			sequence.Patten.Name = "upanddown"
-		}
-
-		if sequence.Functions[Function4_Bounce].State {
-			sequence.Patten.Name = "sinewave"
-		}
-
-		if sequence.Functions[Function7_Invert].State {
-			sequence.Shift = true
-		} else {
-			sequence.Shift = false
-		}
-	}
+	// Map the auto patten change setting.
+	sequence.AutoPatten = sequence.Functions[Function3_Auto_Patten].State
 
 	// Map bounce function to sequence bounce setting.
 	if sequence.Type != "scanner" {
