@@ -1,7 +1,6 @@
 package common
 
 import (
-	"fmt"
 	"time"
 )
 
@@ -411,7 +410,6 @@ func SetMode(selectedSequence int, commandChannels []chan Command, mode string) 
 }
 
 func RevealSequence(selectedSequence int, commandChannels []chan Command) {
-	fmt.Printf("RevealSequence\n")
 	cmd := Command{
 		UnHide: true,
 	}
