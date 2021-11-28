@@ -12,7 +12,7 @@ import (
 func NewDmXController() (controller *ft232.DMXController, err error) {
 	// Constants, these should really be defined in the module and will be
 	// as of the next release
-	vid := uint16(0x0403)
+	vid := uint16(0x0403) // Future Technology Devices International Limited
 	pid := uint16(0x6001)
 	outputInterfaceID := 2
 	inputInterfaceID := 1

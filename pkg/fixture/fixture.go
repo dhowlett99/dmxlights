@@ -305,7 +305,7 @@ func reverse_dmx(n int) int {
 func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
 	gobos := []common.Gobo{}
 	for _, f := range fixturesConfig.Fixtures {
-		fmt.Printf("Fixture Name:%s\n", f.Name)
+		//fmt.Printf("Fixture Name:%s\n", f.Name)
 		if f.Type == "scanner" {
 			for _, channel := range f.Channels {
 				if channel.Name == "Gobo" {

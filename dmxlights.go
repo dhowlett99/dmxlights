@@ -130,17 +130,6 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Find scanner GOBO's
-	for _, f := range fixturesConfig.Fixtures {
-		fmt.Printf("Found fixture: %s, group: %d, desc: %s\n", f.Name, f.Group, f.Description)
-		if f.Type == "scanner" {
-			gobos := fixture.HowManyGobos(fixturesConfig, f)
-			for _, gobo := range gobos {
-				fmt.Printf("Fixture %s Number of Gobos %s\n", f.Name, gobo.Name)
-			}
-		}
-	}
-
 	// Create a channel to send events to the launchpad.
 	eventsForLauchpad := make(chan common.ALight)
 
@@ -1103,6 +1092,7 @@ func HandleSelect(sequences []*common.Sequence,
 	// fmt.Printf("HANDLE: editSequenceColorsMode[%d] = %t \n", selectedSequence, editSequenceColorsMode[selectedSequence])
 	// fmt.Printf("HANDLE: editStaticColorsMode[%d] = %t \n", selectedSequence, editStaticColorsMode[selectedSequence])
 	// fmt.Printf("HANDLE: functionSelectMode[%d] = %t \n", selectedSequence, functionSelectMode[selectedSequence])
+	// fmt.Printf("HANDLE: editPattenMode[%d] = %t \n", selectedSequence, editPattenMode[selectedSequence])
 	// fmt.Printf("HANDLE: Func Static[%d] = %t\n", selectedSequence, sequences[selectedSequence].Functions[common.Function6_Static].State)
 
 	// Light the sequence selector button.
@@ -1113,6 +1103,8 @@ func HandleSelect(sequences []*common.Sequence,
 		//fmt.Printf("Handle 1 Function Bar off\n")
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
+
+		functionSelectMode[selectedSequence] = false
 
 		if sequences[selectedSequence].Functions[common.Function1_Patten].State {
 			//fmt.Printf("Show Patten Selection Buttons\n")
@@ -1132,6 +1124,11 @@ func HandleSelect(sequences []*common.Sequence,
 			//fmt.Printf("Show Static Color Selection Buttons\n")
 			common.SetMode(selectedSequence, commandChannels, "Static")
 			return
+		}
+
+		// Allow us to exit the patten select mode without setting a patten.
+		if editPattenMode[selectedSequence] {
+			editPattenMode[selectedSequence] = false
 		}
 
 		// Else reveal the sequence on the launchpad keys
