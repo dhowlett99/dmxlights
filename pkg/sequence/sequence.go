@@ -304,7 +304,6 @@ func PlayNewSequence(sequence common.Sequence,
 					if sequence.SelectedPatten == 3 {
 						sequence.Patten.Name = "colors"
 					}
-
 				}
 
 				// Setup scanner pattens.
@@ -400,6 +399,10 @@ func PlayNewSequence(sequence common.Sequence,
 						}
 					}
 				}
+
+				// Now that the patten colors have been decided and the positions calculated, set the CurrentSequenceColors
+				// with the colors from that patten.
+				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
 
 				// Run the sequence through.
 				for step := 0; step < sequence.Steps; step++ {
