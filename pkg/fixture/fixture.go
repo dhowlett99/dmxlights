@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -103,8 +104,10 @@ func FixtureReceiver(sequence common.Sequence,
 	fixtures *Fixtures) {
 
 	cmd := common.FixtureCommand{}
-	fadeUp := []int{0, 66, 127, 180, 220, 246, 255}
-	fadeDown := []int{255, 246, 220, 189, 127, 66, 0}
+
+	// Calculate fade curve values.
+	fadeUp := getFade(127.5, false)
+	fadeDown := getFade(127.5, true)
 
 	for {
 		select {
@@ -322,4 +325,29 @@ func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
 		}
 	}
 	return gobos
+}
+
+func getFade(size float64, direction bool) []int {
+
+	out := []int{}
+
+	var theta float64
+	var x float64
+	if direction {
+		for x = 0; x <= 180; x += 15 {
+
+			theta = (x - 90) * math.Pi / 180
+
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	} else {
+		for x = 180; x >= 0; x -= 15 {
+			theta = (x - 90) * math.Pi / 180
+
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	}
+	return out
 }

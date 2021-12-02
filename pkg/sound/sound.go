@@ -84,7 +84,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 func gainChecker() {
 	for {
-		timer1 := time.NewTimer(2 * time.Second)
+		timer1 := time.NewTimer(3 * time.Second)
 		<-timer1.C
 
 		// Calculate and the gain.
