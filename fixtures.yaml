@@ -333,6 +333,62 @@ fixtures:
     name: Blue8
   - number: 26
     name: Strobe
+- name: Uplighter2
+  number: 1
+  description: Fluxia DLB100
+  type: rgb
+  address: 200
+  fixtures:
+  group: 2
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Red2
+  - number: 5
+    name: Green2
+  - number: 6
+    name: Blue2
+  - number: 7
+    name: Red3
+  - number: 8
+    name: Green3
+  - number: 9
+    name: Blue3
+  - number: 10
+    name: Red4
+  - number: 11
+    name: Green4
+  - number: 12
+    name: Blue4
+  - number: 13
+    name: Red5
+  - number: 14
+    name: Green5
+  - number: 15
+    name: Blue5
+  - number: 16
+    name: Red6
+  - number: 17
+    name: Green6
+  - number: 18
+    name: Blue6
+  - number: 19
+    name: Red7
+  - number: 20
+    name: Green7
+  - number: 21
+    name: Blue7
+  - number: 22
+    name: Red8
+  - number: 23
+    name: Green8
+  - number: 24
+    name: Blue8
 - name: ADJ QA PAR 38
   number: 1
   description: American DJ SPOT
@@ -501,7 +557,7 @@ fixtures:
       values:
         - name: master dimmer
           description: Dimmer
-          channel: 69
+          channel: 57
           setting: 0
       buttoncolor: 
         red: 0
@@ -756,4 +812,3 @@ fixtures:
         red: 255
         green: 0
         blue: 0
-
