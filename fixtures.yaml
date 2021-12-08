@@ -389,33 +389,33 @@ fixtures:
     name: Green8
   - number: 24
     name: Blue8
-- name: ADJ QA PAR 38
-  number: 1
-  description: American DJ SPOT
-  type: rgb
-  address: 150
-  group: 2 
-  channels:
-  - number: 1
-    name: Red1
-  - number: 2
-    name: Green1
-  - number: 3
-    name: Blue1
-  - number: 4
-    name: Static
-    value: 0
-  - number: 5
-    name: Master Dimmer
-  - number: 6
-    name: Static
-    value: 0
-  - number: 7
-    name: Static
-    value: 0
-  - number: 8
-    name: Static
-    value: 0
+# - name: ADJ QA PAR 38
+#   number: 1
+#   description: American DJ SPOT
+#   type: rgb
+#   address: 150
+#   group: 2 
+#   channels:
+#   - number: 1
+#     name: Red1
+#   - number: 2
+#     name: Green1
+#   - number: 3
+#     name: Blue1
+#   - number: 4
+#     name: Static
+#     value: 0
+#   - number: 5
+#     name: Master Dimmer
+#   - number: 6
+#     name: Static
+#     value: 0
+#   - number: 7
+#     name: Static
+#     value: 0
+#   - number: 8
+#     name: Static
+#     value: 0
 - name: Scanner
   number: 1
   description: American DJ Comscan LED
@@ -768,11 +768,59 @@ fixtures:
         red: 0
         green: 255
         blue: 0 
-    - name: On
+      values: 
+        - name: mode
+          description: Dimmer Off
+          channel: 154
+          setting: 0
+    - name: Slow Color Fade
       buttoncolor: 
         red: 255
         green: 0
         blue: 0 
+      values: 
+        - name: mode
+          description: Dimmer
+          channel: 154
+          setting: 255
+        - name: mode
+          description: Shutter
+          channel: 155
+          setting: 0
+        - name: mode
+          description: MAcro Mode
+          channel: 156
+          setting: 158
+        - name: mode
+          description: MAcro
+          channel: 157
+          setting: 250
+    - name: Sound Trigger
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 255 
+      values: 
+        - name: mode
+          description: Dimmer
+          channel: 154
+          setting: 255
+        - name: mode
+          description: Shutter
+          channel: 155
+          setting: 100
+        - name: mode
+          description: Shutter Sound Active
+          channel: 156
+          setting: 255
+        - name: mode
+          description: Shutter Sound Active
+          channel: 157
+          setting: 0
+        - name: mode
+          description: Shutter Sound Active
+          channel: 158
+          setting: 32
   - name: switch
     number: 6
     states:
