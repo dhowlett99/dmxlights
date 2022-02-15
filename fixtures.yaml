@@ -637,7 +637,7 @@ fixtures:
       values:
         - name: master dimmer
           description: Dimmer
-          channel: 67
+          channel: 69
           setting: 0
       buttoncolor: 
         red: 0
@@ -647,7 +647,7 @@ fixtures:
       values: 
         - name: master dimmer
           description: Dimmer
-          channel: 67
+          channel: 69
           setting: 255
       buttoncolor: 
         red: 255
@@ -671,7 +671,7 @@ fixtures:
       values: 
         - name: master dimmer
           description: Dimmer
-          channel: 69
+          channel: 57
           setting: 255
       buttoncolor: 
         red: 255
