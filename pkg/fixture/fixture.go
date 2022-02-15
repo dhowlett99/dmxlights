@@ -16,6 +16,8 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
+const debug = false
+
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
 }
@@ -116,7 +118,22 @@ func FixtureReceiver(sequence common.Sequence,
 				// positions can have many fixtures play at the same time.
 				positions := cmd.Positions[cmd.CurrentPosition]
 				for _, position := range positions {
-					if cmd.CurrentPosition == position.StartPosition {
+
+					if debug {
+						// Some debug to print the positions.
+						if sequence.Type == "scanner" && position.Fixture == 0 {
+							fmt.Printf("===========Seq Number %d ==============\n", cmd.SequenceNumber)
+							fmt.Printf("StartPosition %+v\n", position.StartPosition)
+							fmt.Printf("Color %+v\n", position.Color)
+							fmt.Printf("Fixture %+v\n", position.Fixture)
+							fmt.Printf("Gobo %+v\n", position.Gobo)
+							fmt.Printf("Pan %+v\n", position.Pan)
+							fmt.Printf("Tilt %+v\n", position.Tilt)
+							fmt.Printf("Shutter %+v\n", position.Shutter)
+						}
+					}
+
+					if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
 						// Short ciruit the soft fade if we are a scanner.
 						if cmd.Type == "scanner" {
 							if position.Fixture == myFixtureNumber {
@@ -305,11 +322,20 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
-	gobos := []common.Gobo{}
+func HowManyGobos(sequenceNumber int, fixturesConfig *Fixtures) (numberScanners int, gobos []common.Gobo) {
+	if debug {
+		fmt.Printf("HowManyGobos\n")
+	}
+	gobos = []common.Gobo{}
 	for _, f := range fixturesConfig.Fixtures {
-		//fmt.Printf("Fixture Name:%s\n", f.Name)
+		if debug {
+			fmt.Printf("Fixture Name:%s\n", f.Name)
+		}
 		if f.Type == "scanner" {
+			numberScanners++
+			if debug {
+				fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, f.Name, f.Description)
+			}
 			for _, channel := range f.Channels {
 				if channel.Name == "Gobo" {
 					newGobo := common.Gobo{}
@@ -324,7 +350,7 @@ func HowManyGobos(fixturesConfig *Fixtures, fixture Fixture) []common.Gobo {
 			}
 		}
 	}
-	return gobos
+	return numberScanners, gobos
 }
 
 func getFade(size float64, direction bool) []int {

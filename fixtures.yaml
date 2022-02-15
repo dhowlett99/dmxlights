@@ -416,7 +416,7 @@ fixtures:
 #   - number: 8
 #     name: Static
 #     value: 0
-- name: Scanner
+- name: Scanner 1
   number: 1
   description: American DJ Comscan LED
   type: scanner
@@ -473,6 +473,110 @@ fixtures:
   description: American DJ Comscan LED
   type: scanner
   address: 57
+  group: 3
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
+  - number: 4
+    name: Gobo
+    settings:
+      - name: White Circle
+        number: 1
+        setting: 0
+      - name: Yellow Cluster
+        setting: 8
+        number: 2
+      - name: Red Swirl
+        setting: 15
+        number: 3
+      - name: Green Strips
+        setting: 22
+        number: 4
+      - name: Blue Star
+        setting: 28
+        number: 5
+      - name: MultiColor Commas
+        setting: 36
+        number: 6
+      - name: Purple Bubbles
+        setting: 43
+        number: 7
+      - name: Cyan World
+        setting: 50
+        number: 8
+      - name: Blue / Puple Circle
+        setting: 57
+        number: 9
+  - number: 5
+    name: Master
+- name: Scanner 3
+  number: 3
+  description: American DJ Comscan LED
+  type: scanner
+  address: 67
+  group: 3
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
+  - number: 4
+    name: Gobo
+    settings:
+      - name: White Circle
+        number: 1
+        setting: 0
+      - name: Yellow Cluster
+        setting: 8
+        number: 2
+      - name: Red Swirl
+        setting: 15
+        number: 3
+      - name: Green Strips
+        setting: 22
+        number: 4
+      - name: Blue Star
+        setting: 28
+        number: 5
+      - name: MultiColor Commas
+        setting: 36
+        number: 6
+      - name: Purple Bubbles
+        setting: 43
+        number: 7
+      - name: Cyan World
+        setting: 50
+        number: 8
+      - name: Blue / Puple Circle
+        setting: 57
+        number: 9
+  - number: 5
+    name: Master
+- name: Scanner 4
+  number: 4
+  description: American DJ Comscan LED
+  type: scanner
+  address: 77
   group: 3
   channels:
   - number: 1

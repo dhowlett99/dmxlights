@@ -126,6 +126,10 @@ type Command struct {
 	AutoColor             bool
 	UpdateAutoPatten      bool
 	AutoPatten            bool
+	ToggleFixtureState    bool
+	FixtureNumber         int
+	FixtureState          bool
+	SequenceNumber        int
 }
 
 type Gobo struct {
@@ -192,6 +196,7 @@ type Sequence struct {
 	RecoverSequenceColors   bool
 	SaveColors              bool
 	SelectedScannerPatten   int
+	FixtureDisabled         map[int]bool
 }
 
 type Function struct {
@@ -247,8 +252,10 @@ type FixtureCommand struct {
 	PlayFloodOnce       bool
 	UpdateSequenceColor bool
 	SequenceColor       Color
+	SequenceNumber      int
 	Inverted            bool
 	SelectedGobo        int
+	FixtureDisabled     map[int]bool
 }
 
 type Position struct {

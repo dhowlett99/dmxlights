@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -307,6 +307,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Type = "switch"
 		return sequence
 	}
+
+	// Here we want to disable/enable the selected scanner.
+	if command.ToggleFixtureState {
+		if debug {
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.FixtureNumber, command.SequenceNumber)
+		}
+		if command.SequenceNumber == mySequenceNumber {
+			sequence.FixtureDisabled[command.FixtureNumber] = command.FixtureState
+		}
+
+		return sequence
+	}
+
 	if command.UpdateGobo {
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.SelectedGobo)

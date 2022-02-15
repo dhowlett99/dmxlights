@@ -8,6 +8,7 @@ import (
 	"github.com/gordonklaus/portaudio"
 )
 
+const debug = false
 const sampleRate = 44100
 
 var gainSelected = 4
@@ -72,10 +73,15 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 					for index, trigger := range soundTriggers {
 						if trigger.SequenceNumber == index {
 							if trigger.State {
+								if debug {
+									fmt.Printf("%d: Index %d Gain %f   State %t  \n", trigger.SequenceNumber, index, trigger.Gain, trigger.State)
+								}
 								channels.SoundTriggerChannels[index] <- cmd
 							}
 						}
 					}
+					// A short delay stop a sequnece being overwhelmed by trigger events.
+					time.Sleep(time.Millisecond * 10)
 				}
 			}
 		}
@@ -87,6 +93,9 @@ func gainChecker() {
 		timer1 := time.NewTimer(3 * time.Second)
 		<-timer1.C
 
+		if debug {
+			fmt.Printf(">>>> I AM CHECKING THE GAIN \n")
+		}
 		// Calculate and the gain.
 		gain := findGain(gainCounters)
 

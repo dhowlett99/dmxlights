@@ -18,6 +18,8 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
+const debug = false
+
 type SequencesConfig struct {
 	Sequences []SequenceConfig `yaml:"sequences"`
 }
@@ -71,18 +73,18 @@ func CreateSequence(
 		initialPatten = "standard"
 	}
 
+	// Initilaise Scanners's
 	var gobos = []common.Gobo{}
 	if sequenceType == "scanner" {
 		initialPatten = "circle"
 
 		// Initilaise Gobo's
-		for _, f := range fixturesConfig.Fixtures {
-			if f.Type == "scanner" {
-				scanners++
-				gobos = fixture.HowManyGobos(fixturesConfig, f)
-			}
-		}
+		scanners, gobos = fixture.HowManyGobos(mySequenceNumber, fixturesConfig)
 	}
+
+	// A map of the state of fixtures in the sequence.
+	// We can disable a fixture by setting fixtureDisabled to true.
+	fixtureDisabled := make(map[int]bool, 8)
 
 	sequence := common.Sequence{
 		NumberFixtures:          8,
@@ -128,6 +130,7 @@ func CreateSequence(
 		AutoColor:             false,
 		AutoPatten:            false,
 		SelectedScannerPatten: 0,
+		FixtureDisabled:       fixtureDisabled,
 	}
 
 	// Make functions for each of the sequences.
@@ -344,14 +347,17 @@ func PlayNewSequence(sequence common.Sequence,
 					break
 				}
 
-				// Calulate positions for fixtures based on patten.
+				// Calulate positions for fixtures based on the steps in the patten.
 				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
 
-				// Set the patten automatically
+				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
 					for name, patten := range pattens {
 						if patten.Number == sequence.SelectedPatten {
 							sequence.Patten.Name = name
+							if debug {
+								fmt.Printf(">>>> I AM PATTEN %s\n", name)
+							}
 							break
 						}
 					}
@@ -361,7 +367,7 @@ func PlayNewSequence(sequence common.Sequence,
 					}
 				}
 
-				// Set the patten automatically
+				// If we are setting the patten automatically for scanner fixtures.
 				if sequence.AutoPatten && sequence.Type == "scanner" {
 					sequence.SelectedScannerPatten++
 					if sequence.SelectedScannerPatten > 3 {
@@ -369,7 +375,7 @@ func PlayNewSequence(sequence common.Sequence,
 					}
 				}
 
-				// Set the current colors in the sequence.
+				// If we are setting the current colors in a rgb sequence.
 				if sequence.AutoColor && sequence.Type == "rgb" {
 					// Find a new color.
 					newColor := []common.Color{}
@@ -384,6 +390,7 @@ func PlayNewSequence(sequence common.Sequence,
 					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
 
+				// If we are updating the color in a sequence.
 				if sequence.UpdateSequenceColor {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
@@ -413,7 +420,9 @@ func PlayNewSequence(sequence common.Sequence,
 						break
 					}
 
+					// Prepare a message to be sent to the fixtures in the sequence.
 					cmd := common.FixtureCommand{
+						SequenceNumber:  sequence.Number,
 						Inverted:        sequence.Inverted,
 						Master:          sequence.Master,
 						Hide:            sequence.Hide,
@@ -430,6 +439,7 @@ func PlayNewSequence(sequence common.Sequence,
 						Flood:           sequence.Flood,
 						CurrentPosition: step,
 						SelectedGobo:    sequence.SelectedGobo,
+						FixtureDisabled: sequence.FixtureDisabled,
 					}
 
 					// Now tell all the fixtures what they need to do.
@@ -479,6 +489,9 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
+// This is for switch sequences, a type of sequence which is just a set of eight switches.
+// Each switch can have a number of states as defined in the fixtures.yaml file.
+// The color of the lamp indicates which state you are in.
 func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
 
 	for switchNumber, switchData := range sequence.Switches {
@@ -577,6 +590,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	return positionsOut, counter
 }
 
+// replaceColors can take a sequence and replace its current patten colors with the colors specified.
 func replaceColors(positionsMap map[int][]common.Position, colors []common.Color) map[int][]common.Position {
 
 	var insetColor int

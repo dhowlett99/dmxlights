@@ -22,6 +22,8 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
+const debug = false
+
 const (
 	full = 255
 )
@@ -54,6 +56,7 @@ func main() {
 	var lastStaticColorButtonX int    // Which Static Color button did we change last.
 	var lastStaticColorButtonY int    // Which Static Color button did we change last.
 	var soundGain float32 = 0         // Fine gain -0.09 -> 0.09
+	var disabledFixture [][]bool      // Which fixture is disabled on which sequence.
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -213,6 +216,12 @@ func main() {
 	// Initialize four function mode states.
 	functionSelectMode = make([]bool, 4)
 
+	// Initialize eight fixture states for the four sequences.
+	disabledFixture = make([][]bool, 9)
+	for i := 0; i < 4; i++ {
+		disabledFixture[i] = make([]bool, 9)
+	}
+
 	// Initialize a ten length slice of empty slices for static lamps.
 	staticLamps = make([][]bool, 9)
 	// Initialize those 10 empty function button slices
@@ -338,6 +347,26 @@ func main() {
 				ClearSequenceColor: true,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+			// Clear out soundtriggers
+			for _, trigger := range soundTriggers {
+				trigger.State = false
+			}
+
+			// Switch of auto color change and auto patten change.
+			for _, sequence := range sequences {
+				sequence.AutoColor = false
+				sequence.Functions[common.Function2_Auto_Color].State = false
+				sequence.AutoPatten = false
+				sequence.Functions[common.Function3_Auto_Patten].State = false
+			}
+
+			// Disable fixtures.
+			for x := 0; x < 4; x++ {
+				for y := 0; y < 9; y++ {
+					disabledFixture[x][y] = true
+				}
+			}
 
 			continue
 		}
@@ -834,6 +863,58 @@ func main() {
 			}
 		}
 
+		// D I S A B L E   F I X T U R E  - Used to toggle the scanner on or off.
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
+			hit.Y >= 0 &&
+			hit.Y < 4 &&
+			!sequences[selectedSequence].Functions[common.Function1_Patten].State &&
+			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
+			!sequences[selectedSequence].Functions[common.Function5_Color].State &&
+			sequences[hit.Y].Type == "scanner" {
+
+			if !disabledFixture[hit.X][hit.Y] {
+
+				if debug {
+					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true\n", hit.X, hit.Y)
+				}
+
+				disabledFixture[hit.X][hit.Y] = true
+
+				// Tell the sequence to turn off this scanner.
+				cmd := common.Command{
+					ToggleFixtureState: true,
+					SequenceNumber:     hit.Y,
+					FixtureNumber:      hit.X,
+					FixtureState:       true,
+				}
+				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
+
+				// Turn off the lamp.
+				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
+
+			} else {
+				if debug {
+					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to false\n", hit.X, hit.Y)
+				}
+
+				disabledFixture[hit.X][hit.Y] = false
+
+				// Tell the sequence to turn on this scanner.
+				cmd := common.Command{
+					ToggleFixtureState: true,
+					SequenceNumber:     hit.Y,
+					FixtureNumber:      hit.X,
+					FixtureState:       false,
+				}
+				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
+
+				// Turn the lamp on.
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+
+			}
+
+		}
+
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
 		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
 			hit.Y >= 0 &&
@@ -841,7 +922,8 @@ func main() {
 			!sequences[selectedSequence].Functions[common.Function1_Patten].State &&
 			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
 			!sequences[selectedSequence].Functions[common.Function5_Color].State &&
-			sequences[hit.Y].Type != "switch" {
+			sequences[hit.Y].Type != "switch" && // As long as we're not a switch sequence.
+			sequences[hit.Y].Type != "scanner" { // As long as we're not a scanner sequence.
 
 			flashSequence := common.Sequence{
 				Patten: common.Patten{
@@ -1088,19 +1170,23 @@ func HandleSelect(sequences []*common.Sequence,
 	commandChannels []chan common.Command,
 	channels common.Channels) {
 
-	// fmt.Printf("HANDLE: selectButtons[%d] = %t \n", selectedSequence, selectButtonPressed[selectedSequence])
-	// fmt.Printf("HANDLE: editSequenceColorsMode[%d] = %t \n", selectedSequence, editSequenceColorsMode[selectedSequence])
-	// fmt.Printf("HANDLE: editStaticColorsMode[%d] = %t \n", selectedSequence, editStaticColorsMode[selectedSequence])
-	// fmt.Printf("HANDLE: functionSelectMode[%d] = %t \n", selectedSequence, functionSelectMode[selectedSequence])
-	// fmt.Printf("HANDLE: editPattenMode[%d] = %t \n", selectedSequence, editPattenMode[selectedSequence])
-	// fmt.Printf("HANDLE: Func Static[%d] = %t\n", selectedSequence, sequences[selectedSequence].Functions[common.Function6_Static].State)
+	if debug {
+		fmt.Printf("HANDLE: selectButtons[%d] = %t \n", selectedSequence, selectButtonPressed[selectedSequence])
+		fmt.Printf("HANDLE: editSequenceColorsMode[%d] = %t \n", selectedSequence, editSequenceColorsMode[selectedSequence])
+		fmt.Printf("HANDLE: editStaticColorsMode[%d] = %t \n", selectedSequence, editStaticColorsMode[selectedSequence])
+		fmt.Printf("HANDLE: functionSelectMode[%d] = %t \n", selectedSequence, functionSelectMode[selectedSequence])
+		fmt.Printf("HANDLE: editPattenMode[%d] = %t \n", selectedSequence, editPattenMode[selectedSequence])
+		fmt.Printf("HANDLE: Func Static[%d] = %t\n", selectedSequence, sequences[selectedSequence].Functions[common.Function6_Static].State)
+	}
 
 	// Light the sequence selector button.
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// First time into function mode we head back to normal mode.
 	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] && !editSequenceColorsMode[selectedSequence] && !editStaticColorsMode[selectedSequence] {
-		//fmt.Printf("Handle 1 Function Bar off\n")
+		if debug {
+			fmt.Printf("Handle 1 Function Bar off\n")
+		}
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 
@@ -1144,7 +1230,9 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// This the first time we have pressed the select button.
 	if !selectButtonPressed[selectedSequence] {
-		//fmt.Printf("Handle 2\n")
+		if debug {
+			fmt.Printf("Handle 2\n")
+		}
 		// assume everything else is off.
 		selectButtonPressed[0] = false
 		selectButtonPressed[1] = false
@@ -1172,7 +1260,9 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// Are we in function mode ?
 	if functionSelectMode[selectedSequence] {
-		//fmt.Printf("Handle 3\n")
+		if debug {
+			fmt.Printf("Handle 3\n")
+		}
 		// Turn off function mode. Remove the function pads.
 		common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
 		// And reveal the sequence on the launchpad keys
@@ -1188,7 +1278,9 @@ func HandleSelect(sequences []*common.Sequence,
 	if !functionSelectMode[selectedSequence] &&
 		sequences[selectedSequence].Type != "switch" { // Don't alow functions in switch mode.
 
-		//fmt.Printf("Handle 4 - Function Bar On!\n")
+		if debug {
+			fmt.Printf("Handle 4 - Function Bar On!\n")
+		}
 
 		// Set function mode.
 		functionSelectMode[selectedSequence] = true
