@@ -898,6 +898,7 @@ func main() {
 		if hit.X >= 0 && hit.X < 8 &&
 			functionSelectMode[selectedSequence] &&
 			!editPattenMode[selectedSequence] &&
+			!editStaticColorsMode[selectedSequence] &&
 			!sequences[selectedSequence].Functions[common.Function5_Color].State {
 
 			if debug {
@@ -934,11 +935,42 @@ func main() {
 			// Light the correct function key.
 			common.ShowFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad)
 
+			// Now some functions mean that we go into another menu ( set of buttons )
+			// This is true for :-
+			// Function 1 - setting the patten.
+			// Function 5 - setting the sequence colors.
+			// Function 6 - setting the static colors.
+
 			// Map Function 1 to patten mode.
 			editPattenMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function1_Patten].State
 
-			// TODO find a way to get instant patten changes
-			// without stopping and starting sequences.
+			// Go straight into patten select mode, don't wait for a another select press.
+			if editPattenMode[selectedSequence] {
+				time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+				common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
+				ShowPattenSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
+			}
+
+			// Map Function 5 to color edit.
+			editSequenceColorsMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function5_Color].State
+
+			// Go straight into color edit mode, don't wait for a another select press.
+			if editSequenceColorsMode[selectedSequence] {
+				time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+				common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
+				ShowColorSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
+			}
+
+			// Map Function 6 to static color edit.
+			editStaticColorsMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function6_Static].State
+
+			// Go straight into static color edit mode, don't wait for a another select press.
+			if editStaticColorsMode[selectedSequence] {
+				//time.Sleep(2000 * time.Millisecond) // But give the launchpad time to light the function key purple.
+				//common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
+				functionSelectMode[selectedSequence] = false
+				// The sequence will automatically display the colors now!
+			}
 
 			continue
 		}
@@ -1342,7 +1374,8 @@ func HandleSelect(sequences []*common.Sequence,
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
 
 	// First time into function mode we head back to normal mode.
-	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] && !editSequenceColorsMode[selectedSequence] && !editStaticColorsMode[selectedSequence] {
+	if functionSelectMode[selectedSequence] && !selectButtonPressed[selectedSequence] &&
+		!editSequenceColorsMode[selectedSequence] && !editStaticColorsMode[selectedSequence] {
 		if debug {
 			fmt.Printf("Handle 1 Function Bar off\n")
 		}
@@ -1388,7 +1421,8 @@ func HandleSelect(sequences []*common.Sequence,
 	}
 
 	// This the first time we have pressed the select button.
-	if !selectButtonPressed[selectedSequence] {
+	if !selectButtonPressed[selectedSequence] &&
+		!editStaticColorsMode[selectedSequence] {
 		if debug {
 			fmt.Printf("Handle 2\n")
 		}
@@ -1435,11 +1469,15 @@ func HandleSelect(sequences []*common.Sequence,
 
 	// We are in function mode for this sequence.
 	if !functionSelectMode[selectedSequence] &&
-		sequences[selectedSequence].Type != "switch" { // Don't alow functions in switch mode.
+		sequences[selectedSequence].Type != "switch" || // Don't alow functions in switch mode.
+		!functionSelectMode[selectedSequence] && editStaticColorsMode[selectedSequence] { // The case when we leave static colors edit mode.
 
 		if debug {
 			fmt.Printf("Handle 4 - Function Bar On!\n")
 		}
+
+		// Unset the edit static color mode.
+		editStaticColorsMode[selectedSequence] = false
 
 		// Set function mode.
 		functionSelectMode[selectedSequence] = true
@@ -1452,8 +1490,10 @@ func HandleSelect(sequences []*common.Sequence,
 
 		// Create the function buttons.
 		common.MakeFunctionButtons(*sequences[selectedSequence], selectedSequence, eventsForLauchpad, functionButtons, channels)
+
 		// Now forget we pressed twice and start again.
 		selectButtonPressed[selectedSequence] = false
+
 		return
 	}
 }
