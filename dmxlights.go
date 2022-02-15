@@ -218,7 +218,7 @@ func main() {
 
 	// Initialize eight fixture states for the four sequences.
 	disabledFixture = make([][]bool, 9)
-	for i := 0; i < 4; i++ {
+	for i := 0; i < 9; i++ {
 		disabledFixture[i] = make([]bool, 9)
 	}
 
@@ -288,6 +288,10 @@ func main() {
 
 		// Clear all the lights on the launchpad.
 		if hit.X == 0 && hit.Y == -1 {
+
+			if debug {
+				fmt.Printf("CLEAR LAUNCHPAD\n")
+			}
 
 			// Turn off the flood
 			if flood {
@@ -373,6 +377,11 @@ func main() {
 
 		// F L O O D
 		if hit.X == 7 && hit.Y == 3 {
+
+			if debug {
+				fmt.Printf("FLOOD\n")
+			}
+
 			if !flood {
 				cmd := common.Command{
 					UpdateFlood: true,
@@ -408,7 +417,10 @@ func main() {
 
 		// Sound sensitity up.
 		if hit.X == 4 && hit.Y == -1 {
-			fmt.Printf("Sound Up %f\n", soundGain)
+			if debug {
+				fmt.Printf("Sound Up %f\n", soundGain)
+			}
+
 			soundGain = soundGain - 0.01
 			if soundGain < -0.9 {
 				soundGain = -0.9
@@ -420,7 +432,9 @@ func main() {
 
 		// Sound sensitity down.
 		if hit.X == 5 && hit.Y == -1 {
-			fmt.Printf("Sound Down%f\n", soundGain)
+			if debug {
+				fmt.Printf("Sound Down%f\n", soundGain)
+			}
 			soundGain = soundGain + 0.01
 			if soundGain > 0.9 {
 				soundGain = 0.9
@@ -432,6 +446,11 @@ func main() {
 
 		// Master brightness down.
 		if hit.X == 6 && hit.Y == -1 {
+
+			if debug {
+				fmt.Printf("Brightness Down \n")
+			}
+
 			masterBrightness = masterBrightness - 10
 			if masterBrightness < 0 {
 				masterBrightness = 0
@@ -446,6 +465,11 @@ func main() {
 
 		// Master brightness up.
 		if hit.X == 7 && hit.Y == -1 {
+
+			if debug {
+				fmt.Printf("Brightness Up \n")
+			}
+
 			masterBrightness = masterBrightness + 10
 			if masterBrightness > 255 {
 				masterBrightness = 255
@@ -460,6 +484,10 @@ func main() {
 
 		// Save mode.
 		if hit.X == 8 && hit.Y == 4 {
+			if debug {
+				fmt.Printf("Save Mode\n")
+			}
+
 			if savePreset {
 				savePreset = false
 				presets.InitPresets(eventsForLauchpad, presetsStore)
@@ -474,6 +502,11 @@ func main() {
 
 		// Ask all sequences for their current config and save in a file.
 		if hit.X < 8 && (hit.Y > 3 && hit.Y < 7) {
+
+			if debug {
+				fmt.Printf("Ask For Config\n")
+			}
+
 			if savePreset {
 				presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] = true
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
@@ -519,6 +552,11 @@ func main() {
 
 		// Decrement Patten.
 		if hit.X == 2 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Decrement Patten \n")
+			}
+
 			selectedPatten = selectedPatten - 1
 			if selectedPatten < 0 {
 				selectedPatten = 0
@@ -546,6 +584,11 @@ func main() {
 
 		// Increment Patten.
 		if hit.X == 3 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Increment Patten \n")
+			}
+
 			selectedPatten = selectedPatten + 1
 			if selectedPatten > len(availablePattens)-1 {
 				selectedPatten = len(availablePattens) - 1
@@ -579,6 +622,11 @@ func main() {
 
 		// Decrease speed of selected sequence.
 		if hit.X == 0 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Decrease Speed \n")
+			}
+
 			// Get an upto date copy of the sequence.
 			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
 
@@ -598,6 +646,11 @@ func main() {
 
 		// Increase speed of selected sequence.
 		if hit.X == 1 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Increase Speed \n")
+			}
+
 			// Get an upto date copy of the sequence.
 			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
 
@@ -618,6 +671,11 @@ func main() {
 		// S E L E C T    S E Q U E N C E.
 		// Select sequence 1.
 		if hit.X == 8 && hit.Y == 0 {
+
+			if debug {
+				fmt.Printf("Select Sequence %d \n", hit.Y)
+			}
+
 			selectedSequence = 0
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
 				functionSelectMode, editSequenceColorsMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
@@ -634,6 +692,11 @@ func main() {
 
 		// Select sequence 2.
 		if hit.X == 8 && hit.Y == 1 {
+
+			if debug {
+				fmt.Printf("Select Sequence %d \n", hit.Y)
+			}
+
 			selectedSequence = 1
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
 				functionSelectMode, editSequenceColorsMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
@@ -650,6 +713,11 @@ func main() {
 
 		// Select sequence 3.
 		if hit.X == 8 && hit.Y == 2 {
+
+			if debug {
+				fmt.Printf("Select Sequence %d \n", hit.Y)
+			}
+
 			selectedSequence = 2
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
 				functionSelectMode, editSequenceColorsMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
@@ -666,6 +734,11 @@ func main() {
 
 		// Select sequence 4.
 		if hit.X == 8 && hit.Y == 3 {
+
+			if debug {
+				fmt.Printf("Select Sequence %d \n", hit.Y)
+			}
+
 			selectedSequence = 3
 			HandleSelect(sequences, selectedSequence, eventsForLauchpad, selectButtonPressed, functionButtons,
 				functionSelectMode, editSequenceColorsMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
@@ -682,6 +755,11 @@ func main() {
 
 		// Start sequence.
 		if hit.X == 8 && hit.Y == 5 {
+
+			if debug {
+				fmt.Printf("Start Sequence %d \n", hit.Y)
+			}
+
 			sequences[selectedSequence].MusicTrigger = false
 			cmd := common.Command{
 				Start: true,
@@ -696,6 +774,11 @@ func main() {
 
 		// Stop sequence.
 		if hit.X == 8 && hit.Y == 6 {
+
+			if debug {
+				fmt.Printf("Stop Sequence %d \n", hit.Y)
+			}
+
 			cmd := common.Command{
 				Stop:  true,
 				Speed: sequenceSpeed,
@@ -709,6 +792,11 @@ func main() {
 
 		// Size decrease.
 		if hit.X == 4 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Decrease Size\n")
+			}
+
 			size--
 			if size < 0 {
 				size = 0
@@ -736,6 +824,11 @@ func main() {
 
 		// Size increase.
 		if hit.X == 5 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Increase Size\n")
+			}
+
 			// Update the PAR can size.
 			size++
 			if size > 25 {
@@ -763,6 +856,11 @@ func main() {
 
 		// Fade time decrease.
 		if hit.X == 6 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Decrease Fade Time\n")
+			}
+
 			fadeSpeed--
 			if fadeSpeed < 0 {
 				fadeSpeed = 0
@@ -778,6 +876,11 @@ func main() {
 
 		// Fade time increase.
 		if hit.X == 7 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("Increase Fade Time\n")
+			}
+
 			fadeSpeed++
 			if fadeSpeed > 20 {
 				fadeSpeed = 20
@@ -796,6 +899,10 @@ func main() {
 			functionSelectMode[selectedSequence] &&
 			!editPattenMode[selectedSequence] &&
 			!sequences[selectedSequence].Functions[common.Function5_Color].State {
+
+			if debug {
+				fmt.Printf("Function Key X:%d Y:%d\n", hit.X, hit.Y)
+			}
 
 			// Get an upto date copy of the sequence.
 			sequences[selectedSequence] = common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
@@ -842,6 +949,10 @@ func main() {
 			hit.Y < 4 &&
 			sequences[hit.Y].Type == "switch" {
 
+			if debug {
+				fmt.Printf("Switch Key X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
 			// We have a valid switch.
 			if hit.X < len(sequences[hit.Y].Switches) {
 				switchPositions[hit.Y][hit.X] = switchPositions[hit.Y][hit.X] + 1
@@ -872,10 +983,14 @@ func main() {
 			!sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[hit.Y].Type == "scanner" {
 
-			if !disabledFixture[hit.X][hit.Y] {
+			if debug {
+				fmt.Printf("Disable Fixture X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
+			if !disabledFixture[hit.X][hit.Y] && hit.X < sequences[hit.Y].NumberScanners {
 
 				if debug {
-					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true\n", hit.X, hit.Y)
+					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", hit.X, hit.Y, sequences[hit.Y].NumberScanners)
 				}
 
 				disabledFixture[hit.X][hit.Y] = true
@@ -892,7 +1007,11 @@ func main() {
 				// Turn off the lamp.
 				common.LightOff(eventsForLauchpad, hit.X, hit.Y)
 
-			} else {
+				continue
+
+			}
+
+			if disabledFixture[hit.X][hit.Y] && hit.X < sequences[hit.Y].NumberScanners {
 				if debug {
 					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to false\n", hit.X, hit.Y)
 				}
@@ -911,19 +1030,24 @@ func main() {
 				// Turn the lamp on.
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
 
+				continue
 			}
 
 		}
 
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
-		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[selectedSequence] &&
+		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[hit.Y] &&
 			hit.Y >= 0 &&
 			hit.Y < 4 &&
-			!sequences[selectedSequence].Functions[common.Function1_Patten].State &&
-			!sequences[selectedSequence].Functions[common.Function6_Static].State &&
-			!sequences[selectedSequence].Functions[common.Function5_Color].State &&
+			!sequences[hit.Y].Functions[common.Function1_Patten].State &&
+			!sequences[hit.Y].Functions[common.Function6_Static].State &&
+			!sequences[hit.Y].Functions[common.Function5_Color].State &&
 			sequences[hit.Y].Type != "switch" && // As long as we're not a switch sequence.
 			sequences[hit.Y].Type != "scanner" { // As long as we're not a scanner sequence.
+
+			if debug {
+				fmt.Printf("Flash Button X:%d Y:%d\n", hit.X, hit.Y)
+			}
 
 			flashSequence := common.Sequence{
 				Patten: common.Patten{
@@ -959,6 +1083,10 @@ func main() {
 		// Red
 		if hit.X == 1 && hit.Y == -1 {
 
+			if debug {
+				fmt.Printf("Choose Static Red X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
 			staticButtons[selectedSequence].X = lastStaticColorButtonX
 			staticButtons[selectedSequence].Y = lastStaticColorButtonY
 
@@ -974,6 +1102,10 @@ func main() {
 
 		// Green
 		if hit.X == 2 && hit.Y == -1 {
+
+			if debug {
+				fmt.Printf("Choose Static Green X:%d Y:%d\n", hit.X, hit.Y)
+			}
 
 			staticButtons[selectedSequence].X = lastStaticColorButtonX
 			staticButtons[selectedSequence].Y = lastStaticColorButtonY
@@ -991,6 +1123,10 @@ func main() {
 		// Blue
 		if hit.X == 3 && hit.Y == -1 {
 
+			if debug {
+				fmt.Printf("Choose Static Blue X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
 			staticButtons[selectedSequence].X = lastStaticColorButtonX
 			staticButtons[selectedSequence].Y = lastStaticColorButtonY
 
@@ -1006,8 +1142,13 @@ func main() {
 
 		// S E T    S E Q U E N C E   C O L O R
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
+			selectedSequence == hit.Y && // Make sure the buttons pressed are for this sequence.
 			sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[selectedSequence].Type != "scanner" {
+
+			if debug {
+				fmt.Printf("Set Sequence Color X:%d Y:%d\n", hit.X, hit.Y)
+			}
 
 			// Add the selected color to the sequence.
 			cmd := common.Command{
@@ -1035,6 +1176,10 @@ func main() {
 			sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[selectedSequence].Type == "scanner" {
 
+			if debug {
+				fmt.Printf("Set Golo X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
 			// Add the selected color to the sequence.
 			cmd := common.Command{
 				UpdateGobo:   true,
@@ -1059,8 +1204,13 @@ func main() {
 		// S E T  S T A T I C   C O L O R
 		if hit.X >= 0 && hit.X < 8 &&
 			hit.Y != -1 &&
+			selectedSequence == hit.Y && // Make sure the buttons pressed are for this sequence.
 			!functionSelectMode[selectedSequence] && // Not in function Mode
 			editStaticColorsMode[selectedSequence] { // Static Function On
+
+			if debug {
+				fmt.Printf("Set Static Color X:%d Y:%d\n", hit.X, hit.Y)
+			}
 
 			// For this button increment the color.
 			sequences[selectedSequence].StaticColors[hit.X].X = hit.X
@@ -1098,6 +1248,10 @@ func main() {
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
 			editPattenMode[selectedSequence] {
 
+			if debug {
+				fmt.Printf("Set Patten X:%d Y:%d\n", hit.X, hit.Y)
+			}
+
 			// Tell the sequence to change the patten
 			cmd := common.Command{
 				SelectPatten:   true,
@@ -1119,6 +1273,11 @@ func main() {
 
 		// B L A C K O U T   B U T T O N.
 		if hit.X == 8 && hit.Y == 7 {
+
+			if debug {
+				fmt.Printf("BLACKOUT\n")
+			}
+
 			if !blackout {
 				blackout = true
 				cmd := common.Command{

@@ -344,7 +344,9 @@ func HowManyGobos(sequenceNumber int, fixturesConfig *Fixtures) (numberScanners 
 						newGobo.Number = setting.Number
 						newGobo.Setting = setting.Setting
 						gobos = append(gobos, newGobo)
-						fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
+						if debug {
+							fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
+						}
 					}
 				}
 			}

@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -314,7 +314,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.FixtureNumber, command.SequenceNumber)
 		}
 		if command.SequenceNumber == mySequenceNumber {
-			sequence.FixtureDisabled[command.FixtureNumber] = command.FixtureState
+			if command.FixtureNumber < sequence.NumberScanners {
+				sequence.FixtureDisabled[command.FixtureNumber] = command.FixtureState
+			}
 		}
 
 		return sequence
