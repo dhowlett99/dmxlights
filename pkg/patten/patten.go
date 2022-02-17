@@ -1,6 +1,7 @@
 package patten
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -493,14 +494,15 @@ func MakePatterns() map[string]common.Patten {
 
 }
 
-func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift bool) common.Patten {
+// GeneratePatten takes an array of coordinates and turns them into a patten
+// which is the starting point for all sequence steps.
+func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift int) common.Patten {
 
-	reverseCoordinates := []coordinate{}
+	shiftThisMany := ((len(coordinates)) / NumberFixtures)
 
-	for c := len(coordinates); c > 0; c-- {
-		coordinate := coordinates[c-1]
-		reverseCoordinates = append(reverseCoordinates, coordinate)
-	}
+	fmt.Printf("NumberFixtures:%d shiftThisMany:%d shift:%d\n", NumberFixtures, shiftThisMany, shift)
+
+	thisShift := 0
 
 	// First create the patten.
 	patten := common.Patten{}
@@ -508,47 +510,29 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift bool) co
 	steps := []common.Step{}
 
 	// Now create the steps in the patten.
-	for index, coordinate := range coordinates {
+	for coordinateNumber, coordinate := range coordinates {
+		//fmt.Printf("Coordinate Number:%d\n", coordinateNumber)
 		fixtures := []common.Fixture{}
 		for f := 0; f < NumberFixtures; f++ {
-
-			if f == 0 || !shift {
-				newFixture := common.Fixture{
-					Type:         "scanner",
-					MasterDimmer: full,
-					Colors: []common.Color{
-						{
-							R: int(coordinate.y),
-							G: int(coordinate.x),
-							B: makeBlue(int(coordinate.y), int(coordinate.x)),
-						},
-					},
-					Pan:     int(coordinate.y),
-					Tilt:    int(coordinate.x),
-					Shutter: 255,
-					Gobo:    36,
-				}
-				fixtures = append(fixtures, newFixture)
+			newFixture := common.Fixture{
+				Type:         "scanner",
+				MasterDimmer: full,
+				Colors: []common.Color{
+					common.GetColorButtonsArray(coordinateNumber + f),
+				},
+				Pan:     int(coordinate.y + thisShift),
+				Tilt:    int(coordinate.x + thisShift),
+				Shutter: 255,
+				Gobo:    36,
 			}
-			if f == 1 && shift {
-				newFixture := common.Fixture{
-					Type:         "scanner",
-					MasterDimmer: full,
-					Colors: []common.Color{
-						{
-							R: int(reverseCoordinates[index].y),
-							G: int(reverseCoordinates[index].x),
-							B: 0,
-						},
-					},
-					Pan:     int(reverseCoordinates[index].y),
-					Tilt:    int(reverseCoordinates[index].x),
-					Shutter: 255,
-					Gobo:    36,
-				}
-				fixtures = append(fixtures, newFixture)
-			}
+			fixtures = append(fixtures, newFixture)
 
+			thisShift = shiftThisMany*f + shift
+
+			if thisShift >= len(coordinates) {
+				thisShift = 0
+			}
+			fmt.Printf("thisShift %d\n", thisShift)
 		}
 		newStep := common.Step{
 			Type:     "scanner",
@@ -561,11 +545,6 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift bool) co
 
 	return patten
 
-}
-
-func makeBlue(red, green int) int {
-
-	return red + green/2
 }
 
 type coordinate struct {

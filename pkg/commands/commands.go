@@ -80,6 +80,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	if command.UpdateShift {
+		if debug {
+			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Shift)
+		}
+		sequence.Shift = command.Shift
+		sequence.UpdateShift = command.UpdateShift
+		return sequence
+	}
+
 	if command.UpdateSize {
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Size)

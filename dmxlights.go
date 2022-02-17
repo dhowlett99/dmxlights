@@ -22,7 +22,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-const debug = false
+const debug = true
 
 const (
 	full = 255
@@ -36,7 +36,7 @@ var masterBrightness int
 
 //var color int
 var savePreset bool
-var selectedPatten = 0
+var selectedShift = 1
 var blackout bool = false
 var flood bool = false
 
@@ -267,16 +267,6 @@ func main() {
 	// Light the first sequence as the default selected.
 	selectedSequence := 0
 	common.SequenceSelect(eventsForLauchpad, selectedSequence)
-
-	// Initialise the pattens.
-	availablePattens := []string{}
-	availablePattens = append(availablePattens, "standard")
-	availablePattens = append(availablePattens, "inverted")
-	availablePattens = append(availablePattens, "rgbchase")
-	availablePattens = append(availablePattens, "pairs")
-	availablePattens = append(availablePattens, "center")
-	availablePattens = append(availablePattens, "colors")
-	availablePattens = append(availablePattens, "fade")
 
 	// Clear the pad.
 	allFixturesOff(eventsForLauchpad, dmxController, fixturesConfig)
@@ -550,73 +540,43 @@ func main() {
 			continue
 		}
 
-		// Decrement Patten.
+		// Decrease Shift.
 		if hit.X == 2 && hit.Y == 7 {
 
 			if debug {
-				fmt.Printf("Decrement Patten \n")
+				fmt.Printf("Decrease Shift\n")
 			}
 
-			selectedPatten = selectedPatten - 1
-			if selectedPatten < 0 {
-				selectedPatten = 0
+			selectedShift = selectedShift - 1
+			if selectedShift < 1 {
+				selectedShift = 1
 			}
 			cmd := common.Command{
-				UpdatePatten: true,
-				Patten: common.Patten{
-					Name: availablePattens[selectedPatten],
-				},
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-			cmd = common.Command{
-				Stop:  true,
-				Speed: sequenceSpeed,
+				UpdateShift: true,
+				Shift:       selectedShift,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-			cmd = common.Command{
-				Start: true,
-				Speed: sequenceSpeed,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			continue
 		}
 
-		// Increment Patten.
+		// Increase Shift.
 		if hit.X == 3 && hit.Y == 7 {
 
 			if debug {
-				fmt.Printf("Increment Patten \n")
+				fmt.Printf("Increase Shift \n")
 			}
 
-			selectedPatten = selectedPatten + 1
-			if selectedPatten > len(availablePattens)-1 {
-				selectedPatten = len(availablePattens) - 1
+			selectedShift = selectedShift + 1
+			if selectedShift > 8 {
+				selectedShift = 8
 			}
 			cmd := common.Command{
-				Stop: true,
+				UpdateShift: true,
+				Shift:       selectedShift,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-			cmd = common.Command{
-				UpdatePatten: true,
-				Patten: common.Patten{
-					Name: availablePattens[selectedPatten],
-				},
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			cmd = common.Command{
-				Stop:  true,
-				Speed: sequenceSpeed,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
-
-			cmd = common.Command{
-				Start: true,
-				Speed: sequenceSpeed,
-			}
-			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			continue
 		}
 
@@ -798,8 +758,8 @@ func main() {
 			}
 
 			size--
-			if size < 0 {
-				size = 0
+			if size < 1 {
+				size = 1
 			}
 			// Send Update Fade Speed.
 			cmd := common.Command{

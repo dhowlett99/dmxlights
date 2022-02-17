@@ -55,7 +55,6 @@ type Patten struct {
 	Length   int // 8, 4 or 2
 	Size     int
 	Fixtures int // 8 Fixtures
-	Chase    []int
 	Steps    []Step
 }
 
@@ -130,6 +129,8 @@ type Command struct {
 	FixtureNumber         int
 	FixtureState          bool
 	SequenceNumber        int
+	UpdateShift           bool
+	Shift                 int
 }
 
 type Gobo struct {
@@ -164,7 +165,8 @@ type Sequence struct {
 	Steps                   int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten                  Patten // Contains fixtures and steps info.
 	Colors                  []Color
-	Shift                   bool // Used for shifting scanners patterns apart.
+	UpdateShift             bool
+	Shift                   int // Used for shifting scanners patterns apart.
 	CurrentSpeed            time.Duration
 	Speed                   int
 	FadeSpeed               int
@@ -430,7 +432,7 @@ func HideSequence(selectedSequence int, commandChannels []chan Command) {
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 }
 
-// Colors are selected from a pallete of 8 colors, this function takes 1-8 and
+// Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
 // returns the color array
 func GetColorButtonsArray(color int) Color {
 
@@ -455,6 +457,67 @@ func GetColorButtonsArray(color int) Color {
 		return Color{R: 255, G: 255, B: 255} // White
 	case 9:
 		return Color{R: 0, G: 0, B: 0} // Black
+	case 10:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 11:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 12:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 13:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 14:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 15:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 16:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 17:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 18:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 19:
+		return Color{R: 0, G: 0, B: 0} // Black
+	case 20:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 21:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 22:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 23:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 24:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 25:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 26:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 27:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 28:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 29:
+		return Color{R: 0, G: 0, B: 0} // Black
+	case 30:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 31:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 32:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 33:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 34:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 35:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 36:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 37:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 38:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 39:
+		return Color{R: 0, G: 0, B: 0} // Black
+
 	}
 	return Color{}
 }
@@ -542,7 +605,6 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map invert function.
 	sequence.Inverted = sequence.Functions[Function7_Invert].State
-	sequence.Shift = sequence.Functions[Function7_Invert].State
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State

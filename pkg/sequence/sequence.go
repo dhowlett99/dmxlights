@@ -107,7 +107,6 @@ func CreateSequence(
 			Length:   2,
 			Size:     2,
 			Fixtures: 8,
-			Chase:    []int{1, 2, 3, 4, 5, 6, 7, 8},
 			Steps:    pattens[initialPatten].Steps,
 		},
 		SequenceSize: 60,
@@ -120,7 +119,7 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift:                 false,
+		Shift:                 1,
 		Blackout:              false,
 		Master:                255,
 		Gobo:                  gobos,
@@ -236,6 +235,8 @@ func PlayNewSequence(sequence common.Sequence,
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
 
+		sequence.UpdateShift = false
+
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
@@ -343,7 +344,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+				if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 					break
 				}
 
@@ -416,7 +417,7 @@ func PlayNewSequence(sequence common.Sequence,
 
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 
@@ -445,42 +446,42 @@ func PlayNewSequence(sequence common.Sequence,
 					// Now tell all the fixtures what they need to do.
 					fixtureChannel1 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel2 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel3 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel4 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel5 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel6 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel7 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 					fixtureChannel8 <- cmd
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten {
+					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 				}
