@@ -119,7 +119,7 @@ func CreateSequence(
 				B: 0,
 			},
 		},
-		Shift:                 1,
+		Shift:                 0, // Start at zero ie no shift.
 		Blackout:              false,
 		Master:                255,
 		Gobo:                  gobos,

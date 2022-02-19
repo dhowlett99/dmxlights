@@ -498,11 +498,20 @@ func MakePatterns() map[string]common.Patten {
 // which is the starting point for all sequence steps.
 func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift int) common.Patten {
 
-	shiftThisMany := ((len(coordinates)) / NumberFixtures)
+	// Shift this many for each fixture.
+	shiftThisMany := make(map[int]int)
+
+	// The current shift for this fixture
+	thisShift := make(map[int]int)
+
+	// Initalise a shift value for each fixture.
+	for fx := 0; fx < 4; fx++ {
+		thisShift[fx] = 0
+	}
 
 	fmt.Printf("NumberFixtures:%d shiftThisMany:%d shift:%d\n", NumberFixtures, shiftThisMany, shift)
 
-	thisShift := 0
+	fmt.Printf("=========== S T A R T ===============\n")
 
 	// First create the patten.
 	patten := common.Patten{}
@@ -510,29 +519,54 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift int) com
 	steps := []common.Step{}
 
 	// Now create the steps in the patten.
-	for coordinateNumber, coordinate := range coordinates {
+	for coordinateNumber := range coordinates {
+
 		//fmt.Printf("Coordinate Number:%d\n", coordinateNumber)
 		fixtures := []common.Fixture{}
-		for f := 0; f < NumberFixtures; f++ {
+
+		for fixture := 0; fixture < NumberFixtures; fixture++ {
+
+			// Share the shiftable position out across the number of available fixtures
+			shiftThisMany[fixture] = ((len(coordinates)) / 4)
+
+			// Only shift above 0
+			if shift > 0 && fixture != 0 {
+				// The shiftThisMany is basically a quarter of the availale
+				// coordinates, if we multiple by the shift we wiil
+				// get either a 1/4 rotation for a shift of 1, 1/2 shift for 2 and 3/4 for 3.
+				//fmt.Printf("fixture=%d shiftThisMany=%d  shift=%d Shifting by=%d\n", fixture, shiftThisMany, shift, (shiftThisMany[fixture]*(fixture+1))*shift)
+				thisShift[fixture] = (shiftThisMany[fixture] * fixture) * shift
+			}
+			//fmt.Printf("Coordinate No %d\n", coordinateNumber)
+			current := coordinateNumber + thisShift[fixture]
+
+			if current > len(coordinates) {
+				current = 1
+			}
+			if current == len(coordinates) {
+				current = 0
+			}
+			// fmt.Printf("Current No %d\n", current)
+			// fmt.Printf("Pan:%d  \n", coordinates[current].Pan)
+			// fmt.Printf("Tilt:%d \n", coordinates[current].Tilt)
+			// fmt.Printf("thisShift%d\n", thisShift)
+
 			newFixture := common.Fixture{
 				Type:         "scanner",
 				MasterDimmer: full,
 				Colors: []common.Color{
-					common.GetColorButtonsArray(coordinateNumber + f),
+					common.GetColorButtonsArray(current),
 				},
-				Pan:     int(coordinate.y + thisShift),
-				Tilt:    int(coordinate.x + thisShift),
+				Pan:     int(coordinates[current].Pan),
+				Tilt:    int(coordinates[current].Tilt),
 				Shutter: 255,
 				Gobo:    36,
 			}
 			fixtures = append(fixtures, newFixture)
 
-			thisShift = shiftThisMany*f + shift
+			//fmt.Printf("Pan:%d Tilt:%d\n", int(coordinates[current].Pan), int(coordinates[current].Tilt))
 
-			if thisShift >= len(coordinates) {
-				thisShift = 0
-			}
-			fmt.Printf("thisShift %d\n", thisShift)
+			//fmt.Printf("==================================\n")
 		}
 		newStep := common.Step{
 			Type:     "scanner",
@@ -543,20 +577,28 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift int) com
 	patten.Name = "circle"
 	patten.Steps = steps
 
+	for stepNumber, step := range steps {
+
+		fmt.Printf("Step %d\n", stepNumber)
+		for _, fixture := range step.Fixtures {
+			fmt.Printf("Fixture Pan %d  Tilt %d \n", fixture.Pan, fixture.Tilt)
+		}
+	}
+
 	return patten
 
 }
 
 type coordinate struct {
-	x int
-	y int
+	Tilt int
+	Pan  int
 }
 
 func CircleGenerator(size int) (out []coordinate) {
 	var theta float64
 	for theta = 0; theta <= 360; theta += 10 {
 		n := coordinate{}
-		n.x, n.y = circleXY(float64(size), theta)
+		n.Tilt, n.Pan = circleXY(float64(size), theta)
 		out = append(out, n)
 	}
 	return out
@@ -568,8 +610,8 @@ func ScanGenerateSineWave(size int, frequency int) (out []coordinate) {
 	for t = 1; t < T-1; t += 10 {
 		n := coordinate{}
 		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
-		n.x = int(x)
-		n.y = int(t)
+		n.Tilt = int(x)
+		n.Pan = int(t)
 		out = append(out, n)
 	}
 	return out
@@ -579,8 +621,8 @@ func ScanGeneratorUpDown(size int) (out []coordinate) {
 	pan := 128
 	for tilt := 0; tilt < 255; tilt += 10 {
 		n := coordinate{}
-		n.x = tilt
-		n.y = pan
+		n.Tilt = tilt
+		n.Pan = pan
 		out = append(out, n)
 	}
 	return out
@@ -590,8 +632,8 @@ func ScanGeneratorLeftRight(size int) (out []coordinate) {
 	tilt := 128
 	for pan := 0; pan < 255; pan += 10 {
 		n := coordinate{}
-		n.x = tilt
-		n.y = pan
+		n.Tilt = tilt
+		n.Pan = pan
 		out = append(out, n)
 	}
 	return out

@@ -36,7 +36,7 @@ var masterBrightness int
 
 //var color int
 var savePreset bool
-var selectedShift = 1
+var selectedShift = 0
 var blackout bool = false
 var flood bool = false
 
@@ -548,8 +548,8 @@ func main() {
 			}
 
 			selectedShift = selectedShift - 1
-			if selectedShift < 1 {
-				selectedShift = 1
+			if selectedShift < 0 {
+				selectedShift = 0
 			}
 			cmd := common.Command{
 				UpdateShift: true,
@@ -568,8 +568,8 @@ func main() {
 			}
 
 			selectedShift = selectedShift + 1
-			if selectedShift > 8 {
-				selectedShift = 8
+			if selectedShift > 3 {
+				selectedShift = 3
 			}
 			cmd := common.Command{
 				UpdateShift: true,
