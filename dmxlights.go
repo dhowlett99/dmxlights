@@ -22,7 +22,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-const debug = true
+const debug = false
 
 const (
 	full = 255
@@ -1028,14 +1028,16 @@ func main() {
 		}
 
 		// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
-		if hit.X >= 0 && hit.X < 8 && !functionSelectMode[hit.Y] &&
+		if hit.X >= 0 &&
+			hit.X < 8 &&
 			hit.Y >= 0 &&
 			hit.Y < 4 &&
 			!sequences[hit.Y].Functions[common.Function1_Patten].State &&
 			!sequences[hit.Y].Functions[common.Function6_Static].State &&
 			!sequences[hit.Y].Functions[common.Function5_Color].State &&
 			sequences[hit.Y].Type != "switch" && // As long as we're not a switch sequence.
-			sequences[hit.Y].Type != "scanner" { // As long as we're not a scanner sequence.
+			sequences[hit.Y].Type != "scanner" && // As long as we're not a scanner sequence.
+			!functionSelectMode[hit.Y] { // As long as we're not a scanner sequence.
 
 			if debug {
 				fmt.Printf("Flash Button X:%d Y:%d\n", hit.X, hit.Y)

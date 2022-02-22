@@ -7,6 +7,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+const debug = false
+
 const (
 	full = 255
 )
@@ -469,18 +471,6 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
 				},
 			},
-			// { // Step 9, - All off
-			// 	Fixtures: []common.Fixture{
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 	},
-			// },
 		},
 	}
 
@@ -494,99 +484,128 @@ func MakePatterns() map[string]common.Patten {
 
 }
 
+// Storage for scanner values.
+type scanner struct {
+	values []int
+}
+
 // GeneratePatten takes an array of coordinates and turns them into a patten
 // which is the starting point for all sequence steps.
-func GeneratePatten(coordinates []coordinate, NumberFixtures int, shift int) common.Patten {
+func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift int) common.Patten {
 
-	// Shift this many for each fixture.
-	shiftThisMany := make(map[int]int)
+	NumberCoordinates := len(coordinates)
 
-	// The current shift for this fixture
-	thisShift := make(map[int]int)
-
-	// Initalise a shift value for each fixture.
-	for fx := 0; fx < 4; fx++ {
-		thisShift[fx] = 0
+	if debug {
+		fmt.Printf("Number Fixtures %d\n", NumberFixtures)
+		fmt.Printf("Number Coordinates %d\n", NumberCoordinates)
 	}
-
-	fmt.Printf("NumberFixtures:%d shiftThisMany:%d shift:%d\n", NumberFixtures, shiftThisMany, shift)
-
-	fmt.Printf("=========== S T A R T ===============\n")
-
 	// First create the patten.
 	patten := common.Patten{}
 
 	steps := []common.Step{}
 
-	// Now create the steps in the patten.
-	for coordinateNumber := range coordinates {
+	// Storage space for the fixtures
+	scanners := []scanner{}
 
-		//fmt.Printf("Coordinate Number:%d\n", coordinateNumber)
+	// First generate the values for all posible fixtures ie 8
+	for fixture := 0; fixture < 4; fixture++ {
+
+		// new scanner
+		s := scanner{}
+
+		actualShift := (NumberCoordinates / 4) * requestedShift
+
+		shift := fixture * actualShift
+
+		if shift == NumberCoordinates {
+			shift = 0
+		}
+
+		if shift == NumberCoordinates+NumberCoordinates/2 {
+			shift = NumberCoordinates / 2
+		}
+
+		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
+			shift = NumberCoordinates / 4
+		}
+		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
+			s.values = append(s.values, coordinate)
+		}
+		for coordinate := 0; coordinate < shift; coordinate++ {
+			s.values = append(s.values, coordinate)
+		}
+
+		// append the scanner to the list of scanners.
+		scanners = append(scanners, s)
+	}
+
+	for fixture := 0; fixture < 4; fixture++ {
+
+		// new scanner
+		s := scanner{}
+
+		actualShift := (NumberCoordinates / 4) * requestedShift
+
+		shift := fixture * actualShift
+
+		if shift == NumberCoordinates {
+			shift = 0
+		}
+
+		if shift == NumberCoordinates+NumberCoordinates/2 {
+			shift = NumberCoordinates / 2
+		}
+
+		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
+			shift = NumberCoordinates / 4
+		}
+		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
+			s.values = append(s.values, coordinate)
+		}
+		for coordinate := 0; coordinate < shift; coordinate++ {
+			s.values = append(s.values, coordinate)
+		}
+
+		// append the scanner to the list of scanners.
+		scanners = append(scanners, s)
+	}
+
+	if debug {
+		for _, scanner := range scanners {
+			fmt.Printf("scanner %+v\n", scanner)
+		}
+	}
+
+	// Now create the steps in the patten.
+	for f := 0; f < NumberCoordinates; f++ {
+
 		fixtures := []common.Fixture{}
 
-		for fixture := 0; fixture < NumberFixtures; fixture++ {
-
-			// Share the shiftable position out across the number of available fixtures
-			shiftThisMany[fixture] = ((len(coordinates)) / 4)
-
-			// Only shift above 0
-			if shift > 0 && fixture != 0 {
-				// The shiftThisMany is basically a quarter of the availale
-				// coordinates, if we multiple by the shift we wiil
-				// get either a 1/4 rotation for a shift of 1, 1/2 shift for 2 and 3/4 for 3.
-				//fmt.Printf("fixture=%d shiftThisMany=%d  shift=%d Shifting by=%d\n", fixture, shiftThisMany, shift, (shiftThisMany[fixture]*(fixture+1))*shift)
-				thisShift[fixture] = (shiftThisMany[fixture] * fixture) * shift
-			}
-			//fmt.Printf("Coordinate No %d\n", coordinateNumber)
-			current := coordinateNumber + thisShift[fixture]
-
-			if current > len(coordinates) {
-				current = 1
-			}
-			if current == len(coordinates) {
-				current = 0
-			}
-			// fmt.Printf("Current No %d\n", current)
-			// fmt.Printf("Pan:%d  \n", coordinates[current].Pan)
-			// fmt.Printf("Tilt:%d \n", coordinates[current].Tilt)
-			// fmt.Printf("thisShift%d\n", thisShift)
+		for step := 0; step < NumberFixtures; step++ {
 
 			newFixture := common.Fixture{
 				Type:         "scanner",
 				MasterDimmer: full,
 				Colors: []common.Color{
-					common.GetColorButtonsArray(current),
+					common.GetColorButtonsArray(scanners[step].values[f]),
 				},
-				Pan:     int(coordinates[current].Pan),
-				Tilt:    int(coordinates[current].Tilt),
+				Pan:     int(coordinates[scanners[step].values[f]].Pan),
+				Tilt:    int(coordinates[scanners[step].values[f]].Tilt),
 				Shutter: 255,
 				Gobo:    36,
 			}
 			fixtures = append(fixtures, newFixture)
-
-			//fmt.Printf("Pan:%d Tilt:%d\n", int(coordinates[current].Pan), int(coordinates[current].Tilt))
-
-			//fmt.Printf("==================================\n")
 		}
+
 		newStep := common.Step{
 			Type:     "scanner",
 			Fixtures: fixtures,
 		}
 		steps = append(steps, newStep)
+		patten.Name = "circle"
+		patten.Steps = steps
 	}
-	patten.Name = "circle"
-	patten.Steps = steps
-
-	for stepNumber, step := range steps {
-
-		fmt.Printf("Step %d\n", stepNumber)
-		for _, fixture := range step.Fixtures {
-			fmt.Printf("Fixture Pan %d  Tilt %d \n", fixture.Pan, fixture.Tilt)
-		}
-	}
-
 	return patten
-
 }
 
 type coordinate struct {
@@ -596,7 +615,7 @@ type coordinate struct {
 
 func CircleGenerator(size int) (out []coordinate) {
 	var theta float64
-	for theta = 0; theta <= 360; theta += 10 {
+	for theta = 0; theta < 360; theta += 10 {
 		n := coordinate{}
 		n.Tilt, n.Pan = circleXY(float64(size), theta)
 		out = append(out, n)
