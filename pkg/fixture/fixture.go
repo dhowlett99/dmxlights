@@ -133,9 +133,18 @@ func FixtureReceiver(sequence common.Sequence,
 						}
 					}
 
+					// If this fixture is disabled then shut the shutter off.
+					if cmd.CurrentPosition == position.StartPosition &&
+						cmd.Type == "scanner" &&
+						cmd.FixtureDisabled[myFixtureNumber] {
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0)
+						continue
+					}
+
 					if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
 						// Short ciruit the soft fade if we are a scanner.
 						if cmd.Type == "scanner" {
+
 							if position.Fixture == myFixtureNumber {
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, cmd.SelectedGobo, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								if !cmd.Hide {
@@ -244,6 +253,13 @@ func MapFixtures(mySequenceNumber int,
 							}
 						}
 					}
+					if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+						if blackout {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
+						} else {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(master))
+						}
+					}
 				}
 				// Static value.
 				if strings.Contains(channel.Name, "Static") {
@@ -259,13 +275,7 @@ func MapFixtures(mySequenceNumber int,
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
 					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)))
 				}
-				if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-					if blackout {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
-					} else {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(master))
-					}
-				}
+
 			}
 		}
 	}

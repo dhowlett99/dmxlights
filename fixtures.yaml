@@ -248,29 +248,29 @@ fixtures:
   group: 1
   channels: 
   - number: 1
-    name: Red5
-  - number: 2
-    name: Green5
-  - number: 3
-    name: Blue5
-  - number: 4
-    name: Red6
-  - number: 5
-    name: Green6
-  - number: 6
-    name: Blue6
-  - number: 7
-    name: Red7
-  - number: 8
-    name: Green7
-  - number: 9
-    name: Blue7
-  - number: 10
     name: Red8
-  - number: 11
+  - number: 2
     name: Green8
-  - number: 12
+  - number: 3
     name: Blue8
+  - number: 4
+    name: Red7
+  - number: 5
+    name: Green7
+  - number: 6
+    name: Blue7
+  - number: 7
+    name: Red6
+  - number: 8
+    name: Green6
+  - number: 9
+    name: Blue6
+  - number: 10
+    name: Red5
+  - number: 11
+    name: Green5
+  - number: 12
+    name: Blue5
   - number: 13
     name: MasterDimmer
 - name: Uplighter1
