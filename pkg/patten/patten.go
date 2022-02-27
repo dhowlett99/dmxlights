@@ -491,7 +491,7 @@ type scanner struct {
 
 // GeneratePatten takes an array of coordinates and turns them into a patten
 // which is the starting point for all sequence steps.
-func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift int) common.Patten {
+func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift int, chase bool) common.Patten {
 
 	NumberCoordinates := len(coordinates)
 
@@ -576,12 +576,19 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 		}
 	}
 
+	var shutterValue int
 	// Now create the steps in the patten.
 	for f := 0; f < NumberCoordinates; f++ {
 
 		fixtures := []common.Fixture{}
 
 		for step := 0; step < NumberFixtures; step++ {
+
+			if chase { // Flash the scanners in order.
+				shutterValue = calulateShutterValue(f, step, NumberFixtures, NumberCoordinates)
+			} else {
+				shutterValue = 255 // Otherwise just turn on every scanner
+			}
 
 			newFixture := common.Fixture{
 				Type:         "scanner",
@@ -591,7 +598,7 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 				},
 				Pan:     int(coordinates[scanners[step].values[f]].Pan),
 				Tilt:    int(coordinates[scanners[step].values[f]].Tilt),
-				Shutter: 255,
+				Shutter: shutterValue,
 				Gobo:    36,
 			}
 			fixtures = append(fixtures, newFixture)
@@ -606,6 +613,16 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 		patten.Steps = steps
 	}
 	return patten
+}
+
+func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures int, NumberCoordinates int) int {
+
+	howOften := NumberCoordinates / NumberFixtures
+
+	if currentCoordinate/howOften == currentStep {
+		return 255
+	}
+	return 0
 }
 
 type coordinate struct {

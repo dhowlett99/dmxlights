@@ -141,14 +141,18 @@ func FixtureReceiver(sequence common.Sequence,
 						continue
 					}
 
+					// Short ciruit the soft fade if we are a scanner.
 					if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
-						// Short ciruit the soft fade if we are a scanner.
 						if cmd.Type == "scanner" {
 
 							if position.Fixture == myFixtureNumber {
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, cmd.SelectedGobo, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								if !cmd.Hide {
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
+									if cmd.ScannerChase {
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, position.Shutter, eventsForLauchpad)
+									} else {
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
+									}
 								}
 							}
 							continue

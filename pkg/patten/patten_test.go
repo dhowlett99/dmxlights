@@ -58,7 +58,7 @@ func Test_circleGenerator(t *testing.T) {
 				{64, 237},
 				{84, 246},
 				{106, 252},
-				{127, 254},
+				//{127, 254},
 			},
 		},
 	}
@@ -76,6 +76,7 @@ func Test_generatePatten(t *testing.T) {
 		name        string
 		fixtures    int
 		shift       int
+		chase       bool
 		coordinates []coordinate
 		want        common.Patten
 	}{
@@ -860,7 +861,7 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.coordinates, tt.fixtures, tt.shift); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePatten(tt.coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %v", got)
 				t.Errorf("Want = %v", tt.want)
 			}
@@ -918,6 +919,48 @@ func TestScanGenerateSineWave(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("ScanGenerateSineWave() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_calulateShutterValue(t *testing.T) {
+	type args struct {
+		currentCoordinate int
+		currentStep       int
+		NumberFixtures    int
+		NumberCoordinates int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "golden path",
+			args: args{
+				currentCoordinate: 0,
+				currentStep:       0,
+				NumberFixtures:    8,
+				NumberCoordinates: 8,
+			},
+			want: 255,
+		},
+		{
+			name: "golden path",
+			args: args{
+				currentCoordinate: 8,
+				currentStep:       0,
+				NumberFixtures:    8,
+				NumberCoordinates: 8,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := calulateShutterValue(tt.args.currentCoordinate, tt.args.currentStep, tt.args.NumberFixtures, tt.args.NumberCoordinates); got != tt.want {
+				t.Errorf("calulateShutterValue() = %v, want %v", got, tt.want)
 			}
 		})
 	}

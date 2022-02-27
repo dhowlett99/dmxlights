@@ -199,6 +199,7 @@ type Sequence struct {
 	SaveColors              bool
 	SelectedScannerPatten   int
 	FixtureDisabled         map[int]bool
+	ScannerChase            bool
 }
 
 type Function struct {
@@ -258,6 +259,7 @@ type FixtureCommand struct {
 	Inverted            bool
 	SelectedGobo        int
 	FixtureDisabled     map[int]bool
+	ScannerChase        bool
 }
 
 type Position struct {
@@ -313,9 +315,9 @@ const (
 	Function2_Auto_Color    = 1 // Auto Color change.
 	Function3_Auto_Patten   = 2 // Auto Patten change
 	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
-	Function5_Color         = 4 // Set chase color. or select the scanner GOBO or color.
-	Function6_Static        = 5 // Set static colors.
-	Function7_Invert        = 6 // Invert the RGB colors or shift scanners 360 deg of each other.
+	Function5_Color         = 4 // Set chase color. or select the scanner color.
+	Function6_Static        = 5 // Set static color or scanner Gobo.
+	Function7_Invert        = 6 // Invert the RGB colors or set scanner chase mode.
 	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
@@ -605,6 +607,8 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map invert function.
 	sequence.Inverted = sequence.Functions[Function7_Invert].State
+	// Map scanner chase mode. Uses same function key as above.≈
+	sequence.ScannerChase = sequence.Functions[Function7_Invert].State
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State

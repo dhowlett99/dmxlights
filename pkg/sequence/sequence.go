@@ -315,22 +315,22 @@ func PlayNewSequence(sequence common.Sequence,
 					sequence.ChangePatten = false
 					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 0 {
 						coordinates := patten.CircleGenerator(sequence.SequenceSize)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 						steps = scannerPatten.Steps
 					}
 					if sequence.Patten.Name == "leftandright" || sequence.SelectedScannerPatten == 1 {
 						coordinates := patten.ScanGeneratorLeftRight(128)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 						steps = scannerPatten.Steps
 					}
 					if sequence.Patten.Name == "upanddown" || sequence.SelectedScannerPatten == 2 {
 						coordinates := patten.ScanGeneratorUpDown(128)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 						steps = scannerPatten.Steps
 					}
 					if sequence.Patten.Name == "sinewave" || sequence.SelectedScannerPatten == 3 {
 						coordinates := patten.ScanGenerateSineWave(255, 5000)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift)
+						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 						steps = scannerPatten.Steps
 					}
 
@@ -441,6 +441,7 @@ func PlayNewSequence(sequence common.Sequence,
 						CurrentPosition: step,
 						SelectedGobo:    sequence.SelectedGobo,
 						FixtureDisabled: sequence.FixtureDisabled,
+						ScannerChase:    sequence.ScannerChase,
 					}
 
 					// Now tell all the fixtures what they need to do.
