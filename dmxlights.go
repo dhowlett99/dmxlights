@@ -881,9 +881,6 @@ func main() {
 				}
 			}
 
-			// Set up the color edit flag
-			editStaticColorsMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function6_Static].State
-
 			// Send update functions command. This sets the temporary representation of
 			// the function keys in the real sequence.
 			cmd := common.Command{
@@ -922,7 +919,9 @@ func main() {
 			}
 
 			// Map Function 6 to static color edit.
-			editStaticColorsMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function6_Static].State
+			if sequences[selectedSequence].Type != "scanner" {
+				editStaticColorsMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function6_Static].State
+			}
 
 			// Go straight into static color edit mode, don't wait for a another select press.
 			if editStaticColorsMode[selectedSequence] {
@@ -1199,6 +1198,7 @@ func main() {
 		if hit.X >= 0 && hit.X < 8 &&
 			hit.Y != -1 &&
 			selectedSequence == hit.Y && // Make sure the buttons pressed are for this sequence.
+			sequences[selectedSequence].Type != "scanner" && // Not a scanner sequence.
 			!functionSelectMode[selectedSequence] && // Not in function Mode
 			editStaticColorsMode[selectedSequence] { // Static Function On
 
@@ -1360,7 +1360,8 @@ func HandleSelect(sequences []*common.Sequence,
 			return
 		}
 
-		if sequences[selectedSequence].Functions[common.Function6_Static].State {
+		if sequences[selectedSequence].Functions[common.Function6_Static].State &&
+			sequences[selectedSequence].Type != "scanner" {
 			//fmt.Printf("Show Static Color Selection Buttons\n")
 			common.SetMode(selectedSequence, commandChannels, "Static")
 			return
@@ -1519,7 +1520,10 @@ func setEditSequenceColorsMode(selectedSequence int,
 		common.RevealSequence(selectedSequence, commandChannels)
 	}
 
-	if !functionSelectMode[selectedSequence] && sequences[selectedSequence].Functions[common.Function6_Static].State && !editSequenceColorsMode[selectedSequence] {
+	if !functionSelectMode[selectedSequence] &&
+		sequences[selectedSequence].Functions[common.Function6_Static].State &&
+		sequences[selectedSequence].Type != "scanner" &&
+		!editSequenceColorsMode[selectedSequence] {
 		cmd := common.Command{
 			SetEditColors: true,
 			EditColors:    false,

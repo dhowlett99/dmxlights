@@ -603,7 +603,9 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map static function.
-	sequence.Static = sequence.Functions[Function6_Static].State
+	if sequence.Type != "scanner" {
+		sequence.Static = sequence.Functions[Function6_Static].State
+	}
 
 	// Map invert function.
 	sequence.Inverted = sequence.Functions[Function7_Invert].State
