@@ -18,7 +18,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-const debug = false
+const debug = true
 
 type SequencesConfig struct {
 	Sequences []SequenceConfig `yaml:"sequences"`
@@ -31,6 +31,12 @@ type SequenceConfig struct {
 	Group       int    `yaml:"group"`
 }
 
+// LoadSequences loads sequence configuration information.
+// Each sequence has a :-
+//       name: sequence name,  a singe word.
+//       description: free text describing the sequence.
+//       group: assignes to one of the top 4 rows of the launchpad. 1-4
+//       type:  rgb, scanner or switch
 func LoadSequences() (sequences *SequencesConfig, err error) {
 	filename := "sequences.yaml"
 
@@ -51,6 +57,8 @@ func LoadSequences() (sequences *SequencesConfig, err error) {
 	return sequences, nil
 }
 
+// Before a sequence can run it needs to be created.
+// Assigns default values for all types of sequence.
 func CreateSequence(
 	sequenceType string,
 	mySequenceNumber int,
@@ -67,6 +75,9 @@ func CreateSequence(
 
 	// Populate the edit sequence colors for this sequence with the defaults.
 	sequenceColorButtons := setDefaultStaticColorButtons(mySequenceNumber)
+
+	// Populate the set scanner gobo colors buttons for this sequence with the defaults.
+	sequenceGoboColorButtons := setDefaultGoboColorButtons(mySequenceNumber)
 
 	// Set default values
 	if sequenceType == "rgb" {
@@ -86,22 +97,24 @@ func CreateSequence(
 	// We can disable a fixture by setting fixtureDisabled to true.
 	fixtureDisabled := make(map[int]bool, 8)
 
+	// The actual sequence definition.
 	sequence := common.Sequence{
-		NumberFixtures:          8,
-		NumberScanners:          scanners,
-		Type:                    sequenceType,
-		Hide:                    false,
-		Mode:                    "Sequence",
-		StaticColors:            staticColorsButtons,
-		AvailableSequenceColors: sequenceColorButtons,
-		Name:                    sequenceType,
-		Number:                  mySequenceNumber,
-		FadeSpeed:               12,
-		FadeTime:                75 * time.Millisecond,
-		MusicTrigger:            false,
-		Run:                     true,
-		Bounce:                  false,
-		Steps:                   8 * 14, // Eight lamps and 14 steps to fade up and down.
+		NumberFixtures:               8,
+		NumberScanners:               scanners,
+		Type:                         sequenceType,
+		Hide:                         false,
+		Mode:                         "Sequence",
+		StaticColors:                 staticColorsButtons,
+		AvailableSequenceColors:      sequenceColorButtons,
+		AvailableGoboSelectionColors: sequenceGoboColorButtons,
+		Name:                         sequenceType,
+		Number:                       mySequenceNumber,
+		FadeSpeed:                    12,
+		FadeTime:                     75 * time.Millisecond,
+		MusicTrigger:                 false,
+		Run:                          true,
+		Bounce:                       false,
+		Steps:                        8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     initialPatten,
 			Length:   2,
@@ -133,7 +146,7 @@ func CreateSequence(
 	}
 
 	// Make functions for each of the sequences.
-	for function := 0; function < 8; function++ {
+	for function := 0; function <= 8; function++ {
 		newFunction := common.Function{
 			Name:           strconv.Itoa(function),
 			SequenceNumber: mySequenceNumber,
@@ -145,7 +158,10 @@ func CreateSequence(
 
 	if sequenceType == "switch" {
 
-		fmt.Printf("Load switch data\n")
+		if debug {
+			fmt.Printf("Load switch data\n")
+		}
+
 		// Load the switch information in from the fixtures.yaml file.
 		// A new group of switches.
 		newSwitchList := []common.Switch{}
@@ -188,7 +204,8 @@ func CreateSequence(
 	return sequence
 }
 
-func PlayNewSequence(sequence common.Sequence,
+// Now the sequence has been created, this functions starts the sequence.
+func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
 	pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
@@ -260,7 +277,7 @@ func PlayNewSequence(sequence common.Sequence,
 						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 					}
 				}
-				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 			// Only play once, we don't want to flood the DMX universe with
 			// continual commands.
@@ -274,7 +291,7 @@ func PlayNewSequence(sequence common.Sequence,
 			for sequence.Run && !sequence.Static {
 
 				// Map music trigger function.
-				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
+				sequence.MusicTrigger = sequence.Functions[common.Function10_Music_Trigger].State
 
 				// If the music trigger is being used then the timer is disabled.
 				for _, trigger := range soundTriggers {
@@ -442,6 +459,7 @@ func PlayNewSequence(sequence common.Sequence,
 						SelectedGobo:    sequence.SelectedGobo,
 						FixtureDisabled: sequence.FixtureDisabled,
 						ScannerChase:    sequence.ScannerChase,
+						ScannerColor:    sequence.ScannerColor,
 					}
 
 					// Now tell all the fixtures what they need to do.
@@ -491,7 +509,7 @@ func PlayNewSequence(sequence common.Sequence,
 	}
 }
 
-// This is for switch sequences, a type of sequence which is just a set of eight switches.
+// showSwitches - This is for switch sequences, a type of sequence which is just a set of eight switches.
 // Each switch can have a number of states as defined in the fixtures.yaml file.
 // The color of the lamp indicates which state you are in.
 func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
@@ -553,6 +571,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 		}
 	}
 
+	// Bounce repeates the steps in the sequence but backwards.
 	if bounce {
 		for index := len(steps) - 1; index >= 0; index-- {
 			step := steps[index]
@@ -632,18 +651,35 @@ func setDefaultStaticColorButtons(selectedSequence int) []common.StaticColorButt
 	return staticColorsButtons
 }
 
-func invertColor(color common.Color) (out common.Color) {
+// Sets the gobo select colors to default values. Namely Yellow !
+func setDefaultGoboColorButtons(selectedSequence int) []common.StaticColorButton {
 
-	out.R = reverse_dmx(color.R)
-	out.G = reverse_dmx(color.G)
-	out.B = reverse_dmx(color.B)
+	// Make an array to hold gobo button colors.
+	staticColorsButtons := []common.StaticColorButton{}
 
-	return out
+	for X := 0; X < 8; X++ {
+		staticColorButton := common.StaticColorButton{}
+		staticColorButton.X = X
+		staticColorButton.Y = selectedSequence
+		staticColorButton.SelectedColor = X
+		staticColorButton.Color = common.Color{R: 255, G: 255, B: 0}
+		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+	}
 
+	return staticColorsButtons
 }
 
-func reverse_dmx(n int) int {
+// invertColor just reverses the DMX values.
+func invertColor(color common.Color) (out common.Color) {
+	out.R = reverseDmx(color.R)
+	out.G = reverseDmx(color.G)
+	out.B = reverseDmx(color.B)
 
+	return out
+}
+
+// Takes a DMX value 1-255 and reverses the value.
+func reverseDmx(n int) int {
 	in := make(map[int]int, 255)
 	var y = 255
 
@@ -655,15 +691,15 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
+// Flood - We are being asked to be in flood mode.
 func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
-	// We are asked to be in flood mode.
 	if sequence.Flood && sequence.PlayFloodOnce {
 		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
 			for s := range sequence.SelectedFloodSequence {
 				if !sequence.Hide {
 					launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
 				}
-				fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
 		sequence.PlayFloodOnce = false
@@ -675,7 +711,7 @@ func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, events
 				if !sequence.Hide {
 					launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 				}
-				fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
 		sequence.PlayFloodOnce = false

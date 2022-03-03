@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = false
+const debug = true
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -140,7 +140,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		sequence.Functions[common.Function8_Music_Trigger].State = false
+		sequence.Functions[common.Function10_Music_Trigger].State = false
 		sequence.Functions[common.Function6_Static].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
@@ -252,6 +252,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
 		return sequence
 	}
+
+	if command.UpdateScannerColor {
+		if debug {
+			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.SelectedColor)
+		}
+		sequence.UpdateScannerColor = true
+		sequence.SaveColors = true
+		sequence.ScannerColor = command.SelectedColor
+		return sequence
+	}
+
 	if command.ClearSequenceColor {
 		if debug {
 			fmt.Printf("%d: Command Clear Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
@@ -335,7 +346,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.SelectedGobo)
 		}
-		sequence.SelectedGobo = command.SelectedGobo + 1
+		sequence.SelectedGobo = command.SelectedGobo
+		sequence.Static = false
 		return sequence
 	}
 	if command.UpdateAutoColor {
