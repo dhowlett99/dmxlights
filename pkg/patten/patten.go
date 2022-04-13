@@ -637,6 +637,10 @@ func CircleGenerator(size int) (out []coordinate) {
 		n.Tilt, n.Pan = circleXY(float64(size), theta)
 		out = append(out, n)
 	}
+	for _, cood := range out {
+		fmt.Printf("%d,%d\n", cood.Pan, cood.Tilt)
+	}
+
 	return out
 }
 
@@ -679,7 +683,7 @@ func circleXY(r float64, theta float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
 
-	x := int(r*math.Cos(theta) + 128)
-	y := int(-r*math.Sin(theta) + 128)
+	x := int(r*math.Cos(theta) + r)
+	y := int(-r*math.Sin(theta) + r)
 	return x, y
 }
