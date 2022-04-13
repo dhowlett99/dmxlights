@@ -97,8 +97,8 @@ type Command struct {
 	FadeSpeed             int
 	UpdateSize            bool
 	Size                  int
-	UpdateSequenceSize    bool
-	SequenceSize          int
+	UpdateScannerSize     bool
+	ScannerSize           int
 	X                     int
 	Y                     int
 	Blackout              bool
@@ -173,7 +173,7 @@ type Sequence struct {
 	Speed                        int
 	FadeSpeed                    int
 	Size                         int
-	SequenceSize                 int
+	ScannerSize                  int
 	X                            int
 	Y                            int
 	MusicTrigger                 bool

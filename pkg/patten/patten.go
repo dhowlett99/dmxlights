@@ -632,13 +632,15 @@ type coordinate struct {
 
 func CircleGenerator(size int) (out []coordinate) {
 	var theta float64
-	for theta = 0; theta < 360; theta += 10 {
+	for theta = 0; theta < 360; theta += 20 {
 		n := coordinate{}
 		n.Tilt, n.Pan = circleXY(float64(size), theta)
 		out = append(out, n)
 	}
-	for _, cood := range out {
-		fmt.Printf("%d,%d\n", cood.Pan, cood.Tilt)
+	if debug {
+		for _, cood := range out {
+			fmt.Printf("%d,%d\n", cood.Pan, cood.Tilt)
+		}
 	}
 
 	return out

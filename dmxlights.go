@@ -33,7 +33,7 @@ func main() {
 
 	var sequenceSpeed int = 12        // Local copy of sequence speed.
 	var size int                      // current RGB sequence size.
-	var scannerSize int               // Current scanner sequence size.
+	var scannerSize int = 60          // Current scanner size.
 	var savePreset bool               // Save a preset flag.
 	var selectedShift = 0             // Current fixture shift.
 	var blackout bool = false         // Blackout all fixtures.
@@ -764,39 +764,39 @@ func main() {
 				fmt.Printf("Decrease Size\n")
 			}
 
+			// Send Update RGB Size.
 			size--
 			if size < 1 {
 				size = 1
 			}
-			// Send Update Fade Speed.
 			cmd := common.Command{
 				UpdateSize: true,
 				Size:       size,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
+			// Send Update Scanner Size.
 			scannerSize = scannerSize - 10
-			if scannerSize < 0 {
-				scannerSize = 0
+			if scannerSize < 10 {
+				scannerSize = 10
 			}
-			// Send Update Fade Speed.
 			cmd = common.Command{
-				UpdateSize: true,
-				Size:       scannerSize,
+				UpdateScannerSize: true,
+				ScannerSize:       scannerSize,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			continue
 		}
 
-		// Size increase.
+		// Increase Size.
 		if hit.X == 5 && hit.Y == 7 {
 
 			if debug {
 				fmt.Printf("Increase Size\n")
 			}
 
-			// Update the PAR can size.
+			// Send Update RGB Size.
 			size++
 			if size > 25 {
 				size = 25
@@ -807,14 +807,14 @@ func main() {
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-			// Update the Scanner size.
+			// Send Update Scanner Size.
 			scannerSize = scannerSize + 10
 			if scannerSize > 120 {
 				scannerSize = 120
 			}
 			cmd = common.Command{
-				UpdateSize: true,
-				Size:       scannerSize,
+				UpdateScannerSize: true,
+				ScannerSize:       scannerSize,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
