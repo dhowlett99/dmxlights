@@ -80,6 +80,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		return sequence
 	}
 
+	if command.UpdateShift {
+		if debug {
+			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Shift)
+		}
+		sequence.Shift = command.Shift
+		sequence.UpdateShift = command.UpdateShift
+		return sequence
+	}
+
 	if command.UpdateSize {
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Size)
@@ -87,11 +96,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Size = command.Size
 		return sequence
 	}
-	if command.UpdateSequenceSize {
+	if command.UpdateScannerSize {
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Size to %d\n", mySequenceNumber, command.SequenceSize)
+			fmt.Printf("%d: Command Update Scanner Size to %d\n", mySequenceNumber, command.ScannerSize)
 		}
-		sequence.SequenceSize = command.SequenceSize
+		sequence.ScannerSize = command.ScannerSize
 		return sequence
 	}
 	if command.IncreaseFade {
@@ -131,7 +140,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		sequence.Functions[common.Function8_Music_Trigger].State = false
+		sequence.Functions[common.Function10_Music_Trigger].State = false
 		sequence.Functions[common.Function6_Static].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
@@ -243,6 +252,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
 		return sequence
 	}
+
+	if command.UpdateScannerColor {
+		if debug {
+			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.SelectedColor)
+		}
+		sequence.UpdateScannerColor = true
+		sequence.SaveColors = true
+		sequence.ScannerColor = command.SelectedColor
+		return sequence
+	}
+
 	if command.ClearSequenceColor {
 		if debug {
 			fmt.Printf("%d: Command Clear Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
@@ -326,7 +346,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.SelectedGobo)
 		}
-		sequence.SelectedGobo = command.SelectedGobo + 1
+		sequence.SelectedGobo = command.SelectedGobo
+		sequence.Static = false
 		return sequence
 	}
 	if command.UpdateAutoColor {

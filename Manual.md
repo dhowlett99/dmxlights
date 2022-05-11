@@ -141,7 +141,7 @@ A static color sequence is where you want to setup a set of uplighters with spec
 ## Switch Sequence
 
 A switch sequence is simply eight switches that can be used to control simple devices like projectors.
-A swicth can have multiple states, for example you could set a project to have specific color, brightness or Gobo.
+A swicth can have multiple states, for example you could set a fixture to have specific color, brightness or Gobo.
 
 
 

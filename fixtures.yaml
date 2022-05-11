@@ -248,29 +248,29 @@ fixtures:
   group: 1
   channels: 
   - number: 1
-    name: Red5
-  - number: 2
-    name: Green5
-  - number: 3
-    name: Blue5
-  - number: 4
-    name: Red6
-  - number: 5
-    name: Green6
-  - number: 6
-    name: Blue6
-  - number: 7
-    name: Red7
-  - number: 8
-    name: Green7
-  - number: 9
-    name: Blue7
-  - number: 10
     name: Red8
-  - number: 11
+  - number: 2
     name: Green8
-  - number: 12
+  - number: 3
     name: Blue8
+  - number: 4
+    name: Red7
+  - number: 5
+    name: Green7
+  - number: 6
+    name: Blue7
+  - number: 7
+    name: Red6
+  - number: 8
+    name: Green6
+  - number: 9
+    name: Blue6
+  - number: 10
+    name: Red5
+  - number: 11
+    name: Green5
+  - number: 12
+    name: Blue5
   - number: 13
     name: MasterDimmer
 - name: Uplighter1
@@ -420,7 +420,7 @@ fixtures:
   number: 1
   description: American DJ Comscan LED
   type: scanner
-  address: 62
+  address: 400
   group: 3
   channels:
   - number: 1
@@ -472,7 +472,7 @@ fixtures:
   number: 2
   description: American DJ Comscan LED
   type: scanner
-  address: 57
+  address: 405
   group: 3
   channels:
   - number: 1
@@ -524,7 +524,7 @@ fixtures:
   number: 3
   description: American DJ Comscan LED
   type: scanner
-  address: 67
+  address: 410
   group: 3
   channels:
   - number: 1
@@ -576,7 +576,7 @@ fixtures:
   number: 4
   description: American DJ Comscan LED
   type: scanner
-  address: 77
+  address: 415
   group: 3
   channels:
   - number: 1
@@ -624,6 +624,153 @@ fixtures:
         number: 9
   - number: 5
     name: Master
+- name: Scanner 5
+  number: 5
+  description: American DJ Comscan LED
+  type: scanner
+  address: 420
+  group: 3
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
+  - number: 4
+    name: Gobo
+    settings:
+      - name: White Circle
+        number: 1
+        setting: 0
+      - name: Yellow Cluster
+        setting: 8
+        number: 2
+      - name: Red Swirl
+        setting: 15
+        number: 3
+      - name: Green Strips
+        setting: 22
+        number: 4
+      - name: Blue Star
+        setting: 28
+        number: 5
+      - name: MultiColor Commas
+        setting: 36
+        number: 6
+      - name: Purple Bubbles
+        setting: 43
+        number: 7
+      - name: Cyan World
+        setting: 50
+        number: 8
+      - name: Blue / Puple Circle
+        setting: 57
+        number: 9
+  - number: 5
+    name: Master
+- name: Scanner 6
+  number: 6
+  description: American DJ Inno Pocket Spot
+  type: scanner
+  address: 425
+  group: 3
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: FineP
+  - number: 3
+    name: Tilt
+  - number: 4
+    name: FineT
+  - number: 5
+    name: Color
+    settings:
+      - name: White
+        number: 1
+        setting: 0
+      - name: Red
+        setting: 8
+        number: 2
+      - name: Orange
+        setting: 15
+        number: 3
+      - name: Yellow
+        setting: 22
+        number: 4
+      - name: Green
+        setting: 29
+        number: 5
+      - name: Blue
+        setting: 36
+        number: 6
+      - name: Light Blue
+        setting: 43
+        number: 7
+      - name: Pink
+        setting: 50
+        number: 8
+  - number: 6
+    name: Gobo
+    settings:
+      - name: Open
+        number: 1
+        setting: 0
+      - name: Gobo 1
+        setting: 8
+        number: 2
+      - name: Gobo 2
+        setting: 16
+        number: 3
+      - name: Gobo 3
+        setting: 24
+        number: 4
+      - name: Gobo 4
+        setting: 32
+        number: 5
+      - name: Gobo 5
+        setting: 40
+        number: 6
+      - name: Gobo 6
+        setting: 48
+        number: 7
+      - name: Gobo 7
+        setting: 56
+        number: 8
+  - number: 7
+    name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
+  - number: 8
+    name: Master
+  - number: 9
+    name: Speed
+    settings:
+      - name: Fast
+        setting: 255
+  - number: 10
+    name: SoundActive
+    settings:
+      - name: Off
+        setting: 1
+  - number: 11
+    name: Dimmer Curves
+    settings:
+      - name: Default Curve
+        setting: 255
 - name: Switch Box
   description: Switches
   type: switch
