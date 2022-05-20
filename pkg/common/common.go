@@ -132,6 +132,9 @@ type Command struct {
 	UpdateShift           bool
 	Shift                 int
 	UpdateScannerColor    bool
+
+	UpdateNumberCoordinates bool
+	NumberCoordinates       int
 }
 
 type Gobo struct {
@@ -204,6 +207,7 @@ type Sequence struct {
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 int
+	NumberCoordinates            int
 }
 
 type Function struct {

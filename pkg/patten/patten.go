@@ -630,9 +630,9 @@ type coordinate struct {
 	Pan  int
 }
 
-func CircleGenerator(size int) (out []coordinate) {
+func CircleGenerator(size int, NumberCoordinates int) (out []coordinate) {
 	var theta float64
-	for theta = 0; theta < 360; theta += 20 {
+	for theta = 0; theta < 360; theta += float64(360 / NumberCoordinates) {
 		n := coordinate{}
 		n.Tilt, n.Pan = circleXY(float64(size), theta)
 		out = append(out, n)
@@ -646,7 +646,7 @@ func CircleGenerator(size int) (out []coordinate) {
 	return out
 }
 
-func ScanGenerateSineWave(size int, frequency int) (out []coordinate) {
+func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []coordinate) {
 	var t float64
 	T := float64(size)
 	for t = 1; t < T-1; t += 10 {
@@ -659,7 +659,7 @@ func ScanGenerateSineWave(size int, frequency int) (out []coordinate) {
 	return out
 }
 
-func ScanGeneratorUpDown(size int) (out []coordinate) {
+func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
 	pan := 128
 	for tilt := 0; tilt < 255; tilt += 10 {
 		n := coordinate{}
@@ -670,9 +670,9 @@ func ScanGeneratorUpDown(size int) (out []coordinate) {
 	return out
 }
 
-func ScanGeneratorLeftRight(size int) (out []coordinate) {
+func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) {
 	tilt := 128
-	for pan := 0; pan < 255; pan += 10 {
+	for pan := 0; pan < 255; pan += NumberCoordinates {
 		n := coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan

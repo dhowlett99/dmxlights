@@ -379,6 +379,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
+
+	if command.UpdateNumberCoordinates {
+		if debug {
+			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.NumberCoordinates)
+		}
+		sequence.NumberCoordinates = command.NumberCoordinates
+
+		return sequence
+	}
+
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {
