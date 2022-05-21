@@ -12,7 +12,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
-	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
@@ -114,7 +113,7 @@ func CreateSequence(
 		MusicTrigger:                 false,
 		Run:                          true,
 		Bounce:                       false,
-		Steps:                        8 * 14, // Eight lamps and 14 steps to fade up and down.
+		NumberSteps:                  8 * 14, // Eight lamps and 14 steps to fade up and down.
 		Patten: common.Patten{
 			Name:     initialPatten,
 			Length:   2,
@@ -122,7 +121,7 @@ func CreateSequence(
 			Fixtures: 8,
 			Steps:    pattens[initialPatten].Steps,
 		},
-		ScannerSize:  60,
+		ScannerSize:  120,
 		Speed:        14,
 		CurrentSpeed: 25 * time.Millisecond,
 		Colors: []common.Color{
@@ -143,6 +142,7 @@ func CreateSequence(
 		AutoPatten:            false,
 		SelectedScannerPatten: 0,
 		FixtureDisabled:       fixtureDisabled,
+		NumberCoordinates:     10,
 	}
 
 	// Make functions for each of the sequences.
@@ -308,7 +308,9 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				steps := pattens[sequence.Patten.Name].Steps
+				if sequence.Type != "scanner" {
+					sequence.Steps = pattens[sequence.Patten.Name].Steps
+				}
 
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
@@ -330,26 +332,9 @@ func PlaySequence(sequence common.Sequence,
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
 					sequence.ChangePatten = false
-					if sequence.Patten.Name == "circle" || sequence.SelectedScannerPatten == 0 {
-						coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-						steps = scannerPatten.Steps
-					}
-					if sequence.Patten.Name == "leftandright" || sequence.SelectedScannerPatten == 1 {
-						coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-						steps = scannerPatten.Steps
-					}
-					if sequence.Patten.Name == "upanddown" || sequence.SelectedScannerPatten == 2 {
-						coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-						steps = scannerPatten.Steps
-					}
-					if sequence.Patten.Name == "sinewave" || sequence.SelectedScannerPatten == 3 {
-						coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
-						scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-						steps = scannerPatten.Steps
-					}
+					//fmt.Printf("---->Steps %+v\n", )
+
+					sequence.Steps = commands.SetPattern(sequence)
 
 					if sequence.AutoColor {
 						sequence.SelectedGobo++
@@ -366,7 +351,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Calulate positions for fixtures based on the steps in the patten.
-				sequence.Positions, sequence.Steps = calculatePositions(steps, sequence.Bounce)
+				sequence.Positions, sequence.NumberSteps = calculatePositions(sequence.Steps, sequence.Bounce)
 
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
@@ -430,7 +415,9 @@ func PlaySequence(sequence common.Sequence,
 				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
 
 				// Run the sequence through.
-				for step := 0; step < sequence.Steps; step++ {
+				for step := 0; step < sequence.NumberSteps; step++ {
+
+					//fmt.Printf("----STEP>>> %+v\n", step)
 
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
@@ -450,7 +437,7 @@ func PlaySequence(sequence common.Sequence,
 						FadeSpeed:       sequence.FadeSpeed,
 						FadeTime:        sequence.FadeTime,
 						Size:            sequence.Size,
-						Steps:           sequence.Steps,
+						Steps:           sequence.NumberSteps,
 						CurrentSpeed:    sequence.CurrentSpeed,
 						Speed:           sequence.Speed,
 						Blackout:        sequence.Blackout,

@@ -22,7 +22,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-const debug = true
+const debug = false
 
 const (
 	full = 255
@@ -55,7 +55,7 @@ func main() {
 	var soundGain float32 = 0         // Fine gain -0.09 -> 0.09
 	var disabledFixture [][]bool      // Which fixture is disabled on which sequence.
 
-	var selectedCordinates = 20 // Number of coordinates for scanner patterns.
+	var selectedCordinates = 10 // Number of coordinates for scanner patterns.
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -417,8 +417,8 @@ func main() {
 			}
 
 			soundGain = soundGain - 0.01
-			if soundGain < -0.9 {
-				soundGain = -0.9
+			if soundGain < -0.04 {
+				soundGain = -0.04
 			}
 			for _, trigger := range soundTriggers {
 				trigger.Gain = soundGain

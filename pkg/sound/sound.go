@@ -44,7 +44,7 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 
 		defer stream.Close()
 
-		numSamples := 100
+		numSamples := 10
 
 		// Start the thread that reports the gain.
 		go gainChecker()
