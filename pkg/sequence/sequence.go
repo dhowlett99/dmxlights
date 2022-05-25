@@ -12,6 +12,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
+	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
@@ -332,9 +333,8 @@ func PlaySequence(sequence common.Sequence,
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
 					sequence.ChangePatten = false
-					//fmt.Printf("---->Steps %+v\n", )
 
-					sequence.Steps = commands.SetPattern(sequence)
+					sequence.Steps = setPattern(sequence)
 
 					if sequence.AutoColor {
 						sequence.SelectedGobo++
@@ -703,4 +703,33 @@ func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, events
 		}
 		sequence.PlayFloodOnce = false
 	}
+}
+
+func setPattern(sequence common.Sequence) (steps []common.Step) {
+	if sequence.SelectedScannerPatten == 0 {
+		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
+		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+		steps = scannerPatten.Steps
+		return steps
+	}
+	if sequence.SelectedScannerPatten == 1 {
+		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
+		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+		steps = scannerPatten.Steps
+		return steps
+	}
+	if sequence.SelectedScannerPatten == 2 {
+		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
+		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+		steps = scannerPatten.Steps
+		return steps
+	}
+	if sequence.SelectedScannerPatten == 3 {
+		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
+		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+		steps = scannerPatten.Steps
+		return steps
+	}
+
+	return nil
 }

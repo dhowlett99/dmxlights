@@ -6,7 +6,6 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
-	"github.com/dhowlett99/dmxlights/pkg/patten"
 )
 
 const debug = false
@@ -27,9 +26,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			// if debug {
-			// 	fmt.Printf("%d: BEAT\n", mySequenceNumber)
-			// }
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
+			}
 			break
 		}
 	case command = <-commandChannel:
@@ -71,7 +70,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.UpdatePatten = command.UpdatePatten
 		sequence.ChangePatten = false
 		sequence.Patten.Name = command.Patten.Name
-		//sequence.Steps = SetPattern(sequence)
 		return sequence
 	}
 	if command.SelectPatten {
@@ -82,7 +80,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.ChangePatten = true
 		sequence.SelectedPatten = command.SelectedPatten
 		sequence.SelectedScannerPatten = command.SelectedPatten
-		//sequence.Steps = SetPattern(sequence)
 		return sequence
 	}
 
@@ -531,33 +528,4 @@ func SetFade(commandSpeed int) (Fade time.Duration) {
 		Fade = 25
 	}
 	return Fade * time.Millisecond
-}
-
-func SetPattern(sequence common.Sequence) (steps []common.Step) {
-	if sequence.SelectedScannerPatten == 0 {
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 1 {
-		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 2 {
-		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 3 {
-		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-
-	return nil
 }
