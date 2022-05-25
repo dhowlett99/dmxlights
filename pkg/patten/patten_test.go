@@ -64,7 +64,7 @@ func Test_circleGenerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := CircleGenerator(tt.args.size); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := CircleGenerator(tt.args.size, 20); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("circleGenerator() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
@@ -917,7 +917,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency, 10); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("ScanGenerateSineWave() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})

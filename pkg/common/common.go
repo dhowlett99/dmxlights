@@ -60,78 +60,80 @@ type Patten struct {
 
 // Command tells sequences what to do.
 type Command struct {
-	UpdateMode            bool
-	Mode                  string
-	MasterBrightness      bool
-	Master                int
-	Static                bool
-	UpdateStatic          bool
-	UpdateStaticColor     bool
-	UpdateSequenceColor   bool
-	ClearSequenceColor    bool
-	StaticLampFlash       bool
-	SelectedColor         int
-	PlayStaticOnce        bool
-	PlaySwitchOnce        bool
-	SetEditColors         bool
-	EditColors            bool
-	StaticColor           Color
-	StaticLamp            int
-	UnHide                bool
-	Hide                  bool
-	Name                  string
-	Number                int
-	Start                 bool
-	Stop                  bool
-	ReadConfig            bool
-	LoadConfig            bool
-	UpdateSpeed           bool
-	Speed                 int
-	UpdatePatten          bool
-	SelectPatten          bool
-	SelectedPatten        int
-	Patten                Patten
-	IncreaseFade          bool
-	DecreaseFade          bool
-	FadeTime              time.Duration
-	FadeSpeed             int
-	UpdateSize            bool
-	Size                  int
-	UpdateScannerSize     bool
-	ScannerSize           int
-	X                     int
-	Y                     int
-	Blackout              bool
-	Normal                bool
-	SoftFadeOn            bool
-	SoftFadeOff           bool
-	UpdateColor           bool
-	Color                 int
-	UpdateFunctionMode    bool
-	FunctionMode          bool
-	UpdateFunctions       bool
-	Functions             []Function
-	GetUpdatedSequence    bool
-	UpdateSwitch          bool
-	SwitchNumber          int
-	SwitchPosition        int
-	UpdateSwitchPositions bool
-	Inverted              bool
-	UpdateGobo            bool
-	SelectedGobo          int
-	UpdateFlood           bool
-	Flood                 bool
-	UpdateAutoColor       bool
-	AutoColor             bool
-	UpdateAutoPatten      bool
-	AutoPatten            bool
-	ToggleFixtureState    bool
-	FixtureNumber         int
-	FixtureState          bool
-	SequenceNumber        int
-	UpdateShift           bool
-	Shift                 int
-	UpdateScannerColor    bool
+	UpdateMode              bool
+	Mode                    string
+	MasterBrightness        bool
+	Master                  int
+	Static                  bool
+	UpdateStatic            bool
+	UpdateStaticColor       bool
+	UpdateSequenceColor     bool
+	ClearSequenceColor      bool
+	StaticLampFlash         bool
+	SelectedColor           int
+	PlayStaticOnce          bool
+	PlaySwitchOnce          bool
+	SetEditColors           bool
+	EditColors              bool
+	StaticColor             Color
+	StaticLamp              int
+	UnHide                  bool
+	Hide                    bool
+	Name                    string
+	Number                  int
+	Start                   bool
+	Stop                    bool
+	ReadConfig              bool
+	LoadConfig              bool
+	UpdateSpeed             bool
+	Speed                   int
+	UpdatePatten            bool
+	SelectPatten            bool
+	SelectedPatten          int
+	Patten                  Patten
+	IncreaseFade            bool
+	DecreaseFade            bool
+	FadeTime                time.Duration
+	FadeSpeed               int
+	UpdateSize              bool
+	Size                    int
+	UpdateScannerSize       bool
+	ScannerSize             int
+	X                       int
+	Y                       int
+	Blackout                bool
+	Normal                  bool
+	SoftFadeOn              bool
+	SoftFadeOff             bool
+	UpdateColor             bool
+	Color                   int
+	UpdateFunctionMode      bool
+	FunctionMode            bool
+	UpdateFunctions         bool
+	Functions               []Function
+	GetUpdatedSequence      bool
+	UpdateSwitch            bool
+	SwitchNumber            int
+	SwitchPosition          int
+	UpdateSwitchPositions   bool
+	Inverted                bool
+	UpdateGobo              bool
+	SelectedGobo            int
+	UpdateFlood             bool
+	Flood                   bool
+	UpdateAutoColor         bool
+	AutoColor               bool
+	UpdateAutoPatten        bool
+	AutoPatten              bool
+	ToggleFixtureState      bool
+	FixtureNumber           int
+	FixtureState            bool
+	SequenceNumber          int
+	UpdateShift             bool
+	Shift                   int
+	UpdateScannerColor      bool
+	UpdateNumberCoordinates bool
+	NumberCoordinates       int
 }
 
 type Gobo struct {
@@ -164,7 +166,7 @@ type Sequence struct {
 	Number                       int
 	Run                          bool
 	Bounce                       bool
-	Steps                        int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	NumberSteps                  int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten                       Patten // Contains fixtures and steps info.
 	Colors                       []Color
 	UpdateShift                  bool
@@ -195,7 +197,6 @@ type Sequence struct {
 	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
 	AutoColor                    bool
 	AutoPatten                   bool
-	SelectedPatten               int
 	ChangePatten                 bool
 	RecoverSequenceColors        bool
 	SaveColors                   bool
@@ -204,6 +205,11 @@ type Sequence struct {
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 int
+	NumberCoordinates            int
+	Steps                        []Step
+	UpdatePatten                 bool
+	SelectPatten                 bool
+	SelectedPatten               int
 }
 
 type Function struct {

@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = true
+const debug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -26,9 +26,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			// if debug {
-			// 	fmt.Printf("%d: BEAT\n", mySequenceNumber)
-			// }
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
+			}
 			break
 		}
 	case command = <-commandChannel:
@@ -67,6 +67,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Patten.Name)
 		}
+		sequence.UpdatePatten = command.UpdatePatten
+		sequence.ChangePatten = false
 		sequence.Patten.Name = command.Patten.Name
 		return sequence
 	}
@@ -74,6 +76,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.SelectedPatten)
 		}
+		sequence.SelectPatten = command.SelectPatten
 		sequence.ChangePatten = true
 		sequence.SelectedPatten = command.SelectedPatten
 		sequence.SelectedScannerPatten = command.SelectedPatten
@@ -379,6 +382,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 	}
+
+	if command.UpdateNumberCoordinates {
+		if debug {
+			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.NumberCoordinates)
+		}
+		sequence.NumberCoordinates = command.NumberCoordinates
+
+		return sequence
+	}
+
 	// If we are being asekd to load a config, use the new sequence.
 	if command.LoadConfig {
 		if debug {
