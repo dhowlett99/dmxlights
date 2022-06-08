@@ -368,7 +368,17 @@ func main() {
 			// Disable fixtures.
 			for x := 0; x < 4; x++ {
 				for y := 0; y < 9; y++ {
-					disabledFixture[x][y] = true
+					disabledFixture[x][y] = false
+					// Tell the sequence to turn on this scanner.
+					cmd := common.Command{
+						Action: common.ToggleFixtureState,
+						Args: []common.Arg{
+							{Name: "SequenceNumber", Value: x},
+							{Name: "FixtureNumber", Value: y},
+							{Name: "FixtureState", Value: false},
+						},
+					}
+					common.SendCommandToSequence(x, cmd, commandChannels)
 				}
 			}
 
