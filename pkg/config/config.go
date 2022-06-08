@@ -42,13 +42,16 @@ func LoadConfig(filename string) []common.Sequence {
 }
 
 func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
-	cmd := common.Command{
-		LoadConfig: true,
-		X:          X,
-		Y:          Y,
+	command := common.Command{
+		Action: common.LoadConfig,
+		Args: []common.Arg{
+			{Name: "X", Value: X},
+			{Name: "Y", Value: Y},
+		},
 	}
+
 	for _, seq := range commandChannels {
-		seq <- cmd
+		seq <- command
 	}
 }
 
@@ -68,13 +71,16 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 	}()
 
 	// Ask for all the sequencers for their config.
-	cmd := common.Command{
-		ReadConfig: true,
-		X:          X,
-		Y:          Y,
+	command := common.Command{
+		Action: common.ReadConfig,
+		Args: []common.Arg{
+			{Name: "X", Value: X},
+			{Name: "Y", Value: Y},
+		},
 	}
+
 	for _, seq := range sequences {
-		seq <- cmd
+		seq <- command
 	}
 }
 

@@ -8,7 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/config"
 )
 
-const debug = true
+const debug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -38,15 +38,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		break
 	}
 
+	switch command.Action {
 	// Now process any command.
-	if command.Hide {
+	case common.Hide:
 		if debug {
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
 		}
 		sequence.Hide = true
 		return sequence
-	}
-	if command.UnHide {
+
+	case common.UnHide:
 		if debug {
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
@@ -54,80 +55,86 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlaySwitchOnce = true
 		sequence.Hide = false
 		return sequence
-	}
-	if command.UpdateSpeed {
+
+	case common.UpdateSpeed:
+		const SPEED = 0
 		if debug {
-			fmt.Printf("%d: Command Update Speed to %d\n", mySequenceNumber, command.Speed)
+			fmt.Printf("%d: Command Update %s to %d\n", mySequenceNumber, command.Args[SPEED].Name, command.Args[SPEED].Value)
 		}
-		sequence.Speed = command.Speed
-		sequence.CurrentSpeed = SetSpeed(command.Speed)
+		sequence.Speed = command.Args[SPEED].Value.(int)
+		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
-	}
-	if command.UpdatePatten {
+
+	case common.UpdatePatten:
+		const PATTEN_NAME = 0
 		if debug {
-			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Patten.Name)
+			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
-		sequence.Patten.Name = command.Patten.Name
+		sequence.Patten.Name = command.Args[PATTEN_NAME].Value.(string)
 		return sequence
-	}
-	if command.SelectPatten {
+
+	case common.SelectPatten:
+		const SELECTED_PATTEN = 0
 		if debug {
-			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.SelectedPatten)
+			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
 		sequence.ChangePatten = true
-		sequence.SelectedPatten = command.SelectedPatten
-		sequence.SelectedScannerPatten = command.SelectedPatten
+		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
+		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		return sequence
-	}
 
-	if command.UpdateShift {
+	case common.UpdateShift:
+		const SHIFT = 0
 		if debug {
-			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Shift)
+			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
 		}
-		sequence.Shift = command.Shift
-		sequence.UpdateShift = command.UpdateShift
+		sequence.UpdateShift = true
+		sequence.Shift = command.Args[SHIFT].Value.(int)
 		return sequence
-	}
 
-	if command.UpdateSize {
+	case common.UpdateSize:
+		const START = 0
 		if debug {
-			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Size)
+			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
 		}
-		sequence.Size = command.Size
+		sequence.Size = command.Args[START].Value.(int)
 		return sequence
-	}
-	if command.UpdateScannerSize {
+
+	case common.UpdateScannerSize:
+		const SCANNER_SIZE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Size to %d\n", mySequenceNumber, command.ScannerSize)
+			fmt.Printf("%d: Command Update Scanner Size to %d\n", mySequenceNumber, command.Args[SCANNER_SIZE].Value)
 		}
-		sequence.ScannerSize = command.ScannerSize
+		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
-	}
-	if command.IncreaseFade {
+
+	case common.IncreaseFade:
+		const FADE_SPEED = 0
 		if debug {
-			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.FadeSpeed)
+			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.FadeSpeed = command.FadeSpeed
-		sequence.FadeTime = SetSpeed(command.FadeSpeed)
+		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
+		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
 		return sequence
-	}
-	if command.DecreaseFade {
+
+	case common.DecreaseFade:
+		const FADE_SPEED = 0
 		if debug {
-			fmt.Printf("%d: Command Decrease Fade to %d\n", mySequenceNumber, command.FadeSpeed)
+			fmt.Printf("%d: Command Decrease Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.FadeSpeed = command.FadeSpeed
-		sequence.FadeTime = SetSpeed(command.FadeSpeed)
+		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
+		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
 		return sequence
-	}
-	if command.UpdateColor {
+
+	case common.UpdateColor:
+		const COLOR = 0
 		if debug {
-			fmt.Printf("%d: Command Update Color to %d\n", mySequenceNumber, command.Color)
+			fmt.Printf("%d: Command Update Color to %d\n", mySequenceNumber, command.Args[COLOR].Value)
 		}
-		color := command.Color
-		sequence.Color = color
+		sequence.Color = command.Args[COLOR].Value.(int)
 		return sequence
-	}
-	if command.Start {
+
+	case common.Start:
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
@@ -135,8 +142,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Static = false
 		sequence.Run = true
 		return sequence
-	}
-	if command.Stop {
+
+	case common.Stop:
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
@@ -146,15 +153,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Run = false
 		sequence.Static = false
 		return sequence
-	}
-	if command.PlayStaticOnce {
+
+	case common.PlayStaticOnce:
 		if debug {
 			fmt.Printf("%d: Command PlayStaticOnce\n", mySequenceNumber)
 		}
 		sequence.PlayStaticOnce = true
 		return sequence
-	}
-	if command.Blackout {
+
+	case common.Blackout:
 		if debug {
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)
 		}
@@ -162,16 +169,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlaySwitchOnce = true
 		sequence.Blackout = true
 		return sequence
-	}
-	if command.UpdateFlood {
+
+	case common.UpdateFlood:
+		const FLOOD = 0
 		if debug {
-			fmt.Printf("%d: Command Flood to %t\n", mySequenceNumber, command.Flood)
+			fmt.Printf("%d: Command Flood to %t\n", mySequenceNumber, command.Args[FLOOD].Value)
 		}
-		sequence.Flood = command.Flood
+		sequence.Flood = command.Args[FLOOD].Value.(bool)
 		sequence.PlayFloodOnce = true
 		return sequence
-	}
-	if command.Normal {
+
+	case common.Normal:
 		if debug {
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)
 		}
@@ -179,16 +187,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.PlaySwitchOnce = true
 		sequence.Blackout = false
 		return sequence
-	}
-	if command.UpdateFunctions {
+
+	case common.UpdateFunctions:
+		const FUNCTIONS = 0
 		if debug {
 			fmt.Printf("%d: Command Update Functions\n", mySequenceNumber)
-			for _, function := range command.Functions {
+			for _, function := range command.Args[FUNCTIONS].Value.([]common.Function) {
 				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
 			}
 		}
 		// Setup the actions based on the state of the function keys.
-		sequence := common.SetFunctionKeyActions(command.Functions, sequence)
+		sequence := common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
 
 		// Always bounce the pattern if we're a scanner. Except if we're a circle.
 		if sequence.Type == "scanner" && sequence.Patten.Name != "circle" {
@@ -198,29 +207,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			sequence.Bounce = false
 		}
 		return sequence
-	}
-	if command.SetEditColors {
+
+	case common.SetEditColors:
+		const EDIT_COLORS = 0
 		if debug {
-			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Static)
+			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Args[EDIT_COLORS].Value)
 		}
 		sequence.PlayStaticOnce = true
-		sequence.EditColors = command.EditColors
+
+		sequence.EditColors = command.Args[EDIT_COLORS].Value.(bool)
 		return sequence
-	}
-	if command.UpdateStatic {
+
+	case common.UpdateStatic:
+		const STATIC = 0
 		if debug {
-			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Static)
+			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Args[STATIC].Value)
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
-		sequence.Static = command.Static
+		sequence.Static = command.Args[STATIC].Value.(bool)
 
-	}
-	if command.UpdateMode {
+	case common.UpdateMode:
+		const MODE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Mode)
+			fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Args[MODE].Value)
 		}
-		sequence.Mode = command.Mode
+		sequence.Mode = command.Args[MODE].Value.(string)
 		if sequence.Mode == "Static" {
 			sequence.Static = true
 		}
@@ -228,97 +240,105 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			sequence.Static = false
 		}
 		return sequence
-	}
-	if command.UpdateStaticColor {
+
+	case common.UpdateStaticColor:
+		const STATIC = 0            // Boolean
+		const STATIC_LAMP = 1       // Integer
+		const STATIC_LAMP_FLASH = 2 // Boolean
+		const SELECTED_COLOR = 3    // Integer
+		const STATIC_COLOR = 4      // Color
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
-			fmt.Printf("Lamp Color   R:%d  G:%d  B:%d\n", command.StaticColor.R, command.StaticColor.G, command.StaticColor.B)
-			fmt.Printf("Selected Color:%d Flash:%t\n", command.SelectedColor, command.StaticLampFlash)
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[SELECTED_COLOR].Value, command.Args[STATIC_LAMP_FLASH].Value)
 		}
 		sequence.PlayStaticOnce = true
-		sequence.Static = command.Static
+		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
-		sequence.StaticColors[command.StaticLamp].SelectedColor = command.SelectedColor
-		sequence.StaticColors[command.StaticLamp].Color = command.StaticColor
-		sequence.StaticColors[command.StaticLamp].Flash = command.StaticLampFlash
-		return sequence
-	}
-	if command.UpdateSequenceColor {
+		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].SelectedColor = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
+
+	case common.UpdateSequenceColor:
+		const SELECTED_COLOR = 0
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
+			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.UpdateSequenceColor = true
 		sequence.SaveColors = true
-		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.SelectedColor))
+		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.Args[SELECTED_COLOR].Value.(int)))
 		return sequence
-	}
 
-	if command.UpdateScannerColor {
+	case common.UpdateScannerColor:
+		const SELECTED_COLOR = 0
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.SelectedColor)
+			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.UpdateScannerColor = true
 		sequence.SaveColors = true
-		sequence.ScannerColor = command.SelectedColor
+		sequence.ScannerColor = command.Args[SELECTED_COLOR].Value.(int)
 		return sequence
-	}
 
-	if command.ClearSequenceColor {
+	case common.ClearSequenceColor:
 		if debug {
-			fmt.Printf("%d: Command Clear Sequence Color to %d\n", mySequenceNumber, command.SelectedColor)
+			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = []common.Color{}
 		sequence.CurrentSequenceColors = []common.Color{}
 		return sequence
-	}
+
 	// If we are being asked for our config we must reply with our current sequence.
-	if command.ReadConfig {
+	case common.ReadConfig:
 		if debug {
 			fmt.Printf("%d: Command Read Config\n", mySequenceNumber)
 		}
 		replyChannel <- sequence
 		return sequence
-	}
+
 	// We are setting the Master brightness in this sequence.
-	if command.MasterBrightness {
+	case common.MasterBrightness:
+		const MASTER = 0
 		if debug {
-			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, sequence.Master)
+			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, command.Args[MASTER].Value)
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
-		sequence.Master = command.Master
+		sequence.Master = command.Args[MASTER].Value.(int)
 		return sequence
-	}
+
 	// If we are being asked for a updated config we must reply with our current sequence.
-	if command.GetUpdatedSequence {
+	case common.GetUpdatedSequence:
 		if debug {
 			fmt.Printf("%d: Command Get Updated Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
 		return sequence
-	}
+
 	// Update function mode for the current sequence.
-	if command.UpdateFunctionMode {
+	case common.UpdateFunctionMode:
+		const FUNCTION_MODE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Function Mode %t\n", mySequenceNumber, command.FunctionMode)
+			fmt.Printf("%d: Command Update Function Mode %t\n", mySequenceNumber, command.Args[FUNCTION_MODE].Value)
 		}
-		sequence.FunctionMode = command.FunctionMode
+		sequence.FunctionMode = command.Args[FUNCTION_MODE].Value.(bool)
 		return sequence
-	}
+
 	// Update the named switch position for the current sequence.
-	if command.UpdateSwitch {
+	case common.UpdateSwitch:
+		const SWITCH_NUMBER = 0   // Integer
+		const SWITCH_POSITION = 1 // Integer
 		if debug {
-			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.SwitchNumber, command.SwitchPosition)
+			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
 		}
-		sequence.Switches[command.SwitchNumber].CurrentState = command.SwitchPosition
+		sequence.Switches[command.Args[SWITCH_NUMBER].Value.(int)].CurrentState = command.Args[SWITCH_POSITION].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.Run = false
 		sequence.Type = "switch"
 		return sequence
-	}
+
 	// Update switch positions so they get displayed.
-	if command.UpdateSwitchPositions {
+	case common.UpdateSwitchPositions:
 		if debug {
 			fmt.Printf("%d: Command Update Switch Positions \n", mySequenceNumber)
 		}
@@ -326,49 +346,53 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Run = false
 		sequence.Type = "switch"
 		return sequence
-	}
 
 	// Here we want to disable/enable the selected scanner.
-	if command.ToggleFixtureState {
+	case common.ToggleFixtureState:
+		const SEQUENCE_NUMBER = 0 // Integer
+		const FIXTURE_NUMBER = 1  // Integer
+		const FIXTURE_STATE = 2   // Boolean
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.FixtureNumber, command.SequenceNumber)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
-		if command.SequenceNumber == mySequenceNumber {
-			if command.FixtureNumber < sequence.NumberScanners {
-				sequence.FixtureDisabled[command.FixtureNumber] = command.FixtureState
+		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
+			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberScanners {
+				sequence.FixtureDisabled[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[FIXTURE_STATE].Value.(bool)
 			}
 		}
 
 		return sequence
-	}
 
-	if command.UpdateGobo {
+	case common.UpdateGobo:
+		const SELECTED_GOBO = 0
 		if debug {
-			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.SelectedGobo)
+			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.Args[SELECTED_GOBO].Value)
 		}
-		sequence.SelectedGobo = command.SelectedGobo
+		sequence.SelectedGobo = command.Args[SELECTED_GOBO].Value.(int)
 		sequence.Static = false
 		return sequence
-	}
-	if command.UpdateAutoColor {
+
+	case common.UpdateAutoColor:
+		const AUTO_COLOR = 0
 		if debug {
-			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.AutoColor)
+			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[AUTO_COLOR].Value)
 		}
-		sequence.AutoColor = command.AutoColor
+		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
 		sequence.SelectedGobo = 1
-		if !command.AutoColor {
+		if !command.Args[AUTO_COLOR].Value.(bool) {
 			sequence.RecoverSequenceColors = true
 		} else {
 			sequence.RecoverSequenceColors = false
 		}
 		return sequence
-	}
-	if command.UpdateAutoPatten {
+
+	case common.UpdateAutoPatten:
+		const AUTO_PATTEN = 0
 		if debug {
-			fmt.Printf("%d: Command Update Auto Patten to  %t\n", mySequenceNumber, command.AutoPatten)
+			fmt.Printf("%d: Command Update Auto Patten to  %t\n", mySequenceNumber, command.Args[AUTO_PATTEN].Value)
 		}
-		sequence.AutoPatten = command.AutoPatten
-		if !command.AutoPatten {
+		sequence.AutoPatten = command.Args[AUTO_PATTEN].Value.(bool)
+		if !command.Args[AUTO_PATTEN].Value.(bool) {
 			if sequence.Type == "rgb" {
 				sequence.Patten.Name = "standard"
 			}
@@ -378,15 +402,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			}
 		}
 		return sequence
-	}
+
 	// If we are being asekd to load a config, use the new sequence.
-	if command.LoadConfig {
+	case common.LoadConfig:
+		const X = 0
+		const Y = 1
 		if debug {
 			fmt.Printf("%d: Command Load Config\n", mySequenceNumber)
 		}
-		X := command.X
-		Y := command.Y
-		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", X, Y))
+		x := command.Args[X].Value.(int)
+		y := command.Args[Y].Value.(int)
+		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", x, y))
 		seq := common.Sequence{}
 		for _, seq = range config {
 			if seq.Number == sequence.Number {
@@ -398,6 +424,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				return sequence
 			}
 		}
+
 	}
 	return sequence
 }
