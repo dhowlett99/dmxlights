@@ -79,7 +79,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
-		sequence.SelectPatten = command.SelectPatten
+		sequence.SelectPatten = command.Args[SELECTED_PATTEN].Value.(bool)
 		sequence.ChangePatten = true
 		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
@@ -405,16 +405,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 
-	case command.UpdateNumberCoordinates {
-    const NUMBER_COORDINATES = 0
+	case common.UpdateNumberCoordinates:
+		const NUMBER_COORDINATES = 0
 		if debug {
 			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
 		}
-		sequence.NumberCoordinates = command.NumberCoordinates
+		sequence.NumberCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
 
 		return sequence
-	}
-
 
 	// If we are being asekd to load a config, use the new sequence.
 	case common.LoadConfig:

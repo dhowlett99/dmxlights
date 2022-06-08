@@ -120,7 +120,7 @@ const UpdateScannerColor = 44
 const ClearSequenceColor = 45
 const Static = 46
 const MasterBrightness = 47
-
+const UpdateNumberCoordinates = 48
 
 type Gobo struct {
 	Name    string

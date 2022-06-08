@@ -882,8 +882,10 @@ func main() {
 				selectedCordinates = 10
 			}
 			cmd = common.Command{
-				UpdateNumberCoordinates: true,
-				NumberCoordinates:       selectedCordinates,
+				Action: common.UpdateNumberCoordinates,
+				Args: []common.Arg{
+					{Name: "NumberCoordinates", Value: selectedCordinates},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -916,8 +918,10 @@ func main() {
 				selectedCordinates = 40
 			}
 			cmd = common.Command{
-				UpdateNumberCoordinates: true,
-				NumberCoordinates:       selectedCordinates,
+				Action: common.UpdateNumberCoordinates,
+				Args: []common.Arg{
+					{Name: "NumberCoordinates", Value: selectedCordinates},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
