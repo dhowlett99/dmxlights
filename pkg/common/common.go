@@ -1,8 +1,11 @@
 package common
 
 import (
+	"fmt"
 	"time"
 )
+
+const debug = false
 
 type ALight struct {
 	X          int
@@ -58,83 +61,66 @@ type Patten struct {
 	Steps    []Step
 }
 
+type Arg struct {
+	Name  string
+	Value interface{}
+}
+
 // Command tells sequences what to do.
 type Command struct {
-	UpdateMode              bool
-	Mode                    string
-	MasterBrightness        bool
-	Master                  int
-	Static                  bool
-	UpdateStatic            bool
-	UpdateStaticColor       bool
-	UpdateSequenceColor     bool
-	ClearSequenceColor      bool
-	StaticLampFlash         bool
-	SelectedColor           int
-	PlayStaticOnce          bool
-	PlaySwitchOnce          bool
-	SetEditColors           bool
-	EditColors              bool
-	StaticColor             Color
-	StaticLamp              int
-	UnHide                  bool
-	Hide                    bool
-	Name                    string
-	Number                  int
-	Start                   bool
-	Stop                    bool
-	ReadConfig              bool
-	LoadConfig              bool
-	UpdateSpeed             bool
-	Speed                   int
-	UpdatePatten            bool
-	SelectPatten            bool
-	SelectedPatten          int
-	Patten                  Patten
-	IncreaseFade            bool
-	DecreaseFade            bool
-	FadeTime                time.Duration
-	FadeSpeed               int
-	UpdateSize              bool
-	Size                    int
-	UpdateScannerSize       bool
-	ScannerSize             int
-	X                       int
-	Y                       int
-	Blackout                bool
-	Normal                  bool
-	SoftFadeOn              bool
-	SoftFadeOff             bool
-	UpdateColor             bool
-	Color                   int
-	UpdateFunctionMode      bool
-	FunctionMode            bool
-	UpdateFunctions         bool
-	Functions               []Function
-	GetUpdatedSequence      bool
-	UpdateSwitch            bool
-	SwitchNumber            int
-	SwitchPosition          int
-	UpdateSwitchPositions   bool
-	Inverted                bool
-	UpdateGobo              bool
-	SelectedGobo            int
-	UpdateFlood             bool
-	Flood                   bool
-	UpdateAutoColor         bool
-	AutoColor               bool
-	UpdateAutoPatten        bool
-	AutoPatten              bool
-	ToggleFixtureState      bool
-	FixtureNumber           int
-	FixtureState            bool
-	SequenceNumber          int
-	UpdateShift             bool
-	Shift                   int
-	UpdateScannerColor      bool
-	UpdateNumberCoordinates bool
-	NumberCoordinates       int
+	Action int
+	Args   []Arg
 }
+
+// Valid Command Actions.
+const UpdateMode = 1
+const UpdateStatic = 2
+const UpdateStaticColor = 3
+const UpdateSequenceColor = 4
+const PlayStaticOnce = 5
+const PlaySwitchOnce = 6
+const SetEditColors = 7
+const EditColors = 8
+const UnHide = 9
+const Hide = 10
+const Start = 11
+const Stop = 12
+const ReadConfig = 13
+const LoadConfig = 14
+const UpdateSpeed = 15
+const UpdatePatten = 16
+const SelectPatten = 17
+const IncreaseFade = 18
+const DecreaseFade = 19
+const UpdateSize = 20
+const UpdateScannerSize = 21
+const Blackout = 22
+const Normal = 23
+const SoftFadeOn = 24
+const SoftFadeOff = 25
+const UpdateColor = 26
+const UpdateFunctionMode = 27
+const FunctionMode = 28
+const UpdateFunctions = 29
+const GetUpdatedSequence = 30
+const UpdateSwitch = 31
+const UpdateSwitchPositions = 32
+const Inverted = 33
+const UpdateGobo = 34
+const UpdateFlood = 35
+const Flood = 36
+const UpdateAutoColor = 37
+const AutoColor = 38
+const UpdateAutoPatten = 39
+const AutoPatten = 40
+const ToggleFixtureState = 41
+const FixtureState = 42
+const UpdateShift = 43
+const UpdateScannerColor = 44
+const ClearSequenceColor = 45
+const Static = 46
+const MasterBrightness = 47
+
 
 type Gobo struct {
 	Name    string
@@ -398,7 +384,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	HideFunctionButtons(selectedSequence, eventsForLauchpad)
 	// Get an upto date copy of the sequence.
 	cmd := Command{
-		ReadConfig: true,
+		Action: ReadConfig,
 	}
 	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
 
@@ -407,7 +393,6 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 
 	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad)
 }
-
 func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight) {
 	for x := 0; x < 8; x++ {
 		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
@@ -418,9 +403,9 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 
 	// Loop through the available functions for this sequence
 	for index, function := range sequence.Functions {
-		// if debug {
-		// 	fmt.Printf("function %+v\n", function)
-		// }
+		if debug {
+			fmt.Printf("function %+v\n", function)
+		}
 		if function.State {
 			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {
@@ -431,22 +416,24 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 
 func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
 	cmd := Command{
-		UpdateMode: true,
-		Mode:       mode,
+		Action: UpdateMode,
+		Args: []Arg{
+			{Name: "Mode", Value: mode},
+		},
 	}
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 }
 
 func RevealSequence(selectedSequence int, commandChannels []chan Command) {
 	cmd := Command{
-		UnHide: true,
+		Action: UnHide,
 	}
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 }
 
 func HideSequence(selectedSequence int, commandChannels []chan Command) {
 	cmd := Command{
-		Hide: true,
+		Action: Hide,
 	}
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 }
@@ -656,12 +643,13 @@ func HowManyColors(positionsMap map[int][]Position) (colors []Color) {
 	return colors
 }
 
+// Get an upto date copy of the sequence.
 func RefreshSequence(selectedSequence int, commandChannels []chan Command, updateChannels []chan Sequence) *Sequence {
 
-	// Get an upto date copy of the sequence.
 	cmd := Command{
-		GetUpdatedSequence: true,
+		Action: GetUpdatedSequence,
 	}
+
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	newSequence := <-updateChannels[selectedSequence]
 	return &newSequence

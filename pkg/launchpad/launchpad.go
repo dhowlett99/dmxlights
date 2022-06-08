@@ -9,11 +9,12 @@ import (
 
 func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
 	pad.Reset()
-	cmd := common.Command{
-		Stop: true,
+	command := common.Command{
+		Action: common.Stop,
 	}
+
 	for _, sequence := range sequences {
-		sequence <- cmd
+		sequence <- command
 	}
 
 	for x := 0; x < 8; x++ {

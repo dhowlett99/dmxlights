@@ -291,8 +291,10 @@ func main() {
 			// Turn off the flood
 			if flood {
 				cmd := common.Command{
-					UpdateFlood: true,
-					Flood:       false,
+					Action: common.UpdateFlood,
+					Args: []common.Arg{
+						{Name: "Flood", Value: false},
+					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				flood = false
@@ -304,8 +306,9 @@ func main() {
 
 				// Clear the sequence colors for this sequence.
 				cmd := common.Command{
-					ClearSequenceColor: true,
+					Action: common.ClearSequenceColor,
 				}
+
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				// Get an upto date copy of the sequence.
@@ -324,26 +327,28 @@ func main() {
 
 			// Make sure we stop all sequences.
 			cmd := common.Command{
-				Stop: true,
+				Action: common.Stop,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 			// Swicth off any static colors.
 			cmd = common.Command{
-				UpdateStatic: false,
-				Static:       false,
+				Action: common.UpdateStatic,
+				Args: []common.Arg{
+					{Name: "Static", Value: false},
+				},
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 			// refesh the switch positions.
 			cmd = common.Command{
-				UpdateSwitchPositions: true,
+				Action: common.UpdateSwitchPositions,
 			}
 			common.SendCommandToAllSequenceOfType(sequences, selectedSequence, cmd, commandChannels, "switch")
 
 			// Clear the sequence colors.
 			cmd = common.Command{
-				ClearSequenceColor: true,
+				Action: common.ClearSequenceColor,
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
@@ -379,8 +384,10 @@ func main() {
 
 			if !flood {
 				cmd := common.Command{
-					UpdateFlood: true,
-					Flood:       true,
+					Action: common.UpdateFlood,
+					Args: []common.Arg{
+						{Name: "Flood", Value: true},
+					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
@@ -397,8 +404,10 @@ func main() {
 			}
 			if flood {
 				cmd := common.Command{
-					UpdateFlood: true,
-					Flood:       false,
+					Action: common.UpdateFlood,
+					Args: []common.Arg{
+						{Name: "Flood", Value: true},
+					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
@@ -451,8 +460,10 @@ func main() {
 				masterBrightness = 0
 			}
 			cmd := common.Command{
-				MasterBrightness: true,
-				Master:           masterBrightness,
+				Action: common.MasterBrightness,
+				Args: []common.Arg{
+					{Name: "Master", Value: masterBrightness},
+				},
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 			continue
@@ -470,8 +481,10 @@ func main() {
 				masterBrightness = 255
 			}
 			cmd := common.Command{
-				MasterBrightness: true,
-				Master:           masterBrightness,
+				Action: common.MasterBrightness,
+				Args: []common.Arg{
+					{Name: "Master", Value: masterBrightness},
+				},
 			}
 			common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 			continue
@@ -518,7 +531,7 @@ func main() {
 
 					// Stop all sequences, so we start in sync.
 					cmd := common.Command{
-						Stop: true,
+						Action: common.Stop,
 					}
 					common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
@@ -536,7 +549,7 @@ func main() {
 					// Preserve blackout.
 					if !blackout {
 						cmd := common.Command{
-							Normal: true,
+							Action: common.Normal,
 						}
 						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					}
@@ -557,8 +570,10 @@ func main() {
 				selectedShift = 0
 			}
 			cmd := common.Command{
-				UpdateShift: true,
-				Shift:       selectedShift,
+				Action: common.UpdateShift,
+				Args: []common.Arg{
+					{Name: "Shift", Value: selectedShift},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -577,8 +592,10 @@ func main() {
 				selectedShift = 3
 			}
 			cmd := common.Command{
-				UpdateShift: true,
-				Shift:       selectedShift,
+				Action: common.UpdateShift,
+				Args: []common.Arg{
+					{Name: "Shift", Value: selectedShift},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -601,8 +618,10 @@ func main() {
 					sequenceSpeed = 1
 				}
 				cmd := common.Command{
-					Speed:       sequenceSpeed,
-					UpdateSpeed: true,
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: sequenceSpeed},
+					},
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
@@ -625,8 +644,10 @@ func main() {
 					sequenceSpeed = 21
 				}
 				cmd := common.Command{
-					Speed:       sequenceSpeed,
-					UpdateSpeed: true,
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: sequenceSpeed},
+					},
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
@@ -646,7 +667,7 @@ func main() {
 				functionSelectMode, editSequenceColorsMode, editScannerColorsMode, editGoboSelectionMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
 
 			cmd := common.Command{
-				PlayStaticOnce: true,
+				Action: common.PlayStaticOnce,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -668,7 +689,7 @@ func main() {
 				functionSelectMode, editSequenceColorsMode, editScannerColorsMode, editStaticColorsMode, editGoboSelectionMode, editPattenMode, commandChannels, sequenceChannels)
 
 			cmd := common.Command{
-				PlayStaticOnce: true,
+				Action: common.PlayStaticOnce,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -690,7 +711,7 @@ func main() {
 				functionSelectMode, editSequenceColorsMode, editScannerColorsMode, editGoboSelectionMode, editStaticColorsMode, editPattenMode, commandChannels, sequenceChannels)
 
 			cmd := common.Command{
-				PlayStaticOnce: true,
+				Action: common.PlayStaticOnce,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -712,7 +733,7 @@ func main() {
 				functionSelectMode, editSequenceColorsMode, editScannerColorsMode, editStaticColorsMode, editGoboSelectionMode, editPattenMode, commandChannels, sequenceChannels)
 
 			cmd := common.Command{
-				PlayStaticOnce: true,
+				Action: common.PlayStaticOnce,
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -731,8 +752,10 @@ func main() {
 
 			sequences[selectedSequence].MusicTrigger = false
 			cmd := common.Command{
-				Start: true,
-				Speed: sequenceSpeed,
+				Action: common.Start,
+				Args: []common.Arg{
+					{Name: "Speed", Value: sequenceSpeed},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
@@ -749,8 +772,10 @@ func main() {
 			}
 
 			cmd := common.Command{
-				Stop:  true,
-				Speed: sequenceSpeed,
+				Action: common.Stop,
+				Args: []common.Arg{
+					{Name: "Speed", Value: sequenceSpeed},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
@@ -772,8 +797,10 @@ func main() {
 				size = 1
 			}
 			cmd := common.Command{
-				UpdateSize: true,
-				Size:       size,
+				Action: common.UpdateSize,
+				Args: []common.Arg{
+					{Name: "Size", Value: size},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -783,8 +810,10 @@ func main() {
 				scannerSize = 10
 			}
 			cmd = common.Command{
-				UpdateScannerSize: true,
-				ScannerSize:       scannerSize,
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: scannerSize},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -804,8 +833,10 @@ func main() {
 				size = 25
 			}
 			cmd := common.Command{
-				UpdateSize: true,
-				Size:       size,
+				Action: common.UpdateSize,
+				Args: []common.Arg{
+					{Name: "Size", Value: size},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -815,8 +846,10 @@ func main() {
 				scannerSize = 120
 			}
 			cmd = common.Command{
-				UpdateScannerSize: true,
-				ScannerSize:       scannerSize,
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: scannerSize},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -836,8 +869,10 @@ func main() {
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				DecreaseFade: true,
-				FadeSpeed:    fadeSpeed,
+				Action: common.DecreaseFade,
+				Args: []common.Arg{
+					{Name: "FadeSpeed", Value: fadeSpeed},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -868,8 +903,10 @@ func main() {
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				IncreaseFade: true,
-				FadeSpeed:    fadeSpeed,
+				Action: common.IncreaseFade,
+				Args: []common.Arg{
+					{Name: "FadeSpeed", Value: fadeSpeed},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -918,8 +955,10 @@ func main() {
 			// Send update functions command. This sets the temporary representation of
 			// the function keys in the real sequence.
 			cmd := common.Command{
-				UpdateFunctions: true,
-				Functions:       sequences[selectedSequence].Functions,
+				Action: common.UpdateFunctions,
+				Args: []common.Arg{
+					{Name: "Functions", Value: sequences[selectedSequence].Functions},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -1002,9 +1041,11 @@ func main() {
 				// hit.Y is the sequence.
 				// hit.X is the switch.
 				cmd := common.Command{
-					UpdateSwitch:   true,
-					SwitchNumber:   hit.X,
-					SwitchPosition: switchPositions[hit.Y][hit.X],
+					Action: common.UpdateSwitch,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: hit.X},
+						{Name: "SwitchPosition", Value: switchPositions[hit.Y][hit.X]},
+					},
 				}
 				// Send a message to the switch sequence.
 				common.SendCommandToAllSequenceOfType(sequences, hit.Y, cmd, commandChannels, "switch")
@@ -1034,10 +1075,12 @@ func main() {
 
 				// Tell the sequence to turn off this scanner.
 				cmd := common.Command{
-					ToggleFixtureState: true,
-					SequenceNumber:     hit.Y,
-					FixtureNumber:      hit.X,
-					FixtureState:       true,
+					Action: common.ToggleFixtureState,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: hit.Y},
+						{Name: "FixtureNumber", Value: hit.X},
+						{Name: "FixtureState", Value: true},
+					},
 				}
 				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
 
@@ -1057,10 +1100,12 @@ func main() {
 
 				// Tell the sequence to turn on this scanner.
 				cmd := common.Command{
-					ToggleFixtureState: true,
-					SequenceNumber:     hit.Y,
-					FixtureNumber:      hit.X,
-					FixtureState:       false,
+					Action: common.ToggleFixtureState,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: hit.Y},
+						{Name: "FixtureNumber", Value: hit.X},
+						{Name: "FixtureState", Value: false},
+					},
 				}
 				common.SendCommandToSequence(hit.Y, cmd, commandChannels)
 
@@ -1193,15 +1238,17 @@ func main() {
 			if sequences[selectedSequence].Type == "scanner" {
 				// Clear the sequence colors for this sequence.
 				cmd := common.Command{
-					ClearSequenceColor: true,
+					Action: common.ClearSequenceColor,
 				}
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			}
 
 			// Add the selected color to the sequence.
 			cmd := common.Command{
-				UpdateSequenceColor: true,
-				SelectedColor:       hit.X,
+				Action: common.UpdateSequenceColor,
+				Args: []common.Arg{
+					{Name: "SelectedColor", Value: hit.X},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -1231,8 +1278,10 @@ func main() {
 
 			// Set the scanner color for this sequence.
 			cmd := common.Command{
-				UpdateScannerColor: true,
-				SelectedColor:      hit.X,
+				Action: common.UpdateScannerColor,
+				Args: []common.Arg{
+					{Name: "SelectedColor", Value: hit.X},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -1261,8 +1310,10 @@ func main() {
 
 			// Add the selected color to the sequence.
 			cmd := common.Command{
-				UpdateGobo:   true,
-				SelectedGobo: hit.X,
+				Action: common.UpdateGobo,
+				Args: []common.Arg{
+					{Name: "SelectedGobo", Value: hit.X},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -1310,12 +1361,14 @@ func main() {
 			// Tell the sequence about the new color and where we are in the
 			// color cycle.
 			cmd := common.Command{
-				UpdateStaticColor: true,
-				Static:            true,
-				StaticLamp:        hit.X,
-				StaticLampFlash:   false,
-				SelectedColor:     sequences[selectedSequence].StaticColors[hit.X].SelectedColor,
-				StaticColor:       sequences[selectedSequence].StaticColors[hit.X].Color,
+				Action: common.UpdateStaticColor,
+				Args: []common.Arg{
+					{Name: "Static", Value: true},
+					{Name: "StaticLamp", Value: hit.X},
+					{Name: "StaticLampFlash", Value: false},
+					{Name: "SelectedColor", Value: sequences[selectedSequence].StaticColors[hit.X].SelectedColor},
+					{Name: "StaticColor", Value: sequences[selectedSequence].StaticColors[hit.X].Color},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			lastStaticColorButtonX = hit.X
@@ -1334,8 +1387,10 @@ func main() {
 
 			// Tell the sequence to change the patten
 			cmd := common.Command{
-				SelectPatten:   true,
-				SelectedPatten: hit.X,
+				Action: common.SelectPatten,
+				Args: []common.Arg{
+					{Name: "SelectedPatten", Value: hit.X},
+				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
@@ -1361,14 +1416,14 @@ func main() {
 			if !blackout {
 				blackout = true
 				cmd := common.Command{
-					Blackout: true,
+					Action: common.Blackout,
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
 			} else {
 				blackout = false
 				cmd := common.Command{
-					Normal: true,
+					Action: common.Normal,
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
@@ -1383,14 +1438,12 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 	// Static is set to true in the functions and this key is set to
 	// the selected color.
 	cmd := common.Command{
-		UpdateStaticColor: true,
-		Static:            true,
-		StaticLamp:        staticColorButtons.X,
-		SelectedColor:     staticColorButtons.SelectedColor,
-		StaticColor: common.Color{
-			R: staticColorButtons.Color.R,
-			G: staticColorButtons.Color.G,
-			B: staticColorButtons.Color.B,
+		Action: common.UpdateStaticColor,
+		Args: []common.Arg{
+			{Name: "Static", Value: true},
+			{Name: "StaticLamp", Value: staticColorButtons.X},
+			{Name: "SelectedColor", Value: staticColorButtons.SelectedColor},
+			{Name: "StaticColor", Value: common.Color{R: staticColorButtons.Color.R, G: staticColorButtons.Color.G, B: staticColorButtons.Color.B}},
 		},
 	}
 	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
@@ -1575,14 +1628,16 @@ func unSetEditSequenceColorsMode(selectedSequence int,
 	// Turn off the edit colors bar.
 	sequences[selectedSequence].Functions[common.Function5_Color].State = false
 	cmd := common.Command{
-		UpdateFunctions: true,
-		Functions:       sequences[selectedSequence].Functions,
+		Action: common.UpdateFunctions,
+		Args: []common.Arg{
+			{Name: "Functions", Value: sequences[selectedSequence].Functions},
+		},
 	}
 	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 	// Restart the sequence.
 	cmd = common.Command{
-		Start: true,
+		Action: common.Start,
 	}
 	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
