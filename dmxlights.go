@@ -55,6 +55,8 @@ func main() {
 	var soundGain float32 = 0         // Fine gain -0.09 -> 0.09
 	var disabledFixture [][]bool      // Which fixture is disabled on which sequence.
 
+	var selectedCordinates = 10 // Number of coordinates for scanner patterns.
+
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
 
@@ -424,8 +426,8 @@ func main() {
 			}
 
 			soundGain = soundGain - 0.01
-			if soundGain < -0.9 {
-				soundGain = -0.9
+			if soundGain < -0.04 {
+				soundGain = -0.04
 			}
 			for _, trigger := range soundTriggers {
 				trigger.Gain = soundGain
@@ -873,6 +875,18 @@ func main() {
 				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// Fade also send more or less coordinates for the scanner patterns.
+			selectedCordinates--
+			if selectedCordinates < 10 {
+				selectedCordinates = 10
+			}
+			cmd = common.Command{
+				UpdateNumberCoordinates: true,
+				NumberCoordinates:       selectedCordinates,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 			continue
 		}
 
@@ -895,6 +909,18 @@ func main() {
 				},
 			}
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
+			// Fade also send more or less coordinates for the scanner patterns.
+			selectedCordinates++
+			if selectedCordinates > 40 {
+				selectedCordinates = 40
+			}
+			cmd = common.Command{
+				UpdateNumberCoordinates: true,
+				NumberCoordinates:       selectedCordinates,
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+
 			continue
 		}
 

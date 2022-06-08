@@ -121,6 +121,7 @@ const ClearSequenceColor = 45
 const Static = 46
 const MasterBrightness = 47
 
+
 type Gobo struct {
 	Name    string
 	Number  int
@@ -151,7 +152,7 @@ type Sequence struct {
 	Number                       int
 	Run                          bool
 	Bounce                       bool
-	Steps                        int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	NumberSteps                  int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	Patten                       Patten // Contains fixtures and steps info.
 	Colors                       []Color
 	UpdateShift                  bool
@@ -182,7 +183,6 @@ type Sequence struct {
 	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
 	AutoColor                    bool
 	AutoPatten                   bool
-	SelectedPatten               int
 	ChangePatten                 bool
 	RecoverSequenceColors        bool
 	SaveColors                   bool
@@ -191,6 +191,11 @@ type Sequence struct {
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 int
+	NumberCoordinates            int
+	Steps                        []Step
+	UpdatePatten                 bool
+	SelectPatten                 bool
+	SelectedPatten               int
 }
 
 type Function struct {

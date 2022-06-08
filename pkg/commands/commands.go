@@ -26,9 +26,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			// if debug {
-			// 	fmt.Printf("%d: BEAT\n", mySequenceNumber)
-			// }
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
+			}
 			break
 		}
 	case command = <-commandChannel:
@@ -71,6 +71,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
 		sequence.Patten.Name = command.Args[PATTEN_NAME].Value.(string)
+
 		return sequence
 
 	case common.SelectPatten:
@@ -78,6 +79,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
+		sequence.SelectPatten = command.SelectPatten
 		sequence.ChangePatten = true
 		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
@@ -402,6 +404,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			}
 		}
 		return sequence
+
+	case command.UpdateNumberCoordinates {
+    const NUMBER_COORDINATES = 0
+		if debug {
+			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
+		}
+		sequence.NumberCoordinates = command.NumberCoordinates
+
+		return sequence
+	}
+
 
 	// If we are being asekd to load a config, use the new sequence.
 	case common.LoadConfig:
