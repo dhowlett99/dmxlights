@@ -26,9 +26,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			if debug {
-				fmt.Printf("%d: BEAT\n", mySequenceNumber)
-			}
+			// if debug {
+			// 	fmt.Printf("%d: BEAT\n", mySequenceNumber)
+			// }
 			break
 		}
 	case command = <-commandChannel:

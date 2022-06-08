@@ -267,22 +267,24 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
+		// Sequence in flood mode.
+		if sequence.Flood && sequence.PlayFloodOnce {
+			// At this point the fixture threads have been told to stop using the sequence.Flood flag
+			// but they take a few hundred milli seconds to actually stop. So we wait and then turn the
+			// flool function on.ß
+			time.Sleep(300 * time.Millisecond)
+			floodOn(&sequence, dmxController, eventsForLauchpad, fixturesConfig)
+		}
+
+		// Turn off the flood mode, but only once.
+		if !sequence.Flood && sequence.PlayFloodOnce {
+			floodOff(&sequence, dmxController, eventsForLauchpad, fixturesConfig)
+		}
+
 		// Sequence in Static Mode.
-		if sequence.PlayStaticOnce && sequence.Static {
-			for myFixtureNumber, lamp := range sequence.StaticColors {
-				if sequence.Hide {
-					if lamp.Flash {
-						onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-						launchpad.FlashLight(mySequenceNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
-					} else {
-						launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
-					}
-				}
-				fixture.MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-			}
-			// Only play once, we don't want to flood the DMX universe with
-			// continual commands.
-			sequence.PlayStaticOnce = false
+		if sequence.PlayStaticOnce && sequence.Static && !sequence.Flood {
+			time.Sleep(500 * time.Millisecond)
+			Static(&sequence, dmxController, eventsForLauchpad, fixturesConfig, true)
 			continue
 		}
 
@@ -678,30 +680,61 @@ func reverseDmx(n int) int {
 	return in[n]
 }
 
+func Static(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
+
+	for myFixtureNumber, lamp := range sequence.StaticColors {
+		if sequence.Hide {
+			if lamp.Flash {
+				onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
+				launchpad.FlashLight(sequence.Number, myFixtureNumber, onColor, 0, eventsForLauchpad)
+			} else {
+				launchpad.LightLamp(sequence.Number, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			}
+		}
+		fixture.MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+	}
+	// Only play once, we don't want to flood the DMX universe with
+	// continual commands.
+	sequence.PlayStaticOnce = false
+}
+
 // Flood - We are being asked to be in flood mode.
-func Flood(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
-	if sequence.Flood && sequence.PlayFloodOnce {
+func floodOn(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures) {
+
+	if sequence.Type != "switch" {
 		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
 			for s := range sequence.SelectedFloodSequence {
 				if !sequence.Hide {
 					launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
 				}
 				fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 255, Red: 255, Green: 255, Blue: 255})
 			}
 		}
 		sequence.PlayFloodOnce = false
 	}
+}
 
-	if !sequence.Flood && sequence.PlayFloodOnce {
+func floodOff(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures) {
+
+	if sequence.Type != "switch" {
 		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
 			for s := range sequence.SelectedFloodSequence {
 				if !sequence.Hide {
 					launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 				}
 				fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+				common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 0, Red: 0, Green: 0, Blue: 0})
 			}
 		}
 		sequence.PlayFloodOnce = false
+		// Again here, we need to wait for the Flood flag being set to false to propogate to the fixture
+		// threads and then play the static scene but only once.
+		if sequence.Static {
+			time.Sleep(200 * time.Millisecond)
+		}
+		sequence.PlayStaticOnce = true
+		Static(sequence, dmxController, eventsForLauchpad, fixturesConfig, true)
 	}
 }
 

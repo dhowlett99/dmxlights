@@ -386,13 +386,13 @@ func main() {
 		}
 
 		// F L O O D
-		if hit.X == 7 && hit.Y == 3 {
+		if hit.X == 8 && hit.Y == 3 {
 
 			if debug {
 				fmt.Printf("FLOOD\n")
 			}
 
-			if !flood {
+			if !flood { // We're not already in flood so lets ask the sequence to flood.
 				cmd := common.Command{
 					Action: common.UpdateFlood,
 					Args: []common.Arg{
@@ -405,26 +405,19 @@ func main() {
 				time.Sleep(500 * time.Millisecond)
 
 				flood = true
-				sequences[selectedSequence].Flood = true
-				sequences[selectedSequence].PlayFloodOnce = true
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
-				sequence.Flood(sequences[selectedSequence], dmxController, eventsForLauchpad, fixturesConfig, true)
 
 				continue
 			}
-			if flood {
+			if flood { // If we are flood already then tell the sequence to stop flood.
 				cmd := common.Command{
 					Action: common.UpdateFlood,
 					Args: []common.Arg{
-						{Name: "Flood", Value: true},
+						{Name: "Flood", Value: false},
 					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
 				flood = false
-				sequences[selectedSequence].Flood = false
-				sequences[selectedSequence].PlayFloodOnce = true
-				sequence.Flood(sequences[selectedSequence], dmxController, eventsForLauchpad, fixturesConfig, true)
 				continue
 			}
 		}
@@ -536,7 +529,7 @@ func main() {
 				presets.InitPresets(eventsForLauchpad, presetsStore)
 				launchpad.FlashLight(hit.Y, hit.X, 0x0d, 0x78, eventsForLauchpad)
 			} else {
-				// Load config, but only if it exists in the presets map.
+				// L O A D - Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
 
 					// Stop all sequences, so we start in sync.
@@ -563,6 +556,10 @@ func main() {
 						}
 						common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 					}
+
+					// Turn off the local copy of the flood flag.
+					flood = false
+
 				}
 			}
 			continue

@@ -116,7 +116,11 @@ func FixtureReceiver(sequence common.Sequence,
 	for {
 		select {
 		case cmd = <-channels[myFixtureNumber]:
+			if cmd.Flood {
+				continue
+			}
 			if cmd.Tick {
+
 				// positions can have many fixtures play at the same time.
 				positions := cmd.Positions[cmd.CurrentPosition]
 				for _, position := range positions {
