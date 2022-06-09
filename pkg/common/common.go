@@ -128,6 +128,11 @@ type Gobo struct {
 	Setting int
 }
 
+type Coordinate struct {
+	Tilt int
+	Pan  int
+}
+
 // Sequence describes sequences.
 type Sequence struct {
 	NumberFixtures               int
@@ -188,6 +193,7 @@ type Sequence struct {
 	SaveColors                   bool
 	SelectedScannerPatten        int
 	FixtureDisabled              map[int]bool
+	FixtureAvailable             map[int]bool
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 int
@@ -196,6 +202,7 @@ type Sequence struct {
 	UpdatePatten                 bool
 	SelectPatten                 bool
 	SelectedPatten               int
+	ScannerCoordinates           []Coordinate
 }
 
 type Function struct {
@@ -654,3 +661,25 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	newSequence := <-updateChannels[selectedSequence]
 	return &newSequence
 }
+
+// invertColor just reverses the DMX values.
+// func invertColor(color Color) (out Color) {
+// 	out.R = reverseDmx(color.R)
+// 	out.G = reverseDmx(color.G)
+// 	out.B = reverseDmx(color.B)
+
+// 	return out
+// }
+
+// Takes a DMX value 1-255 and reverses the value.
+// func reverseDmx(n int) int {
+// 	in := make(map[int]int, 255)
+// 	var y = 255
+
+// 	for x := 0; x <= 255; x++ {
+
+// 		in[x] = y
+// 		y--
+// 	}
+// 	return in[n]
+// }

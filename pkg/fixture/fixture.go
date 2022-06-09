@@ -67,11 +67,12 @@ type Setting struct {
 }
 
 type Channel struct {
-	Number   int16     `yaml:"number"`
-	Name     string    `yaml:"name"`
-	Value    int16     `yaml:"value"`
-	Comment  string    `yaml:"comment"`
-	Settings []Setting `yaml:"settings"`
+	Number          int16     `yaml:"number"`
+	Name            string    `yaml:"name"`
+	Value           int16     `yaml:"value"`
+	AssignToFixture *int      `yaml:"fixture"`
+	Comment         string    `yaml:"comment"`
+	Settings        []Setting `yaml:"settings"`
 }
 
 // LoadFixtures opens the fixtures config file and returns a pointer to the fixtures.

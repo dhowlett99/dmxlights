@@ -18,7 +18,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-const debug = false
+const debug = true
 
 type SequencesConfig struct {
 	Sequences []SequenceConfig `yaml:"sequences"`
@@ -97,6 +97,10 @@ func CreateSequence(
 	// We can disable a fixture by setting fixtureDisabled to true.
 	fixtureDisabled := make(map[int]bool, 8)
 
+	// A map of available fixtures, if you don't configure all 8 fixtures in a sequence.
+	// This is how you find out how many there are.
+	fixtureAvailable := make(map[int]bool, 8)
+
 	// The actual sequence definition.
 	sequence := common.Sequence{
 		NumberFixtures:               8,
@@ -144,6 +148,7 @@ func CreateSequence(
 		SelectedScannerPatten: 0,
 		FixtureDisabled:       fixtureDisabled,
 		NumberCoordinates:     10,
+		FixtureAvailable:      fixtureAvailable,
 	}
 
 	// Make functions for each of the sequences.
@@ -249,6 +254,21 @@ func PlaySequence(sequence common.Sequence,
 	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
 	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
 
+	// Find out many fixtures we have and make them available.
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Group-1 == mySequenceNumber {
+			for _, channel := range fixture.Channels {
+				if channel.AssignToFixture != nil {
+					sequence.FixtureAvailable[*channel.AssignToFixture-1] = true
+					sequence.FixtureDisabled[*channel.AssignToFixture-1] = false
+				} else {
+					sequence.FixtureAvailable[fixture.Number-1] = true
+					sequence.FixtureDisabled[fixture.Number-1] = false
+				}
+			}
+		}
+	}
+
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
@@ -336,7 +356,11 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.Type == "scanner" {
 					sequence.ChangePatten = false
 
-					sequence.Steps = setPattern(sequence)
+					// Generate coordinates from the selected pattern.
+					sequence.ScannerCoordinates = setPattern(sequence)
+
+					// Generate steps from coordinates.
+					sequence.Steps = patten.GenerateSteps(sequence)
 
 					if sequence.AutoColor {
 						sequence.SelectedGobo++
@@ -353,7 +377,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Calulate positions for fixtures based on the steps in the patten.
-				sequence.Positions, sequence.NumberSteps = calculatePositions(sequence.Steps, sequence.Bounce)
+				sequence.Positions, sequence.NumberSteps = calculatePositions(sequence)
 
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
@@ -452,45 +476,12 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					// Now tell all the fixtures what they need to do.
-					fixtureChannel1 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel2 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel3 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel4 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel5 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel6 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel7 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel8 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
+					for _, fixtureChannel := range fixtureChannels {
+						fixtureChannel <- cmd
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
+						if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
+							break
+						}
 					}
 				}
 			}
@@ -522,7 +513,7 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 // calculatePositions takes the steps defined in the patten and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Position, int) {
+func calculatePositions(sequence common.Sequence) (map[int][]common.Position, int) {
 
 	position := common.Position{}
 
@@ -530,26 +521,28 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 	var counter int
 	positionsOut := make(map[int][]common.Position)
 	var waitForColors bool
-	for _, step := range steps {
+	for _, step := range sequence.Steps {
 		for fixtureIndex, fixture := range step.Fixtures {
-			noColors := len(fixture.Colors)
-			for _, color := range fixture.Colors {
-				// Preserve the scanner commands.
-				position.Gobo = fixture.Gobo
-				position.Pan = fixture.Pan
-				position.Tilt = fixture.Tilt
-				position.Shutter = fixture.Shutter
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					position.StartPosition = counter
-					position.Fixture = fixtureIndex
-					position.Color.R = color.R
-					position.Color.G = color.G
-					position.Color.B = color.B
-					positionsOut[counter] = append(positionsOut[counter], position)
-					if noColors > 1 {
-						if fixture.Type != "scanner" {
-							counter = counter + 14
-							waitForColors = true
+			if !sequence.FixtureDisabled[fixtureIndex] {
+				noColors := len(fixture.Colors)
+				for _, color := range fixture.Colors {
+					// Preserve the scanner commands.
+					position.Gobo = fixture.Gobo
+					position.Pan = fixture.Pan
+					position.Tilt = fixture.Tilt
+					position.Shutter = fixture.Shutter
+					if color.R > 0 || color.G > 0 || color.B > 0 {
+						position.StartPosition = counter
+						position.Fixture = fixtureIndex
+						position.Color.R = color.R
+						position.Color.G = color.G
+						position.Color.B = color.B
+						positionsOut[counter] = append(positionsOut[counter], position)
+						if noColors > 1 {
+							if fixture.Type != "scanner" {
+								counter = counter + 14
+								waitForColors = true
+							}
 						}
 					}
 				}
@@ -557,13 +550,14 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 		}
 		if !waitForColors {
 			counter = counter + 14
+			waitForColors = false
 		}
 	}
 
 	// Bounce repeates the steps in the sequence but backwards.
-	if bounce {
-		for index := len(steps) - 1; index >= 0; index-- {
-			step := steps[index]
+	if sequence.Bounce {
+		for index := len(sequence.Steps) - 1; index >= 0; index-- {
+			step := sequence.Steps[index]
 			for fixtureIndex, fixture := range step.Fixtures {
 				noColors := len(fixture.Colors)
 				for _, color := range fixture.Colors {
@@ -658,28 +652,6 @@ func setDefaultGoboColorButtons(selectedSequence int) []common.StaticColorButton
 	return staticColorsButtons
 }
 
-// invertColor just reverses the DMX values.
-func invertColor(color common.Color) (out common.Color) {
-	out.R = reverseDmx(color.R)
-	out.G = reverseDmx(color.G)
-	out.B = reverseDmx(color.B)
-
-	return out
-}
-
-// Takes a DMX value 1-255 and reverses the value.
-func reverseDmx(n int) int {
-	in := make(map[int]int, 255)
-	var y = 255
-
-	for x := 0; x <= 255; x++ {
-
-		in[x] = y
-		y--
-	}
-	return in[n]
-}
-
 func Static(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
 
 	for myFixtureNumber, lamp := range sequence.StaticColors {
@@ -738,30 +710,21 @@ func floodOff(sequence *common.Sequence, dmxController *ft232.DMXController, eve
 	}
 }
 
-func setPattern(sequence common.Sequence) (steps []common.Step) {
+// setPattern generates coordinates from the selected scanner pattern.
+func setPattern(sequence common.Sequence) []common.Coordinate {
 	if sequence.SelectedScannerPatten == 0 {
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
+		posX := float64(sequence.ScannerSize) // TODO find a way to positon the scanner from the launchpad buttons.
+		posY := float64(sequence.ScannerSize)
+		return patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates, posX, posY)
 	}
 	if sequence.SelectedScannerPatten == 1 {
-		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
+		return patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
 	}
 	if sequence.SelectedScannerPatten == 2 {
-		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
+		return patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
 	}
 	if sequence.SelectedScannerPatten == 3 {
-		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
+		return patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
 	}
 
 	return nil

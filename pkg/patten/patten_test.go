@@ -10,81 +10,95 @@ import (
 func Test_circleGenerator(t *testing.T) {
 	type args struct {
 		size int
+		posX float64
+		posY float64
 	}
 	tests := []struct {
 		name    string
 		args    args
-		wantOut []coordinate
+		wantOut []common.Coordinate
 	}{
 		{
 			name: "standard circle",
 			args: args{
 				size: 126,
+				posX: 128,
+				posY: 128,
 			},
-			wantOut: []coordinate{
-				{128, 254},
-				{149, 252},
-				{171, 246},
-				{191, 237},
-				{208, 224},
-				{224, 208},
-				{237, 191},
-				{246, 171},
-				{252, 149},
-				{254, 128},
-				{252, 106},
-				{246, 84},
-				{237, 65},
-				{224, 47},
-				{208, 31},
-				{191, 18},
-				{171, 9},
-				{149, 3},
-				{128, 2},
-				{106, 3},
-				{84, 9},
-				{65, 18},
-				{47, 31},
-				{31, 47},
-				{18, 65},
-				{9, 84},
-				{3, 106},
-				{2, 127},
-				{3, 149},
-				{9, 171},
-				{18, 191},
-				{31, 208},
-				{47, 224},
-				{64, 237},
-				{84, 246},
-				{106, 252},
+			wantOut: []common.Coordinate{
+				{Tilt: 128, Pan: 254},
+				{Tilt: 149, Pan: 252},
+				{Tilt: 171, Pan: 246},
+				{Tilt: 191, Pan: 237},
+				{Tilt: 208, Pan: 224},
+				{Tilt: 224, Pan: 208},
+				{Tilt: 237, Pan: 191},
+				{Tilt: 246, Pan: 171},
+				{Tilt: 252, Pan: 149},
+				{Tilt: 254, Pan: 128},
+				{Tilt: 252, Pan: 106},
+				{Tilt: 246, Pan: 84},
+				{Tilt: 237, Pan: 65},
+				{Tilt: 224, Pan: 47},
+				{Tilt: 208, Pan: 31},
+				{Tilt: 191, Pan: 18},
+				{Tilt: 171, Pan: 9},
+				{Tilt: 149, Pan: 3},
+				{Tilt: 128, Pan: 2},
+				{Tilt: 106, Pan: 3},
+				{Tilt: 84, Pan: 9},
+				{Tilt: 65, Pan: 18},
+				{Tilt: 47, Pan: 31},
+				{Tilt: 31, Pan: 47},
+				{Tilt: 18, Pan: 65},
+				{Tilt: 9, Pan: 84},
+				{Tilt: 3, Pan: 106},
+				{Tilt: 2, Pan: 127},
+				{Tilt: 3, Pan: 149},
+				{Tilt: 9, Pan: 171},
+				{Tilt: 18, Pan: 191},
+				{Tilt: 31, Pan: 208},
+				{Tilt: 47, Pan: 224},
+				{Tilt: 64, Pan: 237},
+				{Tilt: 84, Pan: 246},
+				{Tilt: 106, Pan: 252},
 				//{127, 254},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := CircleGenerator(tt.args.size, 20); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := CircleGenerator(tt.args.size, len(tt.wantOut), tt.args.posX, tt.args.posY); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("circleGenerator() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})
 	}
 }
 
-func Test_generatePatten(t *testing.T) {
+func Test_generateSteps(t *testing.T) {
+
+	fixtureDisabled := make(map[int]bool, 8)
+	for i := 0; i < 9; i++ {
+		fixtureDisabled[i] = false
+	}
+	fixtureAvailable := make(map[int]bool, 8)
+	for i := 0; i < 9; i++ {
+		fixtureAvailable[i] = true
+	}
+
 	tests := []struct {
 		name        string
 		fixtures    int
 		shift       int
 		chase       bool
-		coordinates []coordinate
-		want        common.Patten
+		coordinates []common.Coordinate
+		want        []common.Step
 	}{
 		{
 			name:     "circle patten - 8 point , no shift",
 			fixtures: 1,
 			shift:    0,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  128,
@@ -118,56 +132,53 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  64,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 192, Tilt: 32},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 192, Tilt: 32},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 232, Tilt: 128},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 232, Tilt: 128},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 192, Tilt: 232},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 192, Tilt: 232},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 64, Tilt: 232},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 64, Tilt: 232},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 32, Tilt: 128},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 32, Tilt: 128},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 64, Tilt: 32},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 64, Tilt: 32},
 					},
 				},
 			},
@@ -176,7 +187,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two fixtures, circle patten - 8 point , with shift of 1/4",
 			fixtures: 2,
 			shift:    1,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -210,64 +221,61 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
 				},
 			},
@@ -276,7 +284,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two fixtures, circle patten - 8 point , with shift of zero",
 			fixtures: 2,
 			shift:    0,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -310,64 +318,61 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
 				},
 			},
@@ -376,7 +381,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 1/4",
 			fixtures: 4,
 			shift:    1,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -410,80 +415,77 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
 				},
 			},
@@ -492,7 +494,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "one fixture, circle patten - 8 point shift of 1/4 ",
 			fixtures: 1,
 			shift:    1,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -526,57 +528,54 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
+			want: []common.Step{
 
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
 				},
 			},
@@ -585,7 +584,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two scanners doing the same circle",
 			fixtures: 2,
 			shift:    0,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  128,
@@ -599,29 +598,26 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  0,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 128},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 128},
 					},
 				},
 			},
@@ -630,7 +626,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 2 ie 1/2",
 			fixtures: 4,
 			shift:    2,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -664,80 +660,77 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
 				},
 			},
@@ -746,7 +739,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 3 ie 3/4 shift",
 			fixtures: 4,
 			shift:    3,
-			coordinates: []coordinate{
+			coordinates: []common.Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -780,80 +773,77 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
-				Name: "circle",
-				Steps: []common.Step{
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-						},
+			want: []common.Step{
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 6, Tilt: 6},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 4, Tilt: 4},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 2, Tilt: 2},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 					},
-					{
-						Type: "scanner",
-						Fixtures: []common.Fixture{
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
-							{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
-						},
+				},
+				{
+					Type: "scanner",
+					Fixtures: []common.Fixture{
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 7, Tilt: 7},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 5, Tilt: 5},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 36, Shutter: 255, Pan: 3, Tilt: 3},
+						{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}, Gobo: 36, Shutter: 255, Pan: 1, Tilt: 1},
 					},
 				},
 			},
@@ -861,7 +851,14 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
+			sequence := common.Sequence{}
+			sequence.ScannerCoordinates = tt.coordinates
+			sequence.NumberScanners = tt.fixtures
+			sequence.Shift = tt.shift
+			sequence.ScannerChase = tt.chase
+			sequence.FixtureDisabled = fixtureDisabled
+			sequence.FixtureAvailable = fixtureAvailable
+			if got := GenerateSteps(sequence); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %v", got)
 				t.Errorf("Want = %v", tt.want)
 			}
@@ -877,7 +874,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantOut []coordinate
+		wantOut []common.Coordinate
 	}{
 		{
 			name: "5000hz sawtooth",
@@ -885,33 +882,33 @@ func TestScanGenerateSineWave(t *testing.T) {
 				size:      255,
 				frequency: 5000,
 			},
-			wantOut: []coordinate{
-				{28, 1},
-				{113, 11},
-				{226, 21},
-				{137, 31},
-				{27, 41},
-				{120, 51},
-				{227, 61},
-				{130, 71},
-				{27, 81},
-				{128, 91},
-				{227, 101},
-				{123, 111},
-				{27, 121},
-				{135, 131},
-				{227, 141},
-				{116, 151},
-				{28, 161},
-				{142, 171},
-				{226, 181},
-				{109, 191},
-				{29, 201},
-				{149, 211},
-				{224, 221},
-				{102, 231},
-				{31, 241},
-				{156, 251},
+			wantOut: []common.Coordinate{
+				{Tilt: 28, Pan: 1},
+				{Tilt: 113, Pan: 11},
+				{Tilt: 226, Pan: 21},
+				{Tilt: 137, Pan: 31},
+				{Tilt: 27, Pan: 41},
+				{Tilt: 120, Pan: 51},
+				{Tilt: 227, Pan: 61},
+				{Tilt: 130, Pan: 71},
+				{Tilt: 27, Pan: 81},
+				{Tilt: 128, Pan: 91},
+				{Tilt: 227, Pan: 101},
+				{Tilt: 123, Pan: 111},
+				{Tilt: 27, Pan: 121},
+				{Tilt: 135, Pan: 131},
+				{Tilt: 227, Pan: 141},
+				{Tilt: 116, Pan: 151},
+				{Tilt: 28, Pan: 161},
+				{Tilt: 142, Pan: 171},
+				{Tilt: 226, Pan: 181},
+				{Tilt: 109, Pan: 191},
+				{Tilt: 29, Pan: 201},
+				{Tilt: 149, Pan: 211},
+				{Tilt: 224, Pan: 221},
+				{Tilt: 102, Pan: 31},
+				{Tilt: 31, Pan: 241},
+				{Tilt: 156, Pan: 251},
 			},
 		},
 	}
@@ -926,8 +923,8 @@ func TestScanGenerateSineWave(t *testing.T) {
 
 func Test_calulateShutterValue(t *testing.T) {
 	type args struct {
-		currentCoordinate int
-		currentStep       int
+		CurrentCoordinate int
+		CurrentStep       int
 		NumberFixtures    int
 		NumberCoordinates int
 	}
@@ -939,8 +936,8 @@ func Test_calulateShutterValue(t *testing.T) {
 		{
 			name: "golden path",
 			args: args{
-				currentCoordinate: 0,
-				currentStep:       0,
+				CurrentCoordinate: 0,
+				CurrentStep:       0,
 				NumberFixtures:    8,
 				NumberCoordinates: 8,
 			},
@@ -949,8 +946,8 @@ func Test_calulateShutterValue(t *testing.T) {
 		{
 			name: "golden path",
 			args: args{
-				currentCoordinate: 8,
-				currentStep:       0,
+				CurrentCoordinate: 8,
+				CurrentStep:       0,
 				NumberFixtures:    8,
 				NumberCoordinates: 8,
 			},
@@ -959,7 +956,7 @@ func Test_calulateShutterValue(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := calulateShutterValue(tt.args.currentCoordinate, tt.args.currentStep, tt.args.NumberFixtures, tt.args.NumberCoordinates); got != tt.want {
+			if got := calulateShutterValue(tt.args.CurrentCoordinate, tt.args.CurrentStep, tt.args.NumberFixtures, tt.args.NumberCoordinates); got != tt.want {
 				t.Errorf("calulateShutterValue() = %v, want %v", got, tt.want)
 			}
 		})

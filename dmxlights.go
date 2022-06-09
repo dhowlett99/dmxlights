@@ -216,9 +216,11 @@ func main() {
 	functionSelectMode = make([]bool, 4)
 
 	// Initialize eight fixture states for the four sequences.
-	disabledFixture = make([][]bool, 9)
-	for i := 0; i < 9; i++ {
-		disabledFixture[i] = make([]bool, 9)
+	// disabledFixture[sequenceNumber][fixtureNumber]
+	disabledFixture = make([][]bool, 4)
+	for sequenceNumber := 0; sequenceNumber < 4; sequenceNumber++ {
+		// 8 fixtures per sequence.
+		disabledFixture[sequenceNumber] = make([]bool, 8)
 	}
 
 	// Initialize a ten length slice of empty slices for static lamps.
@@ -366,19 +368,19 @@ func main() {
 			}
 
 			// Disable fixtures.
-			for x := 0; x < 4; x++ {
-				for y := 0; y < 9; y++ {
-					disabledFixture[x][y] = false
+			for sequenceNumber := 0; sequenceNumber < 4; sequenceNumber++ {
+				for fixtureNumber := 0; fixtureNumber < 9; fixtureNumber++ {
+					disabledFixture[sequenceNumber][fixtureNumber] = false
 					// Tell the sequence to turn on this scanner.
 					cmd := common.Command{
 						Action: common.ToggleFixtureState,
 						Args: []common.Arg{
-							{Name: "SequenceNumber", Value: x},
-							{Name: "FixtureNumber", Value: y},
+							{Name: "SequenceNumber", Value: sequenceNumber},
+							{Name: "FixtureNumber", Value: fixtureNumber},
 							{Name: "FixtureState", Value: false},
 						},
 					}
-					common.SendCommandToSequence(x, cmd, commandChannels)
+					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 				}
 			}
 
@@ -1076,13 +1078,13 @@ func main() {
 				fmt.Printf("Disable Fixture X:%d Y:%d\n", hit.X, hit.Y)
 			}
 
-			if !disabledFixture[hit.X][hit.Y] && hit.X < sequences[hit.Y].NumberScanners {
+			if !disabledFixture[hit.Y][hit.X] && hit.X < sequences[hit.Y].NumberScanners {
 
 				if debug {
 					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", hit.X, hit.Y, sequences[hit.Y].NumberScanners)
 				}
 
-				disabledFixture[hit.X][hit.Y] = true
+				disabledFixture[hit.Y][hit.X] = true
 
 				// Tell the sequence to turn off this scanner.
 				cmd := common.Command{
@@ -1102,12 +1104,12 @@ func main() {
 
 			}
 
-			if disabledFixture[hit.X][hit.Y] && hit.X < sequences[hit.Y].NumberScanners {
+			if disabledFixture[hit.Y][hit.X] && hit.X < sequences[hit.Y].NumberScanners {
 				if debug {
 					fmt.Printf("Toggle Scanner Number %d State on Sequence %d to false\n", hit.X, hit.Y)
 				}
 
-				disabledFixture[hit.X][hit.Y] = false
+				disabledFixture[hit.Y][hit.X] = false
 
 				// Tell the sequence to turn on this scanner.
 				cmd := common.Command{

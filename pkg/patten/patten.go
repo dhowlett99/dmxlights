@@ -7,7 +7,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-const debug = false
+const debug = true
 
 const (
 	full = 255
@@ -489,15 +489,14 @@ type scanner struct {
 	values []int
 }
 
-// GeneratePatten takes an array of coordinates and turns them into a patten
-// which is the starting point for all sequence steps.
-func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift int, chase bool) common.Patten {
+// GenerateSteps takes an array of coordinates and turns them into a steps for the sequence.
+func GenerateSteps(sequence common.Sequence) []common.Step {
 
-	NumberCoordinates := len(coordinates)
+	NumberCoordinates := len(sequence.ScannerCoordinates)
 
 	if debug {
-		fmt.Printf("Number Fixtures %d\n", NumberFixtures)
-		fmt.Printf("Number Coordinates %d\n", NumberCoordinates)
+		fmt.Printf("Number Scanners %d\n", sequence.NumberScanners)
+		fmt.Printf("Number Coordinates %d\n", sequence.NumberCoordinates)
 	}
 	// First create the patten.
 	patten := common.Patten{}
@@ -508,12 +507,14 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 	scanners := []scanner{}
 
 	// First generate the values for all posible fixtures ie 8
+	// But in groups of 4 because we are shifting by a quarter turn each time.
+	// i.e we can only shift by four quaters before we are back at the begining.
 	for fixture := 0; fixture < 4; fixture++ {
 
 		// new scanner
-		s := scanner{}
+		newScanner := scanner{}
 
-		actualShift := (NumberCoordinates / 4) * requestedShift
+		actualShift := (NumberCoordinates / 4) * sequence.Shift
 
 		shift := fixture * actualShift
 
@@ -529,22 +530,23 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 			shift = NumberCoordinates / 4
 		}
 		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
-			s.values = append(s.values, coordinate)
+			newScanner.values = append(newScanner.values, coordinate)
 		}
 		for coordinate := 0; coordinate < shift; coordinate++ {
-			s.values = append(s.values, coordinate)
+			newScanner.values = append(newScanner.values, coordinate)
 		}
 
 		// append the scanner to the list of scanners.
-		scanners = append(scanners, s)
+		scanners = append(scanners, newScanner)
 	}
 
+	// Now the second group of four scanners.
 	for fixture := 0; fixture < 4; fixture++ {
 
 		// new scanner
-		s := scanner{}
+		newScanner := scanner{}
 
-		actualShift := (NumberCoordinates / 4) * requestedShift
+		actualShift := (NumberCoordinates / 4) * sequence.Shift
 
 		shift := fixture * actualShift
 
@@ -560,14 +562,14 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 			shift = NumberCoordinates / 4
 		}
 		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
-			s.values = append(s.values, coordinate)
+			newScanner.values = append(newScanner.values, coordinate)
 		}
 		for coordinate := 0; coordinate < shift; coordinate++ {
-			s.values = append(s.values, coordinate)
+			newScanner.values = append(newScanner.values, coordinate)
 		}
 
 		// append the scanner to the list of scanners.
-		scanners = append(scanners, s)
+		scanners = append(scanners, newScanner)
 	}
 
 	if debug {
@@ -577,33 +579,40 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 	}
 
 	var shutterValue int
-	// Now create the steps in the patten.
-	for f := 0; f < NumberCoordinates; f++ {
 
+	// Now create the steps in the patten.
+	for coodinate := 0; coodinate < NumberCoordinates; coodinate++ {
+
+		// Create a new set of fixtures for this scanner set.
 		fixtures := []common.Fixture{}
 
-		for step := 0; step < NumberFixtures; step++ {
+		for scanner := 0; scanner < sequence.NumberScanners; scanner++ {
 
-			if chase { // Flash the scanners in order.
-				shutterValue = calulateShutterValue(f, step, NumberFixtures, NumberCoordinates)
-			} else {
-				shutterValue = 255 // Otherwise just turn on every scanner
-			}
+			if sequence.FixtureAvailable[scanner] && !sequence.FixtureDisabled[scanner] {
+				if sequence.ScannerChase { // Flash the scanners in order.
+					shutterValue = calulateShutterValue(coodinate, scanner, sequence.NumberScanners, NumberCoordinates)
+				} else {
+					shutterValue = 255 // Otherwise just turn on every scanner
+				}
 
-			newFixture := common.Fixture{
-				Type:         "scanner",
-				MasterDimmer: full,
-				Colors: []common.Color{
-					common.GetColorButtonsArray(scanners[step].values[f]),
-				},
-				Pan:     int(coordinates[scanners[step].values[f]].Pan),
-				Tilt:    int(coordinates[scanners[step].values[f]].Tilt),
-				Shutter: shutterValue,
-				Gobo:    36,
+				newFixture := common.Fixture{
+					Type:         "scanner",
+					MasterDimmer: full,
+					Colors: []common.Color{
+						common.GetColorButtonsArray(scanners[scanner].values[coodinate]),
+					},
+					Pan:     int(sequence.ScannerCoordinates[scanners[scanner].values[coodinate]].Pan),
+					Tilt:    int(sequence.ScannerCoordinates[scanners[scanner].values[coodinate]].Tilt),
+					Shutter: shutterValue,
+					Gobo:    36,
+				}
+				fixtures = append(fixtures, newFixture)
 			}
-			fixtures = append(fixtures, newFixture)
 		}
 
+		if debug {
+			fmt.Printf("Number of fixtures %d\n", len(fixtures))
+		}
 		newStep := common.Step{
 			Type:     "scanner",
 			Fixtures: fixtures,
@@ -612,7 +621,7 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 		patten.Name = "circle"
 		patten.Steps = steps
 	}
-	return patten
+	return patten.Steps
 }
 
 func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures int, NumberCoordinates int) int {
@@ -625,16 +634,12 @@ func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures
 	return 0
 }
 
-type coordinate struct {
-	Tilt int
-	Pan  int
-}
-
-func CircleGenerator(size int, NumberCoordinates int) (out []coordinate) {
+func CircleGenerator(size int, NumberCoordinates int, posX float64, posY float64) []common.Coordinate {
 	var theta float64
+	out := []common.Coordinate{}
 	for theta = 0; theta < 360; theta += (360 / float64(NumberCoordinates)) {
-		n := coordinate{}
-		n.Tilt, n.Pan = circleXY(float64(size), theta)
+		n := common.Coordinate{}
+		n.Tilt, n.Pan = circleXY(float64(size), theta, posX, posY)
 		out = append(out, n)
 	}
 	if debug {
@@ -646,11 +651,11 @@ func CircleGenerator(size int, NumberCoordinates int) (out []coordinate) {
 	return out
 }
 
-func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []coordinate) {
+func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []common.Coordinate) {
 	var t float64
 	T := float64(size)
 	for t = 1; t < T-1; t += 10 {
-		n := coordinate{}
+		n := common.Coordinate{}
 		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
 		n.Tilt = int(x)
 		n.Pan = int(t)
@@ -659,10 +664,10 @@ func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out [
 	return out
 }
 
-func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
+func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []common.Coordinate) {
 	pan := 128
 	for tilt := 0; tilt < 255; tilt += (NumberCoordinates * 2) {
-		n := coordinate{}
+		n := common.Coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
 		out = append(out, n)
@@ -670,10 +675,10 @@ func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
 	return out
 }
 
-func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) {
+func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []common.Coordinate) {
 	tilt := 128
 	for pan := 0; pan < 255; pan += (NumberCoordinates * 2) {
-		n := coordinate{}
+		n := common.Coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
 		out = append(out, n)
@@ -681,11 +686,11 @@ func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) 
 	return out
 }
 
-func circleXY(r float64, theta float64) (int, int) {
+func circleXY(r float64, theta float64, posX float64, posY float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
 
-	x := int(r*math.Cos(theta) + r)
-	y := int(-r*math.Sin(theta) + r)
+	x := int(r*math.Cos(theta) + posX)
+	y := int(-r*math.Sin(theta) + posY)
 	return x, y
 }
