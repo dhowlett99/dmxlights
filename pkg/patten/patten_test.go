@@ -9,7 +9,8 @@ import (
 
 func Test_circleGenerator(t *testing.T) {
 	type args struct {
-		size int
+		radius            int
+		numberCoordinates int
 	}
 	tests := []struct {
 		name    string
@@ -19,7 +20,8 @@ func Test_circleGenerator(t *testing.T) {
 		{
 			name: "standard circle",
 			args: args{
-				size: 126,
+				radius:            126,
+				numberCoordinates: 36,
 			},
 			wantOut: []coordinate{
 				{128, 254},
@@ -64,7 +66,7 @@ func Test_circleGenerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := CircleGenerator(tt.args.size, 20); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := CircleGenerator(tt.args.radius, tt.args.numberCoordinates); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("circleGenerator() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})

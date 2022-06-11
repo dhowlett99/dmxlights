@@ -630,11 +630,11 @@ type coordinate struct {
 	Pan  int
 }
 
-func CircleGenerator(size int, NumberCoordinates int) (out []coordinate) {
+func CircleGenerator(radius int, NumberCoordinates int) (out []coordinate) {
 	var theta float64
 	for theta = 0; theta < 360; theta += (360 / float64(NumberCoordinates)) {
 		n := coordinate{}
-		n.Tilt, n.Pan = circleXY(float64(size), theta)
+		n.Tilt, n.Pan = circleXY(float64(radius), theta, 128, 128)
 		out = append(out, n)
 	}
 	if debug {
@@ -681,11 +681,11 @@ func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) 
 	return out
 }
 
-func circleXY(r float64, theta float64) (int, int) {
+func circleXY(radius float64, theta float64, posX float64, posY float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
 
-	x := int(r*math.Cos(theta) + r)
-	y := int(-r*math.Sin(theta) + r)
+	x := int(radius*math.Cos(theta) + posX)
+	y := int(-radius*math.Sin(theta) + posY)
 	return x, y
 }
