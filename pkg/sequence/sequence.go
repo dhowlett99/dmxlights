@@ -147,7 +147,7 @@ func CreateSequence(
 		AutoPatten:            false,
 		SelectedScannerPatten: 0,
 		FixtureDisabled:       fixtureDisabled,
-		NumberCoordinates:     10,
+		NumberCoordinates:     16,
 		FixtureAvailable:      fixtureAvailable,
 	}
 
@@ -718,13 +718,13 @@ func setPattern(sequence common.Sequence) []common.Coordinate {
 		return patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates, posX, posY)
 	}
 	if sequence.SelectedScannerPatten == 1 {
-		return patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
+		return patten.ScanGeneratorLeftRight(128, sequence.ScannerSize)
 	}
 	if sequence.SelectedScannerPatten == 2 {
-		return patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
+		return patten.ScanGeneratorUpDown(128, sequence.ScannerSize)
 	}
 	if sequence.SelectedScannerPatten == 3 {
-		return patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
+		return patten.ScanGenerateSineWave(255, 5000, sequence.ScannerSize)
 	}
 
 	return nil

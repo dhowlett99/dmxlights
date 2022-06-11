@@ -868,8 +868,9 @@ func Test_generateSteps(t *testing.T) {
 
 func TestScanGenerateSineWave(t *testing.T) {
 	type args struct {
-		size      int
-		frequency int
+		size        int
+		frequency   int
+		scannerSize int
 	}
 	tests := []struct {
 		name    string
@@ -879,8 +880,9 @@ func TestScanGenerateSineWave(t *testing.T) {
 		{
 			name: "5000hz sawtooth",
 			args: args{
-				size:      255,
-				frequency: 5000,
+				size:        255,
+				frequency:   5000,
+				scannerSize: 10,
 			},
 			wantOut: []common.Coordinate{
 				{Tilt: 28, Pan: 1},
@@ -906,7 +908,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 				{Tilt: 29, Pan: 201},
 				{Tilt: 149, Pan: 211},
 				{Tilt: 224, Pan: 221},
-				{Tilt: 102, Pan: 31},
+				{Tilt: 102, Pan: 231},
 				{Tilt: 31, Pan: 241},
 				{Tilt: 156, Pan: 251},
 			},
@@ -914,7 +916,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency, 10); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency, tt.args.scannerSize); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("ScanGenerateSineWave() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})

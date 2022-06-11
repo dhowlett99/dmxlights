@@ -55,7 +55,7 @@ func main() {
 	var soundGain float32 = 0         // Fine gain -0.09 -> 0.09
 	var disabledFixture [][]bool      // Which fixture is disabled on which sequence.
 
-	var selectedCordinates = 10 // Number of coordinates for scanner patterns.
+	var selectedCordinates = 26 // Number of coordinates for scanner patterns.
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -369,7 +369,7 @@ func main() {
 
 			// Disable fixtures.
 			for sequenceNumber := 0; sequenceNumber < 4; sequenceNumber++ {
-				for fixtureNumber := 0; fixtureNumber < 9; fixtureNumber++ {
+				for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
 					disabledFixture[sequenceNumber][fixtureNumber] = false
 					// Tell the sequence to turn on this scanner.
 					cmd := common.Command{
@@ -887,8 +887,8 @@ func main() {
 
 			// Fade also send more or less coordinates for the scanner patterns.
 			selectedCordinates--
-			if selectedCordinates < 10 {
-				selectedCordinates = 10
+			if selectedCordinates < 8 {
+				selectedCordinates = 8
 			}
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,

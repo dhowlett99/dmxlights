@@ -484,16 +484,17 @@ func MakePatterns() map[string]common.Patten {
 
 }
 
-// Storage for scanner values.
-type scanner struct {
+// Storage for scanner coordinate values.
+// scannerCoordinateIndexList is a list of indexes into the array of coordinates,
+// ie which coordinate to use at each step.
+type scannerCoordinateIndexList struct {
 	values []int
 }
 
 // GenerateSteps takes an array of coordinates and turns them into a steps for the sequence.
 func GenerateSteps(sequence common.Sequence) []common.Step {
 
-	NumberCoordinates := len(sequence.ScannerCoordinates)
-
+	//sequence.NumberCoordinates = len(sequence.ScannerCoordinates)
 	if debug {
 		fmt.Printf("Number Scanners %d\n", sequence.NumberScanners)
 		fmt.Printf("Number Coordinates %d\n", sequence.NumberCoordinates)
@@ -504,32 +505,36 @@ func GenerateSteps(sequence common.Sequence) []common.Step {
 	steps := []common.Step{}
 
 	// Storage space for the fixtures
-	scanners := []scanner{}
+	scanners := []scannerCoordinateIndexList{}
 
 	// First generate the values for all posible fixtures ie 8
 	// But in groups of 4 because we are shifting by a quarter turn each time.
 	// i.e we can only shift by four quaters before we are back at the begining.
 	for fixture := 0; fixture < 4; fixture++ {
 
-		// new scanner
-		newScanner := scanner{}
+		newScanner := scannerCoordinateIndexList{}
 
-		actualShift := (NumberCoordinates / 4) * sequence.Shift
+		var shift int
+		actualShift := (sequence.NumberCoordinates / 4) * sequence.Shift
 
-		shift := fixture * actualShift
+		if fixture < 4 {
+			shift = fixture * actualShift
+		} else {
+			shift = (fixture - 4) * actualShift
+		}
 
-		if shift == NumberCoordinates {
+		if shift == sequence.NumberCoordinates {
 			shift = 0
 		}
 
-		if shift == NumberCoordinates+NumberCoordinates/2 {
-			shift = NumberCoordinates / 2
+		if shift == sequence.NumberCoordinates+(sequence.NumberCoordinates/2) {
+			shift = sequence.NumberCoordinates / 2
 		}
 
-		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
-			shift = NumberCoordinates / 4
+		if shift == (sequence.NumberCoordinates*2)+(sequence.NumberCoordinates/4) {
+			shift = sequence.NumberCoordinates / 4
 		}
-		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
+		for coordinate := shift; coordinate < (sequence.NumberCoordinates); coordinate++ {
 			newScanner.values = append(newScanner.values, coordinate)
 		}
 		for coordinate := 0; coordinate < shift; coordinate++ {
@@ -543,25 +548,24 @@ func GenerateSteps(sequence common.Sequence) []common.Step {
 	// Now the second group of four scanners.
 	for fixture := 0; fixture < 4; fixture++ {
 
-		// new scanner
-		newScanner := scanner{}
+		newScanner := scannerCoordinateIndexList{}
 
-		actualShift := (NumberCoordinates / 4) * sequence.Shift
+		actualShift := (sequence.NumberCoordinates / 4) * sequence.Shift
 
 		shift := fixture * actualShift
 
-		if shift == NumberCoordinates {
+		if shift == sequence.NumberCoordinates {
 			shift = 0
 		}
 
-		if shift == NumberCoordinates+NumberCoordinates/2 {
-			shift = NumberCoordinates / 2
+		if shift == sequence.NumberCoordinates+(sequence.NumberCoordinates/2) {
+			shift = sequence.NumberCoordinates / 2
 		}
 
-		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
-			shift = NumberCoordinates / 4
+		if shift == (sequence.NumberCoordinates*2)+(sequence.NumberCoordinates/4) {
+			shift = sequence.NumberCoordinates / 4
 		}
-		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
+		for coordinate := shift; coordinate < (sequence.NumberCoordinates); coordinate++ {
 			newScanner.values = append(newScanner.values, coordinate)
 		}
 		for coordinate := 0; coordinate < shift; coordinate++ {
@@ -574,14 +578,14 @@ func GenerateSteps(sequence common.Sequence) []common.Step {
 
 	if debug {
 		for _, scanner := range scanners {
-			fmt.Printf("scanner %+v\n", scanner)
+			fmt.Printf("Scanner Coordinate Index List %+v\n", scanner)
 		}
 	}
 
 	var shutterValue int
 
 	// Now create the steps in the patten.
-	for coodinate := 0; coodinate < NumberCoordinates; coodinate++ {
+	for coodinate := 0; coodinate < sequence.NumberCoordinates; coodinate++ {
 
 		// Create a new set of fixtures for this scanner set.
 		fixtures := []common.Fixture{}
@@ -590,7 +594,7 @@ func GenerateSteps(sequence common.Sequence) []common.Step {
 
 			if sequence.FixtureAvailable[scanner] && !sequence.FixtureDisabled[scanner] {
 				if sequence.ScannerChase { // Flash the scanners in order.
-					shutterValue = calulateShutterValue(coodinate, scanner, sequence.NumberScanners, NumberCoordinates)
+					shutterValue = calulateShutterValue(coodinate, scanner, sequence.NumberScanners, sequence.NumberCoordinates)
 				} else {
 					shutterValue = 255 // Otherwise just turn on every scanner
 				}
