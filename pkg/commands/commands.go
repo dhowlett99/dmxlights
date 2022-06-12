@@ -171,12 +171,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Blackout = true
 		return sequence
 
-	case common.UpdateFlood:
-		const FLOOD = 0
+	case common.Flood:
 		if debug {
-			fmt.Printf("%d: Command Flood to %t\n", mySequenceNumber, command.Args[FLOOD].Value)
+			fmt.Printf("%d: Command to Start Flood\n", mySequenceNumber)
 		}
-		sequence.Flood = command.Args[FLOOD].Value.(bool)
+		sequence.Flood = true
+		sequence.NoFlood = false
+		sequence.PlayFloodOnce = true
+		return sequence
+
+	case common.NoFlood:
+		if debug {
+			fmt.Printf("%d: Command to Stop Flood\n", mySequenceNumber)
+		}
+		sequence.Flood = false
+		sequence.NoFlood = true
 		sequence.PlayFloodOnce = true
 		return sequence
 

@@ -216,8 +216,6 @@ func PlaySequence(sequence common.Sequence,
 	channels common.Channels,
 	soundTriggers []*common.Trigger) {
 
-	stepDelay := 10 * time.Microsecond
-
 	// Create eight channels to control the fixtures.
 	fixtureChannel1 := make(chan common.FixtureCommand)
 	fixtureChannel2 := make(chan common.FixtureCommand)
@@ -269,16 +267,37 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in flood mode.
 		if sequence.Flood && sequence.PlayFloodOnce {
-			// At this point the fixture threads have been told to stop using the sequence.Flood flag
-			// but they take a few hundred milli seconds to actually stop. So we wait and then turn the
-			// flool function on.ß
-			time.Sleep(300 * time.Millisecond)
-			floodOn(&sequence, dmxController, eventsForLauchpad, fixturesConfig)
+			sequence.Run = false
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Tick:           true,
+				Type:           sequence.Type,
+				SequenceNumber: sequence.Number,
+				Flood:          sequence.Flood,
+			}
+			// Now tell all the fixtures what they need to do.
+			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sequence.Flood = false
+			sequence.PlayFloodOnce = false
+			continue
 		}
 
-		// Turn off the flood mode, but only once.
-		if !sequence.Flood && sequence.PlayFloodOnce {
-			floodOff(&sequence, dmxController, eventsForLauchpad, fixturesConfig)
+		// Stop flood mode.
+		if sequence.NoFlood && sequence.PlayFloodOnce {
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Tick:           true,
+				Type:           sequence.Type,
+				SequenceNumber: sequence.Number,
+				Flood:          sequence.Flood,
+				NoFlood:        sequence.NoFlood,
+			}
+			// Now tell all the fixtures what they need to do.
+			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sequence.NoFlood = false
+			sequence.PlayFloodOnce = false
+			sequence.Run = true
+			continue
 		}
 
 		// Sequence in Static Mode.
@@ -418,9 +437,6 @@ func PlaySequence(sequence common.Sequence,
 
 				// Run the sequence through.
 				for step := 0; step < sequence.NumberSteps; step++ {
-
-					//fmt.Printf("----STEP>>> %+v\n", step)
-
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
@@ -428,7 +444,7 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					// Prepare a message to be sent to the fixtures in the sequence.
-					cmd := common.FixtureCommand{
+					command := common.FixtureCommand{
 						SequenceNumber:  sequence.Number,
 						Inverted:        sequence.Inverted,
 						Master:          sequence.Master,
@@ -444,6 +460,7 @@ func PlaySequence(sequence common.Sequence,
 						Speed:           sequence.Speed,
 						Blackout:        sequence.Blackout,
 						Flood:           sequence.Flood,
+						NoFlood:         sequence.NoFlood,
 						CurrentPosition: step,
 						SelectedGobo:    sequence.SelectedGobo,
 						FixtureDisabled: sequence.FixtureDisabled,
@@ -452,49 +469,17 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					// Now tell all the fixtures what they need to do.
-					fixtureChannel1 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel2 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel3 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel4 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel5 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel6 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel7 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
-					fixtureChannel8 <- cmd
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, stepDelay, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
+					sendToAllFixtures(sequence, fixtureChannels, channels, command)
 				}
 			}
 		}
+	}
+}
+
+// Send a command to all the fixtures.
+func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.FixtureCommand, channels common.Channels, command common.FixtureCommand) {
+	for _, fixture := range fixtureChannels {
+		fixture <- command
 	}
 }
 
@@ -696,46 +681,6 @@ func Static(sequence *common.Sequence, dmxController *ft232.DMXController, event
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
 	sequence.PlayStaticOnce = false
-}
-
-// Flood - We are being asked to be in flood mode.
-func floodOn(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures) {
-
-	if sequence.Type != "switch" {
-		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
-			for s := range sequence.SelectedFloodSequence {
-				if !sequence.Hide {
-					launchpad.LightLamp(s, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
-				}
-				fixture.MapFixtures(s, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-				common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 255, Red: 255, Green: 255, Blue: 255})
-			}
-		}
-		sequence.PlayFloodOnce = false
-	}
-}
-
-func floodOff(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures) {
-
-	if sequence.Type != "switch" {
-		for myFixtureNumber := 0; myFixtureNumber < sequence.NumberFixtures; myFixtureNumber++ {
-			for s := range sequence.SelectedFloodSequence {
-				if !sequence.Hide {
-					launchpad.LightLamp(s, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
-				}
-				fixture.MapFixtures(s, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-				common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 0, Red: 0, Green: 0, Blue: 0})
-			}
-		}
-		sequence.PlayFloodOnce = false
-		// Again here, we need to wait for the Flood flag being set to false to propogate to the fixture
-		// threads and then play the static scene but only once.
-		if sequence.Static {
-			time.Sleep(200 * time.Millisecond)
-		}
-		sequence.PlayStaticOnce = true
-		Static(sequence, dmxController, eventsForLauchpad, fixturesConfig, true)
-	}
 }
 
 func setPattern(sequence common.Sequence) (steps []common.Step) {

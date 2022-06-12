@@ -107,8 +107,8 @@ const UpdateSwitch = 31
 const UpdateSwitchPositions = 32
 const Inverted = 33
 const UpdateGobo = 34
-const UpdateFlood = 35
-const Flood = 36
+const Flood = 35
+const NoFlood = 36
 const UpdateAutoColor = 37
 const AutoColor = 38
 const UpdateAutoPatten = 39
@@ -138,6 +138,7 @@ type Sequence struct {
 	PlayStaticOnce               bool
 	PlaySwitchOnce               bool
 	Flood                        bool
+	NoFlood                      bool
 	PlayFloodOnce                bool
 	StaticColors                 []StaticColorButton
 	AvailableSequenceColors      []StaticColorButton
@@ -248,6 +249,7 @@ type FixtureCommand struct {
 	FadeOffTime         time.Duration
 	Blackout            bool
 	Flood               bool
+	NoFlood             bool
 	PlayFloodOnce       bool
 	UpdateSequenceColor bool
 	SequenceColor       Color

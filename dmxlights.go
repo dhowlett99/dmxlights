@@ -291,7 +291,7 @@ func main() {
 			// Turn off the flood
 			if flood {
 				cmd := common.Command{
-					Action: common.UpdateFlood,
+					Action: common.NoFlood,
 					Args: []common.Arg{
 						{Name: "Flood", Value: false},
 					},
@@ -393,16 +393,29 @@ func main() {
 			}
 
 			if !flood { // We're not already in flood so lets ask the sequence to flood.
+
+				// First save our config
+				config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
+
+				// Stop all sequences, so we start in sync.
 				cmd := common.Command{
-					Action: common.UpdateFlood,
+					Action: common.Stop,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+				// Wait for everything to stop.
+				//time.Sleep(500 * time.Millisecond)
+
+				cmd = common.Command{
+					Action: common.Flood,
 					Args: []common.Arg{
-						{Name: "Flood", Value: true},
+						{Name: "StartFlood", Value: true},
 					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
 				// Wait for sequence to pause.
-				time.Sleep(500 * time.Millisecond)
+				//time.Sleep(500 * time.Millisecond)
 
 				flood = true
 
@@ -410,14 +423,36 @@ func main() {
 			}
 			if flood { // If we are flood already then tell the sequence to stop flood.
 				cmd := common.Command{
-					Action: common.UpdateFlood,
+					Action: common.NoFlood,
 					Args: []common.Arg{
-						{Name: "Flood", Value: false},
+						{Name: "StopFlood", Value: false},
 					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
 				flood = false
+
+				// Recall our previous config
+				config.AskToLoadConfig(commandChannels, 0, 0)
+
+				// Restart all the sequences.
+				cmd = common.Command{
+					Action: common.Start,
+				}
+				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
+
+				// Clear any function modes out and reveal sequence.
+				for selectedSequence := range sequences {
+					// Turn off function mode. Remove the function pads.
+					common.HideFunctionButtons(selectedSequence, eventsForLauchpad)
+					// And reveal the sequence on the launchpad keys
+					common.RevealSequence(selectedSequence, commandChannels)
+					// Turn off the function mode flag.
+					functionSelectMode[selectedSequence] = false
+					// Now forget we pressed twice and start again.
+					selectButtonPressed[selectedSequence] = false
+				}
+
 				continue
 			}
 		}
