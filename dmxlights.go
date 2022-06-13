@@ -403,9 +403,7 @@ func main() {
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
 
-				// Wait for everything to stop.
-				//time.Sleep(500 * time.Millisecond)
-
+				// Start flood.
 				cmd = common.Command{
 					Action: common.Flood,
 					Args: []common.Arg{
@@ -413,9 +411,6 @@ func main() {
 					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-
-				// Wait for sequence to pause.
-				//time.Sleep(500 * time.Millisecond)
 
 				flood = true
 

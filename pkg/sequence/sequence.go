@@ -279,6 +279,7 @@ func PlaySequence(sequence common.Sequence,
 			sendToAllFixtures(sequence, fixtureChannels, channels, command)
 			sequence.Flood = false
 			sequence.PlayFloodOnce = false
+			sequence.Run = false
 			continue
 		}
 
@@ -302,8 +303,21 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.Flood {
-			time.Sleep(500 * time.Millisecond)
-			Static(&sequence, dmxController, eventsForLauchpad, fixturesConfig, true)
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Tick:           true,
+				Type:           sequence.Type,
+				SequenceNumber: sequence.Number,
+				Static:         sequence.Static,
+				StaticColors:   sequence.StaticColors,
+				Hide:           sequence.Hide,
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
+			}
+			// Now tell all the fixtures what they need to do.
+			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sequence.PlayStaticOnce = false
+			sequence.Run = false
 			continue
 		}
 
@@ -367,7 +381,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
+				if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
 					break
 				}
 
@@ -439,7 +453,7 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.ChangePatten || sequence.UpdateShift {
+					if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
 						break
 					}
 
@@ -470,6 +484,10 @@ func PlaySequence(sequence common.Sequence,
 
 					// Now tell all the fixtures what they need to do.
 					sendToAllFixtures(sequence, fixtureChannels, channels, command)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+					if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
+						break
+					}
 				}
 			}
 		}
@@ -663,24 +681,6 @@ func reverseDmx(n int) int {
 		y--
 	}
 	return in[n]
-}
-
-func Static(sequence *common.Sequence, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *fixture.Fixtures, enabled bool) {
-
-	for myFixtureNumber, lamp := range sequence.StaticColors {
-		if sequence.Hide {
-			if lamp.Flash {
-				onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-				launchpad.FlashLight(sequence.Number, myFixtureNumber, onColor, 0, eventsForLauchpad)
-			} else {
-				launchpad.LightLamp(sequence.Number, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
-			}
-		}
-		fixture.MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
-	}
-	// Only play once, we don't want to flood the DMX universe with
-	// continual commands.
-	sequence.PlayStaticOnce = false
 }
 
 func setPattern(sequence common.Sequence) (steps []common.Step) {

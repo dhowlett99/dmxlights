@@ -207,7 +207,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			}
 		}
 		// Setup the actions based on the state of the function keys.
-		sequence := common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
+		sequence = common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
 
 		// Always bounce the pattern if we're a scanner. Except if we're a circle.
 		if sequence.Type == "scanner" && sequence.Patten.Name != "circle" {

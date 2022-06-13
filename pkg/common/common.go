@@ -259,6 +259,8 @@ type FixtureCommand struct {
 	FixtureDisabled     map[int]bool
 	ScannerChase        bool
 	ScannerColor        int
+	Static              bool
+	StaticColors        []StaticColorButton
 }
 
 type Position struct {
@@ -611,6 +613,10 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	// Map static function.
 	if sequence.Type != "scanner" {
 		sequence.Static = sequence.Functions[Function6_Static].State
+		if sequence.Functions[Function6_Static].State {
+			sequence.PlayStaticOnce = true
+			sequence.Hide = true
+		}
 	}
 
 	// Map invert function.

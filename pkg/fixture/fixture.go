@@ -131,6 +131,19 @@ func FixtureReceiver(sequence common.Sequence,
 					common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 0, Red: 0, Green: 0, Blue: 0})
 					continue
 				}
+				if cmd.Static {
+					time.Sleep(100 * time.Millisecond)
+					sequence := common.Sequence{}
+					sequence.Type = cmd.Type
+					sequence.Number = cmd.SequenceNumber
+					sequence.Master = cmd.Master
+					sequence.Blackout = cmd.Blackout
+					sequence.Hide = cmd.Hide
+					sequence.StaticColors = cmd.StaticColors
+					sequence.Static = cmd.Static
+					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, fixtures, true)
+					continue
+				}
 			}
 
 			// Positions can have many fixtures play at the same time.
@@ -415,4 +428,23 @@ func getFade(size float64, direction bool) []int {
 		}
 	}
 	return out
+}
+
+func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
+
+	lamp := sequence.StaticColors[myFixtureNumber]
+
+	if sequence.Hide {
+		if lamp.Flash {
+			onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
+			launchpad.FlashLight(sequence.Number, myFixtureNumber, onColor, 0, eventsForLauchpad)
+		} else {
+			launchpad.LightLamp(sequence.Number, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+		}
+	}
+	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
+
+	// Only play once, we don't want to flood the DMX universe with
+	// continual commands.
+	sequence.PlayStaticOnce = false
 }
