@@ -685,10 +685,12 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    maxdegrees: 230
   - number: 2
     name: FineP
   - number: 3
     name: Tilt
+    maxdegrees: 540
   - number: 4
     name: FineT
   - number: 5

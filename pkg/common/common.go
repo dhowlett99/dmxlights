@@ -264,26 +264,30 @@ type FixtureCommand struct {
 }
 
 type Position struct {
-	Fixture       int
-	StartPosition int
-	Color         Color
-	Pan           int
-	Tilt          int
-	Shutter       int
-	Gobo          int
+	Fixture        int
+	StartPosition  int
+	Color          Color
+	Pan            int
+	PanMaxDegrees  *int
+	Tilt           int
+	TiltMaxDegrees *int
+	Shutter        int
+	Gobo           int
 }
 
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	Type         string
-	MasterDimmer int
-	Colors       []Color
-	Pan          int
-	Tilt         int
-	Shutter      int
-	Gobo         int
+	Type           string
+	MasterDimmer   int
+	Colors         []Color
+	Pan            int
+	PanMaxDegrees  int
+	Tilt           int
+	TiltMaxDegrees int
+	Shutter        int
+	Gobo           int
 }
 
 type ButtonPresets struct {

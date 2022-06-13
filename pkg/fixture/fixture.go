@@ -67,11 +67,12 @@ type Setting struct {
 }
 
 type Channel struct {
-	Number   int16     `yaml:"number"`
-	Name     string    `yaml:"name"`
-	Value    int16     `yaml:"value"`
-	Comment  string    `yaml:"comment"`
-	Settings []Setting `yaml:"settings"`
+	Number     int16     `yaml:"number"`
+	Name       string    `yaml:"name"`
+	Value      int16     `yaml:"value"`
+	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
+	Comment    string    `yaml:"comment"`
+	Settings   []Setting `yaml:"settings"`
 }
 
 // LoadFixtures opens the fixtures config file and returns a pointer to the fixtures.
@@ -177,7 +178,10 @@ func FixtureReceiver(sequence common.Sequence,
 					// Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {
 						if position.Fixture == myFixtureNumber {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, cmd.SelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt,
+								position.Shutter, cmd.SelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+
 							if !cmd.Hide {
 								if cmd.ScannerChase {
 									color := common.GetColorButtonsArray(cmd.ScannerColor)
@@ -272,10 +276,11 @@ func MapFixtures(mySequenceNumber int,
 				if fixture.Number-1 == displayFixture {
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
+
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)))
 					}
 					if strings.Contains(channel.Name, "Tilt") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)))
 					}
 					if strings.Contains(channel.Name, "Shutter") {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
@@ -447,4 +452,29 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
 	sequence.PlayStaticOnce = false
+}
+
+// limitDmxValue - calculates the maximum DMX value based on the number of degrees the fixtire can achieve.
+func limitDmxValue(MaxDegrees *int, Value int) int {
+	// If maxiumum number of degrees have been specified
+	// then do the math so that 360 degrees are never exceeded.
+	if MaxDegrees == nil {
+		return Value
+	}
+
+	if *MaxDegrees > 360 { // If its less then 360 we can't limit.
+		// Limit the DMX value for Pan so the max degree we send is always less than or equal to 360 degrees.
+		OriginalDMXValueRatio := float64(360) / float64(255)
+
+		DegreesRequired := math.Round(OriginalDMXValueRatio * float64(Value))
+
+		var MaxDMX float64 = 255
+
+		DegreesPerDMXClick := float64(*MaxDegrees) / MaxDMX
+
+		NewDMXValue := int(math.Round(DegreesRequired / DegreesPerDMXClick))
+
+		return NewDMXValue
+	}
+	return Value
 }
