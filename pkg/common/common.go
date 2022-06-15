@@ -122,6 +122,8 @@ const Static = 46
 const MasterBrightness = 47
 const UpdateNumberCoordinates = 48
 
+const DefaultScannerSize = 120
+
 type Gobo struct {
 	Name    string
 	Number  int
@@ -316,16 +318,16 @@ type Trigger struct {
 
 // Define the function keys.
 const (
-	Function1_Patten         = 0 // Set patten mode.
-	Function2_Auto_Color     = 1 // Auto Color change.
-	Function3_Auto_Patten    = 2 // Auto Patten change
-	Function4_Bounce         = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
-	Function5_Color          = 4 // Set RGB chase color. or select the scanner color.
-	Function6_Static         = 5 // Set static color.
-	Function7_Gobo           = 5 // Set scanner Gobo.
-	Function8_RGB_Invert     = 6 // Invert the RGB colors.
-	Function9_Scanner_Chase  = 6 // Set scanner chase mode.
-	Function10_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
+	Function1_Patten        = 0 // Set patten mode.
+	Function2_Auto_Color    = 1 // Auto Color change.
+	Function3_Auto_Patten   = 2 // Auto Patten change
+	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
+	Function5_Color         = 4 // Set RGB chase color. or select the scanner color.
+	Function6_Static        = 5 // Set static color.
+	Function6_Gobo          = 5 // Set scanner Gobo.
+	Function7_RGB_Invert    = 6 // Invert the RGB colors.
+	Function7_Scanner_Chase = 6 // Set scanner chase mode.
+	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
 // LightOn Turn on a common.Light.
@@ -624,13 +626,13 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map invert function.
-	sequence.Inverted = sequence.Functions[Function8_RGB_Invert].State
+	sequence.Inverted = sequence.Functions[Function7_RGB_Invert].State
 	// Map scanner chase mode. Uses same function key as above.
-	sequence.ScannerChase = sequence.Functions[Function9_Scanner_Chase].State
+	sequence.ScannerChase = sequence.Functions[Function7_Scanner_Chase].State
 
 	// Map music trigger function.
-	sequence.MusicTrigger = sequence.Functions[Function10_Music_Trigger].State
-	if sequence.Functions[Function10_Music_Trigger].State {
+	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
+	if sequence.Functions[Function8_Music_Trigger].State {
 		sequence.Run = true
 	}
 

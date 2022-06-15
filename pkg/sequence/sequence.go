@@ -122,7 +122,7 @@ func CreateSequence(
 			Fixtures: 8,
 			Steps:    pattens[initialPatten].Steps,
 		},
-		ScannerSize:  120,
+		ScannerSize:  common.DefaultScannerSize,
 		Speed:        14,
 		CurrentSpeed: 25 * time.Millisecond,
 		Colors: []common.Color{
@@ -327,7 +327,7 @@ func PlaySequence(sequence common.Sequence,
 			for sequence.Run && !sequence.Static {
 
 				// Map music trigger function.
-				sequence.MusicTrigger = sequence.Functions[common.Function10_Music_Trigger].State
+				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 				// If the music trigger is being used then the timer is disabled.
 				for _, trigger := range soundTriggers {

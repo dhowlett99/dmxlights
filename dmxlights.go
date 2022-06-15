@@ -33,7 +33,7 @@ func main() {
 
 	var sequenceSpeed int = 12        // Local copy of sequence speed.
 	var size int                      // current RGB sequence size.
-	var scannerSize int = 60          // Current scanner size.
+	var scannerSize int               // Current scanner size.
 	var savePreset bool               // Save a preset flag.
 	var selectedShift = 0             // Current fixture shift.
 	var blackout bool = false         // Blackout all fixtures.
@@ -304,7 +304,7 @@ func main() {
 				flood = false
 			}
 
-			// We want to clear a color selection.
+			// We want to clear a color selection for a selected sequence.
 			if sequences[selectedSequence].Functions[common.Function5_Color].State &&
 				sequences[selectedSequence].Type != "scanner" {
 
@@ -312,7 +312,6 @@ func main() {
 				cmd := common.Command{
 					Action: common.ClearSequenceColor,
 				}
-
 				common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 				// Get an upto date copy of the sequence.
@@ -383,6 +382,23 @@ func main() {
 						},
 					}
 					common.SendCommandToSequence(x, cmd, commandChannels)
+				}
+			}
+
+			for _, sequence := range sequences {
+
+				// Reset the Scanner Size back to default.
+				// Set local copy.
+				scannerSize = common.DefaultScannerSize
+				// Set copy in sequences.
+				if sequence.Type == "scanner" {
+					cmd = common.Command{
+						Action: common.UpdateScannerSize,
+						Args: []common.Arg{
+							{Name: "ScannerSize", Value: common.DefaultScannerSize},
+						},
+					}
+					common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 				}
 			}
 
@@ -1038,7 +1054,7 @@ func main() {
 
 			// Map Function 6 to select gobo mode.
 			if sequences[selectedSequence].Type == "scanner" {
-				editGoboSelectionMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function7_Gobo].State
+				editGoboSelectionMode[selectedSequence] = sequences[selectedSequence].Functions[common.Function6_Gobo].State
 			}
 
 			// Go straight to gobo selection mode.
@@ -1360,7 +1376,7 @@ func main() {
 
 		// S E T   S C A N N E R   G O B O
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
-			sequences[selectedSequence].Functions[common.Function7_Gobo].State &&
+			sequences[selectedSequence].Functions[common.Function6_Gobo].State &&
 			sequences[selectedSequence].Type == "scanner" {
 
 			if debug {
@@ -1582,6 +1598,9 @@ func HandleSelect(sequences []*common.Sequence,
 		if editPattenMode[selectedSequence] {
 			editPattenMode[selectedSequence] = false
 		}
+
+		// Switch off the gobo selection mode.
+		sequences[selectedSequence].Functions[common.Function6_Static].State = false
 
 		// Else reveal the sequence on the launchpad keys
 		if debug {
