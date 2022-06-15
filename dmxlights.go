@@ -1208,61 +1208,75 @@ func main() {
 		// Red
 		if hit.X == 1 && hit.Y == -1 {
 
-			if debug {
-				fmt.Printf("Choose Static Red X:%d Y:%d\n", hit.X, hit.Y)
-			}
+			if sequences[selectedSequence].Functions[common.Function6_Static].State {
 
-			staticButtons[selectedSequence].X = lastStaticColorButtonX
-			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+				if debug {
+					fmt.Printf("Choose Static Red X:%d Y:%d\n", hit.X, hit.Y)
+				}
 
-			if staticButtons[selectedSequence].Color.R > 254 {
-				staticButtons[selectedSequence].Color.R = 0
-			} else {
-				staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
+				staticButtons[selectedSequence].X = lastStaticColorButtonX
+				staticButtons[selectedSequence].Y = lastStaticColorButtonY
+
+				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
+				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
+
+				if staticButtons[selectedSequence].Color.R > 254 {
+					staticButtons[selectedSequence].Color.R = 0
+				} else {
+					staticButtons[selectedSequence].Color.R = staticButtons[selectedSequence].Color.R + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
+				updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+				continue
 			}
-			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: staticButtons[selectedSequence].Color.R, Green: 0, Blue: 0})
-			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
-			continue
 		}
 
 		// Green
 		if hit.X == 2 && hit.Y == -1 {
 
-			if debug {
-				fmt.Printf("Choose Static Green X:%d Y:%d\n", hit.X, hit.Y)
-			}
+			if sequences[selectedSequence].Functions[common.Function6_Static].State {
+				if debug {
+					fmt.Printf("Choose Static Green X:%d Y:%d\n", hit.X, hit.Y)
+				}
 
-			staticButtons[selectedSequence].X = lastStaticColorButtonX
-			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+				staticButtons[selectedSequence].X = lastStaticColorButtonX
+				staticButtons[selectedSequence].Y = lastStaticColorButtonY
+				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
+				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
 
-			if staticButtons[selectedSequence].Color.G > 254 {
-				staticButtons[selectedSequence].Color.G = 0
-			} else {
-				staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
+				if staticButtons[selectedSequence].Color.G > 254 {
+					staticButtons[selectedSequence].Color.G = 0
+				} else {
+					staticButtons[selectedSequence].Color.G = staticButtons[selectedSequence].Color.G + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
+				updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+				continue
 			}
-			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: staticButtons[selectedSequence].Color.G, Blue: 0})
-			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
-			continue
 		}
 
 		// Blue
 		if hit.X == 3 && hit.Y == -1 {
 
-			if debug {
-				fmt.Printf("Choose Static Blue X:%d Y:%d\n", hit.X, hit.Y)
-			}
+			if sequences[selectedSequence].Functions[common.Function6_Static].State {
+				if debug {
+					fmt.Printf("Choose Static Blue X:%d Y:%d\n", hit.X, hit.Y)
+				}
 
-			staticButtons[selectedSequence].X = lastStaticColorButtonX
-			staticButtons[selectedSequence].Y = lastStaticColorButtonY
+				staticButtons[selectedSequence].X = lastStaticColorButtonX
+				staticButtons[selectedSequence].Y = lastStaticColorButtonY
+				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
+				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
 
-			if staticButtons[selectedSequence].Color.B > 254 {
-				staticButtons[selectedSequence].Color.B = 0
-			} else {
-				staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
+				if staticButtons[selectedSequence].Color.B > 254 {
+					staticButtons[selectedSequence].Color.B = 0
+				} else {
+					staticButtons[selectedSequence].Color.B = staticButtons[selectedSequence].Color.B + 10
+				}
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
+				updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
+				continue
 			}
-			common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: staticButtons[selectedSequence].Color.B})
-			updateStaticLamp(selectedSequence, staticButtons[selectedSequence], commandChannels)
-			continue
 		}
 
 		// S E T  R G B  S E Q U E N C E   C O L O R
@@ -1414,6 +1428,8 @@ func main() {
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 			lastStaticColorButtonX = hit.X
 			lastStaticColorButtonY = hit.Y
+			code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
+			launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
 
 			continue
 		}
@@ -1483,6 +1499,7 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 		Args: []common.Arg{
 			{Name: "Static", Value: true},
 			{Name: "StaticLamp", Value: staticColorButtons.X},
+			{Name: "StaticLampFlash", Value: false},
 			{Name: "SelectedColor", Value: staticColorButtons.SelectedColor},
 			{Name: "StaticColor", Value: common.Color{R: staticColorButtons.Color.R, G: staticColorButtons.Color.G, B: staticColorButtons.Color.B}},
 		},
