@@ -288,6 +288,10 @@ func main() {
 				fmt.Printf("CLEAR LAUNCHPAD\n")
 			}
 
+			// Turn off the flashing save button.
+			savePreset = false
+			launchpad.FlashLight(4, 8, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+
 			// Turn off the flood
 			if flood {
 				cmd := common.Command{
