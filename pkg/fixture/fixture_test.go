@@ -6,6 +6,7 @@ func Test_calculateMaxDMX(t *testing.T) {
 
 	fiveFourty := 540
 	threeSixty := 360
+	twoThirty := 230
 	twoFourty := 240
 
 	type args struct {
@@ -26,6 +27,14 @@ func Test_calculateMaxDMX(t *testing.T) {
 			want: 170,
 		},
 		{
+			name: "A scanner that can do 540 degrees",
+			args: args{
+				MaxDegreeValueForFixture: &fiveFourty,
+				Value:                    128,
+			},
+			want: 85,
+		},
+		{
 			name: "a scanner that can do 360 degrees",
 			args: args{
 				MaxDegreeValueForFixture: &threeSixty,
@@ -40,6 +49,14 @@ func Test_calculateMaxDMX(t *testing.T) {
 				Value:                    255,
 			},
 			want: 255,
+		},
+		{
+			name: "A scanner that can do 230 degrees",
+			args: args{
+				MaxDegreeValueForFixture: &twoThirty,
+				Value:                    255,
+			},
+			want: 230,
 		},
 	}
 	for _, tt := range tests {
