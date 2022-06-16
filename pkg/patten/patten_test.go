@@ -11,6 +11,8 @@ func Test_circleGenerator(t *testing.T) {
 	type args struct {
 		radius            int
 		numberCoordinates int
+		posX              float64
+		posY              float64
 	}
 	tests := []struct {
 		name    string
@@ -22,6 +24,8 @@ func Test_circleGenerator(t *testing.T) {
 			args: args{
 				radius:            126,
 				numberCoordinates: 36,
+				posX:              128,
+				posY:              128,
 			},
 			wantOut: []coordinate{
 				{128, 254},
@@ -66,7 +70,7 @@ func Test_circleGenerator(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := CircleGenerator(tt.args.radius, tt.args.numberCoordinates); !reflect.DeepEqual(gotOut, tt.wantOut) {
+			if gotOut := CircleGenerator(tt.args.radius, tt.args.numberCoordinates, tt.args.posX, tt.args.posY); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("circleGenerator() = %v, want %v", gotOut, tt.wantOut)
 			}
 		})

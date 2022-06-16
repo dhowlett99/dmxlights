@@ -71,6 +71,7 @@ type Channel struct {
 	Name       string    `yaml:"name"`
 	Value      int16     `yaml:"value"`
 	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
+	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
 	Comment    string    `yaml:"comment"`
 	Settings   []Setting `yaml:"settings"`
 }
@@ -276,10 +277,16 @@ func MapFixtures(mySequenceNumber int,
 				if fixture.Number-1 == displayFixture {
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
-
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)))
+						if channel.Offset != nil {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan+*channel.Offset)))
+						} else {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)))
+						}
 					}
 					if strings.Contains(channel.Name, "Tilt") {
+						if channel.Offset != nil {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt+*channel.Offset)))
+						}
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)))
 					}
 					if strings.Contains(channel.Name, "Shutter") {

@@ -425,8 +425,10 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 128
   - number: 2
     name: Tilt
+    offset: 128
   - number: 3
     name: Shutter
     settings:
@@ -477,8 +479,10 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 128
   - number: 2
     name: Tilt
+    offset: 128
   - number: 3
     name: Shutter
     settings:
@@ -529,8 +533,10 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 128
   - number: 2
     name: Tilt
+    offset: 128
   - number: 3
     name: Shutter
     settings:
@@ -581,8 +587,10 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 128
   - number: 2
     name: Tilt
+    offset: 128
   - number: 3
     name: Shutter
     settings:
@@ -633,8 +641,10 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 128
   - number: 2
     name: Tilt
+    offset: 128
   - number: 3
     name: Shutter
     settings:
@@ -685,14 +695,16 @@ fixtures:
   channels:
   - number: 1
     name: Pan
+    offset: 0
     maxdegrees: 230
   - number: 2
-    name: FineP
+    name: FinePan
   - number: 3
     name: Tilt
+    offset: 0
     maxdegrees: 540
   - number: 4
-    name: FineT
+    name: FineTilt
   - number: 5
     name: Color
     settings:

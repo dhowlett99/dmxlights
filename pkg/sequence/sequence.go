@@ -689,7 +689,7 @@ func reverseDmx(n int) int {
 
 func setPattern(sequence common.Sequence) (steps []common.Step) {
 	if sequence.SelectedScannerPatten == 0 {
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
+		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates, 0, 0)
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps

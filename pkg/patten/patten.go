@@ -630,11 +630,11 @@ type coordinate struct {
 	Pan  int
 }
 
-func CircleGenerator(radius int, NumberCoordinates int) (out []coordinate) {
+func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []coordinate) {
 	var theta float64
 	for theta = 0; theta < 360; theta += (360 / float64(NumberCoordinates)) {
 		n := coordinate{}
-		n.Tilt, n.Pan = circleXY(float64(radius), theta, 128, 128)
+		n.Tilt, n.Pan = circleXY(float64(radius), theta, posX, posY)
 		out = append(out, n)
 	}
 	if debug {
