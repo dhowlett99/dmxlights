@@ -4,13 +4,8 @@ import "testing"
 
 func Test_calculateMaxDMX(t *testing.T) {
 
-	fiveFourty := 540
-	threeSixty := 360
-	twoThirty := 230
-	twoFourty := 240
-
 	type args struct {
-		MaxDegreeValueForFixture *int
+		MaxDegreeValueForFixture int
 		Value                    int
 	}
 	tests := []struct {
@@ -21,7 +16,7 @@ func Test_calculateMaxDMX(t *testing.T) {
 		{
 			name: "A scanner that can do 540 degrees",
 			args: args{
-				MaxDegreeValueForFixture: &fiveFourty,
+				MaxDegreeValueForFixture: 540,
 				Value:                    255,
 			},
 			want: 170,
@@ -29,7 +24,7 @@ func Test_calculateMaxDMX(t *testing.T) {
 		{
 			name: "A scanner that can do 540 degrees",
 			args: args{
-				MaxDegreeValueForFixture: &fiveFourty,
+				MaxDegreeValueForFixture: 540,
 				Value:                    128,
 			},
 			want: 85,
@@ -37,31 +32,23 @@ func Test_calculateMaxDMX(t *testing.T) {
 		{
 			name: "a scanner that can do 360 degrees",
 			args: args{
-				MaxDegreeValueForFixture: &threeSixty,
+				MaxDegreeValueForFixture: 360,
 				Value:                    255,
 			},
 			want: 255,
 		},
 		{
-			name: "a scanner that can do less than 360 degrees",
+			name: "a scanner that can only do less than 360 degrees",
 			args: args{
-				MaxDegreeValueForFixture: &twoFourty,
-				Value:                    255,
+				MaxDegreeValueForFixture: 240,
+				Value:                    255, // this is indicating we want 360 degs.
 			},
-			want: 255,
-		},
-		{
-			name: "A scanner that can do 230 degrees",
-			args: args{
-				MaxDegreeValueForFixture: &twoThirty,
-				Value:                    255,
-			},
-			want: 230,
+			want: 180,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := limitDmxValue(tt.args.MaxDegreeValueForFixture, tt.args.Value); got != tt.want {
+			if got := limitDmxValue(&tt.args.MaxDegreeValueForFixture, tt.args.Value); got != tt.want {
 				t.Errorf("calculateMaxDMX() = %v, want %v", got, tt.want)
 			}
 		})

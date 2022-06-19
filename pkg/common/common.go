@@ -122,7 +122,7 @@ const Static = 46
 const MasterBrightness = 47
 const UpdateNumberCoordinates = 48
 
-const DefaultScannerSize = 120
+const DefaultScannerSize = 30
 
 type Gobo struct {
 	Name    string
@@ -144,6 +144,7 @@ type Sequence struct {
 	PlayFloodOnce                bool
 	StaticColors                 []StaticColorButton
 	AvailableSequenceColors      []StaticColorButton
+	AvailableFixtureColors       map[int][]StaticColorButton
 	AvailableGoboSelectionColors []StaticColorButton
 	EditColors                   bool
 	Hide                         bool
@@ -186,11 +187,11 @@ type Sequence struct {
 	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
 	AutoColor                    bool
 	AutoPatten                   bool
-	ChangePatten                 bool
 	RecoverSequenceColors        bool
 	SaveColors                   bool
 	SelectedScannerPatten        int
 	FixtureDisabled              map[int]bool
+	DisableOnce                  map[int]bool
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 int
@@ -259,6 +260,7 @@ type FixtureCommand struct {
 	Inverted            bool
 	SelectedGobo        int
 	FixtureDisabled     map[int]bool
+	DisableOnce         map[int]bool
 	ScannerChase        bool
 	ScannerColor        int
 	Static              bool
@@ -539,8 +541,9 @@ func GetColorButtonsArray(color int) Color {
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-
 	switch color {
+	case Color{R: 0, G: 196, B: 255}:
+		return 0x4e // Light Blue
 	case Color{R: 255, G: 0, B: 0}:
 		return 0x48 // Red
 	case Color{R: 255, G: 111, B: 0}:
@@ -563,6 +566,45 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 		return 0x00 // Black
 	}
 	return code
+}
+
+func GetRGBColorByName(color string) Color {
+	switch color {
+	case "Red":
+		return Color{R: 255, G: 0, B: 0}
+
+	case "Orange":
+		return Color{R: 255, G: 111, B: 0}
+
+	case "Yellow":
+		return Color{R: 255, G: 255, B: 0}
+
+	case "Green":
+		return Color{R: 0, G: 255, B: 0}
+
+	case "Cyan":
+		return Color{R: 0, G: 255, B: 255}
+
+	case "Blue":
+		return Color{R: 0, G: 0, B: 255}
+
+	case "Purple":
+		return Color{R: 100, G: 0, B: 255}
+
+	case "Pink":
+		return Color{R: 255, G: 0, B: 255}
+
+	case "White":
+		return Color{R: 255, G: 255, B: 255}
+
+	case "Light Blue":
+		return Color{R: 0, G: 196, B: 255}
+
+	case "Black":
+		return Color{R: 0, G: 0, B: 0}
+
+	}
+	return Color{R: 0, G: 0, B: 0}
 }
 
 func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
@@ -613,7 +655,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	if sequence.Functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
 		sequence.EditSeqColors = true
-		sequence.Run = false
+		//sequence.Run = false
 	}
 
 	// Map static function.

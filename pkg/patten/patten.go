@@ -684,8 +684,8 @@ func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) 
 func circleXY(radius float64, theta float64, posX float64, posY float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
-
-	x := int(radius*math.Cos(theta) + posX)
-	y := int(-radius*math.Sin(theta) + posY)
+	// Adding the raduis always positions the circle so no we don't get any negitive numbers.
+	x := int(radius*math.Cos(theta) + radius)
+	y := int(-radius*math.Sin(theta) + radius)
 	return x, y
 }

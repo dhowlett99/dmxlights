@@ -1,10 +1,8 @@
-# DMX Lights.
-
+# DMX Lights
 
 ## Introduction
 
-DMX lights is a Open Source Project to control DMX light fixtures.  It is designed for the small to medium mobile disco rig and be very easy to setup 
-and use.
+DMX lights is a Open Source Project to control DMX light fixtures.  It is designed for the small to medium mobile disco rig and be very easy to setup and use.
 
 Firstly we use the Novation Launchpad Mini (Mk3) as the control surface and a cheap FTDI RS422 controller as the interface for the DMX lights.
 
@@ -13,7 +11,7 @@ do what to a simple text file.
 
 ## Instalation
 
-clone the DMX lights repositary 
+clone the DMX lights repositary
 
 git clone github.com/dhowlett99/dmxlights
 
@@ -29,7 +27,7 @@ go build dmxlights.go
 
 ### Setting up your fixtures
 
-The simplest of fixture definitions is shown below:- 
+The simplest of fixture definitions is shown below:-
 
 fixtures.yaml
 
@@ -48,15 +46,16 @@ fixtures:
   - number: 3
     name: Blue1
 ```
+
 Fixture Definition
 | Field |  Function |
 |-|-|
-| name | The name is arbitrary and is only used as a label.
-| description | The description is arbitrary and only used to record extra info on the fixture.
-| type | The type defines the sequence type.  Valid values are rgb, scanner, switch.
-| address | The address is the DMX start address you have programed your fixture at.
-| group | The group defines which sequence this fixture belongs too.
-| channels | The channels is the list of the fixtures available DMX traits, these have a number and a name. See below. 
+| name | The name is arbitrary and is only used as a label.|
+| description | The description is arbitrary and only used to record extra info on the fixture.|
+| type | The type defines the sequence type.  Valid values are rgb, scanner, switch.|
+| address | The address is the DMX start address you have programed your fixture at.|
+| group | The group defines which sequence this fixture belongs too.|
+| channels | The channels is the list of the fixtures available DMX traits, these have a number and a name. See below.|
 
 Channel Definition
 
@@ -70,10 +69,11 @@ Channel Definition
 | Comment  | This is is arbitrarty text field.
 | Settings  | Further details
 
+### Settings example
 
-### Settings example 
 You can specifty further details for a channel. This examples outlines the different functions for channel 3 named shutter.
-`
+
+``` yaml
 - number: 3
     name: Shutter
     settings:
@@ -83,7 +83,7 @@ You can specifty further details for a channel. This examples outlines the diffe
         setting: 0
       - name: Strobe
         setting: 100
-`
+```
 
 ## Channel Example
 
@@ -132,10 +132,6 @@ Scanner Fixture - Valid Channel Names or Keywords are :-
 |Master |Channel respondes to Master Brightness |
 |Dimmer|Channel respondes to Master Brightness ( alternative to Master above|
 
-
-
-
-
 ## Running DMX lights
 
 Plug the FTDI interface card and Novation Lauchpad using their respective USB cables.
@@ -144,19 +140,12 @@ Plug the FTDI interface card and Novation Lauchpad using their respective USB ca
 ./dmxlights
 ```
 
-
-
-
 ## LaunchPad Layout
 
-
 The launchpad buttons are laid out in a simple manner, the very top row are global controls.
-
 The next four top rows are reserved to control and display the sequence as defined in the fixtures.yaml file.
-
-The bottom three rows are reserved as storage for your scenes. Once you have selected all the required sequence 
+The bottom three rows are reserved as storage for your scenes. Once you have selected all the required sequence
 charateristics you can press the SAVE buttton and the one of these preset buttons to store the scene.
-
 
 ![LaunchPad Layout](Layout.png)
 
@@ -167,9 +156,8 @@ The botton far right is the blackout button.
 
 ## Sequences
 
-A sequence is the basic control set in DMX Lights. A sequence can have a few different modes depending on 
+A sequence is the basic control set in DMX Lights. A sequence can have a few different modes depending on
 the sequence type.
-
 
 ## Chase Sequence
 
@@ -179,7 +167,7 @@ A basic chase sequence of 8 fixtures with 8 different colors.
 
 A specific to a scanner, this type of sequence can scan in a circle, left to right, up and down and finally in saw tooth motion.
 
-## Static Colors 
+## Static Colors
 
 A static color sequence is where you want to setup a set of uplighters with specific colors.
 
@@ -187,13 +175,3 @@ A static color sequence is where you want to setup a set of uplighters with spec
 
 A switch sequence is simply eight switches that can be used to control simple devices like projectors.
 A swicth can have multiple states, for example you could set a fixture to have specific color, brightness or Gobo.
-
-
-
-
-
-
-
-
-
-##

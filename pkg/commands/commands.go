@@ -79,7 +79,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
-		sequence.ChangePatten = true
+		sequence.UpdatePatten = true
 		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		return sequence
@@ -370,6 +370,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				sequence.FixtureDisabled[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[FIXTURE_STATE].Value.(bool)
 			}
 		}
+
+		// When we disable a fixture we send a off command to the shutter to make it go off.
+		// We only want to do this once to avoid flooding the universe with DMX commands.
+		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
+		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence
 

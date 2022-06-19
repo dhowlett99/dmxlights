@@ -168,9 +168,11 @@ func FixtureReceiver(sequence common.Sequence,
 
 				// If this fixture is disabled then shut the shutter off.
 				if cmd.CurrentPosition == position.StartPosition &&
+					cmd.DisableOnce[myFixtureNumber] &&
 					cmd.Type == "scanner" &&
 					cmd.FixtureDisabled[myFixtureNumber] {
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0)
+					cmd.DisableOnce[myFixtureNumber] = false
 					continue
 				}
 
@@ -256,6 +258,41 @@ func FixtureReceiver(sequence common.Sequence,
 	}
 }
 
+func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, scannerColor int) {
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == sequence.Number {
+			for channelNumber, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Color") {
+					for _, setting := range channel.Settings {
+						//fmt.Printf("Scanner Color  %d\n", scannerColor)
+						//fmt.Printf("Setting  %+v\n", setting)
+						if setting.Number-1 == scannerColor {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, selectedGobo int) {
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == sequence.Number {
+			for channelNumber, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Gobo") {
+					for _, setting := range channel.Settings {
+						if setting.Number == selectedGobo {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
 // When want to light a DMX fixture we need for find it in our fuxture.yaml configuration file.
 // This function maps the requested fixture into a DMX address.
 func MapFixtures(mySequenceNumber int,
@@ -301,7 +338,9 @@ func MapFixtures(mySequenceNumber int,
 					}
 					if strings.Contains(channel.Name, "Color") {
 						for _, setting := range channel.Settings {
-							if setting.Number == scannerColor {
+							//fmt.Printf("Scanner Color  %d\n", scannerColor)
+							//fmt.Printf("Setting  %+v\n", setting)
+							if setting.Number-1 == scannerColor {
 								dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
 							}
 						}
@@ -463,25 +502,30 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 
 // limitDmxValue - calculates the maximum DMX value based on the number of degrees the fixtire can achieve.
 func limitDmxValue(MaxDegrees *int, Value int) int {
+
+	in := float64(Value)
+
+	// Limit the DMX value for Pan so the max degree we send is always less than or equal to 360 degrees.
+	OriginalDMXValueRatio := float64(360) / float64(255)
+
 	// If maxiumum number of degrees have been specified
 	// then do the math so that 360 degrees are never exceeded.
 	if MaxDegrees == nil {
-		return Value
+		return int(in)
 	}
 
-	if *MaxDegrees > 360 { // If its less then 360 we can't limit.
-		// Limit the DMX value for Pan so the max degree we send is always less than or equal to 360 degrees.
-		OriginalDMXValueRatio := float64(360) / float64(255)
-
-		DegreesRequired := math.Round(OriginalDMXValueRatio * float64(Value))
-
-		var MaxDMX float64 = 255
-
-		DegreesPerDMXClick := float64(*MaxDegrees) / MaxDMX
-
-		NewDMXValue := int(math.Round(DegreesRequired / DegreesPerDMXClick))
-
-		return NewDMXValue
+	if *MaxDegrees < 360 { // If its less then 360 we can't limit.
+		return int(in / OriginalDMXValueRatio)
 	}
-	return Value
+
+	DegreesRequired := math.Round(OriginalDMXValueRatio * float64(Value))
+
+	var MaxDMX float64 = 255
+
+	DegreesPerDMXClick := float64(*MaxDegrees) / MaxDMX
+
+	NewDMXValue := int(math.Round(DegreesRequired / DegreesPerDMXClick))
+
+	return NewDMXValue
+
 }

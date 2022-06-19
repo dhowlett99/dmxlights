@@ -696,13 +696,13 @@ fixtures:
   - number: 1
     name: Pan
     offset: 0
-    maxdegrees: 230
+    maxdegrees: 540
   - number: 2
     name: FinePan
   - number: 3
     name: Tilt
     offset: 0
-    maxdegrees: 540
+    maxdegrees: 230
   - number: 4
     name: FineTilt
   - number: 5
@@ -712,26 +712,26 @@ fixtures:
         number: 1
         setting: 0
       - name: Red
-        setting: 8
         number: 2
+        setting: 8
       - name: Orange
-        setting: 15
         number: 3
+        setting: 15
       - name: Yellow
-        setting: 22
         number: 4
+        setting: 22
       - name: Green
-        setting: 29
         number: 5
+        setting: 29
       - name: Blue
-        setting: 36
         number: 6
+        setting: 36
       - name: Light Blue
-        setting: 43
         number: 7
+        setting: 43
       - name: Pink
-        setting: 50
         number: 8
+        setting: 50
   - number: 6
     name: Gobo
     settings:
