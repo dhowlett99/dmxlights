@@ -146,6 +146,7 @@ type Sequence struct {
 	AvailableSequenceColors      []StaticColorButton
 	AvailableFixtureColors       map[int][]StaticColorButton
 	AvailableGoboSelectionColors []StaticColorButton
+	AvailableFixtures            []StaticColorButton
 	EditColors                   bool
 	Hide                         bool
 	Type                         string
@@ -194,7 +195,7 @@ type Sequence struct {
 	DisableOnce                  map[int]bool
 	ScannerChase                 bool
 	UpdateScannerColor           bool
-	ScannerColor                 int
+	ScannerColor                 map[int]int // eight scanners per sequence, each can have their own color.
 	NumberCoordinates            int
 	Steps                        []Step
 	UpdatePatten                 bool
@@ -229,42 +230,43 @@ type Step struct {
 
 // Fixture Command.
 type FixtureCommand struct {
-	Master              int
-	Hide                bool
-	Tick                bool
-	Config              bool // Configure fixture.
-	Start               bool
-	Steps               int
-	Positions           map[int][]Position
-	Type                string
-	StartPosition       int
-	CurrentPosition     int
-	CurrentSpeed        time.Duration
-	Color               Color
-	Speed               int
-	Shift               int
-	Size                int
-	FadeSpeed           int
-	FadeTime            time.Duration
-	FadeUpTime          time.Duration
-	FadeOnTime          time.Duration
-	FadeDownTime        time.Duration
-	FadeOffTime         time.Duration
-	Blackout            bool
-	Flood               bool
-	NoFlood             bool
-	PlayFloodOnce       bool
-	UpdateSequenceColor bool
-	SequenceColor       Color
-	SequenceNumber      int
-	Inverted            bool
-	SelectedGobo        int
-	FixtureDisabled     map[int]bool
-	DisableOnce         map[int]bool
-	ScannerChase        bool
-	ScannerColor        int
-	Static              bool
-	StaticColors        []StaticColorButton
+	Master                 int
+	Hide                   bool
+	Tick                   bool
+	Config                 bool // Configure fixture.
+	Start                  bool
+	Steps                  int
+	Positions              map[int][]Position
+	Type                   string
+	StartPosition          int
+	CurrentPosition        int
+	CurrentSpeed           time.Duration
+	Color                  Color
+	Speed                  int
+	Shift                  int
+	Size                   int
+	FadeSpeed              int
+	FadeTime               time.Duration
+	FadeUpTime             time.Duration
+	FadeOnTime             time.Duration
+	FadeDownTime           time.Duration
+	FadeOffTime            time.Duration
+	Blackout               bool
+	Flood                  bool
+	NoFlood                bool
+	PlayFloodOnce          bool
+	UpdateSequenceColor    bool
+	SequenceColor          Color
+	SequenceNumber         int
+	Inverted               bool
+	SelectedGobo           int
+	FixtureDisabled        map[int]bool
+	DisableOnce            map[int]bool
+	ScannerChase           bool
+	ScannerColor           map[int]int
+	Static                 bool
+	StaticColors           []StaticColorButton
+	AvailableFixtureColors map[int][]StaticColorButton
 }
 
 type Position struct {
@@ -655,7 +657,6 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	if sequence.Functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
 		sequence.EditSeqColors = true
-		//sequence.Run = false
 	}
 
 	// Map static function.

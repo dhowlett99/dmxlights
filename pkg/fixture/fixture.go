@@ -120,7 +120,7 @@ func FixtureReceiver(sequence common.Sequence,
 
 		if cmd.Tick {
 
-			// If we're a RGB fixture implement the flood feature.
+			// If we're a RGB fixture implement the flood and static features.
 			if cmd.Type == "rgb" {
 				if cmd.Flood {
 					time.Sleep(100 * time.Millisecond)
@@ -183,13 +183,31 @@ func FixtureReceiver(sequence common.Sequence,
 						if position.Fixture == myFixtureNumber {
 
 							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt,
-								position.Shutter, cmd.SelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+								position.Shutter, cmd.SelectedGobo, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 
 							if !cmd.Hide {
 								if cmd.ScannerChase {
-									color := common.GetColorButtonsArray(cmd.ScannerColor)
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, color.R, color.G, color.B, position.Shutter, eventsForLauchpad)
+									// We are chase mode, we want the buttons to be the color selected for this scanner.
+
+									// Remember that fixtures in the real world start with 1 not 0.
+									realFixture := position.Fixture + 1
+									// Find the color that has been selected for this fixture.
+									selectedColor := cmd.ScannerColor[position.Fixture]
+
+									// Do we have a set of available colors for this fixture.
+									_, ok := cmd.AvailableFixtureColors[realFixture]
+									if ok {
+										availableColors := cmd.AvailableFixtureColors[realFixture]
+										red := availableColors[selectedColor].Color.R
+										green := availableColors[selectedColor].Color.G
+										blue := availableColors[selectedColor].Color.B
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, red, green, blue, position.Shutter, eventsForLauchpad)
+									} else {
+										// No color selected or available, use white.
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, position.Shutter, eventsForLauchpad)
+									}
 								} else {
+									// We're not in chase mode so use the color generated in the patten generator.
 									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
 								}
 							}
@@ -217,7 +235,7 @@ func FixtureReceiver(sequence common.Sequence,
 									if !cmd.Hide {
 										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 									}
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									time.Sleep(cmd.FadeTime / 4) // Fade down time.
 								}
 								time.Sleep(cmd.FadeTime / 4) // Fade off time.
@@ -230,7 +248,7 @@ func FixtureReceiver(sequence common.Sequence,
 									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 								}
 								// Now ask DMX to actually light the real fixture.
-								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								time.Sleep(cmd.FadeTime / 4) // Fade up Time.
 							}
 							for x := 0; x < cmd.Size; x++ {
@@ -245,7 +263,7 @@ func FixtureReceiver(sequence common.Sequence,
 									if !cmd.Hide {
 										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 									}
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									time.Sleep(cmd.FadeTime / 4) // Fade down time.
 								}
 								time.Sleep(cmd.FadeTime / 4) // Fade off time.

@@ -281,12 +281,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	case common.UpdateScannerColor:
 		const SELECTED_COLOR = 0
+		const FIXTURE_NUMBER = 1
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
+			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.UpdateScannerColor = true
 		sequence.SaveColors = true
-		sequence.ScannerColor = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
 		return sequence
 
 	case common.ClearSequenceColor:

@@ -88,6 +88,18 @@ func CreateSequence(
 	// Every scanner has a number of colors in its wheel.
 	availableFixtureColors := make(map[int][]common.StaticColorButton)
 
+	// You need to select a fixture before you can choose a color or gobo.
+	// availableFixtures holds a set of red buttons, one for every available fixture.
+	availableFixtures := []common.StaticColorButton{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
+			newFixture := common.StaticColorButton{}
+			newFixture.SelectedColor = fixture.Number
+			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			availableFixtures = append(availableFixtures, newFixture)
+		}
+	}
+
 	// Initilaise Scanners's
 	var gobos = []common.Gobo{}
 	if sequenceType == "scanner" {
@@ -106,10 +118,14 @@ func CreateSequence(
 	fixtureDisabled := make(map[int]bool, 8)
 	disabledOnce := make(map[int]bool, 8)
 
+	// A map of the fixture colors.
+	scannerColors := make(map[int]int)
+
 	// The actual sequence definition.
 	sequence := common.Sequence{
 		NumberFixtures:               8,
 		AvailableFixtureColors:       availableFixtureColors,
+		AvailableFixtures:            availableFixtures,
 		NumberScanners:               scanners,
 		Type:                         sequenceType,
 		Hide:                         false,
@@ -156,6 +172,7 @@ func CreateSequence(
 		FixtureDisabled:       fixtureDisabled,
 		DisableOnce:           disabledOnce,
 		NumberCoordinates:     10,
+		ScannerColor:          scannerColors,
 	}
 
 	// Make functions for each of the sequences.
@@ -472,28 +489,29 @@ func PlaySequence(sequence common.Sequence,
 
 					// Prepare a message to be sent to the fixtures in the sequence.
 					command := common.FixtureCommand{
-						SequenceNumber:  sequence.Number,
-						Inverted:        sequence.Inverted,
-						Master:          sequence.Master,
-						Hide:            sequence.Hide,
-						Tick:            true,
-						Positions:       sequence.Positions,
-						Type:            sequence.Type,
-						FadeSpeed:       sequence.FadeSpeed,
-						FadeTime:        sequence.FadeTime,
-						Size:            sequence.Size,
-						Steps:           sequence.NumberSteps,
-						CurrentSpeed:    sequence.CurrentSpeed,
-						Speed:           sequence.Speed,
-						Blackout:        sequence.Blackout,
-						Flood:           sequence.Flood,
-						NoFlood:         sequence.NoFlood,
-						CurrentPosition: step,
-						SelectedGobo:    sequence.SelectedGobo,
-						FixtureDisabled: sequence.FixtureDisabled,
-						DisableOnce:     sequence.DisableOnce,
-						ScannerChase:    sequence.ScannerChase,
-						ScannerColor:    sequence.ScannerColor,
+						SequenceNumber:         sequence.Number,
+						Inverted:               sequence.Inverted,
+						Master:                 sequence.Master,
+						Hide:                   sequence.Hide,
+						Tick:                   true,
+						Positions:              sequence.Positions,
+						Type:                   sequence.Type,
+						FadeSpeed:              sequence.FadeSpeed,
+						FadeTime:               sequence.FadeTime,
+						Size:                   sequence.Size,
+						Steps:                  sequence.NumberSteps,
+						CurrentSpeed:           sequence.CurrentSpeed,
+						Speed:                  sequence.Speed,
+						Blackout:               sequence.Blackout,
+						Flood:                  sequence.Flood,
+						NoFlood:                sequence.NoFlood,
+						CurrentPosition:        step,
+						SelectedGobo:           sequence.SelectedGobo,
+						FixtureDisabled:        sequence.FixtureDisabled,
+						DisableOnce:            sequence.DisableOnce,
+						ScannerChase:           sequence.ScannerChase,
+						ScannerColor:           sequence.ScannerColor,
+						AvailableFixtureColors: sequence.AvailableFixtureColors,
 					}
 
 					// Now tell all the fixtures in this group what they need to do.
@@ -733,6 +751,8 @@ func setPattern(sequence common.Sequence) (steps []common.Step) {
 	return nil
 }
 
+// getAvailableFixtureColors looks through the fixtures list and finds scanners that
+// have colors defined in their config. It then returns an array of these available colors.
 func getAvailableFixtureColors(fixtures *fixture.Fixtures) map[int][]common.StaticColorButton {
 	availableFixtureColors := make(map[int][]common.StaticColorButton)
 	for _, fixture := range fixtures.Fixtures {
