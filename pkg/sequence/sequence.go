@@ -171,8 +171,10 @@ func CreateSequence(
 		SelectedScannerPatten: 0,
 		FixtureDisabled:       fixtureDisabled,
 		DisableOnce:           disabledOnce,
-		NumberCoordinates:     10,
+		NumberCoordinates:     []int{12, 16, 24, 32},
 		ScannerColor:          scannerColors,
+		OffsetPan:             120,
+		OffsetTilt:            120,
 	}
 
 	// Make functions for each of the sequences.
@@ -512,14 +514,13 @@ func PlaySequence(sequence common.Sequence,
 						ScannerChase:           sequence.ScannerChase,
 						ScannerColor:           sequence.ScannerColor,
 						AvailableFixtureColors: sequence.AvailableFixtureColors,
+						OffsetPan:              sequence.OffsetPan,
+						OffsetTilt:             sequence.OffsetTilt,
 					}
 
 					// Now tell all the fixtures in this group what they need to do.
 					sendToAllFixtures(sequence, fixtureChannels, channels, command)
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
-						break
-					}
+
 				}
 			}
 		}
@@ -724,25 +725,25 @@ func setPattern(sequence common.Sequence) (steps []common.Step) {
 		if debug {
 			fmt.Printf("Scanner Size %d\n", sequence.ScannerSize)
 		}
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates, 128, 128)
+		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates[sequence.SelectedCoordinates], float64(sequence.OffsetPan), float64(sequence.OffsetTilt))
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 1 {
-		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
+		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 2 {
-		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
+		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 3 {
-		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
+		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps

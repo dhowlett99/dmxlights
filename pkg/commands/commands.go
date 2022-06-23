@@ -424,8 +424,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
 		}
-		sequence.NumberCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
+		sequence.SelectedCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
+		return sequence
 
+	case common.UpdateOffsetPan:
+		const OFFSET_PAN = 0
+		if debug {
+			fmt.Printf("%d: Command Update Offset Pan to  %d\n", mySequenceNumber, command.Args[OFFSET_PAN].Value)
+		}
+		sequence.OffsetPan = command.Args[OFFSET_PAN].Value.(int)
+		return sequence
+
+	case common.UpdateOffsetTilt:
+		const OFFSET_TILT = 0
+		if debug {
+			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
+		}
+		sequence.OffsetTilt = command.Args[OFFSET_TILT].Value.(int)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.

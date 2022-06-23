@@ -31,33 +31,35 @@ const (
 // main thread is used to get commands from the lauchpad.
 func main() {
 
-	var sequenceSpeed int = 12        // Local copy of sequence speed.
-	var size int                      // current RGB sequence size.
-	var scannerSize int               // Current scanner size.
-	var savePreset bool               // Save a preset flag.
-	var selectedShift = 0             // Current fixture shift.
-	var blackout bool = false         // Blackout all fixtures.
-	var flood bool = false            // Flood all fixtures.
-	var functionButtons [][]bool      // Function buttons.
-	var functionSelectMode []bool     // Which sequence is in function selection mode.
-	var selectButtonPressed []bool    // Which sequence has its Select button pressed.
-	var staticLamps [][]bool          // Static color lamps.
-	var switchPositions [9][9]int     // Sorage for switch positions.
-	var editSequenceColorsMode []bool // This flag is true when the sequence is in sequence colors editing mode.
-	var editScannerColorsMode []bool  // This flag is true when the sequence is in select scanner colors editing mode.
-	var editGoboSelectionMode []bool  // This flag is true when the sequence is in sequence gobo selection mode.
-	var editStaticColorsMode []bool   // This flag is true when the sequence is in static colors editing mode.
-	var editPattenMode []bool         // This flag is true when the sequence is in patten editing mode.
-	var editFixtureSelectionMode bool // This flag is true when the sequence is in select fixture mode.
-	var fadeSpeed = 11                // Default start at 50ms.
-	var masterBrightness = 255        // Affects all DMX fixtures and launchpad lamps.
-	var lastStaticColorButtonX int    // Which Static Color button did we change last.
-	var lastStaticColorButtonY int    // Which Static Color button did we change last.
-	var soundGain float32 = 0         // Fine gain -0.09 -> 0.09
-	var disabledFixture [][]bool      // Which fixture is disabled on which sequence.
-	var selectedFixture int           // Which fixture is selected when changing scanner color or gobo.
-	var followingAction string        // String to find next function, used in selecting a fixture.
-	var selectedCordinates = 10       // Number of coordinates for scanner patterns.
+	var sequenceSpeed int = 12                      // Local copy of sequence speed.
+	var size int                                    // current RGB sequence size.
+	var scannerSize int = common.DefaultScannerSize // Current scanner size.
+	var savePreset bool                             // Save a preset flag.
+	var selectedShift = 0                           // Current fixture shift.
+	var blackout bool = false                       // Blackout all fixtures.
+	var flood bool = false                          // Flood all fixtures.
+	var functionButtons [][]bool                    // Function buttons.
+	var functionSelectMode []bool                   // Which sequence is in function selection mode.
+	var selectButtonPressed []bool                  // Which sequence has its Select button pressed.
+	var staticLamps [][]bool                        // Static color lamps.
+	var switchPositions [9][9]int                   // Sorage for switch positions.
+	var editSequenceColorsMode []bool               // This flag is true when the sequence is in sequence colors editing mode.
+	var editScannerColorsMode []bool                // This flag is true when the sequence is in select scanner colors editing mode.
+	var editGoboSelectionMode []bool                // This flag is true when the sequence is in sequence gobo selection mode.
+	var editStaticColorsMode []bool                 // This flag is true when the sequence is in static colors editing mode.
+	var editPattenMode []bool                       // This flag is true when the sequence is in patten editing mode.
+	var editFixtureSelectionMode bool               // This flag is true when the sequence is in select fixture mode.
+	var fadeSpeed = 11                              // Default start at 50ms.
+	var masterBrightness = 255                      // Affects all DMX fixtures and launchpad lamps.
+	var lastStaticColorButtonX int                  // Which Static Color button did we change last.
+	var lastStaticColorButtonY int                  // Which Static Color button did we change last.
+	var soundGain float32 = 0                       // Fine gain -0.09 -> 0.09
+	var disabledFixture [][]bool                    // Which fixture is disabled on which sequence.
+	var selectedFixture int                         // Which fixture is selected when changing scanner color or gobo.
+	var followingAction string                      // String to find next function, used in selecting a fixture.
+	var selectedCordinates = 0                      // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
+	var offsetPan int = 120                         // Start pan from the center
+	var offsetTilt int = 120                        // Start tilt from the center
 
 	// Make an empty presets store.
 	presetsStore := make(map[string]bool)
@@ -284,7 +286,7 @@ func main() {
 		hit := <-buttonChannel
 
 		// Clear all the lights on the launchpad.
-		if hit.X == 0 && hit.Y == -1 {
+		if hit.X == 0 && hit.Y == -1 && sequences[selectedSequence].Type != "scanner" {
 
 			if debug {
 				fmt.Printf("CLEAR LAUNCHPAD\n")
@@ -937,8 +939,8 @@ func main() {
 
 			// Fade also send more or less coordinates for the scanner patterns.
 			selectedCordinates--
-			if selectedCordinates < 10 {
-				selectedCordinates = 10
+			if selectedCordinates < 0 {
+				selectedCordinates = 0
 			}
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -973,8 +975,8 @@ func main() {
 
 			// Fade also send more or less coordinates for the scanner patterns.
 			selectedCordinates++
-			if selectedCordinates > 40 {
-				selectedCordinates = 40
+			if selectedCordinates > 3 {
+				selectedCordinates = 3
 			}
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -1238,9 +1240,92 @@ func main() {
 			continue
 		}
 
+		// S E L E C T   P O S I T I O N
+		// UP ARROW
+		if hit.X == 0 && hit.Y == -1 && sequences[selectedSequence].Type == "scanner" {
+
+			if debug {
+				fmt.Printf("UP ARROW\n")
+			}
+
+			offsetPan = offsetPan + 5
+
+			if offsetPan > 255 {
+				offsetPan = 255
+			}
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.UpdateOffsetPan,
+				Args: []common.Arg{
+					{Name: "OffsetPan", Value: offsetPan},
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+		}
+
+		// DOWN ARROW
+		if hit.X == 1 && hit.Y == -1 && sequences[selectedSequence].Type == "scanner" {
+			if debug {
+				fmt.Printf("DOWN ARROW\n")
+			}
+			offsetPan = offsetPan - 5
+
+			if offsetPan < 0 {
+				offsetPan = 0
+			}
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.UpdateOffsetPan,
+				Args: []common.Arg{
+					{Name: "OffsetPan", Value: offsetPan},
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+		}
+
+		// LEFT ARROW
+		if hit.X == 2 && hit.Y == -1 && sequences[selectedSequence].Type == "scanner" {
+			if debug {
+				fmt.Printf("LEFT ARROW\n")
+			}
+			offsetTilt = offsetTilt - 5
+
+			if offsetTilt < 0 {
+				offsetTilt = 0
+			}
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.UpdateOffsetTilt,
+				Args: []common.Arg{
+					{Name: "OffsetTilt", Value: offsetTilt},
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+		}
+
+		// RIGHT ARROW
+		if hit.X == 3 && hit.Y == -1 && sequences[selectedSequence].Type == "scanner" {
+			if debug {
+				fmt.Printf("RIGHT ARROW\n")
+			}
+			offsetTilt = offsetTilt + 5
+
+			if offsetTilt > 255 {
+				offsetTilt = 255
+			}
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.UpdateOffsetTilt,
+				Args: []common.Arg{
+					{Name: "OffsetTilt", Value: offsetTilt},
+				},
+			}
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
+		}
+
 		// C H O O S E   S T A T I C    C O L O R
 		// Red
-		if hit.X == 1 && hit.Y == -1 {
+		if hit.X == 1 && hit.Y == -1 && sequences[selectedSequence].Type != "scanner" {
 
 			if sequences[selectedSequence].Functions[common.Function6_Static].State {
 
@@ -1266,7 +1351,7 @@ func main() {
 		}
 
 		// Green
-		if hit.X == 2 && hit.Y == -1 {
+		if hit.X == 2 && hit.Y == -1 && sequences[selectedSequence].Type != "scanner" {
 
 			if sequences[selectedSequence].Functions[common.Function6_Static].State {
 				if debug {
@@ -1290,7 +1375,7 @@ func main() {
 		}
 
 		// Blue
-		if hit.X == 3 && hit.Y == -1 {
+		if hit.X == 3 && hit.Y == -1 && sequences[selectedSequence].Type != "scanner" {
 
 			if sequences[selectedSequence].Functions[common.Function6_Static].State {
 				if debug {

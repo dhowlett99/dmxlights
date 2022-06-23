@@ -121,8 +121,10 @@ const ClearSequenceColor = 45
 const Static = 46
 const MasterBrightness = 47
 const UpdateNumberCoordinates = 48
+const UpdateOffsetPan = 49
+const UpdateOffsetTilt = 50
 
-const DefaultScannerSize = 30
+const DefaultScannerSize = 120
 
 type Gobo struct {
 	Name    string
@@ -196,11 +198,14 @@ type Sequence struct {
 	ScannerChase                 bool
 	UpdateScannerColor           bool
 	ScannerColor                 map[int]int // eight scanners per sequence, each can have their own color.
-	NumberCoordinates            int
+	NumberCoordinates            []int
+	SelectedCoordinates          int
 	Steps                        []Step
 	UpdatePatten                 bool
 	SelectPatten                 bool
 	SelectedPatten               int
+	OffsetPan                    int
+	OffsetTilt                   int
 }
 
 type Function struct {
@@ -267,6 +272,8 @@ type FixtureCommand struct {
 	Static                 bool
 	StaticColors           []StaticColorButton
 	AvailableFixtureColors map[int][]StaticColorButton
+	OffsetPan              int
+	OffsetTilt             int
 }
 
 type Position struct {

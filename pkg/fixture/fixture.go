@@ -178,7 +178,7 @@ func FixtureReceiver(sequence common.Sequence,
 
 				if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
 
-					// Short ciruit the soft fade if we are a scanner.
+					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {
 						if position.Fixture == myFixtureNumber {
 
