@@ -630,11 +630,11 @@ type coordinate struct {
 	Pan  int
 }
 
-func CircleGenerator(radius int, NumberCoordinates int) (out []coordinate) {
+func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []coordinate) {
 	var theta float64
 	for theta = 0; theta < 360; theta += (360 / float64(NumberCoordinates)) {
 		n := coordinate{}
-		n.Tilt, n.Pan = circleXY(float64(radius), theta, 128, 128)
+		n.Tilt, n.Pan = circleXY(float64(radius), theta, posX, posY)
 		out = append(out, n)
 	}
 	if debug {
@@ -649,7 +649,7 @@ func CircleGenerator(radius int, NumberCoordinates int) (out []coordinate) {
 func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []coordinate) {
 	var t float64
 	T := float64(size)
-	for t = 1; t < T-1; t += 10 {
+	for t = 1; t < T-1; t += float64(NumberCoordinates) {
 		n := coordinate{}
 		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
 		n.Tilt = int(x)
@@ -661,7 +661,7 @@ func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out [
 
 func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
 	pan := 128
-	for tilt := 0; tilt < 255; tilt += (NumberCoordinates * 2) {
+	for tilt := 0; tilt < 255; tilt += NumberCoordinates {
 		n := coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
@@ -672,7 +672,7 @@ func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
 
 func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) {
 	tilt := 128
-	for pan := 0; pan < 255; pan += (NumberCoordinates * 2) {
+	for pan := 0; pan < 255; pan += NumberCoordinates {
 		n := coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
@@ -684,7 +684,7 @@ func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) 
 func circleXY(radius float64, theta float64, posX float64, posY float64) (int, int) {
 	// Convert angle to radians
 	theta = (theta - 90) * math.Pi / 180
-
+	// Adding the raduis always positions the circle so no we don't get any negitive numbers.
 	x := int(radius*math.Cos(theta) + posX)
 	y := int(-radius*math.Sin(theta) + posY)
 	return x, y

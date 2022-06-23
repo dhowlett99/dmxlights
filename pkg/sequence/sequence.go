@@ -6,6 +6,7 @@ import (
 	"io/ioutil"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -84,6 +85,21 @@ func CreateSequence(
 		initialPatten = "standard"
 	}
 
+	// Every scanner has a number of colors in its wheel.
+	availableFixtureColors := make(map[int][]common.StaticColorButton)
+
+	// You need to select a fixture before you can choose a color or gobo.
+	// availableFixtures holds a set of red buttons, one for every available fixture.
+	availableFixtures := []common.StaticColorButton{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
+			newFixture := common.StaticColorButton{}
+			newFixture.SelectedColor = fixture.Number
+			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			availableFixtures = append(availableFixtures, newFixture)
+		}
+	}
+
 	// Initilaise Scanners's
 	var gobos = []common.Gobo{}
 	if sequenceType == "scanner" {
@@ -91,15 +107,25 @@ func CreateSequence(
 
 		// Initilaise Gobo's
 		scanners, gobos = fixture.HowManyGobos(mySequenceNumber, fixturesConfig)
+
+		// Get available fixture colors for all fixtures.
+		availableFixtureColors = getAvailableFixtureColors(fixturesConfig)
+
 	}
 
 	// A map of the state of fixtures in the sequence.
 	// We can disable a fixture by setting fixtureDisabled to true.
 	fixtureDisabled := make(map[int]bool, 8)
+	disabledOnce := make(map[int]bool, 8)
+
+	// A map of the fixture colors.
+	scannerColors := make(map[int]int)
 
 	// The actual sequence definition.
 	sequence := common.Sequence{
 		NumberFixtures:               8,
+		AvailableFixtureColors:       availableFixtureColors,
+		AvailableFixtures:            availableFixtures,
 		NumberScanners:               scanners,
 		Type:                         sequenceType,
 		Hide:                         false,
@@ -122,7 +148,7 @@ func CreateSequence(
 			Fixtures: 8,
 			Steps:    pattens[initialPatten].Steps,
 		},
-		ScannerSize:  120,
+		ScannerSize:  common.DefaultScannerSize,
 		Speed:        14,
 		CurrentSpeed: 25 * time.Millisecond,
 		Colors: []common.Color{
@@ -139,11 +165,16 @@ func CreateSequence(
 		SelectedGobo:          1,
 		SelectedFloodSequence: selectedFloodMap,
 		Flood:                 false,
+		SelectedColor:         1,
 		AutoColor:             false,
 		AutoPatten:            false,
 		SelectedScannerPatten: 0,
 		FixtureDisabled:       fixtureDisabled,
-		NumberCoordinates:     10,
+		DisableOnce:           disabledOnce,
+		NumberCoordinates:     []int{12, 16, 24, 32},
+		ScannerColor:          scannerColors,
+		OffsetPan:             120,
+		OffsetTilt:            120,
 	}
 
 	// Make functions for each of the sequences.
@@ -327,7 +358,7 @@ func PlaySequence(sequence common.Sequence,
 			for sequence.Run && !sequence.Static {
 
 				// Map music trigger function.
-				sequence.MusicTrigger = sequence.Functions[common.Function10_Music_Trigger].State
+				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 				// If the music trigger is being used then the timer is disabled.
 				for _, trigger := range soundTriggers {
@@ -350,7 +381,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
-					sequence.ChangePatten = false
+					sequence.UpdatePatten = false
 					if sequence.SelectedPatten == 0 {
 						sequence.Patten.Name = "standard"
 					}
@@ -367,7 +398,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
-					sequence.ChangePatten = false
+					sequence.UpdatePatten = false
 
 					sequence.Steps = setPattern(sequence)
 
@@ -381,7 +412,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
+				if !sequence.Run || sequence.Flood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
 					break
 				}
 
@@ -449,45 +480,47 @@ func PlaySequence(sequence common.Sequence,
 				// with the colors from that patten.
 				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
 
-				// Run the sequence through.
+				// Run through the steps in the sequence.
+				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
+					if !sequence.Run || sequence.Flood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
 						break
 					}
 
 					// Prepare a message to be sent to the fixtures in the sequence.
 					command := common.FixtureCommand{
-						SequenceNumber:  sequence.Number,
-						Inverted:        sequence.Inverted,
-						Master:          sequence.Master,
-						Hide:            sequence.Hide,
-						Tick:            true,
-						Positions:       sequence.Positions,
-						Type:            sequence.Type,
-						FadeSpeed:       sequence.FadeSpeed,
-						FadeTime:        sequence.FadeTime,
-						Size:            sequence.Size,
-						Steps:           sequence.NumberSteps,
-						CurrentSpeed:    sequence.CurrentSpeed,
-						Speed:           sequence.Speed,
-						Blackout:        sequence.Blackout,
-						Flood:           sequence.Flood,
-						NoFlood:         sequence.NoFlood,
-						CurrentPosition: step,
-						SelectedGobo:    sequence.SelectedGobo,
-						FixtureDisabled: sequence.FixtureDisabled,
-						ScannerChase:    sequence.ScannerChase,
-						ScannerColor:    sequence.ScannerColor,
+						SequenceNumber:         sequence.Number,
+						Inverted:               sequence.Inverted,
+						Master:                 sequence.Master,
+						Hide:                   sequence.Hide,
+						Tick:                   true,
+						Positions:              sequence.Positions,
+						Type:                   sequence.Type,
+						FadeSpeed:              sequence.FadeSpeed,
+						FadeTime:               sequence.FadeTime,
+						Size:                   sequence.Size,
+						Steps:                  sequence.NumberSteps,
+						CurrentSpeed:           sequence.CurrentSpeed,
+						Speed:                  sequence.Speed,
+						Blackout:               sequence.Blackout,
+						Flood:                  sequence.Flood,
+						NoFlood:                sequence.NoFlood,
+						CurrentPosition:        step,
+						SelectedGobo:           sequence.SelectedGobo,
+						FixtureDisabled:        sequence.FixtureDisabled,
+						DisableOnce:            sequence.DisableOnce,
+						ScannerChase:           sequence.ScannerChase,
+						ScannerColor:           sequence.ScannerColor,
+						AvailableFixtureColors: sequence.AvailableFixtureColors,
+						OffsetPan:              sequence.OffsetPan,
+						OffsetTilt:             sequence.OffsetTilt,
 					}
 
-					// Now tell all the fixtures what they need to do.
+					// Now tell all the fixtures in this group what they need to do.
 					sendToAllFixtures(sequence, fixtureChannels, channels, command)
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.Static || sequence.ChangePatten || sequence.UpdateShift {
-						break
-					}
+
 				}
 			}
 		}
@@ -540,7 +573,9 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 				// Preserve the scanner commands.
 				position.Gobo = fixture.Gobo
 				position.Pan = fixture.Pan
+				position.PanMaxDegrees = &fixture.PanMaxDegrees
 				position.Tilt = fixture.Tilt
+				position.TiltMaxDegrees = &fixture.TiltMaxDegrees
 				position.Shutter = fixture.Shutter
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					position.StartPosition = counter
@@ -573,7 +608,9 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 					// Preserve the scanner commands.
 					position.Gobo = fixture.Gobo
 					position.Pan = fixture.Pan
+					position.PanMaxDegrees = &fixture.PanMaxDegrees
 					position.Tilt = fixture.Tilt
+					position.TiltMaxDegrees = &fixture.TiltMaxDegrees
 					position.Shutter = fixture.Shutter
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						position.StartPosition = counter
@@ -685,29 +722,51 @@ func reverseDmx(n int) int {
 
 func setPattern(sequence common.Sequence) (steps []common.Step) {
 	if sequence.SelectedScannerPatten == 0 {
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates)
+		if debug {
+			fmt.Printf("Scanner Size %d\n", sequence.ScannerSize)
+		}
+		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates[sequence.SelectedCoordinates], float64(sequence.OffsetPan), float64(sequence.OffsetTilt))
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 1 {
-		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates)
+		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 2 {
-		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates)
+		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 	if sequence.SelectedScannerPatten == 3 {
-		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates)
+		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates[sequence.SelectedCoordinates])
 		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
 		steps = scannerPatten.Steps
 		return steps
 	}
 
 	return nil
+}
+
+// getAvailableFixtureColors looks through the fixtures list and finds scanners that
+// have colors defined in their config. It then returns an array of these available colors.
+func getAvailableFixtureColors(fixtures *fixture.Fixtures) map[int][]common.StaticColorButton {
+	availableFixtureColors := make(map[int][]common.StaticColorButton)
+	for _, fixture := range fixtures.Fixtures {
+		for _, channel := range fixture.Channels {
+			if strings.Contains(channel.Name, "Color") {
+				for _, setting := range channel.Settings {
+					newStaticColorButton := common.StaticColorButton{}
+					newStaticColorButton.SelectedColor = setting.Number
+					newStaticColorButton.Color = common.GetRGBColorByName(setting.Name)
+					availableFixtureColors[fixture.Number] = append(availableFixtureColors[fixture.Number], newStaticColorButton)
+				}
+			}
+		}
+	}
+	return availableFixtureColors
 }

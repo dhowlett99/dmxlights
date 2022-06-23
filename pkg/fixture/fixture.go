@@ -67,11 +67,13 @@ type Setting struct {
 }
 
 type Channel struct {
-	Number   int16     `yaml:"number"`
-	Name     string    `yaml:"name"`
-	Value    int16     `yaml:"value"`
-	Comment  string    `yaml:"comment"`
-	Settings []Setting `yaml:"settings"`
+	Number     int16     `yaml:"number"`
+	Name       string    `yaml:"name"`
+	Value      int16     `yaml:"value"`
+	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
+	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
+	Comment    string    `yaml:"comment"`
+	Settings   []Setting `yaml:"settings"`
 }
 
 // LoadFixtures opens the fixtures config file and returns a pointer to the fixtures.
@@ -118,7 +120,7 @@ func FixtureReceiver(sequence common.Sequence,
 
 		if cmd.Tick {
 
-			// If we're a RGB fixture implement the flood feature.
+			// If we're a RGB fixture implement the flood and static features.
 			if cmd.Type == "rgb" {
 				if cmd.Flood {
 					time.Sleep(100 * time.Millisecond)
@@ -166,23 +168,46 @@ func FixtureReceiver(sequence common.Sequence,
 
 				// If this fixture is disabled then shut the shutter off.
 				if cmd.CurrentPosition == position.StartPosition &&
+					cmd.DisableOnce[myFixtureNumber] &&
 					cmd.Type == "scanner" &&
 					cmd.FixtureDisabled[myFixtureNumber] {
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0)
+					cmd.DisableOnce[myFixtureNumber] = false
 					continue
 				}
 
 				if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
 
-					// Short ciruit the soft fade if we are a scanner.
+					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {
 						if position.Fixture == myFixtureNumber {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt, position.Shutter, cmd.SelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt,
+								position.Shutter, cmd.SelectedGobo, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+
 							if !cmd.Hide {
 								if cmd.ScannerChase {
-									color := common.GetColorButtonsArray(cmd.ScannerColor)
-									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, color.R, color.G, color.B, position.Shutter, eventsForLauchpad)
+									// We are chase mode, we want the buttons to be the color selected for this scanner.
+
+									// Remember that fixtures in the real world start with 1 not 0.
+									realFixture := position.Fixture + 1
+									// Find the color that has been selected for this fixture.
+									selectedColor := cmd.ScannerColor[position.Fixture]
+
+									// Do we have a set of available colors for this fixture.
+									_, ok := cmd.AvailableFixtureColors[realFixture]
+									if ok {
+										availableColors := cmd.AvailableFixtureColors[realFixture]
+										red := availableColors[selectedColor].Color.R
+										green := availableColors[selectedColor].Color.G
+										blue := availableColors[selectedColor].Color.B
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, red, green, blue, position.Shutter, eventsForLauchpad)
+									} else {
+										// No color selected or available, use white.
+										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, position.Shutter, eventsForLauchpad)
+									}
 								} else {
+									// We're not in chase mode so use the color generated in the patten generator.
 									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
 								}
 							}
@@ -210,7 +235,7 @@ func FixtureReceiver(sequence common.Sequence,
 									if !cmd.Hide {
 										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 									}
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									time.Sleep(cmd.FadeTime / 4) // Fade down time.
 								}
 								time.Sleep(cmd.FadeTime / 4) // Fade off time.
@@ -223,7 +248,7 @@ func FixtureReceiver(sequence common.Sequence,
 									launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 								}
 								// Now ask DMX to actually light the real fixture.
-								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								time.Sleep(cmd.FadeTime / 4) // Fade up Time.
 							}
 							for x := 0; x < cmd.Size; x++ {
@@ -238,12 +263,47 @@ func FixtureReceiver(sequence common.Sequence,
 									if !cmd.Hide {
 										launchpad.LightLamp(mySequenceNumber, myFixtureNumber, R, G, B, cmd.Master, eventsForLauchpad)
 									}
-									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
+									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor[position.Fixture], fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									time.Sleep(cmd.FadeTime / 4) // Fade down time.
 								}
 								time.Sleep(cmd.FadeTime / 4) // Fade off time.
 							}
 						}()
+					}
+				}
+			}
+		}
+	}
+}
+
+func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, scannerColor int) {
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == sequence.Number {
+			for channelNumber, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Color") {
+					for _, setting := range channel.Settings {
+						//fmt.Printf("Scanner Color  %d\n", scannerColor)
+						//fmt.Printf("Setting  %+v\n", setting)
+						if setting.Number-1 == scannerColor {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, selectedGobo int) {
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == sequence.Number {
+			for channelNumber, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Gobo") {
+					for _, setting := range channel.Settings {
+						if setting.Number == selectedGobo {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+						}
 					}
 				}
 			}
@@ -272,10 +332,17 @@ func MapFixtures(mySequenceNumber int,
 				if fixture.Number-1 == displayFixture {
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Pan))
+						if channel.Offset != nil {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan+*channel.Offset)))
+						} else {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)))
+						}
 					}
 					if strings.Contains(channel.Name, "Tilt") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Tilt))
+						if channel.Offset != nil {
+							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt+*channel.Offset)))
+						}
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)))
 					}
 					if strings.Contains(channel.Name, "Shutter") {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
@@ -289,7 +356,9 @@ func MapFixtures(mySequenceNumber int,
 					}
 					if strings.Contains(channel.Name, "Color") {
 						for _, setting := range channel.Settings {
-							if setting.Number == scannerColor {
+							//fmt.Printf("Scanner Color  %d\n", scannerColor)
+							//fmt.Printf("Setting  %+v\n", setting)
+							if setting.Number-1 == scannerColor {
 								dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
 							}
 						}
@@ -437,9 +506,9 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	if sequence.Hide {
 		if lamp.Flash {
 			onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-			launchpad.FlashLight(sequence.Number, myFixtureNumber, onColor, 0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(sequence.Number, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(myFixtureNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
@@ -447,4 +516,34 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
 	sequence.PlayStaticOnce = false
+}
+
+// limitDmxValue - calculates the maximum DMX value based on the number of degrees the fixtire can achieve.
+func limitDmxValue(MaxDegrees *int, Value int) int {
+
+	in := float64(Value)
+
+	// Limit the DMX value for Pan so the max degree we send is always less than or equal to 360 degrees.
+	OriginalDMXValueRatio := float64(360) / float64(255)
+
+	// If maxiumum number of degrees have been specified
+	// then do the math so that 360 degrees are never exceeded.
+	if MaxDegrees == nil {
+		return int(in)
+	}
+
+	if *MaxDegrees < 360 { // If its less then 360 we can't limit.
+		return int(in / OriginalDMXValueRatio)
+	}
+
+	DegreesRequired := math.Round(OriginalDMXValueRatio * float64(Value))
+
+	var MaxDMX float64 = 255
+
+	DegreesPerDMXClick := float64(*MaxDegrees) / MaxDMX
+
+	NewDMXValue := int(math.Round(DegreesRequired / DegreesPerDMXClick))
+
+	return NewDMXValue
+
 }

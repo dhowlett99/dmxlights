@@ -121,6 +121,10 @@ const ClearSequenceColor = 45
 const Static = 46
 const MasterBrightness = 47
 const UpdateNumberCoordinates = 48
+const UpdateOffsetPan = 49
+const UpdateOffsetTilt = 50
+
+const DefaultScannerSize = 120
 
 type Gobo struct {
 	Name    string
@@ -142,7 +146,9 @@ type Sequence struct {
 	PlayFloodOnce                bool
 	StaticColors                 []StaticColorButton
 	AvailableSequenceColors      []StaticColorButton
+	AvailableFixtureColors       map[int][]StaticColorButton
 	AvailableGoboSelectionColors []StaticColorButton
+	AvailableFixtures            []StaticColorButton
 	EditColors                   bool
 	Hide                         bool
 	Type                         string
@@ -184,19 +190,22 @@ type Sequence struct {
 	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
 	AutoColor                    bool
 	AutoPatten                   bool
-	ChangePatten                 bool
 	RecoverSequenceColors        bool
 	SaveColors                   bool
 	SelectedScannerPatten        int
 	FixtureDisabled              map[int]bool
+	DisableOnce                  map[int]bool
 	ScannerChase                 bool
 	UpdateScannerColor           bool
-	ScannerColor                 int
-	NumberCoordinates            int
+	ScannerColor                 map[int]int // eight scanners per sequence, each can have their own color.
+	NumberCoordinates            []int
+	SelectedCoordinates          int
 	Steps                        []Step
 	UpdatePatten                 bool
 	SelectPatten                 bool
 	SelectedPatten               int
+	OffsetPan                    int
+	OffsetTilt                   int
 }
 
 type Function struct {
@@ -226,64 +235,72 @@ type Step struct {
 
 // Fixture Command.
 type FixtureCommand struct {
-	Master              int
-	Hide                bool
-	Tick                bool
-	Config              bool // Configure fixture.
-	Start               bool
-	Steps               int
-	Positions           map[int][]Position
-	Type                string
-	StartPosition       int
-	CurrentPosition     int
-	CurrentSpeed        time.Duration
-	Color               Color
-	Speed               int
-	Shift               int
-	Size                int
-	FadeSpeed           int
-	FadeTime            time.Duration
-	FadeUpTime          time.Duration
-	FadeOnTime          time.Duration
-	FadeDownTime        time.Duration
-	FadeOffTime         time.Duration
-	Blackout            bool
-	Flood               bool
-	NoFlood             bool
-	PlayFloodOnce       bool
-	UpdateSequenceColor bool
-	SequenceColor       Color
-	SequenceNumber      int
-	Inverted            bool
-	SelectedGobo        int
-	FixtureDisabled     map[int]bool
-	ScannerChase        bool
-	ScannerColor        int
-	Static              bool
-	StaticColors        []StaticColorButton
+	Master                 int
+	Hide                   bool
+	Tick                   bool
+	Config                 bool // Configure fixture.
+	Start                  bool
+	Steps                  int
+	Positions              map[int][]Position
+	Type                   string
+	StartPosition          int
+	CurrentPosition        int
+	CurrentSpeed           time.Duration
+	Color                  Color
+	Speed                  int
+	Shift                  int
+	Size                   int
+	FadeSpeed              int
+	FadeTime               time.Duration
+	FadeUpTime             time.Duration
+	FadeOnTime             time.Duration
+	FadeDownTime           time.Duration
+	FadeOffTime            time.Duration
+	Blackout               bool
+	Flood                  bool
+	NoFlood                bool
+	PlayFloodOnce          bool
+	UpdateSequenceColor    bool
+	SequenceColor          Color
+	SequenceNumber         int
+	Inverted               bool
+	SelectedGobo           int
+	FixtureDisabled        map[int]bool
+	DisableOnce            map[int]bool
+	ScannerChase           bool
+	ScannerColor           map[int]int
+	Static                 bool
+	StaticColors           []StaticColorButton
+	AvailableFixtureColors map[int][]StaticColorButton
+	OffsetPan              int
+	OffsetTilt             int
 }
 
 type Position struct {
-	Fixture       int
-	StartPosition int
-	Color         Color
-	Pan           int
-	Tilt          int
-	Shutter       int
-	Gobo          int
+	Fixture        int
+	StartPosition  int
+	Color          Color
+	Pan            int
+	PanMaxDegrees  *int
+	Tilt           int
+	TiltMaxDegrees *int
+	Shutter        int
+	Gobo           int
 }
 
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	Type         string
-	MasterDimmer int
-	Colors       []Color
-	Pan          int
-	Tilt         int
-	Shutter      int
-	Gobo         int
+	Type           string
+	MasterDimmer   int
+	Colors         []Color
+	Pan            int
+	PanMaxDegrees  int
+	Tilt           int
+	TiltMaxDegrees int
+	Shutter        int
+	Gobo           int
 }
 
 type ButtonPresets struct {
@@ -312,16 +329,16 @@ type Trigger struct {
 
 // Define the function keys.
 const (
-	Function1_Patten         = 0 // Set patten mode.
-	Function2_Auto_Color     = 1 // Auto Color change.
-	Function3_Auto_Patten    = 2 // Auto Patten change
-	Function4_Bounce         = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
-	Function5_Color          = 4 // Set RGB chase color. or select the scanner color.
-	Function6_Static         = 5 // Set static color.
-	Function7_Gobo           = 5 // Set scanner Gobo.
-	Function8_RGB_Invert     = 6 // Invert the RGB colors.
-	Function9_Scanner_Chase  = 6 // Set scanner chase mode.
-	Function10_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
+	Function1_Patten        = 0 // Set patten mode.
+	Function2_Auto_Color    = 1 // Auto Color change.
+	Function3_Auto_Patten   = 2 // Auto Patten change
+	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
+	Function5_Color         = 4 // Set RGB chase color. or select the scanner color.
+	Function6_Static        = 5 // Set static color.
+	Function6_Gobo          = 5 // Set scanner Gobo.
+	Function7_RGB_Invert    = 6 // Invert the RGB colors.
+	Function7_Scanner_Chase = 6 // Set scanner chase mode.
+	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
 // LightOn Turn on a common.Light.
@@ -533,8 +550,9 @@ func GetColorButtonsArray(color int) Color {
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-
 	switch color {
+	case Color{R: 0, G: 196, B: 255}:
+		return 0x4e // Light Blue
 	case Color{R: 255, G: 0, B: 0}:
 		return 0x48 // Red
 	case Color{R: 255, G: 111, B: 0}:
@@ -557,6 +575,45 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 		return 0x00 // Black
 	}
 	return code
+}
+
+func GetRGBColorByName(color string) Color {
+	switch color {
+	case "Red":
+		return Color{R: 255, G: 0, B: 0}
+
+	case "Orange":
+		return Color{R: 255, G: 111, B: 0}
+
+	case "Yellow":
+		return Color{R: 255, G: 255, B: 0}
+
+	case "Green":
+		return Color{R: 0, G: 255, B: 0}
+
+	case "Cyan":
+		return Color{R: 0, G: 255, B: 255}
+
+	case "Blue":
+		return Color{R: 0, G: 0, B: 255}
+
+	case "Purple":
+		return Color{R: 100, G: 0, B: 255}
+
+	case "Pink":
+		return Color{R: 255, G: 0, B: 255}
+
+	case "White":
+		return Color{R: 255, G: 255, B: 255}
+
+	case "Light Blue":
+		return Color{R: 0, G: 196, B: 255}
+
+	case "Black":
+		return Color{R: 0, G: 0, B: 0}
+
+	}
+	return Color{R: 0, G: 0, B: 0}
 }
 
 func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
@@ -607,7 +664,6 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	if sequence.Functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
 		sequence.EditSeqColors = true
-		sequence.Run = false
 	}
 
 	// Map static function.
@@ -620,13 +676,13 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map invert function.
-	sequence.Inverted = sequence.Functions[Function8_RGB_Invert].State
+	sequence.Inverted = sequence.Functions[Function7_RGB_Invert].State
 	// Map scanner chase mode. Uses same function key as above.
-	sequence.ScannerChase = sequence.Functions[Function9_Scanner_Chase].State
+	sequence.ScannerChase = sequence.Functions[Function7_Scanner_Chase].State
 
 	// Map music trigger function.
-	sequence.MusicTrigger = sequence.Functions[Function10_Music_Trigger].State
-	if sequence.Functions[Function10_Music_Trigger].State {
+	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
+	if sequence.Functions[Function8_Music_Trigger].State {
 		sequence.Run = true
 	}
 

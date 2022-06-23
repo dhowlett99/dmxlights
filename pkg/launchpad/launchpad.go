@@ -46,7 +46,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Lau
 	}
 }
 
-func FlashLight(Y int, X int, onColor int, offColor int, eventsForLauchpad chan common.ALight) {
+func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan common.ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := common.ALight{

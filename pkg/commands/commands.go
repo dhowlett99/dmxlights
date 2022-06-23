@@ -79,7 +79,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
-		sequence.ChangePatten = true
+		sequence.UpdatePatten = true
 		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		return sequence
@@ -148,7 +148,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		sequence.Functions[common.Function10_Music_Trigger].State = false
+		sequence.Functions[common.Function8_Music_Trigger].State = false
 		sequence.Functions[common.Function6_Static].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
@@ -281,12 +281,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 
 	case common.UpdateScannerColor:
 		const SELECTED_COLOR = 0
+		const FIXTURE_NUMBER = 1
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
+			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.UpdateScannerColor = true
 		sequence.SaveColors = true
-		sequence.ScannerColor = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
 		return sequence
 
 	case common.ClearSequenceColor:
@@ -371,6 +372,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			}
 		}
 
+		// When we disable a fixture we send a off command to the shutter to make it go off.
+		// We only want to do this once to avoid flooding the universe with DMX commands.
+		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
+		// it will be the fixtures resposiblity to unset this when it's played the stop command.
+
 		return sequence
 
 	case common.UpdateGobo:
@@ -418,8 +424,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
 		}
-		sequence.NumberCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
+		sequence.SelectedCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
+		return sequence
 
+	case common.UpdateOffsetPan:
+		const OFFSET_PAN = 0
+		if debug {
+			fmt.Printf("%d: Command Update Offset Pan to  %d\n", mySequenceNumber, command.Args[OFFSET_PAN].Value)
+		}
+		sequence.OffsetPan = command.Args[OFFSET_PAN].Value.(int)
+		return sequence
+
+	case common.UpdateOffsetTilt:
+		const OFFSET_TILT = 0
+		if debug {
+			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
+		}
+		sequence.OffsetTilt = command.Args[OFFSET_TILT].Value.(int)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.

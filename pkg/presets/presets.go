@@ -52,7 +52,7 @@ func LoadPresets() map[string]bool {
 	// Read the file.
 	data, err := ioutil.ReadFile("presets.json")
 	if err != nil {
-		fmt.Printf("error reading prests: %v from file:%s", err, "presets.json")
+		fmt.Printf("error reading presets: %v from file:%s\n", err, "presets.json")
 		return presets
 	}
 
