@@ -294,7 +294,7 @@ func main() {
 
 			// Turn off the flashing save button.
 			savePreset = false
-			launchpad.FlashLight(4, 8, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+			launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
 
 			// Turn off the flood
 			if flood {
@@ -418,6 +418,9 @@ func main() {
 
 			if !flood { // We're not already in flood so lets ask the sequence to flood.
 
+				// Flash the flood button to indicate we're not in flood.
+				launchpad.FlashLight(8, 3, 0x03, 0x5f, eventsForLauchpad)
+
 				// First save our config
 				config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
 
@@ -441,6 +444,10 @@ func main() {
 				continue
 			}
 			if flood { // If we are flood already then tell the sequence to stop flood.
+
+				// Turn the flood button back to white.
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 255, Blue: 255})
+
 				cmd := common.Command{
 					Action: common.NoFlood,
 					Args: []common.Arg{
@@ -448,7 +455,7 @@ func main() {
 					},
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 255, Blue: 0})
+
 				flood = false
 
 				// Recall our previous config
@@ -560,7 +567,7 @@ func main() {
 				continue
 			}
 			presets.InitPresets(eventsForLauchpad, presetsStore)
-			launchpad.FlashLight(4, 8, 0x03, 0x5f, eventsForLauchpad)
+			launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
 			savePreset = true
 			continue
 		}
@@ -577,11 +584,11 @@ func main() {
 				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 255, Green: 0, Blue: 0})
 				config.AskToSaveConfig(commandChannels, replyChannels, hit.X, hit.Y)
 				savePreset = false
-				launchpad.FlashLight(4, 8, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+				launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
 				presets.SavePresets(presetsStore)
 				presets.ClearPresets(eventsForLauchpad, presetsStore)
 				presets.InitPresets(eventsForLauchpad, presetsStore)
-				launchpad.FlashLight(hit.Y, hit.X, 0x0d, 0x78, eventsForLauchpad)
+				launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 			} else {
 				// L O A D - Load config, but only if it exists in the presets map.
 				if presetsStore[fmt.Sprint(hit.X)+","+fmt.Sprint(hit.Y)] {
@@ -601,7 +608,7 @@ func main() {
 					// Turn the selected preset light red.
 					common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 3, Green: 0, Blue: 0})
 					presets.InitPresets(eventsForLauchpad, presetsStore)
-					launchpad.FlashLight(hit.Y, hit.X, 0x0d, 0x78, eventsForLauchpad)
+					launchpad.FlashLight(hit.X, hit.Y, 0x0d, 0x78, eventsForLauchpad)
 
 					// Preserve blackout.
 					if !blackout {
@@ -1337,7 +1344,7 @@ func main() {
 				staticButtons[selectedSequence].Y = lastStaticColorButtonY
 
 				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
-				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
+				launchpad.FlashLight(lastStaticColorButtonX, lastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
 
 				if staticButtons[selectedSequence].Color.R > 254 {
 					staticButtons[selectedSequence].Color.R = 0
@@ -1361,7 +1368,7 @@ func main() {
 				staticButtons[selectedSequence].X = lastStaticColorButtonX
 				staticButtons[selectedSequence].Y = lastStaticColorButtonY
 				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
-				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
+				launchpad.FlashLight(lastStaticColorButtonX, lastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
 
 				if staticButtons[selectedSequence].Color.G > 254 {
 					staticButtons[selectedSequence].Color.G = 0
@@ -1385,7 +1392,7 @@ func main() {
 				staticButtons[selectedSequence].X = lastStaticColorButtonX
 				staticButtons[selectedSequence].Y = lastStaticColorButtonY
 				code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
-				launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
+				launchpad.FlashLight(lastStaticColorButtonX, lastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
 
 				if staticButtons[selectedSequence].Color.B > 254 {
 					staticButtons[selectedSequence].Color.B = 0
@@ -1593,7 +1600,7 @@ func main() {
 			lastStaticColorButtonX = hit.X
 			lastStaticColorButtonY = hit.Y
 			code := common.GetLaunchPadColorCodeByRGB(staticButtons[selectedSequence].Color)
-			launchpad.FlashLight(lastStaticColorButtonY, lastStaticColorButtonX, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(lastStaticColorButtonX, lastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
 
 			continue
 		}
@@ -1641,7 +1648,8 @@ func main() {
 					Action: common.Blackout,
 				}
 				common.SendCommandToAllSequence(selectedSequence, cmd, commandChannels)
-				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 255})
+				common.LightOn(eventsForLauchpad, common.ALight{X: hit.X, Y: hit.Y, Brightness: full, Red: 0, Green: 0, Blue: 0})
+				launchpad.FlashLight(8, 7, 0x03, 0x5f, eventsForLauchpad)
 			} else {
 				blackout = false
 				cmd := common.Command{
@@ -1914,9 +1922,9 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(mySequenceNumber, myFixtureNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(myFixtureNumber, mySequenceNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 }
@@ -1939,10 +1947,10 @@ func ShowSelectFixtureButtons(mySequenceNumber int, selectedFixture int, sequenc
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(mySequenceNumber, fixtureNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(fixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
 
 		} else {
-			launchpad.LightLamp(mySequenceNumber, fixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(fixtureNumber, mySequenceNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 	if debug {
@@ -1967,9 +1975,9 @@ func ShowGoboSelectionButtons(mySequenceNumber int, sequence common.Sequence, ev
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(mySequenceNumber, myFixtureNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(myFixtureNumber, mySequenceNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 }
@@ -2002,9 +2010,9 @@ func ShowScannerColorSelectionButtons(mySequenceNumber int, selectedFixture int,
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(mySequenceNumber, fixtureNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(fixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(mySequenceNumber, fixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(fixtureNumber, mySequenceNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 	return nil
@@ -2024,9 +2032,9 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
 		if myFixtureNumber == sequence.SelectedPatten {
 			code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 255, G: 255, B: 255})
-			launchpad.FlashLight(mySequenceNumber, myFixtureNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(myFixtureNumber, mySequenceNumber, 255, 255, 255, sequence.Master, eventsForLauchpad)
 		}
 	}
 }

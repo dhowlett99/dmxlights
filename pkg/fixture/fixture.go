@@ -506,9 +506,9 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	if sequence.Hide {
 		if lamp.Flash {
 			onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-			launchpad.FlashLight(sequence.Number, myFixtureNumber, onColor, 0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
 		} else {
-			launchpad.LightLamp(sequence.Number, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			launchpad.LightLamp(myFixtureNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
 		}
 	}
 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
