@@ -45,6 +45,7 @@ type Switch struct {
 }
 
 type StaticColorButton struct {
+	Number        int
 	X             int
 	Y             int
 	Color         Color
@@ -146,9 +147,9 @@ type Sequence struct {
 	PlayFloodOnce                bool
 	StaticColors                 []StaticColorButton
 	AvailableSequenceColors      []StaticColorButton
-	AvailableFixtureColors       map[int][]StaticColorButton
+	AvailableScannerColors       map[int][]StaticColorButton
 	AvailableGoboSelectionColors []StaticColorButton
-	AvailableFixtures            []StaticColorButton
+	AvailableFixtures            []StaticColorButton // Holds a set of red buttons, one for every available fixture.
 	EditColors                   bool
 	Hide                         bool
 	Type                         string
@@ -271,7 +272,7 @@ type FixtureCommand struct {
 	ScannerColor           map[int]int
 	Static                 bool
 	StaticColors           []StaticColorButton
-	AvailableFixtureColors map[int][]StaticColorButton
+	AvailableScannerColors map[int][]StaticColorButton
 	OffsetPan              int
 	OffsetTilt             int
 }

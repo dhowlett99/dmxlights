@@ -1240,10 +1240,10 @@ func main() {
 				Green:      green,
 				Blue:       blue,
 			})
-			fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, 0, fixturesConfig, blackout, masterBrightness, masterBrightness)
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, blackout, masterBrightness, masterBrightness)
 			time.Sleep(200 * time.Millisecond)
 			common.LightOff(eventsForLauchpad, hit.X, hit.Y)
-			fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, 0, fixturesConfig, blackout, masterBrightness, masterBrightness)
+			fixture.MapFixtures(hit.Y, dmxController, hit.X, 0, 0, 0, pan, tilt, shutter, gobo, nil, fixturesConfig, blackout, masterBrightness, masterBrightness)
 			continue
 		}
 
@@ -1330,7 +1330,7 @@ func main() {
 			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 		}
 
-		// C H O O S E   S T A T I C    C O L O R
+		// S E L E C T   S T A T I C   C O L O R
 		// Red
 		if hit.X == 1 && hit.Y == -1 && sequences[selectedSequence].Type != "scanner" {
 
@@ -1405,7 +1405,7 @@ func main() {
 			}
 		}
 
-		// S E T  R G B  S E Q U E N C E   C O L O R
+		// S E L E C T   R G B   S E Q U E N C E   C O L O R
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
 			selectedSequence == hit.Y && // Make sure the buttons pressed are for this sequence.
 			sequences[selectedSequence].Type != "scanner" &&
@@ -1448,7 +1448,7 @@ func main() {
 			continue
 		}
 
-		// S E T  S C A N N E R   C O L O R
+		// S E L E C T    S C A N N E R   C O L O R
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
 			selectedSequence == hit.Y && // Make sure the buttons pressed are for this sequence.
 			!editFixtureSelectionMode &&
@@ -1493,42 +1493,39 @@ func main() {
 			editFixtureSelectionMode &&
 			sequences[selectedSequence].Functions[common.Function6_Gobo].State || sequences[selectedSequence].Functions[common.Function5_Color].State &&
 			sequences[selectedSequence].Type == "scanner" {
-			if debug {
-				fmt.Printf("Setect Fixture X:%d Y:%d\n", hit.X, hit.Y)
-			}
 
 			selectedFixture = hit.X
 
-			editFixtureSelectionMode = false
+			if debug {
+				fmt.Printf("Selected Fixture is %d \n", selectedFixture)
+			}
 
 			// Update the buttons.
-			selectedFixture = ShowSelectFixtureButtons(selectedSequence, selectedFixture, *sequences[selectedSequence], eventsForLauchpad, fixturesConfig, followingAction)
-
 			if followingAction == "ShowGoboSelectionButtons" {
-				editFixtureSelectionMode = false
 				ShowGoboSelectionButtons(selectedSequence, *sequences[selectedSequence], eventsForLauchpad)
 			}
 			if followingAction == "ShowScannerColorSelectionButtons" {
-				editFixtureSelectionMode = false
 				err := ShowScannerColorSelectionButtons(selectedSequence, selectedFixture, *sequences[selectedSequence], eventsForLauchpad, fixturesConfig)
 				if err != nil {
 					fmt.Printf("error: %v\n", err)
 					common.RevealSequence(selectedSequence, commandChannels)
 				}
 			}
+			editFixtureSelectionMode = false
+			continue
 		}
 
-		// S E T   S C A N N E R   G O B O
+		// S E L E C T   S C A N N E R   G O B O
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
 			!editFixtureSelectionMode &&
 			sequences[selectedSequence].Functions[common.Function6_Gobo].State &&
 			sequences[selectedSequence].Type == "scanner" {
 
-			if debug {
-				fmt.Printf("Set Gobo X:%d Y:%d\n", hit.X, hit.Y)
-			}
-
 			selectedGobo := hit.X + 1
+
+			if debug {
+				fmt.Printf("Set Gobo %d\n", selectedGobo)
+			}
 
 			// Add the selected gobo to the sequence.
 			cmd := common.Command{
@@ -1556,7 +1553,7 @@ func main() {
 			continue
 		}
 
-		// S E T  S T A T I C   C O L O R
+		// S E L E C T   S T A T I C   C O L O R
 		if hit.X >= 0 && hit.X < 8 &&
 			hit.Y != -1 &&
 			!editFixtureSelectionMode &&
@@ -1605,7 +1602,7 @@ func main() {
 			continue
 		}
 
-		// S E T   P A T T E N
+		// S E L E C T   P A T T E N
 		if hit.X >= 0 && hit.X < 8 && hit.Y != -1 &&
 			!editFixtureSelectionMode &&
 			editPattenMode[selectedSequence] {
@@ -1894,7 +1891,7 @@ func allFixturesOff(eventsForLauchpad chan common.ALight, dmxController *ft232.D
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 4; y++ {
 			common.LightOff(eventsForLauchpad, x, y)
-			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0)
+			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
 		}
 	}
 }
@@ -1990,17 +1987,17 @@ func ShowScannerColorSelectionButtons(mySequenceNumber int, selectedFixture int,
 	}
 
 	// if there are no colors available for this fixture turn everything off and print an error.
-	if sequence.AvailableFixtureColors[selectedFixture+1] == nil {
+	if sequence.AvailableScannerColors[selectedFixture+1] == nil {
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == mySequenceNumber+1 {
-				launchpad.LightLamp(mySequenceNumber, fixture.Number-1, 0, 0, 0, sequence.Master, eventsForLauchpad)
+				launchpad.LightLamp(fixture.Number-1, mySequenceNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 			}
 		}
 		return fmt.Errorf("error: no colors available for fixture number %d", selectedFixture+1)
 	}
 
 	// selected fixture is +1 here because the fixtures in the yaml config file start with 1 not 0.
-	for fixtureNumber, lamp := range sequence.AvailableFixtureColors[selectedFixture+1] {
+	for fixtureNumber, lamp := range sequence.AvailableScannerColors[selectedFixture+1] {
 
 		if debug {
 			fmt.Printf("Lamp %+v\n", lamp)
@@ -2022,7 +2019,7 @@ func ShowScannerColorSelectionButtons(mySequenceNumber int, selectedFixture int,
 func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight) {
 	// Check if we need to flash this button.
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
-		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
+		launchpad.LightLamp(myFixtureNumber, mySequenceNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 	}
 }
 
@@ -2042,6 +2039,6 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 // For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight) {
 	for myFixtureNumber := range sequence.AvailableSequenceColors {
-		launchpad.LightLamp(mySequenceNumber, myFixtureNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
+		launchpad.LightLamp(myFixtureNumber, mySequenceNumber, 0, 0, 0, sequence.Master, eventsForLauchpad)
 	}
 }
