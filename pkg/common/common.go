@@ -343,7 +343,9 @@ const (
 )
 
 // LightOn Turn on a common.Light.
-func LightOn(eventsForLauchpad chan ALight, Light ALight) {
+func LightOn(eventsForLauchpad chan ALight, guiButtons chan ALight, Light ALight) {
+
+	// Send message to Novation Launchpad.
 	event := ALight{
 		X:          Light.X,
 		Y:          Light.Y,
@@ -356,6 +358,21 @@ func LightOn(eventsForLauchpad chan ALight, Light ALight) {
 		OffColor:   18,
 	}
 	eventsForLauchpad <- event
+
+	// Send message to GUI buttons.
+	event = ALight{
+		X:          Light.X,
+		Y:          Light.Y,
+		Brightness: Light.Brightness,
+		Red:        Light.Red,
+		Green:      Light.Green,
+		Blue:       Light.Blue,
+		Flash:      Light.Flash,
+		OnColor:    22,
+		OffColor:   18,
+	}
+	guiButtons <- event
+
 }
 
 // LightOff Turn on a common.Light.
@@ -364,14 +381,14 @@ func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
 	eventsForLauchpad <- event
 }
 
-func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
+func SequenceSelect(eventsForLauchpad chan ALight, guiButtons chan ALight, selectedSequence int) {
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
 		//LightOff(eventsForLauchpad, 8, seq)
-		LightOn(eventsForLauchpad, ALight{X: 8, Y: seq, Brightness: 255, Red: 255, Green: 255, Blue: 255})
+		LightOn(eventsForLauchpad, guiButtons, ALight{X: 8, Y: seq, Brightness: 255, Red: 255, Green: 255, Blue: 255})
 	}
 	// Now turn blue the selected sequence select light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255})
+	LightOn(eventsForLauchpad, guiButtons, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255})
 }
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
@@ -402,8 +419,8 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, channels Channels) {
-	HideFunctionButtons(selectedSequence, eventsForLauchpad)
+func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, functionButtons [][]bool, channels Channels) {
+	HideFunctionButtons(selectedSequence, eventsForLauchpad, guiButtons)
 	// Get an upto date copy of the sequence.
 	cmd := Command{
 		Action: ReadConfig,
@@ -413,15 +430,15 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	replyChannel := channels.ReplyChannels[selectedSequence]
 	sequence = <-replyChannel
 
-	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad)
+	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
-func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight) {
+func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
-		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+		LightOn(eventsForLauchpad, guiButtons, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
 	}
 }
 
-func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight) {
+func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Loop through the available functions for this sequence
 	for index, function := range sequence.Functions {
@@ -429,9 +446,9 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 			fmt.Printf("function %+v\n", function)
 		}
 		if function.State {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
+			LightOn(eventsForLauchpad, guiButtons, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
 		} else {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+			LightOn(eventsForLauchpad, guiButtons, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255})
 		}
 	}
 }

@@ -9,23 +9,23 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func InitPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) {
+func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]bool) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+			common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
 			}
 		}
 	}
 }
 
-func ClearPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) {
+func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]bool) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+			common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
 			}
 		}
 	}

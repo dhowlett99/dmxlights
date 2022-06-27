@@ -7,7 +7,7 @@ import (
 	"github.com/rakyll/launchpad/mk3"
 )
 
-func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, sequences []chan common.Command) {
+func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, sequences []chan common.Command) {
 	pad.Reset()
 	command := common.Command{
 		Action: common.Stop,
@@ -20,7 +20,7 @@ func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
 			}
 		}
 	}

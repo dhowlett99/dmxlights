@@ -12,6 +12,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/gui"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
@@ -242,6 +243,7 @@ func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
 	pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
+	guiButtons chan common.ALight,
 	pattens map[string]common.Patten,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
@@ -270,14 +272,14 @@ func PlaySequence(sequence common.Sequence,
 	fixtureChannels = append(fixtureChannels, fixtureChannel8)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -291,7 +293,7 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			showSwitches(mySequenceNumber, &sequence, eventsForLauchpad, dmxController, fixturesConfig)
+			showSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
@@ -557,7 +559,7 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 // showSwitches - This is for switch sequences, a type of sequence which is just a set of eight switches.
 // Each switch can have a number of states as defined in the fixtures.yaml file.
 // The color of the lamp indicates which state you are in.
-func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
+func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
 
 	for switchNumber, switchData := range sequence.Switches {
 		for stateNumber, state := range switchData.States {
@@ -566,6 +568,7 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			if stateNumber == switchData.CurrentState {
 				// Use the button color for this state to light the correct color on the launchpad.
 				launchpad.LightLamp(switchNumber, mySequenceNumber, state.ButtonColor.R, state.ButtonColor.G, state.ButtonColor.B, 255, eventsForLauchpad)
+				gui.LightLamp(switchNumber, mySequenceNumber, state.ButtonColor.R, state.ButtonColor.G, state.ButtonColor.B, sequence.Master, guiButtons)
 
 				// Now play all the values for this state.
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
