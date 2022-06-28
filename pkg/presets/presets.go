@@ -12,9 +12,9 @@ import (
 func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]bool) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+			common.LightLamp(common.ALight{X: x, Y: y, Red: 100, Green: 100, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}
 	}
@@ -23,9 +23,9 @@ func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.AL
 func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]bool) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+			common.LightLamp(common.ALight{X: x, Y: y, Red: 100, Green: 100, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
+				common.LightLamp(common.ALight{X: x, Y: y, Red: 100, Green: 100, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}
 	}

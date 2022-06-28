@@ -30,10 +30,20 @@ type MyPanel struct {
 }
 
 func (panel *MyPanel) updateButtonColor(X int, Y int, color color.Color) {
-	if X == -1 {
+	if X == -1 { // Addressing the top row.
+		fmt.Printf("error X is -1\n")
 		return
 	}
-	if Y == -1 {
+	if Y == -1 { // Addressing the top row.
+		fmt.Printf("error Y is -1\n")
+		return
+	}
+	if X > 8 {
+		fmt.Printf("error X is > 8 \n")
+		return
+	}
+	if Y > 8 {
+		fmt.Printf("error Y is > 8 \n")
 		return
 	}
 	panel.Buttons[X][Y].rectangle.FillColor = color
@@ -94,11 +104,11 @@ func main() {
 
 	LightBlue := color.NRGBA{R: 0, G: 196, B: 255, A: 255}
 	Red := color.NRGBA{R: 255, G: 0, B: 0, A: 255}
-	Orange := color.NRGBA{R: 255, G: 111, B: 0, A: 255}
-	Yellow := color.NRGBA{R: 255, G: 255, B: 0, A: 255}
+	//Orange := color.NRGBA{R: 255, G: 111, B: 0, A: 255}
+	//Yellow := color.NRGBA{R: 255, G: 255, B: 0, A: 255}
 	Green := color.NRGBA{R: 0, G: 255, B: 0, A: 255}
 	Blue := color.NRGBA{R: 0, G: 0, B: 255, A: 255}
-	Purple := color.NRGBA{R: 100, G: 0, B: 255, A: 255}
+	//Purple := color.NRGBA{R: 100, G: 0, B: 255, A: 255}
 	Pink := color.NRGBA{R: 255, G: 0, B: 255, A: 255}
 	Cyan := color.NRGBA{R: 0, G: 255, B: 255, A: 255}
 
@@ -106,11 +116,7 @@ func main() {
 
 	myWindow := myApp.NewWindow("DMX Lights")
 
-	// myLogo, _ := fyne.LoadResourceFromPath("dmxlights.png")
-	// myWindow.SetIcon(myLogo)
-
 	myLogo := panel.convertButtonImageToIcon("dmxlights.png")
-	//lamp := panel.convertButtonImageToIcon("lamp.png")
 
 	myWindow.Resize(fyne.NewSize(400, 50))
 
@@ -139,14 +145,14 @@ func main() {
 	row7 := panel.generateRow(7)
 	row8 := panel.generateRow(8)
 
-	panel.updateButtonColor(0, 0, Red)
-	panel.updateButtonColor(1, 0, Green)
-	panel.updateButtonColor(2, 0, Orange)
-	panel.updateButtonColor(3, 0, Yellow)
+	panel.updateButtonColor(0, 0, Pink)
+	panel.updateButtonColor(1, 0, Red)
+	panel.updateButtonColor(2, 0, Green)
+	panel.updateButtonColor(3, 0, Blue)
 	panel.updateButtonColor(4, 0, LightBlue)
-	panel.updateButtonColor(5, 0, Blue)
-	panel.updateButtonColor(6, 0, Purple)
-	panel.updateButtonColor(7, 0, Pink)
+	panel.updateButtonColor(5, 0, LightBlue)
+	panel.updateButtonColor(6, 0, LightBlue)
+	panel.updateButtonColor(7, 0, LightBlue)
 	panel.updateButtonColor(8, 0, Cyan)
 
 	panel.updateButtonLabel(8, 1, "  >  ")
@@ -210,7 +216,7 @@ func (panel *MyPanel) generateRow(rowNumber int) *fyne.Container {
 		NewButton.button = button.button
 		NewButton.container = button.container
 		NewButton.rectangle = button.rectangle
-		panel.Buttons[X][Y] = NewButton
+		panel.Buttons[columnNumber][rowNumber] = NewButton
 	}
 
 	row0 := container.New(layout.NewHBoxLayout(), containers[0], containers[1], containers[2], containers[3], containers[4], containers[5], containers[6], containers[7], containers[8])

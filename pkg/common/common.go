@@ -343,8 +343,11 @@ const (
 )
 
 // LightOn Turn on a common.Light.
-func LightOn(eventsForLauchpad chan ALight, guiButtons chan ALight, Light ALight) {
+func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
+	if debug {
+		fmt.Printf("LightLamp  X:%d  Y:%d\n", Light.X, Light.Y)
+	}
 	// Send message to Novation Launchpad.
 	event := ALight{
 		X:          Light.X,
@@ -362,7 +365,7 @@ func LightOn(eventsForLauchpad chan ALight, guiButtons chan ALight, Light ALight
 	// Send message to GUI buttons.
 	event = ALight{
 		X:          Light.X,
-		Y:          Light.Y,
+		Y:          Light.Y + 1,
 		Brightness: Light.Brightness,
 		Red:        Light.Red,
 		Green:      Light.Green,
@@ -375,20 +378,13 @@ func LightOn(eventsForLauchpad chan ALight, guiButtons chan ALight, Light ALight
 
 }
 
-// LightOff Turn on a common.Light.
-func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
-	event := ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}
-	eventsForLauchpad <- event
-}
-
 func SequenceSelect(eventsForLauchpad chan ALight, guiButtons chan ALight, selectedSequence int) {
 	// Turn off all sequence lights.
 	for seq := 0; seq < 4; seq++ {
-		//LightOff(eventsForLauchpad, 8, seq)
-		LightOn(eventsForLauchpad, guiButtons, ALight{X: 8, Y: seq, Brightness: 255, Red: 255, Green: 255, Blue: 255})
+		LightLamp(ALight{X: 8, Y: seq, Brightness: 255, Red: 100, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 	}
-	// Now turn blue the selected sequence select light.
-	LightOn(eventsForLauchpad, guiButtons, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255})
+	// Now turn pink the selected sequence select light.
+	LightLamp(ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 }
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
@@ -434,7 +430,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 }
 func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
-		LightOn(eventsForLauchpad, guiButtons, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 	}
 }
 
@@ -446,9 +442,9 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 			fmt.Printf("function %+v\n", function)
 		}
 		if function.State {
-			LightOn(eventsForLauchpad, guiButtons, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 		} else {
-			LightOn(eventsForLauchpad, guiButtons, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255})
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
 	}
 }

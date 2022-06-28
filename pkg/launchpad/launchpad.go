@@ -20,7 +20,7 @@ func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, guiButtons, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}
 	}
@@ -55,20 +55,6 @@ func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan 
 		Y:        Y,
 		OnColor:  onColor,
 		OffColor: offColor,
-	}
-	eventsForLauchpad <- e
-}
-
-func LightLamp(X, Y, R, G, B, Master int, eventsForLauchpad chan common.ALight) {
-
-	// Now trigger the fixture lamp on the launch pad by sending an event.
-	e := common.ALight{
-		X:          X,
-		Y:          Y,
-		Brightness: Master,
-		Red:        R,
-		Green:      G,
-		Blue:       B,
 	}
 	eventsForLauchpad <- e
 }

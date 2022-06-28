@@ -12,8 +12,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/gui"
-	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
@@ -567,8 +565,7 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			// For this state.
 			if stateNumber == switchData.CurrentState {
 				// Use the button color for this state to light the correct color on the launchpad.
-				launchpad.LightLamp(switchNumber, mySequenceNumber, state.ButtonColor.R, state.ButtonColor.G, state.ButtonColor.B, 255, eventsForLauchpad)
-				gui.LightLamp(switchNumber, mySequenceNumber, state.ButtonColor.R, state.ButtonColor.G, state.ButtonColor.B, sequence.Master, guiButtons)
+				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: state.ButtonColor.R, Green: state.ButtonColor.G, Blue: state.ButtonColor.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 
 				// Now play all the values for this state.
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
