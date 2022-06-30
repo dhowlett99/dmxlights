@@ -373,6 +373,30 @@ func main() {
 	panel.updateButtonLabel(8, 2, "  >  ")
 	panel.updateButtonLabel(8, 3, "  >  ")
 
+	panel.updateButtonLabel(0, 0, "CLEAR")
+	panel.updateButtonLabel(1, 0, "RED")
+	panel.updateButtonLabel(2, 0, "GREEN")
+	panel.updateButtonLabel(3, 0, "BLUE")
+	panel.updateButtonLabel(4, 0, "SENS -")
+	panel.updateButtonLabel(5, 0, "SENS +")
+	panel.updateButtonLabel(6, 0, "MAST -")
+	panel.updateButtonLabel(7, 0, "MAST +")
+
+	panel.updateButtonLabel(8, 4, "FLOOD")
+	panel.updateButtonLabel(8, 5, "SAVE")
+	panel.updateButtonLabel(8, 6, "START")
+	panel.updateButtonLabel(8, 7, "STOP")
+
+	panel.updateButtonLabel(0, 8, "SPEED-")
+	panel.updateButtonLabel(1, 8, "SPEED+")
+	panel.updateButtonLabel(2, 8, "SHIFT-")
+	panel.updateButtonLabel(3, 8, "SHIFT+")
+	panel.updateButtonLabel(4, 8, "SIZE-")
+	panel.updateButtonLabel(5, 8, "SIZE+")
+	panel.updateButtonLabel(6, 8, "FADE-")
+	panel.updateButtonLabel(7, 8, "FADE+")
+	panel.updateButtonLabel(8, 8, "BLACK")
+
 	//panel.setButtonIcon(lamp, 1, 1)
 
 	squares := container.New(layout.NewGridLayoutWithRows(columnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
