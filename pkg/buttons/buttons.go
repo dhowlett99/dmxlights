@@ -21,8 +21,7 @@ const (
 )
 
 type CurrentState struct {
-	SelectedSequence         int // The currently selected sequence.
-	MySequenceNumber         int
+	SelectedSequence         int       // The currently selected sequence.
 	SequenceSpeed            int       // Local copy of sequence speed.
 	Size                     int       // current RGB sequence this.Size.
 	ScannerSize              int       // Current scanner this.Size.
@@ -59,6 +58,7 @@ type CurrentState struct {
 	Pattens                  map[string]common.Patten
 	StaticButtons            []common.StaticColorButton
 	SelectedFloodMap         map[int]bool
+	SelectedGobo             int
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -1323,17 +1323,17 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].Functions[common.Function6_Gobo].State &&
 		sequences[this.SelectedSequence].Type == "scanner" {
 
-		selectedGobo := X + 1
+		this.SelectedGobo = X + 1
 
 		if debug {
-			fmt.Printf("Set Gobo %d\n", selectedGobo)
+			fmt.Printf("Sequence %d Set Gobo %d\n", this.SelectedSequence, this.SelectedGobo)
 		}
 
 		// Add the selected gobo to the sequence.
 		cmd := common.Command{
 			Action: common.UpdateGobo,
 			Args: []common.Arg{
-				{Name: "SelectedGobo", Value: selectedGobo},
+				{Name: "SelectedGobo", Value: this.SelectedGobo},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1347,7 +1347,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single gobo DMX message.
-		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, selectedGobo)
+		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
 
 		// We call ShowGoboSelectionButtons here so the selections will flash as you press them.
 		ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons)
@@ -1709,7 +1709,7 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, action string, guiButtons chan common.ALight) int {
 
 	if debug {
-		fmt.Printf("Show Fixture Selection Buttons on the way to %s\n", action)
+		fmt.Printf("Sequence %d Show Fixture Selection Buttons on the way to %s\n", this.SelectedSequence, action)
 	}
 
 	for fixtureNumber, lamp := range sequence.AvailableFixtures {
@@ -1723,10 +1723,10 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(fixtureNumber, this.MySequenceNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
 
 		} else {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.MySequenceNumber, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
 	if debug {
@@ -1739,7 +1739,7 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("Show Gobo Selection Buttons\n")
+		fmt.Printf("Sequence %d Show Gobo Selection Buttons\n", this.SelectedSequence)
 	}
 	// Check if we need to flash this button.
 	for myFixtureNumber, lamp := range sequence.AvailableGoboSelectionColors {
@@ -1751,9 +1751,9 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(myFixtureNumber, this.MySequenceNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(myFixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
 		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: this.MySequenceNumber, Brightness: sequence.Master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
 		}
 	}
 }
@@ -1762,14 +1762,14 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, guiButtons chan common.ALight) error {
 
 	if debug {
-		fmt.Printf("Show Scanner Color Selection Buttons,  Sequence is %d  fixture is %d   color is %d \n", this.MySequenceNumber, this.SelectedFixture, sequence.ScannerColor[this.SelectedFixture])
+		fmt.Printf("Show Scanner Color Selection Buttons,  Sequence is %d  fixture is %d   color is %d \n", this.SelectedSequence, this.SelectedFixture, sequence.ScannerColor[this.SelectedFixture])
 	}
 
 	// if there are no colors available for this fixture turn everything off and print an error.
 	if sequence.AvailableScannerColors[this.SelectedFixture+1] == nil {
 		for _, fixture := range fixtures.Fixtures {
-			if fixture.Group == this.MySequenceNumber+1 {
-				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.MySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			if fixture.Group == this.SelectedSequence+1 {
+				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 			}
 		}
 		return fmt.Errorf("error: no colors available for fixture number %d", this.SelectedFixture+1)
@@ -1786,9 +1786,9 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(fixtureNumber, this.MySequenceNumber, int(code), 0x0, eventsForLauchpad)
+			launchpad.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
 		} else {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.MySequenceNumber, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
 	return nil
