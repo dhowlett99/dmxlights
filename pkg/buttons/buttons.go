@@ -197,8 +197,6 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			// Reset all the edit modes
-			this.FunctionSelectMode[sequenceNumber] = true
 		}
 
 		// Disable fixtures.
