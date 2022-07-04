@@ -21,8 +21,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/flash"
-	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
@@ -156,7 +154,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	// Setup a connection to the launchpad.
+	// Setup a connection to the common.
 	// Tested with a Novation Launchpad mini mk3.
 	fmt.Println("Setup Novation Launchpad")
 	this.Pad, err = mk3.Open()
@@ -165,11 +163,17 @@ func main() {
 	}
 	defer this.Pad.Close()
 
-	// We need to be in programmers mode to use the launchpad.
+	// We need to be in programmers mode to use the common.
 	this.Pad.Program()
 
 	// Create a channel to send events to the GUI.
 	guiButtons := make(chan common.ALight)
+
+	// Make space for info on which GUI button is flashing.
+	GuiFlashButtons := make([][]bool, 10)
+	for i := 0; i < 10; i++ {
+		GuiFlashButtons[i] = make([]bool, 10)
+	}
 
 	// Create a channel to send events to the launchthis.Pad.
 	eventsForLauchpad := make(chan common.ALight)
@@ -310,7 +314,7 @@ func main() {
 
 	// Now create a thread to handle launchpad events.
 	go func() {
-		launchpad.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
+		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
 	}()
 
 	LightBlue := color.NRGBA{R: 0, G: 196, B: 255, A: 255}
@@ -343,15 +347,15 @@ func main() {
 		}),
 	)
 
-	row0 := panel.generateRow(0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row1 := panel.generateRow(1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row2 := panel.generateRow(2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row3 := panel.generateRow(3, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row4 := panel.generateRow(4, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row5 := panel.generateRow(5, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row6 := panel.generateRow(6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row7 := panel.generateRow(7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row8 := panel.generateRow(8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row0 := panel.generateRow(0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row1 := panel.generateRow(1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row2 := panel.generateRow(2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row3 := panel.generateRow(3, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row4 := panel.generateRow(4, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row5 := panel.generateRow(5, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row6 := panel.generateRow(6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row7 := panel.generateRow(7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
+	row8 := panel.generateRow(8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
 
 	panel.updateButtonColor(0, 0, Pink)
 	panel.updateButtonColor(1, 0, Red)
@@ -401,51 +405,49 @@ func main() {
 	this.Pad.Reset()
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, GuiFlashButtons)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, GuiFlashButtons)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, GuiFlashButtons)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, GuiFlashButtons)
 
 	// Light up any existing presets.
-	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
 
 	// Light the function buttons at the bottom.
-	common.ShowFunctionButtons(*sequences[1], 7, eventsForLauchpad, guiButtons)
+	common.ShowFunctionButtons(*sequences[1], 7, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Light the logo blue.
 	this.Pad.Light(8, -1, 0, 0, 255)
 
 	// Light the clear button purple.
-	common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Light the static color buttons.
-	common.LightLamp(common.ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Light top functions.
-	common.LightLamp(common.ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Light the save, start, stop and this.Blackout buttons.
-	common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 7, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 8, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 7, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 8, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Initialise the this.Flood button to be green.
-	common.LightLamp(common.ALight{X: 7, Y: 3, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 7, Y: 3, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	common.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence)
+	sequence.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence, GuiFlashButtons)
 
 	// Clear the pad.
-	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-
-	this.FloodFlashButton = flash.NewFlashButton(8, 3, common.Color{R: 255, G: 0, B: 0}, common.Color{R: 0, G: 0, B: 0}, guiButtons)
+	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig, GuiFlashButtons)
 
 	// Listen to launchpad buttons.
 	go func(guiButtons chan common.ALight,
@@ -456,11 +458,12 @@ func main() {
 		fixturesConfig *fixture.Fixtures,
 		commandChannels []chan common.Command,
 		replyChannels []chan common.Sequence,
-		updateChannels []chan common.Sequence) {
+		updateChannels []chan common.Sequence,
+		GuiFlashButtons [][]bool) {
 
-		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
 
-	}(guiButtons, &this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	}(guiButtons, &this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
 
 	myWindow.SetContent(content)
 
@@ -477,7 +480,8 @@ func (panel *MyPanel) generateRow(rowNumber int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence) *fyne.Container {
+	updateChannels []chan common.Sequence,
+	GuiFlashButtons [][]bool) *fyne.Container {
 
 	White := color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 	//Red := color.NRGBA{R: 255, G: 0, B: 0, A: 255}
@@ -488,7 +492,7 @@ func (panel *MyPanel) generateRow(rowNumber int,
 		Y := rowNumber
 		X := columnNumber
 		button.button = widget.NewButton("     ", func() {
-			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
 		})
 		button.rectangle = canvas.NewRectangle(White)
 		size := fyne.Size{}

@@ -8,9 +8,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/flash"
-	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
+	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
 )
@@ -59,14 +58,14 @@ type CurrentState struct {
 	StaticButtons            []common.StaticColorButton
 	SelectedFloodMap         map[int]bool
 	SelectedGobo             int
-	FloodFlashButton         flash.Flash
 }
 
 // main thread is used to get commands from the lauchpad.
 func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, sequences []*common.Sequence,
 	eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
-	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence) {
+	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
+	GuiFlashButtons [][]bool) {
 
 	// Create a channel to listen for buttons being pressed.
 	buttonChannel := this.Pad.Listen()
@@ -76,7 +75,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 
 		hit := <-buttonChannel
 
-		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, GuiFlashButtons)
 
 	}
 }
@@ -90,13 +89,14 @@ func ProcessButtons(X int, Y int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence) {
+	updateChannels []chan common.Sequence,
+	GuiFlashButtons [][]bool) {
 
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
-	// C L E A R  - Clear all the lights on the launchpad.
+	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
 		if debug {
@@ -105,7 +105,7 @@ func ProcessButtons(X int, Y int,
 
 		// Turn off the flashing save button.
 		this.SavePreset = false
-		launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		// Turn off the this.Flood
 		if this.Flood {
@@ -133,15 +133,15 @@ func ProcessButtons(X int, Y int,
 			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 			// Flash the correct color buttons
-			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			return
 		}
 
-		launchpad.ClearAll(this.Pad, this.PresetsStore, eventsForLauchpad, guiButtons, commandChannels)
-		AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-		presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+		common.ClearAll(this.Pad, this.PresetsStore, eventsForLauchpad, guiButtons, commandChannels, GuiFlashButtons)
+		AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig, GuiFlashButtons)
+		presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
 
 		// Make sure we stop all sequences.
 		cmd := common.Command{
@@ -245,8 +245,7 @@ func ProcessButtons(X int, Y int,
 		if !this.Flood { // We're not already in this.Flood so lets ask the sequence to this.Flood.
 
 			// Flash the this.Flood button to indicate we're not in this.Flood.
-			launchpad.FlashLight(8, 3, 0x03, 0x5f, eventsForLauchpad)
-			flash.StartFlashButton(&this.FloodFlashButton)
+			common.FlashLight(8, 3, 0x03, 0x5f, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			// First save our config
 			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
@@ -273,8 +272,7 @@ func ProcessButtons(X int, Y int,
 		if this.Flood { // If we are this.Flood already then tell the sequence to stop this.Flood.
 
 			// Turn the this.Flood button back to white.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-			this.FloodFlashButton.Enabled = false
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			cmd := common.Command{
 				Action: common.NoFlood,
@@ -298,7 +296,7 @@ func ProcessButtons(X int, Y int,
 			// Clear any function modes out and reveal sequence.
 			for this.SelectedSequence = range sequences {
 				// Turn off function mode. Remove the function pads.
-				common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+				common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 				// And reveal the sequence on the launchpad keys
 				common.RevealSequence(this.SelectedSequence, commandChannels)
 				// Turn off the function mode flag.
@@ -390,12 +388,12 @@ func ProcessButtons(X int, Y int,
 
 		if this.SavePreset {
 			this.SavePreset = false
-			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			return
 		}
-		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		launchpad.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad)
+		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+		common.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		this.SavePreset = true
 		return
 	}
@@ -409,14 +407,17 @@ func ProcessButtons(X int, Y int,
 
 		if this.SavePreset {
 			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = true
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 			this.SavePreset = false
-			launchpad.FlashLight(8, 4, 0, 0, eventsForLauchpad) // turn off the save button from flashing.
+
+			// turn off the save button from flashing.
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+
 			presets.SavePresets(this.PresetsStore)
-			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			launchpad.FlashLight(X, Y, 0x0d, 0x78, eventsForLauchpad)
+			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+			common.FlashLight(X, Y, 0x0c, 0x78, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
@@ -427,16 +428,16 @@ func ProcessButtons(X int, Y int,
 				}
 				common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
-				AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+				AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig, GuiFlashButtons)
 				time.Sleep(300 * time.Millisecond)
 
 				// Load the config.
 				config.AskToLoadConfig(commandChannels, X, Y)
 
 				// Turn the selected preset light red.
-				common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 3, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-				presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-				launchpad.FlashLight(X, Y, 0x0d, 0x78, eventsForLauchpad)
+				common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 3, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+				presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore, GuiFlashButtons)
+				common.FlashLight(X, Y, 0x0c, 0x78, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 				// Preserve this.Blackout.
 				if !this.Blackout {
@@ -560,7 +561,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons)
+		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons, GuiFlashButtons)
 		cmd := common.Command{
 			Action: common.PlayStaticOnce,
 		}
@@ -581,7 +582,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons)
+		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons, GuiFlashButtons)
 
 		cmd := common.Command{
 			Action: common.PlayStaticOnce,
@@ -603,7 +604,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons)
+		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons, GuiFlashButtons)
 
 		cmd := common.Command{
 			Action: common.PlayStaticOnce,
@@ -625,7 +626,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons)
+		HandleSelect(sequences, this, eventsForLauchpad, commandChannels, fixturesConfig, guiButtons, GuiFlashButtons)
 
 		cmd := common.Command{
 			Action: common.PlayStaticOnce,
@@ -653,9 +654,9 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		return
 	}
 
@@ -673,9 +674,9 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		return
 	}
 
@@ -862,7 +863,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Light the correct function key.
-		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons)
+		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		// Now some functions mean that we go into another menu ( set of buttons )
 		// This is true for :-
@@ -876,9 +877,9 @@ func ProcessButtons(X int, Y int,
 		// Go straight into patten select mode, don't wait for a another select press.
 		if this.EditPattenMode[this.SelectedSequence] {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			this.EditFixtureSelectionMode = false
-			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 
 		// Map Function 5 to color edit.
@@ -887,17 +888,17 @@ func ProcessButtons(X int, Y int,
 		// Go straight into color edit mode, don't wait for a another select press.
 		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "rgb" {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
+			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 
 		// Go straight into color edit mode via select fixture, don't wait for a another select press.
 		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "scanner" {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			this.EditFixtureSelectionMode = true
 			this.FollowingAction = "ShowScannerColorSelectionButtons"
-			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
+			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons, GuiFlashButtons)
 		}
 
 		// Map Function 6 to select gobo mode.
@@ -908,10 +909,10 @@ func ProcessButtons(X int, Y int,
 		// Go straight to gobo selection mode via select fixture, don't wait for a another select press.
 		if this.EditGoboSelectionMode[this.SelectedSequence] {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			this.EditFixtureSelectionMode = true
 			this.FollowingAction = "ShowGoboSelectionButtons"
-			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
+			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons, GuiFlashButtons)
 		}
 
 		// Map Function 6 to static color edit.
@@ -996,7 +997,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
 			// Turn off the lamp.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			return
 
@@ -1021,7 +1022,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
 			// Turn the lamp on.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			return
 		}
@@ -1059,10 +1060,10 @@ func ProcessButtons(X int, Y int,
 		shutter := flashSequence.Patten.Steps[X].Fixtures[X].Shutter
 		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
 
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
 		time.Sleep(200 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
 		return
 	}
@@ -1164,14 +1165,14 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 
 			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			launchpad.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			if this.StaticButtons[this.SelectedSequence].Color.R > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.R = 0
 			} else {
 				this.StaticButtons[this.SelectedSequence].Color.R = this.StaticButtons[this.SelectedSequence].Color.R + 10
 			}
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 			return
 		}
@@ -1188,14 +1189,14 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			launchpad.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			if this.StaticButtons[this.SelectedSequence].Color.G > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 0
 			} else {
 				this.StaticButtons[this.SelectedSequence].Color.G = this.StaticButtons[this.SelectedSequence].Color.G + 10
 			}
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 			return
 		}
@@ -1212,14 +1213,14 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			launchpad.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			if this.StaticButtons[this.SelectedSequence].Color.B > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 0
 			} else {
 				this.StaticButtons[this.SelectedSequence].Color.B = this.StaticButtons[this.SelectedSequence].Color.B + 10
 			}
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 			return
 		}
@@ -1263,7 +1264,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
 
 		// We call ShowRGBColorSelectionButtons here so the selections will flash as you press them.
-		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		return
 	}
@@ -1303,7 +1304,7 @@ func ProcessButtons(X int, Y int,
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, scannerColor)
 
 		// We call ShowScannerColorSelectionButtons here so the selections will flash as you press them.
-		ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, guiButtons)
+		ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, guiButtons, GuiFlashButtons)
 
 		return
 	}
@@ -1322,10 +1323,10 @@ func ProcessButtons(X int, Y int,
 
 		// Update the buttons.
 		if this.FollowingAction == "ShowGoboSelectionButtons" {
-			ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons)
+			ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 		if this.FollowingAction == "ShowScannerColorSelectionButtons" {
-			err := ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, guiButtons)
+			err := ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, guiButtons, GuiFlashButtons)
 			if err != nil {
 				fmt.Printf("error: %v\n", err)
 				common.RevealSequence(this.SelectedSequence, commandChannels)
@@ -1368,7 +1369,7 @@ func ProcessButtons(X int, Y int,
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
 
 		// We call ShowGoboSelectionButtons here so the selections will flash as you press them.
-		ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons)
+		ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		return
 	}
@@ -1417,7 +1418,7 @@ func ProcessButtons(X int, Y int,
 		this.LastStaticColorButtonX = X
 		this.LastStaticColorButtonY = Y
 		code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-		launchpad.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad)
+		common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		return
 	}
@@ -1447,7 +1448,7 @@ func ProcessButtons(X int, Y int,
 
 		// We call ShowPattenSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
-		ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+		ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		return
 	}
@@ -1465,15 +1466,15 @@ func ProcessButtons(X int, Y int,
 				Action: common.Blackout,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-			launchpad.FlashLight(8, 7, 0x03, 0x5f, eventsForLauchpad)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+			common.FlashLight(8, 7, 0x03, 0x5f, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
 				Action: common.Normal,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 		return
 	}
@@ -1499,7 +1500,8 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 
 // HandleSelect - Runs when you press a select button to select a sequence.
 
-func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, commandChannels []chan common.Command, fixtures *fixture.Fixtures, guiButtons chan common.ALight) {
+func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight,
+	commandChannels []chan common.Command, fixtures *fixture.Fixtures, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 
 	if debug {
 		fmt.Printf("HANDLE: selectButtons[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
@@ -1513,7 +1515,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Light the sequence selector button.
-	common.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence)
+	sequence.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence, GuiFlashButtons)
 
 	// First time into function mode we head back to normal mode.
 	if this.FunctionSelectMode[this.SelectedSequence] && !this.SelectButtonPressed[this.SelectedSequence] &&
@@ -1522,7 +1524,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("Handle 1 Function Bar off\n")
 		}
 		// Turn off function mode. Remove the function pads.
-		common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+		common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		this.FunctionSelectMode[this.SelectedSequence] = false
 
@@ -1532,7 +1534,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			this.EditPattenMode[this.SelectedSequence] = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
-			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 			return
 		}
 
@@ -1540,7 +1542,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("Show RGB Sequence Color Selection Buttons\n")
 			}
-			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 			return
 		}
 
@@ -1594,7 +1596,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			sequences[this.SelectedSequence].Functions[common.Function1_Patten].State = false
 
 			// Clear the patten function keys
-			ClearPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+			ClearPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 			// And reveal the sequence.
 			common.RevealSequence(this.SelectedSequence, commandChannels)
@@ -1604,7 +1606,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		if !this.FunctionSelectMode[this.SelectedSequence] && sequences[this.SelectedSequence].Functions[common.Function5_Color].State && this.EditSequenceColorsMode[this.SelectedSequence] {
-			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLauchpad, guiButtons)
+			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 		return
 	}
@@ -1615,7 +1617,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("Handle 3\n")
 		}
 		// Turn off function mode. Remove the function pads.
-		common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+		common.HideFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		// And reveal the sequence on the launchpad keys
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 		// Turn off the function mode flag.
@@ -1648,7 +1650,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
 
 		// Create the function buttons.
-		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels)
+		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels, GuiFlashButtons)
 
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = false
@@ -1657,7 +1659,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 }
 
-func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command,
+	eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 
 	// Turn off the edit colors bar.
 	sequences[this.SelectedSequence].Functions[common.Function5_Color].State = false
@@ -1682,20 +1685,20 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 	// Now forget we pressed twice and start again.
 	this.SelectButtonPressed[this.SelectedSequence] = true
 
-	HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons)
+	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
 }
 
-func AllFixturesOff(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+func AllFixturesOff(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, GuiFlashButtons [][]bool) {
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 4; y++ {
-			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
 		}
 	}
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
-func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 
 	if debug {
 		fmt.Printf("Show Color Selection Buttons\n")
@@ -1717,15 +1720,15 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: full, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: full, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 	}
 }
 
 // For the given sequence show the available scanner selection colors on the relevant buttons.
-func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, action string, guiButtons chan common.ALight) int {
+func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, action string, guiButtons chan common.ALight, GuiFlashButtons [][]bool) int {
 
 	if debug {
 		fmt.Printf("Sequence %d Show Fixture Selection Buttons on the way to %s\n", this.SelectedSequence, action)
@@ -1742,10 +1745,10 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 
 		} else {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 	}
 	if debug {
@@ -1755,7 +1758,7 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 }
 
 // ShowGoboSelectionButtons puts up a set of red buttons used to select a fixture.
-func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 
 	if debug {
 		fmt.Printf("Sequence %d Show Gobo Selection Buttons\n", this.SelectedSequence)
@@ -1770,15 +1773,15 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(myFixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(myFixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 	}
 }
 
 // For the given sequence show the available scanner selection colors on the relevant buttons.
-func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, guiButtons chan common.ALight) error {
+func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentState, eventsForLauchpad chan common.ALight, fixtures *fixture.Fixtures, guiButtons chan common.ALight, GuiFlashButtons [][]bool) error {
 
 	if debug {
 		fmt.Printf("Show Scanner Color Selection Buttons,  Sequence is %d  fixture is %d   color is %d \n", this.SelectedSequence, this.SelectedFixture, sequence.ScannerColor[this.SelectedFixture])
@@ -1788,7 +1791,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	if sequence.AvailableScannerColors[this.SelectedFixture+1] == nil {
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == this.SelectedSequence+1 {
-				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 			}
 		}
 		return fmt.Errorf("error: no colors available for fixture number %d", this.SelectedFixture+1)
@@ -1805,38 +1808,31 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		}
 		if lamp.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			launchpad.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
 	}
 	return nil
 }
 
 // For the given sequence clear the available this.Pattens on the relevant buttons.
-func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 	// Check if we need to flash this button.
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
-		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 	}
 }
 
 // For the given sequence show the available this.Pattens on the relevant buttons.
-func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
 	// Check if we need to flash this button.
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
 		if myFixtureNumber == sequence.SelectedPatten {
 			code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 255, G: 255, B: 255})
-			launchpad.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad)
+			common.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 255, Green: 255, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 255, Green: 255, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
 		}
-	}
-}
-
-// For the given sequence hide the available sequence colors..
-func HideColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, selectedSequence int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
-	for myFixtureNumber := range sequence.AvailableSequenceColors {
-		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
 }
