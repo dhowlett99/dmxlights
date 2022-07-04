@@ -8,6 +8,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/flash"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/oliread/usbdmx/ft232"
@@ -59,6 +60,7 @@ type CurrentState struct {
 	StaticButtons            []common.StaticColorButton
 	SelectedFloodMap         map[int]bool
 	SelectedGobo             int
+	FloodFlashButton         flash.Flash
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -230,6 +232,7 @@ func ProcessButtons(X int, Y int,
 
 			// Flash the this.Flood button to indicate we're not in this.Flood.
 			launchpad.FlashLight(8, 3, 0x03, 0x5f, eventsForLauchpad)
+			flash.StartFlashButton(&this.FloodFlashButton)
 
 			// First save our config
 			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
@@ -257,6 +260,7 @@ func ProcessButtons(X int, Y int,
 
 			// Turn the this.Flood button back to white.
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			this.FloodFlashButton.Enabled = false
 
 			cmd := common.Command{
 				Action: common.NoFlood,

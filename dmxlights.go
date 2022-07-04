@@ -21,6 +21,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/flash"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
@@ -450,6 +451,8 @@ func main() {
 
 	// Clear the pad.
 	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+
+	this.FloodFlashButton = flash.NewFlashButton(8, 3, common.Color{R: 255, G: 0, B: 0}, common.Color{R: 0, G: 0, B: 0}, guiButtons)
 
 	// Listen to launchpad buttons.
 	go func(guiButtons chan common.ALight,
