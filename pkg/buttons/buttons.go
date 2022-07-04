@@ -30,7 +30,6 @@ type CurrentState struct {
 	SelectedShift            int       // Current fixture shift.
 	Blackout                 bool      // Blackout all fixtures.
 	Flood                    bool      // Flood all fixtures.
-	FunctionButtons          [][]bool  // Function buttons.
 	FunctionSelectMode       []bool    // Which sequence is in function selection mode.
 	StaticLamps              [][]bool  // Static color lamps.
 	SelectButtonPressed      []bool    // Which sequence has its Select button pressed.
@@ -97,7 +96,7 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
-	// Clear all the lights on the launchpad.
+	// C L E A R  - Clear all the lights on the launchpad.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
 		if debug {
@@ -176,12 +175,30 @@ func ProcessButtons(X int, Y int,
 			trigger.State = false
 		}
 
-		// Switch of auto color change and auto patten change.
-		for _, sequence := range sequences {
-			sequence.AutoColor = false
-			sequence.Functions[common.Function2_Auto_Color].State = false
-			sequence.AutoPatten = false
-			sequence.Functions[common.Function3_Auto_Patten].State = false
+		// Clear all the function buttons.
+		for sequenceNumber := range sequences {
+			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
+			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function6_Gobo].State = false
+			sequences[sequenceNumber].Functions[common.Function6_Static].State = false
+			sequences[sequenceNumber].Functions[common.Function7_RGB_Invert].State = false
+			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
+
+			// Send update functions command. This sets the temporary representation of
+			// the function keys in the real sequence.
+			cmd := common.Command{
+				Action: common.UpdateFunctions,
+				Args: []common.Arg{
+					{Name: "Functions", Value: sequences[sequenceNumber].Functions},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+			// Reset all the edit modes
+			this.FunctionSelectMode[sequenceNumber] = true
 		}
 
 		// Disable fixtures.
@@ -201,9 +218,8 @@ func ProcessButtons(X int, Y int,
 			}
 		}
 
+		// Reset the Scanner Size back to default.
 		for _, sequence := range sequences {
-
-			// Reset the Scanner Size back to default.
 			// Set local copy.
 			this.ScannerSize = common.DefaultScannerSize
 			// Set copy in sequences.
@@ -1489,6 +1505,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	if debug {
 		fmt.Printf("HANDLE: selectButtons[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
+		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.SelectedSequence, this.EditSequenceColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
@@ -1633,7 +1650,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
 
 		// Create the function buttons.
-		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.FunctionButtons, this.SequenceChannels)
+		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels)
 
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = false

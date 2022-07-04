@@ -226,13 +226,6 @@ func main() {
 	this.SequenceChannels.SoundTriggerChannels = soundTriggerChannels
 	this.SequenceChannels.UpdateChannels = updateChannels
 
-	// Initialize a ten length slice of empty slices for function buttons.
-	this.FunctionButtons = make([][]bool, 9)
-	// Initialize those 10 empty function button slices
-	for i := 0; i < 9; i++ {
-		this.FunctionButtons[i] = make([]bool, 9)
-	}
-
 	// Initialize four select buttons.
 	this.SelectButtonPressed = make([]bool, 4)
 

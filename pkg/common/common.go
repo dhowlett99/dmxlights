@@ -415,7 +415,7 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, functionButtons [][]bool, channels Channels) {
+func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
 	HideFunctionButtons(selectedSequence, eventsForLauchpad, guiButtons)
 	// Get an upto date copy of the sequence.
 	cmd := Command{
