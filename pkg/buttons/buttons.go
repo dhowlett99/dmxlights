@@ -64,7 +64,7 @@ type CurrentState struct {
 }
 
 // main thread is used to get commands from the lauchpad.
-func ReadLaunchPadButtons(guiButtons chan common.ALight, this CurrentState, sequences []*common.Sequence,
+func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, sequences []*common.Sequence,
 	eventsForLauchpad chan common.ALight, dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence) {
@@ -77,7 +77,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this CurrentState, sequ
 
 		hit := <-buttonChannel
 
-		ProcessButtons(hit.X, hit.Y, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 	}
 }

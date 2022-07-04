@@ -465,7 +465,7 @@ func main() {
 		replyChannels []chan common.Sequence,
 		updateChannels []chan common.Sequence) {
 
-		buttons.ReadLaunchPadButtons(guiButtons, *this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 	}(guiButtons, &this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
