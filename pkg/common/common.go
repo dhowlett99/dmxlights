@@ -724,7 +724,7 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	// Loop through the available functions for this sequence
 	for index, function := range sequence.Functions {
 		if debug {
-			fmt.Printf("function %+v\n", function)
+			fmt.Printf("ShowFunctionButtons: function %+v\n", function)
 		}
 
 		if function.State {
