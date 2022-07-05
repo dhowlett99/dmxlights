@@ -171,26 +171,38 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Clear all the function buttons.
-		for sequenceNumber := range sequences {
-			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
-			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
-			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
-			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
-			sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
-			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
+		for sequenceNumber, sequence := range sequences {
 
-			// Send update functions command. This sets the temporary representation of
-			// the function keys in the real sequence.
-			cmd := common.Command{
-				Action: common.UpdateFunctions,
-				Args: []common.Arg{
-					{Name: "Functions", Value: sequences[sequenceNumber].Functions},
-				},
+			// Switch sequences don't have funcion keys.
+			if sequence.Type != "switch" {
+				sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
+				sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
+				sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
+				sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
+				sequences[sequenceNumber].Functions[common.Function5_Color].State = false
+				sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
+				sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
+				sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
+
+				// Turn off function mode. Remove the function pads.
+				common.HideFunctionButtons(sequenceNumber, eventsForLauchpad, guiButtons)
+				// And reveal the sequence on the launchpad keys
+				common.RevealSequence(sequenceNumber, commandChannels)
+				// Turn off the function mode flag.
+				this.FunctionSelectMode[sequenceNumber] = false
+				// Now forget we pressed twice and start again.
+				this.SelectButtonPressed[sequenceNumber] = false
+
+				// Send update functions command. This sets the temporary representation of
+				// the function keys in the real sequence.
+				cmd := common.Command{
+					Action: common.UpdateFunctions,
+					Args: []common.Arg{
+						{Name: "Functions", Value: sequences[sequenceNumber].Functions},
+					},
+				}
+				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-
 		}
 
 		// Disable fixtures.
