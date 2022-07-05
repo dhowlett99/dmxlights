@@ -42,6 +42,12 @@ type MyPanel struct {
 
 func (panel *MyPanel) updateButtonColor(alight common.ALight, GuiFlashButtons [][]bool) {
 
+	// Shortcut to label a button.
+	if alight.UpdateLabel {
+		panel.updateButtonLabel(alight.X, alight.Y, alight.Label)
+		return
+	}
+
 	if alight.X == -1 { // Addressing the top row.
 		fmt.Printf("error X is -1\n")
 		return
@@ -440,8 +446,6 @@ func main() {
 	panel.updateButtonLabel(7, 8, "FADE+")
 	panel.updateButtonLabel(8, 8, "BLACK")
 
-	//panel.setButtonIcon(lamp, 1, 1)
-
 	squares := container.New(layout.NewGridLayoutWithRows(columnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
 	content := container.NewBorder(toolbar, nil, nil, nil, squares)
@@ -458,8 +462,8 @@ func main() {
 	// Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
-	// Light the function buttons at the bottom.
-	common.ShowFunctionButtons(*sequences[1], 7, eventsForLauchpad, guiButtons)
+	// Light the buttons at the bottom.
+	common.ShowBottomButtons(*sequences[1], 7, eventsForLauchpad, guiButtons)
 
 	// Light the logo blue.
 	this.Pad.Light(8, -1, 0, 0, 255)

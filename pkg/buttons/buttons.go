@@ -177,9 +177,8 @@ func ProcessButtons(X int, Y int,
 			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
 			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
 			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function6_Gobo].State = false
-			sequences[sequenceNumber].Functions[common.Function6_Static].State = false
-			sequences[sequenceNumber].Functions[common.Function7_RGB_Invert].State = false
+			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
+			sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
 			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
 
 			// Send update functions command. This sets the temporary representation of
@@ -898,7 +897,7 @@ func ProcessButtons(X int, Y int,
 
 		// Map Function 6 to select gobo mode.
 		if sequences[this.SelectedSequence].Type == "scanner" {
-			this.EditGoboSelectionMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Gobo].State
+			this.EditGoboSelectionMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
 		}
 
 		// Go straight to gobo selection mode via select fixture, don't wait for a another select press.
@@ -912,7 +911,7 @@ func ProcessButtons(X int, Y int,
 
 		// Map Function 6 to static color edit.
 		if sequences[this.SelectedSequence].Type != "scanner" {
-			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static].State
+			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
 		}
 
 		// Go straight into static color edit mode, don't wait for a another select press.
@@ -964,7 +963,7 @@ func ProcessButtons(X int, Y int,
 		Y >= 0 &&
 		Y < 4 &&
 		!sequences[this.SelectedSequence].Functions[common.Function1_Patten].State &&
-		!sequences[this.SelectedSequence].Functions[common.Function6_Static].State &&
+		!sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
 		!sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
 		sequences[Y].Type == "scanner" {
 
@@ -1030,7 +1029,7 @@ func ProcessButtons(X int, Y int,
 		Y >= 0 &&
 		Y < 4 &&
 		!sequences[Y].Functions[common.Function1_Patten].State &&
-		!sequences[Y].Functions[common.Function6_Static].State &&
+		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
 		!sequences[Y].Functions[common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
@@ -1150,7 +1149,7 @@ func ProcessButtons(X int, Y int,
 	// Red
 	if X == 1 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
-		if sequences[this.SelectedSequence].Functions[common.Function6_Static].State {
+		if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
 
 			if debug {
 				fmt.Printf("Choose Static Red X:%d Y:%d\n", X, Y)
@@ -1176,7 +1175,7 @@ func ProcessButtons(X int, Y int,
 	// Green
 	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
-		if sequences[this.SelectedSequence].Functions[common.Function6_Static].State {
+		if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
 			if debug {
 				fmt.Printf("Choose Static Green X:%d Y:%d\n", X, Y)
 			}
@@ -1200,7 +1199,7 @@ func ProcessButtons(X int, Y int,
 	// Blue
 	if X == 3 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
-		if sequences[this.SelectedSequence].Functions[common.Function6_Static].State {
+		if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
 			if debug {
 				fmt.Printf("Choose Static Blue X:%d Y:%d\n", X, Y)
 			}
@@ -1307,7 +1306,7 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   F I X T U R E
 	if X >= 0 && X < 8 && Y != -1 &&
 		this.EditFixtureSelectionMode &&
-		sequences[this.SelectedSequence].Functions[common.Function6_Gobo].State || sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State || sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
 		sequences[this.SelectedSequence].Type == "scanner" {
 
 		this.SelectedFixture = X
@@ -1334,7 +1333,7 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   S C A N N E R   G O B O
 	if X >= 0 && X < 8 && Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		sequences[this.SelectedSequence].Functions[common.Function6_Gobo].State &&
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
 		sequences[this.SelectedSequence].Type == "scanner" {
 
 		this.SelectedGobo = X + 1
@@ -1506,7 +1505,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditPattenMode[%d] = %t \n", this.SelectedSequence, this.EditPattenMode[this.SelectedSequence])
-		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static].State)
+		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
 	// Light the sequence selector button.
@@ -1541,7 +1540,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			return
 		}
 
-		if sequences[this.SelectedSequence].Functions[common.Function6_Static].State &&
+		if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
 			sequences[this.SelectedSequence].Type != "scanner" {
 			if debug {
 				fmt.Printf("Show Static Color Selection Buttons\n")
@@ -1556,7 +1555,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Switch off the gobo selection mode.
-		sequences[this.SelectedSequence].Functions[common.Function6_Static].State = false
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 
 		// Else reveal the sequence on the launchpad keys
 		if debug {

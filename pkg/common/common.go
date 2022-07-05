@@ -10,15 +10,17 @@ import (
 const debug = false
 
 type ALight struct {
-	X          int
-	Y          int
-	Brightness int
-	Red        int
-	Green      int
-	Blue       int
-	Flash      bool
-	OnColor    int
-	OffColor   int
+	X           int
+	Y           int
+	Brightness  int
+	Red         int
+	Green       int
+	Blue        int
+	Flash       bool
+	OnColor     int
+	OffColor    int
+	UpdateLabel bool
+	Label       string
 }
 
 type Color struct {
@@ -209,6 +211,8 @@ type Sequence struct {
 	SelectedPatten               int
 	OffsetPan                    int
 	OffsetTilt                   int
+	FunctionLabels               [8]string
+	BottomButtons                [8]string
 }
 
 type Function struct {
@@ -217,6 +221,7 @@ type Function struct {
 	Number         int
 	State          bool
 	Flash          bool
+	Label          string
 }
 
 type Channels struct {
@@ -337,10 +342,8 @@ const (
 	Function3_Auto_Patten   = 2 // Auto Patten change
 	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
 	Function5_Color         = 4 // Set RGB chase color. or select the scanner color.
-	Function6_Static        = 5 // Set static color.
-	Function6_Gobo          = 5 // Set scanner Gobo.
-	Function7_RGB_Invert    = 6 // Invert the RGB colors.
-	Function7_Scanner_Chase = 6 // Set scanner chase mode.
+	Function6_Static_Gobo   = 5 // Set static color / set scanner gobo.
+	Function7_Invert_Chase  = 6 // Invert the RGB colors  / Set scanner chase mode.
 	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
@@ -651,17 +654,17 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map static function.
 	if sequence.Type != "scanner" {
-		sequence.Static = sequence.Functions[Function6_Static].State
-		if sequence.Functions[Function6_Static].State {
+		sequence.Static = sequence.Functions[Function6_Static_Gobo].State
+		if sequence.Functions[Function6_Static_Gobo].State {
 			sequence.PlayStaticOnce = true
 			sequence.Hide = true
 		}
 	}
 
 	// Map invert function.
-	sequence.Inverted = sequence.Functions[Function7_RGB_Invert].State
+	sequence.Inverted = sequence.Functions[Function7_Invert_Chase].State
 	// Map scanner chase mode. Uses same function key as above.
-	sequence.ScannerChase = sequence.Functions[Function7_Scanner_Chase].State
+	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
@@ -712,6 +715,7 @@ func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selected
 func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		LabelButton(x, selectedSequence, "", guiButtons)
 	}
 }
 
@@ -722,11 +726,25 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 		if debug {
 			fmt.Printf("function %+v\n", function)
 		}
+
 		if function.State {
 			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 		} else {
 			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
+		LabelButton(index, selectedSequence, function.Label, guiButtons)
+	}
+}
+
+func ShowBottomButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	// Loop through the available functions for this sequence
+	for index, button := range sequence.BottomButtons {
+		if debug {
+			fmt.Printf("button %+v\n", button)
+		}
+		LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		LabelButton(index, selectedSequence, button, guiButtons)
 	}
 }
 
@@ -769,6 +787,21 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad)
 	}
 }
 
+func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
+
+	if debug {
+		fmt.Printf("Label Button  X:%d  Y:%d  with %s\n", X, Y, label)
+	}
+	// Send message to GUI
+	event := ALight{
+		UpdateLabel: true,
+		X:           X,
+		Y:           Y + 1,
+		Label:       label,
+	}
+	guiButtons <- event
+}
+
 // LightOn Turn on a Light.
 func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
@@ -800,6 +833,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Flash:      false,
 		OnColor:    22,
 		OffColor:   18,
+		Label:      Light.Label,
 	}
 	guiButtons <- event
 

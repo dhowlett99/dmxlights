@@ -177,16 +177,48 @@ func CreateSequence(
 		OffsetTilt:            120,
 	}
 
+	if sequence.Type == "rgb" {
+		sequence.FunctionLabels[0] = "Set\nPatten"
+		sequence.FunctionLabels[1] = "Auto\nColor"
+		sequence.FunctionLabels[2] = "Auto\nPattern"
+		sequence.FunctionLabels[3] = "Bounce"
+		sequence.FunctionLabels[4] = "Chase\nColor"
+		sequence.FunctionLabels[5] = "Static\nColor"
+		sequence.FunctionLabels[6] = "Invert"
+		sequence.FunctionLabels[7] = "Music"
+	}
+
+	if sequence.Type == "scanner" {
+		sequence.FunctionLabels[0] = "Set\nPatten"
+		sequence.FunctionLabels[1] = "Auto\nColor"
+		sequence.FunctionLabels[2] = "Auto\nPattern"
+		sequence.FunctionLabels[3] = "Bounce"
+		sequence.FunctionLabels[4] = "Color"
+		sequence.FunctionLabels[5] = "Gobo"
+		sequence.FunctionLabels[6] = "Chase"
+		sequence.FunctionLabels[7] = "Music"
+	}
+
 	// Make functions for each of the sequences.
-	for function := 0; function <= 8; function++ {
+	for function := 0; function < 8; function++ {
 		newFunction := common.Function{
 			Name:           strconv.Itoa(function),
 			SequenceNumber: mySequenceNumber,
 			Number:         function,
 			State:          false,
+			Label:          sequence.FunctionLabels[function],
 		}
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
+
+	sequence.BottomButtons[0] = "Speed\nDown"
+	sequence.BottomButtons[1] = "Speed\nUp"
+	sequence.BottomButtons[2] = "Shift\nDown"
+	sequence.BottomButtons[3] = "Shift\nUp"
+	sequence.BottomButtons[4] = "Size\nDown"
+	sequence.BottomButtons[5] = "Size\nUp"
+	sequence.BottomButtons[6] = "Fade\nSharp"
+	sequence.BottomButtons[7] = "Fade\nSoft"
 
 	if sequenceType == "switch" {
 
