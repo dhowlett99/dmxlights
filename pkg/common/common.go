@@ -36,6 +36,7 @@ type Value struct {
 
 type State struct {
 	Name        string
+	Label       string
 	Values      []Value
 	ButtonColor Color
 }
@@ -43,6 +44,7 @@ type State struct {
 type Switch struct {
 	Name         string
 	Number       int
+	Label        string
 	CurrentState int
 	Description  string
 	States       []State

@@ -36,6 +36,7 @@ type Value struct {
 
 type State struct {
 	Name        string  `yaml:"name"`
+	Label       string  `yaml:"label"`
 	Values      []Value `yaml:"values"`
 	ButtonColor Color   `yaml:"buttoncolor"`
 	Master      int     `yaml:"master"`
@@ -43,6 +44,7 @@ type State struct {
 
 type Switch struct {
 	Name        string  `yaml:"name"`
+	Label       string  `yaml:"label"`
 	Number      int     `yaml:"number"`
 	Description string  `yaml:"description"`
 	States      []State `yaml:"states"`

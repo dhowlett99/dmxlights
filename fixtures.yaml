@@ -780,9 +780,11 @@ fixtures:
   switches:
   - name: switch
     number: 1
+    label: Proj1
     description: Projector1
     states:
     - name: Off
+      label: Off
       values:
         - name: master dimmer
           description: Dimmer
@@ -793,6 +795,7 @@ fixtures:
         green: 255
         blue: 0
     - name: On
+      label: On
       values: 
         - name: master dimmer
           description: Dimmer
@@ -804,9 +807,11 @@ fixtures:
         blue: 0  
   - name: switch
     number: 2
+    label: Proj2
     description: Projector2
     states:
     - name: Off
+      label: Off
       values:
         - name: master dimmer
           description: Dimmer
@@ -817,6 +822,7 @@ fixtures:
         green: 255
         blue: 0
     - name: On
+      label: On
       values: 
         - name: master dimmer
           description: Dimmer
@@ -828,9 +834,11 @@ fixtures:
         blue: 0
   - name: switch
     number: 3
+    label: Deluge
     description: ACME Deluge
     states:
     - name: Off
+      label: Off
       master: 
       buttoncolor: 
         red: 0
@@ -842,6 +850,7 @@ fixtures:
           channel: 145 # Base address of Deluge Fixture
           setting: 0 # 100% Brightness
     - name: On
+      label: On
       buttoncolor: 
         red: 255
         green: 0
@@ -861,9 +870,11 @@ fixtures:
           setting: 135 # Slow Clockwise
   - name: switch
     number: 4
+    label: Vue
     description: Chauvet Vue 1.1
     states:
     - name: Off
+      label: Off
       buttoncolor: 
         red: 0
         green: 255
@@ -894,6 +905,7 @@ fixtures:
           channel: 144
           setting: 0
     - name: Red
+      label: Red
       buttoncolor: 
         red: 255
         green: 0
@@ -924,10 +936,11 @@ fixtures:
           channel: 144
           setting: 255
     - name: Slow Color Change
+      label: SlwChg
       buttoncolor: 
         red: 255
-        green: 255
-        blue: 0
+        green: 100
+        blue: 100
       values: 
         - name: mode
           description: Operating Mode
@@ -954,6 +967,7 @@ fixtures:
           channel: 144
           setting: 255
     - name: Meduim Color Change
+      label: MdChg
       buttoncolor: 
         red: 0
         green: 0
@@ -984,10 +998,11 @@ fixtures:
           channel: 144
           setting: 255
     - name: Sound Triggered Color Change
+      label: Sound
       buttoncolor: 
-        red: 255
-        green: 255
-        blue: 255
+        red: 128
+        green: 47
+        blue: 187
       values: 
         - name: mode
           description: Operating Mode
@@ -1015,8 +1030,11 @@ fixtures:
           setting: 255
   - name: switch
     number: 5
+    label: Swtch5
+    description: Switch 5
     states:
     - name: Off
+      label: Off
       buttoncolor: 
         red: 0
         green: 255
@@ -1027,6 +1045,7 @@ fixtures:
           channel: 154
           setting: 0
     - name: Slow Color Fade
+      label: Slow
       buttoncolor: 
         red: 255
         green: 0
@@ -1049,10 +1068,11 @@ fixtures:
           channel: 157
           setting: 250
     - name: Sound Trigger
+      label: Sound
       buttoncolor: 
-        red: 255
-        green: 255
-        blue: 255 
+        red: 144
+        green: 203
+        blue: 77 
       values: 
         - name: mode
           description: Dimmer
@@ -1076,39 +1096,48 @@ fixtures:
           setting: 32
   - name: switch
     number: 6
+    label: Swtch6
     states:
     - name: Off
+      label: Off
       buttoncolor: 
         red: 0
         green: 255
         blue: 0
     - name: On
+      label: On
       buttoncolor: 
         red: 255
         green: 0
         blue: 0  
   - name: switch
     number: 7
+    label: Swtch7
     states:
     - name: Off
+      label: Off
       buttoncolor: 
         red: 0
         green: 255
         blue: 0 
     - name: On
+      label: On
       buttoncolor: 
         red: 255
         green: 0
         blue: 0 
   - name: switch
+    label: Swtch8
     number: 8
     states:
     - name: Off
+      label: Off
       buttoncolor: 
         red: 0
         green: 255
         blue: 0 
     - name: On
+      label: Off
       buttoncolor: 
         red: 255
         green: 0

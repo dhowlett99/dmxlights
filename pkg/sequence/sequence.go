@@ -235,6 +235,7 @@ func CreateSequence(
 				for _, swiTch := range fixture.Switches {
 					newSwitch := common.Switch{}
 					newSwitch.Name = swiTch.Name
+					newSwitch.Label = swiTch.Label
 					newSwitch.Number = swiTch.Number
 					newSwitch.Description = swiTch.Description
 
@@ -242,6 +243,7 @@ func CreateSequence(
 					for _, state := range swiTch.States {
 						newState := common.State{}
 						newState.Name = state.Name
+						newState.Label = state.Label
 						newState.ButtonColor.R = state.ButtonColor.R
 						newState.ButtonColor.G = state.ButtonColor.G
 						newState.ButtonColor.B = state.ButtonColor.B
@@ -600,10 +602,14 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				// Use the button color for this state to light the correct color on the launchpad.
 				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: state.ButtonColor.R, Green: state.ButtonColor.G, Blue: state.ButtonColor.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 
+				// Label the switch.
+				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
+
 				// Now play all the values for this state.
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
+		//common.LabelButton(switchNumber+1, mySequenceNumber, switchData.Label, guiButtons)
 	}
 
 	return flood
