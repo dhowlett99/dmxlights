@@ -358,8 +358,7 @@ func SendCommandToAllSequence(selectedSequence int, command Command, commandChan
 	commandChannels[3] <- command
 }
 
-func SendCommandToAllSequenceOfType(sequences []*Sequence, selectedSequence int, command Command, commandChannels []chan Command, Type string) {
-
+func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
 	for index, s := range sequences {
 		if s.Type == Type {
 			commandChannels[index] <- command

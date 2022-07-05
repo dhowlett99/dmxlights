@@ -157,7 +157,7 @@ func ProcessButtons(X int, Y int,
 		cmd = common.Command{
 			Action: common.UpdateSwitchPositions,
 		}
-		common.SendCommandToAllSequenceOfType(sequences, this.SelectedSequence, cmd, commandChannels, "switch")
+		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 
 		// Clear the sequence colors.
 		cmd = common.Command{
@@ -235,6 +235,30 @@ func ProcessButtons(X int, Y int,
 					},
 				}
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			}
+		}
+
+		// Clear down all the switch positions to their fisrt positions.
+		for sequenceNumber, sequence := range sequences {
+
+			if sequence.Type == "switch" {
+
+				// Loop through all the switchies.
+				for X := 0; X < len(sequences[sequenceNumber].Switches); X++ {
+					// Send a message to the sequence for it to toggle the selected switch.
+					this.SwitchPositions[sequenceNumber][X] = 0
+					// Y is the sequence.
+					// X is the switch.
+					cmd := common.Command{
+						Action: common.UpdateSwitch,
+						Args: []common.Arg{
+							{Name: "SwitchNumber", Value: X},
+							{Name: "SwitchPosition", Value: 0},
+						},
+					}
+					// Send a message to the switch sequence.
+					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+				}
 			}
 		}
 
@@ -966,7 +990,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			// Send a message to the switch sequence.
-			common.SendCommandToAllSequenceOfType(sequences, Y, cmd, commandChannels, "switch")
+			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		}
 	}
 
