@@ -372,8 +372,8 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels, GuiFlashButtons [][]bool) {
-	HideFunctionButtons(selectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
+func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
+	HideFunctionButtons(selectedSequence, eventsForLauchpad, guiButtons)
 	// Get an upto date copy of the sequence.
 	cmd := Command{
 		Action: ReadConfig,
@@ -383,7 +383,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	replyChannel := channels.ReplyChannels[selectedSequence]
 	sequence = <-replyChannel
 
-	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons, GuiFlashButtons)
+	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
 
 func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
@@ -703,19 +703,19 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 }
 
 // For the given sequence hide the available sequence colors..
-func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, GuiFlashButtons [][]bool) {
+func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for myFixtureNumber := range sequence.AvailableSequenceColors {
-		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
 }
 
-func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, GuiFlashButtons [][]bool) {
+func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
-		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 	}
 }
 
-func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, GuiFlashButtons [][]bool) {
+func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Loop through the available functions for this sequence
 	for index, function := range sequence.Functions {
@@ -723,14 +723,14 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 			fmt.Printf("function %+v\n", function)
 		}
 		if function.State {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 		} else {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
 	}
 }
 
-func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan ALight, guiButtons chan ALight, sequences []chan Command, GuiFlashButtons [][]bool) {
+func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan ALight, guiButtons chan ALight, sequences []chan Command) {
 	pad.Reset()
 	command := Command{
 		Action: Stop,
@@ -743,7 +743,7 @@ func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				LightLamp(ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons, GuiFlashButtons)
+				LightLamp(ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}
 	}
@@ -770,7 +770,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad)
 }
 
 // LightOn Turn on a Light.
-func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight, GuiFlashButtons [][]bool) {
+func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	if debug {
 		fmt.Printf("LightLamp  X:%d  Y:%d\n", Light.X, Light.Y)
@@ -783,14 +783,11 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      Light.Flash,
+		Flash:      false,
 		OnColor:    22,
 		OffColor:   18,
 	}
 	eventsForLauchpad <- event
-
-	// Tell the GUI button to stop flashing.// Remember we asked this GUI button to flash.
-	GuiFlashButtons[Light.X][Light.Y+1] = false
 
 	// Send message to GUI
 	event = ALight{
@@ -800,7 +797,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      Light.Flash,
+		Flash:      false,
 		OnColor:    22,
 		OffColor:   18,
 	}
@@ -808,55 +805,27 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 
 }
 
-func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan ALight, guiButtons chan ALight, GuiFlashButtons [][]bool) {
+func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{
-		Flash:    true,
-		X:        X,
-		Y:        Y,
-		OnColor:  onColor,
-		OffColor: offColor,
+		X:          X,
+		Y:          Y,
+		Brightness: 255,
+		Flash:      true,
+		OnColor:    onColor,
+		OffColor:   offColor,
 	}
 	eventsForLauchpad <- e
 
-	guiOnColor := GetLaunchPadColorCodeByInt(onColor)
-	guiOffColor := GetLaunchPadColorCodeByInt(offColor)
-	go func() {
-
-		GuiFlashButtons[e.X][e.Y+1] = true
-
-		for {
-			if GuiFlashButtons[e.X][e.Y+1] {
-
-				// Send message to GUI
-				event := ALight{
-					X:          e.X,
-					Y:          e.Y + 1,
-					Brightness: 255,
-					Red:        guiOnColor.R,
-					Green:      guiOnColor.G,
-					Blue:       guiOnColor.B,
-				}
-				guiButtons <- event
-
-				time.Sleep(500 * time.Millisecond)
-
-				// Send message to GUI
-				event = ALight{
-					X:          e.X,
-					Y:          e.Y + 1,
-					Brightness: 255,
-					Red:        guiOffColor.R,
-					Green:      guiOffColor.G,
-					Blue:       guiOffColor.B,
-				}
-				guiButtons <- event
-
-				time.Sleep(500 * time.Millisecond)
-			} else {
-				return
-			}
-		}
-	}()
+	// Send message to GUI
+	event := ALight{
+		X:          e.X,
+		Y:          e.Y + 1,
+		Brightness: 255,
+		Flash:      true,
+		OnColor:    onColor,
+		OffColor:   offColor,
+	}
+	guiButtons <- event
 }
