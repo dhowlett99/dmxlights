@@ -69,10 +69,16 @@ func (panel *MyPanel) updateButtonColor(alight common.ALight, GuiFlashButtons []
 		// We're not flashing.
 		// reset this button so it's not flashing.
 		GuiFlashButtons[alight.X][alight.Y+1] = false
+
+		// Take into account the brightness.
+		Red := (float64(alight.Red) / 100) * (float64(alight.Brightness) / 2.55)
+		Green := (float64(alight.Green) / 100) * (float64(alight.Brightness) / 2.55)
+		Blue := (float64(alight.Blue) / 100) * (float64(alight.Brightness) / 2.55)
+
 		color := color.NRGBA{}
-		color.R = uint8(alight.Red)
-		color.G = uint8(alight.Green)
-		color.B = uint8(alight.Blue)
+		color.R = uint8(Red)
+		color.G = uint8(Green)
+		color.B = uint8(Blue)
 		color.A = 255
 		panel.Buttons[alight.X][alight.Y].rectangle.FillColor = color
 		panel.Buttons[alight.X][alight.Y].rectangle.Refresh()

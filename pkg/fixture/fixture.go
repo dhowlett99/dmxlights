@@ -192,6 +192,7 @@ func FixtureReceiver(sequence common.Sequence,
 									// Remember that fixtures in the real world start with 1 not 0.
 									realFixture := position.Fixture + 1
 									// Find the color that has been selected for this fixture.
+									// selected color is an index into the scanner colors selected.
 									selectedColor := cmd.ScannerColor[position.Fixture]
 
 									// Do we have a set of available colors for this fixture.
