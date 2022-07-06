@@ -51,6 +51,8 @@ type Switch struct {
 }
 
 type StaticColorButton struct {
+	Name          string
+	Label         string
 	Number        int
 	X             int
 	Y             int
@@ -215,6 +217,7 @@ type Sequence struct {
 	OffsetTilt                   int
 	FunctionLabels               [8]string
 	BottomButtons                [8]string
+	FixtureLabels                []string
 }
 
 type Function struct {
@@ -284,6 +287,7 @@ type FixtureCommand struct {
 	AvailableScannerColors map[int][]StaticColorButton
 	OffsetPan              int
 	OffsetTilt             int
+	FixtureLabels          []string
 }
 
 type Position struct {
@@ -302,6 +306,8 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	Name           string
+	Label          string
 	Type           string
 	MasterDimmer   int
 	Colors         []Color
@@ -377,7 +383,10 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 }
 
 func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
-	HideFunctionButtons(selectedSequence, eventsForLauchpad, guiButtons)
+
+	// The taget set of buttons.
+	ClearSelectedRowOfButtons(selectedSequence, eventsForLauchpad, guiButtons)
+
 	// Get an upto date copy of the sequence.
 	cmd := Command{
 		Action: ReadConfig,
@@ -713,9 +722,15 @@ func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selected
 	}
 }
 
-func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		LabelButton(x, selectedSequence, "", guiButtons)
+	}
+}
+
+func ClearLabelsSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	for x := 0; x < 8; x++ {
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}
 }
@@ -777,7 +792,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad)
 		event := <-eventsForLauchpad
 
 		if event.Flash {
-			pad.FlashLight(event.X, event.Y, event.OnColor, event.OffColor)
+			pad.FlashLight(event.X, event.Y, int(event.OnColor), int(event.OffColor))
 		} else {
 			// For the math to work we need to convert our ints to floats and then back again.
 			Red := ((float64(event.Red) / 2) / 100) * (float64(event.Brightness) / 2.55)

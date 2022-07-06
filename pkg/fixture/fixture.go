@@ -52,6 +52,7 @@ type Switch struct {
 
 type Fixture struct {
 	Name        string    `yaml:"name"`
+	Label       string    `yaml:"label"`
 	Number      int       `yaml:"number"`
 	Description string    `yaml:"description"`
 	Type        string    `yaml:"type"`
@@ -212,6 +213,7 @@ func FixtureReceiver(sequence common.Sequence,
 								} else {
 									// We're not in chase mode so use the color generated in the patten generator.common.
 									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: position.Color.R, Green: position.Color.G, Blue: position.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+									common.LabelButton(myFixtureNumber, mySequenceNumber, cmd.FixtureLabels[myFixtureNumber], guiButtons)
 								}
 							}
 						}

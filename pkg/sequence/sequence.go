@@ -93,10 +93,19 @@ func CreateSequence(
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "scanner" {
 			newFixture := common.StaticColorButton{}
+			newFixture.Name = fixture.Name
+			newFixture.Label = fixture.Label
 			newFixture.Number = fixture.Number
 			newFixture.SelectedColor = 1 // Red
 			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
 			availableFixtures = append(availableFixtures, newFixture)
+		}
+	}
+
+	fixtureLabels := []string{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
+			fixtureLabels = append(fixtureLabels, fixture.Label)
 		}
 	}
 
@@ -175,6 +184,7 @@ func CreateSequence(
 		ScannerColor:          scannerColors,
 		OffsetPan:             120,
 		OffsetTilt:            120,
+		FixtureLabels:         fixtureLabels,
 	}
 
 	if sequence.Type == "rgb" {
@@ -571,6 +581,7 @@ func PlaySequence(sequence common.Sequence,
 						AvailableScannerColors: sequence.AvailableScannerColors,
 						OffsetPan:              sequence.OffsetPan,
 						OffsetTilt:             sequence.OffsetTilt,
+						FixtureLabels:          sequence.FixtureLabels,
 					}
 
 					// Now tell all the fixtures in this group what they need to do.

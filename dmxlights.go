@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -124,7 +125,8 @@ func ConvertRGBtoNRGBA(alight common.Color) color.NRGBA {
 }
 
 func (panel *MyPanel) updateButtonLabel(X int, Y int, label string) {
-	panel.Buttons[X][Y].button.Text = label
+	// If the label contains a period, replace it with a new line.
+	panel.Buttons[X][Y].button.Text = strings.Replace(label, ".", "\n", 2)
 	panel.Buttons[X][Y].button.Refresh()
 }
 

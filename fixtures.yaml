@@ -417,6 +417,7 @@ fixtures:
 #     name: Static
 #     value: 0
 - name: Scanner 1
+  label: ADJ.Com.Scan1
   number: 1
   description: American DJ Comscan LED
   type: scanner
@@ -469,6 +470,7 @@ fixtures:
   - number: 5
     name: Master
 - name: Scanner 2
+  label: ADJ.Com.Scan2
   number: 2
   description: American DJ Comscan LED
   type: scanner
@@ -521,6 +523,7 @@ fixtures:
   - number: 5
     name: Master
 - name: Scanner 3
+  label: ADJ.Com.Scan3
   number: 3
   description: American DJ Comscan LED
   type: scanner
@@ -573,6 +576,7 @@ fixtures:
   - number: 5
     name: Master
 - name: Scanner 4
+  label: ADJ.Com.Scan4
   number: 4
   description: American DJ Comscan LED
   type: scanner
@@ -625,6 +629,7 @@ fixtures:
   - number: 5
     name: Master
 - name: Scanner 5
+  label: ADJ.Com.Scan5
   number: 5
   description: American DJ Comscan LED
   type: scanner
@@ -677,6 +682,7 @@ fixtures:
   - number: 5
     name: Master
 - name: Scanner 6
+  label: ADJ.Inno.Spot1
   number: 6
   description: American DJ Inno Pocket Spot
   type: scanner
