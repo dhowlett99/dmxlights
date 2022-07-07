@@ -258,16 +258,25 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Build the default set of Pattens.
+	this.Pattens = patten.MakePatterns()
+
 	// Create the sequences from config file.
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
 	for index, sequenceConf := range sequencesConfig.Sequences {
-		fmt.Printf("Found sequence: %s, desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Description, sequenceConf.Type)
+		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
 		if sequenceConf.Type == "rgb" {
 			this.SelectedFloodMap[index] = true // This sequence is this.Flood able because it's a rgb.
 		}
-		tempSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels, this.SelectedFloodMap)
-		sequences = append(sequences, &tempSequence)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels, this.SelectedFloodMap)
+
+		// Add the name, label and description to the new sequence.
+		newSequence.Name = sequenceConf.Name
+		newSequence.Description = sequenceConf.Description
+		newSequence.Label = sequenceConf.Label
+
+		sequences = append(sequences, &newSequence)
 	}
 
 	// Create all the channels I need.
@@ -328,9 +337,6 @@ func main() {
 
 	// Remember when we are in editing patten mode.
 	this.EditPattenMode = make([]bool, 4)
-
-	// Build the default set of Pattens.
-	this.Pattens = patten.MakePatterns()
 
 	// Create storage for the static color buttons.
 	staticButton1 := common.StaticColorButton{}
@@ -462,10 +468,10 @@ func main() {
 	this.Pad.Reset()
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, this.Pattens, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
 
 	// Light up any existing presets.
 	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)

@@ -1,17 +1,21 @@
 sequences:
 - name: sequence1
+  label: Par Cans
   description: Front of House Main Par Cans
   group: 1
   type: rgb
 - name: sequence2
+  label: Uplighters
   description: Uplighters
   group: 2
   type: rgb
 - name: sequence3
+  label: Scanners
   description: Scanners
   group: 3
   type: scanner
 - name: sequence4
+  label: Switch
   description: Switch Box
   group: 4
   type: switch

@@ -21,43 +21,44 @@ const (
 )
 
 type CurrentState struct {
-	SelectedSequence         int       // The currently selected sequence.
-	SequenceSpeed            int       // Local copy of sequence speed.
-	Size                     int       // current RGB sequence this.Size.
-	ScannerSize              int       // Current scanner this.Size.
-	SavePreset               bool      // Save a preset flag.
-	SelectedShift            int       // Current fixture shift.
-	Blackout                 bool      // Blackout all fixtures.
-	Flood                    bool      // Flood all fixtures.
-	FunctionSelectMode       []bool    // Which sequence is in function selection mode.
-	StaticLamps              [][]bool  // Static color lamps.
-	SelectButtonPressed      []bool    // Which sequence has its Select button pressed.
-	SwitchPositions          [9][9]int // Sorage for switch positions.
-	EditSequenceColorsMode   []bool    // This flag is true when the sequence is in sequence colors editing mode.
-	EditScannerColorsMode    []bool    // This flag is true when the sequence is in select scanner colors editing mode.
-	EditGoboSelectionMode    []bool    // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode     []bool    // This flag is true when the sequence is in static colors editing mode.
-	EditPattenMode           []bool    // This flag is true when the sequence is in patten editing mode.
-	EditFixtureSelectionMode bool      // This flag is true when the sequence is in select fixture mode.
-	FadeSpeed                int       // Default start at 50ms.
-	MasterBrightness         int       // Affects all DMX fixtures and launchpad lamps.
-	LastStaticColorButtonX   int       // Which Static Color button did we change last.
-	LastStaticColorButtonY   int       // Which Static Color button did we change last.
-	SoundGain                float32   // Fine gain -0.09 -> 0.09
-	DisabledFixture          [][]bool  // Which fixture is disabled on which sequence.
-	SelectedFixture          int       // Which fixture is selected when changing scanner color or gobo.
-	FollowingAction          string    // String to find next function, used in selecting a fixture.
-	SelectedCordinates       int       // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
-	OffsetPan                int       // Start pan from the center
-	OffsetTilt               int
-	Pad                      *mk3.Launchpad
-	PresetsStore             map[string]bool
-	SoundTriggers            []*common.Trigger
-	SequenceChannels         common.Channels
-	Pattens                  map[string]common.Patten
-	StaticButtons            []common.StaticColorButton
-	SelectedFloodMap         map[int]bool
-	SelectedGobo             int
+	SelectedSequence         int                        // The currently selected sequence.
+	SequenceSpeed            int                        // Local copy of sequence speed.
+	Size                     int                        // current RGB sequence this.Size.
+	ScannerSize              int                        // Current scanner this.Size.
+	SavePreset               bool                       // Save a preset flag.
+	SelectedShift            int                        // Current fixture shift.
+	Blackout                 bool                       // Blackout all fixtures.
+	Flood                    bool                       // Flood all fixtures.
+	FunctionSelectMode       []bool                     // Which sequence is in function selection mode.
+	StaticLamps              [][]bool                   // Static color lamps.
+	SelectButtonPressed      []bool                     // Which sequence has its Select button pressed.
+	SwitchPositions          [9][9]int                  // Sorage for switch positions.
+	EditSequenceColorsMode   []bool                     // This flag is true when the sequence is in sequence colors editing mode.
+	EditScannerColorsMode    []bool                     // This flag is true when the sequence is in select scanner colors editing mode.
+	EditGoboSelectionMode    []bool                     // This flag is true when the sequence is in sequence gobo selection mode.
+	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
+	EditPattenMode           []bool                     // This flag is true when the sequence is in patten editing mode.
+	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
+	FadeSpeed                int                        // Default start at 50ms.
+	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
+	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
+	LastStaticColorButtonY   int                        // Which Static Color button did we change last.
+	SoundGain                float32                    // Fine gain -0.09 -> 0.09
+	DisabledFixture          [][]bool                   // Which fixture is disabled on which sequence.
+	SelectedFixture          int                        // Which fixture is selected when changing scanner color or gobo.
+	FollowingAction          string                     // String to find next function, used in selecting a fixture.
+	SelectedCordinates       int                        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
+	OffsetPan                int                        // Offset for Pan.
+	OffsetTilt               int                        // Offset for Tilt.
+	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
+	PresetsStore             map[string]bool            // Storage for the Presets.
+	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
+	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
+	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
+	SelectedPatten           int                        // The selected Patten Number. Used as the index for above.
+	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
+	SelectedFloodMap         map[int]bool               // Storage for which sequences can be flood light.
+	SelectedGobo             int                        // The selected GOBO.
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -1082,7 +1083,7 @@ func ProcessButtons(X int, Y int,
 		flashSequence := common.Sequence{
 			Patten: common.Patten{
 				Name:  "colors",
-				Steps: this.Pattens["colors"].Steps,
+				Steps: this.Pattens[4].Steps, // Use the color patten for flashing.
 			},
 		}
 
@@ -1462,15 +1463,17 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPattenMode[this.SelectedSequence] {
 
+		this.SelectedPatten = X
+
 		if debug {
-			fmt.Printf("Set Patten X:%d Y:%d\n", X, Y)
+			fmt.Printf("Set Patten to %d\n", this.SelectedPatten)
 		}
 
 		// Tell the sequence to change the patten.
 		cmd := common.Command{
 			Action: common.SelectPatten,
 			Args: []common.Arg{
-				{Name: "SelectedPatten", Value: X},
+				{Name: "SelectedPatten", Value: this.SelectedPatten},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1637,6 +1640,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 			// Editing patten is over for this sequence.
 			this.EditPattenMode[this.SelectedSequence] = false
+
+			// Clear buttons and remove any labels.
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 		}
 
 		if !this.FunctionSelectMode[this.SelectedSequence] && sequences[this.SelectedSequence].Functions[common.Function5_Color].State && this.EditSequenceColorsMode[this.SelectedSequence] {
@@ -1862,13 +1868,34 @@ func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 
 // For the given sequence show the available this.Pattens on the relevant buttons.
 func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
-	// Check if we need to flash this button.
-	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
-		if myFixtureNumber == sequence.SelectedPatten {
-			code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 255, G: 255, B: 255})
-			common.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
-		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 255, Green: 255, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+
+	if debug {
+		fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
+	}
+
+	if sequence.Type == "rgb" {
+		for _, patten := range sequence.AvailableRGBPattens {
+			if patten.Number == sequence.SelectedRGBPatten {
+				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
+				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
+			} else {
+				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			}
+			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
 		}
+		return
+	}
+
+	if sequence.Type == "scanner" {
+		for _, patten := range sequence.AvailableScannerPattens {
+			if patten.Number == sequence.SelectedScannerPatten {
+				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
+				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
+			} else {
+				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+			}
+			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
+		}
+		return
 	}
 }

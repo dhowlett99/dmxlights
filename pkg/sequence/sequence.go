@@ -26,6 +26,7 @@ type SequencesConfig struct {
 
 type SequenceConfig struct {
 	Name        string `yaml:"name"`
+	Label       string `yaml:"label"`
 	Description string `yaml:"description"`
 	Type        string `yaml:"type"`
 	Group       int    `yaml:"group"`
@@ -62,12 +63,12 @@ func LoadSequences() (sequences *SequencesConfig, err error) {
 func CreateSequence(
 	sequenceType string,
 	mySequenceNumber int,
-	pattens map[string]common.Patten,
+	availableRGBPattens map[int]common.Patten,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
 	selectedFloodMap map[int]bool) common.Sequence {
 
-	var initialPatten string
+	//var initialPatten string
 	var scanners int // Number of scanners in this sequence
 
 	// Populate the static colors for this sequence with the defaults.
@@ -79,28 +80,11 @@ func CreateSequence(
 	// Populate the set scanner gobo colors buttons for this sequence with the defaults.
 	sequenceGoboColorButtons := setDefaultGoboColorButtons(mySequenceNumber)
 
-	// Set default values
-	if sequenceType == "rgb" {
-		initialPatten = "standard"
-	}
-
 	// Every scanner has a number of colors in its wheel.
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 
-	// You need to select a fixture before you can choose a color or gobo.
-	// availableFixtures holds a set of red buttons, one for every available fixture.
-	availableFixtures := []common.StaticColorButton{}
-	for _, fixture := range fixturesConfig.Fixtures {
-		if fixture.Type == "scanner" {
-			newFixture := common.StaticColorButton{}
-			newFixture.Name = fixture.Name
-			newFixture.Label = fixture.Label
-			newFixture.Number = fixture.Number
-			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
-			availableFixtures = append(availableFixtures, newFixture)
-		}
-	}
+	// Find the fixtures.
+	availableFixtures := setAvalableFixtures(fixturesConfig)
 
 	fixtureLabels := []string{}
 	for _, fixture := range fixturesConfig.Fixtures {
@@ -110,12 +94,13 @@ func CreateSequence(
 	}
 
 	// Initilaise Scanners's
-	var gobos = []common.Gobo{}
+	var availableScannerGobos = []common.Gobo{}
 	if sequenceType == "scanner" {
-		initialPatten = "circle"
+		//initialPatten = "circle"
 
 		// Initilaise Gobo's
-		scanners, gobos = fixture.HowManyGobos(mySequenceNumber, fixturesConfig)
+		// Every scanner has a number of gobos in its wheel.
+		scanners, availableScannerGobos = fixture.HowManyGobos(mySequenceNumber, fixturesConfig)
 
 		// Get available scanner colors for all fixtures.
 		availableScannerColors = getAvailableScannerColors(fixturesConfig)
@@ -150,41 +135,28 @@ func CreateSequence(
 		Run:                          true,
 		Bounce:                       false,
 		NumberSteps:                  8 * 14, // Eight lamps and 14 steps to fade up and down.
-		Patten: common.Patten{
-			Name:     initialPatten,
-			Length:   2,
-			Size:     2,
-			Fixtures: 8,
-			Steps:    pattens[initialPatten].Steps,
-		},
-		ScannerSize:  common.DefaultScannerSize,
-		Speed:        14,
-		CurrentSpeed: 25 * time.Millisecond,
-		Colors: []common.Color{
-			{
-				R: 0,
-				G: 0,
-				B: 0,
-			},
-		},
-		Shift:                 0, // Start at zero ie no shift.
-		Blackout:              false,
-		Master:                255,
-		Gobo:                  gobos,
-		SelectedGobo:          1,
-		SelectedFloodSequence: selectedFloodMap,
-		Flood:                 false,
-		SelectedColor:         1,
-		AutoColor:             false,
-		AutoPatten:            false,
-		SelectedScannerPatten: 0,
-		FixtureDisabled:       fixtureDisabled,
-		DisableOnce:           disabledOnce,
-		NumberCoordinates:     []int{12, 16, 24, 32},
-		ScannerColor:          scannerColors,
-		OffsetPan:             120,
-		OffsetTilt:            120,
-		FixtureLabels:         fixtureLabels,
+		AvailableRGBPattens:          availableRGBPattens,
+		ScannerSize:                  common.DefaultScannerSize,
+		Speed:                        14,
+		CurrentSpeed:                 25 * time.Millisecond,
+		Shift:                        0, // Start at zero ie no shift.
+		Blackout:                     false,
+		Master:                       255,
+		AvailableScannerGobos:        availableScannerGobos,
+		SelectedGobo:                 1,
+		SelectedFloodSequence:        selectedFloodMap,
+		Flood:                        false,
+		SelectedColor:                1,
+		AutoColor:                    false,
+		AutoPatten:                   false,
+		SelectedScannerPatten:        0,
+		FixtureDisabled:              fixtureDisabled,
+		DisableOnce:                  disabledOnce,
+		NumberCoordinates:            []int{12, 16, 24, 32},
+		ScannerColor:                 scannerColors,
+		OffsetPan:                    120,
+		OffsetTilt:                   120,
+		FixtureLabels:                fixtureLabels,
 	}
 
 	if sequence.Type == "rgb" {
@@ -227,8 +199,8 @@ func CreateSequence(
 	sequence.BottomButtons[3] = "Shift\nUp"
 	sequence.BottomButtons[4] = "Size\nDown"
 	sequence.BottomButtons[5] = "Size\nUp"
-	sequence.BottomButtons[6] = "Fade\nSharp"
-	sequence.BottomButtons[7] = "Fade\nSoft"
+	sequence.BottomButtons[6] = "Fade\nSoft"
+	sequence.BottomButtons[7] = "Fade\nSharp"
 
 	if sequenceType == "switch" {
 
@@ -286,7 +258,6 @@ func PlaySequence(sequence common.Sequence,
 	pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	pattens map[string]common.Patten,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
@@ -420,32 +391,21 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				if sequence.Type != "scanner" {
-					sequence.Steps = pattens[sequence.Patten.Name].Steps
-				}
-
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
+					sequence.Steps = sequence.AvailableRGBPattens[sequence.SelectedRGBPatten].Steps
 					sequence.UpdatePatten = false
-					if sequence.SelectedPatten == 0 {
-						sequence.Patten.Name = "standard"
-					}
-					if sequence.SelectedPatten == 1 {
-						sequence.Patten.Name = "pairs"
-					}
-					if sequence.SelectedPatten == 2 {
-						sequence.Patten.Name = "inward"
-					}
-					if sequence.SelectedPatten == 3 {
-						sequence.Patten.Name = "colors"
-					}
 				}
 
 				// Setup scanner pattens.
 				if sequence.Type == "scanner" {
+
+					// Get available scanner pattens.
+					sequence.AvailableScannerPattens = getAvailableScannerPattens(sequence)
 					sequence.UpdatePatten = false
 
-					sequence.Steps = setPattern(sequence)
+					sequence.Patten = sequence.AvailableScannerPattens[sequence.SelectedScannerPatten]
+					sequence.Steps = sequence.Patten.Steps
 
 					if sequence.AutoColor {
 						sequence.SelectedGobo++
@@ -486,18 +446,18 @@ func PlaySequence(sequence common.Sequence,
 
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
-					for name, patten := range pattens {
-						if patten.Number == sequence.SelectedPatten {
-							sequence.Patten.Name = name
+					for pattenNumber, patten := range sequence.AvailableRGBPattens {
+						if patten.Number == sequence.SelectedRGBPatten {
+							sequence.Patten.Number = pattenNumber
 							if debug {
-								fmt.Printf(">>>> I AM PATTEN %s\n", name)
+								fmt.Printf(">>>> I AM PATTEN %d\n", pattenNumber)
 							}
 							break
 						}
 					}
-					sequence.SelectedPatten++
-					if sequence.SelectedPatten > len(pattens) {
-						sequence.SelectedPatten = 0
+					sequence.SelectedRGBPatten++
+					if sequence.SelectedRGBPatten > len(sequence.AvailableRGBPattens) {
+						sequence.SelectedRGBPatten = 0
 					}
 				}
 
@@ -750,6 +710,26 @@ func setDefaultStaticColorButtons(selectedSequence int) []common.StaticColorButt
 	return staticColorsButtons
 }
 
+func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
+
+	// You need to select a fixture before you can choose a color or gobo.
+	// availableFixtures holds a set of red buttons, one for every available fixture.
+	availableFixtures := []common.StaticColorButton{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
+			newFixture := common.StaticColorButton{}
+			newFixture.Name = fixture.Name
+			newFixture.Label = fixture.Label
+			newFixture.Number = fixture.Number
+			newFixture.SelectedColor = 1 // Red
+			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			availableFixtures = append(availableFixtures, newFixture)
+		}
+	}
+
+	return availableFixtures
+}
+
 // Sets the gobo select colors to default values. Namely Yellow !
 func setDefaultGoboColorButtons(selectedSequence int) []common.StaticColorButton {
 
@@ -790,38 +770,6 @@ func reverseDmx(n int) int {
 	return in[n]
 }
 
-func setPattern(sequence common.Sequence) (steps []common.Step) {
-	if sequence.SelectedScannerPatten == 0 {
-		if debug {
-			fmt.Printf("Scanner Size %d\n", sequence.ScannerSize)
-		}
-		coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates[sequence.SelectedCoordinates], float64(sequence.OffsetPan), float64(sequence.OffsetTilt))
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 1 {
-		coordinates := patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 2 {
-		coordinates := patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-	if sequence.SelectedScannerPatten == 3 {
-		coordinates := patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates[sequence.SelectedCoordinates])
-		scannerPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
-		steps = scannerPatten.Steps
-		return steps
-	}
-
-	return nil
-}
-
 // getAvailableScannerColors looks through the fixtures list and finds scanners that
 // have colors defined in their config. It then returns an array of these available colors.
 func getAvailableScannerColors(fixtures *fixture.Fixtures) map[int][]common.StaticColorButton {
@@ -839,6 +787,49 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) map[int][]common.Stat
 		}
 	}
 	return availableScannerColors
+}
+
+// getAvailableScannerPattens generates scanner pattens and stores them in the sequence.
+// Each scanner can then select which patten to use.
+// All scanner pattens have the same number of steps defined by NumberCoordinates.
+func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Patten {
+
+	scannerPattens := make(map[int]common.Patten)
+
+	// Scanner circle patten 0
+	coordinates := patten.CircleGenerator(sequence.ScannerSize, sequence.NumberCoordinates[sequence.SelectedCoordinates], float64(sequence.OffsetPan), float64(sequence.OffsetTilt))
+	circlePatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+	circlePatten.Name = "circle"
+	circlePatten.Number = 0
+	circlePatten.Label = "Circle"
+	scannerPattens[0] = circlePatten
+
+	// Scanner left right patten 1
+	coordinates = patten.ScanGeneratorLeftRight(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
+	leftRightPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+	leftRightPatten.Name = "leftright"
+	leftRightPatten.Number = 1
+	leftRightPatten.Label = "Left.Right"
+	scannerPattens[1] = leftRightPatten
+
+	// Scanner up down patten 2
+	coordinates = patten.ScanGeneratorUpDown(128, sequence.NumberCoordinates[sequence.SelectedCoordinates])
+	upDownPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+	upDownPatten.Name = "updown"
+	upDownPatten.Number = 2
+	upDownPatten.Label = "Up.Down"
+	scannerPattens[2] = upDownPatten
+
+	// Scanner zig zag patten 3
+	coordinates = patten.ScanGenerateSineWave(255, 5000, sequence.NumberCoordinates[sequence.SelectedCoordinates])
+	zigZagPatten := patten.GeneratePatten(coordinates, sequence.NumberScanners, sequence.Shift, sequence.ScannerChase)
+	zigZagPatten.Name = "zigzag"
+	zigZagPatten.Number = 3
+	zigZagPatten.Label = "Zig.Zag"
+	scannerPattens[3] = zigZagPatten
+
+	return scannerPattens
+
 }
 
 func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, selectedSequence int) {

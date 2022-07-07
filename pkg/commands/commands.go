@@ -80,7 +80,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
 		sequence.UpdatePatten = true
-		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
+		sequence.SelectedRGBPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		return sequence
 

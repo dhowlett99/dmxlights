@@ -63,6 +63,7 @@ type StaticColorButton struct {
 
 type Patten struct {
 	Name     string
+	Label    string
 	Number   int
 	Length   int // 8, 4 or 2
 	Size     int
@@ -156,6 +157,7 @@ type Sequence struct {
 	StaticColors                 []StaticColorButton
 	AvailableSequenceColors      []StaticColorButton
 	AvailableScannerColors       map[int][]StaticColorButton
+	AvailableScannerGobos        []Gobo
 	AvailableGoboSelectionColors []StaticColorButton
 	AvailableFixtures            []StaticColorButton // Holds a set of red buttons, one for every available fixture.
 	EditColors                   bool
@@ -165,6 +167,8 @@ type Sequence struct {
 	FadeOnTime                   time.Duration
 	FadeOffTime                  time.Duration
 	Name                         string
+	Label                        string
+	Description                  string
 	Number                       int
 	Run                          bool
 	Bounce                       bool
@@ -183,7 +187,6 @@ type Sequence struct {
 	MusicTrigger                 bool
 	Blackout                     bool
 	Color                        int
-	Gobo                         []Gobo
 	SelectedGobo                 int
 	SelectedColor                int
 	Master                       int // Master Brightness
@@ -212,12 +215,14 @@ type Sequence struct {
 	Steps                        []Step
 	UpdatePatten                 bool
 	SelectPatten                 bool
-	SelectedPatten               int
+	SelectedRGBPatten            int
 	OffsetPan                    int
 	OffsetTilt                   int
 	FunctionLabels               [8]string
 	BottomButtons                [8]string
 	FixtureLabels                []string
+	AvailableRGBPattens          map[int]Patten
+	AvailableScannerPattens      map[int]Patten
 }
 
 type Function struct {
@@ -549,6 +554,8 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	switch color {
 	case Color{R: 0, G: 196, B: 255}:
 		return 0x4e // Light Blue
+	case Color{R: 100, G: 100, B: 255}:
+		return 0x4f // Grey Blue.
 	case Color{R: 255, G: 0, B: 0}:
 		return 0x48 // Red
 	case Color{R: 255, G: 111, B: 0}:

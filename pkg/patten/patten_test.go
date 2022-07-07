@@ -17,7 +17,7 @@ func Test_circleGenerator(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantOut []coordinate
+		wantOut []Coordinate
 	}{
 		{
 			name: "standard circle",
@@ -27,7 +27,7 @@ func Test_circleGenerator(t *testing.T) {
 				posX:              128,
 				posY:              128,
 			},
-			wantOut: []coordinate{
+			wantOut: []Coordinate{
 				{128, 254},
 				{149, 252},
 				{171, 246},
@@ -83,14 +83,14 @@ func Test_generatePatten(t *testing.T) {
 		fixtures    int
 		shift       int
 		chase       bool
-		coordinates []coordinate
+		Coordinates []Coordinate
 		want        common.Patten
 	}{
 		{
 			name:     "circle patten - 8 point , no shift",
 			fixtures: 1,
 			shift:    0,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  128,
@@ -182,7 +182,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two fixtures, circle patten - 8 point , with shift of 1/4",
 			fixtures: 2,
 			shift:    1,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -282,7 +282,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two fixtures, circle patten - 8 point , with shift of zero",
 			fixtures: 2,
 			shift:    0,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -382,7 +382,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 1/4",
 			fixtures: 4,
 			shift:    1,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -498,7 +498,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "one fixture, circle patten - 8 point shift of 1/4 ",
 			fixtures: 1,
 			shift:    1,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -591,7 +591,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "two scanners doing the same circle",
 			fixtures: 2,
 			shift:    0,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  128,
@@ -636,7 +636,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 2 ie 1/2",
 			fixtures: 4,
 			shift:    2,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -752,7 +752,7 @@ func Test_generatePatten(t *testing.T) {
 			name:     "four fixtures, circle patten - 8 point , with shift of 3 ie 3/4 shift",
 			fixtures: 4,
 			shift:    3,
-			coordinates: []coordinate{
+			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
 					Pan:  0,
@@ -867,7 +867,7 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePatten(tt.Coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %v", got)
 				t.Errorf("Want = %v", tt.want)
 			}
@@ -883,7 +883,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 	tests := []struct {
 		name    string
 		args    args
-		wantOut []coordinate
+		wantOut []Coordinate
 	}{
 		{
 			name: "5000hz sawtooth",
@@ -891,7 +891,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 				size:      255,
 				frequency: 5000,
 			},
-			wantOut: []coordinate{
+			wantOut: []Coordinate{
 				{28, 1},
 				{113, 11},
 				{226, 21},
