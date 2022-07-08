@@ -1290,7 +1290,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single gobo DMX message.
-		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
+		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
 
 		// We call ShowGoboSelectionButtons here so the selections will flash as you press them.
 		ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons)
