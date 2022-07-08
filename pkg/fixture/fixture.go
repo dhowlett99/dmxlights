@@ -64,6 +64,7 @@ type Fixture struct {
 
 type Setting struct {
 	Name    string `yaml:"name"`
+	Label   string `yaml:"label"`
 	Number  int    `yaml:"number"`
 	Setting int    `yaml:"setting"`
 }
@@ -446,39 +447,6 @@ func reverse_dmx(n int) int {
 		y--
 	}
 	return in[n]
-}
-
-func HowManyGobos(sequenceNumber int, fixturesConfig *Fixtures) (numberScanners int, gobos []common.Gobo) {
-	if debug {
-		fmt.Printf("HowManyGobos\n")
-	}
-	gobos = []common.Gobo{}
-	for _, f := range fixturesConfig.Fixtures {
-		if debug {
-			fmt.Printf("Fixture Name:%s\n", f.Name)
-		}
-		if f.Type == "scanner" {
-			numberScanners++
-			if debug {
-				fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, f.Name, f.Description)
-			}
-			for _, channel := range f.Channels {
-				if channel.Name == "Gobo" {
-					newGobo := common.Gobo{}
-					for _, setting := range channel.Settings {
-						newGobo.Name = setting.Name
-						newGobo.Number = setting.Number
-						newGobo.Setting = setting.Setting
-						gobos = append(gobos, newGobo)
-						if debug {
-							fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
-						}
-					}
-				}
-			}
-		}
-	}
-	return numberScanners, gobos
 }
 
 func getFade(size float64, direction bool) []int {

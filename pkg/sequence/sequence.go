@@ -77,9 +77,6 @@ func CreateSequence(
 	// Populate the edit sequence colors for this sequence with the defaults.
 	sequenceColorButtons := setDefaultStaticColorButtons(mySequenceNumber)
 
-	// Populate the set scanner gobo colors buttons for this sequence with the defaults.
-	sequenceGoboColorButtons := setDefaultGoboColorButtons(mySequenceNumber)
-
 	// Every scanner has a number of colors in its wheel.
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 
@@ -93,14 +90,15 @@ func CreateSequence(
 		}
 	}
 
-	// Initilaise Scanners's
-	var availableScannerGobos = []common.Gobo{}
+	// Every scanner has a number of gobos in its wheel.
+	availableScannerGobos := make(map[int][]common.StaticColorButton)
+
 	if sequenceType == "scanner" {
 		//initialPatten = "circle"
 
 		// Initilaise Gobo's
 		// Every scanner has a number of gobos in its wheel.
-		scanners, availableScannerGobos = fixture.HowManyGobos(mySequenceNumber, fixturesConfig)
+		scanners, availableScannerGobos = getAvailableScannerGobos(mySequenceNumber, fixturesConfig)
 
 		// Get available scanner colors for all fixtures.
 		availableScannerColors = getAvailableScannerColors(fixturesConfig)
@@ -117,46 +115,45 @@ func CreateSequence(
 
 	// The actual sequence definition.
 	sequence := common.Sequence{
-		NumberFixtures:               8,
-		AvailableScannerColors:       availableScannerColors,
-		AvailableFixtures:            availableFixtures,
-		NumberScanners:               scanners,
-		Type:                         sequenceType,
-		Hide:                         false,
-		Mode:                         "Sequence",
-		StaticColors:                 staticColorsButtons,
-		AvailableSequenceColors:      sequenceColorButtons,
-		AvailableGoboSelectionColors: sequenceGoboColorButtons,
-		Name:                         sequenceType,
-		Number:                       mySequenceNumber,
-		FadeSpeed:                    12,
-		FadeTime:                     75 * time.Millisecond,
-		MusicTrigger:                 false,
-		Run:                          true,
-		Bounce:                       false,
-		NumberSteps:                  8 * 14, // Eight lamps and 14 steps to fade up and down.
-		AvailableRGBPattens:          availableRGBPattens,
-		ScannerSize:                  common.DefaultScannerSize,
-		Speed:                        14,
-		CurrentSpeed:                 25 * time.Millisecond,
-		Shift:                        0, // Start at zero ie no shift.
-		Blackout:                     false,
-		Master:                       255,
-		AvailableScannerGobos:        availableScannerGobos,
-		SelectedGobo:                 1,
-		SelectedFloodSequence:        selectedFloodMap,
-		Flood:                        false,
-		SelectedColor:                1,
-		AutoColor:                    false,
-		AutoPatten:                   false,
-		SelectedScannerPatten:        0,
-		FixtureDisabled:              fixtureDisabled,
-		DisableOnce:                  disabledOnce,
-		NumberCoordinates:            []int{12, 16, 24, 32},
-		ScannerColor:                 scannerColors,
-		OffsetPan:                    120,
-		OffsetTilt:                   120,
-		FixtureLabels:                fixtureLabels,
+		NumberFixtures:          8,
+		AvailableScannerColors:  availableScannerColors,
+		AvailableFixtures:       availableFixtures,
+		NumberScanners:          scanners,
+		Type:                    sequenceType,
+		Hide:                    false,
+		Mode:                    "Sequence",
+		StaticColors:            staticColorsButtons,
+		AvailableSequenceColors: sequenceColorButtons,
+		AvailableScannerGobos:   availableScannerGobos,
+		Name:                    sequenceType,
+		Number:                  mySequenceNumber,
+		FadeSpeed:               12,
+		FadeTime:                75 * time.Millisecond,
+		MusicTrigger:            false,
+		Run:                     true,
+		Bounce:                  false,
+		NumberSteps:             8 * 14, // Eight lamps and 14 steps to fade up and down.
+		AvailableRGBPattens:     availableRGBPattens,
+		ScannerSize:             common.DefaultScannerSize,
+		Speed:                   14,
+		CurrentSpeed:            25 * time.Millisecond,
+		Shift:                   0, // Start at zero ie no shift.
+		Blackout:                false,
+		Master:                  255,
+		SelectedGobo:            1,
+		SelectedFloodSequence:   selectedFloodMap,
+		Flood:                   false,
+		SelectedColor:           1,
+		AutoColor:               false,
+		AutoPatten:              false,
+		SelectedScannerPatten:   0,
+		FixtureDisabled:         fixtureDisabled,
+		DisableOnce:             disabledOnce,
+		NumberCoordinates:       []int{12, 16, 24, 32},
+		ScannerColor:            scannerColors,
+		OffsetPan:               120,
+		OffsetTilt:              120,
+		FixtureLabels:           fixtureLabels,
 	}
 
 	if sequence.Type == "rgb" {
@@ -731,22 +728,22 @@ func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorB
 }
 
 // Sets the gobo select colors to default values. Namely Yellow !
-func setDefaultGoboColorButtons(selectedSequence int) []common.StaticColorButton {
+// func setDefaultGoboColorButtons(selectedSequence int) []common.StaticColorButton {
 
-	// Make an array to hold gobo button colors.
-	staticColorsButtons := []common.StaticColorButton{}
+// 	// Make an array to hold gobo button colors.
+// 	staticColorsButtons := []common.StaticColorButton{}
 
-	for X := 0; X < 8; X++ {
-		staticColorButton := common.StaticColorButton{}
-		staticColorButton.X = X
-		staticColorButton.Y = selectedSequence
-		staticColorButton.SelectedColor = X
-		staticColorButton.Color = common.Color{R: 255, G: 255, B: 0}
-		staticColorsButtons = append(staticColorsButtons, staticColorButton)
-	}
+// 	for X := 0; X < 8; X++ {
+// 		staticColorButton := common.StaticColorButton{}
+// 		staticColorButton.X = X
+// 		staticColorButton.Y = selectedSequence
+// 		staticColorButton.SelectedColor = X
+// 		staticColorButton.Color = common.Color{R: 255, G: 255, B: 0}
+// 		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+// 	}
 
-	return staticColorsButtons
-}
+// 	return staticColorsButtons
+// }
 
 // invertColor just reverses the DMX values.
 func invertColor(color common.Color) (out common.Color) {
@@ -787,6 +784,45 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) map[int][]common.Stat
 		}
 	}
 	return availableScannerColors
+}
+
+func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) (int, map[int][]common.StaticColorButton) {
+	if debug {
+		fmt.Printf("getAvailableScannerGobos\n")
+	}
+
+	var numberScanners int
+	gobos := make(map[int][]common.StaticColorButton)
+
+	for _, f := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Fixture Name:%s\n", f.Name)
+		}
+		if f.Type == "scanner" {
+
+			if debug {
+				fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, f.Name, f.Description)
+			}
+			numberScanners++
+			for _, channel := range f.Channels {
+				if channel.Name == "Gobo" {
+					newGobo := common.StaticColorButton{}
+					for _, setting := range channel.Settings {
+						newGobo.Name = setting.Name
+						newGobo.Label = setting.Label
+						newGobo.Number = setting.Number
+						newGobo.Setting = setting.Setting
+						newGobo.Color = common.Color{R: 255, G: 255, B: 0} // Yellow.
+						gobos[f.Number] = append(gobos[f.Number], newGobo)
+						if debug {
+							fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
+						}
+					}
+				}
+			}
+		}
+	}
+	return numberScanners, gobos
 }
 
 // getAvailableScannerPattens generates scanner pattens and stores them in the sequence.

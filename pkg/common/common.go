@@ -59,6 +59,7 @@ type StaticColorButton struct {
 	Color         Color
 	SelectedColor int
 	Flash         bool
+	Setting       int
 }
 
 type Patten struct {
@@ -138,91 +139,93 @@ const DefaultScannerSize = 120
 
 type Gobo struct {
 	Name    string
+	Label   string
 	Number  int
 	Setting int
+	Flash   bool
+	Color   Color
 }
 
 // Sequence describes sequences.
 type Sequence struct {
-	NumberFixtures               int
-	NumberScanners               int
-	Mode                         string // Sequence or Static
-	Static                       bool
-	EditSeqColors                bool
-	PlayStaticOnce               bool
-	PlaySwitchOnce               bool
-	Flood                        bool
-	NoFlood                      bool
-	PlayFloodOnce                bool
-	StaticColors                 []StaticColorButton
-	AvailableSequenceColors      []StaticColorButton
-	AvailableScannerColors       map[int][]StaticColorButton
-	AvailableScannerGobos        []Gobo
-	AvailableGoboSelectionColors []StaticColorButton
-	AvailableFixtures            []StaticColorButton // Holds a set of red buttons, one for every available fixture.
-	EditColors                   bool
-	Hide                         bool
-	Type                         string
-	FadeTime                     time.Duration
-	FadeOnTime                   time.Duration
-	FadeOffTime                  time.Duration
-	Name                         string
-	Label                        string
-	Description                  string
-	Number                       int
-	Run                          bool
-	Bounce                       bool
-	NumberSteps                  int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	Patten                       Patten // Contains fixtures and steps info.
-	Colors                       []Color
-	UpdateShift                  bool
-	Shift                        int // Used for shifting scanners patterns apart.
-	CurrentSpeed                 time.Duration
-	Speed                        int
-	FadeSpeed                    int
-	Size                         int
-	ScannerSize                  int
-	X                            int
-	Y                            int
-	MusicTrigger                 bool
-	Blackout                     bool
-	Color                        int
-	SelectedGobo                 int
-	SelectedColor                int
-	Master                       int // Master Brightness
-	Functions                    []Function
-	FunctionMode                 bool
-	Switches                     []Switch
-	UpdateSequenceColor          bool
-	SequenceColors               []Color
-	Inverted                     bool
-	Positions                    map[int][]Position
-	CurrentSequenceColors        []Color
-	SavedSequenceColors          []Color
-	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
-	AutoColor                    bool
-	AutoPatten                   bool
-	RecoverSequenceColors        bool
-	SaveColors                   bool
-	SelectedScannerPatten        int
-	FixtureDisabled              map[int]bool
-	DisableOnce                  map[int]bool
-	ScannerChase                 bool
-	UpdateScannerColor           bool
-	ScannerColor                 map[int]int // eight scanners per sequence, each can have their own color.
-	NumberCoordinates            []int
-	SelectedCoordinates          int
-	Steps                        []Step
-	UpdatePatten                 bool
-	SelectPatten                 bool
-	SelectedRGBPatten            int
-	OffsetPan                    int
-	OffsetTilt                   int
-	FunctionLabels               [8]string
-	BottomButtons                [8]string
-	FixtureLabels                []string
-	AvailableRGBPattens          map[int]Patten
-	AvailableScannerPattens      map[int]Patten
+	NumberFixtures          int
+	NumberScanners          int
+	Mode                    string // Sequence or Static
+	Static                  bool
+	EditSeqColors           bool
+	PlayStaticOnce          bool
+	PlaySwitchOnce          bool
+	Flood                   bool
+	NoFlood                 bool
+	PlayFloodOnce           bool
+	StaticColors            []StaticColorButton
+	AvailableSequenceColors []StaticColorButton
+	AvailableScannerColors  map[int][]StaticColorButton
+	AvailableScannerGobos   map[int][]StaticColorButton
+	AvailableFixtures       []StaticColorButton // Holds a set of red buttons, one for every available fixture.
+	EditColors              bool
+	Hide                    bool
+	Type                    string
+	FadeTime                time.Duration
+	FadeOnTime              time.Duration
+	FadeOffTime             time.Duration
+	Name                    string
+	Label                   string
+	Description             string
+	Number                  int
+	Run                     bool
+	Bounce                  bool
+	NumberSteps             int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	Patten                  Patten // Contains fixtures and steps info.
+	Colors                  []Color
+	UpdateShift             bool
+	Shift                   int // Used for shifting scanners patterns apart.
+	CurrentSpeed            time.Duration
+	Speed                   int
+	FadeSpeed               int
+	Size                    int
+	ScannerSize             int
+	X                       int
+	Y                       int
+	MusicTrigger            bool
+	Blackout                bool
+	Color                   int
+	SelectedGobo            int
+	SelectedColor           int
+	Master                  int // Master Brightness
+	Functions               []Function
+	FunctionMode            bool
+	Switches                []Switch
+	UpdateSequenceColor     bool
+	SequenceColors          []Color
+	Inverted                bool
+	Positions               map[int][]Position
+	CurrentSequenceColors   []Color
+	SavedSequenceColors     []Color
+	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
+	AutoColor               bool
+	AutoPatten              bool
+	RecoverSequenceColors   bool
+	SaveColors              bool
+	SelectedScannerPatten   int
+	FixtureDisabled         map[int]bool
+	DisableOnce             map[int]bool
+	ScannerChase            bool
+	UpdateScannerColor      bool
+	ScannerColor            map[int]int // eight scanners per sequence, each can have their own color.
+	NumberCoordinates       []int
+	SelectedCoordinates     int
+	Steps                   []Step
+	UpdatePatten            bool
+	SelectPatten            bool
+	SelectedRGBPatten       int
+	OffsetPan               int
+	OffsetTilt              int
+	FunctionLabels          [8]string
+	BottomButtons           [8]string
+	FixtureLabels           []string
+	AvailableRGBPattens     map[int]Patten
+	AvailableScannerPattens map[int]Patten
 }
 
 type Function struct {

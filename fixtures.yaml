@@ -441,30 +441,39 @@ fixtures:
     name: Gobo
     settings:
       - name: White Circle
+        label: White.Circle
         number: 1
         setting: 0
       - name: Yellow Cluster
+        label: Yellow.Cluster
         setting: 8
         number: 2
       - name: Red Swirl
+        label: Red.Swirl
         setting: 15
         number: 3
       - name: Green Strips
+        label: Green.Strips
         setting: 22
         number: 4
       - name: Blue Star
-        setting: 28
+        label: Blue.Star
+        setting: 29
         number: 5
       - name: MultiColor Commas
+        label: Color.Commas
         setting: 36
         number: 6
       - name: Purple Bubbles
+        label: Purple.Bubbles
         setting: 43
         number: 7
       - name: Cyan World
+        label: Cyan.World
         setting: 50
         number: 8
-      - name: Blue / Puple Circle
+      - name: Blue Circle
+        label: Blue.Circle
         setting: 57
         number: 9
   - number: 5
@@ -494,30 +503,39 @@ fixtures:
     name: Gobo
     settings:
       - name: White Circle
+        label: White.Circle
         number: 1
         setting: 0
       - name: Yellow Cluster
+        label: Yellow.Cluster
         setting: 8
         number: 2
       - name: Red Swirl
+        label: Red.Swirl
         setting: 15
         number: 3
       - name: Green Strips
+        label: Green.Strips
         setting: 22
         number: 4
       - name: Blue Star
-        setting: 28
+        label: Blue.Star
+        setting: 29
         number: 5
       - name: MultiColor Commas
+        label: Color.Commas
         setting: 36
         number: 6
       - name: Purple Bubbles
+        label: Purple.Bubbles
         setting: 43
         number: 7
       - name: Cyan World
+        label: Cyan.World
         setting: 50
         number: 8
-      - name: Blue / Puple Circle
+      - name: Blue Circle
+        label: Blue.Circle
         setting: 57
         number: 9
   - number: 5
@@ -547,30 +565,39 @@ fixtures:
     name: Gobo
     settings:
       - name: White Circle
+        label: White.Circle
         number: 1
         setting: 0
       - name: Yellow Cluster
+        label: Yellow.Cluster
         setting: 8
         number: 2
       - name: Red Swirl
+        label: Red.Swirl
         setting: 15
         number: 3
       - name: Green Strips
+        label: Green.Strips
         setting: 22
         number: 4
       - name: Blue Star
-        setting: 28
+        label: Blue.Star
+        setting: 29
         number: 5
       - name: MultiColor Commas
+        label: Color.Commas
         setting: 36
         number: 6
       - name: Purple Bubbles
+        label: Purple.Bubbles
         setting: 43
         number: 7
       - name: Cyan World
+        label: Cyan.World
         setting: 50
         number: 8
-      - name: Blue / Puple Circle
+      - name: Blue Circle
+        label: Blue.Circle
         setting: 57
         number: 9
   - number: 5
@@ -600,30 +627,39 @@ fixtures:
     name: Gobo
     settings:
       - name: White Circle
+        label: White.Circle
         number: 1
         setting: 0
       - name: Yellow Cluster
+        label: Yellow.Cluster
         setting: 8
         number: 2
       - name: Red Swirl
+        label: Red.Swirl
         setting: 15
         number: 3
       - name: Green Strips
+        label: Green.Strips
         setting: 22
         number: 4
       - name: Blue Star
-        setting: 28
+        label: Blue.Star
+        setting: 29
         number: 5
       - name: MultiColor Commas
+        label: Color.Commas
         setting: 36
         number: 6
       - name: Purple Bubbles
+        label: Purple.Bubbles
         setting: 43
         number: 7
       - name: Cyan World
+        label: Cyan.World
         setting: 50
         number: 8
-      - name: Blue / Puple Circle
+      - name: Blue Circle
+        label: Blue.Circle
         setting: 57
         number: 9
   - number: 5
@@ -653,30 +689,39 @@ fixtures:
     name: Gobo
     settings:
       - name: White Circle
+        label: White.Circle
         number: 1
         setting: 0
       - name: Yellow Cluster
+        label: Yellow.Cluster
         setting: 8
         number: 2
       - name: Red Swirl
+        label: Red.Swirl
         setting: 15
         number: 3
       - name: Green Strips
+        label: Green.Strips
         setting: 22
         number: 4
       - name: Blue Star
-        setting: 28
+        label: Blue.Star
+        setting: 29
         number: 5
       - name: MultiColor Commas
+        label: Color.Commas
         setting: 36
         number: 6
       - name: Purple Bubbles
+        label: Purple.Bubbles
         setting: 43
         number: 7
       - name: Cyan World
+        label: Cyan.World
         setting: 50
         number: 8
-      - name: Blue / Puple Circle
+      - name: Blue Circle
+        label: Blue.Circle
         setting: 57
         number: 9
   - number: 5
@@ -730,27 +775,35 @@ fixtures:
     name: Gobo
     settings:
       - name: Open
+        label: Open
         number: 1
         setting: 0
       - name: Gobo 1
+        label: Gobo.1
         setting: 8
         number: 2
       - name: Gobo 2
+        label: Gobo.2
         setting: 16
         number: 3
       - name: Gobo 3
+        label: Gobo.3
         setting: 24
         number: 4
       - name: Gobo 4
+        label: Gobo.4
         setting: 32
         number: 5
       - name: Gobo 5
+        label: Gobo.5
         setting: 40
         number: 6
       - name: Gobo 6
+        label: Gobo.6
         setting: 48
         number: 7
       - name: Gobo 7
+        label: Gobo.7
         setting: 56
         number: 8
   - number: 7

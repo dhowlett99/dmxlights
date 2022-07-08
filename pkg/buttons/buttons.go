@@ -856,7 +856,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
-	if X >= 0 && X < 8 && !this.FunctionSelectMode[Y] &&
+	if X >= 0 && X < 8 && !this.FunctionSelectMode[this.SelectedSequence] &&
 		Y >= 0 &&
 		Y < 4 &&
 		sequences[Y].Type == "switch" {
@@ -889,7 +889,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// D I S A B L E   F I X T U R E  - Used to toggle the scanner on or off.
-	if X >= 0 && X < 8 && !this.FunctionSelectMode[Y] &&
+	if X >= 0 && X < 8 && !this.FunctionSelectMode[this.SelectedSequence] &&
 		Y >= 0 &&
 		Y < 4 &&
 		!sequences[this.SelectedSequence].Functions[common.Function1_Patten].State &&
@@ -1818,14 +1818,19 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		fmt.Printf("Sequence %d Show Gobo Selection Buttons\n", this.SelectedSequence)
 	}
 	// Check if we need to flash this button.
-	for goboNumber, gobo := range sequence.AvailableGoboSelectionColors {
-		if debug {
-			fmt.Printf("fixtureNumber %d   current gobo %d\n", goboNumber, sequence.SelectedGobo)
+	for goboNumber, gobo := range sequence.AvailableScannerGobos[this.SelectedFixture+1] {
+
+		if gobo.Number > 8 {
+			return // We only have 8 buttons so we can't select from any more.
 		}
-		if goboNumber == sequence.SelectedGobo-1 {
+		if gobo.Number == sequence.SelectedGobo {
 			gobo.Flash = true
 		}
+		if debug {
+			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.SelectedGobo, gobo.Flash)
+		}
 		if gobo.Flash {
+			common.LightLamp(common.ALight{X: goboNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: gobo.Color.R, Green: gobo.Color.G, Blue: gobo.Color.B}, eventsForLauchpad, guiButtons)
 			code := common.GetLaunchPadColorCodeByRGB(gobo.Color)
 			common.FlashLight(goboNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons)
 		} else {
