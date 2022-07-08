@@ -855,119 +855,8 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// F U N C T I O N  K E Y S
-	if X >= 0 && X < 8 &&
-		this.FunctionSelectMode[this.SelectedSequence] &&
-		!this.EditPattenMode[this.SelectedSequence] &&
-		!this.EditStaticColorsMode[this.SelectedSequence] &&
-		!this.EditGoboSelectionMode[this.SelectedSequence] &&
-		!sequences[this.SelectedSequence].Functions[common.Function5_Color].State {
-
-		if debug {
-			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
-		}
-
-		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		for _, functions := range sequences[this.SelectedSequence].Functions {
-			if Y == functions.SequenceNumber {
-				if !sequences[this.SelectedSequence].Functions[X].State {
-					sequences[this.SelectedSequence].Functions[X].State = true
-					break
-				}
-				if sequences[this.SelectedSequence].Functions[X].State {
-					sequences[this.SelectedSequence].Functions[X].State = false
-					break
-				}
-			}
-		}
-
-		// Send update functions command. This sets the temporary representation of
-		// the function keys in the real sequence.
-		cmd := common.Command{
-			Action: common.UpdateFunctions,
-			Args: []common.Arg{
-				{Name: "Functions", Value: sequences[this.SelectedSequence].Functions},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// Light the correct function key.
-		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons)
-
-		// Now some functions mean that we go into another menu ( set of buttons )
-		// This is true for :-
-		// Function 1 - setting the patten.
-		// Function 5 - setting the sequence colors or selecting scanner color.
-		// Function 6 - setting the static colors or selecting scanner gobo.
-
-		// Map Function 1 to patten mode.
-		this.EditPattenMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function1_Patten].State
-
-		// Go straight into patten select mode, don't wait for a another select press.
-		if this.EditPattenMode[this.SelectedSequence] {
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			this.EditFixtureSelectionMode = false
-			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
-		}
-
-		// Function 5.
-
-		// Map Function 5 to color edit.
-		this.EditSequenceColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function5_Color].State
-
-		// Go straight into color edit mode, don't wait for a another select press.
-		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "rgb" {
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
-		}
-
-		// Go straight into color edit mode via select fixture, don't wait for a another select press.
-		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "scanner" {
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			this.EditFixtureSelectionMode = true
-			this.FollowingAction = "ShowScannerColorSelectionButtons"
-			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
-		}
-
-		// Function 6
-
-		// Map Function 6 to select gobo mode if we are in scanner sequence.
-		if sequences[this.SelectedSequence].Type == "scanner" && sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
-			this.EditStaticColorsMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-			this.EditGoboSelectionMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
-
-			// Go straight to gobo selection mode via select fixture, don't wait for a another select press.
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			this.EditFixtureSelectionMode = true
-			this.FollowingAction = "ShowGoboSelectionButtons"
-			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
-
-		}
-
-		// Map Function 6 to static color edit if we are a RGB sequence.
-		if sequences[this.SelectedSequence].Type == "rgb" && sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
-			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
-
-			// Go straight to static color selection mode, don't wait for a another select press.
-			// time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-			this.FunctionSelectMode[this.SelectedSequence] = false
-			// The sequence will automatically display the static colors now!
-
-		}
-
-		return
-	}
-
 	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
-	if X >= 0 && X < 8 && !this.FunctionSelectMode[this.SelectedSequence] &&
+	if X >= 0 && X < 8 && !this.FunctionSelectMode[Y] &&
 		Y >= 0 &&
 		Y < 4 &&
 		sequences[Y].Type == "switch" {
@@ -1000,7 +889,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// D I S A B L E   F I X T U R E  - Used to toggle the scanner on or off.
-	if X >= 0 && X < 8 && !this.FunctionSelectMode[this.SelectedSequence] &&
+	if X >= 0 && X < 8 && !this.FunctionSelectMode[Y] &&
 		Y >= 0 &&
 		Y < 4 &&
 		!sequences[this.SelectedSequence].Functions[common.Function1_Patten].State &&
@@ -1074,7 +963,7 @@ func ProcessButtons(X int, Y int,
 		!sequences[Y].Functions[common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
-		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence.
+		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
 
 		if debug {
 			fmt.Printf("Flash Fixture Pressed X:%d Y:%d\n", X, Y)
@@ -1490,6 +1379,117 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
+	// F U N C T I O N  K E Y S
+	if X >= 0 && X < 8 &&
+		this.FunctionSelectMode[this.SelectedSequence] &&
+		!this.EditPattenMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode[this.SelectedSequence] &&
+		!this.EditGoboSelectionMode[this.SelectedSequence] &&
+		!sequences[this.SelectedSequence].Functions[common.Function5_Color].State {
+
+		if debug {
+			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
+		}
+
+		// Get an upto date copy of the sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+		for _, functions := range sequences[this.SelectedSequence].Functions {
+			if Y == functions.SequenceNumber {
+				if !sequences[this.SelectedSequence].Functions[X].State {
+					sequences[this.SelectedSequence].Functions[X].State = true
+					break
+				}
+				if sequences[this.SelectedSequence].Functions[X].State {
+					sequences[this.SelectedSequence].Functions[X].State = false
+					break
+				}
+			}
+		}
+
+		// Send update functions command. This sets the temporary representation of
+		// the function keys in the real sequence.
+		cmd := common.Command{
+			Action: common.UpdateFunctions,
+			Args: []common.Arg{
+				{Name: "Functions", Value: sequences[this.SelectedSequence].Functions},
+			},
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Light the correct function key.
+		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons)
+
+		// Now some functions mean that we go into another menu ( set of buttons )
+		// This is true for :-
+		// Function 1 - setting the patten.
+		// Function 5 - setting the sequence colors or selecting scanner color.
+		// Function 6 - setting the static colors or selecting scanner gobo.
+
+		// Map Function 1 to patten mode.
+		this.EditPattenMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function1_Patten].State
+
+		// Go straight into patten select mode, don't wait for a another select press.
+		if this.EditPattenMode[this.SelectedSequence] {
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			this.EditFixtureSelectionMode = false
+			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+		}
+
+		// Function 5.
+
+		// Map Function 5 to color edit.
+		this.EditSequenceColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function5_Color].State
+
+		// Go straight into color edit mode, don't wait for a another select press.
+		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "rgb" {
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
+		}
+
+		// Go straight into color edit mode via select fixture, don't wait for a another select press.
+		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "scanner" {
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			this.EditFixtureSelectionMode = true
+			this.FollowingAction = "ShowScannerColorSelectionButtons"
+			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
+		}
+
+		// Function 6
+
+		// Map Function 6 to select gobo mode if we are in scanner sequence.
+		if sequences[this.SelectedSequence].Type == "scanner" && sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
+			this.EditStaticColorsMode[this.SelectedSequence] = false // Turn off the other option for this function key.
+			this.EditGoboSelectionMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
+
+			// Go straight to gobo selection mode via select fixture, don't wait for a another select press.
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			this.EditFixtureSelectionMode = true
+			this.FollowingAction = "ShowGoboSelectionButtons"
+			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, this.FollowingAction, guiButtons)
+
+		}
+
+		// Map Function 6 to static color edit if we are a RGB sequence.
+		if sequences[this.SelectedSequence].Type == "rgb" && sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
+			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
+			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
+
+			// Go straight to static color selection mode, don't wait for a another select press.
+			// time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+			this.FunctionSelectMode[this.SelectedSequence] = false
+			// The sequence will automatically display the static colors now!
+
+		}
+
+		return
+	}
+
 	// B L A C K O U T   B U T T O N.
 	if X == 8 && Y == 7 {
 
@@ -1688,6 +1688,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Turn off any static sequence so we can see the functions.
 		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
+
+		// Turn off any previous function bars.
+		for sequenceNumber := range sequences {
+			if this.FunctionSelectMode[sequenceNumber] {
+				common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLauchpad, guiButtons)
+				// And reveal all the other sequence that isn't us.
+				if sequenceNumber != this.SelectedSequence {
+					common.RevealSequence(sequenceNumber, commandChannels)
+					// And turn off the function selected.
+					this.FunctionSelectMode[sequenceNumber] = false
+				}
+			}
+		}
 
 		// Create the function buttons.
 		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels)
