@@ -650,6 +650,9 @@ func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
 	if red == 255 && green == 255 && blue == 255 {
 		return 0x03
 	} // White
+	if red == 0 && green == 0 && blue == 0 {
+		return 0x0
+	} // Black
 	return 0
 }
 

@@ -273,10 +273,10 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("FLOOD\n")
 		}
 
-		if !this.Flood { // We're not already in this.Flood so lets ask the sequence to this.Flood.
+		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
 
-			// Flash the this.Flood button to indicate we're not in this.Flood.
-			common.FlashLight(8, 3, 0x03, 0x5f, eventsForLauchpad, guiButtons)
+			// Flash the flood button pink to indicate we're in flood.
+			common.FlashLight(8, 3, 0x34, 0x0, eventsForLauchpad, guiButtons)
 
 			// First save our config
 			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
@@ -287,7 +287,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
-			// Start this.Flood.
+			// Start flood.
 			cmd = common.Command{
 				Action: common.Flood,
 				Args: []common.Arg{
@@ -300,9 +300,9 @@ func ProcessButtons(X int, Y int,
 
 			return
 		}
-		if this.Flood { // If we are this.Flood already then tell the sequence to stop this.Flood.
+		if this.Flood { // If we are flood already then tell the sequence to stop flood.
 
-			// Turn the this.Flood button back to white.
+			// Turn the flood button back to white.
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
 			cmd := common.Command{
@@ -424,7 +424,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		common.FlashLight(8, 4, 0x03, 0x5f, eventsForLauchpad, guiButtons)
+		common.FlashLight(8, 4, 0x34, 0x0, eventsForLauchpad, guiButtons)
 		this.SavePreset = true
 		return
 	}
@@ -448,7 +448,7 @@ func ProcessButtons(X int, Y int,
 			presets.SavePresets(this.PresetsStore)
 			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, 0x0c, 0x78, eventsForLauchpad, guiButtons)
+			common.FlashLight(X, Y, 0x78, 0x0, eventsForLauchpad, guiButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
@@ -687,7 +687,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		return
 	}
 
@@ -707,7 +707,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		return
 	}
 
@@ -1513,14 +1513,14 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-			common.FlashLight(8, 7, 0x03, 0x5f, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 7, 0x34, 0x0, eventsForLauchpad, guiButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
 				Action: common.Normal,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		}
 		return
 	}
