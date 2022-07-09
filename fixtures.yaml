@@ -460,12 +460,12 @@ fixtures:
         label: Blue.Star
         setting: 29
         number: 5
-      - name: MultiColor Commas
-        label: Color.Commas
+      - name: MultiColor Coma
+        label: Color.Com
         setting: 36
         number: 6
-      - name: Purple Bubbles
-        label: Purple.Bubbles
+      - name: Purple Bub
+        label: Purple.Bub
         setting: 43
         number: 7
       - name: Cyan World
@@ -522,12 +522,12 @@ fixtures:
         label: Blue.Star
         setting: 29
         number: 5
-      - name: MultiColor Commas
-        label: Color.Commas
+      - name: MultiColor Coma
+        label: Color.Coma
         setting: 36
         number: 6
-      - name: Purple Bubbles
-        label: Purple.Bubbles
+      - name: Purple Bub
+        label: Purple.Bub
         setting: 43
         number: 7
       - name: Cyan World
@@ -584,12 +584,12 @@ fixtures:
         label: Blue.Star
         setting: 29
         number: 5
-      - name: MultiColor Commas
-        label: Color.Commas
+      - name: MultiColor Coma
+        label: Color.Coma
         setting: 36
         number: 6
-      - name: Purple Bubbles
-        label: Purple.Bubbles
+      - name: Purple Bub
+        label: Purple.Bub
         setting: 43
         number: 7
       - name: Cyan World
@@ -646,12 +646,12 @@ fixtures:
         label: Blue.Star
         setting: 29
         number: 5
-      - name: MultiColor Commas
-        label: Color.Commas
+      - name: MultiColor Coma
+        label: Color.Coma
         setting: 36
         number: 6
-      - name: Purple Bubbles
-        label: Purple.Bubbles
+      - name: Purple Bub
+        label: Purple.Bub
         setting: 43
         number: 7
       - name: Cyan World
@@ -708,12 +708,12 @@ fixtures:
         label: Blue.Star
         setting: 29
         number: 5
-      - name: MultiColor Commas
-        label: Color.Commas
+      - name: MultiColor Coma
+        label: Color.Coma
         setting: 36
         number: 6
-      - name: Purple Bubbles
-        label: Purple.Bubbles
+      - name: Purple Bub
+        label: Purple.Bub
         setting: 43
         number: 7
       - name: Cyan World

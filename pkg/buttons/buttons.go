@@ -1227,6 +1227,9 @@ func ProcessButtons(X int, Y int,
 		// If the sequence isn't running this will force a single color DMX message.
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, scannerColor)
 
+		// Clear the patten function keys
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+
 		// We call ShowScannerColorSelectionButtons here so the selections will flash as you press them.
 		ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, fixturesConfig, guiButtons)
 
@@ -1244,6 +1247,9 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Selected Fixture is %d \n", this.SelectedFixture)
 		}
+
+		// Clear the patten function keys
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 
 		// Update the buttons.
 		if this.FollowingAction == "ShowGoboSelectionButtons" {
@@ -1291,6 +1297,9 @@ func ProcessButtons(X int, Y int,
 
 		// If the sequence isn't running this will force a single gobo DMX message.
 		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
+
+		// Clear the patten function keys
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 
 		// We call ShowGoboSelectionButtons here so the selections will flash as you press them.
 		ShowGoboSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLauchpad, guiButtons)
@@ -1830,7 +1839,6 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.SelectedGobo, gobo.Flash)
 		}
 		if gobo.Flash {
-			common.LightLamp(common.ALight{X: goboNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: gobo.Color.R, Green: gobo.Color.G, Blue: gobo.Color.B}, eventsForLauchpad, guiButtons)
 			code := common.GetLaunchPadColorCodeByRGB(gobo.Color)
 			common.FlashLight(goboNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons)
 		} else {

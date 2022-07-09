@@ -69,7 +69,7 @@ func (panel *MyPanel) updateButtonColor(alight common.ALight, GuiFlashButtons []
 	if !alight.Flash {
 		// We're not flashing.
 		// reset this button so it's not flashing.
-		GuiFlashButtons[alight.X][alight.Y+1] = false
+		GuiFlashButtons[alight.X][alight.Y] = false
 
 		// Take into account the brightness.
 		Red := (float64(alight.Red) / 100) * (float64(alight.Brightness) / 2.55)
@@ -85,30 +85,38 @@ func (panel *MyPanel) updateButtonColor(alight common.ALight, GuiFlashButtons []
 		panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 	} else {
 
+		// Let everyone know that we're flashing.
+		GuiFlashButtons[alight.X][alight.Y] = true
+
 		// We create a thread to flash the button.
 		go func() {
 
-			GuiFlashButtons[alight.X][alight.Y+1] = true
-
 			for {
-				if !GuiFlashButtons[alight.X][alight.Y+1] {
-					return
-				}
 				// Turn on.
 				// Convert the launchpad code into RGB and the into NRGBA for the GUI.
 				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = ConvertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OnColor))
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
-				// Wait 1/2 second.
-				time.Sleep(500 * time.Millisecond)
+				// Wake up every 10 ms to see if we need to stop.
+				for t := 0; t < 300; t++ {
+					if !GuiFlashButtons[alight.X][alight.Y] {
+						return
+					}
+					time.Sleep(1 * time.Millisecond)
+				}
 
 				// Turn off.
 				// Convert the launchpad code into RGB and the into NRGBA for the GUI.
 				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = ConvertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OffColor))
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
-				// Wait 1/2 second.
-				time.Sleep(500 * time.Millisecond)
+				// Wake up every 10 ms to see if we need to stop.
+				for t := 0; t < 300; t++ {
+					if !GuiFlashButtons[alight.X][alight.Y] {
+						return
+					}
+					time.Sleep(1 * time.Millisecond)
+				}
 			}
 		}()
 	}

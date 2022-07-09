@@ -159,7 +159,7 @@ func CreateSequence(
 	if sequence.Type == "rgb" {
 		sequence.FunctionLabels[0] = "Set\nPatten"
 		sequence.FunctionLabels[1] = "Auto\nColor"
-		sequence.FunctionLabels[2] = "Auto\nPattern"
+		sequence.FunctionLabels[2] = "Auto\nPatten"
 		sequence.FunctionLabels[3] = "Bounce"
 		sequence.FunctionLabels[4] = "Chase\nColor"
 		sequence.FunctionLabels[5] = "Static\nColor"
@@ -170,7 +170,7 @@ func CreateSequence(
 	if sequence.Type == "scanner" {
 		sequence.FunctionLabels[0] = "Set\nPatten"
 		sequence.FunctionLabels[1] = "Auto\nColor"
-		sequence.FunctionLabels[2] = "Auto\nPattern"
+		sequence.FunctionLabels[2] = "Auto\nPatten"
 		sequence.FunctionLabels[3] = "Bounce"
 		sequence.FunctionLabels[4] = "Color"
 		sequence.FunctionLabels[5] = "Gobo"
