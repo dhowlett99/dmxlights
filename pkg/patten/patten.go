@@ -393,7 +393,7 @@ func MakePatterns() map[int]common.Patten {
 			{ // Step 2 - Orange
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 155, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
