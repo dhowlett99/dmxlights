@@ -1872,6 +1872,8 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
+		// Remove any labels.
+		common.LabelButton(fixtureNumber, this.SelectedSequence, "", guiButtons)
 	}
 	return nil
 }
