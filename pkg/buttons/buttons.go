@@ -30,7 +30,6 @@ type CurrentState struct {
 	Blackout                 bool                       // Blackout all fixtures.
 	Flood                    bool                       // Flood all fixtures.
 	FunctionSelectMode       []bool                     // Which sequence is in function selection mode.
-	StaticLamps              [][]bool                   // Static color lamps.
 	SelectButtonPressed      []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions          [9][9]int                  // Sorage for switch positions.
 	EditSequenceColorsMode   []bool                     // This flag is true when the sequence is in sequence colors editing mode.
@@ -1088,9 +1087,6 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 
-			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons)
-
 			if this.StaticButtons[this.SelectedSequence].Color.R > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.R = 0
 			} else {
@@ -1112,8 +1108,6 @@ func ProcessButtons(X int, Y int,
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
-			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons)
 
 			if this.StaticButtons[this.SelectedSequence].Color.G > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 0
@@ -1136,8 +1130,6 @@ func ProcessButtons(X int, Y int,
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
-			code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-			common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, int(code), 0x0, eventsForLauchpad, guiButtons)
 
 			if this.StaticButtons[this.SelectedSequence].Color.B > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 0
@@ -1755,6 +1747,7 @@ func AllFixturesOff(eventsForLauchpad chan common.ALight, guiButtons chan common
 		for y := 0; y < 4; y++ {
 			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
+			common.LabelButton(x, y, "", guiButtons)
 		}
 	}
 }

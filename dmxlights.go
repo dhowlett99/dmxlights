@@ -38,28 +38,29 @@ func main() {
 	fmt.Println("DMX Lighting")
 
 	// Setup State.
-	this.SequenceSpeed = 12
-	this.ScannerSize = common.DefaultScannerSize
-	this.SelectedShift = 0
-	this.Blackout = false
-	this.Flood = false
-	this.FadeSpeed = 11                           // Default start at 50ms.
-	this.MasterBrightness = 255                   // Affects all DMX fixtures and launchpad lamps.
-	this.SoundGain = 0                            // Fine gain -0.09 -> 0.09
-	this.SelectedCordinates = 0                   // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
-	this.OffsetPan = 120                          // Start pan from the center
-	this.OffsetTilt = 120                         // Start tilt from the center.
-	this.PresetsStore = make(map[string]bool)     // Make an empty presets store.
-	this.SelectedFloodMap = make(map[int]bool, 4) // Make a store for which sequences can be flood light.
-	this.PresetsStore = presets.LoadPresets()     // Load the presets from their json files.
-	this.Pattens = patten.MakePatterns()          // Build the default set of Pattens.
-	this.SelectButtonPressed = make([]bool, 4)    // Initialize four select buttons.
-	this.FunctionSelectMode = make([]bool, 4)     // Initialize four function mode states.
-	this.EditSequenceColorsMode = make([]bool, 4) // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = make([]bool, 4)  // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = make([]bool, 4)  // Remember when we are in selecting gobo mode.
-	this.EditStaticColorsMode = make([]bool, 4)   // Remember when we are in editing static colors mode.
-	this.EditPattenMode = make([]bool, 4)         // Remember when we are in editing patten mode.
+	this.SequenceSpeed = 12                         // Selected speed for the sequence.
+	this.ScannerSize = common.DefaultScannerSize    // Default scanner size.
+	this.SelectedShift = 0                          // Default shift size.
+	this.Blackout = false                           // Blackout starts in off.
+	this.Flood = false                              // Flood starts in off.
+	this.FadeSpeed = 11                             // Default start at 50ms.
+	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
+	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
+	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
+	this.OffsetPan = 120                            // Start pan from the center
+	this.OffsetTilt = 120                           // Start tilt from the center.
+	this.PresetsStore = make(map[string]bool)       // Make an empty presets store.
+	this.SelectedFloodMap = make(map[int]bool, 4)   // Make a store for which sequences can be flood light.
+	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
+	this.Pattens = patten.MakePatterns()            // Build the default set of Pattens.
+	this.SelectButtonPressed = make([]bool, 4)      // Initialize four select buttons.
+	this.FunctionSelectMode = make([]bool, 4)       // Initialize four function mode states.
+	this.EditSequenceColorsMode = make([]bool, 4)   // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = make([]bool, 4)    // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = make([]bool, 4)    // Remember when we are in selecting gobo mode.
+	this.EditStaticColorsMode = make([]bool, 4)     // Remember when we are in editing static colors mode.
+	this.EditPattenMode = make([]bool, 4)           // Remember when we are in editing patten mode.
+	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
 
 	// Initialize eight fixture states for the four sequences.
 	this.DisabledFixture = make([][]bool, 9)
@@ -165,13 +166,6 @@ func main() {
 	this.SequenceChannels.ReplyChannels = replyChannels
 	this.SequenceChannels.SoundTriggerChannels = soundTriggerChannels
 	this.SequenceChannels.UpdateChannels = updateChannels
-
-	// Initialize a ten length slice of empty slices for static lamps.
-	this.StaticLamps = make([][]bool, 9)
-	// Initialize those 10 empty function button slices
-	for i := 0; i < 9; i++ {
-		this.StaticLamps[i] = make([]bool, 9)
-	}
 
 	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
 	this.SoundTriggers = []*common.Trigger{}
@@ -299,4 +293,30 @@ func main() {
 
 	myWindow.ShowAndRun()
 
+}
+
+func makeStaticButtonsStorage() []common.StaticColorButton {
+
+	// Create storage for the static color buttons.
+	staticButton1 := common.StaticColorButton{}
+	staticButton2 := common.StaticColorButton{}
+	staticButton3 := common.StaticColorButton{}
+	staticButton4 := common.StaticColorButton{}
+	staticButton5 := common.StaticColorButton{}
+	staticButton6 := common.StaticColorButton{}
+	staticButton7 := common.StaticColorButton{}
+	staticButton8 := common.StaticColorButton{}
+
+	// Add the color buttons to an array.
+	staticButtons := []common.StaticColorButton{}
+	staticButtons = append(staticButtons, staticButton1)
+	staticButtons = append(staticButtons, staticButton2)
+	staticButtons = append(staticButtons, staticButton3)
+	staticButtons = append(staticButtons, staticButton4)
+	staticButtons = append(staticButtons, staticButton5)
+	staticButtons = append(staticButtons, staticButton6)
+	staticButtons = append(staticButtons, staticButton7)
+	staticButtons = append(staticButtons, staticButton8)
+
+	return staticButtons
 }
