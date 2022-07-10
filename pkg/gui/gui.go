@@ -10,6 +10,7 @@ import (
 	"strings"
 	"time"
 
+	"fyne.io/fyne/theme"
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
@@ -269,4 +270,24 @@ func (panel *MyPanel) GenerateRow(rowNumber int,
 	row0 := container.New(layout.NewHBoxLayout(), containers[0], containers[1], containers[2], containers[3], containers[4], containers[5], containers[6], containers[7], containers[8])
 
 	return row0
+}
+
+// MakeToolbar generates a tool bar at the top of the main window.
+func MakeToolbar(myLogo []byte) *widget.Toolbar {
+
+	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
+			log.Println("New document")
+		}),
+		widget.NewToolbarSeparator(),
+		widget.NewToolbarAction(theme.ContentCutIcon(), func() {}),
+		widget.NewToolbarAction(theme.ContentCopyIcon(), func() {}),
+		widget.NewToolbarAction(theme.ContentPasteIcon(), func() {}),
+		widget.NewToolbarSpacer(),
+		widget.NewToolbarAction(theme.ContentRedoIcon(), func() {}),
+		widget.NewToolbarAction(fyne.NewStaticResource("icon", myLogo), func() {
+			log.Println("Display help")
+		}),
+	)
+	return toolbar
 }

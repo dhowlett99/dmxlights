@@ -11,8 +11,6 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
-	"fyne.io/fyne/v2/theme"
-	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
@@ -30,7 +28,14 @@ func main() {
 
 	// Start the GUI.
 	fmt.Println("Start GUI")
-	panel := gui.NewPanel()
+	panel := gui.NewPanel() // Panel represents the buttons in the GUI.
+	myApp := app.New()
+	myWindow := myApp.NewWindow("DMX Lights")
+	myLogo := panel.ConvertButtonImageToIcon("dmxlights.png")
+	myWindow.Resize(fyne.NewSize(400, 50))
+
+	// Generate the toolbar at the top.
+	toolbar := gui.MakeToolbar(myLogo)
 
 	// Setup the current state
 	this := buttons.CurrentState{}
@@ -190,26 +195,6 @@ func main() {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
 	}()
 
-	myApp := app.New()
-	myWindow := myApp.NewWindow("DMX Lights")
-	myLogo := panel.ConvertButtonImageToIcon("dmxlights.png")
-	myWindow.Resize(fyne.NewSize(400, 50))
-
-	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
-			log.Println("New document")
-		}),
-		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.ContentCutIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentCopyIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentPasteIcon(), func() {}),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.ContentRedoIcon(), func() {}),
-		widget.NewToolbarAction(fyne.NewStaticResource("icon", myLogo), func() {
-			log.Println("Display help")
-		}),
-	)
-
 	row0 := panel.GenerateRow(0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row1 := panel.GenerateRow(1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row2 := panel.GenerateRow(2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
@@ -220,10 +205,13 @@ func main() {
 	row7 := panel.GenerateRow(7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row8 := panel.GenerateRow(8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
+	// Label the Gui buttons.
 	panel.LabelButtons()
 
+	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
+	// Now configure the content to contain the top toolbar and the squares.
 	content := container.NewBorder(toolbar, nil, nil, nil, squares)
 
 	// Start off by turning off all of the Lights
