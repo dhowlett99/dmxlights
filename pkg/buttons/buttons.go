@@ -69,9 +69,16 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 	// Create a channel to listen for buttons being pressed.
 	buttonChannel := this.Pad.Listen()
 
+	start := 0
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 		hit := <-buttonChannel
+
+		// My launchpad seems to generate a couple spurious events when it starts up.
+		if start < 2 {
+			start++ // swollow first two events.
+			continue
+		}
 		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	}
 }
