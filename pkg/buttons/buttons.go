@@ -1894,7 +1894,7 @@ func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 	}
 }
 
-// For the given sequence show the available this.Pattens on the relevant buttons.
+// For the given sequence show the available pattens on the relevant buttons.
 func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
