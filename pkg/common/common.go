@@ -91,8 +91,6 @@ const UpdateSequenceColor = 4
 const PlayStaticOnce = 5
 const PlaySwitchOnce = 6
 
-//const SetEditColors = 7
-const EditColors = 8
 const UnHide = 9
 const Hide = 10
 const Start = 11
@@ -149,72 +147,51 @@ type Gobo struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	NumberFixtures int
-	//NumberScanners          int
-	Mode                    string // Sequence or Static
-	Static                  bool
-	PlayStaticOnce          bool
-	PlaySwitchOnce          bool
-	Flood                   bool
-	NoFlood                 bool
-	PlayFloodOnce           bool
-	StaticColors            []StaticColorButton
-	AvailableSequenceColors []StaticColorButton
-	EditColors              bool
-	Hide                    bool
-	Type                    string
-	FadeTime                time.Duration
-	FadeOnTime              time.Duration
-	FadeOffTime             time.Duration
-	Name                    string
-	Label                   string
-	Description             string
-	Number                  int
-	Run                     bool
-	Bounce                  bool
-	NumberSteps             int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	Patten                  Patten // Contains fixtures and steps info.
-	Colors                  []Color
-	UpdateShift             bool
-	CurrentSpeed            time.Duration
-	Speed                   int
-	FadeSpeed               int
-	Size                    int
-	X                       int
-	Y                       int
-	MusicTrigger            bool
-	Blackout                bool
-	Color                   int
-	SelectedColor           int
-	Master                  int // Master Brightness
-	Functions               []Function
-	FunctionMode            bool
-	Switches                []Switch
-	UpdateSequenceColor     bool
-	SequenceColors          []Color
-	Inverted                bool
-	Positions               map[int][]Position
-	CurrentSequenceColors   []Color
-	SavedSequenceColors     []Color
-	SelectedFloodSequence   map[int]bool // A map that remembers who is in flood mode.
-	AutoColor               bool
-	AutoPatten              bool
-	RecoverSequenceColors   bool
-	SaveColors              bool
-	FixtureDisabled         map[int]bool
-	DisableOnce             map[int]bool
-	UpdateScannerColor      bool
-
-	Steps             []Step
-	UpdatePatten      bool
-	SelectPatten      bool
-	SelectedRGBPatten int
-
-	FunctionLabels      [8]string
-	BottomButtons       [8]string
-	FixtureLabels       []string
-	AvailableRGBPattens map[int]Patten
-
+	Name                       string                      // Sequence name.
+	Label                      string                      // Sequence label.
+	Description                string                      // Sequence description.
+	Number                     int                         // Sequence number.
+	Run                        bool                        // True if this sequence is running.
+	Bounce                     bool                        // True if this sequence is bouncing.
+	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
+	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
+	Master                     int                         // Master Brightness
+	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
+	Speed                      int                         // Sequence speed represented by a short number.
+	MusicTrigger               bool                        // Is this sequence in music trigger mode.
+	Blackout                   bool                        // Flag to indicate we're in blackout mode.
+	CurrentColors              []Color                     // Storage for the colors in a sequence.
+	SequenceColors             []Color                     // Temporay storage for changing sequence colors.
+	Color                      int                         // Index into current sequnece colors.
+	Steps                      []Step                      // Steps in this sequence.
+	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	Positions                  map[int][]Position          // Positions decides where a fixture is in a give set of sequence steps.
+	AutoColor                  bool                        // Sequence is going to automatically change the color.
+	AutoPatten                 bool                        // Sequence is going to automatically change the patten.
+	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
+	GuiBottomButtons           [8]string                   // Storage for the labels on the bottom row.
+	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
+	Patten                     Patten                      // Contains fixtures and steps info.
+	PattenInverted             bool                        // The patten is inverted.
+	RGBAvailablePattens        map[int]Patten              // Available pattens for the RGB fixtures.
+	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
+	RGBColor                   int                         // The selected RGB fixture color.
+	FadeSpeed                  int                         // Fade Speed
+	FadeTime                   time.Duration               // Fade time
+	Size                       int                         // Fade size
+	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
+	SelectedRGBPatten          int                         // Selected RGB patten.
+	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
+	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
+	Mode                       string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	StaticColors               []StaticColorButton         // Used in static color editing
+	Static                     bool                        // We're a static sequence.
+	PlayStaticOnce             bool                        // Play a static scene only once.
+	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
+	Flood                      bool                        // We're in flood mode.
+	NoFlood                    bool                        // We're not in flood mode.
+	FloodPlayOnce              bool                        // Play the flood sceme only once.
+	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
 	ScannersTotal              int                         // Total number of scanners in this sequence.
 	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
 	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
@@ -230,6 +207,14 @@ type Sequence struct {
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
 	ScannerOffsetPan           int                         // Offset for pan values.
 	ScannerOffsetTilt          int                         // Offset for tilt values.
+	FixtureDisabled            map[int]bool                // Map of fixtures which are disabled.
+	DisableOnce                map[int]bool                // Map used to play disable only once.
+	UpdateShift                bool                        // Command to update the shift.
+	UpdatePatten               bool                        // Flag to indicate we're going to change the RGB patten.
+	UpdateSequenceColor        bool                        // Command to update the sequence colors.
+	Functions                  []Function                  // Storage for the sequence functions.
+	FunctionMode               bool                        // This sequence is in function mode.
+	Switches                   []Switch                    // A switch sequence stores its data in here.
 }
 
 type Function struct {
@@ -688,7 +673,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map invert function.
-	sequence.Inverted = sequence.Functions[Function7_Invert_Chase].State
+	sequence.PattenInverted = sequence.Functions[Function7_Invert_Chase].State
 	// Map scanner chase mode. Uses same function key as above.
 	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 
@@ -733,7 +718,7 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 
 // For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	for myFixtureNumber := range sequence.AvailableSequenceColors {
+	for myFixtureNumber := range sequence.RGBAvailableColors {
 		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
 }
@@ -771,7 +756,7 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 func ShowBottomButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Loop through the available functions for this sequence
-	for index, button := range sequence.BottomButtons {
+	for index, button := range sequence.GuiBottomButtons {
 		if debug {
 			fmt.Printf("button %+v\n", button)
 		}

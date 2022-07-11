@@ -1184,7 +1184,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// Set the colors.
-		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
+		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// We call ShowRGBColorSelectionButtons here so the selections will flash as you press them.
 		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
@@ -1221,7 +1221,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// Set the colors.
-		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
+		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single color DMX message.
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, scannerColor)
@@ -1292,7 +1292,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// Set the colors.
-		sequences[this.SelectedSequence].CurrentSequenceColors = sequences[this.SelectedSequence].SequenceColors
+		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single gobo DMX message.
 		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
@@ -1766,10 +1766,10 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 		fmt.Printf("Show Color Selection Buttons\n")
 	}
 	// Check if we need to flash this button.
-	for myFixtureNumber, lamp := range sequence.AvailableSequenceColors {
+	for myFixtureNumber, lamp := range sequence.RGBAvailableColors {
 
-		for index, availableColor := range sequence.AvailableSequenceColors {
-			for _, sequenceColor := range sequence.CurrentSequenceColors {
+		for index, availableColor := range sequence.RGBAvailableColors {
+			for _, sequenceColor := range sequence.CurrentColors {
 				if debug {
 					fmt.Printf("myFixtureNumber %d   current color %d\n", myFixtureNumber, sequenceColor)
 				}
@@ -1902,7 +1902,7 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	}
 
 	if sequence.Type == "rgb" {
-		for _, patten := range sequence.AvailableRGBPattens {
+		for _, patten := range sequence.RGBAvailablePattens {
 			if patten.Number == sequence.SelectedRGBPatten {
 				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
 				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)

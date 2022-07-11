@@ -177,7 +177,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Flood = true
 		sequence.NoFlood = false
-		sequence.PlayFloodOnce = true
+		sequence.FloodPlayOnce = true
 		return sequence
 
 	case common.NoFlood:
@@ -186,7 +186,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Flood = false
 		sequence.NoFlood = true
-		sequence.PlayFloodOnce = true
+		sequence.FloodPlayOnce = true
 		return sequence
 
 	case common.Normal:
@@ -275,7 +275,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
-		sequence.UpdateScannerColor = true
 		sequence.SaveColors = true
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
 		return sequence
@@ -286,7 +285,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = []common.Color{}
-		sequence.CurrentSequenceColors = []common.Color{}
+		sequence.CurrentColors = []common.Color{}
 		return sequence
 
 	// If we are being asked for our config we must reply with our current sequence.

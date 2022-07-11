@@ -137,7 +137,7 @@ func main() {
 		if sequenceConf.Type == "rgb" {
 			this.SelectedFloodMap[index] = true // This sequence is this.Flood able because it's a rgb.
 		}
-		newSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels, this.SelectedFloodMap)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name

@@ -65,8 +65,7 @@ func CreateSequence(
 	mySequenceNumber int,
 	availableRGBPattens map[int]common.Patten,
 	fixturesConfig *fixture.Fixtures,
-	channels common.Channels,
-	selectedFloodMap map[int]bool) common.Sequence {
+	channels common.Channels) common.Sequence {
 
 	//var initialPatten string
 	var scanners int // Number of scanners in this sequence
@@ -115,67 +114,65 @@ func CreateSequence(
 
 	// The actual sequence definition.
 	sequence := common.Sequence{
-		NumberFixtures:          8,
-		ScannerAvailableColors:  availableScannerColors,
-		ScannersAvailable:       availableFixtures,
-		ScannersTotal:           scanners,
-		Type:                    sequenceType,
-		Hide:                    false,
-		Mode:                    "Sequence",
-		StaticColors:            staticColorsButtons,
-		AvailableSequenceColors: sequenceColorButtons,
-		ScannerAvailableGobos:   availableScannerGobos,
-		Name:                    sequenceType,
-		Number:                  mySequenceNumber,
-		FadeSpeed:               12,
-		FadeTime:                75 * time.Millisecond,
-		MusicTrigger:            false,
-		Run:                     true,
-		Bounce:                  false,
-		NumberSteps:             8 * 14, // Eight lamps and 14 steps to fade up and down.
-		AvailableRGBPattens:     availableRGBPattens,
-		ScannerSize:             common.DefaultScannerSize,
-		Speed:                   14,
-		CurrentSpeed:            25 * time.Millisecond,
-		ScannerShift:            0, // Start at zero ie no shift.
-		Blackout:                false,
-		Master:                  255,
-		ScannerGobo:             1,
-		SelectedFloodSequence:   selectedFloodMap,
-		Flood:                   false,
-		SelectedColor:           1,
-		AutoColor:               false,
-		AutoPatten:              false,
-		ScannerPatten:           0,
-		FixtureDisabled:         fixtureDisabled,
-		DisableOnce:             disabledOnce,
-		ScannerCoordinates:      []int{12, 16, 24, 32},
-		ScannerColor:            scannerColors,
-		ScannerOffsetPan:        120,
-		ScannerOffsetTilt:       120,
-		FixtureLabels:           fixtureLabels,
+		ScannerAvailableColors: availableScannerColors,
+		ScannersAvailable:      availableFixtures,
+		ScannersTotal:          scanners,
+		Type:                   sequenceType,
+		Hide:                   false,
+		Mode:                   "Sequence",
+		StaticColors:           staticColorsButtons,
+		RGBAvailableColors:     sequenceColorButtons,
+		ScannerAvailableGobos:  availableScannerGobos,
+		Name:                   sequenceType,
+		Number:                 mySequenceNumber,
+		FadeSpeed:              12,
+		FadeTime:               75 * time.Millisecond,
+		MusicTrigger:           false,
+		Run:                    true,
+		Bounce:                 false,
+		NumberSteps:            8 * 14, // Eight lamps and 14 steps to fade up and down.
+		RGBAvailablePattens:    availableRGBPattens,
+		ScannerSize:            common.DefaultScannerSize,
+		Speed:                  14,
+		CurrentSpeed:           25 * time.Millisecond,
+		ScannerShift:           0, // Start at zero ie no shift.
+		Blackout:               false,
+		Master:                 255,
+		ScannerGobo:            1,
+		Flood:                  false,
+		RGBColor:               1,
+		AutoColor:              false,
+		AutoPatten:             false,
+		ScannerPatten:          0,
+		FixtureDisabled:        fixtureDisabled,
+		DisableOnce:            disabledOnce,
+		ScannerCoordinates:     []int{12, 16, 24, 32},
+		ScannerColor:           scannerColors,
+		ScannerOffsetPan:       120,
+		ScannerOffsetTilt:      120,
+		GuiFixtureLabels:       fixtureLabels,
 	}
 
 	if sequence.Type == "rgb" {
-		sequence.FunctionLabels[0] = "Set\nPatten"
-		sequence.FunctionLabels[1] = "Auto\nColor"
-		sequence.FunctionLabels[2] = "Auto\nPatten"
-		sequence.FunctionLabels[3] = "Bounce"
-		sequence.FunctionLabels[4] = "Chase\nColor"
-		sequence.FunctionLabels[5] = "Static\nColor"
-		sequence.FunctionLabels[6] = "Invert"
-		sequence.FunctionLabels[7] = "Music"
+		sequence.GuiFunctionLabels[0] = "Set\nPatten"
+		sequence.GuiFunctionLabels[1] = "Auto\nColor"
+		sequence.GuiFunctionLabels[2] = "Auto\nPatten"
+		sequence.GuiFunctionLabels[3] = "Bounce"
+		sequence.GuiFunctionLabels[4] = "Chase\nColor"
+		sequence.GuiFunctionLabels[5] = "Static\nColor"
+		sequence.GuiFunctionLabels[6] = "Invert"
+		sequence.GuiFunctionLabels[7] = "Music"
 	}
 
 	if sequence.Type == "scanner" {
-		sequence.FunctionLabels[0] = "Set\nPatten"
-		sequence.FunctionLabels[1] = "Auto\nColor"
-		sequence.FunctionLabels[2] = "Auto\nPatten"
-		sequence.FunctionLabels[3] = "Bounce"
-		sequence.FunctionLabels[4] = "Color"
-		sequence.FunctionLabels[5] = "Gobo"
-		sequence.FunctionLabels[6] = "Chase"
-		sequence.FunctionLabels[7] = "Music"
+		sequence.GuiFunctionLabels[0] = "Set\nPatten"
+		sequence.GuiFunctionLabels[1] = "Auto\nColor"
+		sequence.GuiFunctionLabels[2] = "Auto\nPatten"
+		sequence.GuiFunctionLabels[3] = "Bounce"
+		sequence.GuiFunctionLabels[4] = "Color"
+		sequence.GuiFunctionLabels[5] = "Gobo"
+		sequence.GuiFunctionLabels[6] = "Chase"
+		sequence.GuiFunctionLabels[7] = "Music"
 	}
 
 	// Make functions for each of the sequences.
@@ -185,19 +182,19 @@ func CreateSequence(
 			SequenceNumber: mySequenceNumber,
 			Number:         function,
 			State:          false,
-			Label:          sequence.FunctionLabels[function],
+			Label:          sequence.GuiFunctionLabels[function],
 		}
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 
-	sequence.BottomButtons[0] = "Speed\nDown"
-	sequence.BottomButtons[1] = "Speed\nUp"
-	sequence.BottomButtons[2] = "Shift\nDown"
-	sequence.BottomButtons[3] = "Shift\nUp"
-	sequence.BottomButtons[4] = "Size\nDown"
-	sequence.BottomButtons[5] = "Size\nUp"
-	sequence.BottomButtons[6] = "Fade\nSoft"
-	sequence.BottomButtons[7] = "Fade\nSharp"
+	sequence.GuiBottomButtons[0] = "Speed\nDown"
+	sequence.GuiBottomButtons[1] = "Speed\nUp"
+	sequence.GuiBottomButtons[2] = "Shift\nDown"
+	sequence.GuiBottomButtons[3] = "Shift\nUp"
+	sequence.GuiBottomButtons[4] = "Size\nDown"
+	sequence.GuiBottomButtons[5] = "Size\nUp"
+	sequence.GuiBottomButtons[6] = "Fade\nSoft"
+	sequence.GuiBottomButtons[7] = "Fade\nSharp"
 
 	if sequenceType == "switch" {
 
@@ -310,7 +307,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Sequence in flood mode.
-		if sequence.Flood && sequence.PlayFloodOnce {
+		if sequence.Flood && sequence.FloodPlayOnce {
 			sequence.Run = false
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
@@ -322,13 +319,13 @@ func PlaySequence(sequence common.Sequence,
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureChannels, channels, command)
 			sequence.Flood = false
-			sequence.PlayFloodOnce = false
+			sequence.FloodPlayOnce = false
 			sequence.Run = false
 			continue
 		}
 
 		// Stop flood mode.
-		if sequence.NoFlood && sequence.PlayFloodOnce {
+		if sequence.NoFlood && sequence.FloodPlayOnce {
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Tick:           true,
@@ -340,7 +337,7 @@ func PlaySequence(sequence common.Sequence,
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureChannels, channels, command)
 			sequence.NoFlood = false
-			sequence.PlayFloodOnce = false
+			sequence.FloodPlayOnce = false
 			sequence.Run = true
 			continue
 		}
@@ -390,7 +387,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
-					sequence.Steps = sequence.AvailableRGBPattens[sequence.SelectedRGBPatten].Steps
+					sequence.Steps = sequence.RGBAvailablePattens[sequence.SelectedRGBPatten].Steps
 					sequence.UpdatePatten = false
 				}
 
@@ -443,7 +440,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
-					for pattenNumber, patten := range sequence.AvailableRGBPattens {
+					for pattenNumber, patten := range sequence.RGBAvailablePattens {
 						if patten.Number == sequence.SelectedRGBPatten {
 							sequence.Patten.Number = pattenNumber
 							if debug {
@@ -453,7 +450,7 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 					sequence.SelectedRGBPatten++
-					if sequence.SelectedRGBPatten > len(sequence.AvailableRGBPattens) {
+					if sequence.SelectedRGBPatten > len(sequence.RGBAvailablePattens) {
 						sequence.SelectedRGBPatten = 0
 					}
 				}
@@ -470,13 +467,13 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.AutoColor && sequence.Type == "rgb" {
 					// Find a new color.
 					newColor := []common.Color{}
-					newColor = append(newColor, sequence.AvailableSequenceColors[sequence.SelectedColor].Color)
+					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
 					sequence.SequenceColors = newColor
 
 					// Step through the available colors.
-					sequence.SelectedColor++
-					if sequence.SelectedColor > 7 {
-						sequence.SelectedColor = 0
+					sequence.RGBColor++
+					if sequence.RGBColor > 7 {
+						sequence.RGBColor = 0
 					}
 					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
 				}
@@ -500,7 +497,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Now that the patten colors have been decided and the positions calculated, set the CurrentSequenceColors
 				// with the colors from that patten.
-				sequence.CurrentSequenceColors = common.HowManyColors(sequence.Positions)
+				sequence.CurrentColors = common.HowManyColors(sequence.Positions)
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
@@ -514,7 +511,7 @@ func PlaySequence(sequence common.Sequence,
 					// Prepare a message to be sent to the fixtures in the sequence.
 					command := common.FixtureCommand{
 						SequenceNumber:         sequence.Number,
-						Inverted:               sequence.Inverted,
+						Inverted:               sequence.PattenInverted,
 						Master:                 sequence.Master,
 						Hide:                   sequence.Hide,
 						Tick:                   true,
@@ -538,7 +535,7 @@ func PlaySequence(sequence common.Sequence,
 						AvailableScannerColors: sequence.ScannerAvailableColors,
 						OffsetPan:              sequence.ScannerOffsetPan,
 						OffsetTilt:             sequence.ScannerOffsetTilt,
-						FixtureLabels:          sequence.FixtureLabels,
+						FixtureLabels:          sequence.GuiFixtureLabels,
 					}
 
 					// Now tell all the fixtures in this group what they need to do.
