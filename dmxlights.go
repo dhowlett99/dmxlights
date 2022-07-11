@@ -109,9 +109,12 @@ func main() {
 	guiButtons := make(chan common.ALight)
 
 	// Make space for info on which GUI button is flashing.
-	GuiFlashButtons := make([][]bool, 10)
-	for i := 0; i < 10; i++ {
-		GuiFlashButtons[i] = make([]bool, 10)
+	GuiFlashButtons := make([][]common.ALight, 10)
+	for y := 0; y < 10; y++ {
+		GuiFlashButtons[y] = make([]common.ALight, 10)
+		for x := 0; x < 10; x++ {
+			GuiFlashButtons[y][x].GuiFlashStopChannel = make(chan bool)
+		}
 	}
 
 	// Read sequences config file
@@ -183,7 +186,7 @@ func main() {
 	sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
 
 	// Create a thread to handle GUI button events.
-	go func(panel gui.MyPanel, guiButtons chan common.ALight, GuiFlashButtons [][]bool) {
+	go func(panel gui.MyPanel, guiButtons chan common.ALight, GuiFlashButtons [][]common.ALight) {
 		for {
 			alight := <-guiButtons
 			panel.UpdateButtonColor(alight, GuiFlashButtons)

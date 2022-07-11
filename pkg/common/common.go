@@ -11,17 +11,18 @@ import (
 const debug = false
 
 type ALight struct {
-	X           int
-	Y           int
-	Brightness  int
-	Red         int
-	Green       int
-	Blue        int
-	Flash       bool
-	OnColor     int
-	OffColor    int
-	UpdateLabel bool
-	Label       string
+	X                   int
+	Y                   int
+	Brightness          int
+	Red                 int
+	Green               int
+	Blue                int
+	Flash               bool
+	OnColor             int
+	OffColor            int
+	UpdateLabel         bool
+	Label               string
+	GuiFlashStopChannel chan bool
 }
 
 type Color struct {

@@ -105,7 +105,7 @@ func (panel *MyPanel) LabelButtons() {
 	panel.UpdateButtonLabel(8, 8, "BLACK")
 }
 
-func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]bool) {
+func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
 
 	// Shortcut to label a button.
 	if alight.UpdateLabel {
@@ -133,7 +133,14 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 	if !alight.Flash {
 		// We're not flashing.
 		// reset this button so it's not flashing.
-		GuiFlashButtons[alight.X][alight.Y] = false
+
+		// If the GuiFlashButtons array has a true value for this button,
+		// Then there must be a thread flashing the lamp right now.
+		// So we can assume its listening for a stop command.
+		if GuiFlashButtons[alight.X][alight.Y].Flash {
+			GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel <- true
+			GuiFlashButtons[alight.X][alight.Y].Flash = false
+		}
 
 		// Take into account the brightness.
 		Red := (float64(alight.Red) / 100) * (float64(alight.Brightness) / 2.55)
@@ -150,7 +157,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 	} else {
 
 		// Let everyone know that we're flashing.
-		GuiFlashButtons[alight.X][alight.Y] = true
+		GuiFlashButtons[alight.X][alight.Y].Flash = true
 
 		// We create a thread to flash the button.
 		go func() {
@@ -161,13 +168,11 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OnColor))
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
-				// Wake up every 10 ms to see if we need to stop.
-				for t := 0; t < 300; t++ {
-					if !GuiFlashButtons[alight.X][alight.Y] {
-						panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OffColor))
-						return
-					}
-					time.Sleep(1 * time.Millisecond)
+				// We wait for a stop message or 250ms which ever comes first.
+				select {
+				case <-GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel:
+					return
+				case <-time.After(250 * time.Millisecond):
 				}
 
 				// Turn off.
@@ -175,14 +180,13 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OffColor))
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
-				// Wake up every 10 ms to see if we need to stop.
-				for t := 0; t < 300; t++ {
-					if !GuiFlashButtons[alight.X][alight.Y] {
-						panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OffColor))
-						return
-					}
-					time.Sleep(1 * time.Millisecond)
+				// We wait for a stop message or 250ms which ever comes first.
+				select {
+				case <-GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel:
+					return
+				case <-time.After(250 * time.Millisecond):
 				}
+
 			}
 		}()
 	}

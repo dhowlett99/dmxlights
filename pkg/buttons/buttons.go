@@ -308,8 +308,8 @@ func ProcessButtons(X int, Y int,
 		}
 		if this.Flood { // If we are flood already then tell the sequence to stop flood.
 
-			// Turn the flood button back to white.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			// Turn the flood button back to black.
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 
 			cmd := common.Command{
 				Action: common.NoFlood,
@@ -423,10 +423,10 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Save Mode\n")
 		}
 
-		if this.SavePreset {
+		if this.SavePreset { // Turn the save mode off.
 			this.SavePreset = false
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			return
 		}
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
