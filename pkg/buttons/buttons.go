@@ -907,10 +907,10 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)
 		}
 
-		if !this.DisabledFixture[X][Y] && X < sequences[Y].NumberScanners {
+		if !this.DisabledFixture[X][Y] && X < sequences[Y].ScannersTotal {
 
 			if debug {
-				fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].NumberScanners)
+				fmt.Printf("Toggle Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].ScannersTotal)
 			}
 
 			this.DisabledFixture[X][Y] = true
@@ -933,7 +933,7 @@ func ProcessButtons(X int, Y int,
 
 		}
 
-		if this.DisabledFixture[X][Y] && X < sequences[Y].NumberScanners {
+		if this.DisabledFixture[X][Y] && X < sequences[Y].ScannersTotal {
 			if debug {
 				fmt.Printf("Toggle Scanner Number %d State on Sequence %d to false\n", X, Y)
 			}
@@ -1796,7 +1796,7 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 		fmt.Printf("Sequence %d Show Fixture Selection Buttons on the way to %s\n", this.SelectedSequence, action)
 	}
 
-	for fixtureNumber, fixture := range sequence.AvailableFixtures {
+	for fixtureNumber, fixture := range sequence.ScannersAvailable {
 
 		if debug {
 			fmt.Printf("Fixture %+v\n", fixture)
@@ -1827,16 +1827,16 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		fmt.Printf("Sequence %d Show Gobo Selection Buttons\n", this.SelectedSequence)
 	}
 	// Check if we need to flash this button.
-	for goboNumber, gobo := range sequence.AvailableScannerGobos[this.SelectedFixture+1] {
+	for goboNumber, gobo := range sequence.ScannerAvailableGobos[this.SelectedFixture+1] {
 
 		if gobo.Number > 8 {
 			return // We only have 8 buttons so we can't select from any more.
 		}
-		if gobo.Number == sequence.SelectedGobo {
+		if gobo.Number == sequence.ScannerGobo {
 			gobo.Flash = true
 		}
 		if debug {
-			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.SelectedGobo, gobo.Flash)
+			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.ScannerGobo, gobo.Flash)
 		}
 		if gobo.Flash {
 			code := common.GetLaunchPadColorCodeByRGB(gobo.Color)
@@ -1856,7 +1856,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	}
 
 	// if there are no colors available for this fixture turn everything off and print an error.
-	if sequence.AvailableScannerColors[this.SelectedFixture+1] == nil {
+	if sequence.ScannerAvailableColors[this.SelectedFixture+1] == nil {
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == this.SelectedSequence+1 {
 				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
@@ -1866,7 +1866,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	}
 
 	// selected fixture is +1 here because the fixtures in the yaml config file start with 1 not 0.
-	for fixtureNumber, lamp := range sequence.AvailableScannerColors[this.SelectedFixture+1] {
+	for fixtureNumber, lamp := range sequence.ScannerAvailableColors[this.SelectedFixture+1] {
 
 		if debug {
 			fmt.Printf("Lamp %+v\n", lamp)
@@ -1915,8 +1915,8 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	}
 
 	if sequence.Type == "scanner" {
-		for _, patten := range sequence.AvailableScannerPattens {
-			if patten.Number == sequence.SelectedScannerPatten {
+		for _, patten := range sequence.ScannerAvailablePattens {
+			if patten.Number == sequence.ScannerPatten {
 				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
 				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
 			} else {

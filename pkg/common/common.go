@@ -149,8 +149,8 @@ type Gobo struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	NumberFixtures          int
-	NumberScanners          int
+	NumberFixtures int
+	//NumberScanners          int
 	Mode                    string // Sequence or Static
 	Static                  bool
 	PlayStaticOnce          bool
@@ -160,9 +160,6 @@ type Sequence struct {
 	PlayFloodOnce           bool
 	StaticColors            []StaticColorButton
 	AvailableSequenceColors []StaticColorButton
-	AvailableScannerColors  map[int][]StaticColorButton
-	AvailableScannerGobos   map[int][]StaticColorButton
-	AvailableFixtures       []StaticColorButton // Holds a set of red buttons, one for every available fixture.
 	EditColors              bool
 	Hide                    bool
 	Type                    string
@@ -179,18 +176,15 @@ type Sequence struct {
 	Patten                  Patten // Contains fixtures and steps info.
 	Colors                  []Color
 	UpdateShift             bool
-	Shift                   int // Used for shifting scanners patterns apart.
 	CurrentSpeed            time.Duration
 	Speed                   int
 	FadeSpeed               int
 	Size                    int
-	ScannerSize             int
 	X                       int
 	Y                       int
 	MusicTrigger            bool
 	Blackout                bool
 	Color                   int
-	SelectedGobo            int
 	SelectedColor           int
 	Master                  int // Master Brightness
 	Functions               []Function
@@ -207,25 +201,35 @@ type Sequence struct {
 	AutoPatten              bool
 	RecoverSequenceColors   bool
 	SaveColors              bool
-	SelectedScannerPatten   int
 	FixtureDisabled         map[int]bool
 	DisableOnce             map[int]bool
-	ScannerChase            bool
 	UpdateScannerColor      bool
-	ScannerColor            map[int]int // eight scanners per sequence, each can have their own color.
-	NumberCoordinates       []int
-	SelectedCoordinates     int
-	Steps                   []Step
-	UpdatePatten            bool
-	SelectPatten            bool
-	SelectedRGBPatten       int
-	OffsetPan               int
-	OffsetTilt              int
-	FunctionLabels          [8]string
-	BottomButtons           [8]string
-	FixtureLabels           []string
-	AvailableRGBPattens     map[int]Patten
-	AvailableScannerPattens map[int]Patten
+
+	Steps             []Step
+	UpdatePatten      bool
+	SelectPatten      bool
+	SelectedRGBPatten int
+
+	FunctionLabels      [8]string
+	BottomButtons       [8]string
+	FixtureLabels       []string
+	AvailableRGBPattens map[int]Patten
+
+	ScannersTotal              int                         // Total number of scanners in this sequence.
+	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
+	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
+	ScannerAvailablePattens    map[int]Patten              // Available pattens for this scanner.
+	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
+	ScannerPatten              int                         // The selected scanner patten.
+	ScannerSize                int                         // The selected scanner size.
+	ScannerShift               int                         // Used for shifting scanners patterns apart.
+	ScannerGobo                int                         // The selected gobo.
+	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
+	ScannerCoordinates         []int                       // Number of scanner coordinates.
+	ScannerSelectedCoordinates int                         // index into scanner coordinates.
+	ScannerOffsetPan           int                         // Offset for pan values.
+	ScannerOffsetTilt          int                         // Offset for tilt values.
 }
 
 type Function struct {
