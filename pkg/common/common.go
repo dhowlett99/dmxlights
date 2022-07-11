@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/rakyll/launchpad/mk3"
@@ -205,7 +206,9 @@ type Sequence struct {
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
 	ScannerOffsetPan           int                         // Offset for pan values.
 	ScannerOffsetTilt          int                         // Offset for tilt values.
+	FixtureDisabledMutex       *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	FixtureDisabled            map[int]bool                // Map of fixtures which are disabled.
+	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
 	UpdateShift                bool                        // Command to update the shift.
 	UpdatePatten               bool                        // Flag to indicate we're going to change the RGB patten.
@@ -273,7 +276,9 @@ type FixtureCommand struct {
 	SequenceNumber         int
 	Inverted               bool
 	SelectedGobo           int
+	FixtureDisabledMutex   *sync.RWMutex // Mutex to protect the  disable maps from syncronous access.
 	FixtureDisabled        map[int]bool
+	DisableOnceMutex       *sync.RWMutex // Mutex to protect the  disable once map from syncronous access.
 	DisableOnce            map[int]bool
 	ScannerChase           bool
 	ScannerColor           map[int]int

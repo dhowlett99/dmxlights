@@ -170,17 +170,34 @@ func FixtureReceiver(sequence common.Sequence,
 					}
 				}
 
+				cmd.FixtureDisabledMutex.RLock()
+				disableThis := cmd.FixtureDisabled[myFixtureNumber]
+				cmd.FixtureDisabledMutex.RUnlock()
+
+				cmd.DisableOnceMutex.RLock()
+				disableOnce := cmd.DisableOnce[myFixtureNumber]
+				cmd.DisableOnceMutex.RUnlock()
+
 				// If this fixture is disabled then shut the shutter off.
 				if cmd.CurrentPosition == position.StartPosition &&
-					cmd.DisableOnce[myFixtureNumber] &&
 					cmd.Type == "scanner" &&
-					cmd.FixtureDisabled[myFixtureNumber] {
+					disableOnce &&
+					disableThis {
+
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0)
+
+					cmd.DisableOnceMutex.RLock()
 					cmd.DisableOnce[myFixtureNumber] = false
+					cmd.DisableOnceMutex.RUnlock()
+
 					continue
 				}
 
-				if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
+				cmd.FixtureDisabledMutex.RLock()
+				disableThis = cmd.FixtureDisabled[myFixtureNumber]
+				cmd.FixtureDisabledMutex.RUnlock()
+
+				if cmd.CurrentPosition == position.StartPosition && !disableThis {
 
 					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {

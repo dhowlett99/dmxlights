@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -152,6 +153,11 @@ func CreateSequence(
 		ScannerOffsetTilt:      120,
 		GuiFixtureLabels:       fixtureLabels,
 	}
+
+	// Since we will be accessing these maps from the sequence thread and the fixture threads
+	// We need to protect the maps from syncronous access.
+	sequence.FixtureDisabledMutex = &sync.RWMutex{}
+	sequence.DisableOnceMutex = &sync.RWMutex{}
 
 	if sequence.Type == "rgb" {
 		sequence.GuiFunctionLabels[0] = "Set\nPatten"
@@ -520,7 +526,9 @@ func PlaySequence(sequence common.Sequence,
 						CurrentPosition:        step,
 						SelectedGobo:           sequence.ScannerGobo,
 						FixtureDisabled:        sequence.FixtureDisabled,
+						FixtureDisabledMutex:   sequence.FixtureDisabledMutex,
 						DisableOnce:            sequence.DisableOnce,
+						DisableOnceMutex:       sequence.DisableOnceMutex,
 						ScannerChase:           sequence.ScannerChase,
 						ScannerColor:           sequence.ScannerColor,
 						AvailableScannerColors: sequence.ScannerAvailableColors,
