@@ -168,7 +168,6 @@ type Sequence struct {
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPatten                 bool                        // Sequence is going to automatically change the patten.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
-	GuiBottomButtons           [8]string                   // Storage for the labels on the bottom row.
 	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
 	Patten                     Patten                      // Contains fixtures and steps info.
 	PattenInverted             bool                        // The patten is inverted.
@@ -752,15 +751,52 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	}
 }
 
-func ShowBottomButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
-	// Loop through the available functions for this sequence
-	for index, button := range sequence.GuiBottomButtons {
-		if debug {
-			fmt.Printf("button %+v\n", button)
+	// Storage for the rgb labels on the bottom row.
+	var guiBottomRGBButtons [8]string
+	guiBottomRGBButtons[0] = "Speed\nDown"
+	guiBottomRGBButtons[1] = "Speed\nUp"
+	guiBottomRGBButtons[2] = "Shift\nDown"
+	guiBottomRGBButtons[3] = "Shift\nUp"
+	guiBottomRGBButtons[4] = "Size\nDown"
+	guiBottomRGBButtons[5] = "Size\nUp"
+	guiBottomRGBButtons[6] = "Fade\nSoft"
+	guiBottomRGBButtons[7] = "Fade\nSharp"
+
+	// Storage for the scanner labels on the bottom row.
+	var guiBottomScannerButtons [8]string
+	guiBottomScannerButtons[0] = "Speed\nDown"
+	guiBottomScannerButtons[1] = "Speed\nUp"
+	guiBottomScannerButtons[2] = "Shift\nDown"
+	guiBottomScannerButtons[3] = "Shift\nUp"
+	guiBottomScannerButtons[4] = "Size\nDown"
+	guiBottomScannerButtons[5] = "Size\nUp"
+	guiBottomScannerButtons[6] = "Coord\nDown"
+	guiBottomScannerButtons[7] = "Coord\nUp"
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	if tYpe == "rgb" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiBottomRGBButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button, guiButtons)
 		}
-		LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-		LabelButton(index, selectedSequence, button, guiButtons)
+	}
+	if tYpe == "scanner" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiBottomScannerButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button, guiButtons)
+		}
 	}
 }
 

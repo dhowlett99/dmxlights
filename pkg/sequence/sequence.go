@@ -187,15 +187,6 @@ func CreateSequence(
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 
-	sequence.GuiBottomButtons[0] = "Speed\nDown"
-	sequence.GuiBottomButtons[1] = "Speed\nUp"
-	sequence.GuiBottomButtons[2] = "Shift\nDown"
-	sequence.GuiBottomButtons[3] = "Shift\nUp"
-	sequence.GuiBottomButtons[4] = "Size\nDown"
-	sequence.GuiBottomButtons[5] = "Size\nUp"
-	sequence.GuiBottomButtons[6] = "Fade\nSoft"
-	sequence.GuiBottomButtons[7] = "Fade\nSharp"
-
 	if sequenceType == "switch" {
 
 		if debug {

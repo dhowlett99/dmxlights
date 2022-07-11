@@ -227,7 +227,7 @@ func main() {
 	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
 	// Light the buttons at the bottom.
-	common.ShowBottomButtons(*sequences[1], 7, eventsForLauchpad, guiButtons)
+	common.ShowBottomButtons(sequences[1].Type, eventsForLauchpad, guiButtons)
 
 	// Light the logo blue.
 	this.Pad.Light(8, -1, 0, 0, 255)
@@ -245,15 +245,6 @@ func main() {
 	common.LightLamp(common.ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 	common.LightLamp(common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 	common.LightLamp(common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-
-	// Light the save, start, stop and this.Blackout buttons.
-	// common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	// common.LightLamp(common.ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	// common.LightLamp(common.ALight{X: 8, Y: 7, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	// common.LightLamp(common.ALight{X: 8, Y: 8, Brightness: 255, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-
-	// Initialise the this.Flood button to be green.
-	//common.LightLamp(common.ALight{X: 7, Y: 3, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

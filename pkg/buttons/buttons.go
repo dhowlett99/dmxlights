@@ -1656,6 +1656,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if !this.FunctionSelectMode[this.SelectedSequence] && sequences[this.SelectedSequence].Functions[common.Function5_Color].State && this.EditSequenceColorsMode[this.SelectedSequence] {
 			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLauchpad, guiButtons)
 		}
+
+		// Tailor the bottom buttons to the sequence type.
+		common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLauchpad, guiButtons)
+
 		return
 	}
 
