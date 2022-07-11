@@ -90,7 +90,8 @@ const UpdateStaticColor = 3
 const UpdateSequenceColor = 4
 const PlayStaticOnce = 5
 const PlaySwitchOnce = 6
-const SetEditColors = 7
+
+//const SetEditColors = 7
 const EditColors = 8
 const UnHide = 9
 const Hide = 10
@@ -152,7 +153,6 @@ type Sequence struct {
 	NumberScanners          int
 	Mode                    string // Sequence or Static
 	Static                  bool
-	EditSeqColors           bool
 	PlayStaticOnce          bool
 	PlaySwitchOnce          bool
 	Flood                   bool
@@ -672,7 +672,6 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	// Map color selection function.
 	if sequence.Functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
-		sequence.EditSeqColors = true
 	}
 
 	// Map static function.

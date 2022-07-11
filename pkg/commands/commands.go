@@ -218,16 +218,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		return sequence
 
-	case common.SetEditColors:
-		const EDIT_COLORS = 0
-		if debug {
-			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Args[EDIT_COLORS].Value)
-		}
-		sequence.PlayStaticOnce = true
-
-		sequence.EditColors = command.Args[EDIT_COLORS].Value.(bool)
-		return sequence
-
 	case common.UpdateStatic:
 		const STATIC = 0
 		if debug {
