@@ -113,7 +113,16 @@ func main() {
 	for y := 0; y < 10; y++ {
 		GuiFlashButtons[y] = make([]common.ALight, 10)
 		for x := 0; x < 10; x++ {
-			GuiFlashButtons[y][x].GuiFlashStopChannel = make(chan bool)
+			GuiFlashButtons[y][x].FlashStopChannel = make(chan bool)
+		}
+	}
+
+	// Make space for info on which Launchpad button is flashing.
+	LaunchPadFlashButtons := make([][]common.ALight, 10)
+	for y := 0; y < 10; y++ {
+		LaunchPadFlashButtons[y] = make([]common.ALight, 10)
+		for x := 0; x < 10; x++ {
+			LaunchPadFlashButtons[y][x].FlashStopChannel = make(chan bool)
 		}
 	}
 
@@ -194,9 +203,9 @@ func main() {
 	}(panel, guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad events.
-	go func() {
-		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
-	}()
+	go func(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad, LaunchPadFlashButtons [][]common.ALight) {
+		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
+	}(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 
 	row0 := panel.GenerateRow(0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row1 := panel.GenerateRow(1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)

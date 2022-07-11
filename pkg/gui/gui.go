@@ -24,16 +24,6 @@ import (
 
 const ColumnWidth int = 9
 
-//LightBlue := color.NRGBA{R: 0, G: 196, B: 255, A: 255}
-//Red := color.NRGBA{R: 255, G: 0, B: 0, A: 255}
-//Orange := color.NRGBA{R: 255, G: 111, B: 0, A: 255}
-//Yellow := color.NRGBA{R: 255, G: 255, B: 0, A: 255}
-//Green := color.NRGBA{R: 0, G: 255, B: 0, A: 255}
-//Blue := color.NRGBA{R: 0, G: 0, B: 255, A: 255}
-//Purple := color.NRGBA{R: 100, G: 0, B: 255, A: 255}
-//Pink := color.NRGBA{R: 255, G: 0, B: 255, A: 255}
-//Cyan := color.NRGBA{R: 0, G: 255, B: 255, A: 255}
-
 type Button struct {
 	button    *widget.Button
 	rectangle *canvas.Rectangle
@@ -66,16 +56,6 @@ func NewPanel() MyPanel {
 }
 
 func (panel *MyPanel) LabelButtons() {
-	// panel.updateButtonColor(0, 0, Pink)
-	// panel.updateButtonColor(1, 0, Red)
-	// panel.updateButtonColor(2, 0, Green)
-	// panel.updateButtonColor(3, 0, Blue)
-	// panel.updateButtonColor(4, 0, LightBlue)
-	// panel.updateButtonColor(5, 0, LightBlue)
-	// panel.updateButtonColor(6, 0, LightBlue)
-	// panel.updateButtonColor(7, 0, LightBlue)
-	// panel.updateButtonColor(8, 0, Cyan)
-
 	panel.UpdateButtonLabel(8, 1, "  >  ")
 	panel.UpdateButtonLabel(8, 2, "  >  ")
 	panel.UpdateButtonLabel(8, 3, "  >  ")
@@ -138,7 +118,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		// Then there must be a thread flashing the lamp right now.
 		// So we can assume its listening for a stop command.
 		if GuiFlashButtons[alight.X][alight.Y].Flash {
-			GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel <- true
+			GuiFlashButtons[alight.X][alight.Y].FlashStopChannel <- true
 			GuiFlashButtons[alight.X][alight.Y].Flash = false
 		}
 
@@ -154,6 +134,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		color.A = 255
 		panel.Buttons[alight.X][alight.Y].rectangle.FillColor = color
 		panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
+
 	} else {
 
 		// Let everyone know that we're flashing.
@@ -161,32 +142,30 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 		// We create a thread to flash the button.
 		go func() {
-
 			for {
 				// Turn on.
-				// Convert the launchpad code into RGB and the into NRGBA for the GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OnColor))
+				// Convert the  RGB color into NRGBA for the fyne.io GUI.
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OnColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
-				case <-GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel:
+				case <-GuiFlashButtons[alight.X][alight.Y].FlashStopChannel:
 					return
 				case <-time.After(250 * time.Millisecond):
 				}
 
 				// Turn off.
-				// Convert the launchpad code into RGB and the into NRGBA for the GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(common.GetLaunchPadColorCodeByInt(alight.OffColor))
+				// Convert the  RGB color into NRGBA for the fyne.io GUI.
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OffColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
-				case <-GuiFlashButtons[alight.X][alight.Y].GuiFlashStopChannel:
+				case <-GuiFlashButtons[alight.X][alight.Y].FlashStopChannel:
 					return
 				case <-time.After(250 * time.Millisecond):
 				}
-
 			}
 		}()
 	}

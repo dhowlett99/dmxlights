@@ -11,18 +11,18 @@ import (
 const debug = false
 
 type ALight struct {
-	X                   int
-	Y                   int
-	Brightness          int
-	Red                 int
-	Green               int
-	Blue                int
-	Flash               bool
-	OnColor             int
-	OffColor            int
-	UpdateLabel         bool
-	Label               string
-	GuiFlashStopChannel chan bool
+	X                int
+	Y                int
+	Brightness       int
+	Red              int
+	Green            int
+	Blue             int
+	Flash            bool
+	OnColor          Color
+	OffColor         Color
+	UpdateLabel      bool
+	Label            string
+	FlashStopChannel chan bool
 }
 
 type Color struct {
@@ -514,68 +514,6 @@ func GetColorButtonsArray(color int) Color {
 	return Color{}
 }
 
-func GetLaunchPadColorCodeByInt(code int) (color Color) {
-	switch code {
-	case 0x4e: // Light Blue
-		return Color{R: 0, G: 196, B: 255}
-	case 0x78: // Red
-		return Color{R: 255, G: 0, B: 0}
-	case 0x48: // Red
-		return Color{R: 255, G: 0, B: 0}
-	case 0x60: // Orange
-		return Color{R: 255, G: 111, B: 0}
-	case 0x0c: // Light Yellow
-		return Color{R: 100, G: 100, B: 0}
-	case 0x0d: // Yellow
-		return Color{R: 255, G: 255, B: 0}
-	case 0x15: // Green
-		return Color{R: 0, G: 255, B: 0}
-	case 0x25: // Cyan
-		return Color{R: 0, G: 255, B: 255}
-	case 0x4f: // Blue
-		return Color{R: 0, G: 0, B: 255}
-	case 0x51: // Purple
-		return Color{R: 100, G: 0, B: 255}
-	case 0x34: // Pink
-		return Color{R: 255, G: 0, B: 255}
-	case 0x03: // White
-		return Color{R: 255, G: 255, B: 255}
-	case 0x00: // Black
-		return Color{R: 0, G: 0, B: 0}
-	}
-	return Color{R: 0, G: 0, B: 0}
-}
-
-func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-	switch color {
-	case Color{R: 0, G: 196, B: 255}:
-		return 0x4e // Light Blue
-	case Color{R: 100, G: 100, B: 255}:
-		return 0x4f // Grey Blue.
-	case Color{R: 255, G: 0, B: 0}:
-		return 0x48 // Red
-	case Color{R: 255, G: 111, B: 0}:
-		return 0x60 // Orange
-	case Color{R: 255, G: 255, B: 0}:
-		return 0x0d // Yellow
-	case Color{R: 0, G: 255, B: 0}:
-		return 0x15 // Green
-	case Color{R: 0, G: 255, B: 255}:
-		return 0x25 // Cyan
-	case Color{R: 0, G: 0, B: 255}:
-		return 0x4f // Blue
-	case Color{R: 100, G: 0, B: 255}:
-		return 0x51 // Purple
-	case Color{R: 255, G: 0, B: 255}:
-		return 0x34 // Pink
-	case Color{R: 255, G: 255, B: 255}:
-		return 0x03 // White
-	case Color{R: 0, G: 0, B: 0}:
-		return 0x00 // Black
-	}
-	return code
-}
-
 func GetRGBColorByName(color string) Color {
 	switch color {
 	case "Red":
@@ -828,19 +766,66 @@ func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpa
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad) {
-
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad, LaunchPadFlashButtons [][]ALight) {
 	for {
-		event := <-eventsForLauchpad
+		alight := <-eventsForLauchpad
 
-		if event.Flash {
-			pad.FlashLight(event.X, event.Y, int(event.OnColor), int(event.OffColor))
+		if !alight.Flash {
+
+			// We're not flashing.
+			// reset this button so it's not flashing.
+
+			// If the LaunchPadFlashButtons array has a true value for this button,
+			// Then there must be a thread flashing the lamp right now.
+			// So we can assume its listening for a stop command.
+			if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
+				LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
+				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+			}
+
+			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+			Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+			Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+			Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+			pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+
 		} else {
-			// For the math to work we need to convert our ints to floats and then back again.
-			Red := ((float64(event.Red) / 2) / 100) * (float64(event.Brightness) / 2.55)
-			Green := ((float64(event.Green) / 2) / 100) * (float64(event.Brightness) / 2.55)
-			Blue := ((float64(event.Blue) / 2) / 100) * (float64(event.Brightness) / 2.55)
-			pad.Light(event.X, event.Y, int(Red), int(Green), int(Blue))
+
+			// Let everyone know that we're flashing.
+			LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = true
+
+			// We create a thread to flash the button.
+			go func() {
+				for {
+					// Turn on.
+					// For the math to work we need to convert our ints to floats and then back again.
+					Red := ((float64(alight.OnColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					Green := ((float64(alight.OnColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					Blue := ((float64(alight.OnColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+
+					// We wait for a stop message or 250ms which ever comes first.
+					select {
+					case <-LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel:
+						return
+					case <-time.After(250 * time.Millisecond):
+					}
+
+					// Turn off.
+					// For the math to work we need to convert our ints to floats and then back again.
+					Red = ((float64(alight.OffColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					Green = ((float64(alight.OffColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					Blue = ((float64(alight.OffColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+					pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+
+					// We wait for a stop message or 250ms which ever comes first.
+					select {
+					case <-LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel:
+						return
+					case <-time.After(250 * time.Millisecond):
+					}
+				}
+			}()
 		}
 	}
 }
@@ -874,13 +859,13 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      false,
-		OnColor:    22,
-		OffColor:   18,
+		Flash:      Light.Flash,
+		OnColor:    Light.OnColor,
+		OffColor:   Light.OffColor,
 	}
 	eventsForLauchpad <- event
 
-	// Send message to GUI
+	// Send message to fyne.io GUI.
 	event = ALight{
 		X:          Light.X,
 		Y:          Light.Y + 1,
@@ -888,16 +873,15 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      false,
-		OnColor:    22,
-		OffColor:   18,
+		Flash:      Light.Flash,
+		OnColor:    Light.OnColor,
+		OffColor:   Light.OffColor,
 		Label:      Light.Label,
 	}
 	guiButtons <- event
-
 }
 
-func FlashLight(X int, Y int, onColor int, offColor int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{

@@ -98,6 +98,10 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
+	Pink := common.Color{R: 255, G: 0, B: 255}
+	Black := common.Color{R: 0, G: 0, B: 0}
+	Red := common.Color{R: 0, G: 0, B: 0}
+
 	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
@@ -282,7 +286,7 @@ func ProcessButtons(X int, Y int,
 		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
 
 			// Flash the flood button pink to indicate we're in flood.
-			common.FlashLight(8, 3, 0x34, 0x0, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 3, Pink, Black, eventsForLauchpad, guiButtons)
 
 			// First save our config
 			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
@@ -430,7 +434,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		common.FlashLight(8, 4, 0x34, 0x0, eventsForLauchpad, guiButtons)
+		common.FlashLight(8, 4, Pink, Black, eventsForLauchpad, guiButtons)
 		this.SavePreset = true
 		return
 	}
@@ -454,7 +458,7 @@ func ProcessButtons(X int, Y int,
 			presets.SavePresets(this.PresetsStore)
 			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, 0x78, 0x0, eventsForLauchpad, guiButtons)
+			common.FlashLight(X, Y, Pink, Black, eventsForLauchpad, guiButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
@@ -474,7 +478,7 @@ func ProcessButtons(X int, Y int,
 				// Turn the selected preset light red.
 				common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 3, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 				presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-				common.FlashLight(X, Y, 0x0c, 0x78, eventsForLauchpad, guiButtons)
+				common.FlashLight(X, Y, Red, Black, eventsForLauchpad, guiButtons)
 
 				// Preserve this.Blackout.
 				if !this.Blackout {
@@ -1348,9 +1352,6 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		this.LastStaticColorButtonX = X
 		this.LastStaticColorButtonY = Y
-		// code := common.GetLaunchPadColorCodeByRGB(this.StaticButtons[this.SelectedSequence].Color)
-		// fmt.Printf("Flash button X:%d, Y:%d to code number %d for this color %+v\n", X, Y, code, this.StaticButtons[this.SelectedSequence].Color)
-		// common.FlashLight(this.LastStaticColorButtonX, this.LastStaticColorButtonY, code, 0x0, eventsForLauchpad, guiButtons)
 
 		return
 	}
@@ -1512,7 +1513,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-			common.FlashLight(8, 7, 0x34, 0x0, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 7, Pink, Black, eventsForLauchpad, guiButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
@@ -1785,8 +1786,8 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 			}
 		}
 		if lamp.Flash {
-			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			common.FlashLight(myFixtureNumber, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, Black, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: full, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
 		}
@@ -1810,8 +1811,8 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 			this.SelectedFixture = fixtureNumber
 		}
 		if fixture.Flash {
-			code := common.GetLaunchPadColorCodeByRGB(fixture.Color)
-			common.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(fixtureNumber, this.SelectedSequence, fixture.Color, Black, eventsForLauchpad, guiButtons)
 
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: fixture.Color.R, Green: fixture.Color.G, Blue: fixture.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
@@ -1843,8 +1844,8 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.ScannerGobo, gobo.Flash)
 		}
 		if gobo.Flash {
-			code := common.GetLaunchPadColorCodeByRGB(gobo.Color)
-			common.FlashLight(goboNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(goboNumber, this.SelectedSequence, gobo.Color, Black, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: goboNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: gobo.Color.R, Green: gobo.Color.G, Blue: gobo.Color.B}, eventsForLauchpad, guiButtons)
 		}
@@ -1879,8 +1880,8 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 			lamp.Flash = true
 		}
 		if lamp.Flash {
-			code := common.GetLaunchPadColorCodeByRGB(lamp.Color)
-			common.FlashLight(fixtureNumber, this.SelectedSequence, int(code), 0x0, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, Black, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
@@ -1908,8 +1909,9 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	if sequence.Type == "rgb" {
 		for _, patten := range sequence.RGBAvailablePattens {
 			if patten.Number == sequence.SelectedRGBPatten {
-				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
-				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
+				Grey := common.Color{R: 100, G: 100, B: 255}
+				Black := common.Color{R: 0, G: 0, B: 0}
+				common.FlashLight(patten.Number, mySequenceNumber, Grey, Black, eventsForLauchpad, guiButtons)
 			} else {
 				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 			}
@@ -1921,8 +1923,9 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	if sequence.Type == "scanner" {
 		for _, patten := range sequence.ScannerAvailablePattens {
 			if patten.Number == sequence.ScannerPatten {
-				code := common.GetLaunchPadColorCodeByRGB(common.Color{R: 100, G: 100, B: 255})
-				common.FlashLight(patten.Number, mySequenceNumber, int(code), 0x0, eventsForLauchpad, guiButtons)
+				Grey := common.Color{R: 100, G: 100, B: 255}
+				Black := common.Color{R: 0, G: 0, B: 0}
+				common.FlashLight(patten.Number, mySequenceNumber, Grey, Black, eventsForLauchpad, guiButtons)
 			} else {
 				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 			}
