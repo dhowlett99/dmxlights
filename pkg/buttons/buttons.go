@@ -100,7 +100,7 @@ func ProcessButtons(X int, Y int,
 
 	Pink := common.Color{R: 255, G: 0, B: 255}
 	Black := common.Color{R: 0, G: 0, B: 0}
-	Red := common.Color{R: 0, G: 0, B: 0}
+	Red := common.Color{R: 255, G: 0, B: 0}
 
 	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
@@ -458,7 +458,7 @@ func ProcessButtons(X int, Y int,
 			presets.SavePresets(this.PresetsStore)
 			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, Pink, Black, eventsForLauchpad, guiButtons)
+			common.FlashLight(X, Y, Red, Black, eventsForLauchpad, guiButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
