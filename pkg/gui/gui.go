@@ -232,6 +232,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		button := Button{}
 		Y := rowNumber
 		X := columnNumber
+
 		button.button = widget.NewButton("     ", func() {
 			if this.SavePreset {
 				items := []*widget.FormItem{}
@@ -250,18 +251,29 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 		})
-		button.rectangle = canvas.NewRectangle(color.Black)
-		size := fyne.Size{}
-		size.Height = 80
-		size.Width = 80
-		button.rectangle.SetMinSize(size)
-		button.container = container.NewMax(button.rectangle, button.button)
-		containers = append(containers, button.container)
+		if X == 8 && Y == 0 {
+			button := widget.NewButton("MYDMX", nil) // button widget
+			myLogo := canvas.NewImageFromFile("dmxlights.png")
+			container1 := container.NewMax(
+				button,
+				myLogo,
+			)
+			containers = append(containers, container1)
+		} else {
+			button.rectangle = canvas.NewRectangle(color.Black)
+			size := fyne.Size{}
+			size.Height = 80
+			size.Width = 80
+			button.rectangle.SetMinSize(size)
+			button.container = container.NewMax(button.rectangle, button.button)
+			containers = append(containers, button.container)
+		}
 		NewButton := Button{}
 		NewButton.button = button.button
 		NewButton.container = button.container
 		NewButton.rectangle = button.rectangle
 		panel.Buttons[columnNumber][rowNumber] = NewButton
+
 	}
 
 	row0 := container.New(layout.NewHBoxLayout(), containers[0], containers[1], containers[2], containers[3], containers[4], containers[5], containers[6], containers[7], containers[8])
