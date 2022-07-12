@@ -237,11 +237,6 @@ func FixtureReceiver(sequence common.Sequence,
 						continue
 					}
 
-					// Short ciruit the soft fade if we in flood mode.
-					if cmd.Flood {
-						continue
-					}
-
 					// Now create a thread to process the RGB fixture itself.
 					if position.Fixture == myFixtureNumber {
 						go func() {
