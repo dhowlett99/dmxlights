@@ -744,25 +744,6 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	}
 }
 
-func ClearAll(pad *mk3.Launchpad, presetsStore map[string]bool, eventsForLauchpad chan ALight, guiButtons chan ALight, sequences []chan Command) {
-	pad.Reset()
-	command := Command{
-		Action: Stop,
-	}
-
-	for _, sequence := range sequences {
-		sequence <- command
-	}
-
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
-			if presetsStore[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				LightLamp(ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
-			}
-		}
-	}
-}
-
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.

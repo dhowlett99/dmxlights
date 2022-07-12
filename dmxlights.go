@@ -54,9 +54,7 @@ func main() {
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
 	this.OffsetPan = 120                            // Start pan from the center
 	this.OffsetTilt = 120                           // Start tilt from the center.
-	this.PresetsStore = make(map[string]bool)       // Make an empty presets store.
 	this.SelectedFloodMap = make(map[int]bool, 4)   // Make a store for which sequences can be flood light.
-	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
 	this.Pattens = patten.MakePatterns()            // Build the default set of Pattens.
 	this.SelectButtonPressed = make([]bool, 4)      // Initialize four select buttons.
 	this.FunctionSelectMode = make([]bool, 4)       // Initialize four function mode states.
@@ -66,12 +64,28 @@ func main() {
 	this.EditStaticColorsMode = make([]bool, 4)     // Remember when we are in editing static colors mode.
 	this.EditPattenMode = make([]bool, 4)           // Remember when we are in editing patten mode.
 	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
+	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
 
 	// Initialize eight fixture states for the four sequences.
 	this.DisabledFixture = make([][]bool, 9)
 	for i := 0; i < 9; i++ {
 		this.DisabledFixture[i] = make([]bool, 9)
 	}
+
+	// // Initialize eight presets states for the three rows of presets.
+	// this.PresetsStore = make([][]presets.Preset, 9)
+	// for i := 0; i < 9; i++ {
+	// 	this.PresetsStore[i] = make([]presets.Preset, 9)
+	// }
+	// // Label the presets
+	// for x := 0; x < 9; x++ {
+	// 	for y := 0; y < 9; y++ {
+	// 		this.PresetsStore[x][y].X = x
+	// 		this.PresetsStore[x][y].Y = y
+	// 		this.PresetsStore[x][y].Set = false
+	// 		this.PresetsStore[x][y].Label = "empty"
+	// 	}
+	// }
 
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
@@ -207,15 +221,15 @@ func main() {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 	}(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 
-	row0 := panel.GenerateRow(0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row1 := panel.GenerateRow(1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row2 := panel.GenerateRow(2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row3 := panel.GenerateRow(3, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row4 := panel.GenerateRow(4, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row5 := panel.GenerateRow(5, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row6 := panel.GenerateRow(6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row7 := panel.GenerateRow(7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row8 := panel.GenerateRow(8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 	// Label the Gui buttons.
 	panel.LabelButtons()

@@ -51,7 +51,7 @@ type CurrentState struct {
 	OffsetPan                int                        // Offset for Pan.
 	OffsetTilt               int                        // Offset for Tilt.
 	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
-	PresetsStore             map[string]bool            // Storage for the Presets.
+	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
 	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
@@ -146,9 +146,9 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		common.ClearAll(this.Pad, this.PresetsStore, eventsForLauchpad, guiButtons, commandChannels)
+		presets.ClearAll(this.Pad, this.PresetsStore, eventsForLauchpad, guiButtons, commandChannels)
 		AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-		presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+		//presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
 		// Make sure we stop all sequences.
@@ -441,9 +441,10 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			return
 		}
+		this.SavePreset = true
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 		common.FlashLight(8, 4, Pink, Black, eventsForLauchpad, guiButtons)
-		this.SavePreset = true
+
 		return
 	}
 
@@ -456,7 +457,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.SavePreset {
 			// S A V E - Ask all sequences for their current config and save in a file.
-			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = true
+			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{Set: true}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 			this.SavePreset = false
@@ -465,12 +466,11 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 
 			presets.SavePresets(this.PresetsStore)
-			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
-			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
+			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
 
 				// Stop all sequences, so we start in sync.
 				cmd := common.Command{
