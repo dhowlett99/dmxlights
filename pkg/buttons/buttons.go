@@ -101,6 +101,7 @@ func ProcessButtons(X int, Y int,
 	Pink := common.Color{R: 255, G: 0, B: 255}
 	Black := common.Color{R: 0, G: 0, B: 0}
 	Red := common.Color{R: 255, G: 0, B: 0}
+	PresetYellow := common.Color{R: 150, G: 150, B: 0}
 
 	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
@@ -439,7 +440,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// Ask all sequences for their current config and save in a file.
+	// P R E S E T S
 	if X < 8 && (Y > 3 && Y < 7) {
 
 		if debug {
@@ -447,6 +448,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		if this.SavePreset {
+			// S A V E - Ask all sequences for their current config and save in a file.
 			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = true
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
@@ -458,7 +460,7 @@ func ProcessButtons(X int, Y int,
 			presets.SavePresets(this.PresetsStore)
 			presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, Red, Black, eventsForLauchpad, guiButtons)
+			common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] {
@@ -475,10 +477,9 @@ func ProcessButtons(X int, Y int,
 				// Load the config.
 				config.AskToLoadConfig(commandChannels, X, Y)
 
-				// Turn the selected preset light red.
-				common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 3, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+				// Turn the selected preset light flashing red / yellow.
 				presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-				common.FlashLight(X, Y, Red, Black, eventsForLauchpad, guiButtons)
+				common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
 
 				// Preserve this.Blackout.
 				if !this.Blackout {
