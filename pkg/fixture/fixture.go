@@ -111,7 +111,8 @@ func FixtureReceiver(sequence common.Sequence,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
-	fixtures *Fixtures) {
+	fixtures *Fixtures,
+	fixtureStopChannels []chan bool) {
 
 	cmd := common.FixtureCommand{}
 
@@ -127,7 +128,6 @@ func FixtureReceiver(sequence common.Sequence,
 			// If we're a RGB fixture implement the flood and static features.
 			if cmd.Type == "rgb" {
 				if cmd.Flood {
-					time.Sleep(100 * time.Millisecond)
 					MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 					continue
@@ -138,7 +138,6 @@ func FixtureReceiver(sequence common.Sequence,
 					continue
 				}
 				if cmd.Static {
-					time.Sleep(100 * time.Millisecond)
 					sequence := common.Sequence{}
 					sequence.Type = cmd.Type
 					sequence.Number = cmd.SequenceNumber
@@ -239,7 +238,7 @@ func FixtureReceiver(sequence common.Sequence,
 
 					// Now create a thread to process the RGB fixture itself.
 					if position.Fixture == myFixtureNumber {
-						go func() {
+						go func(fixtureStopChannel chan bool) {
 							var R int
 							var G int
 							var B int
@@ -253,9 +252,17 @@ func FixtureReceiver(sequence common.Sequence,
 										common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									// Fade down time.
+									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+										return
+									}
 								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								// Fade off time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
 							for _, value := range fadeUp {
 								R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
@@ -266,12 +273,24 @@ func FixtureReceiver(sequence common.Sequence,
 								}
 								// Now ask DMX to actually light the real fixture.
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-								time.Sleep(cmd.FadeTime / 4) // Fade up Time.
+								// Fade up time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
 							for x := 0; x < cmd.Size; x++ {
-								time.Sleep(cmd.CurrentSpeed * 5)
+								// Time between fades.
+								if listenAndWaitForStop(cmd.CurrentSpeed*5, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
-							time.Sleep(cmd.FadeTime / 4) // Fade on time.
+							// Fade on time.
+							if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								return
+							}
 							if !cmd.Inverted {
 								for _, value := range fadeDown {
 									R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
@@ -281,11 +300,19 @@ func FixtureReceiver(sequence common.Sequence,
 										common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									// Fade down time.
+									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+										return
+									}
 								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								// Fade off time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
-						}()
+						}(fixtureStopChannels[myFixtureNumber])
 					}
 				}
 			}
@@ -533,4 +560,23 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 	return NewDMXValue
 
+}
+
+// listenAndWaitForStop is used in the fixture fade loops.
+// We make the sleeps interuptable so that fixtures can be stopped immediately
+func listenAndWaitForStop(wait time.Duration, fixtureStopChannels chan bool) bool {
+	select {
+	case <-fixtureStopChannels:
+		return true
+	case <-time.After(wait):
+	}
+	return false
+}
+
+// turnOffFixtures is used to turn off a fixture when we stop a sequence.
+func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+	if !cmd.Hide {
+		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+	}
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 }

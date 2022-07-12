@@ -22,6 +22,7 @@ const (
 
 type CurrentState struct {
 	SelectedSequence         int                        // The currently selected sequence.
+	LastSelectedSequence     int                        // Store fof the last selected squence.
 	SequenceSpeed            int                        // Local copy of sequence speed.
 	Size                     int                        // current RGB sequence this.Size.
 	ScannerSize              int                        // Current scanner this.Size.
@@ -286,6 +287,9 @@ func ProcessButtons(X int, Y int,
 
 		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
 
+			// Remember which sequence is currently selected.
+			this.LastSelectedSequence = this.SelectedSequence
+
 			// Flash the flood button pink to indicate we're in flood.
 			common.FlashLight(8, 3, Pink, Black, eventsForLauchpad, guiButtons)
 
@@ -346,6 +350,9 @@ func ProcessButtons(X int, Y int,
 				// Now forget we pressed twice and start again.
 				this.SelectButtonPressed[this.SelectedSequence] = false
 			}
+
+			// Restore the last selected sequence.
+			this.SelectedSequence = this.LastSelectedSequence
 
 			return
 		}
