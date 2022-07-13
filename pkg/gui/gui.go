@@ -139,6 +139,12 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 	} else {
 
+		// Stop any existing flashing.
+		if GuiFlashButtons[alight.X][alight.Y].Flash {
+			GuiFlashButtons[alight.X][alight.Y].FlashStopChannel <- true
+			GuiFlashButtons[alight.X][alight.Y].Flash = false
+		}
+
 		// Let everyone know that we're flashing.
 		GuiFlashButtons[alight.X][alight.Y].Flash = true
 

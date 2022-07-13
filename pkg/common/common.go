@@ -772,6 +772,12 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad,
 
 		} else {
 
+			// Stop any existing flashing.
+			if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
+				LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
+				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+			}
+
 			// Let everyone know that we're flashing.
 			LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = true
 
@@ -840,7 +846,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      Light.Flash,
+		Flash:      false,
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 	}
@@ -854,7 +860,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      Light.Flash,
+		Flash:      false,
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 		Label:      Light.Label,
