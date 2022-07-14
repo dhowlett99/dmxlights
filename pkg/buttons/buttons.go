@@ -1028,7 +1028,7 @@ func ProcessButtons(X int, Y int,
 
 		X = X - 100
 
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
 		return
