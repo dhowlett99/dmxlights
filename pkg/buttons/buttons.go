@@ -1747,7 +1747,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Create the function buttons.
-		common.MakeFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels)
+		common.MakeFunctionButtons(this.SelectedSequence, eventsForLauchpad, guiButtons, this.SequenceChannels)
 
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = false

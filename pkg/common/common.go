@@ -383,9 +383,9 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
+func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
 
-	// The taget set of buttons.
+	// The target set of buttons.
 	ClearSelectedRowOfButtons(selectedSequence, eventsForLauchpad, guiButtons)
 
 	// Get an upto date copy of the sequence.
@@ -395,7 +395,7 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
 
 	replyChannel := channels.ReplyChannels[selectedSequence]
-	sequence = <-replyChannel
+	sequence := <-replyChannel
 
 	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
