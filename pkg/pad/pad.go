@@ -141,7 +141,7 @@ func (pad *Pad) Light(x, y, red int, green int, blue int) error {
 		return err
 	}
 
-	_, err = pad.Write([]byte{0xF7})
+	_, err = pad.Write([]byte{0xF7, 0, 0})
 	if err != nil {
 		return err
 	}

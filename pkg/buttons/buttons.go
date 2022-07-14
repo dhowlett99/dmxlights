@@ -151,7 +151,6 @@ func ProcessButtons(X int, Y int,
 
 		presets.ClearAll(this.Pad, this.PresetsStore, eventsForLauchpad, guiButtons, commandChannels)
 		AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-		//presets.ClearPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
 		// Make sure we stop all sequences.
