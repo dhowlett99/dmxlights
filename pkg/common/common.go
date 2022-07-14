@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/rakyll/launchpad/mk3"
+	"github.com/dhowlett99/dmxlights/pkg/pad"
 )
 
 const debug = false
@@ -747,10 +747,13 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad, LaunchPadFlashButtons [][]ALight) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad, LaunchPadFlashButtons [][]ALight) {
 	for {
+
+		// Wait for the event.
 		alight := <-eventsForLauchpad
 
+		// We're in standard turn the light on.
 		if !alight.Flash {
 
 			// We're not flashing.
@@ -759,27 +762,42 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad,
 			// If the LaunchPadFlashButtons array has a true value for this button,
 			// Then there must be a thread flashing the lamp right now.
 			// So we can assume its listening for a stop command.
-			if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
-				LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
-				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+			if LaunchPadFlashButtons != nil {
+				if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
+					LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
+					LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+				}
 			}
 
 			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
 			Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 			Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 			Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-			pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
 
-		} else {
-
-			// Stop any existing flashing.
-			if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
-				LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
-				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+			// Now light the launchpad button.
+			err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+			if err != nil {
+				fmt.Printf("turn on: error writing to launchpad %e\n" + err.Error())
 			}
 
-			// Let everyone know that we're flashing.
-			LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = true
+			// Now we're been asked go flash this button.
+		} else {
+			// Stop any existing flashing.
+			if LaunchPadFlashButtons != nil {
+				if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
+					// Set this button to not flashing.
+					LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
+					// Send a message to stop the thread.
+					LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
+					// Wait for the any currently flashing button to stop.
+					time.Sleep(10 * time.Millisecond)
+				}
+			}
+
+			// Now start a new flashing button. Let everyone know that we're flashing.
+			if LaunchPadFlashButtons != nil {
+				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = true
+			}
 
 			// We create a thread to flash the button.
 			go func() {
@@ -789,7 +807,10 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad,
 					Red := ((float64(alight.OnColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 					Green := ((float64(alight.OnColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 					Blue := ((float64(alight.OnColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+					err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+					if err != nil {
+						fmt.Printf("flash on: error writing to launchpad %e\n" + err.Error())
+					}
 
 					// We wait for a stop message or 250ms which ever comes first.
 					select {
@@ -803,7 +824,10 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad,
 					Red = ((float64(alight.OffColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 					Green = ((float64(alight.OffColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 					Blue = ((float64(alight.OffColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+					err = pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+					if err != nil {
+						fmt.Printf("flash off: error writing to launchpad %e\n" + err.Error())
+					}
 
 					// We wait for a stop message or 250ms which ever comes first.
 					select {
@@ -818,7 +842,6 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad,
 }
 
 func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
-
 	if debug {
 		fmt.Printf("Label Button  X:%d  Y:%d  with %s\n", X, Y, label)
 	}
@@ -834,7 +857,6 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 
 // LightOn Turn on a Light.
 func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
 	if debug {
 		fmt.Printf("LightLamp  X:%d  Y:%d\n", Light.X, Light.Y)
 	}

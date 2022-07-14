@@ -16,12 +16,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
+	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 func main() {
@@ -72,21 +72,6 @@ func main() {
 		this.DisabledFixture[i] = make([]bool, 9)
 	}
 
-	// // Initialize eight presets states for the three rows of presets.
-	// this.PresetsStore = make([][]presets.Preset, 9)
-	// for i := 0; i < 9; i++ {
-	// 	this.PresetsStore[i] = make([]presets.Preset, 9)
-	// }
-	// // Label the presets
-	// for x := 0; x < 9; x++ {
-	// 	for y := 0; y < 9; y++ {
-	// 		this.PresetsStore[x][y].X = x
-	// 		this.PresetsStore[x][y].Y = y
-	// 		this.PresetsStore[x][y].Set = false
-	// 		this.PresetsStore[x][y].Label = "empty"
-	// 	}
-	// }
-
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
 	dmxController, err := dmx.NewDmXController()
@@ -107,7 +92,7 @@ func main() {
 	// Setup a connection to the Novation Launchpad.
 	// Tested with a Novation Launchpad mini mk3.
 	fmt.Println("Setup Novation Launchpad")
-	this.Pad, err = mk3.Open()
+	this.Pad, err = pad.Open()
 	if err != nil {
 		log.Fatalf("error initializing launchpad: %v", err)
 	}
@@ -136,6 +121,7 @@ func main() {
 	for y := 0; y < 10; y++ {
 		LaunchPadFlashButtons[y] = make([]common.ALight, 10)
 		for x := 0; x < 10; x++ {
+			// Make a stop flashing channel for every button.
 			LaunchPadFlashButtons[y][x].FlashStopChannel = make(chan bool)
 		}
 	}
@@ -217,7 +203,7 @@ func main() {
 	}(panel, guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad events.
-	go func(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad, LaunchPadFlashButtons [][]common.ALight) {
+	go func(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadFlashButtons [][]common.ALight) {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 	}(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 
@@ -239,9 +225,6 @@ func main() {
 
 	// Now configure the content to contain the top toolbar and the squares.
 	content := container.NewBorder(toolbar, nil, nil, nil, squares)
-
-	// Start off by turning off all of the Lights
-	this.Pad.Reset()
 
 	// Start threads for each sequence.
 	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)

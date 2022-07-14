@@ -8,10 +8,10 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -50,7 +50,7 @@ type CurrentState struct {
 	SelectedCordinates       int                        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
 	OffsetPan                int                        // Offset for Pan.
 	OffsetTilt               int                        // Offset for Tilt.
-	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
+	Pad                      *pad.Pad                   // Pointer to the Novation Launchpad object.
 	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
@@ -68,7 +68,10 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence) {
 
 	// Create a channel to listen for buttons being pressed.
-	buttonChannel := this.Pad.Listen()
+	buttonChannel := make(chan pad.Hit)
+	go func() {
+		this.Pad.Listen(buttonChannel)
+	}()
 
 	start := 0
 	// Main loop reading commands from the Novation Launchpad.
@@ -971,7 +974,7 @@ func ProcessButtons(X int, Y int,
 
 	}
 
-	// F L A S H   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
 	if X >= 0 &&
 		X < 8 &&
 		Y >= 0 &&
@@ -984,7 +987,7 @@ func ProcessButtons(X int, Y int,
 		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
 
 		if debug {
-			fmt.Printf("Flash Fixture Pressed X:%d Y:%d\n", X, Y)
+			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
 		}
 
 		flashSequence := common.Sequence{
@@ -1004,9 +1007,30 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
-		time.Sleep(200 * time.Millisecond)
+		return
+	}
+
+	// F L A S H  O F F   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	if X >= 0 &&
+		X != 108 && X != 117 &&
+		X >= 100 && X < 117 &&
+		Y >= 0 && Y < 4 &&
+		!sequences[Y].Functions[common.Function1_Patten].State &&
+		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
+		!sequences[Y].Functions[common.Function5_Color].State &&
+		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
+		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
+		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
+
+		if debug {
+			fmt.Printf("Flash OFF Fixture Pressed X:%d Y:%d\n", X, Y)
+		}
+
+		X = X - 100
+
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
 		return
 	}
 
