@@ -147,3 +147,27 @@ func (pad *Pad) Light(x, y, red int, green int, blue int) error {
 	}
 	return nil
 }
+
+func (pad *Pad) FlashLight(x int, y int, onColor byte, offColor byte) error {
+
+	led := int64((8-y)*10 + x + 1)
+
+	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})
+	if err != nil {
+		return err
+	}
+	_, err = pad.Write([]byte{0x29, 0x02, 0x0D})
+	if err != nil {
+		return err
+	}
+	_, err = pad.Write([]byte{0x03, 0x01, byte(led)})
+	if err != nil {
+		return err
+	}
+	_, err = pad.Write([]byte{byte(onColor), byte(offColor), 0xF7})
+	if err != nil {
+		return err
+	}
+
+	return nil
+}

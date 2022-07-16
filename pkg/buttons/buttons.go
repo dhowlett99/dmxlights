@@ -1941,14 +1941,15 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
 	}
 
+	LightBlue := common.Color{R: 0, G: 100, B: 255}
+	White := common.Color{R: 255, G: 255, B: 255}
+
 	if sequence.Type == "rgb" {
 		for _, patten := range sequence.RGBAvailablePattens {
 			if patten.Number == sequence.SelectedRGBPatten {
-				Grey := common.Color{R: 100, G: 100, B: 255}
-				Black := common.Color{R: 0, G: 0, B: 0}
-				common.FlashLight(patten.Number, mySequenceNumber, Grey, Black, eventsForLauchpad, guiButtons)
+				common.FlashLight(patten.Number, mySequenceNumber, White, LightBlue, eventsForLauchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 			}
 			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
 		}
@@ -1958,11 +1959,9 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	if sequence.Type == "scanner" {
 		for _, patten := range sequence.ScannerAvailablePattens {
 			if patten.Number == sequence.ScannerPatten {
-				Grey := common.Color{R: 100, G: 100, B: 255}
-				Black := common.Color{R: 0, G: 0, B: 0}
-				common.FlashLight(patten.Number, mySequenceNumber, Grey, Black, eventsForLauchpad, guiButtons)
+				common.FlashLight(patten.Number, mySequenceNumber, White, LightBlue, eventsForLauchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 100, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 			}
 			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
 		}
@@ -1985,12 +1984,6 @@ func InitButtons(this *CurrentState, sequences []*common.Sequence,
 
 	// Light the top buttons.
 	common.ShowTopButtons(eventsForLauchpad, guiButtons)
-
-	// refesh the switch positions.
-	// cmd := common.Command{
-	// 	Action: common.UpdateSwitchPositions,
-	// }
-	// common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

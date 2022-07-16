@@ -553,38 +553,33 @@ func GetRGBColorByName(color string) Color {
 	return Color{R: 0, G: 0, B: 0}
 }
 
-func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
-	if red == 255 && green == 0 && blue == 0 {
-		return 0x78
-	} // Red
-	if red == 255 && green == 111 && blue == 0 {
-		return 0x60
-	} // Orange
-	if red == 255 && green == 255 && blue == 0 {
-		return 0x7c
-	} // Yellow
-	if red == 0 && green == 255 && blue == 0 {
-		return 0x15
-	} // Green
-	if red == 0 && green == 255 && blue == 255 {
-		return 0x25
-	} // Cyan
-	if red == 0 && green == 0 && blue == 255 {
-		return 0x42
-	} // Blue
-	if red == 100 && green == 0 && blue == 255 {
-		return 0x2d
-	} // Purple
-	if red == 255 && green == 0 && blue == 255 {
-		return 0x35
-	} // Pink
-	if red == 255 && green == 255 && blue == 255 {
-		return 0x03
-	} // White
-	if red == 0 && green == 0 && blue == 0 {
-		return 0x0
-	} // Black
-	return 0
+func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
+	switch color {
+	case Color{R: 0, G: 100, B: 255}:
+		return 0x2a // Light Blue
+	case Color{R: 255, G: 0, B: 0}:
+		return 0x48 // Red
+	case Color{R: 255, G: 111, B: 0}:
+		return 0x60 // Orange
+	case Color{R: 255, G: 255, B: 0}:
+		return 0x0d // Yellow
+	case Color{R: 0, G: 255, B: 0}:
+		return 0x15 // Green
+	case Color{R: 0, G: 255, B: 255}:
+		return 0x25 // Cyan
+	case Color{R: 0, G: 0, B: 255}:
+		return 0x4f // Blue
+	case Color{R: 100, G: 0, B: 255}:
+		return 0x51 // Purple
+	case Color{R: 255, G: 0, B: 255}:
+		return 0x34 // Pink
+	case Color{R: 255, G: 255, B: 255}:
+		return 0x03 // White
+	case Color{R: 0, G: 0, B: 0}:
+		return 0x00 // Black
+	}
+
+	return code
 }
 
 func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
@@ -765,7 +760,7 @@ func ShowTopButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad, LaunchPadFlashButtons [][]ALight) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad) {
 	for {
 
 		// Wait for the event.
@@ -773,19 +768,6 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad, Launc
 
 		// We're in standard turn the light on.
 		if !alight.Flash {
-
-			// We're not flashing.
-			// reset this button so it's not flashing.
-
-			// If the LaunchPadFlashButtons array has a true value for this button,
-			// Then there must be a thread flashing the lamp right now.
-			// So we can assume its listening for a stop command.
-			if LaunchPadFlashButtons != nil {
-				if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
-					LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
-					LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
-				}
-			}
 
 			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
 			Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
@@ -795,66 +777,20 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad, Launc
 			// Now light the launchpad button.
 			err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
 			if err != nil {
-				fmt.Printf("turn on: error writing to launchpad %e\n" + err.Error())
+				fmt.Printf("error writing to launchpad %e\n" + err.Error())
 			}
 
 			// Now we're been asked go flash this button.
 		} else {
-			// Stop any existing flashing.
-			if LaunchPadFlashButtons != nil {
-				if LaunchPadFlashButtons[alight.X][alight.Y+1].Flash {
-					// Set this button to not flashing.
-					LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = false
-					// Send a message to stop the thread.
-					LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel <- true
-					// Wait for the any currently flashing button to stop.
-					time.Sleep(10 * time.Millisecond)
-				}
+			// Now light the launchpad button.
+			fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
+			fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
+
+			err := pad.FlashLight(alight.X, alight.Y, GetLaunchPadColorCodeByRGB(alight.OnColor), GetLaunchPadColorCodeByRGB(alight.OffColor))
+			if err != nil {
+				fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
 			}
 
-			// Now start a new flashing button. Let everyone know that we're flashing.
-			if LaunchPadFlashButtons != nil {
-				LaunchPadFlashButtons[alight.X][alight.Y+1].Flash = true
-			}
-
-			// We create a thread to flash the button.
-			go func() {
-				for {
-					// Turn on.
-					// For the math to work we need to convert our ints to floats and then back again.
-					Red := ((float64(alight.OnColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					Green := ((float64(alight.OnColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					Blue := ((float64(alight.OnColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
-					if err != nil {
-						fmt.Printf("flash on: error writing to launchpad %e\n" + err.Error())
-					}
-
-					// We wait for a stop message or 250ms which ever comes first.
-					select {
-					case <-LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel:
-						return
-					case <-time.After(250 * time.Millisecond):
-					}
-
-					// Turn off.
-					// For the math to work we need to convert our ints to floats and then back again.
-					Red = ((float64(alight.OffColor.R) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					Green = ((float64(alight.OffColor.G) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					Blue = ((float64(alight.OffColor.B) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-					err = pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
-					if err != nil {
-						fmt.Printf("flash off: error writing to launchpad %e\n" + err.Error())
-					}
-
-					// We wait for a stop message or 250ms which ever comes first.
-					select {
-					case <-LaunchPadFlashButtons[alight.X][alight.Y+1].FlashStopChannel:
-						return
-					case <-time.After(250 * time.Millisecond):
-					}
-				}
-			}()
 		}
 	}
 }

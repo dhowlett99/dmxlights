@@ -116,16 +116,6 @@ func main() {
 		}
 	}
 
-	// Make space for info on which Launchpad button is flashing.
-	LaunchPadFlashButtons := make([][]common.ALight, 10)
-	for y := 0; y < 10; y++ {
-		LaunchPadFlashButtons[y] = make([]common.ALight, 10)
-		for x := 0; x < 10; x++ {
-			// Make a stop flashing channel for every button.
-			LaunchPadFlashButtons[y][x].FlashStopChannel = make(chan bool)
-		}
-	}
-
 	// Read sequences config file
 	fmt.Println("Load Sequences Config File")
 	sequencesConfig, err := sequence.LoadSequences()
@@ -203,9 +193,9 @@ func main() {
 	}(panel, guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad light button events.
-	go func(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadFlashButtons [][]common.ALight) {
-		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
-	}(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
+	go func(eventsForLauchpad chan common.ALight, pad *pad.Pad) {
+		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
+	}(eventsForLauchpad, this.Pad)
 
 	// Add buttons to the main panel.
 	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
@@ -233,6 +223,9 @@ func main() {
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
 	buttons.InitButtons(&this, sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels)
+
+	// Label the buttons.
+	panel.LabelButtons()
 
 	// Clear the pad.
 	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
