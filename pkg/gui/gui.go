@@ -136,7 +136,6 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		color.A = 255
 		panel.Buttons[alight.X][alight.Y].rectangle.FillColor = color
 		panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
-
 	} else {
 
 		// Stop any existing flashing.

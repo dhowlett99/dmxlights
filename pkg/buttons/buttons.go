@@ -107,6 +107,74 @@ func ProcessButtons(X int, Y int,
 	Red := common.Color{R: 255, G: 0, B: 0}
 	PresetYellow := common.Color{R: 150, G: 150, B: 0}
 
+	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	if X >= 0 &&
+		X < 8 &&
+		Y >= 0 &&
+		Y < 4 &&
+		!sequences[Y].Functions[common.Function1_Patten].State &&
+		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
+		!sequences[Y].Functions[common.Function5_Color].State &&
+		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
+		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
+		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
+
+		if debug {
+			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
+		}
+
+		flashSequence := common.Sequence{
+			Patten: common.Patten{
+				Name:  "colors",
+				Steps: this.Pattens[4].Steps, // Use the color patten for flashing.
+			},
+		}
+
+		red := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].R
+		green := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].G
+		blue := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].B
+		pan := flashSequence.Patten.Steps[X].Fixtures[X].Pan
+		tilt := flashSequence.Patten.Steps[X].Fixtures[X].Tilt
+		shutter := flashSequence.Patten.Steps[X].Fixtures[X].Shutter
+		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
+
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
+		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		return
+	}
+
+	// F L A S H  O F F   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	if X >= 0 &&
+		X != 108 && X != 117 &&
+		X >= 100 && X < 117 &&
+		Y >= 0 && Y < 4 &&
+		!sequences[Y].Functions[common.Function1_Patten].State &&
+		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
+		!sequences[Y].Functions[common.Function5_Color].State &&
+		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
+		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
+		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
+
+		if debug {
+			fmt.Printf("Flash OFF Fixture Pressed X:%d Y:%d\n", X, Y)
+		}
+
+		X = X - 100
+
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		return
+	}
+
+	// Swollow the button off events if not used for flash above.
+	if X >= 100 {
+		if debug {
+			fmt.Printf("Swollow Event\n")
+		}
+		return
+	}
+
 	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
@@ -120,7 +188,7 @@ func ProcessButtons(X int, Y int,
 
 		// Turn off the flashing save button.
 		this.SavePreset = false
-		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
 		// Turn off the this.Flood
 		if this.Flood {
@@ -989,66 +1057,6 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-	}
-
-	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
-	if X >= 0 &&
-		X < 8 &&
-		Y >= 0 &&
-		Y < 4 &&
-		!sequences[Y].Functions[common.Function1_Patten].State &&
-		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
-		!sequences[Y].Functions[common.Function5_Color].State &&
-		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
-		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
-
-		if debug {
-			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
-		}
-
-		flashSequence := common.Sequence{
-			Patten: common.Patten{
-				Name:  "colors",
-				Steps: this.Pattens[4].Steps, // Use the color patten for flashing.
-			},
-		}
-
-		red := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].R
-		green := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].G
-		blue := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].B
-		pan := flashSequence.Patten.Steps[X].Fixtures[X].Pan
-		tilt := flashSequence.Patten.Steps[X].Fixtures[X].Tilt
-		shutter := flashSequence.Patten.Steps[X].Fixtures[X].Shutter
-		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
-
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
-		return
-	}
-
-	// F L A S H  O F F   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
-	if X >= 0 &&
-		X != 108 && X != 117 &&
-		X >= 100 && X < 117 &&
-		Y >= 0 && Y < 4 &&
-		!sequences[Y].Functions[common.Function1_Patten].State &&
-		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
-		!sequences[Y].Functions[common.Function5_Color].State &&
-		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
-		!this.FunctionSelectMode[Y] { // As long as we're not a scanner sequence for this sequence.
-
-		if debug {
-			fmt.Printf("Flash OFF Fixture Pressed X:%d Y:%d\n", X, Y)
-		}
-
-		X = X - 100
-
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
-		return
 	}
 
 	// S E L E C T   P O S I T I O N
@@ -1929,8 +1937,8 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 			lamp.Flash = true
 		}
 		if lamp.Flash {
-			White := common.Color{R: 255, G: 255, B: 255}
-			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, White, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, Black, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}

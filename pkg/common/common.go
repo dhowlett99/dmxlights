@@ -766,6 +766,9 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad) {
 		// Wait for the event.
 		alight := <-eventsForLauchpad
 
+		// Wait for a few millisecond so the launchpad and the gui step at the same time
+		time.Sleep(14 * time.Microsecond)
+
 		// We're in standard turn the light on.
 		if !alight.Flash {
 
