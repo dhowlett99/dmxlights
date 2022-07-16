@@ -57,7 +57,6 @@ type CurrentState struct {
 	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
 	SelectedPatten           int                        // The selected Patten Number. Used as the index for above.
 	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
-	SelectedFloodMap         map[int]bool               // Storage for which sequences can be flood light.
 	SelectedGobo             int                        // The selected GOBO.
 }
 

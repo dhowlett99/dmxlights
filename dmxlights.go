@@ -54,7 +54,6 @@ func main() {
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
 	this.OffsetPan = 120                            // Start pan from the center
 	this.OffsetTilt = 120                           // Start tilt from the center.
-	this.SelectedFloodMap = make(map[int]bool, 4)   // Make a store for which sequences can be flood light.
 	this.Pattens = patten.MakePatterns()            // Build the default set of Pattens.
 	this.SelectButtonPressed = make([]bool, 4)      // Initialize four select buttons.
 	this.FunctionSelectMode = make([]bool, 4)       // Initialize four function mode states.
@@ -136,9 +135,6 @@ func main() {
 	sequences := []*common.Sequence{}
 	for index, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
-		if sequenceConf.Type == "rgb" {
-			this.SelectedFloodMap[index] = true // This sequence is this.Flood able because it's a rgb.
-		}
 		newSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
