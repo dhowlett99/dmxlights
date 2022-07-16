@@ -19,7 +19,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug = false
+const debug = true
 
 type SequencesConfig struct {
 	Sequences []SequenceConfig `yaml:"sequences"`
@@ -140,7 +140,7 @@ func CreateSequence(
 		Blackout:               false,
 		Master:                 255,
 		ScannerGobo:            1,
-		Flood:                  false,
+		StartFlood:             false,
 		RGBColor:               1,
 		AutoColor:              false,
 		AutoPatten:             false,
@@ -310,59 +310,63 @@ func PlaySequence(sequence common.Sequence,
 
 		sequence.UpdateShift = false
 
+		if !sequence.Run {
+			sendStopToAllFixtures(sequence, fixtureStopChannels)
+		}
+
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
 
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			showSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
 		}
 
 		// Sequence in flood mode.
-		if sequence.Flood && sequence.FloodPlayOnce {
+		if sequence.StartFlood && sequence.FloodPlayOnce {
 			sequence.Run = false
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Tick:           true,
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				Flood:          sequence.Flood,
+				StartFlood:     sequence.StartFlood,
 			}
 			// Stop the fixture threads doing what the are doing.
 			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureChannels, channels, command)
-			sequence.Flood = false
+			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = false
 			continue
 		}
 
 		// Stop flood mode.
-		if sequence.NoFlood && sequence.FloodPlayOnce {
+		if sequence.StopFlood && sequence.FloodPlayOnce {
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Tick:           true,
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				Flood:          sequence.Flood,
-				NoFlood:        sequence.NoFlood,
+				StartFlood:     sequence.StartFlood,
+				StopFlood:      sequence.StopFlood,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureChannels, channels, command)
-			sequence.NoFlood = false
+			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = true
 			continue
 		}
 
 		// Sequence in Static Mode.
-		if sequence.PlayStaticOnce && sequence.Static && !sequence.Flood {
+		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Tick:           true,
@@ -454,7 +458,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
-				if !sequence.Run || sequence.Flood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
+				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
 					// Tell the fixtures to stop.
 					sendStopToAllFixtures(sequence, fixtureStopChannels)
 					break
@@ -529,7 +533,7 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
-					if !sequence.Run || sequence.Flood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
+					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePatten || sequence.UpdateShift {
 						// Tell the fixtures to stop.
 						sendStopToAllFixtures(sequence, fixtureStopChannels)
 						break
@@ -551,8 +555,8 @@ func PlaySequence(sequence common.Sequence,
 						CurrentSpeed:           sequence.CurrentSpeed,
 						Speed:                  sequence.Speed,
 						Blackout:               sequence.Blackout,
-						Flood:                  sequence.Flood,
-						NoFlood:                sequence.NoFlood,
+						StartFlood:             sequence.StartFlood,
+						StopFlood:              sequence.StopFlood,
 						CurrentPosition:        step,
 						SelectedGobo:           sequence.ScannerGobo,
 						FixtureDisabled:        sequence.FixtureDisabled,
@@ -596,9 +600,13 @@ func sendStopToAllFixtures(sequence common.Sequence, fixtureStopChannels []chan 
 // showSwitches - This is for switch sequences, a type of sequence which is just a set of eight switches.
 // Each switch can have a number of states as defined in the fixtures.yaml file.
 // The color of the lamp indicates which state you are in.
-func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
+// ShowSwitches relies on you giving the sequence number of the switch sequnence.
+func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
 
+	if debug {
+		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
+	}
 	for switchNumber, switchData := range sequence.Switches {
 		for stateNumber, state := range switchData.States {
 
@@ -614,7 +622,6 @@ func showSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 			}
 		}
-		//common.LabelButton(switchNumber+1, mySequenceNumber, switchData.Label, guiButtons)
 	}
 
 	return flood

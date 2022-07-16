@@ -125,9 +125,9 @@ func ProcessButtons(X int, Y int,
 		// Turn off the this.Flood
 		if this.Flood {
 			cmd := common.Command{
-				Action: common.NoFlood,
+				Action: common.StopFlood,
 				Args: []common.Arg{
-					{Name: "Flood", Value: false},
+					{Name: "Stop Flood", Value: false},
 				},
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
@@ -327,23 +327,31 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 
 			cmd := common.Command{
-				Action: common.NoFlood,
+				Action: common.StopFlood,
 				Args: []common.Arg{
-					{Name: "StopFlood", Value: false},
+					{Name: "Stop Flood", Value: false},
 				},
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
 			this.Flood = false
 
-			// Recall our previous config
+			// Recall our previous config.
 			config.AskToLoadConfig(commandChannels, 0, 0)
 
-			// Restart all the sequences.
-			cmd = common.Command{
-				Action: common.Start,
+			// Because the sequences were updated beneath us get an upto date copy of all the sequences.
+			for _, s := range sequences {
+				sequences[s.Number] = common.RefreshSequence(s.Number, commandChannels, updateChannels)
 			}
-			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
+			// Now only restart if they were marked as running in the saved config.
+			for seqNumber, s := range sequences {
+				if s.Run {
+					cmd = common.Command{
+						Action: common.Start,
+					}
+					common.SendCommandToSequence(seqNumber, cmd, commandChannels)
+				}
+			}
 
 			// Clear any function modes out and reveal sequence.
 			for this.SelectedSequence = range sequences {
@@ -359,6 +367,13 @@ func ProcessButtons(X int, Y int,
 
 			// Restore the last selected sequence.
 			this.SelectedSequence = this.LastSelectedSequence
+
+			// Restore any switch channels
+			for _, s := range sequences {
+				if s.Type == "switch" {
+					sequence.ShowSwitches(s.Number, s, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+				}
+			}
 
 			return
 		}
@@ -485,7 +500,7 @@ func ProcessButtons(X int, Y int,
 				common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
 				AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-				time.Sleep(300 * time.Millisecond)
+				//time.Sleep(300 * time.Millisecond)
 
 				// Load the config.
 				config.AskToLoadConfig(commandChannels, X, Y)

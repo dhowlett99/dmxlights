@@ -119,7 +119,7 @@ const UpdateSwitchPositions = 30
 const Inverted = 31
 const UpdateGobo = 32
 const Flood = 33
-const NoFlood = 34
+const StopFlood = 34
 const UpdateAutoColor = 35
 const AutoColor = 36
 const UpdateAutoPatten = 37
@@ -188,8 +188,8 @@ type Sequence struct {
 	Static                     bool                        // We're a static sequence.
 	PlayStaticOnce             bool                        // Play a static scene only once.
 	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
-	Flood                      bool                        // We're in flood mode.
-	NoFlood                    bool                        // We're not in flood mode.
+	StartFlood                 bool                        // We're in flood mode.
+	StopFlood                  bool                        // We're not in flood mode.
 	FloodPlayOnce              bool                        // Play the flood sceme only once.
 	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
 	ScannersTotal              int                         // Total number of scanners in this sequence.
@@ -269,8 +269,8 @@ type FixtureCommand struct {
 	FadeDownTime           time.Duration
 	FadeOffTime            time.Duration
 	Blackout               bool
-	Flood                  bool
-	NoFlood                bool
+	StartFlood             bool
+	StopFlood              bool
 	PlayFloodOnce          bool
 	UpdateSequenceColor    bool
 	SequenceColor          Color

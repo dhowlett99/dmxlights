@@ -127,12 +127,12 @@ func FixtureReceiver(sequence common.Sequence,
 
 			// If we're a RGB fixture implement the flood and static features.
 			if cmd.Type == "rgb" {
-				if cmd.Flood {
+				if cmd.StartFlood {
 					MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 					continue
 				}
-				if cmd.NoFlood {
+				if cmd.StopFlood {
 					MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 					continue
