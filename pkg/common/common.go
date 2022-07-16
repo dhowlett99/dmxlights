@@ -744,6 +744,24 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	}
 }
 
+func ShowTopButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	// Light the clear button purple.
+	LightLamp(ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+
+	// Light the static color buttons.
+	LightLamp(ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+	LightLamp(ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+	LightLamp(ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+
+	// Light top functions.
+	LightLamp(ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	LightLamp(ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	LightLamp(ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	LightLamp(ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+
+}
+
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.

@@ -202,11 +202,12 @@ func main() {
 		}
 	}(panel, guiButtons, GuiFlashButtons)
 
-	// Now create a thread to handle launchpad events.
+	// Now create a thread to handle launchpad light button events.
 	go func(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadFlashButtons [][]common.ALight) {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 	}(eventsForLauchpad, this.Pad, LaunchPadFlashButtons)
 
+	// Add buttons to the main panel.
 	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
@@ -216,9 +217,6 @@ func main() {
 	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-
-	// Label the Gui buttons.
-	panel.LabelButtons()
 
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
@@ -232,32 +230,9 @@ func main() {
 	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
 	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
 
-	// Light up any existing presets.
-	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-
-	// Light the buttons at the bottom.
-	common.ShowBottomButtons(sequences[1].Type, eventsForLauchpad, guiButtons)
-
-	// Light the logo blue.
-	this.Pad.Light(8, -1, 0, 0, 255)
-
-	// Light the clear button purple.
-	common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-
-	// Light the static color buttons.
-	common.LightLamp(common.ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-
-	// Light top functions.
-	common.LightLamp(common.ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	sequence.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence)
+	buttons.InitButtons(&this, sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels)
 
 	// Clear the pad.
 	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)

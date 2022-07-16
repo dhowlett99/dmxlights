@@ -114,6 +114,10 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("CLEAR LAUNCHPAD\n")
 		}
 
+		// Get the pad back into sane mode.
+		this.Pad.Reset()
+		this.Pad.Program()
+
 		// Turn off the flashing save button.
 		this.SavePreset = false
 		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
@@ -1964,4 +1968,32 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 		}
 		return
 	}
+}
+
+func InitButtons(this *CurrentState, sequences []*common.Sequence,
+	eventsForLauchpad chan common.ALight, guiButtons chan common.ALight,
+	dmxController *ft232.DMXController, fixtures *fixture.Fixtures, commandChannels []chan common.Command) {
+
+	// Light the logo blue.
+	this.Pad.Light(8, -1, 0, 0, 255)
+
+	// Light up any existing presets.
+	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+
+	// Light the buttons at the bottom.
+	common.ShowBottomButtons("rgb", eventsForLauchpad, guiButtons)
+
+	// Light the top buttons.
+	common.ShowTopButtons(eventsForLauchpad, guiButtons)
+
+	// refesh the switch positions.
+	// cmd := common.Command{
+	// 	Action: common.UpdateSwitchPositions,
+	// }
+	// common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
+	// Light the first sequence as the default selected.
+	this.SelectedSequence = 0
+	sequence.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence)
+
 }
