@@ -19,7 +19,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug = true
+const debug = false
 
 type SequencesConfig struct {
 	Sequences []SequenceConfig `yaml:"sequences"`
