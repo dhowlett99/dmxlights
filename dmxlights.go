@@ -244,6 +244,13 @@ func main() {
 
 	}(guiButtons, &this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
+	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
+	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+
 	myWindow.SetContent(content)
 
 	myWindow.ShowAndRun()
