@@ -239,23 +239,34 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		Y := rowNumber
 		X := columnNumber
 
+		var skipPopup bool
 		button.button = widget.NewButton("     ", func() {
+
+			if X == 8 && Y == 5 {
+				skipPopup = true
+			}
 			if this.SavePreset {
-				items := []*widget.FormItem{}
-				name := widget.NewEntry()
-				item := widget.NewFormItem("Name", name)
-				items = append(items, item)
-				popup := dialog.NewForm("Enter Preset", "Ok", "Cancel", items, func(bool) {
-					this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, Set: true}
-					presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-					presets.SavePresets(this.PresetsStore)
-					Red := common.Color{R: 255, G: 0, B: 0}
-					PresetYellow := common.Color{R: 150, G: 150, B: 0}
-					common.FlashLight(X, Y-1, Red, PresetYellow, eventsForLauchpad, guiButtons)
-				}, myWindow)
-				popup.Show()
+				if !skipPopup {
+					items := []*widget.FormItem{}
+					name := widget.NewEntry()
+					item := widget.NewFormItem("Name", name)
+					items = append(items, item)
+					popup := dialog.NewForm("Enter Preset", "Ok", "Cancel", items, func(bool) {
+						if name.Text == "" { // We clicked cancel so give up labelling.
+							return
+						}
+						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, Set: true}
+						presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+						presets.SavePresets(this.PresetsStore)
+						Red := common.Color{R: 255, G: 0, B: 0}
+						PresetYellow := common.Color{R: 150, G: 150, B: 0}
+						common.FlashLight(X, Y-1, Red, PresetYellow, eventsForLauchpad, guiButtons)
+					}, myWindow)
+					popup.Show()
+				}
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("MYDMX", nil) // button widget
