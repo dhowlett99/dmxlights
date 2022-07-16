@@ -223,8 +223,8 @@ func main() {
 	this.SelectedSequence = 0
 	buttons.InitButtons(&this, sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels)
 
-	// Label the buttons.
-	panel.LabelButtons()
+	// Label the right hand buttons.
+	panel.LabelRightHandButtons()
 
 	// Clear the pad.
 	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)

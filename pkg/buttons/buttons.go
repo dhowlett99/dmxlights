@@ -1715,6 +1715,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLauchpad, guiButtons)
 		}
 
+		// Tailor the top buttons to the sequence type.
+		common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLauchpad, guiButtons)
+
 		// Tailor the bottom buttons to the sequence type.
 		common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLauchpad, guiButtons)
 
@@ -2005,7 +2008,7 @@ func InitButtons(this *CurrentState, sequences []*common.Sequence,
 	common.ShowBottomButtons("rgb", eventsForLauchpad, guiButtons)
 
 	// Light the top buttons.
-	common.ShowTopButtons(eventsForLauchpad, guiButtons)
+	common.ShowTopButtons("rgb", eventsForLauchpad, guiButtons)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

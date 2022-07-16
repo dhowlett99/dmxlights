@@ -690,6 +690,59 @@ func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	}
 }
 
+func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	type topButton struct {
+		Label string
+		Color Color
+	}
+	// Storage for the rgb labels on the top row.
+	var guiTopRGBButtons [8]topButton
+	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Color{R: 255, G: 0, B: 255}}
+	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Color{R: 255, G: 0, B: 0}}
+	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Color{R: 0, G: 255, B: 0}}
+	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Color{R: 0, G: 0, B: 255}}
+	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: Color{R: 3, G: 255, B: 255}}
+
+	// Storage for the scanner labels on the Top row.
+	var guiTopScannerButtons [8]topButton
+	guiTopScannerButtons[0] = topButton{Label: " ^ ", Color: Color{R: 255, G: 255, B: 255}}
+	guiTopScannerButtons[1] = topButton{Label: " V", Color: Color{R: 255, G: 255, B: 255}}
+	guiTopScannerButtons[2] = topButton{Label: " < ", Color: Color{R: 255, G: 255, B: 255}}
+	guiTopScannerButtons[3] = topButton{Label: " > ", Color: Color{R: 255, G: 255, B: 255}}
+	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: Color{R: 3, G: 255, B: 255}}
+
+	//  The Top row of the Novation Launchpad.
+	TopRow := -1
+
+	if tYpe == "rgb" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiTopRGBButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, TopRow, button.Label, guiButtons)
+		}
+	}
+	if tYpe == "scanner" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiTopScannerButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, TopRow, button.Label, guiButtons)
+		}
+	}
+}
+
 func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Storage for the rgb labels on the bottom row.
@@ -737,24 +790,6 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 			LabelButton(index, bottomRow, button, guiButtons)
 		}
 	}
-}
-
-func ShowTopButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
-	// Light the clear button purple.
-	LightLamp(ALight{X: 0, Y: -1, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-
-	// Light the static color buttons.
-	LightLamp(ALight{X: 1, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-	LightLamp(ALight{X: 2, Y: -1, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-	LightLamp(ALight{X: 3, Y: -1, Brightness: 255, Red: 0, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-
-	// Light top functions.
-	LightLamp(ALight{X: 4, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	LightLamp(ALight{X: 5, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	LightLamp(ALight{X: 6, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	LightLamp(ALight{X: 7, Y: -1, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-
 }
 
 // ListenAndSendToLaunchPad is the thread that listens for events to send to

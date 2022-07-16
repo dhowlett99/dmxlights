@@ -57,34 +57,17 @@ func NewPanel() MyPanel {
 	return panel
 }
 
-func (panel *MyPanel) LabelButtons() {
+func (panel *MyPanel) LabelRightHandButtons() {
 	panel.UpdateButtonLabel(8, 1, "  >  ")
 	panel.UpdateButtonLabel(8, 2, "  >  ")
 	panel.UpdateButtonLabel(8, 3, "  >  ")
-
-	panel.UpdateButtonLabel(0, 0, "CLEAR")
-	panel.UpdateButtonLabel(1, 0, "RED")
-	panel.UpdateButtonLabel(2, 0, "GREEN")
-	panel.UpdateButtonLabel(3, 0, "BLUE")
-	panel.UpdateButtonLabel(4, 0, "SENS -")
-	panel.UpdateButtonLabel(5, 0, "SENS +")
-	panel.UpdateButtonLabel(6, 0, "MAST -")
-	panel.UpdateButtonLabel(7, 0, "MAST +")
 
 	panel.UpdateButtonLabel(8, 4, "FLOOD")
 	panel.UpdateButtonLabel(8, 5, "SAVE")
 	panel.UpdateButtonLabel(8, 6, "START")
 	panel.UpdateButtonLabel(8, 7, "STOP")
 
-	panel.UpdateButtonLabel(0, 8, "SPEED-")
-	panel.UpdateButtonLabel(1, 8, "SPEED+")
-	panel.UpdateButtonLabel(2, 8, "SHIFT-")
-	panel.UpdateButtonLabel(3, 8, "SHIFT+")
-	panel.UpdateButtonLabel(4, 8, "SIZE-")
-	panel.UpdateButtonLabel(5, 8, "SIZE+")
-	panel.UpdateButtonLabel(6, 8, "FADE-")
-	panel.UpdateButtonLabel(7, 8, "FADE+")
-	panel.UpdateButtonLabel(8, 8, "BLACK")
+	panel.UpdateButtonLabel(8, 8, "BLACK.OUT")
 }
 
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
