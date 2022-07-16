@@ -426,33 +426,20 @@ func MakePatterns() map[int]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 5 - Pastel Green
+			{ // Step 5 - Cyan
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 50}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 6 - Cyan Blue
+			{ // Step 6 - Blue
 				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 155, B: 255}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{ // Step 7 - Blue
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -460,9 +447,22 @@ func MakePatterns() map[int]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 8 - Purple
+			{ // Step 7 - Purple
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{ // Step 8 - Pink
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},

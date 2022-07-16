@@ -1854,8 +1854,8 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 			}
 		}
 		if lamp.Flash {
-			White := common.Color{R: 255, G: 255, B: 255}
-			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, White, eventsForLauchpad, guiButtons)
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, Black, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: full, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
 		}
