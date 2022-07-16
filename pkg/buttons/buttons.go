@@ -82,7 +82,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 			start++ // swollow first two events.
 			continue
 		}
-		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
 	}
 }
 
@@ -95,7 +95,8 @@ func ProcessButtons(X int, Y int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence) {
+	updateChannels []chan common.Sequence,
+	gui bool) {
 
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
@@ -140,6 +141,13 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLauchpad, guiButtons)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+
+		if gui {
+			time.Sleep(200 * time.Millisecond)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		}
+
 		return
 	}
 
