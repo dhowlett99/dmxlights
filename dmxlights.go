@@ -26,10 +26,13 @@ import (
 
 func main() {
 
+	os.Setenv("FYNE_THEME", "light")
+
 	// Start the GUI.
 	fmt.Println("Start GUI")
 	panel := gui.NewPanel() // Panel represents the buttons in the GUI.
 	myApp := app.New()
+
 	myWindow := myApp.NewWindow("DMX Lights")
 	myLogo := panel.ConvertButtonImageToIcon("dmxlights.png")
 	myWindow.Resize(fyne.NewSize(400, 50))
@@ -37,7 +40,7 @@ func main() {
 	// Generate the toolbar at the top.
 	toolbar := gui.MakeToolbar(myLogo)
 
-	// Setup the current state
+	// Setup the current state.
 	this := buttons.CurrentState{}
 
 	fmt.Println("DMX Lighting")
@@ -55,8 +58,8 @@ func main() {
 	this.OffsetPan = 120                            // Start pan from the center
 	this.OffsetTilt = 120                           // Start tilt from the center.
 	this.Pattens = patten.MakePatterns()            // Build the default set of Pattens.
-	this.SelectButtonPressed = make([]bool, 4)      // Initialize four select buttons.
-	this.FunctionSelectMode = make([]bool, 4)       // Initialize four function mode states.
+	this.SelectButtonPressed = make([]bool, 4)      // Initialise four select buttons.
+	this.FunctionSelectMode = make([]bool, 4)       // Initialise four function mode states.
 	this.EditSequenceColorsMode = make([]bool, 4)   // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = make([]bool, 4)    // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = make([]bool, 4)    // Remember when we are in selecting gobo mode.

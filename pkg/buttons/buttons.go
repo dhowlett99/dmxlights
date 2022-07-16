@@ -102,7 +102,8 @@ func ProcessButtons(X int, Y int,
 	}
 
 	Pink := common.Color{R: 255, G: 0, B: 255}
-	Black := common.Color{R: 0, G: 0, B: 0}
+	White := common.Color{R: 255, G: 255, B: 255}
+	//Black := common.Color{R: 0, G: 0, B: 0}
 	Red := common.Color{R: 255, G: 0, B: 0}
 	PresetYellow := common.Color{R: 150, G: 150, B: 0}
 
@@ -284,7 +285,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// F L O O D
-	if X == 8 && Y == 3 {
+	if X == 8 && Y == 3 && !this.SavePreset {
 
 		if debug {
 			fmt.Printf("FLOOD\n")
@@ -296,7 +297,7 @@ func ProcessButtons(X int, Y int,
 			this.LastSelectedSequence = this.SelectedSequence
 
 			// Flash the flood button pink to indicate we're in flood.
-			common.FlashLight(8, 3, Pink, Black, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 3, Pink, White, eventsForLauchpad, guiButtons)
 
 			// First save our config
 			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
@@ -322,8 +323,8 @@ func ProcessButtons(X int, Y int,
 		}
 		if this.Flood { // If we are flood already then tell the sequence to stop flood.
 
-			// Turn the flood button back to black.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			// Turn the flood button back to white.
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
 			cmd := common.Command{
 				Action: common.StopFlood,
@@ -458,12 +459,12 @@ func ProcessButtons(X int, Y int,
 		if this.SavePreset { // Turn the save mode off.
 			this.SavePreset = false
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 			return
 		}
 		this.SavePreset = true
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		common.FlashLight(8, 4, Pink, Black, eventsForLauchpad, guiButtons)
+		common.FlashLight(8, 4, Pink, White, eventsForLauchpad, guiButtons)
 
 		return
 	}
@@ -499,7 +500,6 @@ func ProcessButtons(X int, Y int,
 				common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
 				AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-				//time.Sleep(300 * time.Millisecond)
 
 				// Load the config.
 				config.AskToLoadConfig(commandChannels, X, Y)
@@ -725,7 +725,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		return
 	}
 
@@ -745,7 +745,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		time.Sleep(100 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		return
 	}
 
@@ -1562,14 +1562,14 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-			common.FlashLight(8, 7, Pink, Black, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 7, Pink, White, eventsForLauchpad, guiButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
 				Action: common.Normal,
 			}
 			common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
 		return
 	}
@@ -1835,8 +1835,8 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 			}
 		}
 		if lamp.Flash {
-			Black := common.Color{R: 0, G: 0, B: 0}
-			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, Black, eventsForLauchpad, guiButtons)
+			White := common.Color{R: 255, G: 255, B: 255}
+			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, White, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: full, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLauchpad, guiButtons)
 		}
@@ -1860,8 +1860,8 @@ func ShowSelectFixtureButtons(sequence common.Sequence, this *CurrentState, even
 			this.SelectedFixture = fixtureNumber
 		}
 		if fixture.Flash {
-			Black := common.Color{R: 0, G: 0, B: 0}
-			common.FlashLight(fixtureNumber, this.SelectedSequence, fixture.Color, Black, eventsForLauchpad, guiButtons)
+			White := common.Color{R: 255, G: 255, B: 255}
+			common.FlashLight(fixtureNumber, this.SelectedSequence, fixture.Color, White, eventsForLauchpad, guiButtons)
 
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: fixture.Color.R, Green: fixture.Color.G, Blue: fixture.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
@@ -1929,8 +1929,8 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 			lamp.Flash = true
 		}
 		if lamp.Flash {
-			Black := common.Color{R: 0, G: 0, B: 0}
-			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, Black, eventsForLauchpad, guiButtons)
+			White := common.Color{R: 255, G: 255, B: 255}
+			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, White, eventsForLauchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: this.SelectedSequence, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}

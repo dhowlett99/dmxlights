@@ -242,7 +242,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		var skipPopup bool
 		button.button = widget.NewButton("     ", func() {
 
-			if X == 8 && Y == 5 {
+			if X == 8 && Y == 5 || X > 7 || Y < 5 {
 				skipPopup = true
 			}
 			if this.SavePreset {
@@ -277,7 +277,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			)
 			containers = append(containers, container1)
 		} else {
-			button.rectangle = canvas.NewRectangle(color.Black)
+			button.rectangle = canvas.NewRectangle(color.White)
 			size := fyne.Size{}
 			size.Height = 80
 			size.Width = 80
