@@ -40,7 +40,7 @@ func NewDmXController() (controller *ft232.DMXController, err error) {
 			if err := controller.Render(); err != nil {
 				log.Fatalf("Failed to render output: %s", err)
 			}
-
+			// DMX refresh rate.
 			time.Sleep(30 * time.Millisecond)
 		}
 	}(controller)

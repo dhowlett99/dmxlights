@@ -248,7 +248,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToAllSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// refesh the switch positions.
+		// Refesh the switch positions.
 		cmd = common.Command{
 			Action: common.UpdateSwitchPositions,
 		}
@@ -265,11 +265,10 @@ func ProcessButtons(X int, Y int,
 			trigger.State = false
 		}
 
-		// Clear all the function buttons.
 		for sequenceNumber, sequence := range sequences {
 
-			// Switch sequences don't have funcion keys.
-			if sequence.Type != "switch" {
+			// Clear all the function buttons.
+			if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
 				sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
 				sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
 				sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
@@ -298,29 +297,9 @@ func ProcessButtons(X int, Y int,
 				}
 				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 			}
-		}
 
-		// Disable fixtures.
-		for x := 0; x < 4; x++ {
-			for y := 0; y < 9; y++ {
-				this.DisabledFixture[x][y] = false
-				// Tell the sequence to turn on this scanner.
-				cmd := common.Command{
-					Action: common.ToggleFixtureState,
-					Args: []common.Arg{
-						{Name: "SequenceNumber", Value: x},
-						{Name: "FixtureNumber", Value: y},
-						{Name: "FixtureState", Value: false},
-					},
-				}
-				common.SendCommandToSequence(x, cmd, commandChannels)
-			}
-		}
-
-		// Reset the Scanner Size back to default.
-		for _, sequence := range sequences {
-			// Set local copy.
-			this.ScannerSize = common.DefaultScannerSize
+			// Reset the Scanner Size back to default.
+			this.ScannerSize = common.DefaultScannerSize // Set local copy.
 			// Set copy in sequences.
 			if sequence.Type == "scanner" {
 				cmd = common.Command{
@@ -331,11 +310,8 @@ func ProcessButtons(X int, Y int,
 				}
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			}
-		}
 
-		// Clear down all the switch positions to their fisrt positions.
-		for sequenceNumber, sequence := range sequences {
-
+			// Clear down all the switch positions to their fisrt positions.
 			if sequence.Type == "switch" {
 
 				// Loop through all the switchies.
@@ -355,8 +331,26 @@ func ProcessButtons(X int, Y int,
 					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 				}
 			}
+
+			// UnDisable fixtures.
+			if sequence.Type == "scanner" {
+				for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+					this.DisabledFixture[fixtureNumber][sequenceNumber] = false
+					// Tell the sequence to turn on this scanner.
+					cmd := common.Command{
+						Action: common.ToggleFixtureState,
+						Args: []common.Arg{
+							{Name: "SequenceNumber", Value: sequence},
+							{Name: "FixtureNumber", Value: fixtureNumber},
+							{Name: "FixtureState", Value: false},
+						},
+					}
+					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+				}
+			}
 		}
 
+		this.SelectedSequence = 0
 		return
 	}
 
@@ -800,7 +794,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		return
 	}
@@ -820,7 +814,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-		time.Sleep(100 * time.Millisecond)
+		time.Sleep(200 * time.Millisecond)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		return
 	}
@@ -1505,7 +1499,6 @@ func ProcessButtons(X int, Y int,
 
 		// Go straight into patten select mode, don't wait for a another select press.
 		if this.EditPattenMode[this.SelectedSequence] {
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 			this.EditFixtureSelectionMode = false
 			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
@@ -1516,14 +1509,14 @@ func ProcessButtons(X int, Y int,
 		// Map Function 5 to color edit.
 		this.EditSequenceColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function5_Color].State
 
-		// Go straight into color edit mode, don't wait for a another select press.
+		// Go straight into RGB color edit mode, don't wait for a another select press.
 		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "rgb" {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLauchpad, guiButtons)
 		}
 
-		// Go straight into color edit mode via select fixture, don't wait for a another select press.
+		// Go straight into scanner color edit mode via select fixture, don't wait for a another select press.
 		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "scanner" {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
@@ -1554,7 +1547,7 @@ func ProcessButtons(X int, Y int,
 			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
 
 			// Go straight to static color selection mode, don't wait for a another select press.
-			// time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
 			this.FunctionSelectMode[this.SelectedSequence] = false
 			// The sequence will automatically display the static colors now!
