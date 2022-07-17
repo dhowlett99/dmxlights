@@ -347,6 +347,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Type = "switch"
 		return sequence
 
+	case common.EnableAllScanners:
+		const SEQUENCE_NUMBER = 0 // Integer
+		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
+			sequence.FixtureDisabledMutex.Lock()
+			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
+				sequence.FixtureDisabled[command.Args[scanner].Value.(int)] = false
+			}
+			sequence.FixtureDisabledMutex.Unlock()
+		}
+
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
 		const SEQUENCE_NUMBER = 0 // Integer

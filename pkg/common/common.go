@@ -134,6 +134,7 @@ const MasterBrightness = 45
 const UpdateNumberCoordinates = 46
 const UpdateOffsetPan = 47
 const UpdateOffsetTilt = 48
+const EnableAllScanners = 49
 
 const DefaultScannerSize = 120
 

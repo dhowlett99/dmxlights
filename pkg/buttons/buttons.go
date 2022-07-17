@@ -332,23 +332,16 @@ func ProcessButtons(X int, Y int,
 				}
 			}
 
-			// UnDisable fixtures.
+			// Enable all fixtures.
 			if sequence.Type == "scanner" {
-				for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
-					if this.DisabledFixture[fixtureNumber][sequenceNumber] {
-						this.DisabledFixture[fixtureNumber][sequenceNumber] = false
-						// Tell the sequence to turn on this scanner.
-						cmd := common.Command{
-							Action: common.ToggleFixtureState,
-							Args: []common.Arg{
-								{Name: "SequenceNumber", Value: sequence},
-								{Name: "FixtureNumber", Value: fixtureNumber},
-								{Name: "FixtureState", Value: false},
-							},
-						}
-						common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-					}
+				// Tell the sequence to turn on this scanner.
+				cmd := common.Command{
+					Action: common.EnableAllScanners,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: sequence},
+					},
 				}
+				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 			}
 		}
 
