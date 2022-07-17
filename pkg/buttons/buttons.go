@@ -335,17 +335,19 @@ func ProcessButtons(X int, Y int,
 			// UnDisable fixtures.
 			if sequence.Type == "scanner" {
 				for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
-					this.DisabledFixture[fixtureNumber][sequenceNumber] = false
-					// Tell the sequence to turn on this scanner.
-					cmd := common.Command{
-						Action: common.ToggleFixtureState,
-						Args: []common.Arg{
-							{Name: "SequenceNumber", Value: sequence},
-							{Name: "FixtureNumber", Value: fixtureNumber},
-							{Name: "FixtureState", Value: false},
-						},
+					if this.DisabledFixture[fixtureNumber][sequenceNumber] {
+						this.DisabledFixture[fixtureNumber][sequenceNumber] = false
+						// Tell the sequence to turn on this scanner.
+						cmd := common.Command{
+							Action: common.ToggleFixtureState,
+							Args: []common.Arg{
+								{Name: "SequenceNumber", Value: sequence},
+								{Name: "FixtureNumber", Value: fixtureNumber},
+								{Name: "FixtureState", Value: false},
+							},
+						}
+						common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 					}
-					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 				}
 			}
 		}
