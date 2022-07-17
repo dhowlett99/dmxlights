@@ -554,7 +554,7 @@ func ProcessButtons(X int, Y int,
 			this.SavePreset = false
 
 			// turn off the save button from flashing.
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
 			presets.SavePresets(this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
