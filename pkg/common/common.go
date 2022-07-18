@@ -5,7 +5,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/dhowlett99/dmxlights/pkg/pad"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -796,7 +796,7 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad) {
 	for {
 
 		// Wait for the event.
@@ -826,7 +826,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *pad.Pad) {
 				fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
 				fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
 			}
-			err := pad.FlashLight(alight.X, alight.Y, GetLaunchPadColorCodeByRGB(alight.OnColor), GetLaunchPadColorCodeByRGB(alight.OffColor))
+			err := pad.FlashLight(alight.X, alight.Y, int(GetLaunchPadColorCodeByRGB(alight.OnColor)), int(GetLaunchPadColorCodeByRGB(alight.OffColor)))
 			if err != nil {
 				fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
 			}

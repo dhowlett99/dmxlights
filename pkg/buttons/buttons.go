@@ -8,10 +8,10 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/oliread/usbdmx/ft232"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -50,7 +50,7 @@ type CurrentState struct {
 	SelectedCordinates       int                        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
 	OffsetPan                int                        // Offset for Pan.
 	OffsetTilt               int                        // Offset for Tilt.
-	Pad                      *pad.Pad                   // Pointer to the Novation Launchpad object.
+	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
 	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
@@ -66,11 +66,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence) {
 
-	// Create a channel to listen for buttons being pressed.
-	buttonChannel := make(chan pad.Hit)
-	go func() {
-		this.Pad.Listen(buttonChannel)
-	}()
+	buttonChannel := this.Pad.Listen()
 
 	start := 0
 	// Main loop reading commands from the Novation Launchpad.

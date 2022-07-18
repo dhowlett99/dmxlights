@@ -16,12 +16,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
-	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 func main() {
@@ -94,7 +94,7 @@ func main() {
 	// Setup a connection to the Novation Launchpad.
 	// Tested with a Novation Launchpad mini mk3.
 	fmt.Println("Setup Novation Launchpad")
-	this.Pad, err = pad.Open()
+	this.Pad, err = mk3.Open()
 	if err != nil {
 		log.Fatalf("error initializing launchpad: %v", err)
 	}
@@ -192,7 +192,7 @@ func main() {
 	}(panel, guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad light button events.
-	go func(eventsForLauchpad chan common.ALight, pad *pad.Pad) {
+	go func(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad) {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
 	}(eventsForLauchpad, this.Pad)
 

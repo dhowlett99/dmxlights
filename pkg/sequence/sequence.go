@@ -13,10 +13,10 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/patten"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -246,7 +246,7 @@ func CreateSequence(
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
-	pad *pad.Pad,
+	pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,

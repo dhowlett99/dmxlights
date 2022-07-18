@@ -7,7 +7,7 @@ import (
 	"log"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/pad"
+	"github.com/rakyll/launchpad/mk3"
 )
 
 type Preset struct {
@@ -61,7 +61,7 @@ func LoadPresets() map[string]Preset {
 	return presets
 }
 
-func ClearAll(pad *pad.Pad, presets map[string]Preset, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, sequences []chan common.Command) {
+func ClearAll(pad *mk3.Launchpad, presets map[string]Preset, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, sequences []chan common.Command) {
 	command := common.Command{
 		Action: common.Stop,
 	}
