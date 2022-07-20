@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/signal"
 	"syscall"
+	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
@@ -180,6 +181,9 @@ func main() {
 	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 2, State: false, Gain: this.SoundGain})
 	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 3, State: false, Gain: this.SoundGain})
 
+	// Create a timer for timing buttons, long and short presses.
+	this.ButtonTimer = &time.Time{}
+
 	// Create a sound trigger object and give it the sequences so it can access their configs.
 	sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
 
@@ -192,9 +196,9 @@ func main() {
 	}(panel, guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad light button events.
-	go func(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad) {
+	go func() {
 		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
-	}(eventsForLauchpad, this.Pad)
+	}()
 
 	// Add buttons to the main panel.
 	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
@@ -221,7 +225,7 @@ func main() {
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	buttons.InitButtons(&this, sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels)
+	buttons.InitButtons(&this, eventsForLauchpad, guiButtons)
 
 	// Label the right hand buttons.
 	panel.LabelRightHandButtons()

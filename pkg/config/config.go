@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -39,6 +40,14 @@ func LoadConfig(filename string) []common.Sequence {
 		log.Fatalf("error:  reading config: %v from file:%s", err, filename)
 	}
 	return config
+}
+
+func DeleteConfig(filename string) error {
+	err := os.Remove(filename)
+	if err != nil {
+		log.Fatalf("error:  deleting config: %v from file:%s", err, filename)
+	}
+	return nil
 }
 
 func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {

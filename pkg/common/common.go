@@ -361,7 +361,7 @@ func SendCommandToSequence(selectedSequence int, command Command, commandChannel
 	commandChannels[selectedSequence] <- command
 }
 
-func SendCommandToAllSequence(selectedSequence int, command Command, commandChannels []chan Command) {
+func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[0] <- command
 	commandChannels[1] <- command
 	commandChannels[2] <- command
@@ -655,7 +655,7 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 }
 
 // For the given sequence hide the available sequence colors..
-func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for myFixtureNumber := range sequence.RGBAvailableColors {
 		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
@@ -668,7 +668,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 	}
 }
 
-func ClearLabelsSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}
