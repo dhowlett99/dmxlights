@@ -454,6 +454,7 @@ func ProcessButtons(X int, Y int,
 			// Turn the flood button back to white.
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
+			// Send a message to stop
 			cmd := common.Command{
 				Action: common.StopFlood,
 				Args: []common.Arg{
@@ -464,6 +465,18 @@ func ProcessButtons(X int, Y int,
 
 			this.Flood = false
 
+			// Clear any function modes out and reveal sequence.
+			for this.SelectedSequence = range sequences {
+				// Clear any lit buttons.
+				common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+				// And reveal the sequence on the launchpad keys
+				common.RevealSequence(this.SelectedSequence, commandChannels)
+				// Turn off the function mode flag.
+				this.FunctionSelectMode[this.SelectedSequence] = false
+				// Now forget we pressed twice and start again.
+				this.SelectButtonPressed[this.SelectedSequence] = false
+			}
+
 			// Recall our previous config.
 			config.AskToLoadConfig(commandChannels, 0, 0)
 
@@ -471,6 +484,7 @@ func ProcessButtons(X int, Y int,
 			for _, s := range sequences {
 				sequences[s.Number] = common.RefreshSequence(s.Number, commandChannels, updateChannels)
 			}
+
 			// Now only restart if they were marked as running in the saved config.
 			for seqNumber, s := range sequences {
 				if s.Run {
@@ -479,18 +493,11 @@ func ProcessButtons(X int, Y int,
 					}
 					common.SendCommandToSequence(seqNumber, cmd, commandChannels)
 				}
-			}
 
-			// Clear any function modes out and reveal sequence.
-			for this.SelectedSequence = range sequences {
-				// Turn off function mode. Remove the function pads.
-				common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-				// And reveal the sequence on the launchpad keys
-				common.RevealSequence(this.SelectedSequence, commandChannels)
-				// Turn off the function mode flag.
-				this.FunctionSelectMode[this.SelectedSequence] = false
-				// Now forget we pressed twice and start again.
-				this.SelectButtonPressed[this.SelectedSequence] = false
+				// Restore the sound trigger for this sequence.
+				if s.MusicTrigger {
+					this.SoundTriggers[s.Number].State = true
+				}
 			}
 
 			// Restore the last selected sequence.
@@ -502,6 +509,9 @@ func ProcessButtons(X int, Y int,
 					sequence.ShowSwitches(s.Number, s, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 				}
 			}
+
+			fmt.Printf("-----> Func Music is %t\n", sequences[this.SelectedSequence].Functions[common.Function8_Music_Trigger].State)
+			fmt.Printf("-----> Music triger is %t\n", sequences[this.SelectedSequence].MusicTrigger)
 
 			return
 		}
