@@ -138,6 +138,12 @@ const EnableAllScanners = 49
 
 const DefaultScannerSize = 120
 
+var Pink = Color{R: 255, G: 0, B: 255}
+var White = Color{R: 255, G: 255, B: 255}
+var Black = Color{R: 0, G: 0, B: 0}
+var Red = Color{R: 255, G: 0, B: 0}
+var PresetYellow = Color{R: 150, G: 150, B: 0}
+
 type Gobo struct {
 	Name    string
 	Label   string

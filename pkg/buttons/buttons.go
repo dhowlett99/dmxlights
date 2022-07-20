@@ -99,12 +99,6 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
-	Pink := common.Color{R: 255, G: 0, B: 255}
-	White := common.Color{R: 255, G: 255, B: 255}
-	//Black := common.Color{R: 0, G: 0, B: 0}
-	Red := common.Color{R: 255, G: 0, B: 0}
-	PresetYellow := common.Color{R: 150, G: 150, B: 0}
-
 	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
 	if X >= 0 &&
 		X < 8 &&
@@ -208,7 +202,7 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// Short press means load the config.
-			loadConfig(this, X, Y, Red, PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
+			loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
 		}
 		return
 	}
@@ -390,101 +384,18 @@ func ProcessButtons(X int, Y int,
 	// F L O O D
 	if X == 8 && Y == 3 && !this.SavePreset {
 
-		if debug {
-			fmt.Printf("FLOOD\n")
-		}
-
 		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
-
-			// Remember which sequence is currently selected.
-			this.LastSelectedSequence = this.SelectedSequence
-
-			// Flash the flood button pink to indicate we're in flood.
-			common.FlashLight(8, 3, Pink, White, eventsForLauchpad, guiButtons)
-
-			// First save our config
-			config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
-
-			// Stop all sequences, so we start in sync.
-			cmd := common.Command{
-				Action: common.Stop,
+			if debug {
+				fmt.Printf("FLOOD ON\n")
 			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
-
-			// Start flood.
-			cmd = common.Command{
-				Action: common.Flood,
-				Args: []common.Arg{
-					{Name: "StartFlood", Value: true},
-				},
-			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
-
-			this.Flood = true
-
+			floodOn(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons, replyChannels)
 			return
 		}
 		if this.Flood { // If we are flood already then tell the sequence to stop flood.
-
-			// Turn the flood button back to white.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-
-			// Send a message to stop
-			cmd := common.Command{
-				Action: common.StopFlood,
-				Args: []common.Arg{
-					{Name: "Stop Flood", Value: false},
-				},
+			if debug {
+				fmt.Printf("FLOOD OFF\n")
 			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
-
-			this.Flood = false
-
-			// Clear any function modes out and reveal sequence.
-			for this.SelectedSequence = range sequences {
-				// Clear any lit buttons.
-				common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
-				// And reveal the sequence on the launchpad keys
-				common.RevealSequence(this.SelectedSequence, commandChannels)
-				// Turn off the function mode flag.
-				this.FunctionSelectMode[this.SelectedSequence] = false
-				// Now forget we pressed twice and start again.
-				this.SelectButtonPressed[this.SelectedSequence] = false
-			}
-
-			// Recall our previous config.
-			config.AskToLoadConfig(commandChannels, 0, 0)
-
-			// Because the sequences were updated beneath us get an upto date copy of all the sequences.
-			for _, s := range sequences {
-				sequences[s.Number] = common.RefreshSequence(s.Number, commandChannels, updateChannels)
-			}
-
-			// Now only restart if they were marked as running in the saved config.
-			for seqNumber, s := range sequences {
-				if s.Run {
-					cmd = common.Command{
-						Action: common.Start,
-					}
-					common.SendCommandToSequence(seqNumber, cmd, commandChannels)
-				}
-
-				// Restore the sound trigger for this sequence.
-				if s.MusicTrigger {
-					this.SoundTriggers[s.Number].State = true
-				}
-			}
-
-			// Restore the last selected sequence.
-			this.SelectedSequence = this.LastSelectedSequence
-
-			// Restore any switch channels
-			for _, s := range sequences {
-				if s.Type == "switch" {
-					sequence.ShowSwitches(s.Number, s, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-				}
-			}
-
+			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons, updateChannels)
 			return
 		}
 	}
@@ -573,8 +484,11 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 		this.SavePreset = true
+		if this.Flood { // Turn off flood.
+			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons, updateChannels)
+		}
 		presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-		common.FlashLight(8, 4, Pink, White, eventsForLauchpad, guiButtons)
+		common.FlashLight(8, 4, common.Pink, common.White, eventsForLauchpad, guiButtons)
 
 		return
 	}
@@ -597,13 +511,16 @@ func ProcessButtons(X int, Y int,
 
 			presets.SavePresets(this.PresetsStore)
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
+			common.FlashLight(X, Y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+
+			// Now we're done.
+			this.SavePreset = false
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
 
 				if gui { // GUI path.
-					loadConfig(this, X, Y, Red, PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
+					loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
 					this.SavePreset = false
 					common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 					presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
@@ -1599,7 +1516,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
-			common.FlashLight(8, 7, Pink, White, eventsForLauchpad, guiButtons)
+			common.FlashLight(8, 7, common.Pink, common.White, eventsForLauchpad, guiButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
@@ -2072,4 +1989,97 @@ func loadConfig(this *CurrentState, X int, Y int, Red common.Color, PresetYellow
 	// And stop the flood button flashing.
 	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
+}
+
+func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+	commandChannels []chan common.Command, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
+
+	// Turn the flood button back to white.
+	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+
+	// Send a message to stop
+	cmd := common.Command{
+		Action: common.StopFlood,
+		Args: []common.Arg{
+			{Name: "Stop Flood", Value: false},
+		},
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	this.Flood = false
+
+	// Clear any function modes out and reveal sequence.
+	for this.SelectedSequence = range sequences {
+		// Clear any lit buttons.
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLauchpad, guiButtons)
+		// And reveal the sequence on the launchpad keys
+		common.RevealSequence(this.SelectedSequence, commandChannels)
+		// Turn off the function mode flag.
+		this.FunctionSelectMode[this.SelectedSequence] = false
+		// Now forget we pressed twice and start again.
+		this.SelectButtonPressed[this.SelectedSequence] = false
+	}
+
+	// Recall our previous config.
+	config.AskToLoadConfig(commandChannels, 0, 0)
+
+	// Because the sequences were updated beneath us get an upto date copy of all the sequences.
+	for _, s := range sequences {
+		sequences[s.Number] = common.RefreshSequence(s.Number, commandChannels, updateChannels)
+	}
+
+	// Now only restart if they were marked as running in the saved config.
+	for seqNumber, s := range sequences {
+		if s.Run {
+			cmd = common.Command{
+				Action: common.Start,
+			}
+			common.SendCommandToSequence(seqNumber, cmd, commandChannels)
+		}
+
+		// Restore the sound trigger for this sequence.
+		if s.MusicTrigger {
+			this.SoundTriggers[s.Number].State = true
+		}
+	}
+
+	// Restore the last selected sequence.
+	this.SelectedSequence = this.LastSelectedSequence
+
+	// Restore any switch channels
+	for _, s := range sequences {
+		if s.Type == "switch" {
+			sequence.ShowSwitches(s.Number, s, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+		}
+	}
+}
+
+func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+	commandChannels []chan common.Command, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, replyChannels []chan common.Sequence) {
+
+	// Remember which sequence is currently selected.
+	this.LastSelectedSequence = this.SelectedSequence
+
+	// Flash the flood button pink to indicate we're in flood.
+	common.FlashLight(8, 3, common.Pink, common.White, eventsForLauchpad, guiButtons)
+
+	// First save our config
+	config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
+
+	// Stop all sequences, so we start in sync.
+	cmd := common.Command{
+		Action: common.Stop,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	// Start flood.
+	cmd = common.Command{
+		Action: common.Flood,
+		Args: []common.Arg{
+			{Name: "StartFlood", Value: true},
+		},
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	this.Flood = true
 }

@@ -246,7 +246,9 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					}, myWindow)
 					popup.Show()
 				}
-				this.SavePreset = false
+				// this.SavePreset = false
+				// presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+				// common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
 			skipPopup = false
