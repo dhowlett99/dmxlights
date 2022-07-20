@@ -246,6 +246,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					}, myWindow)
 					popup.Show()
 				}
+				this.SavePreset = false
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
 			skipPopup = false

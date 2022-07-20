@@ -207,31 +207,8 @@ func ProcessButtons(X int, Y int,
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
 		} else {
-			// Stop all sequences, so we start in sync.
-			cmd := common.Command{
-				Action: common.Stop,
-			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
-
-			AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-
-			// Load the config.
-			config.AskToLoadConfig(commandChannels, X, Y)
-
-			// Turn the selected preset light flashing red / yellow.
-			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
-
-			// Preserve this.Blackout.
-			if !this.Blackout {
-				cmd := common.Command{
-					Action: common.Normal,
-				}
-				common.SendCommandToAllSequence(cmd, commandChannels)
-			}
-
-			// Turn off the local copy of the this.Flood flag.
-			this.Flood = false
+			// Short press means load the config.
+			loadConfig(this, X, Y, Red, PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
 		}
 		return
 	}
@@ -625,12 +602,21 @@ func ProcessButtons(X int, Y int,
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
 
-				// This is a valid preset we might be trying to load it or delete it.
-				// Start a timer for this button.
-				here := time.Now()
-				this.ButtonTimer = &here
+				if gui { // GUI path.
+					loadConfig(this, X, Y, Red, PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
+					this.SavePreset = false
+					common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+					presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 
-				// And wait for the button release.
+				} else { // Launchpad path.
+					// This is a valid preset we might be trying to load it or delete it.
+					// Start a timer for this button.
+					here := time.Now()
+					this.ButtonTimer = &here
+
+					// And wait for the button release.
+				}
+
 			}
 		}
 		return
@@ -2054,5 +2040,36 @@ func InitButtons(this *CurrentState, eventsForLauchpad chan common.ALight, guiBu
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
 	sequence.SequenceSelect(eventsForLauchpad, guiButtons, this.SelectedSequence)
+
+}
+
+func loadConfig(this *CurrentState, X int, Y int, Red common.Color, PresetYellow common.Color, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+	// Stop all sequences, so we start in sync.
+	cmd := common.Command{
+		Action: common.Stop,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+
+	// Load the config.
+	config.AskToLoadConfig(commandChannels, X, Y)
+
+	// Turn the selected preset light flashing red / yellow.
+	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+	common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
+
+	// Preserve this.Blackout.
+	if !this.Blackout {
+		cmd := common.Command{
+			Action: common.Normal,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+	}
+
+	// Turn off the local copy of the this.Flood flag.
+	this.Flood = false
+	// And stop the flood button flashing.
+	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
 }
