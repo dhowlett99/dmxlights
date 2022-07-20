@@ -531,58 +531,5 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	if commandSpeed == 18 {
 		Speed = 7
 	}
-	if commandSpeed == 19 {
-		Speed = 5
-	}
-	if commandSpeed == 20 {
-		Speed = 3
-	}
-	if commandSpeed == 21 {
-		Speed = 1
-	}
 	return Speed * time.Millisecond
-}
-
-// Fade time must be relative to the current speed.
-func SetFade(commandSpeed int) (Fade time.Duration) {
-	if commandSpeed == 0 {
-		Fade = 1000
-	}
-	if commandSpeed == 1 {
-		Fade = 900
-	}
-	if commandSpeed == 2 {
-		Fade = 800
-	}
-	if commandSpeed == 3 {
-		Fade = 700
-	}
-	if commandSpeed == 4 {
-		Fade = 600
-	}
-	if commandSpeed == 5 {
-		Fade = 500
-	}
-	if commandSpeed == 6 {
-		Fade = 400
-	}
-	if commandSpeed == 7 {
-		Fade = 300
-	}
-	if commandSpeed == 8 {
-		Fade = 200
-	}
-	if commandSpeed == 9 {
-		Fade = 150
-	}
-	if commandSpeed == 10 {
-		Fade = 100
-	}
-	if commandSpeed == 11 {
-		Fade = 50
-	}
-	if commandSpeed == 12 {
-		Fade = 25
-	}
-	return Fade * time.Millisecond
 }

@@ -713,8 +713,8 @@ func ProcessButtons(X int, Y int,
 
 		if !sequences[this.SelectedSequence].MusicTrigger {
 			this.SequenceSpeed++
-			if this.SequenceSpeed > 21 {
-				this.SequenceSpeed = 21
+			if this.SequenceSpeed > 18 {
+				this.SequenceSpeed = 18
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
