@@ -526,10 +526,6 @@ func ProcessButtons(X int, Y int,
 						this.SavePreset = false
 					}
 					loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
-					this.SavePreset = false
-					common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-					presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
