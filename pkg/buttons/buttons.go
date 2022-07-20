@@ -196,8 +196,6 @@ func ProcessButtons(X int, Y int,
 
 		// If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
-			// Print a debug
-			fmt.Printf("Preset X:%d Y:%d %s\n", X, Y, elapsed)
 
 			// Delete a config file
 			config.DeleteConfig(fmt.Sprintf("config%d.%d.json", X, Y))
