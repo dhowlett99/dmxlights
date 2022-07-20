@@ -513,13 +513,18 @@ func ProcessButtons(X int, Y int,
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			common.FlashLight(X, Y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
 
-			// Now we're done.
-			this.SavePreset = false
+			if gui {
+				this.SavePreset = false
+			}
+
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
 
 				if gui { // GUI path.
+					if this.SavePreset {
+						this.SavePreset = false
+					}
 					loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons)
 					this.SavePreset = false
 					common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
