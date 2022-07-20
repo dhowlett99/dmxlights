@@ -142,7 +142,10 @@ var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}
 var Black = Color{R: 0, G: 0, B: 0}
 var Red = Color{R: 255, G: 0, B: 0}
+var Green = Color{R: 0, G: 255, B: 0}
+var Blue = Color{R: 0, G: 0, B: 255}
 var PresetYellow = Color{R: 150, G: 150, B: 0}
+var Cyan = Color{R: 0, G: 255, B: 255}
 
 type Gobo struct {
 	Name    string
@@ -705,25 +708,25 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 	}
 	// Storage for the rgb labels on the top row.
 	var guiTopRGBButtons [8]topButton
-	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Color{R: 255, G: 0, B: 255}}
-	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Color{R: 255, G: 0, B: 0}}
-	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Color{R: 0, G: 255, B: 0}}
-	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Color{R: 0, G: 0, B: 255}}
-	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Pink}
+	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Red}
+	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Green}
+	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Blue}
+	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: Cyan}
+	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: Cyan}
+	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: Cyan}
+	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: Cyan}
 
 	// Storage for the scanner labels on the Top row.
 	var guiTopScannerButtons [8]topButton
-	guiTopScannerButtons[0] = topButton{Label: " ^ ", Color: Color{R: 255, G: 255, B: 255}}
-	guiTopScannerButtons[1] = topButton{Label: " V", Color: Color{R: 255, G: 255, B: 255}}
-	guiTopScannerButtons[2] = topButton{Label: " < ", Color: Color{R: 255, G: 255, B: 255}}
-	guiTopScannerButtons[3] = topButton{Label: " > ", Color: Color{R: 255, G: 255, B: 255}}
-	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: Color{R: 3, G: 255, B: 255}}
-	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: Color{R: 3, G: 255, B: 255}}
+	guiTopScannerButtons[0] = topButton{Label: " ^ ", Color: White}
+	guiTopScannerButtons[1] = topButton{Label: " V", Color: White}
+	guiTopScannerButtons[2] = topButton{Label: " < ", Color: White}
+	guiTopScannerButtons[3] = topButton{Label: " > ", Color: White}
+	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: Cyan}
+	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: Cyan}
+	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: Cyan}
+	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: Cyan}
 
 	//  The Top row of the Novation Launchpad.
 	TopRow := -1
@@ -752,27 +755,32 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 
 func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
+	type bottonButton struct {
+		Label string
+		Color Color
+	}
+
 	// Storage for the rgb labels on the bottom row.
-	var guiBottomRGBButtons [8]string
-	guiBottomRGBButtons[0] = "Speed\nDown"
-	guiBottomRGBButtons[1] = "Speed\nUp"
-	guiBottomRGBButtons[2] = "Shift\nDown"
-	guiBottomRGBButtons[3] = "Shift\nUp"
-	guiBottomRGBButtons[4] = "Size\nDown"
-	guiBottomRGBButtons[5] = "Size\nUp"
-	guiBottomRGBButtons[6] = "Fade\nSoft"
-	guiBottomRGBButtons[7] = "Fade\nSharp"
+	var guiBottomRGBButtons [8]bottonButton
+	guiBottomRGBButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
+	guiBottomRGBButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
+	guiBottomRGBButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
+	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
+	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
+	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
+	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
+	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
 
 	// Storage for the scanner labels on the bottom row.
-	var guiBottomScannerButtons [8]string
-	guiBottomScannerButtons[0] = "Speed\nDown"
-	guiBottomScannerButtons[1] = "Speed\nUp"
-	guiBottomScannerButtons[2] = "Shift\nDown"
-	guiBottomScannerButtons[3] = "Shift\nUp"
-	guiBottomScannerButtons[4] = "Size\nDown"
-	guiBottomScannerButtons[5] = "Size\nUp"
-	guiBottomScannerButtons[6] = "Coord\nDown"
-	guiBottomScannerButtons[7] = "Coord\nUp"
+	var guiBottomScannerButtons [8]bottonButton
+	guiBottomScannerButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
+	guiBottomScannerButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
+	guiBottomScannerButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
+	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
+	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
+	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
+	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: White}
+	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: White}
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
@@ -783,8 +791,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-			LabelButton(index, bottomRow, button, guiButtons)
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
 	if tYpe == "scanner" {
@@ -793,8 +801,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-			LabelButton(index, bottomRow, button, guiButtons)
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
 }
