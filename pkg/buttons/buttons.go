@@ -52,6 +52,7 @@ type CurrentState struct {
 	OffsetTilt               int                        // Offset for Tilt.
 	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
 	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
+	LastPreset               *string                    // Last preset used.
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
 	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
@@ -181,7 +182,7 @@ func ProcessButtons(X int, Y int,
 
 		// If this is a valid preset we are either recalling (short press) it or deleting it (long press)
 		// If its not been set i.e. not valid we just ignore and return.
-		if !this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
+		if !this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].State {
 			return
 		}
 
@@ -195,7 +196,7 @@ func ProcessButtons(X int, Y int,
 			config.DeleteConfig(fmt.Sprintf("config%d.%d.json", X, Y))
 
 			// Delete from preset store
-			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{Set: false}
+			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: false, Selected: false, Label: ""}
 
 			// Show presets again.
 			presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
@@ -388,12 +389,27 @@ func ProcessButtons(X int, Y int,
 			if debug {
 				fmt.Printf("FLOOD ON\n")
 			}
+			// Find the currently selected preset and save it's location.
+			for location, preset := range this.PresetsStore {
+				if preset.State && preset.Selected {
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label}
+					presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+					this.LastPreset = &location
+					break
+				}
+			}
 			floodOn(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons, replyChannels)
 			return
 		}
 		if this.Flood { // If we are flood already then tell the sequence to stop flood.
 			if debug {
 				fmt.Printf("FLOOD OFF\n")
+			}
+			// Restore the last preset
+			if this.LastPreset != nil {
+				lastPreset := this.PresetsStore[*this.LastPreset]
+				this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label}
+				presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 			}
 			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLauchpad, guiButtons, updateChannels)
 			return
@@ -500,9 +516,14 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Ask For Config\n")
 		}
 
+		location := fmt.Sprint(X) + "," + fmt.Sprint(Y)
+
 		if this.SavePreset {
 			// S A V E - Ask all sequences for their current config and save in a file.
-			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{Set: true}
+
+			current := this.PresetsStore[location]
+			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label}
+			this.LastPreset = &location
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 
@@ -519,7 +540,7 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// L O A D - Load config, but only if it exists in the presets map.
-			if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].Set {
+			if this.PresetsStore[location].State {
 
 				if gui { // GUI path.
 					if this.SavePreset {
@@ -534,7 +555,6 @@ func ProcessButtons(X int, Y int,
 
 					// And wait for the button release.
 				}
-
 			}
 		}
 		return
@@ -1974,8 +1994,13 @@ func loadConfig(this *CurrentState, X int, Y int, Red common.Color, PresetYellow
 	config.AskToLoadConfig(commandChannels, X, Y)
 
 	// Turn the selected preset light flashing red / yellow.
+	if this.LastPreset != nil {
+		current := this.PresetsStore[*this.LastPreset]
+		this.PresetsStore[*this.LastPreset] = presets.Preset{State: current.State, Selected: false, Label: current.Label}
+	}
+	current := this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)]
+	this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: current.State, Selected: true, Label: current.Label}
 	presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-	common.FlashLight(X, Y, Red, PresetYellow, eventsForLauchpad, guiButtons)
 
 	// Preserve this.Blackout.
 	if !this.Blackout {
@@ -1990,6 +2015,9 @@ func loadConfig(this *CurrentState, X int, Y int, Red common.Color, PresetYellow
 	// And stop the flood button flashing.
 	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 
+	// Remember we selected this preset
+	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
+	this.LastPreset = &last
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,

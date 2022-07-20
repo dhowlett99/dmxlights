@@ -11,8 +11,9 @@ import (
 )
 
 type Preset struct {
-	Set   bool
-	Label string
+	State    bool   `json:"state"`
+	Selected bool   `json:"-"`
+	Label    string `json:"label"`
 }
 
 func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
@@ -20,8 +21,12 @@ func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.AL
 		for x := 0; x < 8; x++ {
 			// Set to Preset Yellow.
 			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Set {
-				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
+				if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Selected {
+					common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+				} else {
+					common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+				}
 			}
 			common.LabelButton(x, y, presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label, guiButtons)
 		}
@@ -72,7 +77,8 @@ func ClearAll(pad *mk3.Launchpad, presets map[string]Preset, eventsForLauchpad c
 
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Set {
+			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
+				presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = Preset{State: true, Selected: false}
 				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}

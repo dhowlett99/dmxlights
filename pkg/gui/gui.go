@@ -237,7 +237,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 						if name.Text == "" { // We clicked cancel so give up labelling.
 							return
 						}
-						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, Set: true}
+						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, State: true, Selected: true}
 						presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 						presets.SavePresets(this.PresetsStore)
 						Red := common.Color{R: 255, G: 0, B: 0}
@@ -246,9 +246,6 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					}, myWindow)
 					popup.Show()
 				}
-				// this.SavePreset = false
-				// presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-				// common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
 			skipPopup = false
