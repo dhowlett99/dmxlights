@@ -510,9 +510,6 @@ func ProcessButtons(X int, Y int,
 				}
 			}
 
-			fmt.Printf("-----> Func Music is %t\n", sequences[this.SelectedSequence].Functions[common.Function8_Music_Trigger].State)
-			fmt.Printf("-----> Music triger is %t\n", sequences[this.SelectedSequence].MusicTrigger)
-
 			return
 		}
 	}
