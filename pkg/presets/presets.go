@@ -7,31 +7,33 @@ import (
 	"log"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/rakyll/launchpad/mk3"
 )
 
-func InitPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) {
+type Preset struct {
+	State    bool   `json:"state"`
+	Selected bool   `json:"-"`
+	Label    string `json:"label"`
+}
+
+func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 255, Green: 0, Blue: 0})
+			// Set to Preset Yellow.
+			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
+				if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Selected {
+					common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+				} else {
+					common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+				}
 			}
+			common.LabelButton(x, y, presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label, guiButtons)
 		}
 	}
 }
 
-func ClearPresets(eventsForLauchpad chan common.ALight, presets map[string]bool) {
-	for y := 4; y < 7; y++ {
-		for x := 0; x < 8; x++ {
-			common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)] {
-				common.LightOn(eventsForLauchpad, common.ALight{X: x, Y: y, Brightness: 255, Red: 100, Green: 100, Blue: 0})
-			}
-		}
-	}
-}
-
-func SavePresets(presets map[string]bool) {
+func SavePresets(presets map[string]Preset) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")
 	if err != nil {
@@ -45,9 +47,9 @@ func SavePresets(presets map[string]bool) {
 	}
 }
 
-func LoadPresets() map[string]bool {
+func LoadPresets() map[string]Preset {
 
-	presets := map[string]bool{}
+	presets := map[string]Preset{}
 
 	// Read the file.
 	data, err := ioutil.ReadFile("presets.json")
@@ -62,4 +64,24 @@ func LoadPresets() map[string]bool {
 	}
 
 	return presets
+}
+
+func ClearAll(pad *mk3.Launchpad, presets map[string]Preset, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, sequences []chan common.Command) {
+	command := common.Command{
+		Action: common.Stop,
+	}
+
+	for _, sequence := range sequences {
+		sequence <- command
+	}
+
+	for x := 0; x < 8; x++ {
+		for y := 0; y < 8; y++ {
+			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
+				label := presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label
+				presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = Preset{State: true, Selected: false, Label: label}
+				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+			}
+		}
+	}
 }

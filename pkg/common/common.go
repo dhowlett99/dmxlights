@@ -2,21 +2,27 @@ package common
 
 import (
 	"fmt"
+	"sync"
 	"time"
+
+	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
 
 type ALight struct {
-	X          int
-	Y          int
-	Brightness int
-	Red        int
-	Green      int
-	Blue       int
-	Flash      bool
-	OnColor    int
-	OffColor   int
+	X                int
+	Y                int
+	Brightness       int
+	Red              int
+	Green            int
+	Blue             int
+	Flash            bool
+	OnColor          Color
+	OffColor         Color
+	UpdateLabel      bool
+	Label            string
+	FlashStopChannel chan bool
 }
 
 type Color struct {
@@ -32,6 +38,7 @@ type Value struct {
 
 type State struct {
 	Name        string
+	Label       string
 	Values      []Value
 	ButtonColor Color
 }
@@ -39,22 +46,27 @@ type State struct {
 type Switch struct {
 	Name         string
 	Number       int
+	Label        string
 	CurrentState int
 	Description  string
 	States       []State
 }
 
 type StaticColorButton struct {
+	Name          string
+	Label         string
 	Number        int
 	X             int
 	Y             int
 	Color         Color
 	SelectedColor int
 	Flash         bool
+	Setting       int
 }
 
 type Patten struct {
 	Name     string
+	Label    string
 	Number   int
 	Length   int // 8, 4 or 2
 	Size     int
@@ -74,139 +86,149 @@ type Command struct {
 }
 
 // Valid Command Actions.
-const UpdateMode = 1
-const UpdateStatic = 2
-const UpdateStaticColor = 3
-const UpdateSequenceColor = 4
-const PlayStaticOnce = 5
-const PlaySwitchOnce = 6
-const SetEditColors = 7
-const EditColors = 8
-const UnHide = 9
-const Hide = 10
-const Start = 11
-const Stop = 12
-const ReadConfig = 13
-const LoadConfig = 14
-const UpdateSpeed = 15
-const UpdatePatten = 16
-const SelectPatten = 17
-const IncreaseFade = 18
-const DecreaseFade = 19
-const UpdateSize = 20
-const UpdateScannerSize = 21
-const Blackout = 22
-const Normal = 23
-const SoftFadeOn = 24
-const SoftFadeOff = 25
-const UpdateColor = 26
-const UpdateFunctionMode = 27
-const FunctionMode = 28
-const UpdateFunctions = 29
-const GetUpdatedSequence = 30
-const UpdateSwitch = 31
-const UpdateSwitchPositions = 32
-const Inverted = 33
-const UpdateGobo = 34
-const Flood = 35
-const NoFlood = 36
-const UpdateAutoColor = 37
-const AutoColor = 38
-const UpdateAutoPatten = 39
-const AutoPatten = 40
-const ToggleFixtureState = 41
-const FixtureState = 42
-const UpdateShift = 43
-const UpdateScannerColor = 44
-const ClearSequenceColor = 45
-const Static = 46
-const MasterBrightness = 47
-const UpdateNumberCoordinates = 48
-const UpdateOffsetPan = 49
-const UpdateOffsetTilt = 50
+const (
+	Actions int = iota
+	UpdateMode
+	UpdateStatic
+	UpdateStaticColor
+	UpdateSequenceColor
+	PlayStaticOnce
+	PlaySwitchOnce
+	UnHide
+	Hide
+	Start
+	Stop
+	ReadConfig
+	LoadConfig
+	UpdateSpeed
+	UpdatePatten
+	SelectPatten
+	SetFadeSpeed
+	UpdateSize
+	UpdateScannerSize
+	Blackout
+	Normal
+	SoftFadeOn
+	SoftFadeOff
+	UpdateColor
+	UpdateFunctionMode
+	FunctionMode
+	UpdateFunctions
+	GetUpdatedSequence
+	UpdateSwitch
+	UpdateSwitchPositions
+	Inverted
+	UpdateGobo
+	Flood
+	StopFlood
+	UpdateAutoColor
+	AutoColor
+	UpdateAutoPatten
+	AutoPatten
+	ToggleFixtureState
+	FixtureState
+	UpdateShift
+	UpdateScannerColor
+	ClearSequenceColor
+	Static
+	MasterBrightness
+	UpdateNumberCoordinates
+	UpdateOffsetPan
+	UpdateOffsetTilt
+	EnableAllScanners
+)
 
 const DefaultScannerSize = 120
 
+var Pink = Color{R: 255, G: 0, B: 255}
+var White = Color{R: 255, G: 255, B: 255}
+var Black = Color{R: 0, G: 0, B: 0}
+var Red = Color{R: 255, G: 0, B: 0}
+var Green = Color{R: 0, G: 255, B: 0}
+var Blue = Color{R: 0, G: 0, B: 255}
+var PresetYellow = Color{R: 150, G: 150, B: 0}
+var Cyan = Color{R: 0, G: 255, B: 255}
+
 type Gobo struct {
 	Name    string
+	Label   string
 	Number  int
 	Setting int
+	Flash   bool
+	Color   Color
 }
 
 // Sequence describes sequences.
 type Sequence struct {
-	NumberFixtures               int
-	NumberScanners               int
-	Mode                         string // Sequence or Static
-	Static                       bool
-	EditSeqColors                bool
-	PlayStaticOnce               bool
-	PlaySwitchOnce               bool
-	Flood                        bool
-	NoFlood                      bool
-	PlayFloodOnce                bool
-	StaticColors                 []StaticColorButton
-	AvailableSequenceColors      []StaticColorButton
-	AvailableScannerColors       map[int][]StaticColorButton
-	AvailableGoboSelectionColors []StaticColorButton
-	AvailableFixtures            []StaticColorButton // Holds a set of red buttons, one for every available fixture.
-	EditColors                   bool
-	Hide                         bool
-	Type                         string
-	FadeTime                     time.Duration
-	FadeOnTime                   time.Duration
-	FadeOffTime                  time.Duration
-	Name                         string
-	Number                       int
-	Run                          bool
-	Bounce                       bool
-	NumberSteps                  int    // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	Patten                       Patten // Contains fixtures and steps info.
-	Colors                       []Color
-	UpdateShift                  bool
-	Shift                        int // Used for shifting scanners patterns apart.
-	CurrentSpeed                 time.Duration
-	Speed                        int
-	FadeSpeed                    int
-	Size                         int
-	ScannerSize                  int
-	X                            int
-	Y                            int
-	MusicTrigger                 bool
-	Blackout                     bool
-	Color                        int
-	Gobo                         []Gobo
-	SelectedGobo                 int
-	SelectedColor                int
-	Master                       int // Master Brightness
-	Functions                    []Function
-	FunctionMode                 bool
-	Switches                     []Switch
-	UpdateSequenceColor          bool
-	SequenceColors               []Color
-	Inverted                     bool
-	Positions                    map[int][]Position
-	CurrentSequenceColors        []Color
-	SavedSequenceColors          []Color
-	SelectedFloodSequence        map[int]bool // A map that remembers who is in flood mode.
-	AutoColor                    bool
-	AutoPatten                   bool
-	RecoverSequenceColors        bool
-	SaveColors                   bool
-	SelectedScannerPatten        int
-	FixtureDisabled              map[int]bool
-	DisableOnce                  map[int]bool
-	ScannerChase                 bool
-	UpdateScannerColor           bool
-	ScannerColor                 map[int]int // eight scanners per sequence, each can have their own color.
-	NumberCoordinates            []int
-	SelectedCoordinates          int
-	Steps                        []Step
-	UpdatePatten                 bool
-	SelectPatten                 bool
-	SelectedPatten               int
-	OffsetPan                    int
-	OffsetTilt                   int
+	Name                       string                      // Sequence name.
+	Label                      string                      // Sequence label.
+	Description                string                      // Sequence description.
+	Number                     int                         // Sequence number.
+	Run                        bool                        // True if this sequence is running.
+	Bounce                     bool                        // True if this sequence is bouncing.
+	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
+	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
+	Master                     int                         // Master Brightness
+	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
+	Speed                      int                         // Sequence speed represented by a short number.
+	MusicTrigger               bool                        // Is this sequence in music trigger mode.
+	Blackout                   bool                        // Flag to indicate we're in blackout mode.
+	CurrentColors              []Color                     // Storage for the colors in a sequence.
+	SequenceColors             []Color                     // Temporay storage for changing sequence colors.
+	Color                      int                         // Index into current sequnece colors.
+	Steps                      []Step                      // Steps in this sequence.
+	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	Positions                  map[int][]Position          // Positions decides where a fixture is in a give set of sequence steps.
+	AutoColor                  bool                        // Sequence is going to automatically change the color.
+	AutoPatten                 bool                        // Sequence is going to automatically change the patten.
+	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
+	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
+	Patten                     Patten                      // Contains fixtures and steps info.
+	PattenInverted             bool                        // The patten is inverted.
+	RGBAvailablePattens        map[int]Patten              // Available pattens for the RGB fixtures.
+	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
+	RGBColor                   int                         // The selected RGB fixture color.
+	FadeSpeed                  int                         // Fade Speed
+	FadeTime                   time.Duration               // Fade time
+	Size                       int                         // Fade size
+	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
+	SelectedRGBPatten          int                         // Selected RGB patten.
+	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
+	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
+	Mode                       string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	StaticColors               []StaticColorButton         // Used in static color editing
+	Static                     bool                        // We're a static sequence.
+	PlayStaticOnce             bool                        // Play a static scene only once.
+	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
+	StartFlood                 bool                        // We're in flood mode.
+	StopFlood                  bool                        // We're not in flood mode.
+	FloodPlayOnce              bool                        // Play the flood sceme only once.
+	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
+	ScannersTotal              int                         // Total number of scanners in this sequence.
+	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
+	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
+	ScannerAvailablePattens    map[int]Patten              // Available pattens for this scanner.
+	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
+	ScannerPatten              int                         // The selected scanner patten.
+	ScannerSize                int                         // The selected scanner size.
+	ScannerShift               int                         // Used for shifting scanners patterns apart.
+	ScannerGobo                int                         // The selected gobo.
+	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
+	ScannerCoordinates         []int                       // Number of scanner coordinates.
+	ScannerSelectedCoordinates int                         // index into scanner coordinates.
+	ScannerOffsetPan           int                         // Offset for pan values.
+	ScannerOffsetTilt          int                         // Offset for tilt values.
+	FixtureDisabledMutex       *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
+	FixtureDisabled            map[int]bool                // Map of fixtures which are disabled.
+	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
+	DisableOnce                map[int]bool                // Map used to play disable only once.
+	UpdateShift                bool                        // Command to update the shift.
+	UpdatePatten               bool                        // Flag to indicate we're going to change the RGB patten.
+	UpdateSequenceColor        bool                        // Command to update the sequence colors.
+	Functions                  []Function                  // Storage for the sequence functions.
+	FunctionMode               bool                        // This sequence is in function mode.
+	Switches                   []Switch                    // A switch sequence stores its data in here.
 }
 
 type Function struct {
@@ -215,6 +237,7 @@ type Function struct {
 	Number         int
 	State          bool
 	Flash          bool
+	Label          string
 }
 
 type Channels struct {
@@ -258,15 +281,17 @@ type FixtureCommand struct {
 	FadeDownTime           time.Duration
 	FadeOffTime            time.Duration
 	Blackout               bool
-	Flood                  bool
-	NoFlood                bool
+	StartFlood             bool
+	StopFlood              bool
 	PlayFloodOnce          bool
 	UpdateSequenceColor    bool
 	SequenceColor          Color
 	SequenceNumber         int
 	Inverted               bool
 	SelectedGobo           int
+	FixtureDisabledMutex   *sync.RWMutex // Mutex to protect the  disable maps from syncronous access.
 	FixtureDisabled        map[int]bool
+	DisableOnceMutex       *sync.RWMutex // Mutex to protect the  disable once map from syncronous access.
 	DisableOnce            map[int]bool
 	ScannerChase           bool
 	ScannerColor           map[int]int
@@ -275,6 +300,7 @@ type FixtureCommand struct {
 	AvailableScannerColors map[int][]StaticColorButton
 	OffsetPan              int
 	OffsetTilt             int
+	FixtureLabels          []string
 }
 
 type Position struct {
@@ -293,6 +319,8 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	Name           string
+	Label          string
 	Type           string
 	MasterDimmer   int
 	Colors         []Color
@@ -335,58 +363,23 @@ const (
 	Function3_Auto_Patten   = 2 // Auto Patten change
 	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
 	Function5_Color         = 4 // Set RGB chase color. or select the scanner color.
-	Function6_Static        = 5 // Set static color.
-	Function6_Gobo          = 5 // Set scanner Gobo.
-	Function7_RGB_Invert    = 6 // Invert the RGB colors.
-	Function7_Scanner_Chase = 6 // Set scanner chase mode.
+	Function6_Static_Gobo   = 5 // Set static color / set scanner gobo.
+	Function7_Invert_Chase  = 6 // Invert the RGB colors  / Set scanner chase mode.
 	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
-
-// LightOn Turn on a common.Light.
-func LightOn(eventsForLauchpad chan ALight, Light ALight) {
-	event := ALight{
-		X:          Light.X,
-		Y:          Light.Y,
-		Brightness: Light.Brightness,
-		Red:        Light.Red,
-		Green:      Light.Green,
-		Blue:       Light.Blue,
-		Flash:      Light.Flash,
-		OnColor:    22,
-		OffColor:   18,
-	}
-	eventsForLauchpad <- event
-}
-
-// LightOff Turn on a common.Light.
-func LightOff(eventsForLauchpad chan ALight, X int, Y int) {
-	event := ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}
-	eventsForLauchpad <- event
-}
-
-func SequenceSelect(eventsForLauchpad chan ALight, selectedSequence int) {
-	// Turn off all sequence lights.
-	for seq := 0; seq < 4; seq++ {
-		//LightOff(eventsForLauchpad, 8, seq)
-		LightOn(eventsForLauchpad, ALight{X: 8, Y: seq, Brightness: 255, Red: 255, Green: 255, Blue: 255})
-	}
-	// Now turn blue the selected sequence select light.
-	LightOn(eventsForLauchpad, ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255})
-}
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
 	commandChannels[selectedSequence] <- command
 }
 
-func SendCommandToAllSequence(selectedSequence int, command Command, commandChannels []chan Command) {
+func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[0] <- command
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
 }
 
-func SendCommandToAllSequenceOfType(sequences []*Sequence, selectedSequence int, command Command, commandChannels []chan Command, Type string) {
-
+func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
 	for index, s := range sequences {
 		if s.Type == Type {
 			commandChannels[index] <- command
@@ -402,8 +395,11 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 	}
 }
 
-func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, functionButtons [][]bool, channels Channels) {
-	HideFunctionButtons(selectedSequence, eventsForLauchpad)
+func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
+
+	// The target set of buttons.
+	ClearSelectedRowOfButtons(selectedSequence, eventsForLauchpad, guiButtons)
+
 	// Get an upto date copy of the sequence.
 	cmd := Command{
 		Action: ReadConfig,
@@ -411,29 +407,9 @@ func MakeFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauch
 	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
 
 	replyChannel := channels.ReplyChannels[selectedSequence]
-	sequence = <-replyChannel
+	sequence := <-replyChannel
 
-	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad)
-}
-func HideFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight) {
-	for x := 0; x < 8; x++ {
-		LightOn(eventsForLauchpad, ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0})
-	}
-}
-
-func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight) {
-
-	// Loop through the available functions for this sequence
-	for index, function := range sequence.Functions {
-		if debug {
-			fmt.Printf("function %+v\n", function)
-		}
-		if function.State {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255})
-		} else {
-			LightOn(eventsForLauchpad, ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255})
-		}
-	}
+	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
 
 func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
@@ -550,34 +526,6 @@ func GetColorButtonsArray(color int) Color {
 	return Color{}
 }
 
-func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-	switch color {
-	case Color{R: 0, G: 196, B: 255}:
-		return 0x4e // Light Blue
-	case Color{R: 255, G: 0, B: 0}:
-		return 0x48 // Red
-	case Color{R: 255, G: 111, B: 0}:
-		return 0x60 // Orange
-	case Color{R: 255, G: 255, B: 0}:
-		return 0x0d // Yellow
-	case Color{R: 0, G: 255, B: 0}:
-		return 0x15 // Green
-	case Color{R: 0, G: 255, B: 255}:
-		return 0x25 // Cyan
-	case Color{R: 0, G: 0, B: 255}:
-		return 0x4f // Blue
-	case Color{R: 100, G: 0, B: 255}:
-		return 0x51 // Purple
-	case Color{R: 255, G: 0, B: 255}:
-		return 0x34 // Pink
-	case Color{R: 255, G: 255, B: 255}:
-		return 0x03 // White
-	case Color{R: 0, G: 0, B: 0}:
-		return 0x00 // Black
-	}
-	return code
-}
-
 func GetRGBColorByName(color string) Color {
 	switch color {
 	case "Red":
@@ -617,35 +565,33 @@ func GetRGBColorByName(color string) Color {
 	return Color{R: 0, G: 0, B: 0}
 }
 
-func ConvertRGBtoPalette(red, green, blue int) (paletteColor int) {
-	if red == 255 && green == 0 && blue == 0 {
-		return 0x78
-	} // Red
-	if red == 255 && green == 111 && blue == 0 {
-		return 0x60
-	} // Orange
-	if red == 255 && green == 255 && blue == 0 {
-		return 0x7c
-	} // Yellow
-	if red == 0 && green == 255 && blue == 0 {
-		return 0x15
-	} // Green
-	if red == 0 && green == 255 && blue == 255 {
-		return 0x25
-	} // Cyan
-	if red == 0 && green == 0 && blue == 255 {
-		return 0x42
-	} // Blue
-	if red == 100 && green == 0 && blue == 255 {
-		return 0x2d
-	} // Purple
-	if red == 255 && green == 0 && blue == 255 {
-		return 0x35
-	} // Pink
-	if red == 255 && green == 255 && blue == 255 {
-		return 0x03
-	} // White
-	return 0
+func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
+	switch color {
+	case Color{R: 0, G: 100, B: 255}:
+		return 0x2a // Light Blue
+	case Color{R: 255, G: 0, B: 0}:
+		return 0x48 // Red
+	case Color{R: 255, G: 111, B: 0}:
+		return 0x60 // Orange
+	case Color{R: 255, G: 255, B: 0}:
+		return 0x0d // Yellow
+	case Color{R: 0, G: 255, B: 0}:
+		return 0x15 // Green
+	case Color{R: 0, G: 255, B: 255}:
+		return 0x25 // Cyan
+	case Color{R: 0, G: 0, B: 255}:
+		return 0x4f // Blue
+	case Color{R: 100, G: 0, B: 255}:
+		return 0x51 // Purple
+	case Color{R: 255, G: 0, B: 255}:
+		return 0x34 // Pink
+	case Color{R: 255, G: 255, B: 255}:
+		return 0x03 // White
+	case Color{R: 0, G: 0, B: 0}:
+		return 0x00 // Black
+	}
+
+	return code
 }
 
 func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
@@ -664,22 +610,21 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	// Map color selection function.
 	if sequence.Functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
-		sequence.EditSeqColors = true
 	}
 
 	// Map static function.
 	if sequence.Type != "scanner" {
-		sequence.Static = sequence.Functions[Function6_Static].State
-		if sequence.Functions[Function6_Static].State {
+		sequence.Static = sequence.Functions[Function6_Static_Gobo].State
+		if sequence.Functions[Function6_Static_Gobo].State {
 			sequence.PlayStaticOnce = true
 			sequence.Hide = true
 		}
 	}
 
 	// Map invert function.
-	sequence.Inverted = sequence.Functions[Function7_RGB_Invert].State
+	sequence.PattenInverted = sequence.Functions[Function7_Invert_Chase].State
 	// Map scanner chase mode. Uses same function key as above.
-	sequence.ScannerChase = sequence.Functions[Function7_Scanner_Chase].State
+	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
@@ -718,4 +663,264 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	SendCommandToSequence(selectedSequence, cmd, commandChannels)
 	newSequence := <-updateChannels[selectedSequence]
 	return &newSequence
+}
+
+// For the given sequence hide the available sequence colors..
+func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	for myFixtureNumber := range sequence.RGBAvailableColors {
+		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+	}
+}
+
+func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	for x := 0; x < 8; x++ {
+		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		LabelButton(x, selectedSequence, "", guiButtons)
+	}
+}
+
+func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALight) {
+	for x := 0; x < 8; x++ {
+		LabelButton(x, selectedSequence, "", guiButtons)
+	}
+}
+
+func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	// Loop through the available functions for this sequence
+	for index, function := range sequence.Functions {
+		if debug {
+			fmt.Printf("ShowFunctionButtons: function %+v\n", function)
+		}
+
+		if function.State {
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+		} else {
+			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		}
+		LabelButton(index, selectedSequence, function.Label, guiButtons)
+	}
+}
+
+func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	type topButton struct {
+		Label string
+		Color Color
+	}
+	// Storage for the rgb labels on the top row.
+	var guiTopRGBButtons [8]topButton
+	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Pink}
+	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Red}
+	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Green}
+	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Blue}
+	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: Cyan}
+	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: Cyan}
+	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: Cyan}
+	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: Cyan}
+
+	// Storage for the scanner labels on the Top row.
+	var guiTopScannerButtons [8]topButton
+	guiTopScannerButtons[0] = topButton{Label: " ^ ", Color: White}
+	guiTopScannerButtons[1] = topButton{Label: " V", Color: White}
+	guiTopScannerButtons[2] = topButton{Label: " < ", Color: White}
+	guiTopScannerButtons[3] = topButton{Label: " > ", Color: White}
+	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: Cyan}
+	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: Cyan}
+	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: Cyan}
+	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: Cyan}
+
+	//  The Top row of the Novation Launchpad.
+	TopRow := -1
+
+	if tYpe == "rgb" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiTopRGBButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, TopRow, button.Label, guiButtons)
+		}
+	}
+	if tYpe == "scanner" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiTopScannerButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, TopRow, button.Label, guiButtons)
+		}
+	}
+}
+
+func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	type bottonButton struct {
+		Label string
+		Color Color
+	}
+
+	// Storage for the rgb labels on the bottom row.
+	var guiBottomRGBButtons [8]bottonButton
+	guiBottomRGBButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
+	guiBottomRGBButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
+	guiBottomRGBButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
+	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
+	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
+	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
+	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
+	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
+
+	// Storage for the scanner labels on the bottom row.
+	var guiBottomScannerButtons [8]bottonButton
+	guiBottomScannerButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
+	guiBottomScannerButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
+	guiBottomScannerButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
+	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
+	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
+	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
+	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: White}
+	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: White}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	if tYpe == "rgb" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiBottomRGBButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button.Label, guiButtons)
+		}
+	}
+	if tYpe == "scanner" {
+		// Loop through the available functions for this sequence
+		for index, button := range guiBottomScannerButtons {
+			if debug {
+				fmt.Printf("button %+v\n", button)
+			}
+			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LabelButton(index, bottomRow, button.Label, guiButtons)
+		}
+	}
+}
+
+// ListenAndSendToLaunchPad is the thread that listens for events to send to
+// the launch pad.  It is thread safe and is the only thread talking to the
+// launch pad. A channel is used to queue the events to be sent.
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad) {
+	for {
+
+		// Wait for the event.
+		alight := <-eventsForLauchpad
+
+		// Wait for a few millisecond so the launchpad and the gui step at the same time
+		time.Sleep(14 * time.Microsecond)
+
+		// We're in standard turn the light on.
+		if !alight.Flash {
+
+			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+			Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+			Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+			Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+
+			// Now light the launchpad button.
+			err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+			if err != nil {
+				fmt.Printf("error writing to launchpad %e\n" + err.Error())
+			}
+
+			// Now we're been asked go flash this button.
+		} else {
+			// Now light the launchpad button.
+			if debug {
+				fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
+				fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
+			}
+			err := pad.FlashLight(alight.X, alight.Y, int(GetLaunchPadColorCodeByRGB(alight.OnColor)), int(GetLaunchPadColorCodeByRGB(alight.OffColor)))
+			if err != nil {
+				fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
+			}
+
+		}
+	}
+}
+
+func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
+	if debug {
+		fmt.Printf("Label Button  X:%d  Y:%d  with %s\n", X, Y, label)
+	}
+	// Send message to GUI
+	event := ALight{
+		UpdateLabel: true,
+		X:           X,
+		Y:           Y + 1,
+		Label:       label,
+	}
+	guiButtons <- event
+}
+
+// LightOn Turn on a Light.
+func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	if debug {
+		fmt.Printf("LightLamp  X:%d  Y:%d\n", Light.X, Light.Y)
+	}
+	// Send message to Novation Launchpad.
+	event := ALight{
+		X:          Light.X,
+		Y:          Light.Y,
+		Brightness: Light.Brightness,
+		Red:        Light.Red,
+		Green:      Light.Green,
+		Blue:       Light.Blue,
+		Flash:      false,
+		OnColor:    Light.OnColor,
+		OffColor:   Light.OffColor,
+	}
+	eventsForLauchpad <- event
+
+	// Send message to fyne.io GUI.
+	event = ALight{
+		X:          Light.X,
+		Y:          Light.Y + 1,
+		Brightness: Light.Brightness,
+		Red:        Light.Red,
+		Green:      Light.Green,
+		Blue:       Light.Blue,
+		Flash:      false,
+		OnColor:    Light.OnColor,
+		OffColor:   Light.OffColor,
+		Label:      Light.Label,
+	}
+	guiButtons <- event
+}
+
+func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+
+	// Now ask the fixture lamp to flash on the launch pad by sending an event.
+	e := ALight{
+		X:          X,
+		Y:          Y,
+		Brightness: 255,
+		Flash:      true,
+		OnColor:    onColor,
+		OffColor:   offColor,
+	}
+	eventsForLauchpad <- e
+
+	// Send message to GUI
+	event := ALight{
+		X:          e.X,
+		Y:          e.Y + 1,
+		Brightness: 255,
+		Flash:      true,
+		OnColor:    onColor,
+		OffColor:   offColor,
+	}
+	guiButtons <- event
 }

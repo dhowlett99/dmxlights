@@ -11,7 +11,6 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 )
@@ -37,6 +36,7 @@ type Value struct {
 
 type State struct {
 	Name        string  `yaml:"name"`
+	Label       string  `yaml:"label"`
 	Values      []Value `yaml:"values"`
 	ButtonColor Color   `yaml:"buttoncolor"`
 	Master      int     `yaml:"master"`
@@ -44,6 +44,7 @@ type State struct {
 
 type Switch struct {
 	Name        string  `yaml:"name"`
+	Label       string  `yaml:"label"`
 	Number      int     `yaml:"number"`
 	Description string  `yaml:"description"`
 	States      []State `yaml:"states"`
@@ -51,6 +52,7 @@ type Switch struct {
 
 type Fixture struct {
 	Name        string    `yaml:"name"`
+	Label       string    `yaml:"label"`
 	Number      int       `yaml:"number"`
 	Description string    `yaml:"description"`
 	Type        string    `yaml:"type"`
@@ -62,6 +64,7 @@ type Fixture struct {
 
 type Setting struct {
 	Name    string `yaml:"name"`
+	Label   string `yaml:"label"`
 	Number  int    `yaml:"number"`
 	Setting int    `yaml:"setting"`
 }
@@ -106,8 +109,10 @@ func FixtureReceiver(sequence common.Sequence,
 	myFixtureNumber int,
 	channels []chan common.FixtureCommand,
 	eventsForLauchpad chan common.ALight,
+	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
-	fixtures *Fixtures) {
+	fixtures *Fixtures,
+	fixtureStopChannels []chan bool) {
 
 	cmd := common.FixtureCommand{}
 
@@ -122,19 +127,17 @@ func FixtureReceiver(sequence common.Sequence,
 
 			// If we're a RGB fixture implement the flood and static features.
 			if cmd.Type == "rgb" {
-				if cmd.Flood {
-					time.Sleep(100 * time.Millisecond)
+				if cmd.StartFlood {
 					MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
-					common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 255, Red: 255, Green: 255, Blue: 255})
+					common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 					continue
 				}
-				if cmd.NoFlood {
+				if cmd.StopFlood {
 					MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
-					common.LightOn(eventsForLauchpad, common.ALight{X: myFixtureNumber, Y: sequence.Number, Brightness: 0, Red: 0, Green: 0, Blue: 0})
+					common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 					continue
 				}
 				if cmd.Static {
-					time.Sleep(100 * time.Millisecond)
 					sequence := common.Sequence{}
 					sequence.Type = cmd.Type
 					sequence.Number = cmd.SequenceNumber
@@ -143,7 +146,7 @@ func FixtureReceiver(sequence common.Sequence,
 					sequence.Hide = cmd.Hide
 					sequence.StaticColors = cmd.StaticColors
 					sequence.Static = cmd.Static
-					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, fixtures, true)
+					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true)
 					continue
 				}
 			}
@@ -166,17 +169,34 @@ func FixtureReceiver(sequence common.Sequence,
 					}
 				}
 
+				cmd.FixtureDisabledMutex.RLock()
+				disableThis := cmd.FixtureDisabled[myFixtureNumber]
+				cmd.FixtureDisabledMutex.RUnlock()
+
+				cmd.DisableOnceMutex.RLock()
+				disableOnce := cmd.DisableOnce[myFixtureNumber]
+				cmd.DisableOnceMutex.RUnlock()
+
 				// If this fixture is disabled then shut the shutter off.
 				if cmd.CurrentPosition == position.StartPosition &&
-					cmd.DisableOnce[myFixtureNumber] &&
 					cmd.Type == "scanner" &&
-					cmd.FixtureDisabled[myFixtureNumber] {
+					disableOnce &&
+					disableThis {
+
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0)
+
+					cmd.DisableOnceMutex.RLock()
 					cmd.DisableOnce[myFixtureNumber] = false
+					cmd.DisableOnceMutex.RUnlock()
+
 					continue
 				}
 
-				if cmd.CurrentPosition == position.StartPosition && !cmd.FixtureDisabled[myFixtureNumber] {
+				cmd.FixtureDisabledMutex.RLock()
+				disableThis = cmd.FixtureDisabled[myFixtureNumber]
+				cmd.FixtureDisabledMutex.RUnlock()
+
+				if cmd.CurrentPosition == position.StartPosition && !disableThis {
 
 					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {
@@ -192,6 +212,7 @@ func FixtureReceiver(sequence common.Sequence,
 									// Remember that fixtures in the real world start with 1 not 0.
 									realFixture := position.Fixture + 1
 									// Find the color that has been selected for this fixture.
+									// selected color is an index into the scanner colors selected.
 									selectedColor := cmd.ScannerColor[position.Fixture]
 
 									// Do we have a set of available colors for this fixture.
@@ -201,28 +222,23 @@ func FixtureReceiver(sequence common.Sequence,
 										red := availableColors[selectedColor].Color.R
 										green := availableColors[selectedColor].Color.G
 										blue := availableColors[selectedColor].Color.B
-										launchpad.LightLamp(myFixtureNumber, mySequenceNumber, red, green, blue, position.Shutter, eventsForLauchpad)
+										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: red, Green: green, Blue: blue, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
 									} else {
 										// No color selected or available, use white.
-										launchpad.LightLamp(myFixtureNumber, mySequenceNumber, 255, 255, 255, position.Shutter, eventsForLauchpad)
+										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
 									}
 								} else {
-									// We're not in chase mode so use the color generated in the patten generator.
-									launchpad.LightLamp(myFixtureNumber, mySequenceNumber, position.Color.R, position.Color.G, position.Color.B, cmd.Master, eventsForLauchpad)
+									// We're not in chase mode so use the color generated in the patten generator.common.
+									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: position.Color.R, Green: position.Color.G, Blue: position.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 								}
 							}
 						}
 						continue
 					}
 
-					// Short ciruit the soft fade if we in flood mode.
-					if cmd.Flood {
-						continue
-					}
-
 					// Now create a thread to process the RGB fixture itself.
 					if position.Fixture == myFixtureNumber {
-						go func() {
+						go func(fixtureStopChannel chan bool) {
 							var R int
 							var G int
 							var B int
@@ -233,42 +249,70 @@ func FixtureReceiver(sequence common.Sequence,
 									G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 									B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
 									if !cmd.Hide {
-										launchpad.LightLamp(myFixtureNumber, mySequenceNumber, R, G, B, cmd.Master, eventsForLauchpad)
+										common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									// Fade down time.
+									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+										return
+									}
 								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								// Fade off time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
 							for _, value := range fadeUp {
 								R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 								G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 								B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
 								if !cmd.Hide {
-									launchpad.LightLamp(myFixtureNumber, mySequenceNumber, R, G, B, cmd.Master, eventsForLauchpad)
+									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 								}
 								// Now ask DMX to actually light the real fixture.
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-								time.Sleep(cmd.FadeTime / 4) // Fade up Time.
+								// Fade up time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
 							for x := 0; x < cmd.Size; x++ {
-								time.Sleep(cmd.CurrentSpeed * 5)
+								// Time between fades.
+								if listenAndWaitForStop(cmd.CurrentSpeed*5, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
-							time.Sleep(cmd.FadeTime / 4) // Fade on time.
+							// Fade on time.
+							if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								return
+							}
 							if !cmd.Inverted {
 								for _, value := range fadeDown {
 									R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 									G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 									B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
 									if !cmd.Hide {
-										launchpad.LightLamp(myFixtureNumber, mySequenceNumber, R, G, B, cmd.Master, eventsForLauchpad)
+										common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
-									time.Sleep(cmd.FadeTime / 4) // Fade down time.
+									// Fade down time.
+									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+										return
+									}
 								}
-								time.Sleep(cmd.FadeTime / 4) // Fade off time.
+								// Fade off time.
+								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
-						}()
+						}(fixtureStopChannels[myFixtureNumber])
 					}
 				}
 			}
@@ -443,39 +487,6 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func HowManyGobos(sequenceNumber int, fixturesConfig *Fixtures) (numberScanners int, gobos []common.Gobo) {
-	if debug {
-		fmt.Printf("HowManyGobos\n")
-	}
-	gobos = []common.Gobo{}
-	for _, f := range fixturesConfig.Fixtures {
-		if debug {
-			fmt.Printf("Fixture Name:%s\n", f.Name)
-		}
-		if f.Type == "scanner" {
-			numberScanners++
-			if debug {
-				fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, f.Name, f.Description)
-			}
-			for _, channel := range f.Channels {
-				if channel.Name == "Gobo" {
-					newGobo := common.Gobo{}
-					for _, setting := range channel.Settings {
-						newGobo.Name = setting.Name
-						newGobo.Number = setting.Number
-						newGobo.Setting = setting.Setting
-						gobos = append(gobos, newGobo)
-						if debug {
-							fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
-						}
-					}
-				}
-			}
-		}
-	}
-	return numberScanners, gobos
-}
-
 func getFade(size float64, direction bool) []int {
 
 	out := []int{}
@@ -501,16 +512,17 @@ func getFade(size float64, direction bool) []int {
 	return out
 }
 
-func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
+func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
 
 	lamp := sequence.StaticColors[myFixtureNumber]
 
 	if sequence.Hide {
 		if lamp.Flash {
-			onColor := common.ConvertRGBtoPalette(lamp.Color.R, lamp.Color.G, lamp.Color.B)
-			launchpad.FlashLight(myFixtureNumber, myFixtureNumber, onColor, 0, eventsForLauchpad)
+			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(sequence.Number, myFixtureNumber, onColor, Black, eventsForLauchpad, guiButtons)
 		} else {
-			launchpad.LightLamp(myFixtureNumber, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, sequence.Master, eventsForLauchpad)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master)
@@ -548,4 +560,23 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 	return NewDMXValue
 
+}
+
+// listenAndWaitForStop is used in the fixture fade loops.
+// We make the sleeps interuptable so that fixtures can be stopped immediately
+func listenAndWaitForStop(wait time.Duration, fixtureStopChannels chan bool) bool {
+	select {
+	case <-fixtureStopChannels:
+		return true
+	case <-time.After(wait):
+	}
+	return false
+}
+
+// turnOffFixtures is used to turn off a fixture when we stop a sequence.
+func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+	if !cmd.Hide {
+		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+	}
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 }

@@ -13,11 +13,14 @@ const (
 	full = 255
 )
 
-func MakePatterns() map[string]common.Patten {
+func MakePatterns() map[int]common.Patten {
 
-	Pattens := make(map[string]common.Patten)
+	Pattens := make(map[int]common.Patten)
 
 	standard := common.Patten{
+		Name:   "Chase",
+		Number: 0,
+		Label:  "Std.Chase",
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -119,6 +122,9 @@ func MakePatterns() map[string]common.Patten {
 	}
 
 	rgbchase := common.Patten{
+		Name:   "RGB Chase",
+		Number: 1,
+		Label:  "RGB.Chase",
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -220,6 +226,9 @@ func MakePatterns() map[string]common.Patten {
 	}
 
 	pairs := common.Patten{
+		Name:   "Pairs",
+		Label:  "Pairs",
+		Number: 2,
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -305,22 +314,13 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			// {
-			// 	Fixtures: []common.Fixture{
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-			// 		{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-			// 	},
-			// },
 		},
 	}
 
 	inward := common.Patten{
+		Name:   "Inward",
+		Label:  "Inward",
+		Number: 3,
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -374,6 +374,9 @@ func MakePatterns() map[string]common.Patten {
 	}
 
 	colors := common.Patten{
+		Name:   "Color Chase",
+		Label:  "Color.Chase",
+		Number: 4,
 		Steps: []common.Step{
 			{ // Step 1, - Red
 				Fixtures: []common.Fixture{
@@ -390,7 +393,7 @@ func MakePatterns() map[string]common.Patten {
 			{ // Step 2 - Orange
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 155, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -423,33 +426,20 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 5 - Pastel Green
+			{ // Step 5 - Cyan
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 50}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 6 - Cyan Blue
+			{ // Step 6 - Blue
 				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 155, B: 255}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{ // Step 7 - Blue
-				Fixtures: []common.Fixture{
-					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -457,9 +447,22 @@ func MakePatterns() map[string]common.Patten {
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 				},
 			},
-			{ // Step 8 - Purple
+			{ // Step 7 - Purple
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{ // Step 8 - Pink
 				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -474,11 +477,11 @@ func MakePatterns() map[string]common.Patten {
 		},
 	}
 
-	Pattens["standard"] = standard
-	Pattens["rgbchase"] = rgbchase
-	Pattens["pairs"] = pairs
-	Pattens["inward"] = inward
-	Pattens["colors"] = colors
+	Pattens[0] = standard
+	Pattens[1] = rgbchase
+	Pattens[2] = pairs
+	Pattens[3] = inward
+	Pattens[4] = colors
 
 	return Pattens
 
@@ -489,11 +492,11 @@ type scanner struct {
 	values []int
 }
 
-// GeneratePatten takes an array of coordinates and turns them into a patten
+// GeneratePatten takes an array of Coordinates and turns them into a patten
 // which is the starting point for all sequence steps.
-func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift int, chase bool) common.Patten {
+func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool) common.Patten {
 
-	NumberCoordinates := len(coordinates)
+	NumberCoordinates := len(Coordinates)
 
 	if debug {
 		fmt.Printf("Number Fixtures %d\n", NumberFixtures)
@@ -528,11 +531,11 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
 			shift = NumberCoordinates / 4
 		}
-		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
-			s.values = append(s.values, coordinate)
+		for Coordinate := shift; Coordinate < NumberCoordinates; Coordinate++ {
+			s.values = append(s.values, Coordinate)
 		}
-		for coordinate := 0; coordinate < shift; coordinate++ {
-			s.values = append(s.values, coordinate)
+		for Coordinate := 0; Coordinate < shift; Coordinate++ {
+			s.values = append(s.values, Coordinate)
 		}
 
 		// append the scanner to the list of scanners.
@@ -559,11 +562,11 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 		if shift == (NumberCoordinates*2)+(NumberCoordinates/4) {
 			shift = NumberCoordinates / 4
 		}
-		for coordinate := shift; coordinate < NumberCoordinates; coordinate++ {
-			s.values = append(s.values, coordinate)
+		for Coordinate := shift; Coordinate < NumberCoordinates; Coordinate++ {
+			s.values = append(s.values, Coordinate)
 		}
-		for coordinate := 0; coordinate < shift; coordinate++ {
-			s.values = append(s.values, coordinate)
+		for Coordinate := 0; Coordinate < shift; Coordinate++ {
+			s.values = append(s.values, Coordinate)
 		}
 
 		// append the scanner to the list of scanners.
@@ -596,8 +599,8 @@ func GeneratePatten(coordinates []coordinate, NumberFixtures int, requestedShift
 				Colors: []common.Color{
 					common.GetColorButtonsArray(scanners[step].values[f]),
 				},
-				Pan:     int(coordinates[scanners[step].values[f]].Pan),
-				Tilt:    int(coordinates[scanners[step].values[f]].Tilt),
+				Pan:     int(Coordinates[scanners[step].values[f]].Pan),
+				Tilt:    int(Coordinates[scanners[step].values[f]].Tilt),
 				Shutter: shutterValue,
 				Gobo:    36,
 			}
@@ -625,15 +628,15 @@ func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures
 	return 0
 }
 
-type coordinate struct {
+type Coordinate struct {
 	Tilt int
 	Pan  int
 }
 
-func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []coordinate) {
+func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []Coordinate) {
 	var theta float64
 	for theta = 0; theta < 360; theta += (360 / float64(NumberCoordinates)) {
-		n := coordinate{}
+		n := Coordinate{}
 		n.Tilt, n.Pan = circleXY(float64(radius), theta, posX, posY)
 		out = append(out, n)
 	}
@@ -646,11 +649,11 @@ func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float
 	return out
 }
 
-func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []coordinate) {
+func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []Coordinate) {
 	var t float64
 	T := float64(size)
 	for t = 1; t < T-1; t += float64(NumberCoordinates) {
-		n := coordinate{}
+		n := Coordinate{}
 		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
 		n.Tilt = int(x)
 		n.Pan = int(t)
@@ -659,10 +662,10 @@ func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out [
 	return out
 }
 
-func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
+func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []Coordinate) {
 	pan := 128
 	for tilt := 0; tilt < 255; tilt += NumberCoordinates {
-		n := coordinate{}
+		n := Coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
 		out = append(out, n)
@@ -670,10 +673,10 @@ func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []coordinate) {
 	return out
 }
 
-func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []coordinate) {
+func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []Coordinate) {
 	tilt := 128
 	for pan := 0; pan < 255; pan += NumberCoordinates {
-		n := coordinate{}
+		n := Coordinate{}
 		n.Tilt = tilt
 		n.Pan = pan
 		out = append(out, n)

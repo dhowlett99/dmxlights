@@ -80,8 +80,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
 		}
 		sequence.UpdatePatten = true
-		sequence.SelectedPatten = command.Args[SELECTED_PATTEN].Value.(int)
-		sequence.SelectedScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
+		sequence.SelectedRGBPatten = command.Args[SELECTED_PATTEN].Value.(int)
+		sequence.ScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
 		return sequence
 
 	case common.UpdateShift:
@@ -90,7 +90,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
 		}
 		sequence.UpdateShift = true
-		sequence.Shift = command.Args[SHIFT].Value.(int)
+		sequence.ScannerShift = command.Args[SHIFT].Value.(int)
 		return sequence
 
 	case common.UpdateSize:
@@ -109,19 +109,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
-	case common.IncreaseFade:
+	case common.SetFadeSpeed:
 		const FADE_SPEED = 0
 		if debug {
-			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
-		}
-		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
-		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
-		return sequence
-
-	case common.DecreaseFade:
-		const FADE_SPEED = 0
-		if debug {
-			fmt.Printf("%d: Command Decrease Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
+			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
 		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
 		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
@@ -149,7 +140,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
 		sequence.Functions[common.Function8_Music_Trigger].State = false
-		sequence.Functions[common.Function6_Static].State = false
+		sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Static = false
@@ -175,18 +166,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command to Start Flood\n", mySequenceNumber)
 		}
-		sequence.Flood = true
-		sequence.NoFlood = false
-		sequence.PlayFloodOnce = true
+		sequence.StartFlood = true
+		sequence.StopFlood = false
+		sequence.FloodPlayOnce = true
 		return sequence
 
-	case common.NoFlood:
+	case common.StopFlood:
 		if debug {
 			fmt.Printf("%d: Command to Stop Flood\n", mySequenceNumber)
 		}
-		sequence.Flood = false
-		sequence.NoFlood = true
-		sequence.PlayFloodOnce = true
+		sequence.StartFlood = false
+		sequence.StopFlood = true
+		sequence.FloodPlayOnce = true
 		return sequence
 
 	case common.Normal:
@@ -216,16 +207,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if sequence.Type == "scanner" && sequence.Patten.Name == "circle" {
 			sequence.Bounce = false
 		}
-		return sequence
-
-	case common.SetEditColors:
-		const EDIT_COLORS = 0
-		if debug {
-			fmt.Printf("%d: Command EditColors Static to %t\n", mySequenceNumber, command.Args[EDIT_COLORS].Value)
-		}
-		sequence.PlayStaticOnce = true
-
-		sequence.EditColors = command.Args[EDIT_COLORS].Value.(bool)
 		return sequence
 
 	case common.UpdateStatic:
@@ -285,7 +266,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
-		sequence.UpdateScannerColor = true
 		sequence.SaveColors = true
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
 		return sequence
@@ -296,7 +276,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = []common.Color{}
-		sequence.CurrentSequenceColors = []common.Color{}
+		sequence.CurrentColors = []common.Color{}
 		return sequence
 
 	// If we are being asked for our config we must reply with our current sequence.
@@ -358,6 +338,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.Type = "switch"
 		return sequence
 
+	case common.EnableAllScanners:
+		const SEQUENCE_NUMBER = 0 // Integer
+		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
+			sequence.FixtureDisabledMutex.Lock()
+			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
+				sequence.FixtureDisabled[command.Args[scanner].Value.(int)] = false
+			}
+			sequence.FixtureDisabledMutex.Unlock()
+		}
+
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
 		const SEQUENCE_NUMBER = 0 // Integer
@@ -367,14 +357,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberScanners {
+			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.ScannersTotal {
+				sequence.FixtureDisabledMutex.Lock()
 				sequence.FixtureDisabled[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[FIXTURE_STATE].Value.(bool)
+				sequence.FixtureDisabledMutex.Unlock()
 			}
 		}
 
 		// When we disable a fixture we send a off command to the shutter to make it go off.
 		// We only want to do this once to avoid flooding the universe with DMX commands.
+		sequence.DisableOnceMutex.Lock()
 		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
+		sequence.DisableOnceMutex.Unlock()
 		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence
@@ -384,7 +378,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.Args[SELECTED_GOBO].Value)
 		}
-		sequence.SelectedGobo = command.Args[SELECTED_GOBO].Value.(int)
+		sequence.ScannerGobo = command.Args[SELECTED_GOBO].Value.(int)
 		sequence.Static = false
 		return sequence
 
@@ -394,7 +388,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[AUTO_COLOR].Value)
 		}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
-		sequence.SelectedGobo = 1
+		sequence.ScannerGobo = 1
 		if !command.Args[AUTO_COLOR].Value.(bool) {
 			sequence.RecoverSequenceColors = true
 		} else {
@@ -414,7 +408,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 			}
 			if sequence.Type == "scanner" {
 				sequence.Patten.Name = "circle"
-				sequence.SelectedScannerPatten = 1
+				sequence.ScannerPatten = 1
 			}
 		}
 		return sequence
@@ -424,7 +418,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
 		}
-		sequence.SelectedCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
+		sequence.ScannerSelectedCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
 		return sequence
 
 	case common.UpdateOffsetPan:
@@ -432,7 +426,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Offset Pan to  %d\n", mySequenceNumber, command.Args[OFFSET_PAN].Value)
 		}
-		sequence.OffsetPan = command.Args[OFFSET_PAN].Value.(int)
+		sequence.ScannerOffsetPan = command.Args[OFFSET_PAN].Value.(int)
 		return sequence
 
 	case common.UpdateOffsetTilt:
@@ -440,7 +434,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		if debug {
 			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
 		}
-		sequence.OffsetTilt = command.Args[OFFSET_TILT].Value.(int)
+		sequence.ScannerOffsetTilt = command.Args[OFFSET_TILT].Value.(int)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.
@@ -528,58 +522,5 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	if commandSpeed == 18 {
 		Speed = 7
 	}
-	if commandSpeed == 19 {
-		Speed = 5
-	}
-	if commandSpeed == 20 {
-		Speed = 3
-	}
-	if commandSpeed == 21 {
-		Speed = 1
-	}
 	return Speed * time.Millisecond
-}
-
-// Fade time must be relative to the current speed.
-func SetFade(commandSpeed int) (Fade time.Duration) {
-	if commandSpeed == 0 {
-		Fade = 1000
-	}
-	if commandSpeed == 1 {
-		Fade = 900
-	}
-	if commandSpeed == 2 {
-		Fade = 800
-	}
-	if commandSpeed == 3 {
-		Fade = 700
-	}
-	if commandSpeed == 4 {
-		Fade = 600
-	}
-	if commandSpeed == 5 {
-		Fade = 500
-	}
-	if commandSpeed == 6 {
-		Fade = 400
-	}
-	if commandSpeed == 7 {
-		Fade = 300
-	}
-	if commandSpeed == 8 {
-		Fade = 200
-	}
-	if commandSpeed == 9 {
-		Fade = 150
-	}
-	if commandSpeed == 10 {
-		Fade = 100
-	}
-	if commandSpeed == 11 {
-		Fade = 50
-	}
-	if commandSpeed == 12 {
-		Fade = 25
-	}
-	return Fade * time.Millisecond
 }
