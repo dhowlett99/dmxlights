@@ -227,7 +227,6 @@ func ProcessButtons(X int, Y int,
 
 		// Get the pad back into sane mode.
 		this.Pad.Reset()
-		this.Pad.Program()
 
 		// Turn off the flashing save button.
 		this.SavePreset = false
@@ -243,6 +242,10 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
 			this.Flood = false
+
+			// Turn the flood button back to white.
+			common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
 		}
 
 		// We want to clear a color selection for a selected sequence.
@@ -341,6 +344,40 @@ func ProcessButtons(X int, Y int,
 					Action: common.UpdateScannerSize,
 					Args: []common.Arg{
 						{Name: "ScannerSize", Value: common.DefaultScannerSize},
+					},
+				}
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			}
+
+			// Reset the fade speed back to the default
+			if sequence.Type == "rgb" {
+				this.FadeSpeed = 12
+				cmd = common.Command{
+					Action: common.SetFadeSpeed,
+					Args: []common.Arg{
+						{Name: "FadeSpeed", Value: this.FadeSpeed},
+					},
+				}
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			}
+
+			// Reset the speed back to the default.
+			this.SequenceSpeed = 14
+			cmd = common.Command{
+				Action: common.UpdateSpeed,
+				Args: []common.Arg{
+					{Name: "Speed", Value: this.SequenceSpeed},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			if sequence.Type == "scanner" {
+				// Reset the number of coordinates.
+				this.SelectedCordinates = 0
+				cmd = common.Command{
+					Action: common.UpdateNumberCoordinates,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.SelectedCordinates},
 					},
 				}
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -897,7 +934,7 @@ func ProcessButtons(X int, Y int,
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.DecreaseFade,
+				Action: common.SetFadeSpeed,
 				Args: []common.Arg{
 					{Name: "FadeSpeed", Value: this.FadeSpeed},
 				},
@@ -941,7 +978,7 @@ func ProcessButtons(X int, Y int,
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.IncreaseFade,
+				Action: common.SetFadeSpeed,
 				Args: []common.Arg{
 					{Name: "FadeSpeed", Value: this.FadeSpeed},
 				},

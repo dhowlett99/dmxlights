@@ -86,55 +86,57 @@ type Command struct {
 }
 
 // Valid Command Actions.
-const UpdateMode = 1
-const UpdateStatic = 2
-const UpdateStaticColor = 3
-const UpdateSequenceColor = 4
-const PlayStaticOnce = 5
-const PlaySwitchOnce = 6
-const UnHide = 7
-const Hide = 8
-const Start = 9
-const Stop = 10
-const ReadConfig = 11
-const LoadConfig = 12
-const UpdateSpeed = 13
-const UpdatePatten = 14
-const SelectPatten = 15
-const IncreaseFade = 16
-const DecreaseFade = 17
-const UpdateSize = 18
-const UpdateScannerSize = 19
-const Blackout = 20
-const Normal = 21
-const SoftFadeOn = 22
-const SoftFadeOff = 23
-const UpdateColor = 24
-const UpdateFunctionMode = 25
-const FunctionMode = 26
-const UpdateFunctions = 27
-const GetUpdatedSequence = 28
-const UpdateSwitch = 29
-const UpdateSwitchPositions = 30
-const Inverted = 31
-const UpdateGobo = 32
-const Flood = 33
-const StopFlood = 34
-const UpdateAutoColor = 35
-const AutoColor = 36
-const UpdateAutoPatten = 37
-const AutoPatten = 38
-const ToggleFixtureState = 39
-const FixtureState = 40
-const UpdateShift = 41
-const UpdateScannerColor = 42
-const ClearSequenceColor = 43
-const Static = 44
-const MasterBrightness = 45
-const UpdateNumberCoordinates = 46
-const UpdateOffsetPan = 47
-const UpdateOffsetTilt = 48
-const EnableAllScanners = 49
+const (
+	Actions int = iota
+	UpdateMode
+	UpdateStatic
+	UpdateStaticColor
+	UpdateSequenceColor
+	PlayStaticOnce
+	PlaySwitchOnce
+	UnHide
+	Hide
+	Start
+	Stop
+	ReadConfig
+	LoadConfig
+	UpdateSpeed
+	UpdatePatten
+	SelectPatten
+	SetFadeSpeed
+	UpdateSize
+	UpdateScannerSize
+	Blackout
+	Normal
+	SoftFadeOn
+	SoftFadeOff
+	UpdateColor
+	UpdateFunctionMode
+	FunctionMode
+	UpdateFunctions
+	GetUpdatedSequence
+	UpdateSwitch
+	UpdateSwitchPositions
+	Inverted
+	UpdateGobo
+	Flood
+	StopFlood
+	UpdateAutoColor
+	AutoColor
+	UpdateAutoPatten
+	AutoPatten
+	ToggleFixtureState
+	FixtureState
+	UpdateShift
+	UpdateScannerColor
+	ClearSequenceColor
+	Static
+	MasterBrightness
+	UpdateNumberCoordinates
+	UpdateOffsetPan
+	UpdateOffsetTilt
+	EnableAllScanners
+)
 
 const DefaultScannerSize = 120
 

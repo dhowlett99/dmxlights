@@ -109,19 +109,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
-	case common.IncreaseFade:
+	case common.SetFadeSpeed:
 		const FADE_SPEED = 0
 		if debug {
-			fmt.Printf("%d: Command Increase Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
-		}
-		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
-		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
-		return sequence
-
-	case common.DecreaseFade:
-		const FADE_SPEED = 0
-		if debug {
-			fmt.Printf("%d: Command Decrease Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
+			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
 		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
 		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))

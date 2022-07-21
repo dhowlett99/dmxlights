@@ -52,7 +52,7 @@ func main() {
 	this.SelectedShift = 0                          // Default shift size.
 	this.Blackout = false                           // Blackout starts in off.
 	this.Flood = false                              // Flood starts in off.
-	this.FadeSpeed = 11                             // Default start at 50ms.
+	this.FadeSpeed = 12                             // Default start at 50ms.
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
