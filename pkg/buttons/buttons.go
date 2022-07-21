@@ -201,17 +201,63 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
+	// C L E A R  - clear all from the GUI.
+	if X == 0 && Y == -1 && gui {
+		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+	}
+
+	// C L E A R  - Start the timer, waiting for a long press to clear all.
+	if X == 0 && Y == -1 && !gui {
+		// Start a timer for this button.
+		here := time.Now()
+		this.ButtonTimer = &here
+		return
+	}
+
+	// C L E A R  - We have a long press.
+	if X == 100 && Y == -1 && !gui {
+
+		// Remove the off button offset.
+		X = X - 100
+		// Stop the timer for this preset.
+		elapsed := time.Since(*this.ButtonTimer)
+		// If the timer is longer than 1 seconds then we have a long press.
+		if elapsed > 2*time.Second {
+			clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		} else {
+
+			// S E L E C T   P O S I T I O N
+			// UP ARROW
+			if sequences[this.SelectedSequence].Type == "scanner" {
+
+				if debug {
+					fmt.Printf("UP ARROW\n")
+				}
+
+				buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+
+				this.OffsetPan = this.OffsetPan + 5
+
+				if this.OffsetPan > 255 {
+					this.OffsetPan = 255
+				}
+				// Clear the sequence colors for this sequence.
+				cmd := common.Command{
+					Action: common.UpdateOffsetPan,
+					Args: []common.Arg{
+						{Name: "OffsetPan", Value: this.OffsetPan},
+					},
+				}
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			}
+		}
+	}
+
 	// Swollow the button off events if not used for flash above.
 	if X >= 100 {
 		if debug {
 			fmt.Printf("Swollow Event\n")
 		}
-		return
-	}
-
-	// C L E A R  - Clear all the lights on the common.
-	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
-		clearAll(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
 
@@ -905,31 +951,6 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-	}
-
-	// S E L E C T   P O S I T I O N
-	// UP ARROW
-	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
-
-		if debug {
-			fmt.Printf("UP ARROW\n")
-		}
-
-		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
-
-		this.OffsetPan = this.OffsetPan + 5
-
-		if this.OffsetPan > 255 {
-			this.OffsetPan = 255
-		}
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.UpdateOffsetPan,
-			Args: []common.Arg{
-				{Name: "OffsetPan", Value: this.OffsetPan},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 	}
 
 	// DOWN ARROW
@@ -2016,14 +2037,18 @@ func buttonTouched(alight common.ALight, eventsForLaunchpad chan common.ALight, 
 	common.LightLamp(common.ALight{X: alight.X, Y: alight.Y, Brightness: 255, Red: alight.OffColor.R, Green: alight.OffColor.G, Blue: alight.OffColor.B}, eventsForLaunchpad, guiButtons)
 }
 
-func clearAll(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	if debug {
 		fmt.Printf("CLEAR LAUNCHPAD\n")
 	}
 
-	buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
+	if sequences[this.SelectedSequence].Type == "scanner" {
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+	} else {
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
+	}
 
 	// Get the pad back into sane mode.
 	this.Pad.Reset()
@@ -2067,7 +2092,6 @@ func clearAll(X int, Y int, this *CurrentState, sequences []*common.Sequence, dm
 		return
 	}
 
-	presets.ClearAll(this.Pad, this.PresetsStore, eventsForLaunchpad, guiButtons, commandChannels)
 	AllFixturesOff(eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
 	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
@@ -2216,6 +2240,4 @@ func clearAll(X int, Y int, this *CurrentState, sequences []*common.Sequence, dm
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 	}
-
-	this.SelectedSequence = 0
 }

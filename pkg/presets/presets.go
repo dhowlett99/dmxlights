@@ -7,7 +7,6 @@ import (
 	"log"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 type Preset struct {
@@ -64,24 +63,4 @@ func LoadPresets() map[string]Preset {
 	}
 
 	return presets
-}
-
-func ClearAll(pad *mk3.Launchpad, presets map[string]Preset, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, sequences []chan common.Command) {
-	command := common.Command{
-		Action: common.Stop,
-	}
-
-	for _, sequence := range sequences {
-		sequence <- command
-	}
-
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
-			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
-				label := presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label
-				presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = Preset{State: true, Selected: false, Label: label}
-				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
-			}
-		}
-	}
 }

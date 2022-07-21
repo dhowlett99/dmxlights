@@ -721,7 +721,7 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 
 	// Storage for the scanner labels on the Top row.
 	var guiTopScannerButtons [8]topButton
-	guiTopScannerButtons[0] = topButton{Label: " ^ ", Color: White}
+	guiTopScannerButtons[0] = topButton{Label: "CLEAR. ^ ", Color: White}
 	guiTopScannerButtons[1] = topButton{Label: " V", Color: White}
 	guiTopScannerButtons[2] = topButton{Label: " < ", Color: White}
 	guiTopScannerButtons[3] = topButton{Label: " > ", Color: White}
