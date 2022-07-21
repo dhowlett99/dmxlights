@@ -70,16 +70,9 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 
 	buttonChannel := this.Pad.Listen()
 
-	start := 0
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 		hit := <-buttonChannel
-
-		// My launchpad seems to generate a couple spurious events when it starts up.
-		if start < 2 {
-			start++ // swollow first two events.
-			continue
-		}
 		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
 	}
 }
@@ -218,206 +211,7 @@ func ProcessButtons(X int, Y int,
 
 	// C L E A R  - Clear all the lights on the common.
 	if X == 0 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
-
-		if debug {
-			fmt.Printf("CLEAR LAUNCHPAD\n")
-		}
-
-		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
-
-		// Get the pad back into sane mode.
-		this.Pad.Reset()
-
-		// Turn off the flashing save button.
-		this.SavePreset = false
-		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-
-		// Turn off the this.Flood
-		if this.Flood {
-			cmd := common.Command{
-				Action: common.StopFlood,
-				Args: []common.Arg{
-					{Name: "Stop Flood", Value: false},
-				},
-			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
-			this.Flood = false
-
-			// Turn the flood button back to white.
-			common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-
-		}
-
-		// We want to clear a color selection for a selected sequence.
-		if sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
-			sequences[this.SelectedSequence].Type != "scanner" {
-
-			// Clear the sequence colors for this sequence.
-			cmd := common.Command{
-				Action: common.ClearSequenceColor,
-			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-			// Get an upto date copy of the sequence.
-			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-			// Flash the correct color buttons
-			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-
-			return
-		}
-
-		presets.ClearAll(this.Pad, this.PresetsStore, eventsForLaunchpad, guiButtons, commandChannels)
-		AllFixturesOff(eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
-		presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-
-		// Make sure we stop all sequences.
-		cmd := common.Command{
-			Action: common.Stop,
-		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
-
-		// Swicth off any static colors.
-		cmd = common.Command{
-			Action: common.UpdateStatic,
-			Args: []common.Arg{
-				{Name: "Static", Value: false},
-			},
-		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
-
-		// Refesh the switch positions.
-		cmd = common.Command{
-			Action: common.UpdateSwitchPositions,
-		}
-		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
-
-		// Clear the sequence colors.
-		cmd = common.Command{
-			Action: common.ClearSequenceColor,
-		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
-
-		// Clear out soundtriggers
-		for _, trigger := range this.SoundTriggers {
-			trigger.State = false
-		}
-
-		for sequenceNumber, sequence := range sequences {
-
-			// Clear all the function buttons.
-			if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
-				sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
-				sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
-				sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
-				sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
-				sequences[sequenceNumber].Functions[common.Function5_Color].State = false
-				sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
-				sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
-				sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
-
-				// Turn off function mode. Remove the function pads.
-				common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
-				// And reveal the sequence on the launchpad keys
-				common.RevealSequence(sequenceNumber, commandChannels)
-				// Turn off the function mode flag.
-				this.FunctionSelectMode[sequenceNumber] = false
-				// Now forget we pressed twice and start again.
-				this.SelectButtonPressed[sequenceNumber] = false
-
-				// Send update functions command. This sets the temporary representation of
-				// the function keys in the real sequence.
-				cmd := common.Command{
-					Action: common.UpdateFunctions,
-					Args: []common.Arg{
-						{Name: "Functions", Value: sequences[sequenceNumber].Functions},
-					},
-				}
-				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-			}
-
-			// Reset the Scanner Size back to default.
-			this.ScannerSize = common.DefaultScannerSize // Set local copy.
-			// Set copy in sequences.
-			if sequence.Type == "scanner" {
-				cmd = common.Command{
-					Action: common.UpdateScannerSize,
-					Args: []common.Arg{
-						{Name: "ScannerSize", Value: common.DefaultScannerSize},
-					},
-				}
-				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			}
-
-			// Reset the fade speed back to the default
-			if sequence.Type == "rgb" {
-				this.FadeSpeed = 12
-				cmd = common.Command{
-					Action: common.SetFadeSpeed,
-					Args: []common.Arg{
-						{Name: "FadeSpeed", Value: this.FadeSpeed},
-					},
-				}
-				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			}
-
-			// Reset the speed back to the default.
-			this.SequenceSpeed = 14
-			cmd = common.Command{
-				Action: common.UpdateSpeed,
-				Args: []common.Arg{
-					{Name: "Speed", Value: this.SequenceSpeed},
-				},
-			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-			if sequence.Type == "scanner" {
-				// Reset the number of coordinates.
-				this.SelectedCordinates = 0
-				cmd = common.Command{
-					Action: common.UpdateNumberCoordinates,
-					Args: []common.Arg{
-						{Name: "Speed", Value: this.SelectedCordinates},
-					},
-				}
-				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			}
-
-			// Clear down all the switch positions to their fisrt positions.
-			if sequence.Type == "switch" {
-
-				// Loop through all the switchies.
-				for X := 0; X < len(sequences[sequenceNumber].Switches); X++ {
-					// Send a message to the sequence for it to toggle the selected switch.
-					this.SwitchPositions[sequenceNumber][X] = 0
-					// Y is the sequence.
-					// X is the switch.
-					cmd := common.Command{
-						Action: common.UpdateSwitch,
-						Args: []common.Arg{
-							{Name: "SwitchNumber", Value: X},
-							{Name: "SwitchPosition", Value: 0},
-						},
-					}
-					// Send a message to the switch sequence.
-					common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-				}
-			}
-
-			// Enable all fixtures.
-			if sequence.Type == "scanner" {
-				// Tell the sequence to turn on this scanner.
-				cmd := common.Command{
-					Action: common.EnableAllScanners,
-					Args: []common.Arg{
-						{Name: "SequenceNumber", Value: sequence},
-					},
-				}
-				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-			}
-		}
-
-		this.SelectedSequence = 0
+		clearAll(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
 
@@ -2220,4 +2014,208 @@ func buttonTouched(alight common.ALight, eventsForLaunchpad chan common.ALight, 
 	common.LightLamp(common.ALight{X: alight.X, Y: alight.Y, Brightness: 255, Red: alight.OnColor.R, Green: alight.OnColor.G, Blue: alight.OnColor.B}, eventsForLaunchpad, guiButtons)
 	time.Sleep(200 * time.Millisecond)
 	common.LightLamp(common.ALight{X: alight.X, Y: alight.Y, Brightness: 255, Red: alight.OffColor.R, Green: alight.OffColor.G, Blue: alight.OffColor.B}, eventsForLaunchpad, guiButtons)
+}
+
+func clearAll(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
+
+	if debug {
+		fmt.Printf("CLEAR LAUNCHPAD\n")
+	}
+
+	buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
+
+	// Get the pad back into sane mode.
+	this.Pad.Reset()
+
+	// Turn off the flashing save button.
+	this.SavePreset = false
+	common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
+	// Turn off the this.Flood
+	if this.Flood {
+		cmd := common.Command{
+			Action: common.StopFlood,
+			Args: []common.Arg{
+				{Name: "Stop Flood", Value: false},
+			},
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+		this.Flood = false
+
+		// Turn the flood button back to white.
+		common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
+	}
+
+	// We want to clear a color selection for a selected sequence.
+	if sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
+		sequences[this.SelectedSequence].Type != "scanner" {
+
+		// Clear the sequence colors for this sequence.
+		cmd := common.Command{
+			Action: common.ClearSequenceColor,
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Get an upto date copy of the sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+		// Flash the correct color buttons
+		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+		return
+	}
+
+	presets.ClearAll(this.Pad, this.PresetsStore, eventsForLaunchpad, guiButtons, commandChannels)
+	AllFixturesOff(eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+
+	// Make sure we stop all sequences.
+	cmd := common.Command{
+		Action: common.Stop,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	// Swicth off any static colors.
+	cmd = common.Command{
+		Action: common.UpdateStatic,
+		Args: []common.Arg{
+			{Name: "Static", Value: false},
+		},
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	// Refesh the switch positions.
+	cmd = common.Command{
+		Action: common.UpdateSwitchPositions,
+	}
+	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
+	// Clear the sequence colors.
+	cmd = common.Command{
+		Action: common.ClearSequenceColor,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	// Clear out soundtriggers
+	for _, trigger := range this.SoundTriggers {
+		trigger.State = false
+	}
+
+	for sequenceNumber, sequence := range sequences {
+
+		// Clear all the function buttons.
+		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
+			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
+			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
+			sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
+			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
+
+			// Turn off function mode. Remove the function pads.
+			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+			// And reveal the sequence on the launchpad keys
+			common.RevealSequence(sequenceNumber, commandChannels)
+			// Turn off the function mode flag.
+			this.FunctionSelectMode[sequenceNumber] = false
+			// Now forget we pressed twice and start again.
+			this.SelectButtonPressed[sequenceNumber] = false
+
+			// Send update functions command. This sets the temporary representation of
+			// the function keys in the real sequence.
+			cmd := common.Command{
+				Action: common.UpdateFunctions,
+				Args: []common.Arg{
+					{Name: "Functions", Value: sequences[sequenceNumber].Functions},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+
+		// Reset the Scanner Size back to default.
+		this.ScannerSize = common.DefaultScannerSize // Set local copy.
+		// Set copy in sequences.
+		if sequence.Type == "scanner" {
+			cmd = common.Command{
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: common.DefaultScannerSize},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Reset the fade speed back to the default
+		if sequence.Type == "rgb" {
+			this.FadeSpeed = 12
+			cmd = common.Command{
+				Action: common.SetFadeSpeed,
+				Args: []common.Arg{
+					{Name: "FadeSpeed", Value: this.FadeSpeed},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Reset the speed back to the default.
+		this.SequenceSpeed = 14
+		cmd = common.Command{
+			Action: common.UpdateSpeed,
+			Args: []common.Arg{
+				{Name: "Speed", Value: this.SequenceSpeed},
+			},
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		if sequence.Type == "scanner" {
+			// Reset the number of coordinates.
+			this.SelectedCordinates = 0
+			cmd = common.Command{
+				Action: common.UpdateNumberCoordinates,
+				Args: []common.Arg{
+					{Name: "Speed", Value: this.SelectedCordinates},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Clear down all the switch positions to their fisrt positions.
+		if sequence.Type == "switch" {
+
+			// Loop through all the switchies.
+			for X := 0; X < len(sequences[sequenceNumber].Switches); X++ {
+				// Send a message to the sequence for it to toggle the selected switch.
+				this.SwitchPositions[sequenceNumber][X] = 0
+				// Y is the sequence.
+				// X is the switch.
+				cmd := common.Command{
+					Action: common.UpdateSwitch,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: X},
+						{Name: "SwitchPosition", Value: 0},
+					},
+				}
+				// Send a message to the switch sequence.
+				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+			}
+		}
+
+		// Enable all fixtures.
+		if sequence.Type == "scanner" {
+			// Tell the sequence to turn on this scanner.
+			cmd := common.Command{
+				Action: common.EnableAllScanners,
+				Args: []common.Arg{
+					{Name: "SequenceNumber", Value: sequence},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+	}
+
+	this.SelectedSequence = 0
 }
