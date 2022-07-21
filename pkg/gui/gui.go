@@ -230,7 +230,11 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			if this.SavePreset {
 				if !skipPopup {
 					items := []*widget.FormItem{}
+					// Keep existing text.
 					name := widget.NewEntry()
+					if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].Label != "" {
+						name.SetText(this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].Label)
+					}
 					item := widget.NewFormItem("Name", name)
 					items = append(items, item)
 					popup := dialog.NewForm("Enter Preset", "Ok", "Cancel", items, func(bool) {
