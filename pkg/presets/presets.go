@@ -78,7 +78,8 @@ func ClearAll(pad *mk3.Launchpad, presets map[string]Preset, eventsForLauchpad c
 	for x := 0; x < 8; x++ {
 		for y := 0; y < 8; y++ {
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
-				presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = Preset{State: true, Selected: false}
+				label := presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label
+				presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = Preset{State: true, Selected: false, Label: label}
 				common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 		}

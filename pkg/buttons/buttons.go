@@ -579,8 +579,17 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			presets.SavePresets(this.PresetsStore)
+
+			// clear any selected preset.
+			for location, preset := range this.PresetsStore {
+				if preset.State && preset.Selected {
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label}
+				}
+			}
+
+			// Select this location and flash its button.
+			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label}
 			presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-			common.FlashLight(X, Y, common.Red, common.PresetYellow, eventsForLaunchpad, guiButtons)
 
 			if gui {
 				this.SavePreset = false
