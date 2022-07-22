@@ -2190,7 +2190,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			ShowScannerStatus(*sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons)
 
 			// Reset the number of coordinates.
-
 			this.SelectedCordinates = 0
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -2206,6 +2205,16 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
 					{Name: "ScannerSize", Value: common.DefaultScannerSize},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Reset the scanner patten back to default.
+			this.SelectedPatten = common.DefaultScannerPatten
+			cmd = common.Command{
+				Action: common.UpdateScannerPatten,
+				Args: []common.Arg{
+					{Name: "ScannerPatten", Value: common.DefaultScannerPatten},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)

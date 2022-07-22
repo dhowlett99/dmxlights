@@ -101,7 +101,7 @@ const (
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
-	UpdatePatten
+	UpdateScannerPatten
 	SelectPatten
 	SetFadeSpeed
 	UpdateSize
@@ -140,6 +140,7 @@ const (
 )
 
 const DefaultScannerSize = 120
+const DefaultScannerPatten = 0
 
 var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}

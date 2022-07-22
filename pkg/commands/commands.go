@@ -65,13 +65,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
-	case common.UpdatePatten:
+	case common.UpdateScannerPatten:
 		const PATTEN_NAME = 0
 		if debug {
 			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
-		sequence.Patten.Name = command.Args[PATTEN_NAME].Value.(string)
-
+		sequence.SelectedRGBPatten = command.Args[PATTEN_NAME].Value.(int)
+		sequence.ScannerPatten = command.Args[PATTEN_NAME].Value.(int)
 		return sequence
 
 	case common.SelectPatten:
