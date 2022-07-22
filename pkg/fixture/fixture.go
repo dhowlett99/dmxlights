@@ -223,13 +223,16 @@ func FixtureReceiver(sequence common.Sequence,
 										green := availableColors[selectedColor].Color.G
 										blue := availableColors[selectedColor].Color.B
 										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: red, Green: green, Blue: blue, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
+										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 									} else {
 										// No color selected or available, use white.
 										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
+										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 									}
 								} else {
 									// We're not in chase mode so use the color generated in the patten generator.common.
 									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: position.Color.R, Green: position.Color.G, Blue: position.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 								}
 							}
 						}
