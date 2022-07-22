@@ -602,7 +602,7 @@ func sendStopToAllFixtures(sequence common.Sequence, fixtureStopChannels []chan 
 // The color of the lamp indicates which state you are in.
 // ShowSwitches relies on you giving the sequence number of the switch sequnence.
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) (flood bool) {
+	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) {
 
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
@@ -623,8 +623,6 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			}
 		}
 	}
-
-	return flood
 }
 
 // calculatePositions takes the steps defined in the patten and
