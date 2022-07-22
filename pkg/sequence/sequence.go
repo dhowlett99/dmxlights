@@ -644,9 +644,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 				// Preserve the scanner commands.
 				position.Gobo = fixture.Gobo
 				position.Pan = fixture.Pan
-				position.PanMaxDegrees = &fixture.PanMaxDegrees
 				position.Tilt = fixture.Tilt
-				position.TiltMaxDegrees = &fixture.TiltMaxDegrees
 				position.Shutter = fixture.Shutter
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					position.StartPosition = counter
@@ -679,9 +677,7 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 					// Preserve the scanner commands.
 					position.Gobo = fixture.Gobo
 					position.Pan = fixture.Pan
-					position.PanMaxDegrees = &fixture.PanMaxDegrees
 					position.Tilt = fixture.Tilt
-					position.TiltMaxDegrees = &fixture.TiltMaxDegrees
 					position.Shutter = fixture.Shutter
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						position.StartPosition = counter

@@ -319,17 +319,15 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	Name           string
-	Label          string
-	Type           string
-	MasterDimmer   int
-	Colors         []Color
-	Pan            int
-	PanMaxDegrees  int
-	Tilt           int
-	TiltMaxDegrees int
-	Shutter        int
-	Gobo           int
+	Name         string
+	Label        string
+	Type         string
+	MasterDimmer int
+	Colors       []Color
+	Pan          int
+	Tilt         int
+	Shutter      int
+	Gobo         int
 }
 
 type ButtonPresets struct {
