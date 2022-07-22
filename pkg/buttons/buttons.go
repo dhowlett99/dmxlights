@@ -47,7 +47,7 @@ type CurrentState struct {
 	DisabledFixture          [][]bool                   // Which fixture is disabled on which sequence.
 	SelectedFixture          int                        // Which fixture is selected when changing scanner color or gobo.
 	FollowingAction          string                     // String to find next function, used in selecting a fixture.
-	SelectedCordinates       int                        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=26,2=24,3=32
+	SelectedCordinates       int                        // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=26,2=24,3=32
 	OffsetPan                int                        // Offset for Pan.
 	OffsetTilt               int                        // Offset for Tilt.
 	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
