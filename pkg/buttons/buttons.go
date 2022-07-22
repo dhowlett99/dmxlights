@@ -222,7 +222,7 @@ func ProcessButtons(X int, Y int,
 		// Stop the timer for this preset.
 		elapsed := time.Since(*this.ButtonTimer)
 		// If the timer is longer than 1 seconds then we have a long press.
-		if elapsed > 2*time.Second {
+		if elapsed > 1*time.Second {
 			clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		} else {
 
@@ -920,8 +920,8 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Turn off the lamp.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			// Show the status.
+			ShowScannerStatus(*sequences[Y], this, eventsForLaunchpad, guiButtons)
 
 			return
 
@@ -945,8 +945,8 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Turn the lamp on.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			// Show the status.
+			ShowScannerStatus(*sequences[Y], this, eventsForLaunchpad, guiButtons)
 
 			return
 		}
@@ -1708,6 +1708,34 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		}
 	}
 }
+func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+	for x := 0; x < 8; x++ {
+		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
+			if sequences[sequenceNumber].Type == "rgb" {
+				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
+				common.LabelButton(x, sequenceNumber, "", guiButtons)
+			}
+		}
+	}
+}
+
+// Show Scanner status - Dim White is disabled, White is enabled.
+func ShowScannerStatus(sequence common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("Show Scanner Status for sequence %d number of scanners %d\n", sequence.Number, sequence.ScannersTotal)
+	}
+	for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
+		if !this.DisabledFixture[scannerNumber][sequence.Number] {
+			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: full, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LabelButton(scannerNumber, sequence.Number, "On", guiButtons)
+		} else {
+			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: full, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
+			common.LabelButton(scannerNumber, sequence.Number, "Off", guiButtons)
+		}
+	}
+}
 
 // For the given sequence show the available sequence colors on the relevant buttons.
 func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
@@ -2092,6 +2120,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	}
 
+	AllRGBFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
 	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Make sure we stop all sequences.
@@ -2122,48 +2151,15 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-		// Clear all the function buttons.
-		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
-			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
-			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
-			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
-			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
-			sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
-			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
-
-			// Turn off function mode. Remove the function pads.
-			//common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
-			// And reveal the sequence on the launchpad keys
-			// common.RevealSequence(sequenceNumber, commandChannels)
-			// Turn off the function mode flag.
-			this.FunctionSelectMode[sequenceNumber] = false
-			// Now forget we pressed twice and start again.
-			this.SelectButtonPressed[sequenceNumber] = false
-
-			// Send update functions command. This sets the temporary representation of
-			// the function keys in the real sequence.
-			cmd := common.Command{
-				Action: common.UpdateFunctions,
-				Args: []common.Arg{
-					{Name: "Functions", Value: sequences[sequenceNumber].Functions},
-				},
-			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		// Reset the speed back to the default.
+		this.SequenceSpeed = 14
+		cmd = common.Command{
+			Action: common.UpdateSpeed,
+			Args: []common.Arg{
+				{Name: "Speed", Value: this.SequenceSpeed},
+			},
 		}
-
-		// Reset the Scanner Size back to default.
-		if sequence.Type == "scanner" {
-			this.ScannerSize = common.DefaultScannerSize
-			cmd = common.Command{
-				Action: common.UpdateScannerSize,
-				Args: []common.Arg{
-					{Name: "ScannerSize", Value: common.DefaultScannerSize},
-				},
-			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Reset the fade speed back to the default
 		if sequence.Type == "rgb" {
@@ -2177,18 +2173,24 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
-		// Reset the speed back to the default.
-		this.SequenceSpeed = 14
-		cmd = common.Command{
-			Action: common.UpdateSpeed,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.SequenceSpeed},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// Reset the number of coordinates.
+		// Tell the sequence to turn on all the scanners.
 		if sequence.Type == "scanner" {
+			// Enable all scanners.
+			for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
+				this.DisabledFixture[scannerNumber][sequence.Number] = false
+			}
+			cmd := common.Command{
+				Action: common.EnableAllScanners,
+				Args: []common.Arg{
+					{Name: "SequenceNumber", Value: sequence},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+			ShowScannerStatus(*sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons)
+
+			// Reset the number of coordinates.
+
 			this.SelectedCordinates = 0
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -2197,6 +2199,38 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Reset the Scanner Size back to default.
+			this.ScannerSize = common.DefaultScannerSize
+			cmd = common.Command{
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: common.DefaultScannerSize},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Clear all the function buttons.
+		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
+			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
+			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
+			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
+			sequences[sequenceNumber].Functions[common.Function7_Invert_Chase].State = false
+			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
+
+			// Send update functions command. This sets the temporary representation of
+			// the function keys in the real sequence.
+			cmd := common.Command{
+				Action: common.UpdateFunctions,
+				Args: []common.Arg{
+					{Name: "Functions", Value: sequences[sequenceNumber].Functions},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
 		// Clear switch positions to their first positions.
@@ -2209,15 +2243,15 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		// Tell the sequence to turn on all the scanners.
-		if sequence.Type == "scanner" {
-			cmd := common.Command{
-				Action: common.EnableAllScanners,
-				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: sequence},
-				},
-			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-		}
+		// Clear all modes.
+		this.EditFixtureSelectionMode = false
+		this.FunctionSelectMode[sequenceNumber] = false
+		this.SelectButtonPressed[sequenceNumber] = false
+		this.EditGoboSelectionMode[sequenceNumber] = false
+		this.EditPattenMode[sequenceNumber] = false
+		this.EditScannerColorsMode[sequenceNumber] = false
+		this.EditSequenceColorsMode[sequenceNumber] = false
+		this.EditStaticColorsMode[sequenceNumber] = false
+
 	}
 }
