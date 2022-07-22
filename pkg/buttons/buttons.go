@@ -196,7 +196,7 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// Short press means load the config.
-			loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
 		}
 		return
 	}
@@ -443,7 +443,7 @@ func ProcessButtons(X int, Y int,
 					if this.SavePreset {
 						this.SavePreset = false
 					}
-					loadConfig(this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
@@ -1699,9 +1699,9 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 }
 
-func AllFixturesOff(eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
 	for x := 0; x < 8; x++ {
-		for y := 0; y < 4; y++ {
+		for y := 0; y < len(sequences); y++ {
 			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
 			common.LabelButton(x, y, "", guiButtons)
@@ -1899,14 +1899,14 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 }
 
-func loadConfig(this *CurrentState, X int, Y int, Red common.Color, PresetYellow common.Color, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, Red common.Color, PresetYellow common.Color, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
 		Action: common.Stop,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	AllFixturesOff(eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
 
 	// Load the config.
 	config.AskToLoadConfig(commandChannels, X, Y)
@@ -2044,6 +2044,25 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		fmt.Printf("CLEAR LAUNCHPAD\n")
 	}
 
+	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
+	if sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
+		sequences[this.SelectedSequence].Type != "scanner" {
+
+		// Clear the sequence colors for this sequence.
+		cmd := common.Command{
+			Action: common.ClearSequenceColor,
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Get an upto date copy of the sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+		// Flash the correct color buttons
+		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+		return
+	}
+
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 	} else {
@@ -2073,26 +2092,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	}
 
-	// We want to clear a color selection for a selected sequence.
-	if sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
-		sequences[this.SelectedSequence].Type != "scanner" {
-
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.ClearSequenceColor,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		// Flash the correct color buttons
-		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-
-		return
-	}
-
-	AllFixturesOff(eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
 	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Make sure we stop all sequences.
@@ -2110,24 +2109,18 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	// Refesh the switch positions.
-	cmd = common.Command{
-		Action: common.UpdateSwitchPositions,
-	}
-	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
-
-	// Clear the sequence colors.
-	cmd = common.Command{
-		Action: common.ClearSequenceColor,
-	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
-
 	// Clear out soundtriggers
 	for _, trigger := range this.SoundTriggers {
 		trigger.State = false
 	}
 
 	for sequenceNumber, sequence := range sequences {
+
+		// Clear the sequence colors.
+		cmd = common.Command{
+			Action: common.ClearSequenceColor,
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 		// Clear all the function buttons.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
@@ -2141,9 +2134,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
 
 			// Turn off function mode. Remove the function pads.
-			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+			//common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 			// And reveal the sequence on the launchpad keys
-			common.RevealSequence(sequenceNumber, commandChannels)
+			// common.RevealSequence(sequenceNumber, commandChannels)
 			// Turn off the function mode flag.
 			this.FunctionSelectMode[sequenceNumber] = false
 			// Now forget we pressed twice and start again.
@@ -2161,9 +2154,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// Reset the Scanner Size back to default.
-		this.ScannerSize = common.DefaultScannerSize // Set local copy.
-		// Set copy in sequences.
 		if sequence.Type == "scanner" {
+			this.ScannerSize = common.DefaultScannerSize
 			cmd = common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
@@ -2195,8 +2187,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// Reset the number of coordinates.
 		if sequence.Type == "scanner" {
-			// Reset the number of coordinates.
 			this.SelectedCordinates = 0
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -2207,30 +2199,18 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
-		// Clear down all the switch positions to their fisrt positions.
+		// Clear switch positions to their first positions.
 		if sequence.Type == "switch" {
-
-			// Loop through all the switchies.
-			for X := 0; X < len(sequences[sequenceNumber].Switches); X++ {
-				// Send a message to the sequence for it to toggle the selected switch.
-				this.SwitchPositions[sequenceNumber][X] = 0
-				// Y is the sequence.
-				// X is the switch.
-				cmd := common.Command{
-					Action: common.UpdateSwitch,
-					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: X},
-						{Name: "SwitchPosition", Value: 0},
-					},
-				}
-				// Send a message to the switch sequence.
-				common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+			this.SwitchPositions = [9][9]int{}
+			cmd := common.Command{
+				Action: common.ClearAllSwitchPositions,
 			}
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		// Enable all fixtures.
+		// Tell the sequence to turn on all the scanners.
 		if sequence.Type == "scanner" {
-			// Tell the sequence to turn on this scanner.
 			cmd := common.Command{
 				Action: common.EnableAllScanners,
 				Args: []common.Arg{

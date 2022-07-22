@@ -315,6 +315,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.FunctionMode = command.Args[FUNCTION_MODE].Value.(bool)
 		return sequence
 
+	// Clear switch positions for this sequence
+	case common.ClearAllSwitchPositions:
+		// Loop through all the switchies.
+		for X := 0; X < len(sequence.Switches); X++ {
+			sequence.Switches[X].CurrentState = 0
+		}
+		sequence.PlaySwitchOnce = true
+		return sequence
+
 	// Update the named switch position for the current sequence.
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer

@@ -115,6 +115,7 @@ const (
 	FunctionMode
 	UpdateFunctions
 	GetUpdatedSequence
+	ClearAllSwitchPositions
 	UpdateSwitch
 	UpdateSwitchPositions
 	Inverted

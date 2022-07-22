@@ -68,8 +68,8 @@ func CreateSequence(
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels) common.Sequence {
 
-	//var initialPatten string
-	var scanners int // Number of scanners in this sequence
+	// Number of scanners in this sequence
+	var scanners int
 
 	// Populate the static colors for this sequence with the defaults.
 	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)

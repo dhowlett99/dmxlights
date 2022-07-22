@@ -231,7 +231,7 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad.
-	buttons.AllFixturesOff(eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	buttons.AllFixturesOff(sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 
 	// Listen to launchpad buttons.
 	go func(guiButtons chan common.ALight,
