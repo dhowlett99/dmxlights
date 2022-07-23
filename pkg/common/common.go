@@ -174,6 +174,9 @@ type Sequence struct {
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
 	MusicTrigger               bool                        // Is this sequence in music trigger mode.
+	Ring                       bool                        // A ring is when a music triggers a ring of events for a scannner.
+	Beat                       bool                        // Used by a ring to indicate the start of a ring.
+	RingCounter                int                         // Used to keep track of the number of events in this ring, usually a multiple of the number of steps in the sequence.
 	Blackout                   bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors              []Color                     // Storage for the colors in a sequence.
 	SequenceColors             []Color                     // Temporay storage for changing sequence colors.

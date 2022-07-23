@@ -23,19 +23,55 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	command := common.Command{}
 
 	// Wait for a trigger: sound, command or timeout.
-	select {
-	case command = <-soundTriggerChannel:
-		if sequence.MusicTrigger {
-			// if debug {
-			// 	fmt.Printf("%d: BEAT\n", mySequenceNumber)
-			// }
+	if !sequence.Ring {
+		select {
+		case command = <-soundTriggerChannel:
+			if sequence.MusicTrigger {
+				if debug {
+					fmt.Printf("%d: BEAT\n", mySequenceNumber)
+				}
+				sequence.Beat = true
+				if sequence.Type == "scanner" {
+					sequence.Ring = true
+				}
+				break
+			}
+		case command = <-commandChannel:
+			break
+
+		case <-time.After(speed):
 			break
 		}
-	case command = <-commandChannel:
-		break
+	}
 
-	case <-time.After(speed):
-		break
+	// A ring is when a music triggers a ring of events for a scannner.
+	// This way a beat of the music makes the scanner run through a quarter of the
+	// available coordinates instead of just one step. This makes the movement much
+	// more vibrant.
+	if sequence.Type == "scanner" && sequence.Ring {
+
+		// We still need to receive commands.
+		select {
+		case command = <-commandChannel:
+			break
+
+		case <-time.After(1 * time.Millisecond):
+			break
+		}
+
+		if sequence.Beat {
+			if sequence.RingCounter > len(sequence.Steps)/4 {
+				// We're at the end of a rotation.
+				sequence.RingCounter = 0
+				sequence.Beat = false
+				sequence.Ring = false
+
+			} else {
+				sequence.RingCounter++
+				// We're in a ring of scanner movements, have a short delay in the steps.
+				time.Sleep(5 * time.Millisecond)
+			}
+		}
 	}
 
 	switch command.Action {

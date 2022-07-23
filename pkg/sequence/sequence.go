@@ -68,9 +68,6 @@ func CreateSequence(
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels) common.Sequence {
 
-	// Number of scanners in this sequence
-	var scanners int
-
 	// Populate the static colors for this sequence with the defaults.
 	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
 
@@ -93,15 +90,19 @@ func CreateSequence(
 	// Every scanner has a number of gobos in its wheel.
 	availableScannerGobos := make(map[int][]common.StaticColorButton)
 
-	if sequenceType == "scanner" {
-		//initialPatten = "circle"
+	// A map of the fixture colors.
+	scannerColors := make(map[int]int)
 
-		// Initilaise Gobo's
-		// Every scanner has a number of gobos in its wheel.
+	// Number of scanners in this sequence
+	var scanners int
+
+	if sequenceType == "scanner" {
+
+		// Initilise Gobos
 		scanners, availableScannerGobos = getAvailableScannerGobos(mySequenceNumber, fixturesConfig)
 
-		// Get available scanner colors for all fixtures.
-		availableScannerColors = getAvailableScannerColors(fixturesConfig)
+		// Initialise Colors.
+		availableScannerColors, scannerColors = getAvailableScannerColors(fixturesConfig)
 
 	}
 
@@ -109,9 +110,6 @@ func CreateSequence(
 	// We can disable a fixture by setting fixtureDisabled to true.
 	fixtureDisabled := make(map[int]bool, 8)
 	disabledOnce := make(map[int]bool, 8)
-
-	// A map of the fixture colors.
-	scannerColors := make(map[int]int)
 
 	// The actual sequence definition.
 	sequence := common.Sequence{
@@ -434,7 +432,8 @@ func PlaySequence(sequence common.Sequence,
 							sequence.ScannerGobo = 0
 						}
 
-						scannerColorSelectedForThisFixtureLastTime := 0
+						scannerLastColor := 0
+
 						// AvailableFixtures give the real number of configured scanners.
 						for _, fixture := range sequence.ScannersAvailable {
 							// First check that this fixture has some configured colors.
@@ -443,12 +442,12 @@ func PlaySequence(sequence common.Sequence,
 								// Found a scanner with some colors.
 								totalColorForThisFixture := len(colors)
 
-								sequence.ScannerColor[fixture.Number] = sequence.ScannerColor[fixture.Number] + 1
-								if sequence.ScannerColor[fixture.Number] > scannerColorSelectedForThisFixtureLastTime {
-									if sequence.ScannerColor[fixture.Number] > totalColorForThisFixture {
-										sequence.ScannerColor[fixture.Number] = 1
+								sequence.ScannerColor[fixture.Number-1]++
+								if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
+									if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
+										sequence.ScannerColor[fixture.Number-1] = 0
 									}
-									scannerColorSelectedForThisFixtureLastTime = scannerColorSelectedForThisFixtureLastTime + 1
+									scannerLastColor++
 									continue
 								}
 							}
@@ -539,6 +538,14 @@ func PlaySequence(sequence common.Sequence,
 						break
 					}
 
+					sequence.FixtureDisabledMutex.RLock()
+					fixtureDisabled := sequence.FixtureDisabled
+					sequence.FixtureDisabledMutex.RUnlock()
+
+					sequence.DisableOnceMutex.RLock()
+					disabledOnce := sequence.DisableOnce
+					sequence.DisableOnceMutex.RUnlock()
+
 					// Prepare a message to be sent to the fixtures in the sequence.
 					command := common.FixtureCommand{
 						SequenceNumber:         sequence.Number,
@@ -559,9 +566,9 @@ func PlaySequence(sequence common.Sequence,
 						StopFlood:              sequence.StopFlood,
 						CurrentPosition:        step,
 						SelectedGobo:           sequence.ScannerGobo,
-						FixtureDisabled:        sequence.FixtureDisabled,
+						FixtureDisabled:        fixtureDisabled,
 						FixtureDisabledMutex:   sequence.FixtureDisabledMutex,
-						DisableOnce:            sequence.DisableOnce,
+						DisableOnce:            disabledOnce,
 						DisableOnceMutex:       sequence.DisableOnceMutex,
 						ScannerChase:           sequence.ScannerChase,
 						ScannerColor:           sequence.ScannerColor,
@@ -789,7 +796,11 @@ func reverseDmx(n int) int {
 
 // getAvailableScannerColors looks through the fixtures list and finds scanners that
 // have colors defined in their config. It then returns an array of these available colors.
-func getAvailableScannerColors(fixtures *fixture.Fixtures) map[int][]common.StaticColorButton {
+// Also returns a map of the default values for each scanner that has colors.
+func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.StaticColorButton, map[int]int) {
+
+	scannerColors := make(map[int]int)
+
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 	for _, fixture := range fixtures.Fixtures {
 		for _, channel := range fixture.Channels {
@@ -799,11 +810,12 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) map[int][]common.Stat
 					newStaticColorButton.SelectedColor = setting.Number
 					newStaticColorButton.Color = common.GetRGBColorByName(setting.Name)
 					availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
+					scannerColors[fixture.Number-1] = 0
 				}
 			}
 		}
 	}
-	return availableScannerColors
+	return availableScannerColors, scannerColors
 }
 
 func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) (int, map[int][]common.StaticColorButton) {

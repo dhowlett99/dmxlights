@@ -403,9 +403,9 @@ func MapFixtures(mySequenceNumber int,
 					}
 					if strings.Contains(channel.Name, "Color") {
 						for colorNumber := range scannerColor {
-							if colorNumber == fixture.Number {
+							if colorNumber == displayFixture {
 								for _, setting := range channel.Settings {
-									if setting.Number-1 == scannerColor[fixture.Number] {
+									if setting.Number-1 == scannerColor[displayFixture] {
 										dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
 									}
 								}
