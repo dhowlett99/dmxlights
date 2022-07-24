@@ -839,7 +839,7 @@ fixtures:
   switches:
   - name: switch
     number: 1
-    label: Proj1
+    label: Oil.Wheel
     description: Projector1
     states:
     - name: Off
@@ -866,7 +866,7 @@ fixtures:
         blue: 0  
   - name: switch
     number: 2
-    label: Proj2
+    label: Flame.Wheel
     description: Projector2
     states:
     - name: Off
@@ -979,7 +979,7 @@ fixtures:
           channel: 140
           setting: 255
         - name: green
-          description: greeb
+          description: green
           channel: 141
           setting: 0
         - name: blue
@@ -1072,7 +1072,7 @@ fixtures:
           channel: 140
           setting: 0
         - name: green
-          description: greeb
+          description: green
           channel: 141
           setting: 0
         - name: blue
@@ -1087,9 +1087,9 @@ fixtures:
           description: Dimmer
           channel: 144
           setting: 255
-  - name: switch
+  - name: QPar36
     number: 5
-    label: Swtch5
+    label: QPar36
     description: Switch 5
     states:
     - name: Off
@@ -1171,7 +1171,7 @@ fixtures:
         blue: 0  
   - name: switch
     number: 7
-    label: Swtch7
+    label: Booth
     states:
     - name: Off
       label: Off
@@ -1185,6 +1185,17 @@ fixtures:
         red: 255
         green: 0
         blue: 0 
+    - name: Slow 
+      label: Slow.Fade
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 255
   - name: switch
     label: Swtch8
     number: 8
