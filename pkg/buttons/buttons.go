@@ -539,6 +539,7 @@ func ProcessButtons(X int, Y int,
 
 		// Update the status bar
 		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.SequenceSpeed), "speed", guiButtons)
+
 		return
 	}
 
@@ -710,9 +711,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Size\n")
 		}
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
-
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Send Update RGB Size.
@@ -741,6 +739,9 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+
 		return
 	}
 
@@ -750,9 +751,6 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Increase Size\n")
 		}
-
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
@@ -782,6 +780,9 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+
 		return
 	}
 
@@ -791,9 +792,6 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Decrease Fade Time\n")
 		}
-
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
 
 		if sequences[this.SelectedSequence].Type == "rgb" {
 
@@ -831,6 +829,10 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+
 		return
 	}
 
@@ -840,9 +842,6 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Increase Fade Time\n")
 		}
-
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
 
 		if sequences[this.SelectedSequence].Type == "rgb" {
 			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
@@ -878,6 +877,10 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+
 		return
 	}
 

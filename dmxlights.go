@@ -54,6 +54,7 @@ func main() {
 	this.Blackout = false                           // Blackout starts in off.
 	this.Flood = false                              // Flood starts in off.
 	this.FadeTime = common.DefaultFadeTime          // Set the default fade time
+	this.Size = common.DefaultRGBSize               // Set the defaults size for the RGB fixtures.
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
@@ -192,10 +193,10 @@ func main() {
 	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
 	panel.SpeedLabel = speedLabel
 
-	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", 0))
+	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultScannerShift))
 	panel.ShiftLabel = shiftLabel
 
-	sizeLabel := widget.NewLabel(fmt.Sprintf("Size %02d", 0))
+	sizeLabel := widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
 	panel.SizeLabel = sizeLabel
 
 	fadeLabel := widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultFadeTime))
