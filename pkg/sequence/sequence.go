@@ -124,15 +124,14 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		FadeSpeed:              12,
-		FadeTime:               75 * time.Millisecond,
+		FadeTime:               1,
 		MusicTrigger:           false,
 		Run:                    true,
 		Bounce:                 false,
-		NumberSteps:            8 * 14, // Eight lamps and 14 steps to fade up and down.
 		RGBAvailablePattens:    availableRGBPattens,
 		ScannerSize:            common.DefaultScannerSize,
-		Speed:                  14,
+		Size:                   common.DefaultRGBSize,
+		Speed:                  12,
 		CurrentSpeed:           25 * time.Millisecond,
 		ScannerShift:           0, // Start at zero ie no shift.
 		Blackout:               false,
@@ -304,8 +303,8 @@ func PlaySequence(sequence common.Sequence,
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-	for {
 
+	for {
 		sequence.UpdateShift = false
 
 		if !sequence.Run {
@@ -399,6 +398,12 @@ func PlaySequence(sequence common.Sequence,
 				for _, trigger := range soundTriggers {
 					if sequence.MusicTrigger {
 						sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+						// TODO eventually Music speed will be set by the BPM analyser.
+						// But this hasn't been written yet. We just have some framework code
+						// in pkg/sound which counts peaks and this is where we display them.
+						sequence.MusicSpeed = 25 * time.Millisecond
+						common.UpdateStatusBar(fmt.Sprintf("BPM %03d", trigger.BPM), "bpm", guiButtons)
+
 						if trigger.SequenceNumber == mySequenceNumber {
 							trigger.State = true
 						}
@@ -407,6 +412,7 @@ func PlaySequence(sequence common.Sequence,
 							trigger.State = false
 						}
 						sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
+						sequence.MusicSpeed = sequence.CurrentSpeed
 					}
 				}
 
@@ -555,10 +561,10 @@ func PlaySequence(sequence common.Sequence,
 						Tick:                   true,
 						Positions:              sequence.Positions,
 						Type:                   sequence.Type,
-						FadeSpeed:              sequence.FadeSpeed,
 						FadeTime:               sequence.FadeTime,
 						Size:                   sequence.Size,
 						Steps:                  sequence.NumberSteps,
+						MusicSpeed:             sequence.MusicSpeed,
 						CurrentSpeed:           sequence.CurrentSpeed,
 						Speed:                  sequence.Speed,
 						Blackout:               sequence.Blackout,

@@ -11,7 +11,7 @@ import (
 const debug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
+func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
 
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
@@ -23,13 +23,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 	command := common.Command{}
 
 	// Wait for a trigger: sound, command or timeout.
-	if !sequence.Ring {
+	if !sequence.Ring || sequence.Type == "rgb" {
 		select {
 		case command = <-soundTriggerChannel:
 			if sequence.MusicTrigger {
 				if debug {
 					fmt.Printf("%d: BEAT\n", mySequenceNumber)
 				}
+				// Start ringer for scanners.
 				sequence.Beat = true
 				if sequence.Type == "scanner" {
 					sequence.Ring = true
@@ -39,7 +40,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		case command = <-commandChannel:
 			break
 
-		case <-time.After(speed):
+		case <-time.After(currentSpeed):
 			break
 		}
 	}
@@ -74,8 +75,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 	}
 
-	switch command.Action {
 	// Now process any command.
+	switch command.Action {
+
 	case common.Hide:
 		if debug {
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
@@ -99,6 +101,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		}
 		sequence.Speed = command.Args[SPEED].Value.(int)
 		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
+		//sequence.MusicSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
 	case common.UpdateScannerPatten:
@@ -145,13 +148,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
-	case common.SetFadeSpeed:
+	case common.UpdateFadeSpeed:
 		const FADE_SPEED = 0
 		if debug {
 			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.FadeSpeed = command.Args[FADE_SPEED].Value.(int)
-		sequence.FadeTime = SetSpeed(command.Args[FADE_SPEED].Value.(int))
+		sequence.FadeTime = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
 	case common.UpdateColor:
@@ -503,7 +505,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, speed time.Duration, sequ
 				return sequence
 			}
 		}
-
 	}
 	return sequence
 }

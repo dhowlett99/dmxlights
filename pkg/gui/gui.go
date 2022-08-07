@@ -33,7 +33,12 @@ type Button struct {
 }
 
 type MyPanel struct {
-	Buttons [][]Button
+	Buttons    [][]Button
+	SpeedLabel *widget.Label
+	ShiftLabel *widget.Label
+	SizeLabel  *widget.Label
+	FadeLabel  *widget.Label
+	BPMLabel   *widget.Label
 }
 
 func NewPanel() MyPanel {
@@ -78,6 +83,12 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		return
 	}
 
+	// Shortcut to label a status bar item.
+	if alight.UpdateStatus {
+		panel.UpdateStatusBar(alight.Status, alight.Which)
+		return
+	}
+
 	if alight.X == -1 { // Addressing the top row.
 		fmt.Printf("error X is -1\n")
 		return
@@ -95,9 +106,8 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		return
 	}
 
+	// We're not flashing. Reset this button so it's not flashing.
 	if !alight.Flash {
-		// We're not flashing.
-		// reset this button so it's not flashing.
 
 		// If the GuiFlashButtons array has a true value for this button,
 		// Then there must be a thread flashing the lamp right now.
@@ -178,6 +188,24 @@ func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
 	panel.Buttons[X][Y].button.Refresh()
 }
 
+func (panel *MyPanel) UpdateStatusBar(label string, which string) {
+	if which == "speed" {
+		panel.SpeedLabel.SetText(label)
+	}
+	if which == "shift" {
+		panel.ShiftLabel.SetText(label)
+	}
+	if which == "size" {
+		panel.SizeLabel.SetText(label)
+	}
+	if which == "fade" {
+		panel.FadeLabel.SetText(label)
+	}
+	if which == "bpm" {
+		panel.BPMLabel.SetText(label)
+	}
+}
+
 func (panel *MyPanel) ConvertButtonImageToIcon(filename string) []byte {
 	iconFile, err := os.Open(filename)
 	if err != nil {
@@ -192,13 +220,6 @@ func (panel *MyPanel) ConvertButtonImageToIcon(filename string) []byte {
 	}
 
 	return iconImage
-}
-
-func (panel *MyPanel) SetButtonIcon(icon []byte, X int, Y int) {
-	panel.Buttons[X][Y].button.Icon = fyne.NewStaticResource("", icon)
-	size := panel.Buttons[X][Y].button.MinSize()
-	fmt.Printf("size -> %+v\n", size)
-	panel.Buttons[X][Y].button.Refresh()
 }
 
 func (panel *MyPanel) GetButtonColor(X int, Y int) color.Color {

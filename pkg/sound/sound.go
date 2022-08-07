@@ -16,7 +16,15 @@ var gainCounters = make([]int, 10)
 
 func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) {
 
+	BPMChannel := make(chan bool)
+
 	go func() {
+
+		// Franework variables for the BPM Analyser.
+		var BPMtimer *time.Timer
+		var BPMcounter int
+		var BPMactualCounter int
+		var BPMsecondUp bool
 
 		gain := []float32{0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15}
 
@@ -49,6 +57,25 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 		// Start the thread that reports the gain.
 		go gainChecker()
 
+		// Start a 20 second timer.
+		// And count the beats received in 20 seconds. Multiply by 3 to get beats per minute.
+		BPMtimer = time.NewTimer(20 * time.Second)
+
+		// A very simple Beat counter which needs more work to be a real BPM.
+		// List for the timer to finish and then report the number of beats.
+		go func() {
+			for {
+				select {
+				case <-BPMChannel:
+					BPMcounter++
+					continue
+				case <-BPMtimer.C:
+					BPMsecondUp = true
+					BPMactualCounter = BPMcounter
+				}
+			}
+		}()
+
 		for {
 			stream.Read()
 			if err != nil {
@@ -69,6 +96,17 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 				actualGain := gain[gainSelected] + soundTriggers[0].Gain
 
 				if out[i] > actualGain {
+
+					// Send a message to BPM counter.
+					BPMChannel <- true
+
+					// If the BPM sample time is up, then we restart counters here.
+					if BPMsecondUp {
+						BPMcounter = 0
+						BPMsecondUp = false
+						BPMtimer = time.NewTimer(20 * time.Second)
+					}
+
 					cmd := common.Command{}
 					for index, trigger := range soundTriggers {
 						if trigger.SequenceNumber == index {
@@ -78,6 +116,8 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 								}
 								channels.SoundTriggerChannels[index] <- cmd
 							}
+							// Remember the BPM valuse so they don't get overwritten.
+							trigger.BPM = BPMactualCounter
 						}
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.

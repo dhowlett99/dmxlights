@@ -117,8 +117,8 @@ func FixtureReceiver(sequence common.Sequence,
 	cmd := common.FixtureCommand{}
 
 	// Calculate fade curve values.
-	fadeUp := getFade(127.5, false)
-	fadeDown := getFade(127.5, true)
+	fadeUpValues := getFadeValues(127.5, false)
+	fadeDownValues := getFadeValues(127.5, true)
 
 	for {
 		cmd = <-channels[myFixtureNumber]
@@ -246,8 +246,15 @@ func FixtureReceiver(sequence common.Sequence,
 							var G int
 							var B int
 
+							// Calculate fade times.
+							fadeTime := cmd.MusicSpeed / 3
+							fadeUpTime := fadeTime / time.Duration(cmd.FadeTime)
+							fadeOntime := fadeTime * time.Duration(cmd.Size*5)
+							fadeDownTime := fadeTime / time.Duration(cmd.FadeTime)
+							fadeOffTime := fadeTime * time.Duration(cmd.Size*5)
+
 							if cmd.Inverted {
-								for _, value := range fadeDown {
+								for _, value := range fadeDownValues {
 									R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 									G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 									B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
@@ -256,18 +263,20 @@ func FixtureReceiver(sequence common.Sequence,
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									// Fade down time.
-									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									if listenAndWaitForStop(fadeDownTime, fixtureStopChannel) {
 										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 										return
 									}
 								}
 								// Fade off time.
-								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+								if listenAndWaitForStop(fadeOffTime, fixtureStopChannel) {
 									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 									return
 								}
 							}
-							for _, value := range fadeUp {
+
+							// Fade up.
+							for _, value := range fadeUpValues {
 								R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 								G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 								B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
@@ -277,25 +286,21 @@ func FixtureReceiver(sequence common.Sequence,
 								// Now ask DMX to actually light the real fixture.
 								MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 								// Fade up time.
-								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
-									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
-									return
-								}
-							}
-							for x := 0; x < cmd.Size; x++ {
-								// Time between fades.
-								if listenAndWaitForStop(cmd.CurrentSpeed*5, fixtureStopChannel) {
+								if listenAndWaitForStop(fadeUpTime, fixtureStopChannel) {
 									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 									return
 								}
 							}
 							// Fade on time.
-							if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
-								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
-								return
+							for x := 0; x < cmd.Size; x++ {
+								if listenAndWaitForStop(fadeOntime, fixtureStopChannel) {
+									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+									return
+								}
 							}
 							if !cmd.Inverted {
-								for _, value := range fadeDown {
+								// Fade down.
+								for _, value := range fadeDownValues {
 									R = int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
 									G = int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
 									B = int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
@@ -304,16 +309,17 @@ func FixtureReceiver(sequence common.Sequence,
 									}
 									MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master)
 									// Fade down time.
-									if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+									if listenAndWaitForStop(fadeDownTime, fixtureStopChannel) {
 										turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 										return
 									}
 								}
 								// Fade off time.
-								if listenAndWaitForStop(cmd.FadeTime/4, fixtureStopChannel) {
+								if listenAndWaitForStop(fadeOffTime, fixtureStopChannel) {
 									turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 									return
 								}
+
 							}
 						}(fixtureStopChannels[myFixtureNumber])
 					}
@@ -490,7 +496,7 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func getFade(size float64, direction bool) []int {
+func getFadeValues(size float64, direction bool) []int {
 
 	out := []int{}
 

@@ -12,6 +12,7 @@ import (
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
@@ -52,7 +53,7 @@ func main() {
 	this.SelectedShift = 0                          // Default shift size.
 	this.Blackout = false                           // Blackout starts in off.
 	this.Flood = false                              // Flood starts in off.
-	this.FadeSpeed = 12                             // Default start at 50ms.
+	this.FadeTime = common.DefaultFadeTime          // Set the default fade time
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
@@ -187,6 +188,22 @@ func main() {
 	// Create a sound trigger object and give it the sequences so it can access their configs.
 	sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
 
+	// Create objects for bottom status bar.
+	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
+	panel.SpeedLabel = speedLabel
+
+	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", 0))
+	panel.ShiftLabel = shiftLabel
+
+	sizeLabel := widget.NewLabel(fmt.Sprintf("Size %02d", 0))
+	panel.SizeLabel = sizeLabel
+
+	fadeLabel := widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultFadeTime))
+	panel.FadeLabel = fadeLabel
+
+	bpmLabel := widget.NewLabel(fmt.Sprintf("BPM %03d", 0))
+	panel.BPMLabel = bpmLabel
+
 	// Create a thread to handle GUI button events.
 	go func(panel gui.MyPanel, guiButtons chan common.ALight, GuiFlashButtons [][]common.ALight) {
 		for {
@@ -214,8 +231,12 @@ func main() {
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
-	// Now configure the content to contain the top toolbar and the squares.
-	content := container.NewBorder(toolbar, nil, nil, nil, squares)
+	statusBar := fyne.NewContainerWithLayout(
+		layout.NewHBoxLayout(), speedLabel, layout.NewSpacer(), shiftLabel, layout.NewSpacer(), sizeLabel, layout.NewSpacer(), fadeLabel, layout.NewSpacer(), bpmLabel)
+
+	// Now configure the panel content to contain the top toolbar and the squares.
+	main := container.NewBorder(toolbar, nil, nil, nil, squares)
+	content := container.NewBorder(main, nil, nil, nil, statusBar)
 
 	// Start threads for each sequence.
 	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)

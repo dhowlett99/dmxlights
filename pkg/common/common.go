@@ -22,6 +22,9 @@ type ALight struct {
 	OffColor         Color
 	UpdateLabel      bool
 	Label            string
+	UpdateStatus     bool
+	Status           string
+	Which            string
 	FlashStopChannel chan bool
 }
 
@@ -103,7 +106,7 @@ const (
 	UpdateSpeed
 	UpdateScannerPatten
 	SelectPatten
-	SetFadeSpeed
+	UpdateFadeSpeed
 	UpdateSize
 	UpdateScannerSize
 	Blackout
@@ -141,6 +144,9 @@ const (
 
 const DefaultScannerSize = 120
 const DefaultScannerPatten = 0
+const DefaultRGBSize = 1
+const DefaultFadeTime = 12
+const DefaultSpeed = 12
 
 var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}
@@ -172,6 +178,7 @@ type Sequence struct {
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
+	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
 	MusicTrigger               bool                        // Is this sequence in music trigger mode.
 	Ring                       bool                        // A ring is when a music triggers a ring of events for a scannner.
@@ -193,8 +200,7 @@ type Sequence struct {
 	RGBAvailablePattens        map[int]Patten              // Available pattens for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	FadeSpeed                  int                         // Fade Speed
-	FadeTime                   time.Duration               // Fade time
+	FadeTime                   int                         // Fade time
 	Size                       int                         // Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
 	SelectedRGBPatten          int                         // Selected RGB patten.
@@ -275,16 +281,13 @@ type FixtureCommand struct {
 	StartPosition          int
 	CurrentPosition        int
 	CurrentSpeed           time.Duration
+	MusicSpeed             time.Duration
 	Color                  Color
 	Speed                  int
 	Shift                  int
 	Size                   int
 	FadeSpeed              int
-	FadeTime               time.Duration
-	FadeUpTime             time.Duration
-	FadeOnTime             time.Duration
-	FadeDownTime           time.Duration
-	FadeOffTime            time.Duration
+	FadeTime               int
 	Blackout               bool
 	StartFlood             bool
 	StopFlood              bool
@@ -357,6 +360,7 @@ type Trigger struct {
 	SequenceNumber int
 	State          bool
 	Gain           float32
+	BPM            int
 }
 
 // Define the function keys.
@@ -899,6 +903,16 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 		Label:      Light.Label,
+	}
+	guiButtons <- event
+}
+
+func UpdateStatusBar(status string, which string, guiButtons chan ALight) {
+	// Send message to fyne.io GUI.
+	event := ALight{
+		UpdateStatus: true,
+		Status:       status,
+		Which:        which,
 	}
 	guiButtons <- event
 }

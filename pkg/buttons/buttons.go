@@ -39,7 +39,7 @@ type CurrentState struct {
 	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
 	EditPattenMode           []bool                     // This flag is true when the sequence is in patten editing mode.
 	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
-	FadeSpeed                int                        // Default start at 50ms.
+	FadeTime                 int                        // Default start at 1
 	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
 	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY   int                        // Which Static Color button did we change last.
@@ -478,6 +478,9 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.SelectedShift), "shift", guiButtons)
+
 		return
 	}
 
@@ -501,6 +504,9 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.SelectedShift), "shift", guiButtons)
 
 		return
 	}
@@ -530,6 +536,9 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.SequenceSpeed), "speed", guiButtons)
 		return
 	}
 
@@ -558,6 +567,10 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.SequenceSpeed), "speed", guiButtons)
+
 		return
 	}
 
@@ -697,6 +710,9 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Size\n")
 		}
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Send Update RGB Size.
@@ -735,12 +751,15 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Size\n")
 		}
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Send Update RGB Size.
 		this.Size++
-		if this.Size > 25 {
-			this.Size = 25
+		if this.Size > 50 {
+			this.Size = 50
 		}
 		cmd := common.Command{
 			Action: common.UpdateSize,
@@ -773,19 +792,23 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Fade Time\n")
 		}
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+
 		if sequences[this.SelectedSequence].Type == "rgb" {
 
 			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-			this.FadeSpeed--
-			if this.FadeSpeed < 0 {
-				this.FadeSpeed = 0
+			this.FadeTime--
+			if this.FadeTime < 1 {
+				this.FadeTime = 1
 			}
+
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.SetFadeSpeed,
+				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeSpeed},
+					{Name: "FadeSpeed", Value: this.FadeTime},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -818,18 +841,21 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Fade Time\n")
 		}
 
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+
 		if sequences[this.SelectedSequence].Type == "rgb" {
 			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-			this.FadeSpeed++
-			if this.FadeSpeed > 20 {
-				this.FadeSpeed = 20
+			this.FadeTime++
+			if this.FadeTime > 50 {
+				this.FadeTime = 50
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.SetFadeSpeed,
+				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeSpeed},
+					{Name: "FadeSpeed", Value: this.FadeTime},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -2163,11 +2189,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Reset the fade speed back to the default
 		if sequence.Type == "rgb" {
-			this.FadeSpeed = 12
+			this.FadeTime = 1
 			cmd = common.Command{
-				Action: common.SetFadeSpeed,
+				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeSpeed},
+					{Name: "FadeSpeed", Value: this.FadeTime},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
