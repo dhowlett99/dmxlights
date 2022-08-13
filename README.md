@@ -11,6 +11,8 @@ FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface 
 - github.com/rakyll/launchpad/mk2
 - github.com/oliread/usbdmx"
 - github.com/oliread/usbdmx/ft232"
+- github.com/gordonklaus/portaudio
+- fyne.io/fyne/v2
 
 
 # FTDI Integration
@@ -43,4 +45,6 @@ $ sudo kextunload -b com.apple.driver.AppleUSBFTDI
 I use the mk3 version.
 
 "github.com/rakyll/launchpad/mk3”
+
+
 

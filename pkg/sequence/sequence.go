@@ -107,8 +107,15 @@ func CreateSequence(
 	}
 
 	// A map of the state of fixtures in the sequence.
-	// We can disable a fixture by setting fixtureDisabled to true.
-	fixtureDisabled := make(map[int]bool, 8)
+	// We can disable a fixture by setting fixture Enabled to false.
+	scannerState := make(map[int]common.ScannerState, 8)
+	for x := 0; x < 8; x++ {
+		newScanner := common.ScannerState{}
+		newScanner.Enabled = true
+		newScanner.Inverted = false
+		scannerState[x] = newScanner
+	}
+
 	disabledOnce := make(map[int]bool, 8)
 
 	// The actual sequence definition.
@@ -142,7 +149,7 @@ func CreateSequence(
 		AutoColor:              false,
 		AutoPatten:             false,
 		ScannerPatten:          0,
-		FixtureDisabled:        fixtureDisabled,
+		ScannerState:           scannerState,
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32},
 		ScannerColor:           scannerColors,
@@ -177,6 +184,10 @@ func CreateSequence(
 		sequence.GuiFunctionLabels[6] = "Chase"
 		sequence.GuiFunctionLabels[7] = "Music"
 	}
+
+	// Find the number of fixtures for this sequence.
+	sequence.NumberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig)
+	sequence.FixturePositions = make(map[int]map[int][]common.Position, sequence.NumberFixtures)
 
 	// Make functions for each of the sequences.
 	for function := 0; function < 8; function++ {
@@ -469,8 +480,16 @@ func PlaySequence(sequence common.Sequence,
 					break
 				}
 
-				// Calulate positions for fixtures based on the steps in the patten.
-				sequence.Positions, sequence.NumberSteps = calculatePositions(sequence.Steps, sequence.Bounce)
+				// Calulate positions for each fixture based on the steps in the patten.
+				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+
+					positions, num := calculatePositions(sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted)
+					sequence.NumberSteps = num
+					sequence.FixturePositions[fixture] = make(map[int][]common.Position, 9)
+					for key, value := range positions {
+						sequence.FixturePositions[fixture][key] = value
+					}
+				}
 
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
@@ -509,21 +528,29 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.RGBColor > 7 {
 						sequence.RGBColor = 0
 					}
-					sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
+					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+						sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
+					}
 				}
 
 				// If we are updating the color in a sequence.
 				if sequence.UpdateSequenceColor {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
-							sequence.Positions = replaceColors(sequence.Positions, sequence.SavedSequenceColors)
+							for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+								sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
+							}
 							sequence.AutoColor = false
 						}
 					} else {
-						sequence.Positions = replaceColors(sequence.Positions, sequence.SequenceColors)
+						for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+							sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
+						}
 						// Save the current color selection.
 						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColors(sequence.Positions)
+							for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+								sequence.SavedSequenceColors = common.HowManyColors(sequence.FixturePositions[fixture])
+							}
 							sequence.SaveColors = false
 						}
 					}
@@ -531,7 +558,9 @@ func PlaySequence(sequence common.Sequence,
 
 				// Now that the patten colors have been decided and the positions calculated, set the CurrentSequenceColors
 				// with the colors from that patten.
-				sequence.CurrentColors = common.HowManyColors(sequence.Positions)
+				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+					sequence.CurrentColors = common.HowManyColors(sequence.FixturePositions[fixture])
+				}
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
@@ -545,47 +574,51 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					sequence.FixtureDisabledMutex.RLock()
-					fixtureDisabled := sequence.FixtureDisabled
+					scannerState := sequence.ScannerState
 					sequence.FixtureDisabledMutex.RUnlock()
 
 					sequence.DisableOnceMutex.RLock()
 					disabledOnce := sequence.DisableOnce
 					sequence.DisableOnceMutex.RUnlock()
 
-					// Prepare a message to be sent to the fixtures in the sequence.
-					command := common.FixtureCommand{
-						SequenceNumber:         sequence.Number,
-						Inverted:               sequence.PattenInverted,
-						Master:                 sequence.Master,
-						Hide:                   sequence.Hide,
-						Tick:                   true,
-						Positions:              sequence.Positions,
-						Type:                   sequence.Type,
-						FadeTime:               sequence.FadeTime,
-						Size:                   sequence.Size,
-						Steps:                  sequence.NumberSteps,
-						MusicSpeed:             sequence.MusicSpeed,
-						CurrentSpeed:           sequence.CurrentSpeed,
-						Speed:                  sequence.Speed,
-						Blackout:               sequence.Blackout,
-						StartFlood:             sequence.StartFlood,
-						StopFlood:              sequence.StopFlood,
-						CurrentPosition:        step,
-						SelectedGobo:           sequence.ScannerGobo,
-						FixtureDisabled:        fixtureDisabled,
-						FixtureDisabledMutex:   sequence.FixtureDisabledMutex,
-						DisableOnce:            disabledOnce,
-						DisableOnceMutex:       sequence.DisableOnceMutex,
-						ScannerChase:           sequence.ScannerChase,
-						ScannerColor:           sequence.ScannerColor,
-						AvailableScannerColors: sequence.ScannerAvailableColors,
-						OffsetPan:              sequence.ScannerOffsetPan,
-						OffsetTilt:             sequence.ScannerOffsetTilt,
-						FixtureLabels:          sequence.GuiFixtureLabels,
-					}
-
 					// Now tell all the fixtures in this group what they need to do.
-					sendToAllFixtures(sequence, fixtureChannels, channels, command)
+					for fixtureNumber, fixture := range fixtureChannels {
+
+						// Prepare a message to be sent to the fixtures in the sequence.
+						command := common.FixtureCommand{
+							SequenceNumber: sequence.Number,
+							Inverted:       sequence.PattenInverted,
+							Master:         sequence.Master,
+							Hide:           sequence.Hide,
+							Tick:           true,
+							// Every fixture can have its own positions.
+							Positions:              sequence.FixturePositions[fixtureNumber],
+							Type:                   sequence.Type,
+							FadeTime:               sequence.FadeTime,
+							Size:                   sequence.Size,
+							Steps:                  sequence.NumberSteps,
+							MusicSpeed:             sequence.MusicSpeed,
+							CurrentSpeed:           sequence.CurrentSpeed,
+							Speed:                  sequence.Speed,
+							Blackout:               sequence.Blackout,
+							StartFlood:             sequence.StartFlood,
+							StopFlood:              sequence.StopFlood,
+							CurrentPosition:        step,
+							SelectedGobo:           sequence.ScannerGobo,
+							ScannerState:           scannerState,
+							FixtureDisabledMutex:   sequence.FixtureDisabledMutex,
+							DisableOnce:            disabledOnce,
+							DisableOnceMutex:       sequence.DisableOnceMutex,
+							ScannerChase:           sequence.ScannerChase,
+							ScannerColor:           sequence.ScannerColor,
+							AvailableScannerColors: sequence.ScannerAvailableColors,
+							OffsetPan:              sequence.ScannerOffsetPan,
+							OffsetTilt:             sequence.ScannerOffsetTilt,
+							FixtureLabels:          sequence.GuiFixtureLabels,
+						}
+
+						fixture <- command
+					}
 				}
 			}
 		}
@@ -640,48 +673,17 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 // calculatePositions takes the steps defined in the patten and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Position, int) {
+func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int][]common.Position, int) {
 
 	position := common.Position{}
 
 	// We have multiple positions for each fixture.
 	var counter int
-	positionsOut := make(map[int][]common.Position)
 	var waitForColors bool
-	for _, step := range steps {
-		for fixtureIndex, fixture := range step.Fixtures {
-			noColors := len(fixture.Colors)
-			for _, color := range fixture.Colors {
-				// Preserve the scanner commands.
-				position.Gobo = fixture.Gobo
-				position.Pan = fixture.Pan
-				position.Tilt = fixture.Tilt
-				position.Shutter = fixture.Shutter
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					position.StartPosition = counter
-					position.Fixture = fixtureIndex
-					position.Color.R = color.R
-					position.Color.G = color.G
-					position.Color.B = color.B
-					positionsOut[counter] = append(positionsOut[counter], position)
-					if noColors > 1 {
-						if fixture.Type != "scanner" {
-							counter = counter + 14
-							waitForColors = true
-						}
-					}
-				}
-			}
-		}
-		if !waitForColors {
-			counter = counter + 14
-		}
-	}
+	positionsOut := make(map[int][]common.Position)
 
-	// Bounce repeates the steps in the sequence but backwards.
-	if bounce {
-		for index := len(steps) - 1; index >= 0; index-- {
-			step := steps[index]
+	if !invert {
+		for _, step := range steps {
 			for fixtureIndex, fixture := range step.Fixtures {
 				noColors := len(fixture.Colors)
 				for _, color := range fixture.Colors {
@@ -705,8 +707,44 @@ func calculatePositions(steps []common.Step, bounce bool) (map[int][]common.Posi
 						}
 					}
 				}
-				if step.Type == "scanner" {
-					counter = counter + 14
+			}
+			if !waitForColors {
+				counter = counter + 14
+			}
+		}
+	}
+
+	if bounce || invert {
+		// Generate the positions in reverse.
+		// Reverse the steps.
+		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
+			step := steps[stepNumber-1]
+
+			// Reverse the fixtures.
+			for fixtureNumber := len(step.Fixtures); fixtureNumber > 0; fixtureNumber-- {
+				fixture := step.Fixtures[fixtureNumber-1]
+
+				position := common.Position{}
+				// Reverse the colors.
+				noColors := len(fixture.Colors)
+				for colorNumber := noColors; colorNumber > 0; colorNumber-- {
+					color := fixture.Colors[colorNumber-1]
+
+					position.Gobo = fixture.Gobo
+					position.Pan = fixture.Pan
+					position.Tilt = fixture.Tilt
+					position.Shutter = fixture.Shutter
+					position.StartPosition = counter
+					position.Fixture = fixtureNumber - 1
+					position.Color = color
+
+					positionsOut[counter] = append(positionsOut[counter], position)
+					if noColors >= 1 {
+						if fixture.Type != "scanner" {
+							counter = counter + 14
+							waitForColors = true
+						}
+					}
 				}
 			}
 			if !waitForColors {
@@ -822,6 +860,38 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 		}
 	}
 	return availableScannerColors, scannerColors
+}
+
+func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
+	if debug {
+		fmt.Printf("getNumberOfFixtures\n")
+	}
+
+	var numberFixtures int
+
+	for _, fixture := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Fixture Name:%s\n", fixture.Name)
+		}
+
+		if debug {
+			fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, fixture.Name, fixture.Description)
+		}
+
+		if fixture.NumberChannels > numberFixtures {
+			return fixture.NumberChannels
+		}
+
+		if fixture.Group == sequenceNumber+1 {
+			if fixture.Number > numberFixtures {
+				numberFixtures++
+			}
+
+		}
+	}
+
+	fmt.Printf("Sequence: %d - Number of Fixtures %d\n", sequenceNumber, numberFixtures)
+	return numberFixtures
 }
 
 func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) (int, map[int][]common.StaticColorButton) {

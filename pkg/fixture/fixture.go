@@ -51,15 +51,16 @@ type Switch struct {
 }
 
 type Fixture struct {
-	Name        string    `yaml:"name"`
-	Label       string    `yaml:"label"`
-	Number      int       `yaml:"number"`
-	Description string    `yaml:"description"`
-	Type        string    `yaml:"type"`
-	Group       int       `yaml:"group"`
-	Address     int16     `yaml:"address"`
-	Channels    []Channel `yaml:"channels"`
-	Switches    []Switch  `yaml:"switches"`
+	Name           string    `yaml:"name"`
+	Label          string    `yaml:"label"`
+	Number         int       `yaml:"number"`
+	Description    string    `yaml:"description"`
+	Type           string    `yaml:"type"`
+	Group          int       `yaml:"group"`
+	Address        int16     `yaml:"address"`
+	Channels       []Channel `yaml:"channels"`
+	Switches       []Switch  `yaml:"switches"`
+	NumberChannels int       `yaml:"number_channels"`
 }
 
 type Setting struct {
@@ -170,7 +171,7 @@ func FixtureReceiver(sequence common.Sequence,
 				}
 
 				cmd.FixtureDisabledMutex.RLock()
-				disableThis := cmd.FixtureDisabled[myFixtureNumber]
+				enabled := cmd.ScannerState[myFixtureNumber].Enabled
 				cmd.FixtureDisabledMutex.RUnlock()
 
 				cmd.DisableOnceMutex.RLock()
@@ -181,7 +182,7 @@ func FixtureReceiver(sequence common.Sequence,
 				if cmd.CurrentPosition == position.StartPosition &&
 					cmd.Type == "scanner" &&
 					disableOnce &&
-					disableThis {
+					!enabled {
 
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0)
 
@@ -193,10 +194,10 @@ func FixtureReceiver(sequence common.Sequence,
 				}
 
 				cmd.FixtureDisabledMutex.RLock()
-				disableThis = cmd.FixtureDisabled[myFixtureNumber]
+				enabled = cmd.ScannerState[myFixtureNumber].Enabled
 				cmd.FixtureDisabledMutex.RUnlock()
 
-				if cmd.CurrentPosition == position.StartPosition && !disableThis {
+				if cmd.CurrentPosition == position.StartPosition && enabled {
 
 					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
 					if cmd.Type == "scanner" {
@@ -335,8 +336,6 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 			for channelNumber, channel := range fixture.Channels {
 				if strings.Contains(channel.Name, "Color") {
 					for _, setting := range channel.Settings {
-						//fmt.Printf("Scanner Color  %d\n", scannerColor)
-						//fmt.Printf("Setting  %+v\n", setting)
 						if setting.Number-1 == scannerColor {
 							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
 						}

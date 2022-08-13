@@ -25,6 +25,11 @@ go mod tidy
 go build dmxlights.go
 ```
 
+or on a older mac
+```sh
+go build -tags legacy dmxlights.go
+```
+
 ### Setting up your fixtures
 
 The simplest of fixture definitions is shown below:-

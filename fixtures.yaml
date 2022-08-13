@@ -275,6 +275,7 @@ fixtures:
     name: MasterDimmer
 - name: Uplighter1
   number: 1
+  number_channels: 8
   description: Chauvet Color Rail IRC
   type: rgb
   address: 172
@@ -335,6 +336,7 @@ fixtures:
     name: Strobe
 - name: Uplighter2
   number: 1
+  number_channels: 8
   description: Fluxia DLB100
   type: rgb
   address: 200
@@ -389,33 +391,34 @@ fixtures:
     name: Green8
   - number: 24
     name: Blue8
-# - name: ADJ QA PAR 38
-#   number: 1
-#   description: American DJ SPOT
-#   type: rgb
-#   address: 150
-#   group: 2 
-#   channels:
-#   - number: 1
-#     name: Red1
-#   - number: 2
-#     name: Green1
-#   - number: 3
-#     name: Blue1
-#   - number: 4
-#     name: Static
-#     value: 0
-#   - number: 5
-#     name: Master Dimmer
-#   - number: 6
-#     name: Static
-#     value: 0
-#   - number: 7
-#     name: Static
-#     value: 0
-#   - number: 8
-#     name: Static
-#     value: 0
+- name: ADJ QA PAR 38
+  number: 1
+  number_channels: 8
+  description: American DJ SPOT
+  type: rgb
+  address: 150
+  group: 2 
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Static
+    value: 0
+  - number: 5
+    name: Master Dimmer
+  - number: 6
+    name: Static
+    value: 0
+  - number: 7
+    name: Static
+    value: 0
+  - number: 8
+    name: Static
+    value: 0
 - name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -732,6 +735,112 @@ fixtures:
   description: American DJ Inno Pocket Spot
   type: scanner
   address: 425
+  group: 3
+  channels:
+  - number: 1
+    name: Pan
+    maxdegrees: 540
+  - number: 2
+    name: FinePan
+  - number: 3
+    name: Tilt
+    maxdegrees: 230
+  - number: 4
+    name: FineTilt
+  - number: 5
+    name: Color
+    settings:
+      - name: White
+        number: 1
+        setting: 0
+      - name: Red
+        number: 2
+        setting: 8
+      - name: Orange
+        number: 3
+        setting: 15
+      - name: Yellow
+        number: 4
+        setting: 22
+      - name: Green
+        number: 5
+        setting: 29
+      - name: Blue
+        number: 6
+        setting: 36
+      - name: Light Blue
+        number: 7
+        setting: 43
+      - name: Pink
+        number: 8
+        setting: 50
+  - number: 6
+    name: Gobo
+    settings:
+      - name: Open
+        label: Open
+        number: 1
+        setting: 0
+      - name: Gobo 1
+        label: Gobo.1
+        setting: 8
+        number: 2
+      - name: Gobo 2
+        label: Gobo.2
+        setting: 16
+        number: 3
+      - name: Gobo 3
+        label: Gobo.3
+        setting: 24
+        number: 4
+      - name: Gobo 4
+        label: Gobo.4
+        setting: 32
+        number: 5
+      - name: Gobo 5
+        label: Gobo.5
+        setting: 40
+        number: 6
+      - name: Gobo 6
+        label: Gobo.6
+        setting: 48
+        number: 7
+      - name: Gobo 7
+        label: Gobo.7
+        setting: 56
+        number: 8
+  - number: 7
+    name: Shutter
+    settings:
+      - name: Open
+        setting: 255
+      - name: Closed
+        setting: 0
+      - name: Strobe
+        setting: 100
+  - number: 8
+    name: Master
+  - number: 9
+    name: Speed
+    settings:
+      - name: Fast
+        setting: 255
+  - number: 10
+    name: SoundActive
+    settings:
+      - name: Off
+        setting: 1
+  - number: 11
+    name: Dimmer Curves
+    settings:
+      - name: Default Curve
+        setting: 255
+- name: Scanner 7
+  label: ADJ.Inno.Spot1
+  number: 7
+  description: American DJ Inno Pocket Spot
+  type: scanner
+  address: 440
   group: 3
   channels:
   - number: 1

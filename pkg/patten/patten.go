@@ -581,14 +581,14 @@ func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift
 
 	var shutterValue int
 	// Now create the steps in the patten.
-	for f := 0; f < NumberCoordinates; f++ {
+	for stepNumber := 0; stepNumber < NumberCoordinates; stepNumber++ {
 
 		fixtures := []common.Fixture{}
 
-		for step := 0; step < NumberFixtures; step++ {
+		for fixture := 0; fixture < NumberFixtures; fixture++ {
 
 			if chase { // Flash the scanners in order.
-				shutterValue = calulateShutterValue(f, step, NumberFixtures, NumberCoordinates)
+				shutterValue = calulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates)
 			} else {
 				shutterValue = 255 // Otherwise just turn on every scanner
 			}
@@ -597,10 +597,10 @@ func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift
 				Type:         "scanner",
 				MasterDimmer: full,
 				Colors: []common.Color{
-					common.GetColorButtonsArray(scanners[step].values[f]),
+					common.GetColorButtonsArray(scanners[fixture].values[stepNumber]),
 				},
-				Pan:     int(Coordinates[scanners[step].values[f]].Pan),
-				Tilt:    int(Coordinates[scanners[step].values[f]].Tilt),
+				Pan:     int(Coordinates[scanners[fixture].values[stepNumber]].Pan),
+				Tilt:    int(Coordinates[scanners[fixture].values[stepNumber]].Tilt),
 				Shutter: shutterValue,
 				Gobo:    36,
 			}

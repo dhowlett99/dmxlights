@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func Test_calculatePositions(t *testing.T) {
@@ -13,6 +14,7 @@ func Test_calculatePositions(t *testing.T) {
 	type args struct {
 		steps  []common.Step
 		bounce bool
+		invert bool
 	}
 	tests := []struct {
 		name string
@@ -593,12 +595,41 @@ func Test_calculatePositions(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "Scanners inverted no bounce",
+			args: args{
+				bounce: false,
+				invert: true,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Pan: 1, Tilt: 1, Gobo: 1, Shutter: 255},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Pan: 2, Tilt: 2, Gobo: 1, Shutter: 255},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0:  {{Fixture: 0, StartPosition: 0, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2}},
+				14: {{Fixture: 0, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1}},
+				28: {{Fixture: 0, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0}},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := calculatePositions(tt.args.steps, tt.args.bounce); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("got = %v", got)
-				t.Errorf("want =%v", tt.want)
+			if got, _ := calculatePositions(tt.args.steps, tt.args.bounce, tt.args.invert); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("got = %+v", got)
+				t.Errorf("want =%+v", tt.want)
 			}
 		})
 	}
@@ -647,7 +678,93 @@ func Test_invertColor(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotOut := invertColor(tt.args.color); !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("invertColor() = %v, want %v", gotOut, tt.wantOut)
+				t.Errorf("invertColor() = %+v, want %+v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_getNumberOfFixtures(t *testing.T) {
+
+	type args struct {
+		sequenceNumber int
+		fixtures       *fixture.Fixtures
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "ten fixtures",
+			args: args{
+				sequenceNumber: 0,
+				fixtures: &fixture.Fixtures{
+					Fixtures: []fixture.Fixture{
+
+						{Name: "fixture1", Group: 1},
+						{Name: "fixture2", Group: 1},
+						{Name: "fixture3", Group: 1},
+						{Name: "fixture4", Group: 1},
+						{Name: "fixture5", Group: 1},
+						{Name: "fixture6", Group: 1},
+						{Name: "fixture7", Group: 1},
+						{Name: "fixture8", Group: 1},
+
+						{Name: "fixture1", Group: 2},
+						{Name: "fixture2", Group: 2},
+						{Name: "fixture3", Group: 2},
+
+						{Name: "fixture1", Group: 3},
+						{Name: "fixture2", Group: 3},
+						{Name: "fixture3", Group: 3},
+						{Name: "fixture4", Group: 3},
+
+						{Name: "fixture1", Group: 4},
+						{Name: "fixture2", Group: 4},
+					},
+				},
+			},
+			want: 8,
+		},
+
+		{
+			name: "ten fixtures",
+			args: args{
+				sequenceNumber: 1,
+				fixtures: &fixture.Fixtures{
+					Fixtures: []fixture.Fixture{
+
+						{Name: "fixture1", Group: 1},
+						{Name: "fixture2", Group: 1},
+						{Name: "fixture3", Group: 1},
+						{Name: "fixture4", Group: 1},
+						{Name: "fixture5", Group: 1},
+						{Name: "fixture6", Group: 1},
+						{Name: "fixture7", Group: 1},
+						{Name: "fixture8", Group: 1},
+
+						{Name: "fixture1", Group: 2},
+						{Name: "fixture2", Group: 2},
+						{Name: "fixture3", Group: 2},
+
+						{Name: "fixture1", Group: 3},
+						{Name: "fixture2", Group: 3},
+						{Name: "fixture3", Group: 3},
+						{Name: "fixture4", Group: 3},
+
+						{Name: "fixture1", Group: 4},
+						{Name: "fixture2", Group: 4},
+					},
+				},
+			},
+			want: 3,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := getNumberOfFixtures(tt.args.sequenceNumber, tt.args.fixtures); got != tt.want {
+				t.Errorf("getNumberOfFixtures() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

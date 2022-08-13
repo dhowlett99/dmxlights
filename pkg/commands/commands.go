@@ -238,13 +238,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Setup the actions based on the state of the function keys.
 		sequence = common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
 
-		// Always bounce the pattern if we're a scanner. Except if we're a circle.
-		if sequence.Type == "scanner" && sequence.Patten.Name != "circle" {
-			sequence.Bounce = true
-		}
-		if sequence.Type == "scanner" && sequence.Patten.Name == "circle" {
-			sequence.Bounce = false
-		}
 		return sequence
 
 	case common.UpdateStatic:
@@ -390,23 +383,30 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			sequence.FixtureDisabledMutex.Lock()
 			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
-				sequence.FixtureDisabled[command.Args[scanner].Value.(int)] = false
+				newScannerState := common.ScannerState{}
+				newScannerState.Enabled = true
+				newScannerState.Inverted = false
+				sequence.ScannerState[command.Args[scanner].Value.(int)] = newScannerState
 			}
 			sequence.FixtureDisabledMutex.Unlock()
 		}
 
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
-		const SEQUENCE_NUMBER = 0 // Integer
-		const FIXTURE_NUMBER = 1  // Integer
-		const FIXTURE_STATE = 2   // Boolean
+		const SEQUENCE_NUMBER = 0  // Integer
+		const FIXTURE_NUMBER = 1   // Integer
+		const FIXTURE_STATE = 2    // Boolean
+		const FIXTURE_INVERTED = 3 // Boolean
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d on sequence %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SEQUENCE_NUMBER].Value)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.ScannersTotal {
 				sequence.FixtureDisabledMutex.Lock()
-				sequence.FixtureDisabled[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[FIXTURE_STATE].Value.(bool)
+				newScannerState := common.ScannerState{}
+				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
+				newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
+				sequence.ScannerState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 				sequence.FixtureDisabledMutex.Unlock()
 			}
 		}

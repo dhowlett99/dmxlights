@@ -67,6 +67,11 @@ type StaticColorButton struct {
 	Setting       int
 }
 
+type ScannerState struct {
+	Enabled  bool
+	Inverted bool
+}
+
 type Patten struct {
 	Name     string
 	Label    string
@@ -191,7 +196,8 @@ type Sequence struct {
 	Color                      int                         // Index into current sequnece colors.
 	Steps                      []Step                      // Steps in this sequence.
 	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	Positions                  map[int][]Position          // Positions decides where a fixture is in a give set of sequence steps.
+	NumberFixtures             int                         // Number of fixtures for this sequence.
+	FixturePositions           map[int]map[int][]Position  // Fixture positions decides where a fixture is in a give set of sequence steps.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPatten                 bool                        // Sequence is going to automatically change the patten.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
@@ -232,7 +238,7 @@ type Sequence struct {
 	ScannerOffsetPan           int                         // Offset for pan values.
 	ScannerOffsetTilt          int                         // Offset for tilt values.
 	FixtureDisabledMutex       *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
-	FixtureDisabled            map[int]bool                // Map of fixtures which are disabled.
+	ScannerState               map[int]ScannerState        // Map of fixtures which are disabled.
 	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
 	UpdateShift                bool                        // Command to update the shift.
@@ -299,7 +305,7 @@ type FixtureCommand struct {
 	Inverted               bool
 	SelectedGobo           int
 	FixtureDisabledMutex   *sync.RWMutex // Mutex to protect the  disable maps from syncronous access.
-	FixtureDisabled        map[int]bool
+	ScannerState           map[int]ScannerState
 	DisableOnceMutex       *sync.RWMutex // Mutex to protect the  disable once map from syncronous access.
 	DisableOnce            map[int]bool
 	ScannerChase           bool
@@ -611,9 +617,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	sequence.AutoPatten = sequence.Functions[Function3_Auto_Patten].State
 
 	// Map bounce function to sequence bounce setting.
-	if sequence.Type != "scanner" {
-		sequence.Bounce = sequence.Functions[Function4_Bounce].State
-	}
+	sequence.Bounce = sequence.Functions[Function4_Bounce].State
 
 	// Map color selection function.
 	if sequence.Functions[Function5_Color].State {

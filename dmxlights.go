@@ -72,9 +72,15 @@ func main() {
 	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
 
 	// Initialize eight fixture states for the four sequences.
-	this.DisabledFixture = make([][]bool, 9)
-	for i := 0; i < 9; i++ {
-		this.DisabledFixture[i] = make([]bool, 9)
+	this.ScannerState = make([][]common.ScannerState, 9)
+	for x := 0; x < 9; x++ {
+		this.ScannerState[x] = make([]common.ScannerState, 9)
+		for y := 0; y < 9; y++ {
+			newScanner := common.ScannerState{}
+			newScanner.Enabled = true
+			newScanner.Inverted = false
+			this.ScannerState[x][y] = newScanner
+		}
 	}
 
 	// Setup DMX interface.
