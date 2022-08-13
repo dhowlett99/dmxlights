@@ -683,6 +683,7 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 	positionsOut := make(map[int][]common.Position)
 
 	if !invert {
+		waitForColors = false
 		for _, step := range steps {
 			for fixtureIndex, fixture := range step.Fixtures {
 				noColors := len(fixture.Colors)
@@ -743,6 +744,39 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 						if fixture.Type != "scanner" {
 							counter = counter + 14
 							waitForColors = true
+						}
+					}
+				}
+			}
+			if !waitForColors {
+				counter = counter + 14
+			}
+		}
+	}
+
+	if bounce && invert {
+		waitForColors = false
+		for _, step := range steps {
+			for fixtureIndex, fixture := range step.Fixtures {
+				noColors := len(fixture.Colors)
+				for _, color := range fixture.Colors {
+					// Preserve the scanner commands.
+					position.Gobo = fixture.Gobo
+					position.Pan = fixture.Pan
+					position.Tilt = fixture.Tilt
+					position.Shutter = fixture.Shutter
+					if color.R > 0 || color.G > 0 || color.B > 0 {
+						position.StartPosition = counter
+						position.Fixture = fixtureIndex
+						position.Color.R = color.R
+						position.Color.G = color.G
+						position.Color.B = color.B
+						positionsOut[counter] = append(positionsOut[counter], position)
+						if noColors > 1 {
+							if fixture.Type != "scanner" {
+								counter = counter + 14
+								waitForColors = true
+							}
 						}
 					}
 				}

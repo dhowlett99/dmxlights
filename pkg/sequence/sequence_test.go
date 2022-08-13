@@ -624,6 +624,38 @@ func Test_calculatePositions(t *testing.T) {
 				28: {{Fixture: 0, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0}},
 			},
 		},
+		{
+			name: "Scanners inverted with bounce",
+			args: args{
+				bounce: true,
+				invert: true,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Pan: 1, Tilt: 1, Gobo: 1, Shutter: 255},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Pan: 2, Tilt: 2, Gobo: 1, Shutter: 255},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0:  {{Fixture: 0, StartPosition: 0, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2}},
+				14: {{Fixture: 0, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1}},
+				28: {{Fixture: 0, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0}},
+				42: {{Fixture: 0, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0}},
+				56: {{Fixture: 0, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1}},
+				70: {{Fixture: 0, StartPosition: 70, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2}},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

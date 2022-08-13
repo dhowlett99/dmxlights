@@ -28,10 +28,12 @@ import (
 
 func main() {
 
+	fmt.Println("DMX Lighting")
+
 	os.Setenv("FYNE_THEME", "light")
 
 	// Start the GUI.
-	fmt.Println("Start GUI")
+	fmt.Println("Starting GUI")
 	panel := gui.NewPanel() // Panel represents the buttons in the GUI.
 	myApp := app.New()
 
@@ -44,8 +46,6 @@ func main() {
 
 	// Setup the current state.
 	this := buttons.CurrentState{}
-
-	fmt.Println("DMX Lighting")
 
 	// Setup State.
 	this.SequenceSpeed = 12                         // Selected speed for the sequence.

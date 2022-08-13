@@ -203,19 +203,26 @@ func ProcessButtons(X int, Y int,
 	// C L E A R  - clear all from the GUI.
 	if X == 0 && Y == -1 && gui {
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		return
 	}
 
 	// C L E A R  - Start the timer, waiting for a long press to clear all.
-	if X == 0 && Y == -1 && !gui {
+	// Because a short press in scanner mode shifts the scanners up.
+	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
 		// Start a timer for this button.
 		here := time.Now()
 		this.ButtonTimer = &here
 		return
 	}
 
-	// C L E A R  - We have a long press.
-	if X == 100 && Y == -1 && !gui {
+	//  C L E A R - clear all if we're not in the scanner mode.
+	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type != "scanner" {
+		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		return
+	}
 
+	// C L E A R  - We have a long press.
+	if X == 100 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
 		// Remove the off button offset.
 		X = X - 100
 		// Stop the timer for this preset.
@@ -250,6 +257,7 @@ func ProcessButtons(X int, Y int,
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			}
 		}
+		return
 	}
 
 	// Swollow the button off events if not used for flash above.
@@ -2261,6 +2269,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			// Enable all scanners.
 			for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
 				this.ScannerState[scannerNumber][sequence.Number].Enabled = false
+				this.ScannerState[scannerNumber][sequence.Number].Inverted = false
 			}
 			cmd := common.Command{
 				Action: common.EnableAllScanners,
@@ -2270,7 +2279,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			ShowScannerStatus(Y, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
+			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
 
 			// Reset the number of coordinates.
 			this.SelectedCordinates = 0
