@@ -136,6 +136,7 @@ func CreateSequence(
 		Run:                    true,
 		Bounce:                 false,
 		RGBAvailablePattens:    availableRGBPattens,
+		RGBPatten:              common.DefaultRGBPatten,
 		ScannerSize:            common.DefaultScannerSize,
 		Size:                   common.DefaultRGBSize,
 		Speed:                  12,
@@ -148,7 +149,7 @@ func CreateSequence(
 		RGBColor:               1,
 		AutoColor:              false,
 		AutoPatten:             false,
-		ScannerPatten:          0,
+		ScannerPatten:          common.DefaultScannerPatten,
 		ScannerState:           scannerState,
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32},
@@ -160,7 +161,7 @@ func CreateSequence(
 
 	// Since we will be accessing these maps from the sequence thread and the fixture threads
 	// We need to protect the maps from syncronous access.
-	sequence.FixtureDisabledMutex = &sync.RWMutex{}
+	sequence.ScannerStateMutex = &sync.RWMutex{}
 	sequence.DisableOnceMutex = &sync.RWMutex{}
 
 	if sequence.Type == "rgb" {
@@ -429,7 +430,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb pattens.
 				if sequence.Type == "rgb" {
-					sequence.Steps = sequence.RGBAvailablePattens[sequence.SelectedRGBPatten].Steps
+					sequence.Steps = sequence.RGBAvailablePattens[sequence.RGBPatten].Steps
 					sequence.UpdatePatten = false
 				}
 
@@ -494,7 +495,7 @@ func PlaySequence(sequence common.Sequence,
 				// If we are setting the patten automatically for rgb fixtures.
 				if sequence.AutoPatten && sequence.Type == "rgb" {
 					for pattenNumber, patten := range sequence.RGBAvailablePattens {
-						if patten.Number == sequence.SelectedRGBPatten {
+						if patten.Number == sequence.RGBPatten {
 							sequence.Patten.Number = pattenNumber
 							if debug {
 								fmt.Printf(">>>> I AM PATTEN %d\n", pattenNumber)
@@ -502,9 +503,9 @@ func PlaySequence(sequence common.Sequence,
 							break
 						}
 					}
-					sequence.SelectedRGBPatten++
-					if sequence.SelectedRGBPatten > len(sequence.RGBAvailablePattens) {
-						sequence.SelectedRGBPatten = 0
+					sequence.RGBPatten++
+					if sequence.RGBPatten > len(sequence.RGBAvailablePattens) {
+						sequence.RGBPatten = 0
 					}
 				}
 
@@ -573,9 +574,9 @@ func PlaySequence(sequence common.Sequence,
 						break
 					}
 
-					sequence.FixtureDisabledMutex.RLock()
+					sequence.ScannerStateMutex.RLock()
 					scannerState := sequence.ScannerState
-					sequence.FixtureDisabledMutex.RUnlock()
+					sequence.ScannerStateMutex.RUnlock()
 
 					sequence.DisableOnceMutex.RLock()
 					disabledOnce := sequence.DisableOnce
@@ -586,12 +587,11 @@ func PlaySequence(sequence common.Sequence,
 
 						// Prepare a message to be sent to the fixtures in the sequence.
 						command := common.FixtureCommand{
-							SequenceNumber: sequence.Number,
-							Inverted:       sequence.PattenInverted,
-							Master:         sequence.Master,
-							Hide:           sequence.Hide,
-							Tick:           true,
-							// Every fixture can have its own positions.
+							SequenceNumber:         sequence.Number,
+							Inverted:               sequence.PattenInverted,
+							Master:                 sequence.Master,
+							Hide:                   sequence.Hide,
+							Tick:                   true,
 							Positions:              sequence.FixturePositions[fixtureNumber],
 							Type:                   sequence.Type,
 							FadeTime:               sequence.FadeTime,
@@ -606,9 +606,7 @@ func PlaySequence(sequence common.Sequence,
 							CurrentPosition:        step,
 							SelectedGobo:           sequence.ScannerGobo,
 							ScannerState:           scannerState,
-							FixtureDisabledMutex:   sequence.FixtureDisabledMutex,
 							DisableOnce:            disabledOnce,
-							DisableOnceMutex:       sequence.DisableOnceMutex,
 							ScannerChase:           sequence.ScannerChase,
 							ScannerColor:           sequence.ScannerColor,
 							AvailableScannerColors: sequence.ScannerAvailableColors,

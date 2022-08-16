@@ -107,20 +107,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateScannerPatten:
 		const PATTEN_NAME = 0
 		if debug {
-			fmt.Printf("%d: Command Update Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
+			fmt.Printf("%d: Command Update Scanner Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
-		sequence.SelectedRGBPatten = command.Args[PATTEN_NAME].Value.(int)
+		sequence.UpdatePatten = true
 		sequence.ScannerPatten = command.Args[PATTEN_NAME].Value.(int)
 		return sequence
 
-	case common.SelectPatten:
-		const SELECTED_PATTEN = 0
+	case common.UpdateRGBPatten:
+		const PATTEN_NAME = 0
 		if debug {
-			fmt.Printf("%d: Command Select Patten to %d\n", mySequenceNumber, command.Args[SELECTED_PATTEN].Value)
+			fmt.Printf("%d: Command Update RGB Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
 		sequence.UpdatePatten = true
-		sequence.SelectedRGBPatten = command.Args[SELECTED_PATTEN].Value.(int)
-		sequence.ScannerPatten = command.Args[SELECTED_PATTEN].Value.(int)
+		sequence.RGBPatten = command.Args[PATTEN_NAME].Value.(int)
 		return sequence
 
 	case common.UpdateShift:
@@ -381,14 +380,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.EnableAllScanners:
 		const SEQUENCE_NUMBER = 0 // Integer
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			sequence.FixtureDisabledMutex.Lock()
+			sequence.ScannerStateMutex.Lock()
 			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[command.Args[scanner].Value.(int)] = newScannerState
 			}
-			sequence.FixtureDisabledMutex.Unlock()
+			sequence.ScannerStateMutex.Unlock()
 		}
 
 	// Here we want to disable/enable the selected scanner.
@@ -402,12 +401,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.ScannersTotal {
-				sequence.FixtureDisabledMutex.Lock()
+				sequence.ScannerStateMutex.Lock()
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
 				newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
 				sequence.ScannerState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
-				sequence.FixtureDisabledMutex.Unlock()
+				sequence.ScannerStateMutex.Unlock()
 			}
 		}
 

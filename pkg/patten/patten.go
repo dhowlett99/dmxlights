@@ -17,9 +17,41 @@ func MakePatterns() map[int]common.Patten {
 
 	Pattens := make(map[int]common.Patten)
 
+	flash := common.Patten{
+		Name:   "Flash",
+		Number: 0,
+		Label:  "Flash",
+		Steps: []common.Step{
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+		},
+	}
+
 	standard := common.Patten{
 		Name:   "Chase",
-		Number: 0,
+		Number: 1,
 		Label:  "Std.Chase",
 		Steps: []common.Step{
 			{
@@ -123,7 +155,7 @@ func MakePatterns() map[int]common.Patten {
 
 	rgbchase := common.Patten{
 		Name:   "RGB Chase",
-		Number: 1,
+		Number: 2,
 		Label:  "RGB.Chase",
 		Steps: []common.Step{
 			{
@@ -228,7 +260,7 @@ func MakePatterns() map[int]common.Patten {
 	pairs := common.Patten{
 		Name:   "Pairs",
 		Label:  "Pairs",
-		Number: 2,
+		Number: 3,
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -320,7 +352,7 @@ func MakePatterns() map[int]common.Patten {
 	inward := common.Patten{
 		Name:   "Inward",
 		Label:  "Inward",
-		Number: 3,
+		Number: 4,
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -376,7 +408,7 @@ func MakePatterns() map[int]common.Patten {
 	colors := common.Patten{
 		Name:   "Color Chase",
 		Label:  "Color.Chase",
-		Number: 4,
+		Number: 5,
 		Steps: []common.Step{
 			{ // Step 1, - Red
 				Fixtures: []common.Fixture{
@@ -477,11 +509,12 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	Pattens[0] = standard
-	Pattens[1] = rgbchase
-	Pattens[2] = pairs
-	Pattens[3] = inward
-	Pattens[4] = colors
+	Pattens[0] = flash
+	Pattens[1] = standard
+	Pattens[2] = rgbchase
+	Pattens[3] = pairs
+	Pattens[4] = inward
+	Pattens[5] = colors
 
 	return Pattens
 

@@ -47,14 +47,11 @@ func main() {
 	// Setup the current state.
 	this := buttons.CurrentState{}
 
-	// Setup State.
-	this.SequenceSpeed = 12                         // Selected speed for the sequence.
-	this.ScannerSize = common.DefaultScannerSize    // Default scanner size.
-	this.SelectedShift = 0                          // Default shift size.
-	this.Blackout = false                           // Blackout starts in off.
-	this.Flood = false                              // Flood starts in off.
-	this.FadeTime = common.DefaultFadeTime          // Set the default fade time
-	this.Size = common.DefaultRGBSize               // Set the defaults size for the RGB fixtures.
+	this.ScannerSize = common.DefaultScannerSize // Default scanner size.
+
+	this.Blackout = false // Blackout starts in off.
+	this.Flood = false    // Flood starts in off.
+
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
@@ -70,6 +67,10 @@ func main() {
 	this.EditPattenMode = make([]bool, 4)           // Remember when we are in editing patten mode.
 	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
+	this.Speed = make(map[int]int, 4)               // Initialise storage for four sequences.
+	this.Size = make(map[int]int, 4)                // Initialise storage for four sequences.
+	this.Shift = make(map[int]int, 4)               // Initialise storage for four sequences.
+	this.Fade = make(map[int]int, 4)                // Initialise storage for four sequences.
 
 	// Initialize eight fixture states for the four sequences.
 	this.ScannerState = make([][]common.ScannerState, 9)
@@ -145,9 +146,9 @@ func main() {
 	// Create the sequences from config file.
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
-	for index, sequenceConf := range sequencesConfig.Sequences {
+	for sequenceNumber, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
-		newSequence := sequence.CreateSequence(sequenceConf.Type, index, this.Pattens, fixturesConfig, this.SequenceChannels)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceNumber, this.Pattens, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name
@@ -155,6 +156,12 @@ func main() {
 		newSequence.Label = sequenceConf.Label
 
 		sequences = append(sequences, &newSequence)
+
+		// Setup Default State.
+		this.Speed[sequenceNumber] = common.DefaultSpeed  // Selected speed for the sequence.
+		this.Shift[sequenceNumber] = common.DefaultShift  // Default shift size.
+		this.Size[sequenceNumber] = common.DefaultRGBSize // Set the defaults size for the RGB fixtures.
+		this.Fade[sequenceNumber] = common.DefaultFade    // Set the default fade time
 	}
 
 	// Create all the channels I need.
@@ -199,13 +206,13 @@ func main() {
 	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
 	panel.SpeedLabel = speedLabel
 
-	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultScannerShift))
+	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultShift))
 	panel.ShiftLabel = shiftLabel
 
 	sizeLabel := widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
 	panel.SizeLabel = sizeLabel
 
-	fadeLabel := widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultFadeTime))
+	fadeLabel := widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultFade))
 	panel.FadeLabel = fadeLabel
 
 	bpmLabel := widget.NewLabel(fmt.Sprintf("BPM %03d", 0))

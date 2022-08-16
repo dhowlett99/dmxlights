@@ -110,7 +110,7 @@ const (
 	LoadConfig
 	UpdateSpeed
 	UpdateScannerPatten
-	SelectPatten
+	UpdateRGBPatten
 	UpdateFadeSpeed
 	UpdateSize
 	UpdateScannerSize
@@ -148,11 +148,14 @@ const (
 )
 
 const DefaultScannerSize = 120
-const DefaultScannerPatten = 0
+const MaxScannerSize = 120
+const DefaultScannerPatten = 0 // Circle
+const DefaultRGBPatten = 1     // Chase
 const DefaultRGBSize = 1
-const DefaultFadeTime = 12
+const DefaultFade = 1
 const DefaultSpeed = 12
-const DefaultScannerShift = 0
+const DefaultShift = 0
+const DefaultNumberCoordinates = 0
 
 var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}
@@ -207,10 +210,10 @@ type Sequence struct {
 	RGBAvailablePattens        map[int]Patten              // Available pattens for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
+	RGBPatten                  int                         // Selected RGB patten.
 	FadeTime                   int                         // Fade time
 	Size                       int                         // Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
-	SelectedRGBPatten          int                         // Selected RGB patten.
 	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
 	Mode                       string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
@@ -237,7 +240,7 @@ type Sequence struct {
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
 	ScannerOffsetPan           int                         // Offset for pan values.
 	ScannerOffsetTilt          int                         // Offset for tilt values.
-	FixtureDisabledMutex       *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
+	ScannerStateMutex          *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	ScannerState               map[int]ScannerState        // Map of fixtures which are disabled.
 	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
@@ -304,9 +307,7 @@ type FixtureCommand struct {
 	SequenceNumber         int
 	Inverted               bool
 	SelectedGobo           int
-	FixtureDisabledMutex   *sync.RWMutex // Mutex to protect the  disable maps from syncronous access.
 	ScannerState           map[int]ScannerState
-	DisableOnceMutex       *sync.RWMutex // Mutex to protect the  disable once map from syncronous access.
 	DisableOnce            map[int]bool
 	ScannerChase           bool
 	ScannerColor           map[int]int

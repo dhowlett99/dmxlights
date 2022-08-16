@@ -170,13 +170,13 @@ func FixtureReceiver(sequence common.Sequence,
 					}
 				}
 
-				cmd.FixtureDisabledMutex.RLock()
+				sequence.ScannerStateMutex.RLock()
 				enabled := cmd.ScannerState[myFixtureNumber].Enabled
-				cmd.FixtureDisabledMutex.RUnlock()
+				sequence.ScannerStateMutex.RUnlock()
 
-				cmd.DisableOnceMutex.RLock()
+				sequence.DisableOnceMutex.RLock()
 				disableOnce := cmd.DisableOnce[myFixtureNumber]
-				cmd.DisableOnceMutex.RUnlock()
+				sequence.DisableOnceMutex.RUnlock()
 
 				// If this fixture is disabled then shut the shutter off.
 				if cmd.CurrentPosition == position.StartPosition &&
@@ -186,16 +186,16 @@ func FixtureReceiver(sequence common.Sequence,
 
 					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0)
 
-					cmd.DisableOnceMutex.RLock()
-					cmd.DisableOnce[myFixtureNumber] = false
-					cmd.DisableOnceMutex.RUnlock()
+					sequence.DisableOnceMutex.RLock()
+					sequence.DisableOnce[myFixtureNumber] = false
+					sequence.DisableOnceMutex.RUnlock()
 
 					continue
 				}
 
-				cmd.FixtureDisabledMutex.RLock()
+				sequence.ScannerStateMutex.RLock()
 				enabled = cmd.ScannerState[myFixtureNumber].Enabled
-				cmd.FixtureDisabledMutex.RUnlock()
+				sequence.ScannerStateMutex.RUnlock()
 
 				if cmd.CurrentPosition == position.StartPosition && enabled {
 

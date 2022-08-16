@@ -22,11 +22,12 @@ const (
 type CurrentState struct {
 	SelectedSequence         int                        // The currently selected sequence.
 	LastSelectedSequence     int                        // Store fof the last selected squence.
-	SequenceSpeed            int                        // Local copy of sequence speed.
-	Size                     int                        // current RGB sequence this.Size.
-	ScannerSize              int                        // Current scanner this.Size.
+	Speed                    map[int]int                // Local copy of sequence speed. Indexed by sequence.
+	Shift                    map[int]int                // Current fixture shift. Indexed by sequence.
+	Size                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence.
+	Fade                     map[int]int                // Default start at 1. Indexed by sequence.
+	ScannerSize              int                        // Current scanner this.Size[this.SelectedSequence].
 	SavePreset               bool                       // Save a preset flag.
-	SelectedShift            int                        // Current fixture shift.
 	Blackout                 bool                       // Blackout all fixtures.
 	Flood                    bool                       // Flood all fixtures.
 	FunctionSelectMode       []bool                     // Which sequence is in function selection mode.
@@ -38,7 +39,6 @@ type CurrentState struct {
 	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
 	EditPattenMode           []bool                     // This flag is true when the sequence is in patten editing mode.
 	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
-	FadeTime                 int                        // Default start at 1
 	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
 	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY   int                        // Which Static Color button did we change last.
@@ -55,7 +55,8 @@ type CurrentState struct {
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
 	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
-	SelectedPatten           int                        // The selected Patten Number. Used as the index for above.
+	ScannerPatten            int                        // The selected Scanner Patten Number. Used as the index for above.
+	RGBPatten                int                        // The selected RGB Patten Number. Used as the index for above.
 	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
 	SelectedGobo             int                        // The selected GOBO.
 	ButtonTimer              *time.Time                 // Button Timer
@@ -92,7 +93,7 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
-	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on color patten.
 	if X >= 0 &&
 		X < 8 &&
 		Y >= 0 &&
@@ -107,11 +108,11 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
 		}
-
+		colorPatten := 5
 		flashSequence := common.Sequence{
 			Patten: common.Patten{
 				Name:  "colors",
-				Steps: this.Pattens[4].Steps, // Use the color patten for flashing.
+				Steps: this.Pattens[colorPatten].Steps, // Use the color patten for flashing.
 			},
 		}
 
@@ -473,20 +474,20 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		this.SelectedShift = this.SelectedShift - 1
-		if this.SelectedShift < 0 {
-			this.SelectedShift = 0
+		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] - 1
+		if this.Shift[this.SelectedSequence] < 0 {
+			this.Shift[this.SelectedSequence] = 0
 		}
 		cmd := common.Command{
 			Action: common.UpdateShift,
 			Args: []common.Arg{
-				{Name: "Shift", Value: this.SelectedShift},
+				{Name: "Shift", Value: this.Shift[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.SelectedShift), "shift", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
 
 		return
 	}
@@ -500,20 +501,20 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		this.SelectedShift = this.SelectedShift + 1
-		if this.SelectedShift > 3 {
-			this.SelectedShift = 3
+		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] + 1
+		if this.Shift[this.SelectedSequence] > 3 {
+			this.Shift[this.SelectedSequence] = 3
 		}
 		cmd := common.Command{
 			Action: common.UpdateShift,
 			Args: []common.Arg{
-				{Name: "Shift", Value: this.SelectedShift},
+				{Name: "Shift", Value: this.Shift[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.SelectedShift), "shift", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
 
 		return
 	}
@@ -531,21 +532,21 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		if !sequences[this.SelectedSequence].MusicTrigger {
-			this.SequenceSpeed--
-			if this.SequenceSpeed < 0 {
-				this.SequenceSpeed = 1
+			this.Speed[this.SelectedSequence]--
+			if this.Speed[this.SelectedSequence] < 0 {
+				this.Speed[this.SelectedSequence] = 1
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.SequenceSpeed},
+					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.SequenceSpeed), "speed", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
 
 		return
 	}
@@ -563,21 +564,21 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		if !sequences[this.SelectedSequence].MusicTrigger {
-			this.SequenceSpeed++
-			if this.SequenceSpeed > 18 {
-				this.SequenceSpeed = 18
+			this.Speed[this.SelectedSequence]++
+			if this.Speed[this.SelectedSequence] > 18 {
+				this.Speed[this.SelectedSequence] = 18
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.SequenceSpeed},
+					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.SequenceSpeed), "speed", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
 
 		return
 	}
@@ -681,7 +682,7 @@ func ProcessButtons(X int, Y int,
 		cmd := common.Command{
 			Action: common.Start,
 			Args: []common.Arg{
-				{Name: "Speed", Value: this.SequenceSpeed},
+				{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -701,7 +702,7 @@ func ProcessButtons(X int, Y int,
 		cmd := common.Command{
 			Action: common.Stop,
 			Args: []common.Arg{
-				{Name: "Speed", Value: this.SequenceSpeed},
+				{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -721,14 +722,14 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Send Update RGB Size.
-		this.Size--
-		if this.Size < 1 {
-			this.Size = 1
+		this.Size[this.SelectedSequence]--
+		if this.Size[this.SelectedSequence] < 1 {
+			this.Size[this.SelectedSequence] = 1
 		}
 		cmd := common.Command{
 			Action: common.UpdateSize,
 			Args: []common.Arg{
-				{Name: "Size", Value: this.Size},
+				{Name: "Size", Value: this.Size[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -747,7 +748,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
 
 		return
 	}
@@ -762,22 +763,22 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Send Update RGB Size.
-		this.Size++
-		if this.Size > 50 {
-			this.Size = 50
+		this.Size[this.SelectedSequence]++
+		if this.Size[this.SelectedSequence] > 50 {
+			this.Size[this.SelectedSequence] = 50
 		}
 		cmd := common.Command{
 			Action: common.UpdateSize,
 			Args: []common.Arg{
-				{Name: "Size", Value: this.Size},
+				{Name: "Size", Value: this.Size[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Send Update Scanner Size.
 		this.ScannerSize = this.ScannerSize + 10
-		if this.ScannerSize > 120 {
-			this.ScannerSize = 120
+		if this.ScannerSize > common.MaxScannerSize {
+			this.ScannerSize = common.MaxScannerSize
 		}
 		cmd = common.Command{
 			Action: common.UpdateScannerSize,
@@ -788,7 +789,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size), "size", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
 
 		return
 	}
@@ -804,16 +805,16 @@ func ProcessButtons(X int, Y int,
 
 			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-			this.FadeTime--
-			if this.FadeTime < 1 {
-				this.FadeTime = 1
+			this.Fade[this.SelectedSequence]--
+			if this.Fade[this.SelectedSequence] < 1 {
+				this.Fade[this.SelectedSequence] = 1
 			}
 
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeTime},
+					{Name: "FadeSpeed", Value: this.Fade[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -838,7 +839,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
 
 		return
 	}
@@ -853,15 +854,15 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.SelectedSequence].Type == "rgb" {
 			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-			this.FadeTime++
-			if this.FadeTime > 50 {
-				this.FadeTime = 50
+			this.Fade[this.SelectedSequence]++
+			if this.Fade[this.SelectedSequence] > 50 {
+				this.Fade[this.SelectedSequence] = 50
 			}
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeTime},
+					{Name: "FadeSpeed", Value: this.Fade[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -886,7 +887,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.FadeTime), "fade", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
 
 		return
 	}
@@ -1374,17 +1375,17 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPattenMode[this.SelectedSequence] {
 
-		this.SelectedPatten = X
+		this.RGBPatten = X
 
 		if debug {
-			fmt.Printf("Set Patten to %d\n", this.SelectedPatten)
+			fmt.Printf("Set Patten to %d\n", this.RGBPatten)
 		}
 
 		// Tell the sequence to change the patten.
 		cmd := common.Command{
-			Action: common.SelectPatten,
+			Action: common.UpdateRGBPatten,
 			Args: []common.Arg{
-				{Name: "SelectedPatten", Value: this.SelectedPatten},
+				{Name: "SelectedPatten", Value: this.RGBPatten},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1975,7 +1976,7 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 
 	if sequence.Type == "rgb" {
 		for _, patten := range sequence.RGBAvailablePattens {
-			if patten.Number == sequence.SelectedRGBPatten {
+			if patten.Number == sequence.RGBPatten {
 				common.FlashLight(patten.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
@@ -2243,25 +2244,45 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 		// Reset the speed back to the default.
-		this.SequenceSpeed = 14
+		this.Speed[sequenceNumber] = common.DefaultSpeed
 		cmd = common.Command{
 			Action: common.UpdateSpeed,
 			Args: []common.Arg{
-				{Name: "Speed", Value: this.SequenceSpeed},
+				{Name: "Speed", Value: this.Speed[sequenceNumber]},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+		// Reset the shift back to the default.
+		this.Shift[sequenceNumber] = common.DefaultShift
+		cmd = common.Command{
+			Action: common.UpdateShift,
+			Args: []common.Arg{
+				{Name: "Shift", Value: this.Shift[sequenceNumber]},
+			},
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+		// Reset the Size back to the default.
+		this.Size[sequenceNumber] = common.DefaultRGBSize
+		cmd = common.Command{
+			Action: common.UpdateSize,
+			Args: []common.Arg{
+				{Name: "Size", Value: this.Size[sequenceNumber]},
+			},
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 		// Reset the fade speed back to the default
 		if sequence.Type == "rgb" {
-			this.FadeTime = 1
+			this.Fade[sequenceNumber] = common.DefaultFade
 			cmd = common.Command{
 				Action: common.UpdateFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.FadeTime},
+					{Name: "FadeSpeed", Value: this.Fade[sequenceNumber]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
 		// Tell the sequence to turn on all the scanners.
@@ -2282,37 +2303,47 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
 
 			// Reset the number of coordinates.
-			this.SelectedCordinates = 0
+			this.SelectedCordinates = common.DefaultNumberCoordinates
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.SelectedCordinates},
+					{Name: "Coordinates", Value: this.SelectedCordinates},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 			// Reset the Scanner Size back to default.
 			this.ScannerSize = common.DefaultScannerSize
 			cmd = common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: common.DefaultScannerSize},
+					{Name: "ScannerSize", Value: this.ScannerSize},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 			// Reset the scanner patten back to default.
-			this.SelectedPatten = common.DefaultScannerPatten
+			this.ScannerPatten = common.DefaultScannerPatten
 			cmd = common.Command{
 				Action: common.UpdateScannerPatten,
 				Args: []common.Arg{
-					{Name: "ScannerPatten", Value: common.DefaultScannerPatten},
+					{Name: "ScannerPatten", Value: this.ScannerPatten},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+			// Reset the RGB patten back to default.
+			this.RGBPatten = common.DefaultRGBPatten
+			cmd = common.Command{
+				Action: common.UpdateRGBPatten,
+				Args: []common.Arg{
+					{Name: "RGBPatten", Value: this.RGBPatten},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		// Clear all the function buttons.
+		// Clear all the function buttons for this sequence.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
 			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
 			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
@@ -2353,6 +2384,27 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditScannerColorsMode[sequenceNumber] = false
 		this.EditSequenceColorsMode[sequenceNumber] = false
 		this.EditStaticColorsMode[sequenceNumber] = false
+
+		// Update the status bar for the first sequnce. Because that will be the one selected after a clear.
+		this.SelectedSequence = 0
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
+
+		// Now convice handle() to do the work for us and
+		// select the first sequence and place everything in normal mode.
+		this.FunctionSelectMode[this.SelectedSequence] = true
+		this.SelectButtonPressed[this.SelectedSequence] = false
+		this.EditSequenceColorsMode[this.SelectedSequence] = false
+		this.EditStaticColorsMode[this.SelectedSequence] = false
+
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
+		cmd := common.Command{
+			Action: common.PlayStaticOnce,
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 	}
 }
