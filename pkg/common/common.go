@@ -72,7 +72,7 @@ type ScannerState struct {
 	Inverted bool
 }
 
-type Patten struct {
+type Pattern struct {
 	Name     string
 	Label    string
 	Number   int
@@ -109,8 +109,8 @@ const (
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
-	UpdateScannerPatten
-	UpdateRGBPatten
+	UpdateScannerPattern
+	UpdateRGBPattern
 	UpdateFadeSpeed
 	UpdateSize
 	UpdateScannerSize
@@ -134,8 +134,8 @@ const (
 	StopStrobe
 	UpdateAutoColor
 	AutoColor
-	UpdateAutoPatten
-	AutoPatten
+	UpdateAutoPattern
+	AutoPattern
 	ToggleFixtureState
 	FixtureState
 	UpdateShift
@@ -151,8 +151,8 @@ const (
 
 const DefaultScannerSize = 120
 const MaxScannerSize = 120
-const DefaultScannerPatten = 0 // Circle
-const DefaultRGBPatten = 1     // Chase
+const DefaultScannerPattern = 0 // Circle
+const DefaultRGBPattern = 1     // Chase
 const DefaultRGBSize = 1
 const DefaultFade = 1
 const DefaultSpeed = 12
@@ -205,15 +205,15 @@ type Sequence struct {
 	NumberFixtures             int                         // Number of fixtures for this sequence.
 	FixturePositions           map[int]map[int][]Position  // Fixture positions decides where a fixture is in a give set of sequence steps.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
-	AutoPatten                 bool                        // Sequence is going to automatically change the patten.
+	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
-	Patten                     Patten                      // Contains fixtures and steps info.
-	PattenInverted             bool                        // The patten is inverted.
-	RGBAvailablePattens        map[int]Patten              // Available pattens for the RGB fixtures.
+	Pattern                    Pattern                     // Contains fixtures and steps info.
+	PatternInverted            bool                        // The pattern is inverted.
+	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	RGBPatten                  int                         // Selected RGB patten.
+	RGBPattern                 int                         // Selected RGB pattern.
 	FadeTime                   int                         // Fade time
 	Size                       int                         // Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
@@ -233,9 +233,9 @@ type Sequence struct {
 	ScannersTotal              int                         // Total number of scanners in this sequence.
 	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
 	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
-	ScannerAvailablePattens    map[int]Patten              // Available pattens for this scanner.
+	ScannerAvailablePatterns   map[int]Pattern             // Available patterns for this scanner.
 	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
-	ScannerPatten              int                         // The selected scanner patten.
+	ScannerPattern             int                         // The selected scanner pattern.
 	ScannerSize                int                         // The selected scanner size.
 	ScannerShift               int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                int                         // The selected gobo.
@@ -250,7 +250,7 @@ type Sequence struct {
 	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
 	UpdateShift                bool                        // Command to update the shift.
-	UpdatePatten               bool                        // Flag to indicate we're going to change the RGB patten.
+	UpdatePattern              bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor        bool                        // Command to update the sequence colors.
 	Functions                  []Function                  // Storage for the sequence functions.
 	FunctionMode               bool                        // This sequence is in function mode.
@@ -379,9 +379,9 @@ type Trigger struct {
 
 // Define the function keys.
 const (
-	Function1_Patten        = 0 // Set patten mode.
+	Function1_Pattern       = 0 // Set pattern mode.
 	Function2_Auto_Color    = 1 // Auto Color change.
-	Function3_Auto_Patten   = 2 // Auto Patten change
+	Function3_Auto_Pattern  = 2 // Auto Pattern change
 	Function4_Bounce        = 3 // Sequence auto reverses.  doesn't apply in scanner mode.
 	Function5_Color         = 4 // Set RGB chase color. or select the scanner color.
 	Function6_Static_Gobo   = 5 // Set static color / set scanner gobo.
@@ -620,8 +620,8 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	// Map the auto color change setting.
 	sequence.AutoColor = sequence.Functions[Function2_Auto_Color].State
 
-	// Map the auto patten change setting.
-	sequence.AutoPatten = sequence.Functions[Function3_Auto_Patten].State
+	// Map the auto pattern change setting.
+	sequence.AutoPattern = sequence.Functions[Function3_Auto_Pattern].State
 
 	// Map bounce function to sequence bounce setting.
 	sequence.Bounce = sequence.Functions[Function4_Bounce].State
@@ -641,7 +641,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map invert function.
-	sequence.PattenInverted = sequence.Functions[Function7_Invert_Chase].State
+	sequence.PatternInverted = sequence.Functions[Function7_Invert_Chase].State
 	// Map scanner chase mode. Uses same function key as above.
 	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 

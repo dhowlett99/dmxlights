@@ -40,7 +40,7 @@ type CurrentState struct {
 	EditScannerColorsMode    []bool                     // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode    []bool                     // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditPattenMode           []bool                     // This flag is true when the sequence is in patten editing mode.
+	EditPatternMode          []bool                     // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
 	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
@@ -57,9 +57,9 @@ type CurrentState struct {
 	LastPreset               *string                    // Last preset used.
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
-	Pattens                  map[int]common.Patten      // A indexed map of the available pattens for this sequence.
-	ScannerPatten            int                        // The selected Scanner Patten Number. Used as the index for above.
-	RGBPatten                int                        // The selected RGB Patten Number. Used as the index for above.
+	Patterns                 map[int]common.Pattern     // A indexed map of the available patterns for this sequence.
+	ScannerPattern           int                        // The selected Scanner Pattern Number. Used as the index for above.
+	RGBPattern               int                        // The selected RGB Pattern Number. Used as the index for above.
 	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
 	SelectedGobo             int                        // The selected GOBO.
 	ButtonTimer              *time.Time                 // Button Timer
@@ -96,12 +96,12 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
-	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on color patten.
+	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on color pattern.
 	if X >= 0 &&
 		X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
-		!sequences[Y].Functions[common.Function1_Patten].State &&
+		!sequences[Y].Functions[common.Function1_Pattern].State &&
 		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
 		!sequences[Y].Functions[common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
@@ -111,21 +111,21 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
 		}
-		colorPatten := 5
+		colorPattern := 5
 		flashSequence := common.Sequence{
-			Patten: common.Patten{
+			Pattern: common.Pattern{
 				Name:  "colors",
-				Steps: this.Pattens[colorPatten].Steps, // Use the color patten for flashing.
+				Steps: this.Patterns[colorPattern].Steps, // Use the color pattern for flashing.
 			},
 		}
 
-		red := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].R
-		green := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].G
-		blue := flashSequence.Patten.Steps[X].Fixtures[X].Colors[0].B
-		pan := flashSequence.Patten.Steps[X].Fixtures[X].Pan
-		tilt := flashSequence.Patten.Steps[X].Fixtures[X].Tilt
-		shutter := flashSequence.Patten.Steps[X].Fixtures[X].Shutter
-		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
+		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
+		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
+		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
+		pan := flashSequence.Pattern.Steps[X].Fixtures[X].Pan
+		tilt := flashSequence.Pattern.Steps[X].Fixtures[X].Tilt
+		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
+		gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
@@ -139,12 +139,12 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// F L A S H  O F F   B U T T O N S - Briefly light (flash) the fixtures based on current patten.
+	// F L A S H  O F F   B U T T O N S - Briefly light (flash) the fixtures based on current pattern.
 	if X >= 0 &&
 		X != 108 && X != 117 &&
 		X >= 100 && X < 117 &&
 		Y >= 0 && Y < 4 &&
-		!sequences[Y].Functions[common.Function1_Patten].State &&
+		!sequences[Y].Functions[common.Function1_Pattern].State &&
 		!sequences[Y].Functions[common.Function6_Static_Gobo].State &&
 		!sequences[Y].Functions[common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
@@ -957,7 +957,7 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 && !this.FunctionSelectMode[this.SelectedSequence] &&
 		Y >= 0 &&
 		Y < 4 &&
-		!sequences[this.SelectedSequence].Functions[common.Function1_Patten].State &&
+		!sequences[this.SelectedSequence].Functions[common.Function1_Pattern].State &&
 		!sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
 		!sequences[this.SelectedSequence].Functions[common.Function5_Color].State &&
 		sequences[Y].Type == "scanner" {
@@ -1272,7 +1272,7 @@ func ProcessButtons(X int, Y int,
 		// If the sequence isn't running this will force a single color DMX message.
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, scannerColor)
 
-		// Clear the patten function keys
+		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// We call ShowScannerColorSelectionButtons here so the selections will flash as you press them.
@@ -1293,7 +1293,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Selected Fixture is %d \n", this.SelectedFixture)
 		}
 
-		// Clear the patten function keys
+		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// Update the buttons.
@@ -1343,7 +1343,7 @@ func ProcessButtons(X int, Y int,
 		// If the sequence isn't running this will force a single gobo DMX message.
 		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo)
 
-		// Clear the patten function keys
+		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// We call ShowGoboSelectionButtons here so the selections will flash as you press them.
@@ -1401,19 +1401,19 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   P A T T E N
 	if X >= 0 && X < 8 && Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		this.EditPattenMode[this.SelectedSequence] {
+		this.EditPatternMode[this.SelectedSequence] {
 
-		this.RGBPatten = X
+		this.RGBPattern = X
 
 		if debug {
-			fmt.Printf("Set Patten to %d\n", this.RGBPatten)
+			fmt.Printf("Set Pattern to %d\n", this.RGBPattern)
 		}
 
-		// Tell the sequence to change the patten.
+		// Tell the sequence to change the pattern.
 		cmd := common.Command{
-			Action: common.UpdateRGBPatten,
+			Action: common.UpdateRGBPattern,
 			Args: []common.Arg{
-				{Name: "SelectedPatten", Value: this.RGBPatten},
+				{Name: "SelectedPattern", Value: this.RGBPattern},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1423,9 +1423,9 @@ func ProcessButtons(X int, Y int,
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
-		// We call ShowPattenSelectionButtons here so the selections will flash as you press them.
+		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
-		ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+		ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 		return
 	}
@@ -1433,7 +1433,7 @@ func ProcessButtons(X int, Y int,
 	// F U N C T I O N  K E Y S
 	if X >= 0 && X < 8 &&
 		this.FunctionSelectMode[this.SelectedSequence] &&
-		!this.EditPattenMode[this.SelectedSequence] &&
+		!this.EditPatternMode[this.SelectedSequence] &&
 		!this.EditStaticColorsMode[this.SelectedSequence] &&
 		!this.EditGoboSelectionMode[this.SelectedSequence] &&
 		!sequences[this.SelectedSequence].Functions[common.Function5_Color].State {
@@ -1473,18 +1473,18 @@ func ProcessButtons(X int, Y int,
 
 		// Now some functions mean that we go into another menu ( set of buttons )
 		// This is true for :-
-		// Function 1 - setting the patten.
+		// Function 1 - setting the pattern.
 		// Function 5 - setting the sequence colors or selecting scanner color.
 		// Function 6 - setting the static colors or selecting scanner gobo.
 
-		// Map Function 1 to patten mode.
-		this.EditPattenMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function1_Patten].State
+		// Map Function 1 to pattern mode.
+		this.EditPatternMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function1_Pattern].State
 
-		// Go straight into patten select mode, don't wait for a another select press.
-		if this.EditPattenMode[this.SelectedSequence] {
+		// Go straight into pattern select mode, don't wait for a another select press.
+		if this.EditPatternMode[this.SelectedSequence] {
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = false
-			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 		}
 
 		// Function 5.
@@ -1597,7 +1597,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
-		fmt.Printf("HANDLE: this.EditPattenMode[%d] = %t \n", this.SelectedSequence, this.EditPattenMode[this.SelectedSequence])
+		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
@@ -1615,13 +1615,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		this.FunctionSelectMode[this.SelectedSequence] = false
 
-		if sequences[this.SelectedSequence].Functions[common.Function1_Patten].State {
+		if sequences[this.SelectedSequence].Functions[common.Function1_Pattern].State {
 			if debug {
-				fmt.Printf("Show Patten Selection Buttons\n")
+				fmt.Printf("Show Pattern Selection Buttons\n")
 			}
-			this.EditPattenMode[this.SelectedSequence] = true
+			this.EditPatternMode[this.SelectedSequence] = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
-			ShowPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}
 
@@ -1642,9 +1642,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			return
 		}
 
-		// Allow us to exit the patten select mode without setting a patten.
-		if this.EditPattenMode[this.SelectedSequence] {
-			this.EditPattenMode[this.SelectedSequence] = false
+		// Allow us to exit the pattern select mode without setting a pattern.
+		if this.EditPatternMode[this.SelectedSequence] {
+			this.EditPatternMode[this.SelectedSequence] = false
 		}
 
 		// Switch off the gobo selection mode.
@@ -1678,18 +1678,18 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.FunctionSelectMode[this.SelectedSequence] = false
 		this.SelectButtonPressed[this.SelectedSequence] = true
 
-		if sequences[this.SelectedSequence].Functions[common.Function1_Patten].State {
-			// Reset the patten function key.
-			sequences[this.SelectedSequence].Functions[common.Function1_Patten].State = false
+		if sequences[this.SelectedSequence].Functions[common.Function1_Pattern].State {
+			// Reset the pattern function key.
+			sequences[this.SelectedSequence].Functions[common.Function1_Pattern].State = false
 
-			// Clear the patten function keys
-			ClearPattenSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			// Clear the pattern function keys
+			ClearPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 			// And reveal the sequence.
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
-			// Editing patten is over for this sequence.
-			this.EditPattenMode[this.SelectedSequence] = false
+			// Editing pattern is over for this sequence.
+			this.EditPatternMode[this.SelectedSequence] = false
 
 			// Clear buttons and remove any labels.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -1987,16 +1987,16 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	return nil
 }
 
-// For the given sequence clear the available this.Pattens on the relevant buttons.
-func ClearPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+// For the given sequence clear the available this.Patterns on the relevant buttons.
+func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 	// Check if we need to flash this button.
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
 	}
 }
 
-// For the given sequence show the available pattens on the relevant buttons.
-func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+// For the given sequence show the available patterns on the relevant buttons.
+func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
@@ -2006,25 +2006,25 @@ func ShowPattenSelectionButtons(mySequenceNumber int, sequence common.Sequence, 
 	White := common.Color{R: 255, G: 255, B: 255}
 
 	if sequence.Type == "rgb" {
-		for _, patten := range sequence.RGBAvailablePattens {
-			if patten.Number == sequence.RGBPatten {
-				common.FlashLight(patten.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+		for _, pattern := range sequence.RGBAvailablePatterns {
+			if pattern.Number == sequence.RGBPattern {
+				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
+			common.LabelButton(pattern.Number, mySequenceNumber, pattern.Label, guiButtons)
 		}
 		return
 	}
 
 	if sequence.Type == "scanner" {
-		for _, patten := range sequence.ScannerAvailablePattens {
-			if patten.Number == sequence.ScannerPatten {
-				common.FlashLight(patten.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+		for _, pattern := range sequence.ScannerAvailablePatterns {
+			if pattern.Number == sequence.ScannerPattern {
+				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: patten.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(patten.Number, mySequenceNumber, patten.Label, guiButtons)
+			common.LabelButton(pattern.Number, mySequenceNumber, pattern.Label, guiButtons)
 		}
 		return
 	}
@@ -2371,22 +2371,22 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			// Reset the scanner patten back to default.
-			this.ScannerPatten = common.DefaultScannerPatten
+			// Reset the scanner pattern back to default.
+			this.ScannerPattern = common.DefaultScannerPattern
 			cmd = common.Command{
-				Action: common.UpdateScannerPatten,
+				Action: common.UpdateScannerPattern,
 				Args: []common.Arg{
-					{Name: "ScannerPatten", Value: this.ScannerPatten},
+					{Name: "ScannerPattern", Value: this.ScannerPattern},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			// Reset the RGB patten back to default.
-			this.RGBPatten = common.DefaultRGBPatten
+			// Reset the RGB pattern back to default.
+			this.RGBPattern = common.DefaultRGBPattern
 			cmd = common.Command{
-				Action: common.UpdateRGBPatten,
+				Action: common.UpdateRGBPattern,
 				Args: []common.Arg{
-					{Name: "RGBPatten", Value: this.RGBPatten},
+					{Name: "RGBPattern", Value: this.RGBPattern},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
@@ -2394,9 +2394,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Clear all the function buttons for this sequence.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
-			sequences[sequenceNumber].Functions[common.Function1_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function1_Pattern].State = false
 			sequences[sequenceNumber].Functions[common.Function2_Auto_Color].State = false
-			sequences[sequenceNumber].Functions[common.Function3_Auto_Patten].State = false
+			sequences[sequenceNumber].Functions[common.Function3_Auto_Pattern].State = false
 			sequences[sequenceNumber].Functions[common.Function4_Bounce].State = false
 			sequences[sequenceNumber].Functions[common.Function5_Color].State = false
 			sequences[sequenceNumber].Functions[common.Function6_Static_Gobo].State = false
@@ -2429,7 +2429,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.FunctionSelectMode[sequenceNumber] = false
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.EditGoboSelectionMode[sequenceNumber] = false
-		this.EditPattenMode[sequenceNumber] = false
+		this.EditPatternMode[sequenceNumber] = false
 		this.EditScannerColorsMode[sequenceNumber] = false
 		this.EditSequenceColorsMode[sequenceNumber] = false
 		this.EditStaticColorsMode[sequenceNumber] = false

@@ -1,4 +1,4 @@
-package patten
+package pattern
 
 import (
 	"fmt"
@@ -13,11 +13,11 @@ const (
 	full = 255
 )
 
-func MakePatterns() map[int]common.Patten {
+func MakePatterns() map[int]common.Pattern {
 
-	Pattens := make(map[int]common.Patten)
+	Patterns := make(map[int]common.Pattern)
 
-	flash := common.Patten{
+	flash := common.Pattern{
 		Name:   "Flash",
 		Number: 0,
 		Label:  "Flash",
@@ -49,7 +49,7 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	standard := common.Patten{
+	standard := common.Pattern{
 		Name:   "Chase",
 		Number: 1,
 		Label:  "Std.Chase",
@@ -153,7 +153,7 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	rgbchase := common.Patten{
+	rgbchase := common.Pattern{
 		Name:   "RGB Chase",
 		Number: 2,
 		Label:  "RGB.Chase",
@@ -257,7 +257,7 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	pairs := common.Patten{
+	pairs := common.Pattern{
 		Name:   "Pairs",
 		Label:  "Pairs",
 		Number: 3,
@@ -349,7 +349,7 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	inward := common.Patten{
+	inward := common.Pattern{
 		Name:   "Inward",
 		Label:  "Inward",
 		Number: 4,
@@ -405,7 +405,7 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	colors := common.Patten{
+	colors := common.Pattern{
 		Name:   "Color Chase",
 		Label:  "Color.Chase",
 		Number: 5,
@@ -509,14 +509,14 @@ func MakePatterns() map[int]common.Patten {
 		},
 	}
 
-	Pattens[0] = flash
-	Pattens[1] = standard
-	Pattens[2] = rgbchase
-	Pattens[3] = pairs
-	Pattens[4] = inward
-	Pattens[5] = colors
+	Patterns[0] = flash
+	Patterns[1] = standard
+	Patterns[2] = rgbchase
+	Patterns[3] = pairs
+	Patterns[4] = inward
+	Patterns[5] = colors
 
-	return Pattens
+	return Patterns
 
 }
 
@@ -525,9 +525,9 @@ type scanner struct {
 	values []int
 }
 
-// GeneratePatten takes an array of Coordinates and turns them into a patten
+// GeneratePattern takes an array of Coordinates and turns them into a pattern
 // which is the starting point for all sequence steps.
-func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool) common.Patten {
+func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool) common.Pattern {
 
 	NumberCoordinates := len(Coordinates)
 
@@ -535,8 +535,8 @@ func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift
 		fmt.Printf("Number Fixtures %d\n", NumberFixtures)
 		fmt.Printf("Number Coordinates %d\n", NumberCoordinates)
 	}
-	// First create the patten.
-	patten := common.Patten{}
+	// First create the pattern.
+	pattern := common.Pattern{}
 
 	steps := []common.Step{}
 
@@ -613,7 +613,7 @@ func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift
 	}
 
 	var shutterValue int
-	// Now create the steps in the patten.
+	// Now create the steps in the pattern.
 	for stepNumber := 0; stepNumber < NumberCoordinates; stepNumber++ {
 
 		fixtures := []common.Fixture{}
@@ -645,10 +645,10 @@ func GeneratePatten(Coordinates []Coordinate, NumberFixtures int, requestedShift
 			Fixtures: fixtures,
 		}
 		steps = append(steps, newStep)
-		patten.Name = "circle"
-		patten.Steps = steps
+		pattern.Name = "circle"
+		pattern.Steps = steps
 	}
-	return patten
+	return pattern
 }
 
 func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures int, NumberCoordinates int) int {

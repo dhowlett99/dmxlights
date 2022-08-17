@@ -1,4 +1,4 @@
-package patten
+package pattern
 
 import (
 	"reflect"
@@ -77,17 +77,17 @@ func Test_circleGenerator(t *testing.T) {
 	}
 }
 
-func Test_generatePatten(t *testing.T) {
+func Test_generatePattern(t *testing.T) {
 	tests := []struct {
 		name        string
 		fixtures    int
 		shift       int
 		chase       bool
 		Coordinates []Coordinate
-		want        common.Patten
+		want        common.Pattern
 	}{
 		{
-			name:     "circle patten - 8 point , no shift",
+			name:     "circle pattern - 8 point , no shift",
 			fixtures: 1,
 			shift:    0,
 			Coordinates: []Coordinate{
@@ -124,7 +124,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  64,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -179,7 +179,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "two fixtures, circle patten - 8 point , with shift of 1/4",
+			name:     "two fixtures, circle pattern - 8 point , with shift of 1/4",
 			fixtures: 2,
 			shift:    1,
 			Coordinates: []Coordinate{
@@ -216,7 +216,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -279,7 +279,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "two fixtures, circle patten - 8 point , with shift of zero",
+			name:     "two fixtures, circle pattern - 8 point , with shift of zero",
 			fixtures: 2,
 			shift:    0,
 			Coordinates: []Coordinate{
@@ -316,7 +316,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -379,7 +379,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle patten - 8 point , with shift of 1/4",
+			name:     "four fixtures, circle pattern - 8 point , with shift of 1/4",
 			fixtures: 4,
 			shift:    1,
 			Coordinates: []Coordinate{
@@ -416,7 +416,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -495,7 +495,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "one fixture, circle patten - 8 point shift of 1/4 ",
+			name:     "one fixture, circle pattern - 8 point shift of 1/4 ",
 			fixtures: 1,
 			shift:    1,
 			Coordinates: []Coordinate{
@@ -532,7 +532,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 
@@ -605,7 +605,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  0,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -633,7 +633,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle patten - 8 point , with shift of 2 ie 1/2",
+			name:     "four fixtures, circle pattern - 8 point , with shift of 2 ie 1/2",
 			fixtures: 4,
 			shift:    2,
 			Coordinates: []Coordinate{
@@ -670,7 +670,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -749,7 +749,7 @@ func Test_generatePatten(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle patten - 8 point , with shift of 3 ie 3/4 shift",
+			name:     "four fixtures, circle pattern - 8 point , with shift of 3 ie 3/4 shift",
 			fixtures: 4,
 			shift:    3,
 			Coordinates: []Coordinate{
@@ -786,7 +786,7 @@ func Test_generatePatten(t *testing.T) {
 					Pan:  7,
 				},
 			},
-			want: common.Patten{
+			want: common.Pattern{
 				Name: "circle",
 				Steps: []common.Step{
 					{
@@ -867,7 +867,7 @@ func Test_generatePatten(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePatten(tt.Coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %v", got)
 				t.Errorf("Want = %v", tt.want)
 			}

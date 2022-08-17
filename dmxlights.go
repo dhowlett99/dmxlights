@@ -18,7 +18,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
-	"github.com/dhowlett99/dmxlights/pkg/patten"
+	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
@@ -57,14 +57,14 @@ func main() {
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
 	this.OffsetPan = 120                            // Start pan from the center
 	this.OffsetTilt = 120                           // Start tilt from the center.
-	this.Pattens = patten.MakePatterns()            // Build the default set of Pattens.
+	this.Patterns = pattern.MakePatterns()          // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, 4)      // Initialise four select buttons.
 	this.FunctionSelectMode = make([]bool, 4)       // Initialise four function mode states.
 	this.EditSequenceColorsMode = make([]bool, 4)   // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = make([]bool, 4)    // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = make([]bool, 4)    // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, 4)     // Remember when we are in editing static colors mode.
-	this.EditPattenMode = make([]bool, 4)           // Remember when we are in editing patten mode.
+	this.EditPatternMode = make([]bool, 4)          // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
 	this.Speed = make(map[int]int, 4)               // Initialise storage for four sequences.
@@ -148,7 +148,7 @@ func main() {
 	sequences := []*common.Sequence{}
 	for sequenceNumber, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
-		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceNumber, this.Pattens, fixturesConfig, this.SequenceChannels)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceNumber, this.Patterns, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name

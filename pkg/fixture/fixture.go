@@ -232,7 +232,7 @@ func FixtureReceiver(sequence common.Sequence,
 										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 									}
 								} else {
-									// We're not in chase mode so use the color generated in the patten generator.common.
+									// We're not in chase mode so use the color generated in the pattern generator.common.
 									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: position.Color.R, Green: position.Color.G, Blue: position.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 								}

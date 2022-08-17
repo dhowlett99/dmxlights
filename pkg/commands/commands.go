@@ -104,22 +104,22 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		//sequence.MusicSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
-	case common.UpdateScannerPatten:
+	case common.UpdateScannerPattern:
 		const PATTEN_NAME = 0
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
-		sequence.UpdatePatten = true
-		sequence.ScannerPatten = command.Args[PATTEN_NAME].Value.(int)
+		sequence.UpdatePattern = true
+		sequence.ScannerPattern = command.Args[PATTEN_NAME].Value.(int)
 		return sequence
 
-	case common.UpdateRGBPatten:
+	case common.UpdateRGBPattern:
 		const PATTEN_NAME = 0
 		if debug {
 			fmt.Printf("%d: Command Update RGB Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
 		}
-		sequence.UpdatePatten = true
-		sequence.RGBPatten = command.Args[PATTEN_NAME].Value.(int)
+		sequence.UpdatePattern = true
+		sequence.RGBPattern = command.Args[PATTEN_NAME].Value.(int)
 		return sequence
 
 	case common.UpdateShift:
@@ -456,19 +456,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		return sequence
 
-	case common.UpdateAutoPatten:
+	case common.UpdateAutoPattern:
 		const AUTO_PATTEN = 0
 		if debug {
 			fmt.Printf("%d: Command Update Auto Patten to  %t\n", mySequenceNumber, command.Args[AUTO_PATTEN].Value)
 		}
-		sequence.AutoPatten = command.Args[AUTO_PATTEN].Value.(bool)
+		sequence.AutoPattern = command.Args[AUTO_PATTEN].Value.(bool)
 		if !command.Args[AUTO_PATTEN].Value.(bool) {
 			if sequence.Type == "rgb" {
-				sequence.Patten.Name = "standard"
+				sequence.Pattern.Name = "standard"
 			}
 			if sequence.Type == "scanner" {
-				sequence.Patten.Name = "circle"
-				sequence.ScannerPatten = 1
+				sequence.Pattern.Name = "circle"
+				sequence.ScannerPattern = 1
 			}
 		}
 		return sequence
