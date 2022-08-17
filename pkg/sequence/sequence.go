@@ -385,6 +385,7 @@ func PlaySequence(sequence common.Sequence,
 				StaticColors:   sequence.StaticColors,
 				Hide:           sequence.Hide,
 				Master:         sequence.Master,
+				StrobeSpeed:    sequence.StrobeSpeed,
 				Blackout:       sequence.Blackout,
 			}
 

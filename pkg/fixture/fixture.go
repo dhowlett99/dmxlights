@@ -147,6 +147,7 @@ func FixtureReceiver(sequence common.Sequence,
 					sequence.Hide = cmd.Hide
 					sequence.StaticColors = cmd.StaticColors
 					sequence.Static = cmd.Static
+					sequence.StrobeSpeed = cmd.StrobeSpeed
 					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true)
 					continue
 				}

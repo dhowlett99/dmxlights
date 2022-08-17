@@ -128,9 +128,6 @@ func ProcessButtons(X int, Y int,
 		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fmt.Printf("Seq %d  Fixture %d , Master %d  Blackout %t Red %d  Green %d  Blue %d Strobe %v \n", Y, X, this.MasterBrightness, this.Blackout, red, green, blue, this.StrobeSpeed)
-
-		//fmt.Printf("fixturesConfig %+v \n", fixturesConfig)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 
 		if gui {
@@ -2240,10 +2237,26 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Turn the flood button back to white.
 		common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	}
 
+	// Turn off the strobe
+	if this.Strobe {
+		cmd := common.Command{
+			Action: common.StopStrobe,
+			Args: []common.Arg{
+				{Name: "Stop Strobe", Value: false},
+			},
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+		this.Strobe = false
+		this.StrobeSpeed = 0
+
+		// Turn the flood button back to white.
+		common.LightLamp(common.ALight{X: 8, Y: 6, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 	}
 
 	AllRGBFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Make sure we stop all sequences.
@@ -2436,11 +2449,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			Action: common.PlayStaticOnce,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		cmd = common.Command{
-			Action: common.Normal,
-		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
 
 	}
 }

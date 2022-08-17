@@ -32,6 +32,18 @@ func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.AL
 	}
 }
 
+func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
+	for y := 4; y < 7; y++ {
+		for x := 0; x < 8; x++ {
+			// Set to Preset Yellow.
+			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+			newPreset := presets[fmt.Sprint(x)+","+fmt.Sprint(y)]
+			newPreset.Selected = false
+			presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset
+		}
+	}
+}
+
 func SavePresets(presets map[string]Preset) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")
