@@ -828,6 +828,18 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	}
 }
 
+func ShowRunningStatus(sequenceNumber int, runningState map[int]bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+	for key, value := range runningState {
+		if sequenceNumber == key {
+			if value {
+				LightLamp(ALight{X: 8, Y: 5, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			} else {
+				LightLamp(ALight{X: 8, Y: 5, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			}
+		}
+	}
+}
+
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.

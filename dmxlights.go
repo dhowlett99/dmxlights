@@ -111,7 +111,7 @@ func main() {
 	defer this.Pad.Close()
 
 	// Create a channel to send events to the launchpad.
-	eventsForLauchpad := make(chan common.ALight)
+	eventsForLaunchpad := make(chan common.ALight)
 
 	// We need to be in programmers mode to use the launchpad.
 	this.Pad.Program()
@@ -229,19 +229,19 @@ func main() {
 
 	// Now create a thread to handle launchpad light button events.
 	go func() {
-		common.ListenAndSendToLaunchPad(eventsForLauchpad, this.Pad)
+		common.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad)
 	}()
 
 	// Add buttons to the main panel.
-	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
@@ -254,42 +254,45 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, statusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	buttons.InitButtons(&this, eventsForLauchpad, guiButtons)
+	buttons.InitButtons(&this, eventsForLaunchpad, guiButtons)
 
 	// Label the right hand buttons.
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, 0)
+	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0)
 
 	// Listen to launchpad buttons.
 	go func(guiButtons chan common.ALight,
 		this *buttons.CurrentState,
 		sequences []*common.Sequence,
-		eventsForLauchpad chan common.ALight,
+		eventsForLaunchpad chan common.ALight,
 		dmxController *ft232.DMXController,
 		fixturesConfig *fixture.Fixtures,
 		commandChannels []chan common.Command,
 		replyChannels []chan common.Sequence,
 		updateChannels []chan common.Sequence) {
 
-		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
-	}(guiButtons, &this, sequences, eventsForLauchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+
+	// Show this sequence running status in the start/stop button.
+	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 	myWindow.SetContent(content)
 

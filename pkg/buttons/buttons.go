@@ -1705,6 +1705,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Tailor the bottom buttons to the sequence type.
 		common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
 
+		// Show this sequence running status in the start/stop button.
+		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+
 		return
 	}
 
