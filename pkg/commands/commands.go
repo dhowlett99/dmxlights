@@ -217,6 +217,20 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.FloodPlayOnce = true
 		return sequence
 
+	case common.Strobe:
+		if debug {
+			fmt.Printf("%d: Command to Start Strobe\n", mySequenceNumber)
+		}
+		sequence.StrobeSpeed = 255
+		return sequence
+
+	case common.StopStrobe:
+		if debug {
+			fmt.Printf("%d: Command to Stop Strobe\n", mySequenceNumber)
+		}
+		sequence.StrobeSpeed = 0
+		return sequence
+
 	case common.Normal:
 		if debug {
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)

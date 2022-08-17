@@ -69,8 +69,8 @@ func (panel *MyPanel) LabelRightHandButtons() {
 
 	panel.UpdateButtonLabel(8, 4, "FLOOD")
 	panel.UpdateButtonLabel(8, 5, "SAVE")
-	panel.UpdateButtonLabel(8, 6, "START")
-	panel.UpdateButtonLabel(8, 7, "STOP")
+	panel.UpdateButtonLabel(8, 6, "START.STOP")
+	panel.UpdateButtonLabel(8, 7, "STROBE")
 
 	panel.UpdateButtonLabel(8, 8, "BLACK.OUT")
 }

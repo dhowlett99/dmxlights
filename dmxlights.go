@@ -49,9 +49,9 @@ func main() {
 
 	this.ScannerSize = common.DefaultScannerSize // Default scanner size.
 
-	this.Blackout = false // Blackout starts in off.
-	this.Flood = false    // Flood starts in off.
-
+	this.Blackout = false                           // Blackout starts in off.
+	this.Flood = false                              // Flood starts in off.
+	this.Running = make(map[int]bool, 4)            // Initialise storage for four sequences.
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
 	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
@@ -162,6 +162,7 @@ func main() {
 		this.Shift[sequenceNumber] = common.DefaultShift  // Default shift size.
 		this.Size[sequenceNumber] = common.DefaultRGBSize // Set the defaults size for the RGB fixtures.
 		this.Fade[sequenceNumber] = common.DefaultFade    // Set the default fade time
+		this.Running[sequenceNumber] = true               // Set this sequence to be in the running state.
 	}
 
 	// Create all the channels I need.
@@ -265,8 +266,8 @@ func main() {
 	// Label the right hand buttons.
 	panel.LabelRightHandButtons()
 
-	// Clear the pad.
-	buttons.AllFixturesOff(sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	// Clear the pad. Strobe is set to 0.
+	buttons.AllFixturesOff(sequences, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, 0)
 
 	// Listen to launchpad buttons.
 	go func(guiButtons chan common.ALight,

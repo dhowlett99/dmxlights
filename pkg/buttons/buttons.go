@@ -26,6 +26,9 @@ type CurrentState struct {
 	Shift                    map[int]int                // Current fixture shift. Indexed by sequence.
 	Size                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence.
 	Fade                     map[int]int                // Default start at 1. Indexed by sequence.
+	Running                  map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
+	Strobe                   bool                       // We are in strobe mode. True if strobing
+	StrobeSpeed              int                        // Strobe speed. value is speed 0-255
 	ScannerSize              int                        // Current scanner this.Size[this.SelectedSequence].
 	SavePreset               bool                       // Save a preset flag.
 	Blackout                 bool                       // Blackout all fixtures.
@@ -125,12 +128,15 @@ func ProcessButtons(X int, Y int,
 		gobo := flashSequence.Patten.Steps[X].Fixtures[X].Gobo
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		fmt.Printf("Seq %d  Fixture %d , Master %d  Blackout %t Red %d  Green %d  Blue %d Strobe %v \n", Y, X, this.MasterBrightness, this.Blackout, red, green, blue, this.StrobeSpeed)
+
+		//fmt.Printf("fixturesConfig %+v \n", fixturesConfig)
+		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		}
 
 		return
@@ -156,7 +162,7 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		return
 	}
 
@@ -674,42 +680,67 @@ func ProcessButtons(X int, Y int,
 	// Start sequence.
 	if X == 8 && Y == 5 {
 
-		if debug {
-			fmt.Printf("Start Sequence %d \n", Y)
+		// If sequence is running, stop it
+		if this.Running[this.SelectedSequence] {
+			if debug {
+				fmt.Printf("Stop Sequence %d \n", this.SelectedSequence)
+			}
+			cmd := common.Command{
+				Action: common.Stop,
+				Args: []common.Arg{
+					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
+			this.Running[this.SelectedSequence] = false
+			return
+		} else {
+			// Start this sequence.
+			if debug {
+				fmt.Printf("Start Sequence %d \n", Y)
+			}
+			sequences[this.SelectedSequence].MusicTrigger = false
+			cmd := common.Command{
+				Action: common.Start,
+				Args: []common.Arg{
+					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			this.Running[this.SelectedSequence] = true
+			return
 		}
 
-		sequences[this.SelectedSequence].MusicTrigger = false
-		cmd := common.Command{
-			Action: common.Start,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		time.Sleep(200 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-		return
 	}
 
-	// Stop sequence.
+	// Strobe.
 	if X == 8 && Y == 6 {
-
-		if debug {
-			fmt.Printf("Stop Sequence %d \n", this.SelectedSequence)
+		// If strobing, stop it
+		if this.Strobe {
+			// Stop strobing this sequence.
+			cmd := common.Command{
+				Action: common.StopStrobe,
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			this.Strobe = false
+			this.StrobeSpeed = 0
+			return
+		} else {
+			// Start strobing.
+			cmd := common.Command{
+				Action: common.Strobe,
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.FlashLight(X, Y, common.White, common.Black, eventsForLaunchpad, guiButtons)
+			this.Strobe = true
+			this.StrobeSpeed = 255
+			this.Running[this.SelectedSequence] = false
+			return
 		}
-
-		cmd := common.Command{
-			Action: common.Stop,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		time.Sleep(200 * time.Millisecond)
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-		return
 	}
 
 	// Size decrease.
@@ -1770,11 +1801,11 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 }
 
-func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures) {
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, strobeSpeed int) {
 	for x := 0; x < 8; x++ {
 		for y := 0; y < len(sequences); y++ {
 			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
+			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
 			common.LabelButton(x, y, "", guiButtons)
 		}
 	}
@@ -1784,7 +1815,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0)
+				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
@@ -2026,7 +2057,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0)
 
 	// Load the config.
 	config.AskToLoadConfig(commandChannels, X, Y)
@@ -2405,6 +2436,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			Action: common.PlayStaticOnce,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		cmd = common.Command{
+			Action: common.Normal,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
 
 	}
 }

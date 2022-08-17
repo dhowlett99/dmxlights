@@ -207,7 +207,7 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- name: FOH PAR
+- name: FOH XBRICK 1
   number: 1
   description: Stairville Xbrick
   type: rgb
@@ -240,39 +240,23 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-- name: FOH PAR
-  number: 2
+- name: FOH XBRICK 2
+  number: 1
   description: Stairville Xbrick
   type: rgb
   address: 114
   group: 1
   channels: 
   - number: 1
-    name: Red8
+    name: Red1
   - number: 2
-    name: Green8
+    name: Green1
   - number: 3
-    name: Blue8
+    name: Blue1
   - number: 4
-    name: Red7
-  - number: 5
-    name: Green7
-  - number: 6
-    name: Blue7
-  - number: 7
-    name: Red6
-  - number: 8
-    name: Green6
-  - number: 9
-    name: Blue6
-  - number: 10
-    name: Red5
-  - number: 11
-    name: Green5
-  - number: 12
-    name: Blue5
-  - number: 13
     name: MasterDimmer
+  - number: 5
+    name: Strobe
 - name: Uplighter1
   number: 1
   number_channels: 8

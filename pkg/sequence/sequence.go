@@ -335,7 +335,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Sequence in flood mode.
+		// Start flood mode.
 		if sequence.StartFlood && sequence.FloodPlayOnce {
 			sequence.Run = false
 			// Prepare a message to be sent to the fixtures in the sequence.
@@ -590,6 +590,7 @@ func PlaySequence(sequence common.Sequence,
 							SequenceNumber:         sequence.Number,
 							Inverted:               sequence.PattenInverted,
 							Master:                 sequence.Master,
+							StrobeSpeed:            sequence.StrobeSpeed,
 							Hide:                   sequence.Hide,
 							Tick:                   true,
 							Positions:              sequence.FixturePositions[fixtureNumber],

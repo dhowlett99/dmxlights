@@ -130,6 +130,8 @@ const (
 	UpdateGobo
 	Flood
 	StopFlood
+	Strobe
+	StopStrobe
 	UpdateAutoColor
 	AutoColor
 	UpdateAutoPatten
@@ -186,6 +188,7 @@ type Sequence struct {
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
+	StrobeSpeed                int                         // Strobe speed.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
 	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
@@ -223,6 +226,8 @@ type Sequence struct {
 	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
 	StartFlood                 bool                        // We're in flood mode.
 	StopFlood                  bool                        // We're not in flood mode.
+	StartStrobe                bool                        // We're in strobe mode.
+	StopStrobe                 bool                        // We're not in strobe mode.
 	FloodPlayOnce              bool                        // Play the flood sceme only once.
 	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
 	ScannersTotal              int                         // Total number of scanners in this sequence.
@@ -281,6 +286,7 @@ type Step struct {
 // Fixture Command.
 type FixtureCommand struct {
 	Master                 int
+	StrobeSpeed            int
 	Hide                   bool
 	Tick                   bool
 	Config                 bool // Configure fixture.
