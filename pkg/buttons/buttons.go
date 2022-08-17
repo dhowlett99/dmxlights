@@ -2279,6 +2279,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		trigger.State = false
 	}
 
+	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {
 
 		// Clear the sequence colors.
@@ -2329,9 +2330,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		// Tell the sequence to turn on all the scanners.
+		// Tell the sequence to disable all the scanners.
 		if sequence.Type == "scanner" {
-			// Enable all scanners.
+			// Disable all scanners.
 			for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
 				this.ScannerState[scannerNumber][sequence.Number].Enabled = false
 				this.ScannerState[scannerNumber][sequence.Number].Inverted = false
@@ -2344,6 +2345,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
+			// Tell the scanner button what to show.
 			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
 
 			// Reset the number of coordinates.
@@ -2356,7 +2358,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-			// Reset the Scanner Size back to default.
+			// Reset the scanner size back to default.
 			this.ScannerSize = common.DefaultScannerSize
 			cmd = common.Command{
 				Action: common.UpdateScannerSize,
@@ -2442,13 +2444,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.SelectButtonPressed[this.SelectedSequence] = false
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditStaticColorsMode[this.SelectedSequence] = false
-
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		cmd := common.Command{
-			Action: common.PlayStaticOnce,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
 	}
 }
