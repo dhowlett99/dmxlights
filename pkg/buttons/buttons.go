@@ -58,8 +58,8 @@ type CurrentState struct {
 	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
 	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
 	Patterns                 map[int]common.Pattern     // A indexed map of the available patterns for this sequence.
-	ScannerPattern           int                        // The selected Scanner Pattern Number. Used as the index for above.
-	RGBPattern               int                        // The selected RGB Pattern Number. Used as the index for above.
+	ScannerPattern           int                        // The selected scanner pattern Number. Used as the index for above.
+	RGBPattern               int                        // The selected RGB pattern Number. Used as the index for above.
 	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
 	SelectedGobo             int                        // The selected GOBO.
 	ButtonTimer              *time.Time                 // Button Timer
@@ -199,7 +199,7 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// Short press means load the config.
-			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		}
 		return
 	}
@@ -454,7 +454,7 @@ func ProcessButtons(X int, Y int,
 					if this.SavePreset {
 						this.SavePreset = false
 					}
-					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
@@ -478,8 +478,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] - 1
-		if this.Shift[this.SelectedSequence] < 0 {
-			this.Shift[this.SelectedSequence] = 0
+		if this.Shift[this.SelectedSequence] < 1 {
+			this.Shift[this.SelectedSequence] = 1
 		}
 		cmd := common.Command{
 			Action: common.UpdateShift,
@@ -505,8 +505,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] + 1
-		if this.Shift[this.SelectedSequence] > 3 {
-			this.Shift[this.SelectedSequence] = 3
+		if this.Shift[this.SelectedSequence] > 50 {
+			this.Shift[this.SelectedSequence] = 50
 		}
 		cmd := common.Command{
 			Action: common.UpdateShift,
@@ -722,7 +722,7 @@ func ProcessButtons(X int, Y int,
 				Action: common.StopStrobe,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.ShowStrobeStatus(false, eventsForLaunchpad, guiButtons)
 			this.Strobe = false
 			this.StrobeSpeed = 0
 			return
@@ -731,8 +731,9 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.Strobe,
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.FlashLight(X, Y, common.White, common.Black, eventsForLaunchpad, guiButtons)
+			// Store the strobe flag in all sequences.
+			common.SendCommandToAllSequence(cmd, commandChannels)
+			common.ShowStrobeStatus(true, eventsForLaunchpad, guiButtons)
 			this.Strobe = true
 			this.StrobeSpeed = 255
 			this.Running[this.SelectedSequence] = false
@@ -1403,17 +1404,15 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode[this.SelectedSequence] {
 
-		this.RGBPattern = X
-
 		if debug {
-			fmt.Printf("Set Pattern to %d\n", this.RGBPattern)
+			fmt.Printf("Set Pattern to %d\n", X)
 		}
 
 		// Tell the sequence to change the pattern.
 		cmd := common.Command{
-			Action: common.UpdateRGBPattern,
+			Action: common.UpdatePattern,
 			Args: []common.Arg{
-				{Name: "SelectedPattern", Value: this.RGBPattern},
+				{Name: "SelectPattern", Value: X},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -2007,7 +2006,7 @@ func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 
 	if sequence.Type == "rgb" {
 		for _, pattern := range sequence.RGBAvailablePatterns {
-			if pattern.Number == sequence.RGBPattern {
+			if pattern.Number == sequence.SelectedPattern {
 				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
@@ -2019,7 +2018,7 @@ func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 
 	if sequence.Type == "scanner" {
 		for _, pattern := range sequence.ScannerAvailablePatterns {
-			if pattern.Number == sequence.ScannerPattern {
+			if pattern.Number == sequence.SelectedPattern {
 				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
@@ -2050,7 +2049,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 }
 
-func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, Red common.Color, PresetYellow common.Color, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, Red common.Color, PresetYellow common.Color, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
 		Action: common.Stop,
@@ -2087,6 +2086,31 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	// Remember we selected this preset
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
 	this.LastPreset = &last
+
+	// Get an upto date copy of the sequence.
+	sequences[0] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+	this.StrobeSpeed = sequences[this.SelectedSequence].StrobeSpeed
+	if this.StrobeSpeed > 0 {
+		this.Strobe = true
+		// Show this sequence running status in the start/stop button.
+		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+		common.ShowStrobeStatus(true, eventsForLaunchpad, guiButtons)
+	} else {
+		this.Strobe = false
+		common.ShowStrobeStatus(false, eventsForLaunchpad, guiButtons)
+	}
+
+	// restore the speed, shift, size and fade labels data.
+	for sequenceNumber, sequence := range sequences {
+		this.Speed[sequenceNumber] = sequence.Speed
+		this.Shift[sequenceNumber] = sequence.ScannerShift
+		this.Size[sequenceNumber] = sequence.Size
+		this.Fade[sequenceNumber] = sequence.FadeTime
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[0]), "shift", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[0]), "size", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[0]), "fade", guiButtons)
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
@@ -2285,6 +2309,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {
 
+		this.Running[sequenceNumber] = false
+
 		// Clear the sequence colors.
 		cmd = common.Command{
 			Action: common.ClearSequenceColor,
@@ -2372,21 +2398,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
 			// Reset the scanner pattern back to default.
-			this.ScannerPattern = common.DefaultScannerPattern
+			this.ScannerPattern = common.DefaultPattern
 			cmd = common.Command{
-				Action: common.UpdateScannerPattern,
+				Action: common.UpdatePattern,
 				Args: []common.Arg{
-					{Name: "ScannerPattern", Value: this.ScannerPattern},
-				},
-			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-
-			// Reset the RGB pattern back to default.
-			this.RGBPattern = common.DefaultRGBPattern
-			cmd = common.Command{
-				Action: common.UpdateRGBPattern,
-				Args: []common.Arg{
-					{Name: "RGBPattern", Value: this.RGBPattern},
+					{Name: "SelectPattern", Value: this.ScannerPattern},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
@@ -2448,5 +2464,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditStaticColorsMode[this.SelectedSequence] = false
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
+		// Show this sequence running status in the start/stop button.
+		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 	}
 }

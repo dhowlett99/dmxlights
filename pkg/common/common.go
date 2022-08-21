@@ -109,8 +109,7 @@ const (
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
-	UpdateScannerPattern
-	UpdateRGBPattern
+	UpdatePattern
 	UpdateFadeSpeed
 	UpdateSize
 	UpdateScannerSize
@@ -151,13 +150,16 @@ const (
 
 const DefaultScannerSize = 120
 const MaxScannerSize = 120
-const DefaultScannerPattern = 0 // Circle
-const DefaultRGBPattern = 1     // Chase
+const DefaultPattern = 0
 const DefaultRGBSize = 1
-const DefaultFade = 1
-const DefaultSpeed = 12
-const DefaultShift = 0
+const DefaultFade = 10
+const DefaultSpeed = 7
+const DefaultShift = 1
 const DefaultNumberCoordinates = 0
+
+// A full step cycle is 39 ticks ie 39 values.
+// 13 fade up values, 13 on values and 13 off values.
+const StepSize = 39
 
 var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}
@@ -185,10 +187,12 @@ type Sequence struct {
 	Number                     int                         // Sequence number.
 	Run                        bool                        // True if this sequence is running.
 	Bounce                     bool                        // True if this sequence is bouncing.
+	Invert                     bool                        // True if RGB sequence patten is inverted.
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
 	StrobeSpeed                int                         // Strobe speed.
+	Shift                      int                         // RGB shift.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
 	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
@@ -203,17 +207,16 @@ type Sequence struct {
 	Steps                      []Step                      // Steps in this sequence.
 	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures             int                         // Number of fixtures for this sequence.
-	FixturePositions           map[int]map[int][]Position  // Fixture positions decides where a fixture is in a give set of sequence steps.
+	FixtureRGBPositions        map[int][]Position          // One set of Fixture positions for RGB devices. Index is Position.
+	FixtureScannerPositions    map[int]map[int][]Position  // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. Index is Scanner and then Position.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                    Pattern                     // Contains fixtures and steps info.
-	PatternInverted            bool                        // The pattern is inverted.
 	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	RGBPattern                 int                         // Selected RGB pattern.
 	FadeTime                   int                         // Fade time
 	Size                       int                         // Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
@@ -235,7 +238,7 @@ type Sequence struct {
 	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
 	ScannerAvailablePatterns   map[int]Pattern             // Available patterns for this scanner.
 	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
-	ScannerPattern             int                         // The selected scanner pattern.
+	SelectedPattern            int                         // The selected pattern.
 	ScannerSize                int                         // The selected scanner size.
 	ScannerShift               int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                int                         // The selected gobo.
@@ -283,6 +286,17 @@ type Step struct {
 	Type     string
 }
 
+type NewFixtureCommand struct {
+	Step         int
+	RGBPositions map[int][]Position
+	StrobeSpeed  int
+	Master       int
+	Blackout     bool
+	Hide         bool
+	ScannerColor map[int]int
+	Size         int
+}
+
 // Fixture Command.
 type FixtureCommand struct {
 	Master                 int
@@ -292,10 +306,10 @@ type FixtureCommand struct {
 	Config                 bool // Configure fixture.
 	Start                  bool
 	Steps                  int
-	Positions              map[int][]Position
+	ScannerPositions       map[int]map[int][]Position
+	RGBPositions           map[int][]Position
 	Type                   string
 	StartPosition          int
-	CurrentPosition        int
 	CurrentSpeed           time.Duration
 	MusicSpeed             time.Duration
 	Color                  Color
@@ -311,7 +325,7 @@ type FixtureCommand struct {
 	UpdateSequenceColor    bool
 	SequenceColor          Color
 	SequenceNumber         int
-	Inverted               bool
+	Invert                 bool
 	SelectedGobo           int
 	ScannerState           map[int]ScannerState
 	DisableOnce            map[int]bool
@@ -641,7 +655,7 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map invert function.
-	sequence.PatternInverted = sequence.Functions[Function7_Invert_Chase].State
+	sequence.Invert = sequence.Functions[Function7_Invert_Chase].State
 	// Map scanner chase mode. Uses same function key as above.
 	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 
@@ -789,8 +803,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
 	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
 	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
-	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
+	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
+	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
 
 	// Storage for the scanner labels on the bottom row.
 	var guiBottomScannerButtons [8]bottonButton
@@ -838,6 +852,14 @@ func ShowRunningStatus(sequenceNumber int, runningState map[int]bool, eventsForL
 			}
 		}
 	}
+}
+
+func ShowStrobeStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+	if state {
+		FlashLight(8, 6, White, Black, eventsForLaunchpad, guiButtons)
+		return
+	}
+	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 }
 
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
@@ -964,4 +986,27 @@ func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad c
 		OffColor:   offColor,
 	}
 	guiButtons <- event
+}
+
+// InvertColor just reverses the DMX values.
+func InvertColor(color Color) (out Color) {
+
+	out.R = ReverseDmx(color.R)
+	out.G = ReverseDmx(color.G)
+	out.B = ReverseDmx(color.B)
+
+	return out
+}
+
+// Takes a DMX value 1-255 and reverses the value.
+func ReverseDmx(n int) int {
+	in := make(map[int]int, 255)
+	var y = 255
+
+	for x := 0; x <= 255; x++ {
+
+		in[x] = y
+		y--
+	}
+	return in[n]
 }

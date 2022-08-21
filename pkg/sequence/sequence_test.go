@@ -656,61 +656,201 @@ func Test_calculatePositions(t *testing.T) {
 				70: {{Fixture: 0, StartPosition: 70, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2}},
 			},
 		},
+		{
+			name: "Multicolored Patten",
+			args: args{
+				bounce: false,
+				invert: false,
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+						},
+					},
+				},
+			},
+			want: map[int][]common.Position{
+				0: {
+					{Fixture: 0, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 0, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 0, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 0, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 0, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				14: {
+					{Fixture: 0, StartPosition: 14, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 14, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 14, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 14, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				28: {
+					{Fixture: 0, StartPosition: 28, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 28, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 28, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 28, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				42: {
+					{Fixture: 0, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 42, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 42, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 42, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 42, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				56: {
+					{Fixture: 0, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 56, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 56, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 56, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 56, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				70: {
+					{Fixture: 0, StartPosition: 70, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 70, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 70, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 70, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				84: {
+					{Fixture: 0, StartPosition: 84, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 84, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 84, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 84, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+				98: {
+					{Fixture: 0, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 1, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 2, StartPosition: 98, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 3, StartPosition: 98, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 4, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 5, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 6, StartPosition: 98, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+					{Fixture: 7, StartPosition: 98, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := calculatePositions(tt.args.steps, tt.args.bounce, tt.args.invert); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := calculatePositions("scanner", tt.args.steps, tt.args.bounce, tt.args.invert, 0); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
-			}
-		})
-	}
-}
-
-func Test_invertColor(t *testing.T) {
-	type args struct {
-		color common.Color
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantOut common.Color
-	}{
-		{
-			name: "golden path",
-			args: args{
-				color: common.Color{
-					R: 255,
-					G: 255,
-					B: 255,
-				},
-			},
-			wantOut: common.Color{
-				R: 0,
-				G: 0,
-				B: 0,
-			},
-		},
-		{
-			name: "golden path",
-			args: args{
-				color: common.Color{
-					R: 0,
-					G: 0,
-					B: 0,
-				},
-			},
-			wantOut: common.Color{
-				R: 255,
-				G: 255,
-				B: 255,
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := invertColor(tt.args.color); !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("invertColor() = %+v, want %+v", gotOut, tt.wantOut)
 			}
 		})
 	}

@@ -131,17 +131,15 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		FadeTime:               1,
+		FadeTime:               common.DefaultFade,
 		MusicTrigger:           false,
 		Run:                    true,
 		Bounce:                 false,
 		RGBAvailablePatterns:   availableRGBPatterns,
-		RGBPattern:             common.DefaultRGBPattern,
 		ScannerSize:            common.DefaultScannerSize,
 		Size:                   common.DefaultRGBSize,
-		Speed:                  12,
-		CurrentSpeed:           25 * time.Millisecond,
-		ScannerShift:           0, // Start at zero ie no shift.
+		Speed:                  common.DefaultSpeed,
+		ScannerShift:           common.DefaultShift,
 		Blackout:               false,
 		Master:                 255,
 		ScannerGobo:            1,
@@ -149,7 +147,7 @@ func CreateSequence(
 		RGBColor:               1,
 		AutoColor:              false,
 		AutoPattern:            false,
-		ScannerPattern:         common.DefaultScannerPattern,
+		SelectedPattern:        common.DefaultPattern,
 		ScannerState:           scannerState,
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32},
@@ -188,7 +186,7 @@ func CreateSequence(
 
 	// Find the number of fixtures for this sequence.
 	sequence.NumberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig)
-	sequence.FixturePositions = make(map[int]map[int][]common.Position, sequence.NumberFixtures)
+	sequence.FixtureScannerPositions = make(map[int]map[int][]common.Position, sequence.NumberFixtures)
 
 	// Make functions for each of the sequences.
 	for function := 0; function < 8; function++ {
@@ -274,15 +272,34 @@ func PlaySequence(sequence common.Sequence,
 	fixtureChannel8 := make(chan common.FixtureCommand)
 
 	// Make an array to hold all the fixture channels.
-	fixtureChannels := []chan common.FixtureCommand{}
-	fixtureChannels = append(fixtureChannels, fixtureChannel1)
-	fixtureChannels = append(fixtureChannels, fixtureChannel2)
-	fixtureChannels = append(fixtureChannels, fixtureChannel3)
-	fixtureChannels = append(fixtureChannels, fixtureChannel4)
-	fixtureChannels = append(fixtureChannels, fixtureChannel5)
-	fixtureChannels = append(fixtureChannels, fixtureChannel6)
-	fixtureChannels = append(fixtureChannels, fixtureChannel7)
-	fixtureChannels = append(fixtureChannels, fixtureChannel8)
+	fixtureControlChannels := []chan common.FixtureCommand{}
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel1)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel2)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel3)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel4)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel5)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel6)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel7)
+	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel8)
+
+	// Create channels used for stepping the fixture threads for this sequnece.
+	fixtureStepChannels := []chan common.NewFixtureCommand{}
+	fixtureStepChannel0 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel0)
+	fixtureStepChannel1 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel1)
+	fixtureStepChannel2 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel2)
+	fixtureStepChannel3 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel3)
+	fixtureStepChannel4 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel4)
+	fixtureStepChannel5 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel5)
+	fixtureStepChannel6 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel6)
+	fixtureStepChannel7 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
 
 	// Create channels used for stopping the fixture threads for this sequnece.
 	fixtureStopChannels := []chan bool{}
@@ -304,14 +321,14 @@ func PlaySequence(sequence common.Sequence,
 	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel7)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureChannels, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, fixtureStopChannels)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureControlChannels[0], fixtureStepChannels[0], fixtureStopChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureControlChannels[1], fixtureStepChannels[1], fixtureStopChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureControlChannels[2], fixtureStepChannels[2], fixtureStopChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureControlChannels[3], fixtureStepChannels[3], fixtureStopChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureControlChannels[4], fixtureStepChannels[4], fixtureStopChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureControlChannels[5], fixtureStepChannels[5], fixtureStopChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureControlChannels[6], fixtureStepChannels[6], fixtureStopChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureControlChannels[7], fixtureStepChannels[7], fixtureStopChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -324,7 +341,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Check for any waiting commands.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed*10, sequence, channels)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
@@ -349,7 +366,7 @@ func PlaySequence(sequence common.Sequence,
 			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
 			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = false
@@ -367,7 +384,7 @@ func PlaySequence(sequence common.Sequence,
 				StopFlood:      sequence.StopFlood,
 			}
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
 			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = true
@@ -393,7 +410,7 @@ func PlaySequence(sequence common.Sequence,
 			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
 			sequence.PlayStaticOnce = false
 			sequence.Run = false
 			continue
@@ -431,7 +448,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					sequence.Steps = sequence.RGBAvailablePatterns[sequence.RGBPattern].Steps
+					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
 					sequence.UpdatePattern = false
 				}
 
@@ -442,7 +459,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
 					sequence.UpdatePattern = false
 
-					sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.ScannerPattern]
+					sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
 					sequence.Steps = sequence.Pattern.Steps
 
 					if sequence.AutoColor {
@@ -475,28 +492,34 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Check is any commands are waiting.
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
 					// Tell the fixtures to stop.
 					sendStopToAllFixtures(sequence, fixtureStopChannels)
 					break
 				}
 
-				// Calulate positions for each fixture based on the steps in the pattern.
-				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-
-					positions, num := calculatePositions(sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted)
-					sequence.NumberSteps = num
-					sequence.FixturePositions[fixture] = make(map[int][]common.Position, 9)
-					for key, value := range positions {
-						sequence.FixturePositions[fixture][key] = value
+				// Calulate positions for each scanner based on the steps in the pattern.
+				if sequence.Type == "scanner" {
+					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+						positions, num := calculatePositions("scanner", sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted, sequence.Shift)
+						sequence.NumberSteps = num
+						sequence.FixtureScannerPositions[fixture] = make(map[int][]common.Position, 9)
+						for key, value := range positions {
+							sequence.FixtureScannerPositions[fixture][key] = value
+						}
 					}
+				}
+
+				// Calulate positions for each RGB fixture.
+				if sequence.Type == "rgb" {
+					sequence.FixtureRGBPositions, sequence.NumberSteps = calculatePositions("rgb", sequence.Steps, sequence.Bounce, sequence.Invert, sequence.Shift)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
 				if sequence.AutoPattern && sequence.Type == "rgb" {
 					for patternNumber, pattern := range sequence.RGBAvailablePatterns {
-						if pattern.Number == sequence.RGBPattern {
+						if pattern.Number == sequence.SelectedPattern {
 							sequence.Pattern.Number = patternNumber
 							if debug {
 								fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
@@ -504,17 +527,17 @@ func PlaySequence(sequence common.Sequence,
 							break
 						}
 					}
-					sequence.RGBPattern++
-					if sequence.RGBPattern > len(sequence.RGBAvailablePatterns) {
-						sequence.RGBPattern = 0
+					sequence.SelectedPattern++
+					if sequence.SelectedPattern > len(sequence.RGBAvailablePatterns) {
+						sequence.SelectedPattern = 0
 					}
 				}
 
 				// If we are setting the pattern automatically for scanner fixtures.
 				if sequence.AutoPattern && sequence.Type == "scanner" {
-					sequence.ScannerPattern++
-					if sequence.ScannerPattern > 3 {
-						sequence.ScannerPattern = 0
+					sequence.SelectedPattern++
+					if sequence.SelectedPattern > 3 {
+						sequence.SelectedPattern = 0
 					}
 				}
 
@@ -530,29 +553,21 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.RGBColor > 7 {
 						sequence.RGBColor = 0
 					}
-					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
-					}
+					sequence.FixtureRGBPositions = replaceColors(sequence.FixtureRGBPositions, sequence.SequenceColors)
 				}
 
 				// If we are updating the color in a sequence.
-				if sequence.UpdateSequenceColor {
+				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
-							for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-								sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
-							}
+							sequence.FixtureRGBPositions = replaceColors(sequence.FixtureRGBPositions, sequence.SequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
-						for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-							sequence.FixturePositions[fixture] = replaceColors(sequence.FixturePositions[fixture], sequence.SequenceColors)
-						}
+						sequence.FixtureRGBPositions = replaceColors(sequence.FixtureRGBPositions, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
-							for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-								sequence.SavedSequenceColors = common.HowManyColors(sequence.FixturePositions[fixture])
-							}
+							sequence.SavedSequenceColors = common.HowManyColors(sequence.FixtureRGBPositions)
 							sequence.SaveColors = false
 						}
 					}
@@ -561,62 +576,79 @@ func PlaySequence(sequence common.Sequence,
 				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
 				// with the colors from that pattern.
 				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-					sequence.CurrentColors = common.HowManyColors(sequence.FixturePositions[fixture])
+					sequence.CurrentColors = common.HowManyColors(sequence.FixtureScannerPositions[fixture])
 				}
+
+				// sequence.ScannerStateMutex.RLock()
+				// scannerState := sequence.ScannerState
+				// sequence.ScannerStateMutex.RUnlock()
+
+				// sequence.DisableOnceMutex.RLock()
+				// disabledOnce := sequence.DisableOnce
+				// sequence.DisableOnceMutex.RUnlock()
+
+				// //fmt.Printf("Step %d \n", step)
+				// for fixtureNumber, fixture := range fixtureControlChannels {
+				// 	positions := sequence.FixtureRGBPositions[fixtureNumber]
+
+				// 	// Prepare a message to be sent to the fixtures in the sequence.
+				// 	command := common.FixtureCommand{
+				// 		SequenceNumber:         sequence.Number,
+				// 		Invert:                 sequence.Invert,
+				// 		Master:                 sequence.Master,
+				// 		StrobeSpeed:            sequence.StrobeSpeed,
+				// 		Hide:                   sequence.Hide,
+				// 		Tick:                   true,
+				// 		ScannerPositions:       sequence.FixtureScannerPositions,
+				// 		RGBPositions:           positions,
+				// 		Type:                   sequence.Type,
+				// 		FadeTime:               sequence.FadeTime,
+				// 		Size:                   sequence.Size,
+				// 		Steps:                  sequence.NumberSteps,
+				// 		MusicSpeed:             sequence.MusicSpeed,
+				// 		CurrentSpeed:           sequence.CurrentSpeed,
+				// 		Speed:                  sequence.Speed,
+				// 		Blackout:               sequence.Blackout,
+				// 		StartFlood:             sequence.StartFlood,
+				// 		StopFlood:              sequence.StopFlood,
+				// 		SelectedGobo:           sequence.ScannerGobo,
+				// 		ScannerState:           scannerState,
+				// 		DisableOnce:            disabledOnce,
+				// 		ScannerChase:           sequence.ScannerChase,
+				// 		ScannerColor:           sequence.ScannerColor,
+				// 		AvailableScannerColors: sequence.ScannerAvailableColors,
+				// 		OffsetPan:              sequence.ScannerOffsetPan,
+				// 		OffsetTilt:             sequence.ScannerOffsetTilt,
+				// 		FixtureLabels:          sequence.GuiFixtureLabels,
+				// 	}
+
+				// 	fixture <- command
+				// }
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
+
+					//fmt.Printf("Step %d \n", step)
+
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/20, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
 						// Tell the fixtures to stop.
 						sendStopToAllFixtures(sequence, fixtureStopChannels)
 						break
 					}
 
-					sequence.ScannerStateMutex.RLock()
-					scannerState := sequence.ScannerState
-					sequence.ScannerStateMutex.RUnlock()
-
-					sequence.DisableOnceMutex.RLock()
-					disabledOnce := sequence.DisableOnce
-					sequence.DisableOnceMutex.RUnlock()
-
-					// Now tell all the fixtures in this group what they need to do.
-					for fixtureNumber, fixture := range fixtureChannels {
-
-						// Prepare a message to be sent to the fixtures in the sequence.
-						command := common.FixtureCommand{
-							SequenceNumber:         sequence.Number,
-							Inverted:               sequence.PatternInverted,
-							Master:                 sequence.Master,
-							StrobeSpeed:            sequence.StrobeSpeed,
-							Hide:                   sequence.Hide,
-							Tick:                   true,
-							Positions:              sequence.FixturePositions[fixtureNumber],
-							Type:                   sequence.Type,
-							FadeTime:               sequence.FadeTime,
-							Size:                   sequence.Size,
-							Steps:                  sequence.NumberSteps,
-							MusicSpeed:             sequence.MusicSpeed,
-							CurrentSpeed:           sequence.CurrentSpeed,
-							Speed:                  sequence.Speed,
-							Blackout:               sequence.Blackout,
-							StartFlood:             sequence.StartFlood,
-							StopFlood:              sequence.StopFlood,
-							CurrentPosition:        step,
-							SelectedGobo:           sequence.ScannerGobo,
-							ScannerState:           scannerState,
-							DisableOnce:            disabledOnce,
-							ScannerChase:           sequence.ScannerChase,
-							ScannerColor:           sequence.ScannerColor,
-							AvailableScannerColors: sequence.ScannerAvailableColors,
-							OffsetPan:              sequence.ScannerOffsetPan,
-							OffsetTilt:             sequence.ScannerOffsetTilt,
-							FixtureLabels:          sequence.GuiFixtureLabels,
-						}
-
+					command := common.NewFixtureCommand{
+						Step:         step,
+						RGBPositions: sequence.FixtureRGBPositions,
+						StrobeSpeed:  sequence.StrobeSpeed,
+						Master:       sequence.Master,
+						Blackout:     sequence.Blackout,
+						Hide:         sequence.Hide,
+						Size:         sequence.Size,
+					}
+					for _, fixture := range fixtureStepChannels {
 						fixture <- command
 					}
 				}
@@ -673,7 +705,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 // calculatePositions takes the steps defined in the pattern and
 // turns them into positions used by the sequencer.
-func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int][]common.Position, int) {
+func calculatePositions(tYpe string, steps []common.Step, bounce bool, invert bool, shift int) (map[int][]common.Position, int) {
 
 	position := common.Position{}
 
@@ -702,7 +734,7 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 						positionsOut[counter] = append(positionsOut[counter], position)
 						if noColors > 1 {
 							if fixture.Type != "scanner" {
-								counter = counter + 14
+								counter = counter + shift
 								waitForColors = true
 							}
 						}
@@ -710,53 +742,46 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 				}
 			}
 			if !waitForColors {
-				counter = counter + 14
+				counter = counter + shift
 			}
 		}
 	}
 
-	if bounce || invert {
-		// Generate the positions in reverse.
-		// Reverse the steps.
-		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
-			step := steps[stepNumber-1]
-
-			// Reverse the fixtures.
-			for fixtureNumber := len(step.Fixtures); fixtureNumber > 0; fixtureNumber-- {
-				fixture := step.Fixtures[fixtureNumber-1]
-
-				position := common.Position{}
-				// Reverse the colors.
+	if invert && tYpe == "rgb" {
+		waitForColors = false
+		for _, step := range steps {
+			for fixtureIndex, fixture := range step.Fixtures {
 				noColors := len(fixture.Colors)
-				for colorNumber := noColors; colorNumber > 0; colorNumber-- {
-					color := fixture.Colors[colorNumber-1]
-
+				for _, color := range fixture.Colors {
+					// Preserve the scanner commands.
 					position.Gobo = fixture.Gobo
 					position.Pan = fixture.Pan
 					position.Tilt = fixture.Tilt
 					position.Shutter = fixture.Shutter
-					position.StartPosition = counter
-					position.Fixture = fixtureNumber - 1
-					position.Color = color
-
-					positionsOut[counter] = append(positionsOut[counter], position)
-					if noColors >= 1 {
-						if fixture.Type != "scanner" {
-							counter = counter + 14
-							waitForColors = true
+					if color.R == 0 || color.G == 0 || color.B == 0 {
+						position.StartPosition = counter
+						position.Fixture = fixtureIndex
+						position.Color = common.InvertColor(color)
+						positionsOut[counter] = append(positionsOut[counter], position)
+						if noColors > 1 {
+							if fixture.Type != "scanner" {
+								counter = counter + shift
+								waitForColors = true
+							}
 						}
 					}
 				}
 			}
 			if !waitForColors {
-				counter = counter + 14
+				counter = counter + shift
 			}
 		}
 	}
 
-	if bounce && invert {
+	if bounce && tYpe == "rgb" {
 		waitForColors = false
-		for _, step := range steps {
+		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
+			step := steps[stepNumber-1]
 			for fixtureIndex, fixture := range step.Fixtures {
 				noColors := len(fixture.Colors)
 				for _, color := range fixture.Colors {
@@ -774,7 +799,7 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 						positionsOut[counter] = append(positionsOut[counter], position)
 						if noColors > 1 {
 							if fixture.Type != "scanner" {
-								counter = counter + 14
+								counter = counter + shift
 								waitForColors = true
 							}
 						}
@@ -782,7 +807,83 @@ func calculatePositions(steps []common.Step, bounce bool, invert bool) (map[int]
 				}
 			}
 			if !waitForColors {
-				counter = counter + 14
+				counter = counter + shift
+			}
+		}
+	}
+
+	if bounce || invert {
+		if tYpe == "scanner" {
+			// Generate the positions in reverse.
+			// Reverse the steps.
+			for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
+				step := steps[stepNumber-1]
+
+				// Reverse the fixtures.
+				for fixtureNumber := len(step.Fixtures); fixtureNumber > 0; fixtureNumber-- {
+					fixture := step.Fixtures[fixtureNumber-1]
+
+					position := common.Position{}
+					// Reverse the colors.
+					noColors := len(fixture.Colors)
+					for colorNumber := noColors; colorNumber > 0; colorNumber-- {
+						color := fixture.Colors[colorNumber-1]
+
+						position.Gobo = fixture.Gobo
+						position.Pan = fixture.Pan
+						position.Tilt = fixture.Tilt
+						position.Shutter = fixture.Shutter
+						position.StartPosition = counter
+						position.Fixture = fixtureNumber - 1
+						position.Color = color
+
+						positionsOut[counter] = append(positionsOut[counter], position)
+						if noColors >= 1 {
+							if fixture.Type != "scanner" {
+								counter = counter + shift
+								waitForColors = true
+							}
+						}
+					}
+				}
+				if !waitForColors {
+					counter = counter + shift
+				}
+			}
+		}
+	}
+
+	if bounce && invert {
+		if tYpe == "scanner" {
+			waitForColors = false
+			for _, step := range steps {
+				for fixtureIndex, fixture := range step.Fixtures {
+					noColors := len(fixture.Colors)
+					for _, color := range fixture.Colors {
+						// Preserve the scanner commands.
+						position.Gobo = fixture.Gobo
+						position.Pan = fixture.Pan
+						position.Tilt = fixture.Tilt
+						position.Shutter = fixture.Shutter
+						if color.R > 0 || color.G > 0 || color.B > 0 {
+							position.StartPosition = counter
+							position.Fixture = fixtureIndex
+							position.Color.R = color.R
+							position.Color.G = color.G
+							position.Color.B = color.B
+							positionsOut[counter] = append(positionsOut[counter], position)
+							if noColors > 1 {
+								if fixture.Type != "scanner" {
+									counter = counter + shift
+									waitForColors = true
+								}
+							}
+						}
+					}
+				}
+				if !waitForColors {
+					counter = counter + shift
+				}
 			}
 		}
 	}
@@ -848,28 +949,6 @@ func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorB
 	}
 
 	return availableFixtures
-}
-
-// invertColor just reverses the DMX values.
-func invertColor(color common.Color) (out common.Color) {
-	out.R = reverseDmx(color.R)
-	out.G = reverseDmx(color.G)
-	out.B = reverseDmx(color.B)
-
-	return out
-}
-
-// Takes a DMX value 1-255 and reverses the value.
-func reverseDmx(n int) int {
-	in := make(map[int]int, 255)
-	var y = 255
-
-	for x := 0; x <= 255; x++ {
-
-		in[x] = y
-		y--
-	}
-	return in[n]
 }
 
 // getAvailableScannerColors looks through the fixtures list and finds scanners that
