@@ -293,6 +293,7 @@ type NewFixtureCommand struct {
 	Master       int
 	Blackout     bool
 	Hide         bool
+	Invert       bool
 	ScannerColor map[int]int
 	Size         int
 }

@@ -135,6 +135,33 @@ func FixtureReceiver(
 
 				// Now create a thread to process the RGB fixture itself.
 				if position.Fixture == myFixtureNumber {
+
+					if cmd.Invert {
+						// Fade down.
+						for _, value := range fadeDownValues {
+							R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+							G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+							B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+							if !cmd.Hide {
+								common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+							}
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+							// Fade down time.
+							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								break start
+							}
+						}
+
+						// Fade on or off time.
+						for x := 0; x < cmd.Size*10; x++ {
+							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								break start
+							}
+						}
+					}
+
 					// Fade up.
 					for _, value := range fadeUpValues {
 						R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
@@ -151,27 +178,30 @@ func FixtureReceiver(
 							break start
 						}
 					}
-					// Fade on time.
-					for x := 0; x < cmd.Size*10; x++ {
-						if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
-							turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
-							break start
-						}
-					}
 
-					// Fade down.
-					for _, value := range fadeDownValues {
-						R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
-						G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
-						B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
-						if !cmd.Hide {
-							common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+					if !cmd.Invert {
+						// Fade on or off time.
+						for x := 0; x < cmd.Size*10; x++ {
+							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								break start
+							}
 						}
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
-						// Fade down time.
-						if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
-							turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
-							break start
+
+						// Fade down.
+						for _, value := range fadeDownValues {
+							R := int((float64(position.Color.R) / 100) * (float64(value) / 2.55))
+							G := int((float64(position.Color.G) / 100) * (float64(value) / 2.55))
+							B := int((float64(position.Color.B) / 100) * (float64(value) / 2.55))
+							if !cmd.Hide {
+								common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: R, Green: G, Blue: B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+							}
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, R, G, B, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+							// Fade down time.
+							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
+								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+								break start
+							}
 						}
 					}
 				}

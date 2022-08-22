@@ -513,7 +513,8 @@ func PlaySequence(sequence common.Sequence,
 
 				// Calulate positions for each RGB fixture.
 				if sequence.Type == "rgb" {
-					sequence.FixtureRGBPositions, sequence.NumberSteps = calculatePositions("rgb", sequence.Steps, sequence.Bounce, sequence.Invert, sequence.Shift)
+					// Invert is done in a differnent way for RGB fixtures so invert flag is always fales here.
+					sequence.FixtureRGBPositions, sequence.NumberSteps = calculatePositions("rgb", sequence.Steps, sequence.Bounce, false, sequence.Shift)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -647,6 +648,7 @@ func PlaySequence(sequence common.Sequence,
 						Blackout:     sequence.Blackout,
 						Hide:         sequence.Hide,
 						Size:         sequence.Size,
+						Invert:       sequence.Invert,
 					}
 					for _, fixture := range fixtureStepChannels {
 						fixture <- command
@@ -731,37 +733,6 @@ func calculatePositions(tYpe string, steps []common.Step, bounce bool, invert bo
 						position.Color.R = color.R
 						position.Color.G = color.G
 						position.Color.B = color.B
-						positionsOut[counter] = append(positionsOut[counter], position)
-						if noColors > 1 {
-							if fixture.Type != "scanner" {
-								counter = counter + shift
-								waitForColors = true
-							}
-						}
-					}
-				}
-			}
-			if !waitForColors {
-				counter = counter + shift
-			}
-		}
-	}
-
-	if invert && tYpe == "rgb" {
-		waitForColors = false
-		for _, step := range steps {
-			for fixtureIndex, fixture := range step.Fixtures {
-				noColors := len(fixture.Colors)
-				for _, color := range fixture.Colors {
-					// Preserve the scanner commands.
-					position.Gobo = fixture.Gobo
-					position.Pan = fixture.Pan
-					position.Tilt = fixture.Tilt
-					position.Shutter = fixture.Shutter
-					if color.R == 0 || color.G == 0 || color.B == 0 {
-						position.StartPosition = counter
-						position.Fixture = fixtureIndex
-						position.Color = common.InvertColor(color)
 						positionsOut[counter] = append(positionsOut[counter], position)
 						if noColors > 1 {
 							if fixture.Type != "scanner" {
