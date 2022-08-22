@@ -1649,6 +1649,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
+	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+
 	// Light the sequence selector button.
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
 
