@@ -2461,7 +2461,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			cmd = common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize},
+					{Name: "ScannerSize", Value: this.ScannerSize[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
