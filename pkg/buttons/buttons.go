@@ -29,7 +29,7 @@ type CurrentState struct {
 	ScannerSize              map[int]int             // current scanner size for all fixtures. Indexed by sequence
 	RGBFade                  map[int]int             // Indexed by sequence.
 	ScannerFade              map[int]int             // Indexed by sequence.
-	ScannerCordinates        map[int]int             // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=26,2=24,3=32, Indexed by sequence.
+	ScannerCoordinates       map[int]int             // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32, Indexed by sequence.
 	Running                  map[int]bool            // Which sequence is running. Indexed by sequence. True if running.
 	Strobe                   bool                    // We are in strobe mode. True if strobing
 	StrobeSpeed              int                     // Strobe speed. value is speed 0-255
@@ -909,19 +909,20 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCordinates[this.SelectedSequence]--
-			if this.ScannerCordinates[this.SelectedSequence] < 0 {
-				this.ScannerCordinates[this.SelectedSequence] = 0
+			this.ScannerCoordinates[this.SelectedSequence]--
+			if this.ScannerCoordinates[this.SelectedSequence] < 0 {
+				this.ScannerCoordinates[this.SelectedSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCordinates[this.SelectedSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Coord %02d", this.ScannerCordinates[this.SelectedSequence]), "fade", guiButtons)
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
+			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 			return
 		}
 
@@ -956,19 +957,20 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCordinates[this.SelectedSequence]++
-			if this.ScannerCordinates[this.SelectedSequence] > 3 {
-				this.ScannerCordinates[this.SelectedSequence] = 3
+			this.ScannerCoordinates[this.SelectedSequence]++
+			if this.ScannerCoordinates[this.SelectedSequence] > 3 {
+				this.ScannerCoordinates[this.SelectedSequence] = 3
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCordinates[this.SelectedSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Coord %02d", this.ScannerCordinates[this.SelectedSequence]), "fade", guiButtons)
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
+			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 			return
 		}
 	}
@@ -1663,7 +1665,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.ScannerCordinates[this.SelectedSequence]), "fade", guiButtons)
+		label = getScannerCoordinatesLabel(this.ScannerShift[this.SelectedSequence])
+		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 	}
 
 	// Light the sequence selector button.
@@ -2447,11 +2450,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
 
 			// Reset the number of coordinates.
-			this.ScannerCordinates[sequenceNumber] = common.DefaultScannerCoordinates
+			this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates
 			cmd = common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "Coordinates", Value: this.ScannerCordinates[sequenceNumber]},
+					{Name: "Coordinates", Value: this.ScannerCoordinates[sequenceNumber]},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
@@ -2553,6 +2556,25 @@ func getScannerShiftLabel(shift int) string {
 
 	case shift == 3:
 		return "3/4"
+
+	}
+	return ""
+}
+
+func getScannerCoordinatesLabel(shift int) string {
+
+	switch {
+	case shift == 0:
+		return "12"
+
+	case shift == 1:
+		return "16"
+
+	case shift == 2:
+		return "24"
+
+	case shift == 3:
+		return "32"
 
 	}
 	return ""
