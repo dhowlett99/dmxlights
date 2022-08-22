@@ -131,7 +131,7 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		RGBFadeTime:            common.DefaultRGBFade,
+		RGBFade:                common.DefaultRGBFade,
 		MusicTrigger:           false,
 		Run:                    true,
 		Bounce:                 false,
@@ -432,7 +432,6 @@ func PlaySequence(sequence common.Sequence,
 						// TODO eventually Music speed will be set by the BPM analyser.
 						// But this hasn't been written yet. We just have some framework code
 						// in pkg/sound which counts peaks and this is where we display them.
-						sequence.MusicSpeed = 25 * time.Millisecond
 						common.UpdateStatusBar(fmt.Sprintf("BPM %03d", trigger.BPM), "bpm", guiButtons)
 
 						if trigger.SequenceNumber == mySequenceNumber {
@@ -443,7 +442,6 @@ func PlaySequence(sequence common.Sequence,
 							trigger.State = false
 						}
 						sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
-						sequence.MusicSpeed = sequence.CurrentSpeed
 					}
 				}
 
@@ -607,7 +605,6 @@ func PlaySequence(sequence common.Sequence,
 				// 		FadeTime:               sequence.FadeTime,
 				// 		Size:                   sequence.Size,
 				// 		Steps:                  sequence.NumberSteps,
-				// 		MusicSpeed:             sequence.MusicSpeed,
 				// 		CurrentSpeed:           sequence.CurrentSpeed,
 				// 		Speed:                  sequence.Speed,
 				// 		Blackout:               sequence.Blackout,
@@ -649,6 +646,7 @@ func PlaySequence(sequence common.Sequence,
 						Blackout:     sequence.Blackout,
 						Hide:         sequence.Hide,
 						RGBSize:      sequence.RGBSize,
+						RGBFade:      sequence.RGBFade,
 						Invert:       sequence.Invert,
 					}
 					for _, fixture := range fixtureStepChannels {

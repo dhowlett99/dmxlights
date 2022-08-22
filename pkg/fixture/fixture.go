@@ -115,10 +115,6 @@ func FixtureReceiver(
 	dmxController *ft232.DMXController,
 	fixtures *Fixtures) {
 
-	// Calculate fade curve values.
-	fadeUpValues := getFadeValues(127.5, false)
-	fadeDownValues := getFadeValues(127.5, true)
-
 	// Outer loop wait for configuration.
 	for {
 
@@ -127,6 +123,10 @@ func FixtureReceiver(
 
 		// Positions can have many fixtures play at the same time.
 		positions := cmd.RGBPositions[cmd.Step]
+
+		// Calculate fade curve values.
+		fadeUpValues := getFadeValues(127.5, float64(cmd.RGBFade), false)
+		fadeDownValues := getFadeValues(127.5, float64(cmd.RGBFade), true)
 
 	start:
 		for _, position := range positions {
@@ -380,31 +380,23 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func getFadeValues(size float64, direction bool) []int {
+func getFadeValues(size float64, fade float64, direction bool) []int {
 
 	out := []int{}
 
 	var theta float64
 	var x float64
 	if direction {
-		for x = 0; x <= 180; x += 15 {
-
+		for x = 0; x <= 180; x += fade {
 			theta = (x - 90) * math.Pi / 180
-
 			x := int(-size*math.Sin(theta) + size)
-			//if x > 10 {
 			out = append(out, x)
-			//}
 		}
 	} else {
-		for x = 180; x >= 0; x -= 15 {
+		for x = 180; x >= 0; x -= fade {
 			theta = (x - 90) * math.Pi / 180
-
 			x := int(-size*math.Sin(theta) + size)
-			//if x > 10 {
 			out = append(out, x)
-			//}
-
 		}
 	}
 	return out

@@ -2156,7 +2156,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		this.ScannerShift[sequenceNumber] = sequence.ScannerShift
 		this.RGBSize[sequenceNumber] = sequence.RGBSize
 		this.ScannerSize = sequence.ScannerSize
-		this.RGBFade[sequenceNumber] = sequence.RGBFadeTime
+		this.RGBFade[sequenceNumber] = sequence.RGBFade
 
 	}
 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)

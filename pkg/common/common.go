@@ -198,7 +198,6 @@ type Sequence struct {
 	StrobeSpeed                int                         // Strobe speed.
 	RGBShift                   int                         // RGB shift.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
-	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
 	MusicTrigger               bool                        // Is this sequence in music trigger mode.
 	Ring                       bool                        // A ring is when a music triggers a ring of events for a scannner.
@@ -221,7 +220,7 @@ type Sequence struct {
 	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	RGBFadeTime                int                         // RGB Fade time
+	RGBFade                    int                         // RGB Fade time
 	RGBSize                    int                         // RGB Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
 	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
@@ -300,6 +299,7 @@ type NewFixtureCommand struct {
 	Invert       bool
 	ScannerColor map[int]int
 	RGBSize      int
+	RGBFade      int
 }
 
 // Fixture Command.
@@ -316,7 +316,6 @@ type FixtureCommand struct {
 	Type                   string
 	StartPosition          int
 	CurrentSpeed           time.Duration
-	MusicSpeed             time.Duration
 	Color                  Color
 	Speed                  int
 	Shift                  int
@@ -808,8 +807,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
 	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
 	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
-	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
+	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
+	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
 
 	// Storage for the scanner labels on the bottom row.
 	var guiBottomScannerButtons [8]bottonButton

@@ -101,7 +101,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Speed = command.Args[SPEED].Value.(int)
 		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
-		//sequence.MusicSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
 	case common.UpdatePattern:
@@ -151,7 +150,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.RGBFadeTime = command.Args[FADE_SPEED].Value.(int)
+		sequence.RGBFade = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
 	case common.UpdateColor:
