@@ -10,6 +10,18 @@ import (
 
 const debug = false
 
+const DefaultScannerSize = 120
+const MaxScannerSize = 120
+const MaxRGBSize = 120
+const DefaultPattern = 0
+const DefaultRGBSize = 1
+const DefaultRGBFade = 10
+const DefaultScannerFade = 10
+const DefaultSpeed = 7
+const DefaultRGBShift = 39
+const DefaultScannerShift = 1
+const DefaultNumberCoordinates = 0
+
 type ALight struct {
 	X                int
 	Y                int
@@ -110,8 +122,8 @@ const (
 	LoadConfig
 	UpdateSpeed
 	UpdatePattern
-	UpdateFadeSpeed
-	UpdateSize
+	UpdateRGBFadeSpeed
+	UpdateRGBSize
 	UpdateScannerSize
 	Blackout
 	Normal
@@ -137,7 +149,8 @@ const (
 	AutoPattern
 	ToggleFixtureState
 	FixtureState
-	UpdateShift
+	UpdateRGBShift
+	UpdateScannerShift
 	UpdateScannerColor
 	ClearSequenceColor
 	Static
@@ -147,15 +160,6 @@ const (
 	UpdateOffsetTilt
 	EnableAllScanners
 )
-
-const DefaultScannerSize = 120
-const MaxScannerSize = 120
-const DefaultPattern = 0
-const DefaultRGBSize = 1
-const DefaultFade = 10
-const DefaultSpeed = 7
-const DefaultShift = 1
-const DefaultNumberCoordinates = 0
 
 // A full step cycle is 39 ticks ie 39 values.
 // 13 fade up values, 13 on values and 13 off values.
@@ -192,7 +196,7 @@ type Sequence struct {
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
 	StrobeSpeed                int                         // Strobe speed.
-	Shift                      int                         // RGB shift.
+	RGBShift                   int                         // RGB shift.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
 	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
@@ -217,8 +221,8 @@ type Sequence struct {
 	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	FadeTime                   int                         // Fade time
-	Size                       int                         // Fade size
+	RGBFadeTime                int                         // RGB Fade time
+	RGBSize                    int                         // RGB Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
 	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
@@ -295,7 +299,7 @@ type NewFixtureCommand struct {
 	Hide         bool
 	Invert       bool
 	ScannerColor map[int]int
-	Size         int
+	RGBSize      int
 }
 
 // Fixture Command.

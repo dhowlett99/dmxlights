@@ -23,13 +23,15 @@ type CurrentState struct {
 	SelectedSequence         int                        // The currently selected sequence.
 	LastSelectedSequence     int                        // Store fof the last selected squence.
 	Speed                    map[int]int                // Local copy of sequence speed. Indexed by sequence.
-	Shift                    map[int]int                // Current fixture shift. Indexed by sequence.
-	Size                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence.
-	Fade                     map[int]int                // Default start at 1. Indexed by sequence.
+	RGBShift                 map[int]int                // Current rgb fixture shift. Indexed by sequence.
+	ScannerShift             map[int]int                // Current scanner fixture shift. Indexed by sequence.
+	RGBSize                  map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
+	ScannerSize              int                        // current scanner size for all sequences.
+	RGBFade                  map[int]int                // Indexed by sequence.
+	ScannerFade              map[int]int                // Indexed by sequence.
 	Running                  map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
 	Strobe                   bool                       // We are in strobe mode. True if strobing
 	StrobeSpeed              int                        // Strobe speed. value is speed 0-255
-	ScannerSize              int                        // Current scanner this.Size[this.SelectedSequence].
 	SavePreset               bool                       // Save a preset flag.
 	Blackout                 bool                       // Blackout all fixtures.
 	Flood                    bool                       // Flood all fixtures.
@@ -477,22 +479,41 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] - 1
-		if this.Shift[this.SelectedSequence] < 1 {
-			this.Shift[this.SelectedSequence] = 1
-		}
-		cmd := common.Command{
-			Action: common.UpdateShift,
-			Args: []common.Arg{
-				{Name: "Shift", Value: this.Shift[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		if sequences[this.SelectedSequence].Type == "rgb" {
+			this.RGBShift[this.SelectedSequence] = this.RGBShift[this.SelectedSequence] - 1
+			if this.RGBShift[this.SelectedSequence] < 1 {
+				this.RGBShift[this.SelectedSequence] = 1
+			}
+			cmd := common.Command{
+				Action: common.UpdateRGBShift,
+				Args: []common.Arg{
+					{Name: "RGBShift", Value: this.RGBShift[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+			return
+		}
 
-		return
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			this.ScannerShift[this.SelectedSequence] = this.ScannerShift[this.SelectedSequence] - 1
+			if this.ScannerShift[this.SelectedSequence] < 1 {
+				this.ScannerShift[this.SelectedSequence] = 1
+			}
+			cmd := common.Command{
+				Action: common.UpdateScannerShift,
+				Args: []common.Arg{
+					{Name: "ScannerShift", Value: this.ScannerShift[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.ScannerShift[this.SelectedSequence]), "shift", guiButtons)
+			return
+		}
 	}
 
 	// Increase Shift.
@@ -504,22 +525,41 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		this.Shift[this.SelectedSequence] = this.Shift[this.SelectedSequence] + 1
-		if this.Shift[this.SelectedSequence] > 50 {
-			this.Shift[this.SelectedSequence] = 50
-		}
-		cmd := common.Command{
-			Action: common.UpdateShift,
-			Args: []common.Arg{
-				{Name: "Shift", Value: this.Shift[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		if sequences[this.SelectedSequence].Type == "rgb" {
+			this.RGBShift[this.SelectedSequence] = this.RGBShift[this.SelectedSequence] + 1
+			if this.RGBShift[this.SelectedSequence] > 50 {
+				this.RGBShift[this.SelectedSequence] = 50
+			}
+			cmd := common.Command{
+				Action: common.UpdateRGBShift,
+				Args: []common.Arg{
+					{Name: "Shift", Value: this.RGBShift[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+			return
+		}
 
-		return
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			this.ScannerShift[this.SelectedSequence] = this.ScannerShift[this.SelectedSequence] + 1
+			if this.ScannerShift[this.SelectedSequence] > 50 {
+				this.ScannerShift[this.SelectedSequence] = 50
+			}
+			cmd := common.Command{
+				Action: common.UpdateScannerShift,
+				Args: []common.Arg{
+					{Name: "ScannerShift", Value: this.ScannerShift[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.ScannerShift[this.SelectedSequence]), "shift", guiButtons)
+			return
+		}
 	}
 
 	// Decrease speed of selected sequence.
@@ -750,36 +790,42 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		// Send Update RGB Size.
-		this.Size[this.SelectedSequence]--
-		if this.Size[this.SelectedSequence] < 1 {
-			this.Size[this.SelectedSequence] = 1
+		if sequences[this.SelectedSequence].Type == "rgb" {
+			// Send Update RGB Size.
+			this.RGBSize[this.SelectedSequence]--
+			if this.RGBSize[this.SelectedSequence] < 1 {
+				this.RGBSize[this.SelectedSequence] = 1
+			}
+			cmd := common.Command{
+				Action: common.UpdateRGBSize,
+				Args: []common.Arg{
+					{Name: "RGBSize", Value: this.RGBSize[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+			return
 		}
-		cmd := common.Command{
-			Action: common.UpdateSize,
-			Args: []common.Arg{
-				{Name: "Size", Value: this.Size[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Send Update Scanner Size.
-		this.ScannerSize = this.ScannerSize - 10
-		if this.ScannerSize < 10 {
-			this.ScannerSize = 10
-		}
-		cmd = common.Command{
-			Action: common.UpdateScannerSize,
-			Args: []common.Arg{
-				{Name: "ScannerSize", Value: this.ScannerSize},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			// Send Update Scanner Size.
+			this.ScannerSize = this.ScannerSize - 10
+			if this.ScannerSize < 0 {
+				this.ScannerSize = 0
+			}
+			cmd := common.Command{
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: this.ScannerSize},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
-
-		return
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize), "size", guiButtons)
+			return
+		}
 	}
 
 	// Increase Size.
@@ -791,36 +837,43 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		// Send Update RGB Size.
-		this.Size[this.SelectedSequence]++
-		if this.Size[this.SelectedSequence] > 50 {
-			this.Size[this.SelectedSequence] = 50
+		if sequences[this.SelectedSequence].Type == "rgb" {
+			// Send Update RGB Size.
+			this.RGBSize[this.SelectedSequence]++
+			if this.RGBSize[this.SelectedSequence] > common.MaxRGBSize {
+				this.RGBSize[this.SelectedSequence] = common.MaxRGBSize
+			}
+			cmd := common.Command{
+				Action: common.UpdateRGBSize,
+				Args: []common.Arg{
+					{Name: "RGBSize", Value: this.RGBSize[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+			return
 		}
-		cmd := common.Command{
-			Action: common.UpdateSize,
-			Args: []common.Arg{
-				{Name: "Size", Value: this.Size[this.SelectedSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Send Update Scanner Size.
-		this.ScannerSize = this.ScannerSize + 10
-		if this.ScannerSize > common.MaxScannerSize {
-			this.ScannerSize = common.MaxScannerSize
-		}
-		cmd = common.Command{
-			Action: common.UpdateScannerSize,
-			Args: []common.Arg{
-				{Name: "ScannerSize", Value: this.ScannerSize},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			// Send Update Scanner Size.
+			this.ScannerSize = this.ScannerSize + 10
+			if this.ScannerSize > common.MaxScannerSize {
+				this.ScannerSize = common.MaxScannerSize
+			}
+			cmd := common.Command{
+				Action: common.UpdateScannerSize,
+				Args: []common.Arg{
+					{Name: "ScannerSize", Value: this.ScannerSize},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize), "size", guiButtons)
 
-		return
+			return
+		}
 	}
 
 	// Fade time decrease.
@@ -830,29 +883,28 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Fade Time\n")
 		}
 
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+
 		if sequences[this.SelectedSequence].Type == "rgb" {
-
-			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
-
-			this.Fade[this.SelectedSequence]--
-			if this.Fade[this.SelectedSequence] < 1 {
-				this.Fade[this.SelectedSequence] = 1
+			this.RGBFade[this.SelectedSequence]--
+			if this.RGBFade[this.SelectedSequence] < 1 {
+				this.RGBFade[this.SelectedSequence] = 1
 			}
-
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.UpdateFadeSpeed,
+				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.Fade[this.SelectedSequence]},
+					{Name: "RGBFadeSpeed", Value: this.RGBFade[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+
+			return
 		}
 
 		if sequences[this.SelectedSequence].Type == "scanner" {
-
-			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
-
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.SelectedCordinates--
 			if this.SelectedCordinates < 0 {
@@ -865,12 +917,11 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Coord %02d", this.SelectedCordinates), "fade", guiButtons)
+			return
 		}
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
-
-		return
 	}
 
 	// Fade time increase.
@@ -880,27 +931,27 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Fade Time\n")
 		}
 
-		if sequences[this.SelectedSequence].Type == "rgb" {
-			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-			this.Fade[this.SelectedSequence]++
-			if this.Fade[this.SelectedSequence] > 50 {
-				this.Fade[this.SelectedSequence] = 50
+		if sequences[this.SelectedSequence].Type == "rgb" {
+			this.RGBFade[this.SelectedSequence]++
+			if this.RGBFade[this.SelectedSequence] > 50 {
+				this.RGBFade[this.SelectedSequence] = 50
 			}
 			// Send fade update command.
 			cmd := common.Command{
-				Action: common.UpdateFadeSpeed,
+				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.Fade[this.SelectedSequence]},
+					{Name: "FadeSpeed", Value: this.RGBFade[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+			return
 		}
 
 		if sequences[this.SelectedSequence].Type == "scanner" {
-
-			buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
-
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.SelectedCordinates++
 			if this.SelectedCordinates > 3 {
@@ -913,12 +964,10 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Coord %02d", this.SelectedCordinates), "fade", guiButtons)
+			return
 		}
-
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
-
-		return
 	}
 
 	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
@@ -2103,14 +2152,17 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	// restore the speed, shift, size and fade labels data.
 	for sequenceNumber, sequence := range sequences {
 		this.Speed[sequenceNumber] = sequence.Speed
-		this.Shift[sequenceNumber] = sequence.ScannerShift
-		this.Size[sequenceNumber] = sequence.Size
-		this.Fade[sequenceNumber] = sequence.FadeTime
+		this.RGBShift[sequenceNumber] = sequence.RGBShift
+		this.ScannerShift[sequenceNumber] = sequence.ScannerShift
+		this.RGBSize[sequenceNumber] = sequence.RGBSize
+		this.ScannerSize = sequence.ScannerSize
+		this.RGBFade[sequenceNumber] = sequence.RGBFadeTime
+
 	}
 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[0]), "shift", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[0]), "size", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[0]), "fade", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
@@ -2327,33 +2379,33 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-		// Reset the shift back to the default.
-		this.Shift[sequenceNumber] = common.DefaultShift
+		// Reset the RGB shift back to the default.
+		this.RGBShift[sequenceNumber] = common.DefaultRGBShift
 		cmd = common.Command{
-			Action: common.UpdateShift,
+			Action: common.UpdateRGBShift,
 			Args: []common.Arg{
-				{Name: "Shift", Value: this.Shift[sequenceNumber]},
+				{Name: "RGBShift", Value: this.RGBShift[sequenceNumber]},
 			},
 		}
 		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-		// Reset the Size back to the default.
-		this.Size[sequenceNumber] = common.DefaultRGBSize
+		// Reset the RGB Size back to the default.
+		this.RGBSize[sequenceNumber] = common.DefaultRGBSize
 		cmd = common.Command{
-			Action: common.UpdateSize,
+			Action: common.UpdateRGBSize,
 			Args: []common.Arg{
-				{Name: "Size", Value: this.Size[sequenceNumber]},
+				{Name: "Size", Value: this.RGBSize[sequenceNumber]},
 			},
 		}
 		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-		// Reset the fade speed back to the default
+		// Reset the RGB fade speed back to the default
 		if sequence.Type == "rgb" {
-			this.Fade[sequenceNumber] = common.DefaultFade
+			this.RGBFade[sequenceNumber] = common.DefaultRGBFade
 			cmd = common.Command{
-				Action: common.UpdateFadeSpeed,
+				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.Fade[sequenceNumber]},
+					{Name: "FadeSpeed", Value: this.RGBFade[sequenceNumber]},
 				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
@@ -2453,9 +2505,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Update the status bar for the first sequnce. Because that will be the one selected after a clear.
 		this.SelectedSequence = 0
 		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.Shift[this.SelectedSequence]), "shift", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.Size[this.SelectedSequence]), "size", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.Fade[this.SelectedSequence]), "fade", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
 
 		// Now convice handle() to do the work for us and
 		// select the first sequence and place everything in normal mode.

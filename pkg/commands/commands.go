@@ -113,22 +113,29 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
 
-	case common.UpdateShift:
+	case common.UpdateRGBShift:
 		const SHIFT = 0
 		if debug {
-			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
+			fmt.Printf("%d: Command Update RGB Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
+		}
+		sequence.RGBShift = command.Args[SHIFT].Value.(int)
+		return sequence
+
+	case common.UpdateScannerShift:
+		const SHIFT = 0
+		if debug {
+			fmt.Printf("%d: Command Update Scanner Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
 		}
 		sequence.UpdateShift = true
 		sequence.ScannerShift = command.Args[SHIFT].Value.(int)
-		sequence.Shift = command.Args[SHIFT].Value.(int)
 		return sequence
 
-	case common.UpdateSize:
+	case common.UpdateRGBSize:
 		const START = 0
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
 		}
-		sequence.Size = command.Args[START].Value.(int)
+		sequence.RGBSize = command.Args[START].Value.(int)
 		return sequence
 
 	case common.UpdateScannerSize:
@@ -139,12 +146,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
-	case common.UpdateFadeSpeed:
+	case common.UpdateRGBFadeSpeed:
 		const FADE_SPEED = 0
 		if debug {
 			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.FadeTime = command.Args[FADE_SPEED].Value.(int)
+		sequence.RGBFadeTime = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
 	case common.UpdateColor:

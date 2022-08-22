@@ -154,7 +154,7 @@ func FixtureReceiver(
 						}
 
 						// Fade on or off time.
-						for x := 0; x < cmd.Size*10; x++ {
+						for x := 0; x < cmd.RGBSize*10; x++ {
 							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
 								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 								break start
@@ -181,7 +181,7 @@ func FixtureReceiver(
 
 					if !cmd.Invert {
 						// Fade on or off time.
-						for x := 0; x < cmd.Size*10; x++ {
+						for x := 0; x < cmd.RGBSize*10; x++ {
 							if listenAndWaitForStop(fixtureStepChannel, fixtureStopChannel) {
 								turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 								break start

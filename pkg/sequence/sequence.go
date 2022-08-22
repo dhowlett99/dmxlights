@@ -131,15 +131,16 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		FadeTime:               common.DefaultFade,
+		RGBFadeTime:            common.DefaultRGBFade,
 		MusicTrigger:           false,
 		Run:                    true,
 		Bounce:                 false,
 		RGBAvailablePatterns:   availableRGBPatterns,
 		ScannerSize:            common.DefaultScannerSize,
-		Size:                   common.DefaultRGBSize,
+		RGBSize:                common.DefaultRGBSize,
 		Speed:                  common.DefaultSpeed,
-		ScannerShift:           common.DefaultShift,
+		ScannerShift:           common.DefaultScannerShift,
+		RGBShift:               common.DefaultRGBShift,
 		Blackout:               false,
 		Master:                 255,
 		ScannerGobo:            1,
@@ -502,7 +503,7 @@ func PlaySequence(sequence common.Sequence,
 				// Calulate positions for each scanner based on the steps in the pattern.
 				if sequence.Type == "scanner" {
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						positions, num := calculatePositions("scanner", sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted, sequence.Shift)
+						positions, num := calculatePositions("scanner", sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted, sequence.ScannerShift)
 						sequence.NumberSteps = num
 						sequence.FixtureScannerPositions[fixture] = make(map[int][]common.Position, 9)
 						for key, value := range positions {
@@ -514,7 +515,7 @@ func PlaySequence(sequence common.Sequence,
 				// Calulate positions for each RGB fixture.
 				if sequence.Type == "rgb" {
 					// Invert is done in a differnent way for RGB fixtures so invert flag is always fales here.
-					sequence.FixtureRGBPositions, sequence.NumberSteps = calculatePositions("rgb", sequence.Steps, sequence.Bounce, false, sequence.Shift)
+					sequence.FixtureRGBPositions, sequence.NumberSteps = calculatePositions("rgb", sequence.Steps, sequence.Bounce, false, sequence.RGBShift)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -647,7 +648,7 @@ func PlaySequence(sequence common.Sequence,
 						Master:       sequence.Master,
 						Blackout:     sequence.Blackout,
 						Hide:         sequence.Hide,
-						Size:         sequence.Size,
+						RGBSize:      sequence.RGBSize,
 						Invert:       sequence.Invert,
 					}
 					for _, fixture := range fixtureStepChannels {
