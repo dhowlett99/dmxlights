@@ -501,7 +501,7 @@ func PlaySequence(sequence common.Sequence,
 				// Calulate positions for each scanner based on the steps in the pattern.
 				if sequence.Type == "scanner" {
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						positions, num := calculatePositions("scanner", sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted, sequence.ScannerShift)
+						positions, num := calculatePositions("scanner", sequence.Steps, sequence.Bounce, sequence.ScannerState[fixture].Inverted, 14)
 						sequence.NumberSteps = num
 						sequence.FixtureScannerPositions[fixture] = make(map[int][]common.Position, 9)
 						for key, value := range positions {
@@ -579,13 +579,13 @@ func PlaySequence(sequence common.Sequence,
 					sequence.CurrentColors = common.HowManyColors(sequence.FixtureScannerPositions[fixture])
 				}
 
-				// sequence.ScannerStateMutex.RLock()
-				// scannerState := sequence.ScannerState
-				// sequence.ScannerStateMutex.RUnlock()
+				sequence.ScannerStateMutex.RLock()
+				scannerState := sequence.ScannerState
+				sequence.ScannerStateMutex.RUnlock()
 
-				// sequence.DisableOnceMutex.RLock()
-				// disabledOnce := sequence.DisableOnce
-				// sequence.DisableOnceMutex.RUnlock()
+				sequence.DisableOnceMutex.RLock()
+				disabledOnce := sequence.DisableOnce
+				sequence.DisableOnceMutex.RUnlock()
 
 				// //fmt.Printf("Step %d \n", step)
 				// for fixtureNumber, fixture := range fixtureControlChannels {
@@ -638,18 +638,30 @@ func PlaySequence(sequence common.Sequence,
 						break
 					}
 
-					command := common.NewFixtureCommand{
-						Step:         step,
-						RGBPositions: sequence.FixtureRGBPositions,
-						StrobeSpeed:  sequence.StrobeSpeed,
-						Master:       sequence.Master,
-						Blackout:     sequence.Blackout,
-						Hide:         sequence.Hide,
-						RGBSize:      sequence.RGBSize,
-						RGBFade:      sequence.RGBFade,
-						Invert:       sequence.Invert,
-					}
-					for _, fixture := range fixtureStepChannels {
+					for fixtureNumber, fixture := range fixtureStepChannels {
+						command := common.NewFixtureCommand{
+							Step:                   step,
+							StrobeSpeed:            sequence.StrobeSpeed,
+							Master:                 sequence.Master,
+							Blackout:               sequence.Blackout,
+							Hide:                   sequence.Hide,
+							Invert:                 sequence.Invert,
+							Type:                   sequence.Type,
+							RGBSize:                sequence.RGBSize,
+							RGBFade:                sequence.RGBFade,
+							RGBPositions:           sequence.FixtureRGBPositions,
+							RGBStartFlood:          sequence.StartFlood,
+							RGBStopFlood:           sequence.StopFlood,
+							ScannerPositions:       sequence.FixtureScannerPositions[fixtureNumber],
+							ScannerSelectedGobo:    sequence.ScannerGobo,
+							ScannerState:           scannerState,
+							ScannerDisableOnce:     disabledOnce,
+							ScannerChase:           sequence.ScannerChase,
+							ScannerColor:           sequence.ScannerColor,
+							ScannerAvailableColors: sequence.ScannerAvailableColors,
+							ScannerOffsetPan:       sequence.ScannerOffsetPan,
+							ScannerOffsetTilt:      sequence.ScannerOffsetTilt,
+						}
 						fixture <- command
 					}
 				}

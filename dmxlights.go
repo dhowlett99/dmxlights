@@ -52,7 +52,6 @@ func main() {
 	this.Running = make(map[int]bool, 4)            // Initialise storage for four sequences.
 	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
-	this.SelectedCordinates = 0                     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
 	this.OffsetPan = 120                            // Start pan from the center
 	this.OffsetTilt = 120                           // Start tilt from the center.
 	this.Patterns = pattern.MakePatterns()          // Build the default set of Patterns.
@@ -67,10 +66,12 @@ func main() {
 	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
 	this.Speed = make(map[int]int, 4)               // Initialise storage for four sequences.
 	this.RGBSize = make(map[int]int, 4)             // Initialise storage for four sequences.
+	this.ScannerSize = make(map[int]int, 4)         // Initialise storage for four sequences.
 	this.RGBShift = make(map[int]int, 4)            // Initialise storage for four sequences.
 	this.ScannerShift = make(map[int]int, 4)        // Initialise storage for four sequences.
 	this.RGBFade = make(map[int]int, 4)             // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, 4)         // Initialise storage for four sequences.
+	this.ScannerCordinates = make(map[int]int, 4)   // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
 
 	// Initialize eight fixture states for the four sequences.
 	this.ScannerState = make([][]common.ScannerState, 9)
@@ -158,15 +159,15 @@ func main() {
 		sequences = append(sequences, &newSequence)
 
 		// Setup Default State.
-		this.Speed[sequenceNumber] = common.DefaultSpeed               // Selected speed for the sequence. Common to all types of sequence.
-		this.Running[sequenceNumber] = true                            // Set this sequence to be in the running state. Common to all types of sequence.
-		this.RGBShift[sequenceNumber] = common.DefaultRGBShift         // Default RGB shift size.
-		this.ScannerShift[sequenceNumber] = common.DefaultScannerShift // Default scanner shift size.
-		this.RGBSize[sequenceNumber] = common.DefaultRGBSize           // Set the defaults size for the RGB fixtures.
-		this.ScannerSize = common.DefaultScannerSize                   // Set the defaults size for the scanner fixtures.
-		this.RGBFade[sequenceNumber] = common.DefaultRGBFade           // Set the default fade time for RGB fixtures.
-		this.ScannerFade[sequenceNumber] = common.DefaultScannerFade   // Set the default fade time for scanners.
-
+		this.Speed[sequenceNumber] = common.DefaultSpeed                          // Selected speed for the sequence. Common to all types of sequence.
+		this.Running[sequenceNumber] = true                                       // Set this sequence to be in the running state. Common to all types of sequence.
+		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                    // Default RGB shift size.
+		this.ScannerShift[sequenceNumber] = common.DefaultScannerShift            // Default scanner shift size.
+		this.RGBSize[sequenceNumber] = common.DefaultRGBSize                      // Set the defaults size for the RGB fixtures.
+		this.ScannerSize[sequenceNumber] = common.DefaultScannerSize              // Set the defaults size for the scanner fixtures.
+		this.RGBFade[sequenceNumber] = common.DefaultRGBFade                      // Set the default fade time for RGB fixtures.
+		this.ScannerFade[sequenceNumber] = common.DefaultScannerFade              // Set the default fade time for scanners.
+		this.ScannerCordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
 	}
 
 	// Create all the channels I need.

@@ -19,8 +19,8 @@ const DefaultRGBFade = 10
 const DefaultScannerFade = 10
 const DefaultSpeed = 7
 const DefaultRGBShift = 39
-const DefaultScannerShift = 1
-const DefaultNumberCoordinates = 0
+const DefaultScannerShift = 0
+const DefaultScannerCoordinates = 0
 
 type ALight struct {
 	X                int
@@ -290,16 +290,33 @@ type Step struct {
 }
 
 type NewFixtureCommand struct {
-	Step         int
-	RGBPositions map[int][]Position
-	StrobeSpeed  int
-	Master       int
-	Blackout     bool
-	Hide         bool
-	Invert       bool
-	ScannerColor map[int]int
-	RGBSize      int
-	RGBFade      int
+	Step int
+	Type string
+
+	// Command commands.
+	StrobeSpeed int
+	Master      int
+	Blackout    bool
+	Hide        bool
+	Invert      bool
+
+	// RGB commands.
+	RGBPositions  map[int][]Position
+	RGBSize       int
+	RGBFade       int
+	RGBStartFlood bool
+	RGBStopFlood  bool
+
+	// Scanner Commands.
+	ScannerColor           map[int]int
+	ScannerPositions       map[int][]Position
+	ScannerState           map[int]ScannerState
+	ScannerDisableOnce     map[int]bool
+	ScannerChase           bool
+	ScannerAvailableColors map[int][]StaticColorButton
+	ScannerSelectedGobo    int
+	ScannerOffsetPan       int
+	ScannerOffsetTilt      int
 }
 
 // Fixture Command.
