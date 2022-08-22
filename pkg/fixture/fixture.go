@@ -13,7 +13,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug = false
+//const debug = false
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
@@ -107,8 +107,7 @@ func FixtureReceiver(
 	sequence common.Sequence,
 	mySequenceNumber int,
 	myFixtureNumber int,
-	fixtureControlChannel chan common.FixtureCommand,
-	fixtureStepChannel chan common.NewFixtureCommand,
+	fixtureStepChannel chan common.FixtureCommand,
 	fixtureStopChannel chan bool,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
@@ -120,6 +119,33 @@ func FixtureReceiver(
 
 		// Wait for first step
 		cmd := <-fixtureStepChannel
+
+		// If we're a RGB fixture implement the flood and static features.
+		if cmd.Type == "rgb" {
+			if cmd.RGBStartFlood {
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
+				continue
+			}
+			if cmd.RGBStopFlood {
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+				continue
+			}
+			if cmd.RGBStatic {
+				sequence := common.Sequence{}
+				sequence.Type = cmd.Type
+				sequence.Number = cmd.SequenceNumber
+				sequence.Master = cmd.Master
+				sequence.Blackout = cmd.Blackout
+				sequence.Hide = cmd.Hide
+				sequence.StaticColors = cmd.RGBStaticColors
+				sequence.Static = cmd.RGBStatic
+				sequence.StrobeSpeed = cmd.StrobeSpeed
+				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true)
+				continue
+			}
+		}
 
 		if cmd.Type == "rgb" {
 			// Positions can have many fixtures play at the same time.
@@ -483,25 +509,25 @@ func getFadeValues(size float64, fade float64, direction bool) []int {
 	return out
 }
 
-// func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
+func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
 
-// 	lamp := sequence.StaticColors[myFixtureNumber]
+	lamp := sequence.StaticColors[myFixtureNumber]
 
-// 	if sequence.Hide {
-// 		if lamp.Flash {
-// 			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
-// 			Black := common.Color{R: 0, G: 0, B: 0}
-// 			common.FlashLight(sequence.Number, myFixtureNumber, onColor, Black, eventsForLauchpad, guiButtons)
-// 		} else {
-// 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
-// 		}
-// 	}
-// 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+	if sequence.Hide {
+		if lamp.Flash {
+			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(sequence.Number, myFixtureNumber, onColor, Black, eventsForLauchpad, guiButtons)
+		} else {
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
+		}
+	}
+	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 
-// 	// Only play once, we don't want to flood the DMX universe with
-// 	// continual commands.
-// 	sequence.PlayStaticOnce = false
-// }
+	// Only play once, we don't want to flood the DMX universe with
+	// continual commands.
+	sequence.PlayStaticOnce = false
+}
 
 // limitDmxValue - calculates the maximum DMX value based on the number of degrees the fixtire can achieve.
 func limitDmxValue(MaxDegrees *int, Value int) int {
@@ -535,7 +561,7 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 // listenAndWaitForStop is used in the fixture fade loops.
 // We make the sleeps interuptable so that fixtures can be stopped immediately
-func listenAndWaitForStop(stepChannel chan common.NewFixtureCommand, stopChannel chan bool) bool {
+func listenAndWaitForStop(stepChannel chan common.FixtureCommand, stopChannel chan bool) bool {
 
 	select {
 	case <-stopChannel:
@@ -552,7 +578,7 @@ func listenAndWaitForStop(stepChannel chan common.NewFixtureCommand, stopChannel
 }
 
 // turnOffFixtures is used to turn off a fixture when we stop a sequence.
-func turnOffFixtures(cmd common.NewFixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}

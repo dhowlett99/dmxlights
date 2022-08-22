@@ -262,44 +262,23 @@ func PlaySequence(sequence common.Sequence,
 	channels common.Channels,
 	soundTriggers []*common.Trigger) {
 
-	// Create eight channels to control the fixtures.
-	fixtureChannel1 := make(chan common.FixtureCommand)
-	fixtureChannel2 := make(chan common.FixtureCommand)
-	fixtureChannel3 := make(chan common.FixtureCommand)
-	fixtureChannel4 := make(chan common.FixtureCommand)
-	fixtureChannel5 := make(chan common.FixtureCommand)
-	fixtureChannel6 := make(chan common.FixtureCommand)
-	fixtureChannel7 := make(chan common.FixtureCommand)
-	fixtureChannel8 := make(chan common.FixtureCommand)
-
-	// Make an array to hold all the fixture channels.
-	fixtureControlChannels := []chan common.FixtureCommand{}
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel1)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel2)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel3)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel4)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel5)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel6)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel7)
-	fixtureControlChannels = append(fixtureControlChannels, fixtureChannel8)
-
 	// Create channels used for stepping the fixture threads for this sequnece.
-	fixtureStepChannels := []chan common.NewFixtureCommand{}
-	fixtureStepChannel0 := make(chan common.NewFixtureCommand)
+	fixtureStepChannels := []chan common.FixtureCommand{}
+	fixtureStepChannel0 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel0)
-	fixtureStepChannel1 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel1 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel1)
-	fixtureStepChannel2 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel2 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel2)
-	fixtureStepChannel3 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel3 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel3)
-	fixtureStepChannel4 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel4 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel4)
-	fixtureStepChannel5 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel5 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel5)
-	fixtureStepChannel6 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel6 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel6)
-	fixtureStepChannel7 := make(chan common.NewFixtureCommand)
+	fixtureStepChannel7 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
 
 	// Create channels used for stopping the fixture threads for this sequnece.
@@ -322,14 +301,14 @@ func PlaySequence(sequence common.Sequence,
 	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel7)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureControlChannels[0], fixtureStepChannels[0], fixtureStopChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureControlChannels[1], fixtureStepChannels[1], fixtureStopChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureControlChannels[2], fixtureStepChannels[2], fixtureStopChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureControlChannels[3], fixtureStepChannels[3], fixtureStopChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureControlChannels[4], fixtureStepChannels[4], fixtureStopChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureControlChannels[5], fixtureStepChannels[5], fixtureStopChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureControlChannels[6], fixtureStepChannels[6], fixtureStopChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureControlChannels[7], fixtureStepChannels[7], fixtureStopChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], fixtureStopChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], fixtureStopChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], fixtureStopChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], fixtureStopChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], fixtureStopChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], fixtureStopChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], fixtureStopChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], fixtureStopChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -358,16 +337,15 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Run = false
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Tick:           true,
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				StartFlood:     sequence.StartFlood,
+				RGBStartFlood:  sequence.StartFlood,
 			}
 			// Stop the fixture threads doing what the are doing.
 			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = false
@@ -378,14 +356,13 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.StopFlood && sequence.FloodPlayOnce {
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Tick:           true,
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				StartFlood:     sequence.StartFlood,
-				StopFlood:      sequence.StopFlood,
+				RGBStartFlood:  sequence.StartFlood,
+				RGBStopFlood:   sequence.StopFlood,
 			}
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = true
@@ -396,22 +373,21 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Tick:           true,
-				Type:           sequence.Type,
-				SequenceNumber: sequence.Number,
-				Static:         sequence.Static,
-				StaticColors:   sequence.StaticColors,
-				Hide:           sequence.Hide,
-				Master:         sequence.Master,
-				StrobeSpeed:    sequence.StrobeSpeed,
-				Blackout:       sequence.Blackout,
+				Type:            sequence.Type,
+				SequenceNumber:  sequence.Number,
+				RGBStatic:       sequence.Static,
+				RGBStaticColors: sequence.StaticColors,
+				Hide:            sequence.Hide,
+				Master:          sequence.Master,
+				StrobeSpeed:     sequence.StrobeSpeed,
+				Blackout:        sequence.Blackout,
 			}
 
 			// Stop the fixture threads doing what the are doing.
 			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureControlChannels, channels, command)
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.PlayStaticOnce = false
 			sequence.Run = false
 			continue
@@ -587,43 +563,6 @@ func PlaySequence(sequence common.Sequence,
 				disabledOnce := sequence.DisableOnce
 				sequence.DisableOnceMutex.RUnlock()
 
-				// //fmt.Printf("Step %d \n", step)
-				// for fixtureNumber, fixture := range fixtureControlChannels {
-				// 	positions := sequence.FixtureRGBPositions[fixtureNumber]
-
-				// 	// Prepare a message to be sent to the fixtures in the sequence.
-				// 	command := common.FixtureCommand{
-				// 		SequenceNumber:         sequence.Number,
-				// 		Invert:                 sequence.Invert,
-				// 		Master:                 sequence.Master,
-				// 		StrobeSpeed:            sequence.StrobeSpeed,
-				// 		Hide:                   sequence.Hide,
-				// 		Tick:                   true,
-				// 		ScannerPositions:       sequence.FixtureScannerPositions,
-				// 		RGBPositions:           positions,
-				// 		Type:                   sequence.Type,
-				// 		FadeTime:               sequence.FadeTime,
-				// 		Size:                   sequence.Size,
-				// 		Steps:                  sequence.NumberSteps,
-				// 		CurrentSpeed:           sequence.CurrentSpeed,
-				// 		Speed:                  sequence.Speed,
-				// 		Blackout:               sequence.Blackout,
-				// 		StartFlood:             sequence.StartFlood,
-				// 		StopFlood:              sequence.StopFlood,
-				// 		SelectedGobo:           sequence.ScannerGobo,
-				// 		ScannerState:           scannerState,
-				// 		DisableOnce:            disabledOnce,
-				// 		ScannerChase:           sequence.ScannerChase,
-				// 		ScannerColor:           sequence.ScannerColor,
-				// 		AvailableScannerColors: sequence.ScannerAvailableColors,
-				// 		OffsetPan:              sequence.ScannerOffsetPan,
-				// 		OffsetTilt:             sequence.ScannerOffsetTilt,
-				// 		FixtureLabels:          sequence.GuiFixtureLabels,
-				// 	}
-
-				// 	fixture <- command
-				// }
-
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
@@ -639,7 +578,7 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					for fixtureNumber, fixture := range fixtureStepChannels {
-						command := common.NewFixtureCommand{
+						command := common.FixtureCommand{
 							Step:                   step,
 							StrobeSpeed:            sequence.StrobeSpeed,
 							Master:                 sequence.Master,
@@ -652,6 +591,7 @@ func PlaySequence(sequence common.Sequence,
 							RGBPositions:           sequence.FixtureRGBPositions,
 							RGBStartFlood:          sequence.StartFlood,
 							RGBStopFlood:           sequence.StopFlood,
+							SequenceNumber:         sequence.Number,
 							ScannerPositions:       sequence.FixtureScannerPositions[fixtureNumber],
 							ScannerSelectedGobo:    sequence.ScannerGobo,
 							ScannerState:           scannerState,

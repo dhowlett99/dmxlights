@@ -289,9 +289,10 @@ type Step struct {
 	Type     string
 }
 
-type NewFixtureCommand struct {
-	Step int
-	Type string
+type FixtureCommand struct {
+	Step           int
+	Type           string
+	SequenceNumber int
 
 	// Command commands.
 	StrobeSpeed int
@@ -301,11 +302,13 @@ type NewFixtureCommand struct {
 	Invert      bool
 
 	// RGB commands.
-	RGBPositions  map[int][]Position
-	RGBSize       int
-	RGBFade       int
-	RGBStartFlood bool
-	RGBStopFlood  bool
+	RGBPositions    map[int][]Position
+	RGBSize         int
+	RGBFade         int
+	RGBStartFlood   bool
+	RGBStopFlood    bool
+	RGBStatic       bool
+	RGBStaticColors []StaticColorButton
 
 	// Scanner Commands.
 	ScannerColor           map[int]int
@@ -317,47 +320,6 @@ type NewFixtureCommand struct {
 	ScannerSelectedGobo    int
 	ScannerOffsetPan       int
 	ScannerOffsetTilt      int
-}
-
-// Fixture Command.
-type FixtureCommand struct {
-	Master                 int
-	StrobeSpeed            int
-	Hide                   bool
-	Tick                   bool
-	Config                 bool // Configure fixture.
-	Start                  bool
-	Steps                  int
-	ScannerPositions       map[int]map[int][]Position
-	RGBPositions           map[int][]Position
-	Type                   string
-	StartPosition          int
-	CurrentSpeed           time.Duration
-	Color                  Color
-	Speed                  int
-	Shift                  int
-	Size                   int
-	FadeSpeed              int
-	FadeTime               int
-	Blackout               bool
-	StartFlood             bool
-	StopFlood              bool
-	PlayFloodOnce          bool
-	UpdateSequenceColor    bool
-	SequenceColor          Color
-	SequenceNumber         int
-	Invert                 bool
-	SelectedGobo           int
-	ScannerState           map[int]ScannerState
-	DisableOnce            map[int]bool
-	ScannerChase           bool
-	ScannerColor           map[int]int
-	Static                 bool
-	StaticColors           []StaticColorButton
-	AvailableScannerColors map[int][]StaticColorButton
-	OffsetPan              int
-	OffsetTilt             int
-	FixtureLabels          []string
 }
 
 type Position struct {

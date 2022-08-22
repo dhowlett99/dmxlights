@@ -820,13 +820,13 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize},
+					{Name: "ScannerSize", Value: this.ScannerSize[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
 			return
 		}
 	}
@@ -867,13 +867,13 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize},
+					{Name: "ScannerSize", Value: this.ScannerSize[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
 
 			return
 		}
