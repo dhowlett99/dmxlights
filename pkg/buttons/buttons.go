@@ -482,8 +482,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.SelectedSequence].Type == "rgb" {
 			this.RGBShift[this.SelectedSequence] = this.RGBShift[this.SelectedSequence] - 1
-			if this.RGBShift[this.SelectedSequence] < 1 {
-				this.RGBShift[this.SelectedSequence] = 1
+			if this.RGBShift[this.SelectedSequence] < 0 {
+				this.RGBShift[this.SelectedSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,

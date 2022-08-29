@@ -18,9 +18,11 @@ const DefaultRGBSize = 1
 const DefaultRGBFade = 10
 const DefaultScannerFade = 10
 const DefaultSpeed = 7
-const DefaultRGBShift = 39
+const DefaultRGBShift = 0
 const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
+
+const MaxBrightness = 255
 
 type ALight struct {
 	X                int
@@ -41,9 +43,10 @@ type ALight struct {
 }
 
 type Color struct {
-	R int
-	G int
-	B int
+	R            int
+	G            int
+	B            int
+	MasterDimmer int
 }
 
 type Value struct {
@@ -210,8 +213,8 @@ type Sequence struct {
 	Steps                      []Step                      // Steps in this sequence.
 	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures             int                         // Number of fixtures for this sequence.
-	FixtureRGBPositions        map[int][]Position          // One set of Fixture positions for RGB devices. Index is Position.
-	FixtureScannerPositions    map[int]map[int][]Position  // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. Index is Scanner and then Position.
+	RGBPositions               map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
+	ScannerPositions           map[int]map[int][]Position  // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. Index Positions.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
@@ -302,7 +305,7 @@ type FixtureCommand struct {
 	Invert      bool
 
 	// RGB commands.
-	RGBPositions    map[int][]Position
+	RGBPosition     Position
 	RGBSize         int
 	RGBFade         int
 	RGBStartFlood   bool
@@ -312,7 +315,7 @@ type FixtureCommand struct {
 
 	// Scanner Commands.
 	ScannerColor           map[int]int
-	ScannerPositions       map[int][]Position
+	ScannerPosition        map[int][]Position
 	ScannerState           map[int]ScannerState
 	ScannerDisableOnce     map[int]bool
 	ScannerChase           bool
@@ -323,9 +326,13 @@ type FixtureCommand struct {
 }
 
 type Position struct {
-	Fixture        int
-	StartPosition  int
+	// RGB
+	Fixtures       map[int]Fixture
 	Color          Color
+	PositionNumber int
+	// Scanner
+	ScannerNumber  int
+	StartPosition  int
 	Pan            int
 	PanMaxDegrees  *int
 	Tilt           int
@@ -334,19 +341,26 @@ type Position struct {
 	Gobo           int
 }
 
+type PreFadeDetails struct {
+	FadeValue    int
+	MasterDimmer int
+	Color        Color
+}
+
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	Name         string
-	Label        string
-	Type         string
-	MasterDimmer int
-	Colors       []Color
-	Pan          int
-	Tilt         int
-	Shutter      int
-	Gobo         int
+	Name          string
+	Label         string
+	Type          string
+	MasterDimmer  int
+	Colors        []Color
+	PositionColor Color
+	Pan           int
+	Tilt          int
+	Shutter       int
+	Gobo          int
 }
 
 type ButtonPresets struct {
@@ -653,7 +667,21 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	return sequence
 }
 
-func HowManyColors(positionsMap map[int][]Position) (colors []Color) {
+func HowManyColors(positionsMap map[int]Position) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, position := range positionsMap {
+		colorMap[position.Color] = true
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
+}
+
+func HowManyScannerColors(positionsMap map[int][]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
 	for _, positions := range positionsMap {
