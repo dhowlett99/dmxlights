@@ -983,12 +983,30 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 		if insertColor >= numberColors {
 			insertColor = 0
 		}
-		position.Color = colors[insertColor]
+		//fmt.Printf("Insert color %+v\n", colors[insertColor])
+		for fixtureNumber, fixture := range position.Fixtures {
+			for colorNumber, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
+					continue
+				}
+			}
+		}
+
 		insertColor++
 
 		replace[currentPosition] = position
 
 	}
+
+	length := len(positionsMap)
+	for step := 0; step < length; step++ {
+
+		fmt.Printf("%v", replace[step])
+
+		fmt.Printf("\n")
+	}
+
 	return replace
 }
 
@@ -1176,39 +1194,6 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 	// Now turn pink the selected sequence select light.
 	common.LightLamp(common.ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 }
-
-// func getFadeValues(size float64, fade float64, direction bool) []int {
-
-// 	if direction {
-// 		if fade == 1 {
-// 			return []int{255, 247, 225, 191, 149, 105, 63, 29, 7, 0}
-// 		}
-// 		if fade == 2 {
-// 			return []int{255, 255, 255, 255, 255, 225, 149, 63, 7, 0}
-// 		}
-// 		if fade == 2 {
-// 			return []int{255, 255, 255, 255, 255, 225, 255, 63, 0}
-// 		}
-// 		if fade == 3 {
-// 			return []int{255, 0, 0, 0, 0, 0, 0, 0, 0, 0}
-// 		}
-// 	}
-// 	if fade == 1 {
-// 		return []int{0, 7, 29, 63, 105, 149, 191, 225, 247, 255}
-// 	}
-// 	if fade == 2 {
-// 		return []int{0, 29, 105, 191, 225, 255, 255, 255, 255, 255}
-// 	}
-// 	if fade == 2 {
-// 		return []int{0, 105, 225, 255, 255, 255, 255, 255, 255, 255}
-// 	}
-// 	if fade == 3 {
-// 		return []int{0, 255, 225, 255, 255, 255, 255, 255, 255, 255}
-// 	}
-
-// 	return []int{0, 7, 29, 63, 105, 149, 191, 225, 247, 255}
-
-// }
 
 func getFadeValues(size float64, fade float64, direction bool) []int {
 
