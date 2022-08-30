@@ -515,8 +515,7 @@ func PlaySequence(sequence common.Sequence,
 					slopeOff = append(slopeOff, fadeOffValues...)
 					slopeOff = append(slopeOff, fadeDownValues...)
 
-					// Invert is done in a differnent way for RGB fixtures so invert flag is always false here.
-					sequence.RGBPositions, sequence.NumberSteps = calculateRGBPositions(slopeOn, slopeOff, sequence.Steps, sequence.Bounce, false, sequence.RGBShift, sequence.RGBFade, sequence.RGBSize)
+					sequence.RGBPositions, sequence.NumberSteps = calculateRGBPositions(sequence, slopeOn, slopeOff)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -683,22 +682,23 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 	}
 }
 
-func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.Step, bounce bool, invert bool, shift int, fade int, size int) (map[int]common.Position, int) {
+func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []int) (map[int]common.Position, int) {
 
 	positionsOut := make(map[int]common.Position)
 	fixtures := make(map[int][]common.Color)
 	fadeColors := make(map[int][]common.Color)
 	slope := make(map[int][]common.PreFadeDetails)
-	slopeColors := make(map[int][]common.Color)
+
+	var numberFixtures int
+	var numberFixturesInThisStep int
 
 	// First loop make a space in the slope values for each fixture.
-	for _, patten := range pattenSteps {
+	for _, patten := range sequence.Steps {
+		numberFixturesInThisStep = 0
 		for fixtureNumber, fixture := range patten.Fixtures {
-			colors := []common.Color{}
+			numberFixturesInThisStep++
 			for _, color := range fixture.Colors {
-
 				var fadeValues []common.PreFadeDetails
-
 				// make space for a color
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					for _, slope := range slopeOn {
@@ -710,26 +710,26 @@ func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.S
 						fadeValues = append(fadeValues, newPreFade)
 					}
 					slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
-					colors = append(colors, color)
-
 				} else {
 					for range slopeOff {
 						newPreFade := common.PreFadeDetails{
-							FadeValue: 0,
-							Color:     color,
+							FadeValue:    0,
+							Color:        color,
+							MasterDimmer: fixture.MasterDimmer,
 						}
 						fadeValues = append(fadeValues, newPreFade)
 					}
 					slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
-					colors = append(colors, color)
 				}
-				slopeColors[fixtureNumber] = colors
 			}
+		}
+		if numberFixturesInThisStep > numberFixtures {
+			numberFixtures = numberFixturesInThisStep
 		}
 	}
 
 	// Go through the fade values and apply the fade value to the color.
-	for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
 		for _, prefade := range slope[fixtureNumber] {
 			newColor := common.Color{}
 			newColor.R = int((float64(prefade.Color.R) / 100) * (float64(prefade.FadeValue) / 2.55))
@@ -744,23 +744,22 @@ func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.S
 	var counter int
 	length := len(fadeColors[0])
 	for index := range fadeColors[0] {
-		for fixture := 0; fixture < 8; fixture++ {
+		for fixture := 0; fixture < numberFixtures; fixture++ {
 			if fixture == 0 {
 				fixtures[0] = append(fixtures[0], fadeColors[0][makeShift(index, length, 0)])
 			} else {
-				fixtures[fixture] = append(fixtures[fixture], fadeColors[fixture][makeShift(index, length, shift*fixture)])
+				fixtures[fixture] = append(fixtures[fixture], fadeColors[fixture][makeShift(index, length, sequence.RGBShift*fixture)])
 			}
 		}
 		counter++
 	}
 
 	// Adjust the length based on the shift and the number of fixtures.
-	counter = counter - (shift * 7)
+	counter = counter - (sequence.RGBShift * (numberFixtures - 1))
 
 	if debug {
 		// Print out the fixtures so far.
-		for fixture := 0; fixture < 8; fixture++ {
-			fmt.Printf("Fixture%d ", fixture)
+		for fixture := 0; fixture < numberFixtures; fixture++ {
 			for out := 0; out < counter; out++ {
 				fmt.Printf("%v", fixtures[fixture][out])
 			}
@@ -772,16 +771,16 @@ func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.S
 	for step := 0; step < counter; step++ {
 		// Create a new position.
 		newPosition := common.Position{}
-		newPosition.PositionNumber = step
-
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixture := 0; fixture < 8; fixture++ {
+		for fixture := 0; fixture < numberFixtures; fixture++ {
 			newFixture := common.Fixture{}
-			newFixture.PositionColor.R = fixtures[fixture][step].R
-			newFixture.PositionColor.G = fixtures[fixture][step].G
-			newFixture.PositionColor.B = fixtures[fixture][step].B
+			newColor := common.Color{}
+			newColor.R = fixtures[fixture][step].R
+			newColor.G = fixtures[fixture][step].G
+			newColor.B = fixtures[fixture][step].B
+			newFixture.Colors = append(newFixture.Colors, newColor)
 			newFixture.MasterDimmer = fixtures[fixture][step].MasterDimmer
 			newPosition.Fixtures[fixture] = newFixture
 		}
@@ -793,10 +792,9 @@ func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.S
 
 	if debug {
 		// Print out the positions in fixtures order.
-		for fixture := 0; fixture < 8; fixture++ {
-			fmt.Printf("fixture%d ", fixture)
+		for fixture := 0; fixture < numberFixtures; fixture++ {
 			for step := 0; step < counter; step++ {
-				fmt.Printf("%d", positionsOut[step].Fixtures[fixture].PositionColor)
+				fmt.Printf("%v", positionsOut[step].Fixtures[fixture].Colors)
 			}
 			fmt.Printf("\n")
 		}
@@ -806,7 +804,6 @@ func calculateRGBPositions(slopeOn []int, slopeOff []int, pattenSteps []common.S
 }
 
 func makeShift(index int, length int, shift int) int {
-
 	var use int
 	if index+shift >= length {
 		use = index + shift - length

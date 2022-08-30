@@ -351,16 +351,15 @@ type PreFadeDetails struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	Name          string
-	Label         string
-	Type          string
-	MasterDimmer  int
-	Colors        []Color
-	PositionColor Color
-	Pan           int
-	Tilt          int
-	Shutter       int
-	Gobo          int
+	Name         string
+	Label        string
+	Type         string
+	MasterDimmer int
+	Colors       []Color
+	Pan          int
+	Tilt         int
+	Shutter      int
+	Gobo         int
 }
 
 type ButtonPresets struct {

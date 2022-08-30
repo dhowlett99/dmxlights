@@ -946,13 +946,8 @@ func TestCalculateRGBPositions(t *testing.T) {
 
 	full := 255
 	type args struct {
-		steps  []common.Step
-		bounce bool
-		invert bool
-		shift  int
-		size   int
-		fade   int
-		slope  []int
+		sequence common.Sequence
+		slope    []int
 	}
 	tests := []struct {
 		name  string
@@ -963,107 +958,110 @@ func TestCalculateRGBPositions(t *testing.T) {
 		{
 			name: "golden path - common par fixture RGB",
 			args: args{
-				bounce: false,
-				invert: false,
-				shift:  0,
-				size:   255,
-				fade:   10,
-				slope:  []int{1, 50, 255},
-				steps: []common.Step{
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+
+				slope: []int{1, 50, 255},
+				sequence: common.Sequence{
+					Bounce:   false,
+					Invert:   false,
+					RGBShift: 0,
+					RGBSize:  255,
+					RGBFade:  10,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							},
 						},
 					},
 				},
@@ -1364,107 +1362,45 @@ func TestCalculateRGBPositions(t *testing.T) {
 		{
 			name: "Shift1 - common par fixture RGB",
 			args: args{
-				bounce: false,
-				invert: false,
-				shift:  1,
-				size:   255,
-				fade:   10,
-				slope:  []int{1, 50, 255, 255, 255, 255, 50, 1},
-				steps: []common.Step{
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				slope: []int{1, 50, 255},
+				sequence: common.Sequence{
+					Bounce:   false,
+					Invert:   false,
+					RGBShift: 1,
+					RGBSize:  255,
+					RGBFade:  10,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
 						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: []common.Fixture{
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							},
 						},
 					},
 				},
@@ -1476,10 +1412,6 @@ func TestCalculateRGBPositions(t *testing.T) {
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				1: {
@@ -1488,290 +1420,78 @@ func TestCalculateRGBPositions(t *testing.T) {
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				2: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				3: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				4: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				5: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 				6: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
+						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
 					},
 				},
 				7: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
 					},
 				},
 				8: {
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				9: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				10: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				11: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				12: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				13: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				14: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				15: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				16: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				17: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				18: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				19: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				20: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-				21: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 1, B: 0}}},
-					},
-				},
-				22: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 50, B: 0}}},
-					},
-				},
-				23: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 254, B: 0}}},
 					},
 				},
 			},
 
-			want1: 24,
+			want1: 9,
 		},
 	}
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := calculateRGBPositions(tt.args.slope, tt.args.slope, tt.args.steps, tt.args.bounce, tt.args.invert, tt.args.shift, tt.args.fade, tt.args.size)
+			got, got1 := calculateRGBPositions(tt.args.sequence, tt.args.slope, tt.args.slope)
 			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("calculateRGBPositions() got = %+v, want %+v", got, tt.want)
+				t.Errorf("calculateRGBPositions() got = %v, want %v", got, tt.want)
 			}
 			if got1 != tt.want1 {
-				t.Errorf("calculateRGBPositions() got1 = %+v, want %+v", got1, tt.want1)
+				t.Errorf("calculateRGBPositions() got1 = %v, want %v", got1, tt.want1)
 			}
 		})
 	}

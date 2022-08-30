@@ -154,14 +154,16 @@ func FixtureReceiver(
 
 		if cmd.Type == "rgb" {
 			fixture := cmd.RGBPosition.Fixtures[myFixtureNumber]
-			red := fixture.PositionColor.R
-			green := fixture.PositionColor.G
-			blue := fixture.PositionColor.B
+			for _, color := range fixture.Colors {
+				red := color.R
+				green := color.G
+				blue := color.B
 
-			if !cmd.Hide {
-				common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+				if !cmd.Hide {
+					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+				}
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 			}
-			MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 		}
 
 		if cmd.Type == "scanner" {
