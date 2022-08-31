@@ -108,7 +108,6 @@ func FixtureReceiver(
 	mySequenceNumber int,
 	myFixtureNumber int,
 	fixtureStepChannel chan common.FixtureCommand,
-	fixtureStopChannel chan bool,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,

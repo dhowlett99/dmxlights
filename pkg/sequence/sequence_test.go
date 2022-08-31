@@ -2056,6 +2056,60 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 				},
 			},
 		},
+		{
+			name: "replace a number of colors with just one.",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: []common.Fixture{
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+						},
+					},
+				},
+				colors: []common.Color{
+					{R: 0, G: 255, B: 0},
+				},
+			},
+			want: []common.Step{
+				{
+					Fixtures: []common.Fixture{
+						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					},
+				},
+				{
+					Fixtures: []common.Fixture{
+						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					},
+				},
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

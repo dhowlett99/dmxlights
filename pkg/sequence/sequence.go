@@ -281,44 +281,21 @@ func PlaySequence(sequence common.Sequence,
 	fixtureStepChannel7 := make(chan common.FixtureCommand)
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
 
-	// Create channels used for stopping the fixture threads for this sequnece.
-	fixtureStopChannels := []chan bool{}
-	fixtureStopChannel0 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel0)
-	fixtureStopChannel1 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel1)
-	fixtureStopChannel2 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel2)
-	fixtureStopChannel3 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel3)
-	fixtureStopChannel4 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel4)
-	fixtureStopChannel5 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel5)
-	fixtureStopChannel6 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel6)
-	fixtureStopChannel7 := make(chan bool)
-	fixtureStopChannels = append(fixtureStopChannels, fixtureStopChannel7)
-
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], fixtureStopChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], fixtureStopChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], fixtureStopChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], fixtureStopChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], fixtureStopChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], fixtureStopChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], fixtureStopChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], fixtureStopChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 
 	for {
 		sequence.UpdateShift = false
-
-		if !sequence.Run {
-			sendStopToAllFixtures(sequence, fixtureStopChannels)
-		}
 
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
@@ -341,8 +318,6 @@ func PlaySequence(sequence common.Sequence,
 				SequenceNumber: sequence.Number,
 				RGBStartFlood:  sequence.StartFlood,
 			}
-			// Stop the fixture threads doing what the are doing.
-			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
@@ -382,9 +357,6 @@ func PlaySequence(sequence common.Sequence,
 				StrobeSpeed:     sequence.StrobeSpeed,
 				Blackout:        sequence.Blackout,
 			}
-
-			// Stop the fixture threads doing what the are doing.
-			sendStopToAllFixtures(sequence, fixtureStopChannels)
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
@@ -469,8 +441,6 @@ func PlaySequence(sequence common.Sequence,
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
-					// Tell the fixtures to stop.
-					sendStopToAllFixtures(sequence, fixtureStopChannels)
 					break
 				}
 
@@ -598,8 +568,6 @@ func PlaySequence(sequence common.Sequence,
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
-						// Tell the fixtures to stop.
-						sendStopToAllFixtures(sequence, fixtureStopChannels)
 						break
 					}
 
@@ -642,17 +610,6 @@ func PlaySequence(sequence common.Sequence,
 func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.FixtureCommand, channels common.Channels, command common.FixtureCommand) {
 	for _, fixture := range fixtureChannels {
 		fixture <- command
-	}
-}
-
-// Send a Stop command to all the fixtures.
-func sendStopToAllFixtures(sequence common.Sequence, fixtureStopChannels []chan bool) {
-	for _, fixture := range fixtureStopChannels {
-		select {
-		case fixture <- true:
-			continue
-		case <-time.After(5 * time.Millisecond):
-		}
 	}
 }
 
@@ -819,6 +776,10 @@ func makeShift(index int, length int, shift int) int {
 // calculateScannerPositions takes the steps defined in the pattern and
 // turns them into positions used by the sequencer.
 func calculateScannerPositions(tYpe string, steps []common.Step, bounce bool, invert bool, shift int) (map[int][]common.Position, int) {
+
+	if debug {
+		fmt.Printf("calculateScannerPositions\n")
+	}
 
 	position := common.Position{}
 
@@ -1036,15 +997,12 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 
 	}
 
-	// if debug {
-	// 	length := len(positionsMap)
-	// 	for step := 0; step < length; step++ {
-
-	// 		fmt.Printf("%v", replace[step])
-
-	// 		fmt.Printf("\n")
-	// 	}
-	// }
+	if debug {
+		length := len(positionsMap)
+		for step := 0; step < length; step++ {
+			fmt.Printf("%v\n", replace[step])
+		}
+	}
 
 	return replace
 }
