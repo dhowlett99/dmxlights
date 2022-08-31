@@ -596,7 +596,7 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
 						// Tell the fixtures to stop.
 						sendStopToAllFixtures(sequence, fixtureStopChannels)
@@ -993,12 +993,14 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 		}
 	}
 
-	for stepNumber, step := range steps {
-		fmt.Printf("Step %d\n", stepNumber)
-		for fixtureNumber, fixture := range step.Fixtures {
-			fmt.Printf("\tFixture %d\n", fixtureNumber)
-			for _, color := range fixture.Colors {
-				fmt.Printf("\t\tColor %+v\n", color)
+	if debug {
+		for stepNumber, step := range steps {
+			fmt.Printf("Step %d\n", stepNumber)
+			for fixtureNumber, fixture := range step.Fixtures {
+				fmt.Printf("\tFixture %d\n", fixtureNumber)
+				for _, color := range fixture.Colors {
+					fmt.Printf("\t\tColor %+v\n", color)
+				}
 			}
 		}
 	}
