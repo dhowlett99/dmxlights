@@ -670,7 +670,13 @@ func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
 	for _, position := range positionsMap {
-		colorMap[position.Color] = true
+		for _, fixture := range position.Fixtures {
+			for _, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					colorMap[color] = true
+				}
+			}
+		}
 	}
 
 	for color := range colorMap {
