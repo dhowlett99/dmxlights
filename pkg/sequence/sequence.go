@@ -652,9 +652,9 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 	var numberFixturesInThisStep int
 
 	// First loop make a space in the slope values for each fixture.
-	for _, patten := range sequence.Steps {
+	for _, step := range sequence.Steps {
 		numberFixturesInThisStep = 0
-		for fixtureNumber, fixture := range patten.Fixtures {
+		for fixtureNumber, fixture := range step.Fixtures {
 			numberFixturesInThisStep++
 			for _, color := range fixture.Colors {
 				var fadeValues []common.PreFadeDetails
@@ -684,6 +684,44 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 		}
 		if numberFixturesInThisStep > numberFixtures {
 			numberFixtures = numberFixturesInThisStep
+		}
+	}
+
+	if sequence.Bounce {
+		for stepNumber := len(sequence.Steps); stepNumber > 0; stepNumber-- {
+			step := sequence.Steps[stepNumber-1]
+			numberFixturesInThisStep = 0
+			for fixtureNumber, fixture := range step.Fixtures {
+				numberFixturesInThisStep++
+				for _, color := range fixture.Colors {
+					var fadeValues []common.PreFadeDetails
+					// make space for a color
+					if color.R > 0 || color.G > 0 || color.B > 0 {
+						for _, slope := range slopeOn {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    slope,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
+						}
+						slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
+					} else {
+						for range slopeOff {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    0,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
+						}
+						slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
+					}
+				}
+			}
+			if numberFixturesInThisStep > numberFixtures {
+				numberFixtures = numberFixturesInThisStep
+			}
 		}
 	}
 
