@@ -486,6 +486,25 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
+				// At this point colors are solid colors from the patten and not faded yet.
+				// an ideal point to replace colors in a sequence.
+				// If we are updating the color in a sequence.
+				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
+					if sequence.RecoverSequenceColors {
+						if sequence.SavedSequenceColors != nil {
+							sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+							sequence.AutoColor = false
+						}
+					} else {
+						sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+						// Save the current color selection.
+						if sequence.SaveColors {
+							sequence.SavedSequenceColors = common.HowManyColors(sequence.RGBPositions)
+							sequence.SaveColors = false
+						}
+					}
+				}
+
 				// Calulate positions for each RGB fixture.
 				if sequence.Type == "rgb" {
 
@@ -556,23 +575,6 @@ func PlaySequence(sequence common.Sequence,
 						sequence.RGBColor = 0
 					}
 					sequence.RGBPositions = replaceColors(sequence.RGBPositions, sequence.SequenceColors)
-				}
-
-				// If we are updating the color in a sequence.
-				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
-					if sequence.RecoverSequenceColors {
-						if sequence.SavedSequenceColors != nil {
-							sequence.RGBPositions = replaceColors(sequence.RGBPositions, sequence.SequenceColors)
-							sequence.AutoColor = false
-						}
-					} else {
-						sequence.RGBPositions = replaceColors(sequence.RGBPositions, sequence.SequenceColors)
-						// Save the current color selection.
-						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColors(sequence.RGBPositions)
-							sequence.SaveColors = false
-						}
-					}
 				}
 
 				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
@@ -971,6 +973,39 @@ func calculateScannerPositions(tYpe string, steps []common.Step, bounce bool, in
 	return positionsOut, counter
 }
 
+func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
+
+	var insertColor int
+	numberColors := len(colors)
+
+	for stepNumber, step := range steps {
+		for fixtureNumber, fixture := range step.Fixtures {
+			for colorNumber, color := range fixture.Colors {
+				// found a color.
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					if insertColor >= numberColors {
+						insertColor = 0
+					}
+					steps[stepNumber].Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
+					insertColor++
+				}
+			}
+		}
+	}
+
+	for stepNumber, step := range steps {
+		fmt.Printf("Step %d\n", stepNumber)
+		for fixtureNumber, fixture := range step.Fixtures {
+			fmt.Printf("\tFixture %d\n", fixtureNumber)
+			for _, color := range fixture.Colors {
+				fmt.Printf("\t\tColor %+v\n", color)
+			}
+		}
+	}
+
+	return steps
+}
+
 // replaceColors can take a sequence and replace its current pattern colors with the colors specified.
 func replaceColors(positionsMap map[int]common.Position, colors []common.Color) map[int]common.Position {
 
@@ -999,13 +1034,15 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 
 	}
 
-	length := len(positionsMap)
-	for step := 0; step < length; step++ {
+	// if debug {
+	// 	length := len(positionsMap)
+	// 	for step := 0; step < length; step++ {
 
-		fmt.Printf("%v", replace[step])
+	// 		fmt.Printf("%v", replace[step])
 
-		fmt.Printf("\n")
-	}
+	// 		fmt.Printf("\n")
+	// 	}
+	// }
 
 	return replace
 }
