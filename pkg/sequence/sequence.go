@@ -485,16 +485,16 @@ func PlaySequence(sequence common.Sequence,
 					var fadeOnValues []int
 					var fadeOffValues []int
 
-					MusicSpeed := 40
-					fadeSlot := MusicSpeed / 10
-					fadeUpTime := (fadeSlot * sequence.RGBFade) / 2
-					fadeDownTime := (fadeSlot * sequence.RGBFade) / 2
-					fadeOnTime := (MusicSpeed - fadeSlot*sequence.RGBFade) + (fadeSlot * (sequence.RGBSize)) - fadeSlot
+					// MusicSpeed := 40
+					// fadeSlot := MusicSpeed / 10
+					// fadeUpTime := (fadeSlot * sequence.RGBFade) / 2
+					// fadeDownTime := (fadeSlot * sequence.RGBFade) / 2
+					// fadeOnTime := (MusicSpeed - fadeSlot*sequence.RGBFade) + (fadeSlot * (sequence.RGBSize)) - fadeSlot
 
 					// // Calculate fade curve values.
-					fadeUpValues = getFadeValues(float64(common.MaxBrightness), float64(fadeUpTime), false)
-					fadeOnValues = getFadeOnValues(common.MaxBrightness, fadeOnTime)
-					fadeDownValues := getFadeValues(float64(common.MaxBrightness), float64(fadeDownTime), true)
+					fadeUpValues = getFadeValues(float64(common.MaxBrightness), sequence.RGBFade, false)
+					fadeOnValues = getFadeOnValues(common.MaxBrightness, sequence.RGBSize)
+					fadeDownValues := getFadeValues(float64(common.MaxBrightness), sequence.RGBFade, true)
 
 					slopeOn = append(slopeOn, fadeUpValues...)
 					slopeOn = append(slopeOn, fadeOnValues...)
@@ -701,9 +701,11 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 
 	// Now apply the shift.
 	var counter int
-	length := len(fadeColors[0])
+
 	for index := range fadeColors[0] {
+
 		for fixture := 0; fixture < numberFixtures; fixture++ {
+			length := len(fadeColors[fixture])
 			if fixture == 0 {
 				fixtures[0] = append(fixtures[0], fadeColors[0][makeShift(index, length, 0)])
 			} else {
@@ -764,10 +766,20 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 
 func makeShift(index int, length int, shift int) int {
 	var use int
-	if index+shift >= length {
+
+	if debug {
+		fmt.Printf("index %d shift %d length %d\n", index, shift, length)
+	}
+	if index+shift > length {
 		use = index + shift - length
 	} else {
 		use = index + shift
+	}
+	if use == length {
+		use = 0
+	}
+	if debug {
+		fmt.Printf("I will use %d\n", use)
 	}
 
 	return use
@@ -1192,29 +1204,81 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 	common.LightLamp(common.ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 }
 
-func getFadeValues(size float64, fade float64, direction bool) []int {
+func getFadeValues(size float64, fade int, reverse bool) []int {
 
 	out := []int{}
+	outPadded := []int{}
 	size = size / 2
-	fade = fade * 2
+
+	var numberCoordinates float64
+
+	if fade == 1 {
+		numberCoordinates = 20
+	}
+	if fade == 2 {
+		numberCoordinates = 25
+	}
+	if fade == 3 {
+		numberCoordinates = 30
+	}
+	if fade == 4 {
+		numberCoordinates = 35
+	}
+	if fade == 5 {
+		numberCoordinates = 40
+	}
+	if fade == 6 {
+		numberCoordinates = 45
+	}
+	if fade == 7 {
+		numberCoordinates = 50
+	}
+	if fade == 8 {
+		numberCoordinates = 55
+	}
+	if fade == 9 {
+		numberCoordinates = 60
+	}
+	if fade == 10 {
+		numberCoordinates = 65
+	}
 
 	var theta float64
 	var x float64
-	if direction {
-		for x = 0; x <= 180; x += fade {
+	if reverse {
+		for x = 0; x <= 180; x += numberCoordinates {
 			theta = (x - 90) * math.Pi / 180
 			x := int(-size*math.Sin(theta) + size)
 			out = append(out, x)
 		}
 	} else {
-		for x = 180; x >= 0; x -= fade {
+		for x = 180; x >= 0; x -= numberCoordinates {
 			theta = (x - 90) * math.Pi / 180
 			x := int(-size*math.Sin(theta) + size)
 			out = append(out, x)
 		}
 	}
 
-	return out
+	if reverse {
+		for value := 10; value > 0; value-- {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[len(out)-value])
+			}
+		}
+
+	} else {
+		for value := 0; value < 10; value++ {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[value])
+			}
+		}
+	}
+
+	return outPadded
 }
 
 func getFadeOnValues(size int, fade int) []int {

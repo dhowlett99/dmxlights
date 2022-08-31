@@ -1499,9 +1499,9 @@ func TestCalculateRGBPositions(t *testing.T) {
 
 func Test_getFadeValues(t *testing.T) {
 	type args struct {
-		size      float64
-		fade      float64
-		direction bool
+		size    float64
+		fade    int
+		reverse bool
 	}
 	tests := []struct {
 		name string
@@ -1509,81 +1509,126 @@ func Test_getFadeValues(t *testing.T) {
 		want []int
 	}{
 		{
-			name: "soft fade up",
+			name: "Fade up 1",
 			args: args{
-				size:      255,
-				fade:      5,
-				direction: false, // Fade up
-			},
-			want: []int{0, 1, 7, 17, 29, 45, 63, 83, 105, 127, 149, 171, 191, 209, 225, 237, 247, 253, 255},
-		},
-		{
-			name: "faster fade up",
-			args: args{
-				size:      255,
-				fade:      10,
-				direction: false,
+				size:    255,
+				fade:    1,
+				reverse: false, // Fade up
 			},
 			want: []int{0, 7, 29, 63, 105, 149, 191, 225, 247, 255},
 		},
 		{
-			name: "faster fade up to half brightness",
+			name: "Fade down 1",
 			args: args{
-				size:      128,
-				fade:      10,
-				direction: false,
+				size:    255,
+				fade:    1,
+				reverse: true, // Fade up
 			},
-			want: []int{0, 3, 14, 32, 52, 75, 96, 113, 124, 128},
+			want: []int{255, 247, 225, 191, 149, 105, 63, 29, 7, 0},
 		},
 		{
-			name: "sharp fade up to half brightness",
+			name: "Fade up 2",
 			args: args{
-				size:      128,
-				fade:      15,
-				direction: false,
+				size:    255,
+				fade:    2,
+				reverse: false, // Fade up
 			},
-			want: []int{0, 8, 32, 64, 96, 119, 128},
+			want: []int{0, 11, 45, 94, 149, 200, 237, 254, 255, 255},
 		},
 		{
-			name: "sharp2 fade up to half brightness",
+			name: "Fade down 2",
 			args: args{
-				size:      128,
-				fade:      20,
-				direction: false,
+				size:    255,
+				fade:    2,
+				reverse: true, // Fade up
 			},
-			want: []int{0, 14, 52, 96, 124},
+			want: []int{255, 255, 255, 243, 209, 160, 105, 54, 17, 0},
 		},
 		{
-			name: "sharp3 fade up to half brightness",
+			name: "Fade up 3",
 			args: args{
-				size:      128,
-				fade:      40,
-				direction: false,
+				size:    255,
+				fade:    3,
+				reverse: false, // Fade up
 			},
-			want: []int{0, 52, 124},
+			want: []int{0, 17, 63, 127, 191, 237, 255, 255, 255, 255},
 		},
 		{
-			name: "sharp4 fade up to half brightness",
+			name: "Fade up 4",
 			args: args{
-				size:      128,
-				fade:      45,
-				direction: false,
+				size:    255,
+				fade:    4,
+				reverse: false, // Fade up
 			},
-			want: []int{0, 64, 128},
+			want: []int{0, 23, 83, 160, 225, 254, 255, 255, 255, 255},
 		},
 		{
-			name: "really sharp fade up to full brightness",
+			name: "Fade up 5",
 			args: args{
-				size:      255,
-				fade:      90,
-				direction: false,
+				size:    255,
+				fade:    5,
+				reverse: false, // Fade up
 			},
-			want: []int{0, 255},
+			want: []int{0, 29, 105, 191, 247, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade up 6",
+			args: args{
+				size:    255,
+				fade:    6,
+				reverse: false, // Fade up
+			},
+			want: []int{0, 37, 127, 217, 255, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade up 7",
+			args: args{
+				size:    255,
+				fade:    7,
+				reverse: false, // Fade up
+			},
+			want: []int{0, 45, 149, 237, 255, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade up 8",
+			args: args{
+				size:    255,
+				fade:    8,
+				reverse: false, // Fade up
+			},
+			want: []int{0, 54, 171, 250, 255, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade up 9",
+			args: args{
+				size:    255,
+				fade:    9,
+				reverse: false, // Fade up
+			},
+			want: []int{0, 63, 191, 255, 255, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade up 10",
+			args: args{
+				size:    255,
+				fade:    10,
+				reverse: false, // Fade up
+			},
+			want: []int{0, 73, 209, 255, 255, 255, 255, 255, 255, 255},
+		},
+		{
+			name: "Fade down 10",
+			args: args{
+				size:    255,
+				fade:    10,
+				reverse: true, // Fade down
+			},
+			want: []int{255, 255, 255, 255, 255, 255, 255, 255, 181, 45},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getFadeValues(tt.args.size, tt.args.fade, tt.args.direction); !reflect.DeepEqual(got, tt.want) {
+			if got := getFadeValues(tt.args.size, tt.args.fade, tt.args.reverse); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("getFadeValues() = %v, want %v", got, tt.want)
 			}
 		})

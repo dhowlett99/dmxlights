@@ -939,8 +939,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.SelectedSequence].Type == "rgb" {
 			this.RGBFade[this.SelectedSequence]++
-			if this.RGBFade[this.SelectedSequence] > 50 {
-				this.RGBFade[this.SelectedSequence] = 50
+			if this.RGBFade[this.SelectedSequence] > common.MaxRGBFade {
+				this.RGBFade[this.SelectedSequence] = common.MaxRGBFade
 			}
 			// Send fade update command.
 			cmd := common.Command{
