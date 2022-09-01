@@ -158,23 +158,10 @@ func FixtureReceiver(
 				green := color.G
 				blue := color.B
 
-				if !cmd.Invert {
-					// Filter out all the blacks.
-					if red > 0 || green > 0 || blue > 0 {
-						if !cmd.Hide {
-							common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-						}
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
-					}
-				} else {
-
-					if !cmd.Hide {
-						common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-					}
-					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
-
+				if !cmd.Hide {
+					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
-
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 			}
 		}
 
