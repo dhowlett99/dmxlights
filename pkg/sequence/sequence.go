@@ -475,35 +475,15 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				// Calulate positions for each RGB fixture.
+				if sequence.Invert && sequence.Type == "rgb" {
+					patterns := pattern.MakePatterns()
+					sequence.Steps = invertRGBColors(patterns[sequence.SelectedPattern].Steps, common.HowManyStepColors(patterns[sequence.SelectedPattern].Steps))
+				}
+
 				if sequence.Type == "rgb" {
-
-					slopeOn := []int{}
-					slopeOff := []int{}
-
-					var fadeUpValues []int
-					var fadeOnValues []int
-					var fadeOffValues []int
-
-					// MusicSpeed := 40
-					// fadeSlot := MusicSpeed / 10
-					// fadeUpTime := (fadeSlot * sequence.RGBFade) / 2
-					// fadeDownTime := (fadeSlot * sequence.RGBFade) / 2
-					// fadeOnTime := (MusicSpeed - fadeSlot*sequence.RGBFade) + (fadeSlot * (sequence.RGBSize)) - fadeSlot
-
-					// // Calculate fade curve values.
-					fadeUpValues = getFadeValues(float64(common.MaxBrightness), sequence.RGBFade, false)
-					fadeOnValues = getFadeOnValues(common.MaxBrightness, sequence.RGBSize)
-					fadeDownValues := getFadeValues(float64(common.MaxBrightness), sequence.RGBFade, true)
-
-					slopeOn = append(slopeOn, fadeUpValues...)
-					slopeOn = append(slopeOn, fadeOnValues...)
-					slopeOn = append(slopeOn, fadeDownValues...)
-
-					slopeOff = append(slopeOff, fadeUpValues...)
-					slopeOff = append(slopeOff, fadeOffValues...)
-					slopeOff = append(slopeOff, fadeDownValues...)
-
+					// Calculate fade curve values.
+					slopeOn, slopeOff := calculateFadeValues(sequence.RGBFade, sequence.RGBSize)
+					// Calulate positions for each RGB fixture.
 					sequence.RGBPositions, sequence.NumberSteps = calculateRGBPositions(sequence, slopeOn, slopeOff)
 				}
 
@@ -606,6 +586,53 @@ func PlaySequence(sequence common.Sequence,
 	}
 }
 
+// calculateFadeValues - calculate fade curve values.
+func calculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
+
+	fadeUpValues := getFadeValues(float64(common.MaxBrightness), fade, false)
+	fadeOnValues := getFadeOnValues(common.MaxBrightness, size)
+	fadeDownValues := getFadeValues(float64(common.MaxBrightness), fade, true)
+
+	slopeOn = append(slopeOn, fadeUpValues...)
+	slopeOn = append(slopeOn, fadeOnValues...)
+	slopeOn = append(slopeOn, fadeDownValues...)
+
+	slopeOff = append(slopeOff, fadeDownValues...)
+	slopeOff = append(slopeOff, fadeUpValues...)
+
+	return slopeOn, slopeOff
+}
+
+func invertRGBColors(steps []common.Step, colors []common.Color) []common.Step {
+
+	var insertColor int
+	numberColors := len(colors)
+
+	for _, step := range steps {
+		// if this step being a fading step ?
+
+		for _, fixture := range step.Fixtures {
+			for colorNumber, color := range fixture.Colors {
+				//fmt.Printf("insert %d colno %d color %v\n", insertColor, colorNumber, color)
+				if insertColor >= numberColors {
+					insertColor = 0
+				}
+
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					// insert a black.
+					fixture.Colors[colorNumber] = common.Color{}
+					insertColor++
+				} else {
+					// its a blank space so insert one of the colors.
+					fixture.Colors[colorNumber] = colors[insertColor]
+				}
+			}
+		}
+	}
+
+	return steps
+}
+
 // Send a command to all the fixtures.
 func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.FixtureCommand, channels common.Channels, command common.FixtureCommand) {
 	for _, fixture := range fixtureChannels {
@@ -660,23 +687,45 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 				var fadeValues []common.PreFadeDetails
 				// make space for a color
 				if color.R > 0 || color.G > 0 || color.B > 0 {
-					for _, slope := range slopeOn {
-						newPreFade := common.PreFadeDetails{
-							FadeValue:    slope,
-							Color:        color,
-							MasterDimmer: fixture.MasterDimmer,
+					if !sequence.Invert {
+						for _, slope := range slopeOn {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    slope,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
 						}
-						fadeValues = append(fadeValues, newPreFade)
+					} else {
+						for range slopeOff {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    255,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
+						}
 					}
 					slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 				} else {
-					for range slopeOff {
-						newPreFade := common.PreFadeDetails{
-							FadeValue:    0,
-							Color:        color,
-							MasterDimmer: fixture.MasterDimmer,
+					if !sequence.Invert {
+						for range slopeOff {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    0,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
 						}
-						fadeValues = append(fadeValues, newPreFade)
+					} else {
+						for _, slope := range slopeOn {
+							newPreFade := common.PreFadeDetails{
+								FadeValue:    slope,
+								Color:        color,
+								MasterDimmer: fixture.MasterDimmer,
+							}
+							fadeValues = append(fadeValues, newPreFade)
+						}
 					}
 					slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 				}
@@ -697,23 +746,45 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 					var fadeValues []common.PreFadeDetails
 					// make space for a color
 					if color.R > 0 || color.G > 0 || color.B > 0 {
-						for _, slope := range slopeOn {
-							newPreFade := common.PreFadeDetails{
-								FadeValue:    slope,
-								Color:        color,
-								MasterDimmer: fixture.MasterDimmer,
+						if !sequence.Invert {
+							for _, slope := range slopeOn {
+								newPreFade := common.PreFadeDetails{
+									FadeValue:    slope,
+									Color:        color,
+									MasterDimmer: fixture.MasterDimmer,
+								}
+								fadeValues = append(fadeValues, newPreFade)
 							}
-							fadeValues = append(fadeValues, newPreFade)
+						} else {
+							for range slopeOff {
+								newPreFade := common.PreFadeDetails{
+									FadeValue:    255,
+									Color:        color,
+									MasterDimmer: fixture.MasterDimmer,
+								}
+								fadeValues = append(fadeValues, newPreFade)
+							}
 						}
 						slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 					} else {
-						for range slopeOff {
-							newPreFade := common.PreFadeDetails{
-								FadeValue:    0,
-								Color:        color,
-								MasterDimmer: fixture.MasterDimmer,
+						if !sequence.Invert {
+							for range slopeOff {
+								newPreFade := common.PreFadeDetails{
+									FadeValue:    0,
+									Color:        color,
+									MasterDimmer: fixture.MasterDimmer,
+								}
+								fadeValues = append(fadeValues, newPreFade)
 							}
-							fadeValues = append(fadeValues, newPreFade)
+						} else {
+							for _, slope := range slopeOn {
+								newPreFade := common.PreFadeDetails{
+									FadeValue:    slope,
+									Color:        color,
+									MasterDimmer: fixture.MasterDimmer,
+								}
+								fadeValues = append(fadeValues, newPreFade)
+							}
 						}
 						slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 					}

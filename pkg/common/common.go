@@ -687,6 +687,30 @@ func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 	return colors
 }
 
+func HowManyStepColors(steps []Step) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, step := range steps {
+		for _, fixture := range step.Fixtures {
+			for _, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					colorMap[color] = true
+				}
+			}
+		}
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	if debug {
+		fmt.Printf("HowManyStepColors %d\n", len(colors))
+	}
+
+	return colors
+}
+
 func HowManyScannerColors(positionsMap map[int][]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
