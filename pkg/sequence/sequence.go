@@ -546,7 +546,7 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/2, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
 						break
 					}
@@ -668,28 +668,60 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 	}
 }
 
+func reverse(in int) int {
+	switch in {
+	case 0:
+		return 10
+	case 1:
+		return 9
+	case 2:
+		return 8
+	case 3:
+		return 7
+	case 4:
+		return 6
+	case 5:
+		return 5
+	case 6:
+		return 4
+	case 7:
+		return 3
+	case 8:
+		return 2
+	case 9:
+		return 1
+	case 10:
+		return 0
+	}
+
+	return 10
+}
+
 func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []int) (map[int]common.Position, int) {
 
 	positionsOut := make(map[int]common.Position)
 	fixtures := make(map[int][]common.Color)
 	fadeColors := make(map[int][]common.Color)
 	slope := make(map[int][]common.PreFadeDetails)
+	shift := reverse(sequence.RGBShift)
 
 	var numberFixtures int
 	var numberFixturesInThisStep int
+	var shiftCounter int
 
 	// First loop make a space in the slope values for each fixture.
 	for _, step := range sequence.Steps {
 		numberFixturesInThisStep = 0
 		for fixtureNumber, fixture := range step.Fixtures {
 			numberFixturesInThisStep++
+			newPreFade := common.PreFadeDetails{}
 			for _, color := range fixture.Colors {
 				var fadeValues []common.PreFadeDetails
 				// make space for a color
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					if !sequence.Invert {
 						for _, slope := range slopeOn {
-							newPreFade := common.PreFadeDetails{
+							newPreFade = common.PreFadeDetails{
 								FadeValue:    slope,
 								Color:        color,
 								MasterDimmer: fixture.MasterDimmer,
@@ -698,7 +730,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 						}
 					} else {
 						for range slopeOff {
-							newPreFade := common.PreFadeDetails{
+							newPreFade = common.PreFadeDetails{
 								FadeValue:    255,
 								Color:        color,
 								MasterDimmer: fixture.MasterDimmer,
@@ -709,13 +741,18 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 					slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 				} else {
 					if !sequence.Invert {
+						shiftCounter = 0
 						for range slopeOff {
+							if shiftCounter == shift {
+								break
+							}
 							newPreFade := common.PreFadeDetails{
 								FadeValue:    0,
 								Color:        color,
 								MasterDimmer: fixture.MasterDimmer,
 							}
 							fadeValues = append(fadeValues, newPreFade)
+							shiftCounter++
 						}
 					} else {
 						for _, slope := range slopeOn {
@@ -742,13 +779,14 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 			numberFixturesInThisStep = 0
 			for fixtureNumber, fixture := range step.Fixtures {
 				numberFixturesInThisStep++
+				newPreFade := common.PreFadeDetails{}
 				for _, color := range fixture.Colors {
 					var fadeValues []common.PreFadeDetails
 					// make space for a color
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						if !sequence.Invert {
 							for _, slope := range slopeOn {
-								newPreFade := common.PreFadeDetails{
+								newPreFade = common.PreFadeDetails{
 									FadeValue:    slope,
 									Color:        color,
 									MasterDimmer: fixture.MasterDimmer,
@@ -757,7 +795,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 							}
 						} else {
 							for range slopeOff {
-								newPreFade := common.PreFadeDetails{
+								newPreFade = common.PreFadeDetails{
 									FadeValue:    255,
 									Color:        color,
 									MasterDimmer: fixture.MasterDimmer,
@@ -768,13 +806,18 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 						slope[fixtureNumber] = append(slope[fixtureNumber], fadeValues...)
 					} else {
 						if !sequence.Invert {
+							shiftCounter = 0
 							for range slopeOff {
+								if shiftCounter == shift {
+									break
+								}
 								newPreFade := common.PreFadeDetails{
 									FadeValue:    0,
 									Color:        color,
 									MasterDimmer: fixture.MasterDimmer,
 								}
 								fadeValues = append(fadeValues, newPreFade)
+								shiftCounter++
 							}
 						} else {
 							for _, slope := range slopeOn {
@@ -810,26 +853,20 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 
 	// Now apply the shift.
 	var counter int
-
 	for index := range fadeColors[0] {
-
 		for fixture := 0; fixture < numberFixtures; fixture++ {
-			length := len(fadeColors[fixture])
-			if fixture == 0 {
-				fixtures[0] = append(fixtures[0], fadeColors[0][makeShift(index, length, 0)])
-			} else {
-				fixtures[fixture] = append(fixtures[fixture], fadeColors[fixture][makeShift(index, length, sequence.RGBShift*fixture)])
-			}
+			fixtures[fixture] = append(fixtures[fixture], fadeColors[fixture][index])
 		}
 		counter++
 	}
 
 	// Adjust the length based on the shift and the number of fixtures.
-	counter = counter - (sequence.RGBShift * (numberFixtures - 1))
+	//counter = counter - (shift * (numberFixtures - 1))
 
 	if debug {
 		// Print out the fixtures so far.
 		for fixture := 0; fixture < numberFixtures; fixture++ {
+			fmt.Printf("Fixture ")
 			for out := 0; out < counter; out++ {
 				fmt.Printf("%v", fixtures[fixture][out])
 			}
@@ -891,6 +928,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 	if debug {
 		// Print out the positions in fixtures order.
 		for fixture := 0; fixture < numberFixtures; fixture++ {
+			fmt.Printf("Position ")
 			for step := 0; step < counter; step++ {
 				fmt.Printf("%v", positionsOut[step].Fixtures[fixture].Colors)
 			}

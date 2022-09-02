@@ -516,6 +516,18 @@ func MakePatterns() map[int]common.Pattern {
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
 					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
 					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},

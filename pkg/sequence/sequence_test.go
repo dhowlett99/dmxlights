@@ -967,7 +967,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					Invert:   false,
 					RGBShift: 0,
 					RGBSize:  255,
-					RGBFade:  10,
+					RGBFade:  0,
 					Steps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
@@ -1369,7 +1369,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 				sequence: common.Sequence{
 					Bounce:   false,
 					Invert:   false,
-					RGBShift: 1,
+					RGBShift: 8,
 					RGBSize:  255,
 					RGBFade:  10,
 					Steps: []common.Step{
