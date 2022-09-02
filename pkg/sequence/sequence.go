@@ -921,27 +921,6 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 	return positionsOut, counter
 }
 
-func makeShift(index int, length int, shift int) int {
-	var use int
-
-	if debug {
-		fmt.Printf("index %d shift %d length %d\n", index, shift, length)
-	}
-	if index+shift > length {
-		use = index + shift - length
-	} else {
-		use = index + shift
-	}
-	if use == length {
-		use = 0
-	}
-	if debug {
-		fmt.Printf("I will use %d\n", use)
-	}
-
-	return use
-}
-
 // calculateScannerPositions takes the steps defined in the pattern and
 // turns them into positions used by the sequencer.
 func calculateScannerPositions(tYpe string, steps []common.Step, bounce bool, invert bool, shift int) (map[int][]common.Position, int) {
