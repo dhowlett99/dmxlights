@@ -700,9 +700,7 @@ func reverse(in int) int {
 func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []int) (map[int]common.Position, int) {
 
 	positionsOut := make(map[int]common.Position)
-	//fixtures := make(map[int][]common.Color)
 	fadeColors := make(map[int][]common.Color)
-
 	shift := reverse(sequence.RGBShift)
 
 	var numberFixtures int
@@ -716,9 +714,11 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 			numberFixturesInThisStep++
 
 			for _, color := range fixture.Colors {
-				// make space for a color
+
 				if color.R > 0 || color.G > 0 || color.B > 0 {
+					// make space for a colored lamp.
 					if !sequence.Invert {
+						// A faded up and down color.
 						for _, slope := range slopeOn {
 							newColor := common.Color{}
 							newColor.R = int((float64(color.R) / 100) * (float64(slope) / 2.55))
@@ -728,6 +728,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 							fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 						}
 					} else {
+						// A solid on color.
 						for range slopeOn {
 							newColor := common.Color{}
 							newColor.R = int((float64(color.R) / 100) * (float64(255) / 2.55))
@@ -740,10 +741,12 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 				} else {
 					if !sequence.Invert {
 						shiftCounter = 0
+						// make space for a off lamp.
 						for range slopeOff {
 							if shiftCounter == shift {
 								break
 							}
+							// A black lamp.
 							newColor := common.Color{}
 							newColor.R = int((float64(color.R) / 100) * (float64(0) / 2.55))
 							newColor.G = int((float64(color.G) / 100) * (float64(0) / 2.55))
@@ -753,6 +756,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 							shiftCounter++
 						}
 					} else {
+						// A fading to black lamp.
 						for _, slope := range slopeOff {
 							newColor := common.Color{}
 							newColor.R = int((float64(color.R) / 100) * (float64(slope) / 2.55))
@@ -778,9 +782,11 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 				numberFixturesInThisStep++
 
 				for _, color := range fixture.Colors {
-					// make space for a color
+
 					if color.R > 0 || color.G > 0 || color.B > 0 {
+						// make space for a colored lamp.
 						if !sequence.Invert {
+							// A faded up and down color.
 							for _, slope := range slopeOn {
 								newColor := common.Color{}
 								newColor.R = int((float64(color.R) / 100) * (float64(slope) / 2.55))
@@ -790,6 +796,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
+							// A solid on color.
 							for range slopeOn {
 								newColor := common.Color{}
 								newColor.R = int((float64(color.R) / 100) * (float64(255) / 2.55))
@@ -802,10 +809,12 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 					} else {
 						if !sequence.Invert {
 							shiftCounter = 0
+							// make space for a off lamp.
 							for range slopeOff {
 								if shiftCounter == shift {
 									break
 								}
+								// A black lamp.
 								newColor := common.Color{}
 								newColor.R = int((float64(color.R) / 100) * (float64(0) / 2.55))
 								newColor.G = int((float64(color.G) / 100) * (float64(0) / 2.55))
@@ -815,6 +824,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 								shiftCounter++
 							}
 						} else {
+							// A fading to black lamp.
 							for _, slope := range slopeOff {
 								newColor := common.Color{}
 								newColor.R = int((float64(color.R) / 100) * (float64(slope) / 2.55))
