@@ -837,6 +837,7 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 		}
 	}
 
+	lampOn := make(map[int]bool)
 	// Assemble the positions.
 	for step := 0; step < counter; step++ {
 		// Create a new position.
@@ -846,18 +847,45 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 
 		for fixture := 0; fixture < numberFixtures; fixture++ {
 			newFixture := common.Fixture{}
+
 			newColor := common.Color{}
 			newColor.R = fixtures[fixture][step].R
 			newColor.G = fixtures[fixture][step].G
 			newColor.B = fixtures[fixture][step].B
-			newFixture.Colors = append(newFixture.Colors, newColor)
+
+			// Optimisation is applied in this step. We only play out off's to the universe if the lamp is already on.
+			/// And in the case of inverted playout only colors if the lamp is already on.
+			if !sequence.Invert {
+				// We've found a color.
+				if fixtures[fixture][step].R > 0 || fixtures[fixture][step].G > 0 || fixtures[fixture][step].B > 0 {
+					newFixture.Colors = append(newFixture.Colors, newColor)
+					lampOn[fixture] = true
+				} else {
+					// turn the lamp off, but only if its already on.
+					if lampOn[fixture] {
+						newFixture.Colors = append(newFixture.Colors, common.Color{})
+						lampOn[fixture] = false
+					}
+				}
+			} else {
+				// We've found a color. turn it on but only if its already off.
+				if fixtures[fixture][step].R > 0 || fixtures[fixture][step].G > 0 || fixtures[fixture][step].B > 0 {
+					if !lampOn[fixture] {
+						newFixture.Colors = append(newFixture.Colors, newColor)
+						lampOn[fixture] = true
+					}
+				} else {
+					// turn the lamp off
+					newFixture.Colors = append(newFixture.Colors, common.Color{})
+					lampOn[fixture] = false
+				}
+			}
 			newFixture.MasterDimmer = fixtures[fixture][step].MasterDimmer
 			newPosition.Fixtures[fixture] = newFixture
 		}
 
 		// Add this position
 		positionsOut[step] = newPosition
-
 	}
 
 	if debug {
