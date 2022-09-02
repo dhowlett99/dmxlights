@@ -342,12 +342,6 @@ type Position struct {
 	Gobo           int
 }
 
-type PreFadeDetails struct {
-	FadeValue    int
-	MasterDimmer int
-	Color        Color
-}
-
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
