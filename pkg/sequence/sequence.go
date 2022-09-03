@@ -843,7 +843,23 @@ func calculateRGBPositions(sequence common.Sequence, slopeOn []int, slopeOff []i
 		}
 	}
 
-	counter := len(fadeColors[0])
+	// It appears counters arn't always the same.
+	counter1 := len(fadeColors[0])
+	counter2 := len(fadeColors[1])
+	counter3 := len(fadeColors[2])
+	counter4 := len(fadeColors[3])
+
+	// Use the shortest for safety.
+	counter := counter1
+	if counter2 < counter1 {
+		counter = counter2
+	}
+	if counter3 < counter {
+		counter = counter3
+	}
+	if counter4 < counter {
+		counter = counter4
+	}
 
 	if debug {
 		// Print out the fixtures so far.
