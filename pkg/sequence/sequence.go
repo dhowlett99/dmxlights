@@ -440,7 +440,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
-				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
+				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
 
@@ -547,7 +547,7 @@ func PlaySequence(sequence common.Sequence,
 
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
-					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift {
+					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}
 
@@ -558,10 +558,7 @@ func PlaySequence(sequence common.Sequence,
 							Master:                 sequence.Master,
 							Blackout:               sequence.Blackout,
 							Hide:                   sequence.Hide,
-							Invert:                 sequence.Invert,
 							Type:                   sequence.Type,
-							RGBSize:                sequence.RGBSize,
-							RGBFade:                sequence.RGBFade,
 							RGBPosition:            sequence.RGBPositions[step],
 							RGBStartFlood:          sequence.StartFlood,
 							RGBStopFlood:           sequence.StopFlood,

@@ -259,6 +259,7 @@ type Sequence struct {
 	ScannerState               map[int]ScannerState        // Map of fixtures which are disabled.
 	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
+	UpdateSize                 bool                        // Command to update size.
 	UpdateShift                bool                        // Command to update the shift.
 	UpdatePattern              bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor        bool                        // Command to update the sequence colors.
@@ -303,12 +304,9 @@ type FixtureCommand struct {
 	Master      int
 	Blackout    bool
 	Hide        bool
-	Invert      bool
 
 	// RGB commands.
 	RGBPosition     Position
-	RGBSize         int
-	RGBFade         int
 	RGBStartFlood   bool
 	RGBStopFlood    bool
 	RGBStatic       bool
