@@ -259,6 +259,7 @@ type Sequence struct {
 	ScannerShift               int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                int                         // The selected gobo.
 	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
 	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates         []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
@@ -644,8 +645,9 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 		}
 	}
 
-	// Map invert function.
+	// Map RGB invert function.
 	sequence.Invert = sequence.Functions[Function7_Invert_Chase].State
+
 	// Map scanner chase mode. Uses same function key as above.
 	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 

@@ -174,9 +174,10 @@ func FixtureReceiver(
 			// If this fixture is disabled then shut the shutter off.
 			if disableOnce && !enabled {
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
-				sequence.DisableOnceMutex.RLock()
+				// Locking for write.
+				sequence.DisableOnceMutex.Lock()
 				sequence.DisableOnce[myFixtureNumber] = false
-				sequence.DisableOnceMutex.RUnlock()
+				sequence.DisableOnceMutex.Unlock()
 				continue
 			}
 
