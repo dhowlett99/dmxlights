@@ -58,7 +58,7 @@ type Fixture struct {
 	Address        int16     `yaml:"address"`
 	Channels       []Channel `yaml:"channels"`
 	Switches       []Switch  `yaml:"switches"`
-	NumberChannels int       `yaml:"number_channels"`
+	NumberChannels int       `yaml:"use_channels"`
 }
 
 type Setting struct {
@@ -113,16 +113,11 @@ func FixtureReceiver(
 	dmxController *ft232.DMXController,
 	fixtures *Fixtures) {
 
-	//var running bool
 	// Outer loop wait for configuration.
 	for {
 
 		// Wait for first step
 		cmd := <-fixtureStepChannel
-
-		// if sequence.Number == 0 && myFixtureNumber == 0 {
-		// 	fmt.Printf("----> trigger\n")
-		// }
 
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
@@ -149,9 +144,7 @@ func FixtureReceiver(
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true)
 				continue
 			}
-		}
-
-		if cmd.Type == "rgb" {
+			// Play out fixture to DMX channels.
 			fixture := cmd.RGBPosition.Fixtures[myFixtureNumber]
 			for _, color := range fixture.Colors {
 				red := color.R
@@ -167,78 +160,61 @@ func FixtureReceiver(
 
 		if cmd.Type == "scanner" {
 
-			// Positions can have many fixtures play at the same time.
-			positions := cmd.ScannerPosition[cmd.Step]
-			for _, position := range positions {
+			// find the fixture
+			fixture := cmd.ScannerPosition.Fixtures[myFixtureNumber]
 
-				sequence.ScannerStateMutex.RLock()
-				enabled := cmd.ScannerState[myFixtureNumber].Enabled
-				sequence.ScannerStateMutex.RUnlock()
+			sequence.ScannerStateMutex.RLock()
+			enabled := cmd.ScannerState[myFixtureNumber].Enabled
+			sequence.ScannerStateMutex.RUnlock()
 
+			sequence.DisableOnceMutex.RLock()
+			disableOnce := cmd.ScannerDisableOnce[myFixtureNumber]
+			sequence.DisableOnceMutex.RUnlock()
+
+			// If this fixture is disabled then shut the shutter off.
+			if disableOnce && !enabled {
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
 				sequence.DisableOnceMutex.RLock()
-				disableOnce := cmd.ScannerDisableOnce[myFixtureNumber]
+				sequence.DisableOnce[myFixtureNumber] = false
 				sequence.DisableOnceMutex.RUnlock()
+				continue
+			}
 
-				// If this fixture is disabled then shut the shutter off.
-				if cmd.Step == position.StartPosition &&
-					cmd.Type == "scanner" &&
-					disableOnce &&
-					!enabled {
+			if enabled {
 
-					MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
+				// If enables activate the physical scanner.
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.Pan, fixture.Tilt,
+					fixture.Shutter, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 
-					sequence.DisableOnceMutex.RLock()
-					sequence.DisableOnce[myFixtureNumber] = false
-					sequence.DisableOnceMutex.RUnlock()
+				if !cmd.Hide {
+					if cmd.ScannerChase {
+						// We are chase mode, we want the buttons to be the color selected for this scanner.
+						// Remember that fixtures in the real world start with 1 not 0.
+						realFixture := myFixtureNumber + 1
+						// Find the color that has been selected for this fixture.
+						// selected color is an index into the scanner colors selected.
+						selectedColor := cmd.ScannerColor[myFixtureNumber]
 
-					continue
-				}
-
-				sequence.ScannerStateMutex.RLock()
-				enabled = cmd.ScannerState[myFixtureNumber].Enabled
-				sequence.ScannerStateMutex.RUnlock()
-
-				if cmd.Step == position.StartPosition && enabled {
-
-					// S C A N N E R - Short ciruit the soft fade if we are a scanner.
-					if cmd.Type == "scanner" {
-						if position.ScannerNumber == myFixtureNumber {
-
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, position.Color.R, position.Color.G, position.Color.B, position.Pan, position.Tilt,
-								position.Shutter, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
-
-							if !cmd.Hide {
-								if cmd.ScannerChase {
-									// We are chase mode, we want the buttons to be the color selected for this scanner.
-
-									// Remember that fixtures in the real world start with 1 not 0.
-									realFixture := position.ScannerNumber + 1
-									// Find the color that has been selected for this fixture.
-									// selected color is an index into the scanner colors selected.
-									selectedColor := cmd.ScannerColor[position.ScannerNumber]
-
-									// Do we have a set of available colors for this fixture.
-									_, ok := cmd.ScannerAvailableColors[realFixture]
-									if ok {
-										availableColors := cmd.ScannerAvailableColors[realFixture]
-										red := availableColors[selectedColor].Color.R
-										green := availableColors[selectedColor].Color.G
-										blue := availableColors[selectedColor].Color.B
-										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: red, Green: green, Blue: blue, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
-										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
-									} else {
-										// No color selected or available, use white.
-										common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: position.Shutter}, eventsForLauchpad, guiButtons)
-										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
-									}
-								} else {
-									// We're not in chase mode so use the color generated in the pattern generator.common.
-									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: position.Color.R, Green: position.Color.G, Blue: position.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
-								}
-							}
+						// Do we have a set of available colors for this fixture.
+						_, ok := cmd.ScannerAvailableColors[realFixture]
+						if ok {
+							availableColors := cmd.ScannerAvailableColors[realFixture]
+							red := availableColors[selectedColor].Color.R
+							green := availableColors[selectedColor].Color.G
+							blue := availableColors[selectedColor].Color.B
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: red, Green: green, Blue: blue, Brightness: fixture.Shutter}, eventsForLauchpad, guiButtons)
+							common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+						} else {
+							// No color selected or available, use white.
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: fixture.Shutter}, eventsForLauchpad, guiButtons)
+							common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 						}
-						continue
+					} else {
+						// We're not in chase mode so use the color generated in the pattern generator.common.
+						for _, color := range fixture.Colors {
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+							common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+						}
 					}
 				}
 			}

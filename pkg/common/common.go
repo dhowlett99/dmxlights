@@ -44,10 +44,20 @@ type ALight struct {
 }
 
 type Color struct {
-	R            int
-	G            int
-	B            int
-	MasterDimmer int
+	R int
+	G int
+	B int
+}
+
+// Used in calculating Positions.
+type FixtureBuffer struct {
+	Color         Color
+	MasterDimmer  int
+	Gobo          int
+	Pan           int
+	Tilt          int
+	Shutter       int
+	ScannerNumber int
 }
 
 type Value struct {
@@ -215,7 +225,7 @@ type Sequence struct {
 	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures             int                         // Number of fixtures for this sequence.
 	RGBPositions               map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
-	ScannerPositions           map[int]map[int][]Position  // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. Index Positions.
+	ScannerPositions           map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
@@ -240,7 +250,6 @@ type Sequence struct {
 	StopStrobe                 bool                        // We're not in strobe mode.
 	FloodPlayOnce              bool                        // Play the flood sceme only once.
 	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
-	ScannersTotal              int                         // Total number of scanners in this sequence.
 	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
 	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
 	ScannerAvailablePatterns   map[int]Pattern             // Available patterns for this scanner.
@@ -314,7 +323,7 @@ type FixtureCommand struct {
 
 	// Scanner Commands.
 	ScannerColor           map[int]int
-	ScannerPosition        map[int][]Position
+	ScannerPosition        Position
 	ScannerState           map[int]ScannerState
 	ScannerDisableOnce     map[int]bool
 	ScannerChase           bool
@@ -326,28 +335,20 @@ type FixtureCommand struct {
 
 type Position struct {
 	// RGB
-	Fixtures       map[int]Fixture
-	Color          Color
-	PositionNumber int
-	// Scanner
-	ScannerNumber  int
-	StartPosition  int
-	Pan            int
-	PanMaxDegrees  *int
-	Tilt           int
-	TiltMaxDegrees *int
-	Shutter        int
-	Gobo           int
+	Fixtures map[int]Fixture
+	//PositionNumber int
 }
 
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	//ScannerNumber int
 	Name         string
 	Label        string
 	Type         string
 	MasterDimmer int
+	ScannerColor Color
 	Colors       []Color
 	Pan          int
 	Tilt         int
@@ -703,12 +704,16 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	return colors
 }
 
-func HowManyScannerColors(positionsMap map[int][]Position) (colors []Color) {
+func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
-	for _, positions := range positionsMap {
-		for _, position := range positions {
-			colorMap[position.Color] = true
+	for _, positionMap := range positionsMap {
+		fixtureLen := len(positionMap.Fixtures)
+		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
+			fixture := positionMap.Fixtures[fixtureNumber]
+			for _, color := range fixture.Colors {
+				colorMap[color] = true
+			}
 		}
 	}
 

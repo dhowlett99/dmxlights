@@ -1023,7 +1023,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Disable scanner if we're already enabled and inverted.
-		if this.ScannerState[X][Y].Enabled && this.ScannerState[X][Y].Inverted && X < sequences[Y].ScannersTotal {
+		if this.ScannerState[X][Y].Enabled && this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 			if debug {
 				fmt.Printf("Disable Scanner Number %d State on Sequence %d to false\n", X, Y)
 			}
@@ -1050,10 +1050,10 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Enable scanner if not enabled and not inverted.
-		if !this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].ScannersTotal {
+		if !this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 
 			if debug {
-				fmt.Printf("Enable Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].ScannersTotal)
+				fmt.Printf("Enable Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].NumberFixtures)
 			}
 
 			this.ScannerState[X][Y].Enabled = true
@@ -1079,7 +1079,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Invert scanner if we're enabled but not inverted.
-		if this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].ScannersTotal {
+		if this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 			if debug {
 				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
 			}
@@ -1894,12 +1894,12 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 func ShowScannerStatus(selectedSequence int, sequence common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("Show Scanner Status for sequence %d number of scanners %d\n", sequence.Number, sequence.ScannersTotal)
+		fmt.Printf("Show Scanner Status for sequence %d number of scanners %d\n", sequence.Number, sequence.NumberFixtures)
 	}
 
 	common.HideSequence(selectedSequence, commandChannels)
 
-	for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
+	for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
 
 		if debug {
 			fmt.Printf("Enabled %t Inverted %t\n", this.ScannerState[scannerNumber][sequence.Number].Enabled, this.ScannerState[scannerNumber][sequence.Number].Inverted)
@@ -2434,7 +2434,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Tell the sequence to disable all the scanners.
 		if sequence.Type == "scanner" {
 			// Disable all scanners.
-			for scannerNumber := 0; scannerNumber < sequence.ScannersTotal; scannerNumber++ {
+			for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
 				this.ScannerState[scannerNumber][sequence.Number].Enabled = false
 				this.ScannerState[scannerNumber][sequence.Number].Inverted = false
 			}

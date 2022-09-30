@@ -23,56 +23,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	command := common.Command{}
 
 	// Wait for a trigger: sound, command or timeout.
-	if !sequence.Ring || sequence.Type == "rgb" {
-		select {
-		case command = <-soundTriggerChannel:
-			if sequence.MusicTrigger {
-				if debug {
-					fmt.Printf("%d: BEAT\n", mySequenceNumber)
-				}
-				// Start ringer for scanners.
-				sequence.Beat = true
-				if sequence.Type == "scanner" {
-					sequence.Ring = true
-				}
-				break
+	select {
+	case command = <-soundTriggerChannel:
+		if sequence.MusicTrigger {
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
 			}
-		case command = <-commandChannel:
-			break
-
-		case <-time.After(currentSpeed):
 			break
 		}
-	}
+	case command = <-commandChannel:
+		break
 
-	// A ring is when a music triggers a ring of events for a scannner.
-	// This way a beat of the music makes the scanner run through a quarter of the
-	// available coordinates instead of just one step. This makes the movement much
-	// more vibrant.
-	if sequence.Type == "scanner" && sequence.Ring {
-
-		// We still need to receive commands.
-		select {
-		case command = <-commandChannel:
-			break
-
-		case <-time.After(1 * time.Millisecond):
-			break
-		}
-
-		if sequence.Beat {
-			if sequence.RingCounter > len(sequence.Steps)/4 {
-				// We're at the end of a rotation.
-				sequence.RingCounter = 0
-				sequence.Beat = false
-				sequence.Ring = false
-
-			} else {
-				sequence.RingCounter++
-				// We're in a ring of scanner movements, have a short delay in the steps.
-				time.Sleep(5 * time.Millisecond)
-			}
-		}
+	case <-time.After(currentSpeed):
+		break
 	}
 
 	// Now process any command.
@@ -393,7 +356,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const SEQUENCE_NUMBER = 0 // Integer
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			sequence.ScannerStateMutex.Lock()
-			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
+			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
@@ -412,7 +375,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.ScannersTotal {
+			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
 				sequence.ScannerStateMutex.Lock()
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)

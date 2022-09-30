@@ -725,8 +725,8 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 	}
 
 	if debug {
-		for _, scanner := range scanners {
-			fmt.Printf("scanner %+v\n", scanner)
+		for scannerNumber, scanner := range scanners {
+			fmt.Printf("%d--->scanner %+v\n", scannerNumber, scanner)
 		}
 	}
 
@@ -739,7 +739,7 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		for fixture := 0; fixture < NumberFixtures; fixture++ {
 
 			if chase { // Flash the scanners in order.
-				shutterValue = calulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates)
+				shutterValue = CalulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates, false)
 			} else {
 				shutterValue = 255 // Otherwise just turn on every scanner
 			}
@@ -750,8 +750,8 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 				Colors: []common.Color{
 					common.GetColorButtonsArray(scanners[fixture].values[stepNumber]),
 				},
-				Pan:     int(Coordinates[scanners[fixture].values[stepNumber]].Pan),
-				Tilt:    int(Coordinates[scanners[fixture].values[stepNumber]].Tilt),
+				Pan:     Coordinates[scanners[fixture].values[stepNumber]].Pan,
+				Tilt:    Coordinates[scanners[fixture].values[stepNumber]].Tilt,
 				Shutter: shutterValue,
 				Gobo:    36,
 			}
@@ -768,11 +768,11 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 	return pattern
 }
 
-func calulateShutterValue(currentCoordinate int, currentStep int, NumberFixtures int, NumberCoordinates int) int {
+func CalulateShutterValue(currentCoordinate int, fixture int, NumberFixtures int, NumberCoordinates int, bounce bool) int {
 
 	howOften := NumberCoordinates / NumberFixtures
 
-	if currentCoordinate/howOften == currentStep {
+	if currentCoordinate/howOften == fixture {
 		return 255
 	}
 	return 0
