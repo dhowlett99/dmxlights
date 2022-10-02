@@ -294,6 +294,21 @@ func PlaySequence(sequence common.Sequence,
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 
+		// Clear all fixtures.
+		if sequence.Clear {
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Type:           sequence.Type,
+				SequenceNumber: sequence.Number,
+				Clear:          sequence.Clear,
+			}
+
+			// Now tell all the fixtures what they need to do.
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sequence.Clear = false
+			continue
+		}
+
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches

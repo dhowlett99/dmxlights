@@ -241,6 +241,7 @@ type Sequence struct {
 	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
 	Mode                       string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
 	StaticColors               []StaticColorButton         // Used in static color editing
+	Clear                      bool                        // Clear all fixtures in this sequence.
 	Static                     bool                        // We're a static sequence.
 	PlayStaticOnce             bool                        // Play a static scene only once.
 	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
@@ -314,6 +315,7 @@ type FixtureCommand struct {
 	Master      int
 	Blackout    bool
 	Hide        bool
+	Clear       bool
 
 	// RGB commands.
 	RGBPosition     Position
