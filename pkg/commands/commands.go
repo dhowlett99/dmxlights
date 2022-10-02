@@ -23,56 +23,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	command := common.Command{}
 
 	// Wait for a trigger: sound, command or timeout.
-	if !sequence.Ring || sequence.Type == "rgb" {
-		select {
-		case command = <-soundTriggerChannel:
-			if sequence.MusicTrigger {
-				if debug {
-					fmt.Printf("%d: BEAT\n", mySequenceNumber)
-				}
-				// Start ringer for scanners.
-				sequence.Beat = true
-				if sequence.Type == "scanner" {
-					sequence.Ring = true
-				}
-				break
+	select {
+	case command = <-soundTriggerChannel:
+		if sequence.MusicTrigger {
+			if debug {
+				fmt.Printf("%d: BEAT\n", mySequenceNumber)
 			}
-		case command = <-commandChannel:
-			break
-
-		case <-time.After(currentSpeed):
 			break
 		}
-	}
+	case command = <-commandChannel:
+		break
 
-	// A ring is when a music triggers a ring of events for a scannner.
-	// This way a beat of the music makes the scanner run through a quarter of the
-	// available coordinates instead of just one step. This makes the movement much
-	// more vibrant.
-	if sequence.Type == "scanner" && sequence.Ring {
-
-		// We still need to receive commands.
-		select {
-		case command = <-commandChannel:
-			break
-
-		case <-time.After(1 * time.Millisecond):
-			break
-		}
-
-		if sequence.Beat {
-			if sequence.RingCounter > len(sequence.Steps)/4 {
-				// We're at the end of a rotation.
-				sequence.RingCounter = 0
-				sequence.Beat = false
-				sequence.Ring = false
-
-			} else {
-				sequence.RingCounter++
-				// We're in a ring of scanner movements, have a short delay in the steps.
-				time.Sleep(5 * time.Millisecond)
-			}
-		}
+	case <-time.After(currentSpeed):
+		break
 	}
 
 	// Now process any command.
@@ -101,42 +64,40 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Speed = command.Args[SPEED].Value.(int)
 		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
-		//sequence.MusicSpeed = SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
-	case common.UpdateScannerPattern:
-		const PATTEN_NAME = 0
+	case common.UpdatePattern:
+		const PATTEN_NUMBER = 0
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
+			fmt.Printf("%d: Command Update Scanner Patten to %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
 		sequence.UpdatePattern = true
-		sequence.ScannerPattern = command.Args[PATTEN_NAME].Value.(int)
+		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
 
-	case common.UpdateRGBPattern:
-		const PATTEN_NAME = 0
-		if debug {
-			fmt.Printf("%d: Command Update RGB Patten to %s\n", mySequenceNumber, command.Args[PATTEN_NAME].Value)
-		}
-		sequence.UpdatePattern = true
-		sequence.RGBPattern = command.Args[PATTEN_NAME].Value.(int)
-		return sequence
-
-	case common.UpdateShift:
+	case common.UpdateRGBShift:
 		const SHIFT = 0
 		if debug {
-			fmt.Printf("%d: Command Update Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
+			fmt.Printf("%d: Command Update RGB Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
+		}
+		sequence.RGBShift = command.Args[SHIFT].Value.(int)
+		return sequence
+
+	case common.UpdateScannerShift:
+		const SHIFT = 0
+		if debug {
+			fmt.Printf("%d: Command Update Scanner Shift to %d\n", mySequenceNumber, command.Args[SHIFT].Value)
 		}
 		sequence.UpdateShift = true
 		sequence.ScannerShift = command.Args[SHIFT].Value.(int)
 		return sequence
 
-	case common.UpdateSize:
+	case common.UpdateRGBSize:
 		const START = 0
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
 		}
-		sequence.Size = command.Args[START].Value.(int)
+		sequence.RGBSize = command.Args[START].Value.(int)
 		return sequence
 
 	case common.UpdateScannerSize:
@@ -147,12 +108,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
-	case common.UpdateFadeSpeed:
+	case common.UpdateRGBFadeSpeed:
 		const FADE_SPEED = 0
 		if debug {
 			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
-		sequence.FadeTime = command.Args[FADE_SPEED].Value.(int)
+		sequence.RGBFade = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
 	case common.UpdateColor:
@@ -395,7 +356,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const SEQUENCE_NUMBER = 0 // Integer
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			sequence.ScannerStateMutex.Lock()
-			for scanner := 0; scanner < sequence.ScannersTotal; scanner++ {
+			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
@@ -414,7 +375,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.ScannersTotal {
+			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
 				sequence.ScannerStateMutex.Lock()
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
@@ -463,13 +424,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.AutoPattern = command.Args[AUTO_PATTEN].Value.(bool)
 		if !command.Args[AUTO_PATTEN].Value.(bool) {
-			if sequence.Type == "rgb" {
-				sequence.Pattern.Name = "standard"
-			}
-			if sequence.Type == "scanner" {
-				sequence.Pattern.Name = "circle"
-				sequence.ScannerPattern = 1
-			}
+			sequence.SelectedPattern = 0
 		}
 		return sequence
 

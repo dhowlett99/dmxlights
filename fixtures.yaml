@@ -240,13 +240,30 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-- name: FOH XBRICK 2
+# - name: FOH XBRICK 2
+#   number: 1
+#   description: Stairville Xbrick
+#   type: rgb
+#   address: 114
+#   group: 1
+#   channels: 
+#   - number: 1
+#     name: Red1
+#   - number: 2
+#     name: Green1
+#   - number: 3
+#     name: Blue1
+#   - number: 4
+#     name: MasterDimmer
+#   - number: 5
+#     name: Strobe
+- name: FOH XBRICK 1
   number: 1
   description: Stairville Xbrick
   type: rgb
   address: 114
   group: 1
-  channels: 
+  channels:
   - number: 1
     name: Red1
   - number: 2
@@ -254,12 +271,28 @@ fixtures:
   - number: 3
     name: Blue1
   - number: 4
-    name: MasterDimmer
+    name: Red2
   - number: 5
-    name: Strobe
+    name: Green2
+  - number: 6
+    name: Blue2
+  - number: 7
+    name: Red3
+  - number: 8
+    name: Green3
+  - number: 9
+    name: Blue3
+  - number: 10
+    name: Red4
+  - number: 11
+    name: Green4
+  - number: 12
+    name: Blue4
+  - number: 13
+    name: Master
 - name: Uplighter1
   number: 1
-  number_channels: 8
+  use_channels: 8
   description: Chauvet Color Rail IRC
   type: rgb
   address: 172
@@ -320,7 +353,7 @@ fixtures:
     name: Strobe
 - name: Uplighter2
   number: 1
-  number_channels: 8
+  use_channels: 8
   description: Fluxia DLB100
   type: rgb
   address: 200
@@ -377,7 +410,7 @@ fixtures:
     name: Blue8
 - name: ADJ QA PAR 38
   number: 1
-  number_channels: 8
+  use_channels: 8
   description: American DJ SPOT
   type: rgb
   address: 150

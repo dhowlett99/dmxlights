@@ -10,6 +10,21 @@ import (
 
 const debug = false
 
+const DefaultScannerSize = 120
+const MaxScannerSize = 120
+const MaxRGBSize = 120
+const MaxRGBFade = 10
+const DefaultPattern = 0
+const DefaultRGBSize = 1
+const DefaultRGBFade = 1
+const DefaultScannerFade = 10
+const DefaultSpeed = 7
+const DefaultRGBShift = 0
+const DefaultScannerShift = 0
+const DefaultScannerCoordinates = 0
+
+const MaxBrightness = 255
+
 type ALight struct {
 	X                int
 	Y                int
@@ -32,6 +47,17 @@ type Color struct {
 	R int
 	G int
 	B int
+}
+
+// Used in calculating Positions.
+type FixtureBuffer struct {
+	Color         Color
+	MasterDimmer  int
+	Gobo          int
+	Pan           int
+	Tilt          int
+	Shutter       int
+	ScannerNumber int
 }
 
 type Value struct {
@@ -109,10 +135,9 @@ const (
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
-	UpdateScannerPattern
-	UpdateRGBPattern
-	UpdateFadeSpeed
-	UpdateSize
+	UpdatePattern
+	UpdateRGBFadeSpeed
+	UpdateRGBSize
 	UpdateScannerSize
 	Blackout
 	Normal
@@ -138,7 +163,8 @@ const (
 	AutoPattern
 	ToggleFixtureState
 	FixtureState
-	UpdateShift
+	UpdateRGBShift
+	UpdateScannerShift
 	UpdateScannerColor
 	ClearSequenceColor
 	Static
@@ -149,15 +175,9 @@ const (
 	EnableAllScanners
 )
 
-const DefaultScannerSize = 120
-const MaxScannerSize = 120
-const DefaultScannerPattern = 0 // Circle
-const DefaultRGBPattern = 1     // Chase
-const DefaultRGBSize = 1
-const DefaultFade = 1
-const DefaultSpeed = 12
-const DefaultShift = 0
-const DefaultNumberCoordinates = 0
+// A full step cycle is 39 ticks ie 39 values.
+// 13 fade up values, 13 on values and 13 off values.
+const StepSize = 39
 
 var Pink = Color{R: 255, G: 0, B: 255}
 var White = Color{R: 255, G: 255, B: 255}
@@ -185,12 +205,13 @@ type Sequence struct {
 	Number                     int                         // Sequence number.
 	Run                        bool                        // True if this sequence is running.
 	Bounce                     bool                        // True if this sequence is bouncing.
+	Invert                     bool                        // True if RGB sequence patten is inverted.
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
 	StrobeSpeed                int                         // Strobe speed.
+	RGBShift                   int                         // RGB shift.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
-	MusicSpeed                 time.Duration               // Sequence speed calculated by BPM of music and represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
 	MusicTrigger               bool                        // Is this sequence in music trigger mode.
 	Ring                       bool                        // A ring is when a music triggers a ring of events for a scannner.
@@ -203,19 +224,18 @@ type Sequence struct {
 	Steps                      []Step                      // Steps in this sequence.
 	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures             int                         // Number of fixtures for this sequence.
-	FixturePositions           map[int]map[int][]Position  // Fixture positions decides where a fixture is in a give set of sequence steps.
+	RGBPositions               map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
+	ScannerPositions           map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
 	AutoColor                  bool                        // Sequence is going to automatically change the color.
 	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                    Pattern                     // Contains fixtures and steps info.
-	PatternInverted            bool                        // The pattern is inverted.
 	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                   int                         // The selected RGB fixture color.
-	RGBPattern                 int                         // Selected RGB pattern.
-	FadeTime                   int                         // Fade time
-	Size                       int                         // Fade size
+	RGBFade                    int                         // RGB Fade time
+	RGBSize                    int                         // RGB Fade size
 	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
 	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
@@ -230,16 +250,16 @@ type Sequence struct {
 	StopStrobe                 bool                        // We're not in strobe mode.
 	FloodPlayOnce              bool                        // Play the flood sceme only once.
 	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
-	ScannersTotal              int                         // Total number of scanners in this sequence.
 	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
 	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
 	ScannerAvailablePatterns   map[int]Pattern             // Available patterns for this scanner.
 	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
-	ScannerPattern             int                         // The selected scanner pattern.
+	SelectedPattern            int                         // The selected pattern.
 	ScannerSize                int                         // The selected scanner size.
 	ScannerShift               int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                int                         // The selected gobo.
 	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
 	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates         []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
@@ -249,6 +269,7 @@ type Sequence struct {
 	ScannerState               map[int]ScannerState        // Map of fixtures which are disabled.
 	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
 	DisableOnce                map[int]bool                // Map used to play disable only once.
+	UpdateSize                 bool                        // Command to update size.
 	UpdateShift                bool                        // Command to update the shift.
 	UpdatePattern              bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor        bool                        // Command to update the sequence colors.
@@ -283,68 +304,52 @@ type Step struct {
 	Type     string
 }
 
-// Fixture Command.
 type FixtureCommand struct {
-	Master                 int
-	StrobeSpeed            int
-	Hide                   bool
-	Tick                   bool
-	Config                 bool // Configure fixture.
-	Start                  bool
-	Steps                  int
-	Positions              map[int][]Position
-	Type                   string
-	StartPosition          int
-	CurrentPosition        int
-	CurrentSpeed           time.Duration
-	MusicSpeed             time.Duration
-	Color                  Color
-	Speed                  int
-	Shift                  int
-	Size                   int
-	FadeSpeed              int
-	FadeTime               int
-	Blackout               bool
-	StartFlood             bool
-	StopFlood              bool
-	PlayFloodOnce          bool
-	UpdateSequenceColor    bool
-	SequenceColor          Color
-	SequenceNumber         int
-	Inverted               bool
-	SelectedGobo           int
-	ScannerState           map[int]ScannerState
-	DisableOnce            map[int]bool
-	ScannerChase           bool
+	Step           int
+	Type           string
+	SequenceNumber int
+
+	// Command commands.
+	StrobeSpeed int
+	Master      int
+	Blackout    bool
+	Hide        bool
+
+	// RGB commands.
+	RGBPosition     Position
+	RGBStartFlood   bool
+	RGBStopFlood    bool
+	RGBStatic       bool
+	RGBStaticColors []StaticColorButton
+
+	// Scanner Commands.
 	ScannerColor           map[int]int
-	Static                 bool
-	StaticColors           []StaticColorButton
-	AvailableScannerColors map[int][]StaticColorButton
-	OffsetPan              int
-	OffsetTilt             int
-	FixtureLabels          []string
+	ScannerPosition        Position
+	ScannerState           map[int]ScannerState
+	ScannerDisableOnce     map[int]bool
+	ScannerChase           bool
+	ScannerAvailableColors map[int][]StaticColorButton
+	ScannerSelectedGobo    int
+	ScannerOffsetPan       int
+	ScannerOffsetTilt      int
 }
 
 type Position struct {
-	Fixture        int
-	StartPosition  int
-	Color          Color
-	Pan            int
-	PanMaxDegrees  *int
-	Tilt           int
-	TiltMaxDegrees *int
-	Shutter        int
-	Gobo           int
+	// RGB
+	Fixtures map[int]Fixture
+	//PositionNumber int
 }
 
 // A fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	//ScannerNumber int
 	Name         string
 	Label        string
 	Type         string
 	MasterDimmer int
+	ScannerColor Color
 	Colors       []Color
 	Pan          int
 	Tilt         int
@@ -640,8 +645,9 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 		}
 	}
 
-	// Map invert function.
-	sequence.PatternInverted = sequence.Functions[Function7_Invert_Chase].State
+	// Map RGB invert function.
+	sequence.Invert = sequence.Functions[Function7_Invert_Chase].State
+
 	// Map scanner chase mode. Uses same function key as above.
 	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
 
@@ -656,12 +662,60 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	return sequence
 }
 
-func HowManyColors(positionsMap map[int][]Position) (colors []Color) {
+func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
-	for _, positions := range positionsMap {
-		for _, position := range positions {
-			colorMap[position.Color] = true
+	for _, position := range positionsMap {
+		for _, fixture := range position.Fixtures {
+			for _, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					colorMap[color] = true
+				}
+			}
+		}
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
+}
+
+func HowManyStepColors(steps []Step) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, step := range steps {
+		for _, fixture := range step.Fixtures {
+			for _, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					colorMap[color] = true
+				}
+			}
+		}
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	if debug {
+		fmt.Printf("HowManyStepColors %d\n", len(colors))
+	}
+
+	return colors
+}
+
+func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, positionMap := range positionsMap {
+		fixtureLen := len(positionMap.Fixtures)
+		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
+			fixture := positionMap.Fixtures[fixtureNumber]
+			for _, color := range fixture.Colors {
+				colorMap[color] = true
+			}
 		}
 	}
 
@@ -840,6 +894,14 @@ func ShowRunningStatus(sequenceNumber int, runningState map[int]bool, eventsForL
 	}
 }
 
+func ShowStrobeStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+	if state {
+		FlashLight(8, 6, White, Black, eventsForLaunchpad, guiButtons)
+		return
+	}
+	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+}
+
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
@@ -964,4 +1026,27 @@ func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad c
 		OffColor:   offColor,
 	}
 	guiButtons <- event
+}
+
+// InvertColor just reverses the DMX values.
+func InvertColor(color Color) (out Color) {
+
+	out.R = ReverseDmx(color.R)
+	out.G = ReverseDmx(color.G)
+	out.B = ReverseDmx(color.B)
+
+	return out
+}
+
+// Takes a DMX value 1-255 and reverses the value.
+func ReverseDmx(n int) int {
+	in := make(map[int]int, 255)
+	var y = 255
+
+	for x := 0; x <= 255; x++ {
+
+		in[x] = y
+		y--
+	}
+	return in[n]
 }

@@ -180,3 +180,79 @@ A static color sequence is where you want to setup a set of uplighters with spec
 
 A switch sequence is simply eight switches that can be used to control simple devices like projectors.
 A swicth can have multiple states, for example you could set a fixture to have specific color, brightness or Gobo.
+
+## Default configuration
+
+The top row is configured as a stardard RGB sequence, assuming these will be configures to run the front of house PAR cans.
+The next row is your uplighters, I would expect them to be placed around the room to give backgroud lighting. Again this sequence is configured as a RGB sequence.
+Next are the scanners arrange in sequence. Scanner sequences light different colors to represent the position of each scanner. By default all scanners follow the same patten and position in the patten. 
+Finallay the last sequence is configured as a switch sequence. The eight buttons represent the state of a DMX fixture. Useful for turning on a projector. Every time you press a switch seqence fixture it will cycle through the states as defined in the fixtures.yaml file.
+
+As soon as you start DMX lights the sequences will start to run,  you get a chase patten as soon as the pattens have been read from the configuration.  
+
+# RGB Sequence configuration
+
+A RGB sequence will start with a green chase from left  to right. You can configure the following using the functions. 
+
+## RGB Functions 
+
+To access RGB functions press the select button for this sequence twice.
+The Function keys light up pink. Functions are labeled from the left.
+
+|Number | Function | Description |
+|-|-|-|
+| 1 |Patten Selection | Selects Sequence Patten|
+| 2 | Auto Color | Makes the sequence select a color automatically|Auto Patten |
+|3 | Auto Pattern | Makes the sequence select a patten automatically |
+| 4 |Bounce|Will make the sequence bounce. Sequence auto reverses. |
+| 5 | Chase Color Selection|  Set RGB chase colors|
+| 6 | Static Color Selection | Set static color |
+| 7 | Invert Chase | Invert the RGB colors  |
+| 8 | Music Trigger | Sequence will step in time to music.
+
+
+### Function 1  Patten Selection
+
+Press function 1 reveals the available pattens for this sequence.
+
+|Number | Patten | Description |
+|-|-|-|
+|1|Chase Standard Chase | Green chase from left to right.
+|2| Flash | All fixtures flash on and off in white.
+|3| RGB Chase| Fixtures flash red, green and then blue.
+|4| Pairs | Fixtures chase in pairs.|
+|5| Inward | Fixtures start at both ends and chase inward.|
+|6| Color Chase | A single fixture will  step through 8 colors|
+|7| Multi Color Chase| All fixtures will step through 8 colors, out of sync with each other.|
+
+Function 2 Automatic color selection.
+
+Press Function 2 and the button will light to indicate auto color selection has been engaged. Auto colors will remain active until you press this function again. Auto colors overrides the manual color selection and the colors set in the original patten.
+
+Function 3 Automatic pattern selection
+
+Press Function 3 and the button will light to indicate auto pattern selection has been engaged. Auto patterns will remain active until you press this function again. Auto patterns overrides the manual pattern selection and the pattern set in the original patten.
+
+Function 4 Bounce - Auto Reverse.
+
+Press Function 4 and the button will light to indicate auto reverse selection has been engaged. Auto reveres overrides the pattern set in the original patten. Chase will appear to bounce from left to right and then right to left until you press this function again. 
+
+Function 5 Chase Color Selection
+
+Press Function 5 and eight colors will appear, you can then select the colors you require in the sequence. You can select up to eight colors and add weighting, for example red, red, green and blue will give you 4 colors with two reds, a green and then a blue. Pressing the clear button will clear the selection. Selected colors will flash. Press the sequence select button to exit manual chase color selection. 
+
+Function 6 Static Color Selection.
+
+Press function 6 to select static colors for this sequence.
+A sequence can be completely static with no chases in this mode.
+A display of eight colors will appear, touch a button to cycle through the color for that fixture. Also pressing red, green or blue will adjust the amount of each,  enabling a full color pallete for each fixture. Press the select button twice to get back to the function display and press function 6 to toggle off the static display.
+
+Function 7 Invert Chase
+
+Press function 7 to invert the chase colors.
+A chase is inverted to black so if you have a green fixture chasing you will invert the sequence, and get a black fixture chasing on a green background. Press function 7 again to toggle off the invert chase function.
+
+Function 8 Music Trigger.
+
+Pressing function 8 will disable the speed of the sequence completely and the chase will step in time to the music. Music sensitivity is auto detected on the volume of the sound. But you can effect a fine tunning by pressing Sens- or Sens+ to increase or decrease the reaction to the music being played. Sens- and Sens+ apply to all sequences using the music trigger.
+
