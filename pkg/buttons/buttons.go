@@ -2246,6 +2246,14 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
 		}
 	}
+
+	// Preserve this.Blackout.
+	if !this.Blackout {
+		cmd := common.Command{
+			Action: common.Normal,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+	}
 }
 
 func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,

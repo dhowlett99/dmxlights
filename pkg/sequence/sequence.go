@@ -325,7 +325,7 @@ func PlaySequence(sequence common.Sequence,
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				RGBStartFlood:  sequence.StartFlood,
+				StartFlood:     sequence.StartFlood,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -342,8 +342,8 @@ func PlaySequence(sequence common.Sequence,
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
-				RGBStartFlood:  sequence.StartFlood,
-				RGBStopFlood:   sequence.StopFlood,
+				StartFlood:     sequence.StartFlood,
+				StopFlood:      sequence.StopFlood,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
@@ -579,8 +579,8 @@ func PlaySequence(sequence common.Sequence,
 							Hide:                   sequence.Hide,
 							Type:                   sequence.Type,
 							RGBPosition:            sequence.RGBPositions[step],
-							RGBStartFlood:          sequence.StartFlood,
-							RGBStopFlood:           sequence.StopFlood,
+							StartFlood:             sequence.StartFlood,
+							StopFlood:              sequence.StopFlood,
 							SequenceNumber:         sequence.Number,
 							ScannerPosition:        sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
 							ScannerSelectedGobo:    sequence.ScannerGobo,
@@ -1121,168 +1121,6 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 	return positionsOut, counter
 }
 
-// calculateScannerPositions takes the steps defined in the pattern and
-// turns them into positions used by the sequencer.
-// Returns map of positions which have array of of positions for each fixture
-// func calculateScannerPositions(tYpe string, steps []common.Step, bounce bool, invert bool, shift int) (map[int][]common.Position, int) {
-
-// 	if debug {
-// 		fmt.Printf("calculateScannerPositions\n")
-// 	}
-
-// 	position := common.Position{}
-
-// 	// We have multiple positions for each fixture.
-// 	var counter int
-// 	var waitForColors bool
-
-// 	positionsOut := make(map[int][]common.Position, 9)
-
-// 	if !invert {
-// 		waitForColors = false
-// 		for _, step := range steps {
-// 			for fixtureIndex, fixture := range step.Fixtures {
-// 				noColors := len(fixture.Colors)
-// 				for _, color := range fixture.Colors {
-// 					// Preserve the scanner commands.
-// 					position.Gobo = fixture.Gobo
-// 					position.Pan = fixture.Pan
-// 					position.Tilt = fixture.Tilt
-// 					position.Shutter = fixture.Shutter
-// 					if color.R > 0 || color.G > 0 || color.B > 0 {
-// 						position.StartPosition = counter
-// 						position.ScannerNumber = fixtureIndex
-// 						position.Color.R = color.R
-// 						position.Color.G = color.G
-// 						position.Color.B = color.B
-// 						positionsOut[counter] = append(positionsOut[counter], position)
-// 						if noColors > 1 {
-// 							if fixture.Type != "scanner" {
-// 								counter = counter + shift
-// 								waitForColors = true
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 			if !waitForColors {
-// 				counter = counter + shift
-// 			}
-// 		}
-// 	}
-
-// 	if bounce && tYpe == "rgb" {
-// 		waitForColors = false
-// 		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
-// 			step := steps[stepNumber-1]
-// 			for fixtureIndex, fixture := range step.Fixtures {
-// 				noColors := len(fixture.Colors)
-// 				for _, color := range fixture.Colors {
-// 					// Preserve the scanner commands.
-// 					position.Gobo = fixture.Gobo
-// 					position.Pan = fixture.Pan
-// 					position.Tilt = fixture.Tilt
-// 					position.Shutter = fixture.Shutter
-// 					if color.R > 0 || color.G > 0 || color.B > 0 {
-// 						position.StartPosition = counter
-// 						position.ScannerNumber = fixtureIndex
-// 						position.Color.R = color.R
-// 						position.Color.G = color.G
-// 						position.Color.B = color.B
-// 						positionsOut[counter] = append(positionsOut[counter], position)
-// 						if noColors > 1 {
-// 							if fixture.Type != "scanner" {
-// 								counter = counter + shift
-// 								waitForColors = true
-// 							}
-// 						}
-// 					}
-// 				}
-// 			}
-// 			if !waitForColors {
-// 				counter = counter + shift
-// 			}
-// 		}
-// 	}
-
-// 	if bounce || invert {
-// 		if tYpe == "scanner" {
-// 			// Generate the positions in reverse.
-// 			// Reverse the steps.
-// 			for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
-// 				step := steps[stepNumber-1]
-
-// 				// Reverse the fixtures.
-// 				for fixtureIndex := len(step.Fixtures); fixtureIndex > 0; fixtureIndex-- {
-// 					fixture := step.Fixtures[fixtureIndex-1]
-
-// 					position := common.Position{}
-// 					// Reverse the colors.
-// 					noColors := len(fixture.Colors)
-// 					for colorNumber := noColors; colorNumber > 0; colorNumber-- {
-// 						color := fixture.Colors[colorNumber-1]
-
-// 						position.Gobo = fixture.Gobo
-// 						position.Pan = fixture.Pan
-// 						position.Tilt = fixture.Tilt
-// 						position.Shutter = fixture.Shutter
-// 						position.StartPosition = counter
-// 						position.ScannerNumber = fixtureIndex - 1
-// 						position.Color = color
-// 						positionsOut[counter] = append(positionsOut[counter], position)
-// 						if noColors >= 1 {
-// 							if fixture.Type != "scanner" {
-// 								counter = counter + shift
-// 								waitForColors = true
-// 							}
-// 						}
-// 					}
-// 				}
-// 				if !waitForColors {
-// 					counter = counter + shift
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	if bounce && invert {
-// 		if tYpe == "scanner" {
-// 			waitForColors = false
-// 			for _, step := range steps {
-// 				for fixtureIndex, fixture := range step.Fixtures {
-// 					noColors := len(fixture.Colors)
-// 					for _, color := range fixture.Colors {
-// 						// Preserve the scanner commands.
-// 						position.Gobo = fixture.Gobo
-// 						position.Pan = fixture.Pan
-// 						position.Tilt = fixture.Tilt
-// 						position.Shutter = fixture.Shutter
-// 						if color.R > 0 || color.G > 0 || color.B > 0 {
-// 							position.StartPosition = counter
-// 							position.ScannerNumber = fixtureIndex
-// 							position.Color.R = color.R
-// 							position.Color.G = color.G
-// 							position.Color.B = color.B
-// 							positionsOut[counter] = append(positionsOut[counter], position)
-// 							if noColors > 1 {
-// 								if fixture.Type != "scanner" {
-// 									counter = counter + shift
-// 									waitForColors = true
-// 								}
-// 							}
-// 						}
-// 					}
-// 				}
-// 				if !waitForColors {
-// 					counter = counter + shift
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	return positionsOut, counter
-// }
-
 func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
 
 	var insertColor int
@@ -1493,28 +1331,28 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 	scannerPattens[0] = circlePatten
 
 	// Scanner left right pattern 1
-	// coordinates = pattern.ScanGeneratorLeftRight(128, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
-	// leftRightPatten := pattern.GeneratePattern(coordinates, sequence.ScannersTotal, sequence.ScannerShift, sequence.ScannerChase)
-	// leftRightPatten.Name = "leftright"
-	// leftRightPatten.Number = 1
-	// leftRightPatten.Label = "Left.Right"
-	// scannerPattens[1] = leftRightPatten
+	coordinates = pattern.ScanGeneratorLeftRight(128, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
+	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	leftRightPatten.Name = "leftright"
+	leftRightPatten.Number = 1
+	leftRightPatten.Label = "Left.Right"
+	scannerPattens[1] = leftRightPatten
 
 	// // Scanner up down pattern 2
-	// coordinates = pattern.ScanGeneratorUpDown(128, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
-	// upDownPatten := pattern.GeneratePattern(coordinates, sequence.ScannersTotal, sequence.ScannerShift, sequence.ScannerChase)
-	// upDownPatten.Name = "updown"
-	// upDownPatten.Number = 2
-	// upDownPatten.Label = "Up.Down"
-	// scannerPattens[2] = upDownPatten
+	coordinates = pattern.ScanGeneratorUpDown(128, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
+	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	upDownPatten.Name = "updown"
+	upDownPatten.Number = 2
+	upDownPatten.Label = "Up.Down"
+	scannerPattens[2] = upDownPatten
 
 	// // Scanner zig zag pattern 3
-	// coordinates = pattern.ScanGenerateSineWave(255, 5000, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
-	// zigZagPatten := pattern.GeneratePattern(coordinates, sequence.ScannersTotal, sequence.ScannerShift, sequence.ScannerChase)
-	// zigZagPatten.Name = "zigzag"
-	// zigZagPatten.Number = 3
-	// zigZagPatten.Label = "Zig.Zag"
-	// scannerPattens[3] = zigZagPatten
+	coordinates = pattern.ScanGenerateSineWave(255, 5000, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates])
+	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	zigZagPatten.Name = "zigzag"
+	zigZagPatten.Number = 3
+	zigZagPatten.Label = "Zig.Zag"
+	scannerPattens[3] = zigZagPatten
 
 	return scannerPattens
 

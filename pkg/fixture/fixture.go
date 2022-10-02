@@ -2,6 +2,7 @@ package fixture
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
@@ -125,12 +126,12 @@ func FixtureReceiver(
 				turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
 				continue
 			}
-			if cmd.RGBStartFlood {
+			if cmd.StartFlood {
 				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 				continue
 			}
-			if cmd.RGBStopFlood {
+			if cmd.StopFlood {
 				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
@@ -163,6 +164,12 @@ func FixtureReceiver(
 		}
 
 		if cmd.Type == "scanner" {
+
+			// Turn off the scanners in flood mode.
+			if cmd.StartFlood {
+				turnOnFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+				continue
+			}
 
 			// find the fixture
 			fixture := cmd.ScannerPosition.Fixtures[myFixtureNumber]
@@ -453,4 +460,70 @@ func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceN
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
 	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+}
+
+func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+	if !cmd.Hide {
+		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+	}
+	// A map of the fixture colors.
+	cmd.ScannerColor = make(map[int]int)
+	cmd.ScannerColor[myFixtureNumber] = findColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
+
+	red := 255
+	green := 255
+	blue := 255
+	pan := 128
+	tilt := 128
+	shutter := 255
+	gobo := findGobo(myFixtureNumber, mySequenceNumber, "Open", fixtures)
+	fmt.Printf("Gobo Number %d \n", gobo)
+	brightness := 255
+	master := 255
+
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, pan, tilt, shutter, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed)
+}
+
+func findGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == mySequenceNumber {
+			for _, channel := range fixture.Channels {
+				if fixture.Number == myFixtureNumber+1 {
+
+					if strings.Contains(channel.Name, "Gobo") {
+						for _, setting := range channel.Settings {
+							fmt.Printf("Gobo Name %s \n", setting.Name)
+							if setting.Name == selectedGobo {
+								return setting.Number
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
+func findColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures, scannerColors map[int]int) int {
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == mySequenceNumber {
+			for _, channel := range fixture.Channels {
+				if fixture.Number == myFixtureNumber+1 {
+					if strings.Contains(channel.Name, "Color") {
+						for colorNumber := range scannerColors {
+							if colorNumber == myFixtureNumber {
+								for _, setting := range channel.Settings {
+									if setting.Number-1 == scannerColors[myFixtureNumber] {
+										return setting.Number
+									}
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0
 }

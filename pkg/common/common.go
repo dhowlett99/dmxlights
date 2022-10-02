@@ -317,10 +317,11 @@ type FixtureCommand struct {
 	Hide        bool
 	Clear       bool
 
+	StartFlood bool
+	StopFlood  bool
+
 	// RGB commands.
 	RGBPosition     Position
-	RGBStartFlood   bool
-	RGBStopFlood    bool
 	RGBStatic       bool
 	RGBStaticColors []StaticColorButton
 

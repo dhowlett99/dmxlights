@@ -726,7 +726,7 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 
 	if debug {
 		for scannerNumber, scanner := range scanners {
-			fmt.Printf("%d--->scanner %+v\n", scannerNumber, scanner)
+			fmt.Printf("%dscanner %+v\n", scannerNumber, scanner)
 		}
 	}
 
