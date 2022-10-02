@@ -2,7 +2,6 @@ package fixture
 
 import (
 	"errors"
-	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
@@ -477,7 +476,6 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	tilt := 128
 	shutter := 255
 	gobo := findGobo(myFixtureNumber, mySequenceNumber, "Open", fixtures)
-	fmt.Printf("Gobo Number %d \n", gobo)
 	brightness := 255
 	master := 255
 
@@ -492,7 +490,6 @@ func findGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fi
 
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
-							fmt.Printf("Gobo Name %s \n", setting.Name)
 							if setting.Name == selectedGobo {
 								return setting.Number
 							}
