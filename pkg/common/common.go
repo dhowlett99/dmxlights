@@ -167,6 +167,7 @@ const (
 	UpdateScannerShift
 	UpdateScannerColor
 	ClearSequenceColor
+	ClearStaticColor
 	Static
 	MasterBrightness
 	UpdateNumberCoordinates
@@ -1052,4 +1053,22 @@ func ReverseDmx(n int) int {
 		y--
 	}
 	return in[n]
+}
+
+// Sets the static colors to default values.
+func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
+
+	// Make an array to hold static colors.
+	staticColorsButtons := []StaticColorButton{}
+
+	for X := 0; X < 8; X++ {
+		staticColorButton := StaticColorButton{}
+		staticColorButton.X = X
+		staticColorButton.Y = selectedSequence
+		staticColorButton.SelectedColor = X
+		staticColorButton.Color = GetColorButtonsArray(X)
+		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+	}
+
+	return staticColorsButtons
 }

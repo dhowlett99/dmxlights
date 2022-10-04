@@ -285,6 +285,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.CurrentColors = []common.Color{}
 		return sequence
 
+	case common.ClearStaticColor:
+		if debug {
+			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
+		}
+		// Populate the static colors for this sequence with the defaults.
+		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
+		sequence.PlayStaticOnce = true
+		sequence.Static = true
+		sequence.Hide = true
+		return sequence
+
 	// If we are being asked for our config we must reply with our current sequence.
 	case common.ReadConfig:
 		if debug {

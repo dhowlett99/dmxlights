@@ -70,10 +70,10 @@ func CreateSequence(
 	channels common.Channels) common.Sequence {
 
 	// Populate the static colors for this sequence with the defaults.
-	staticColorsButtons := setDefaultStaticColorButtons(mySequenceNumber)
+	staticColorsButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
 
 	// Populate the edit sequence colors for this sequence with the defaults.
-	sequenceColorButtons := setDefaultStaticColorButtons(mySequenceNumber)
+	sequenceColorButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
 
 	// Every scanner has a number of colors in its wheel.
 	availableScannerColors := make(map[int][]common.StaticColorButton)
@@ -1193,24 +1193,6 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 	}
 
 	return replace
-}
-
-// Sets the static colors to default values.
-func setDefaultStaticColorButtons(selectedSequence int) []common.StaticColorButton {
-
-	// Make an array to hold static colors.
-	staticColorsButtons := []common.StaticColorButton{}
-
-	for X := 0; X < 8; X++ {
-		staticColorButton := common.StaticColorButton{}
-		staticColorButton.X = X
-		staticColorButton.Y = selectedSequence
-		staticColorButton.SelectedColor = X
-		staticColorButton.Color = common.GetColorButtonsArray(X)
-		staticColorsButtons = append(staticColorsButtons, staticColorButton)
-	}
-
-	return staticColorsButtons
 }
 
 func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {

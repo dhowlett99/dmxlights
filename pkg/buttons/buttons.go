@@ -1583,14 +1583,24 @@ func ProcessButtons(X int, Y int,
 		// Map Function 6 to static color edit if we are a RGB sequence.
 		if sequences[this.SelectedSequence].Type == "rgb" && sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-			this.EditStaticColorsMode[this.SelectedSequence] = sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State
 
+			// Turn on edit static color mode.
+			if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
+				this.EditStaticColorsMode[this.SelectedSequence] = true
+			}
 			// Go straight to static color selection mode, don't wait for a another select press.
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
 			this.FunctionSelectMode[this.SelectedSequence] = false
-			// The sequence will automatically display the static colors now!
 
+			// Swicth on any static colors.
+			cmd = common.Command{
+				Action: common.UpdateStatic,
+				Args: []common.Arg{
+					{Name: "Static", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
 		return
@@ -1642,7 +1652,6 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 }
 
 // HandleSelect - Runs when you press a select button to select a sequence.
-
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
@@ -1652,13 +1661,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.SelectedSequence, this.EditSequenceColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
-		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
+	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
-
 	if sequences[this.SelectedSequence].Type == "rgb" {
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
@@ -1738,8 +1746,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// This the first time we have pressed the select button.
-	if !this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditStaticColorsMode[this.SelectedSequence] {
+	if !this.SelectButtonPressed[this.SelectedSequence] && !this.EditStaticColorsMode[this.SelectedSequence] {
 		if debug {
 			fmt.Printf("Handle 2\n")
 		}
@@ -2320,6 +2327,27 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Flash the correct color buttons
 		ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+		return
+	}
+
+	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
+	if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
+		sequences[this.SelectedSequence].Type != "scanner" {
+
+		// Clear the sequence colors for this sequence.
+		cmd := common.Command{
+			Action: common.ClearStaticColor,
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Get an upto date copy of the sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+		// Flash the correct color buttons
+		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+		this.FunctionSelectMode[this.SelectedSequence] = false
+		// The sequence will automatically display the static colors now!
 
 		return
 	}
