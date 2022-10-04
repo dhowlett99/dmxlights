@@ -1549,6 +1549,9 @@ func ProcessButtons(X int, Y int,
 		if this.EditSequenceColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type == "rgb" {
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			// Set the colors.
+			sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
+			// Show the colors
 			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 		}
 
@@ -1697,6 +1700,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("Show RGB Sequence Color Selection Buttons\n")
 			}
+			// Set the colors.
+			sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
+			// Show the colors
 			ShowRGBColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}

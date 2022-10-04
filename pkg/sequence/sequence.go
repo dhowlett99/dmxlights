@@ -132,6 +132,7 @@ func CreateSequence(
 		Bounce:                 false,
 		RGBAvailablePatterns:   availableRGBPatterns,
 		ScannerSize:            common.DefaultScannerSize,
+		SequenceColors:         []common.Color{{R: 0, G: 255, B: 0}},
 		RGBSize:                common.DefaultRGBSize,
 		Speed:                  common.DefaultSpeed,
 		ScannerShift:           common.DefaultScannerShift,
