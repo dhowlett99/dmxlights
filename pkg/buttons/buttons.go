@@ -1680,6 +1680,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 	}
 
+	// Light the top buttons.
+	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+
 	// Light the sequence selector button.
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
 
@@ -2589,10 +2592,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Update the status bar for the first sequnce. Because that will be the one selected after a clear.
 		this.SelectedSequence = 0
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
 
 		// Now convice handle() to do the work for us and
 		// select the first sequence and place everything in normal mode.
