@@ -869,8 +869,8 @@ func Test_generatePattern(t *testing.T) {
 
 func TestScanGenerateSineWave(t *testing.T) {
 	type args struct {
-		size      int
-		frequency int
+		size      float64
+		frequency float64
 	}
 	tests := []struct {
 		name    string

@@ -799,10 +799,11 @@ func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float
 	return out
 }
 
-func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out []Coordinate) {
+func ScanGenerateSineWave(size float64, frequency float64, NumberCoordinates float64) (out []Coordinate) {
 	var t float64
+	size = size * 2
 	T := float64(size)
-	for t = 1; t < T-1; t += float64(NumberCoordinates) {
+	for t = 1; t < T-1; t += float64((255 / NumberCoordinates)) {
 		n := Coordinate{}
 		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
 		n.Tilt = int(x)
@@ -812,23 +813,37 @@ func ScanGenerateSineWave(size int, frequency int, NumberCoordinates int) (out [
 	return out
 }
 
-func ScanGeneratorUpDown(size int, NumberCoordinates int) (out []Coordinate) {
+func ScanGeneratorUpDown(size float64, NumberCoordinates float64) (out []Coordinate) {
+	var tilt float64
+	var divideBy float64
 	pan := 128
-	for tilt := 0; tilt < 255; tilt += NumberCoordinates {
+	size = size * 2
+	if size > 255 {
+		size = 255
+	}
+	divideBy = 255 / NumberCoordinates
+
+	for tilt = 0; tilt < size; tilt += divideBy {
 		n := Coordinate{}
-		n.Tilt = tilt
-		n.Pan = pan
+		n.Tilt = int(tilt)
+		n.Pan = int(pan)
 		out = append(out, n)
 	}
 	return out
 }
 
-func ScanGeneratorLeftRight(size int, NumberCoordinates int) (out []Coordinate) {
-	tilt := 128
-	for pan := 0; pan < 255; pan += NumberCoordinates {
+func ScanGeneratorLeftRight(size float64, NumberCoordinates float64) (out []Coordinate) {
+	var tilt float64
+	var pan float64
+	tilt = 128
+	size = size * 2
+	if size > 255 {
+		size = 255
+	}
+	for pan = 0; pan < size; pan += (255 / NumberCoordinates) {
 		n := Coordinate{}
-		n.Tilt = tilt
-		n.Pan = pan
+		n.Tilt = int(tilt)
+		n.Pan = int(pan)
 		out = append(out, n)
 	}
 	return out

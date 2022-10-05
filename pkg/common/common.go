@@ -472,6 +472,28 @@ func HideSequence(selectedSequence int, commandChannels []chan Command) {
 // returns the color array
 func GetColorButtonsArray(color int) Color {
 
+	// if color > 10 && color < 20 {
+	// 	color = color - 10
+	// }
+	// if color > 20 && color < 30 {
+	// 	color = color - 20
+	// }
+	// if color > 30 && color < 40 {
+	// 	color = color - 30
+	// }
+	// if color > 40 && color < 50 {
+	// 	color = color - 40
+	// }
+	// if color > 50 && color < 60 {
+	// 	color = color - 50
+	// }
+	// if color > 60 && color < 70 {
+	// 	color = color - 60
+	// }
+	// if color > 70 && color < 80 {
+	// 	color = color - 70
+	// }
+
 	switch color {
 	case 0:
 		return Color{R: 255, G: 0, B: 0} // Red
@@ -553,7 +575,66 @@ func GetColorButtonsArray(color int) Color {
 		return Color{R: 255, G: 255, B: 255} // White
 	case 39:
 		return Color{R: 0, G: 0, B: 0} // Black
-
+	case 40:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 41:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 42:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 43:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 44:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 45:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 46:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 47:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 48:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 49:
+		return Color{R: 0, G: 0, B: 0} // Black
+	case 50:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 51:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 52:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 53:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 54:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 55:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 56:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 57:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 58:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 59:
+		return Color{R: 0, G: 0, B: 0} // Black
+	case 60:
+		return Color{R: 255, G: 0, B: 0} // Red
+	case 61:
+		return Color{R: 255, G: 111, B: 0} // Orange
+	case 62:
+		return Color{R: 255, G: 255, B: 0} // Yellow
+	case 63:
+		return Color{R: 0, G: 255, B: 0} // Green
+	case 64:
+		return Color{R: 0, G: 255, B: 255} // Cyan
+	case 65:
+		return Color{R: 0, G: 0, B: 255} // Blue
+	case 66:
+		return Color{R: 100, G: 0, B: 255} // Purple
+	case 67:
+		return Color{R: 255, G: 0, B: 255} // Pink
+	case 68:
+		return Color{R: 255, G: 255, B: 255} // White
+	case 69:
+		return Color{R: 0, G: 0, B: 0} // Black
 	}
 	return Color{}
 }

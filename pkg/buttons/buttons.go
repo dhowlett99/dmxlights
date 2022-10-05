@@ -29,7 +29,7 @@ type CurrentState struct {
 	ScannerSize              map[int]int                // current scanner size for all fixtures. Indexed by sequence
 	RGBFade                  map[int]int                // Indexed by sequence.
 	ScannerFade              map[int]int                // Indexed by sequence.
-	ScannerCoordinates       map[int]int                // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32, Indexed by sequence.
+	ScannerCoordinates       map[int]int                // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
 	Running                  map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
 	Strobe                   bool                       // We are in strobe mode. True if strobing
 	StrobeSpeed              int                        // Strobe speed. value is speed 0-255
@@ -958,8 +958,8 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.SelectedSequence]++
-			if this.ScannerCoordinates[this.SelectedSequence] > 3 {
-				this.ScannerCoordinates[this.SelectedSequence] = 3
+			if this.ScannerCoordinates[this.SelectedSequence] > 4 {
+				this.ScannerCoordinates[this.SelectedSequence] = 4
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
@@ -2639,6 +2639,9 @@ func getScannerCoordinatesLabel(shift int) string {
 
 	case shift == 3:
 		return "32"
+
+	case shift == 4:
+		return "64"
 
 	}
 	return ""
