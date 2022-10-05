@@ -1441,7 +1441,7 @@ func ProcessButtons(X int, Y int,
 			Args: []common.Arg{
 				{Name: "Static", Value: true},
 				{Name: "StaticLamp", Value: X},
-				{Name: "StaticLampFlash", Value: false},
+				{Name: "StaticLampFlash", Value: true},
 				{Name: "SelectedColor", Value: sequences[this.SelectedSequence].StaticColors[X].SelectedColor},
 				{Name: "StaticColor", Value: sequences[this.SelectedSequence].StaticColors[X].Color},
 			},

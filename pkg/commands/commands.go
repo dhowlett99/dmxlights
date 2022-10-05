@@ -252,6 +252,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
+		// turn all flashing off first.
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+			sequence.StaticColors[fixture].Flash = false
+		}
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].SelectedColor = command.Args[SELECTED_COLOR].Value.(int)
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
