@@ -287,10 +287,28 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.ClearStaticColor:
 		if debug {
-			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
+			fmt.Printf("%d: Command Clear Static Color \n", mySequenceNumber)
 		}
 		// Populate the static colors for this sequence with the defaults.
 		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
+		sequence.PlayStaticOnce = true
+		sequence.Static = true
+		sequence.Hide = true
+		return sequence
+
+	case common.SetStaticColorBar:
+		const SELECTED_COLOR = 0
+		if debug {
+			fmt.Printf("%d: Command Set Static Color Bar to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
+		}
+		// Find the color bar for this selection.
+		color := common.GetColorButtonsArray(command.Args[SELECTED_COLOR].Value.(int) - 1)
+		newStaticColor := common.StaticColorButton{
+			Color: color,
+		}
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+			sequence.StaticColors[fixture] = newStaticColor
+		}
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
 		sequence.Hide = true

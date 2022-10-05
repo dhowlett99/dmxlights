@@ -20,52 +20,52 @@ const (
 )
 
 type CurrentState struct {
-	SelectedSequence         int                     // The currently selected sequence.
-	LastSelectedSequence     int                     // Store fof the last selected squence.
-	Speed                    map[int]int             // Local copy of sequence speed. Indexed by sequence.
-	RGBShift                 map[int]int             // Current rgb fixture shift. Indexed by sequence.
-	ScannerShift             map[int]int             // Current scanner shift for all fixtures.  Indexed by sequence
-	RGBSize                  map[int]int             // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
-	ScannerSize              map[int]int             // current scanner size for all fixtures. Indexed by sequence
-	RGBFade                  map[int]int             // Indexed by sequence.
-	ScannerFade              map[int]int             // Indexed by sequence.
-	ScannerCoordinates       map[int]int             // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32, Indexed by sequence.
-	Running                  map[int]bool            // Which sequence is running. Indexed by sequence. True if running.
-	Strobe                   bool                    // We are in strobe mode. True if strobing
-	StrobeSpeed              int                     // Strobe speed. value is speed 0-255
-	SavePreset               bool                    // Save a preset flag.
-	Blackout                 bool                    // Blackout all fixtures.
-	Flood                    bool                    // Flood all fixtures.
-	FunctionSelectMode       []bool                  // Which sequence is in function selection mode.
-	SelectButtonPressed      []bool                  // Which sequence has its Select button pressed.
-	SwitchPositions          [9][9]int               // Sorage for switch positions.
-	EditSequenceColorsMode   []bool                  // This flag is true when the sequence is in sequence colors editing mode.
-	EditScannerColorsMode    []bool                  // This flag is true when the sequence is in select scanner colors editing mode.
-	EditGoboSelectionMode    []bool                  // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode     []bool                  // This flag is true when the sequence is in static colors editing mode.
-	EditPatternMode          []bool                  // This flag is true when the sequence is in pattern editing mode.
-	EditFixtureSelectionMode bool                    // This flag is true when the sequence is in select fixture mode.
-	MasterBrightness         int                     // Affects all DMX fixtures and launchpad lamps.
-	LastStaticColorButtonX   int                     // Which Static Color button did we change last.
-	LastStaticColorButtonY   int                     // Which Static Color button did we change last.
-	SoundGain                float32                 // Fine gain -0.09 -> 0.09
-	ScannerState             [][]common.ScannerState // Which fixture is enabled: bool and inverted: bool on which sequence.
-	SelectedFixture          int                     // Which fixture is selected when changing scanner color or gobo.
-	FollowingAction          string                  // String to find next function, used in selecting a fixture.
-
-	OffsetPan        int                        // Offset for Pan.
-	OffsetTilt       int                        // Offset for Tilt.
-	Pad              *mk3.Launchpad             // Pointer to the Novation Launchpad object.
-	PresetsStore     map[string]presets.Preset  // Storage for the Presets.
-	LastPreset       *string                    // Last preset used.
-	SoundTriggers    []*common.Trigger          // Pointer to the Sound Triggers.
-	SequenceChannels common.Channels            // Channles used to communicate with the sequence.
-	Patterns         map[int]common.Pattern     // A indexed map of the available patterns for this sequence.
-	ScannerPattern   int                        // The selected scanner pattern Number. Used as the index for above.
-	RGBPattern       int                        // The selected RGB pattern Number. Used as the index for above.
-	StaticButtons    []common.StaticColorButton // Storage for the color of the static buttons.
-	SelectedGobo     int                        // The selected GOBO.
-	ButtonTimer      *time.Time                 // Button Timer
+	SelectedSequence         int                        // The currently selected sequence.
+	LastSelectedSequence     int                        // Store fof the last selected squence.
+	Speed                    map[int]int                // Local copy of sequence speed. Indexed by sequence.
+	RGBShift                 map[int]int                // Current rgb fixture shift. Indexed by sequence.
+	ScannerShift             map[int]int                // Current scanner shift for all fixtures.  Indexed by sequence
+	RGBSize                  map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
+	ScannerSize              map[int]int                // current scanner size for all fixtures. Indexed by sequence
+	RGBFade                  map[int]int                // Indexed by sequence.
+	ScannerFade              map[int]int                // Indexed by sequence.
+	ScannerCoordinates       map[int]int                // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32, Indexed by sequence.
+	Running                  map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
+	Strobe                   bool                       // We are in strobe mode. True if strobing
+	StrobeSpeed              int                        // Strobe speed. value is speed 0-255
+	SavePreset               bool                       // Save a preset flag.
+	Blackout                 bool                       // Blackout all fixtures.
+	Flood                    bool                       // Flood all fixtures.
+	FunctionSelectMode       []bool                     // Which sequence is in function selection mode.
+	SelectButtonPressed      []bool                     // Which sequence has its Select button pressed.
+	SwitchPositions          [9][9]int                  // Sorage for switch positions.
+	EditSequenceColorsMode   []bool                     // This flag is true when the sequence is in sequence colors editing mode.
+	EditScannerColorsMode    []bool                     // This flag is true when the sequence is in select scanner colors editing mode.
+	EditGoboSelectionMode    []bool                     // This flag is true when the sequence is in sequence gobo selection mode.
+	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
+	EditPatternMode          []bool                     // This flag is true when the sequence is in pattern editing mode.
+	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
+	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
+	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
+	LastStaticColorButtonY   int                        // Which Static Color button did we change last.
+	SoundGain                float32                    // Fine gain -0.09 -> 0.09
+	ScannerState             [][]common.ScannerState    // Which fixture is enabled: bool and inverted: bool on which sequence.
+	SelectedFixture          int                        // Which fixture is selected when changing scanner color or gobo.
+	FollowingAction          string                     // String to find next function, used in selecting a fixture.
+	OffsetPan                int                        // Offset for Pan.
+	OffsetTilt               int                        // Offset for Tilt.
+	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
+	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
+	LastPreset               *string                    // Last preset used.
+	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
+	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
+	Patterns                 map[int]common.Pattern     // A indexed map of the available patterns for this sequence.
+	ScannerPattern           int                        // The selected scanner pattern Number. Used as the index for above.
+	RGBPattern               int                        // The selected RGB pattern Number. Used as the index for above.
+	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
+	SelectedGobo             int                        // The selected GOBO.
+	ButtonTimer              *time.Time                 // Button Timer
+	SelectColorBar           int                        // Storage for color bar in static color selection.
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -2335,11 +2335,34 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	if sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
 		sequences[this.SelectedSequence].Type != "scanner" {
 
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.ClearStaticColor,
+		// Back to the begining of the rotation.
+		if this.SelectColorBar > common.MaxColorBar {
+			this.SelectColorBar = 0
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// First press resets the colors to the default color bar.
+		if this.SelectColorBar == 0 {
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.ClearStaticColor,
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Rotate around solid colors.
+		if this.SelectColorBar > 0 {
+			// Clear the sequence colors for this sequence.
+			cmd := common.Command{
+				Action: common.SetStaticColorBar,
+				Args: []common.Arg{
+					{Name: "Selection", Value: this.SelectColorBar},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
+		// Now increment the color bar.
+		this.SelectColorBar++
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)

@@ -14,6 +14,7 @@ const DefaultScannerSize = 120
 const MaxScannerSize = 120
 const MaxRGBSize = 120
 const MaxRGBFade = 10
+const MaxColorBar = 9 // Eight colors and a default color bar.
 const DefaultPattern = 0
 const DefaultRGBSize = 1
 const DefaultRGBFade = 1
@@ -168,6 +169,7 @@ const (
 	UpdateScannerColor
 	ClearSequenceColor
 	ClearStaticColor
+	SetStaticColorBar
 	Static
 	MasterBrightness
 	UpdateNumberCoordinates
