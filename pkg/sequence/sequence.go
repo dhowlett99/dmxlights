@@ -406,6 +406,8 @@ func PlaySequence(sequence common.Sequence,
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
 					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+					sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
+					sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
 					sequence.UpdatePattern = false
 				}
 
@@ -532,7 +534,11 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// If we are setting the current colors in a rgb sequence.
-				if sequence.AutoColor && sequence.Type == "rgb" {
+				if sequence.AutoColor &&
+					sequence.Type == "rgb" &&
+					sequence.Pattern.Label != "Multi.Color" &&
+					sequence.Pattern.Label != "Color.Chase" {
+
 					// Find a new color.
 					newColor := []common.Color{}
 					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
