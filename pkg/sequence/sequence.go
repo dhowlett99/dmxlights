@@ -414,8 +414,13 @@ func PlaySequence(sequence common.Sequence,
 				// Setup scanner patterns.
 				if sequence.Type == "scanner" {
 
+					// Retrieve the scanner state.
+					sequence.ScannerStateMutex.RLock()
+					scannerState := sequence.ScannerState
+					sequence.ScannerStateMutex.RUnlock()
+
 					// Get available scanner patterns.
-					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence, scannerState)
 					sequence.UpdatePattern = false
 
 					sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
@@ -578,30 +583,32 @@ func PlaySequence(sequence common.Sequence,
 
 					for fixtureNumber, fixture := range fixtureStepChannels {
 
-						command := common.FixtureCommand{
-							Step:                   step,
-							StrobeSpeed:            sequence.StrobeSpeed,
-							Master:                 sequence.Master,
-							Blackout:               sequence.Blackout,
-							Hide:                   sequence.Hide,
-							Type:                   sequence.Type,
-							RGBPosition:            sequence.RGBPositions[step],
-							StartFlood:             sequence.StartFlood,
-							StopFlood:              sequence.StopFlood,
-							SequenceNumber:         sequence.Number,
-							ScannerPosition:        sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
-							ScannerSelectedGobo:    sequence.ScannerGobo,
-							ScannerState:           scannerState,
-							ScannerDisableOnce:     disabledOnce,
-							ScannerChase:           sequence.ScannerChase,
-							ScannerColor:           sequence.ScannerColor,
-							ScannerAvailableColors: sequence.ScannerAvailableColors,
-							ScannerOffsetPan:       sequence.ScannerOffsetPan,
-							ScannerOffsetTilt:      sequence.ScannerOffsetTilt,
-						}
+						if scannerState[fixtureNumber].Enabled {
+							command := common.FixtureCommand{
+								Step:                   step,
+								StrobeSpeed:            sequence.StrobeSpeed,
+								Master:                 sequence.Master,
+								Blackout:               sequence.Blackout,
+								Hide:                   sequence.Hide,
+								Type:                   sequence.Type,
+								RGBPosition:            sequence.RGBPositions[step],
+								StartFlood:             sequence.StartFlood,
+								StopFlood:              sequence.StopFlood,
+								SequenceNumber:         sequence.Number,
+								ScannerPosition:        sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
+								ScannerSelectedGobo:    sequence.ScannerGobo,
+								ScannerState:           scannerState,
+								ScannerDisableOnce:     disabledOnce,
+								ScannerChase:           sequence.ScannerChase,
+								ScannerColor:           sequence.ScannerColor,
+								ScannerAvailableColors: sequence.ScannerAvailableColors,
+								ScannerOffsetPan:       sequence.ScannerOffsetPan,
+								ScannerOffsetTilt:      sequence.ScannerOffsetTilt,
+							}
 
-						// Start the fixture group.
-						fixture <- command
+							// Start the fixture group.
+							fixture <- command
+						}
 					}
 				}
 			}
@@ -1301,13 +1308,13 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 // getAvailableScannerPattens generates scanner patterns and stores them in the sequence.
 // Each scanner can then select which pattern to use.
 // All scanner patterns have the same number of steps defined by NumberCoordinates.
-func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern {
+func getAvailableScannerPattens(sequence common.Sequence, scannerState map[int]common.ScannerState) map[int]common.Pattern {
 
 	scannerPattens := make(map[int]common.Pattern)
 
 	// Scanner circle pattern 0
 	coordinates := pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetPan), float64(sequence.ScannerOffsetTilt))
-	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, scannerState)
 	circlePatten.Name = "circle"
 	circlePatten.Number = 0
 	circlePatten.Label = "Circle"
@@ -1315,7 +1322,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// Scanner left right pattern 1
 	coordinates = pattern.ScanGeneratorLeftRight(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, scannerState)
 	leftRightPatten.Name = "leftright"
 	leftRightPatten.Number = 1
 	leftRightPatten.Label = "Left.Right"
@@ -1323,7 +1330,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// // Scanner up down pattern 2
 	coordinates = pattern.ScanGeneratorUpDown(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, scannerState)
 	upDownPatten.Name = "updown"
 	upDownPatten.Number = 2
 	upDownPatten.Label = "Up.Down"
@@ -1331,7 +1338,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// // Scanner zig zag pattern 3
 	coordinates = pattern.ScanGenerateSineWave(float64(sequence.ScannerSize), 5000, float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase)
+	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, scannerState)
 	zigZagPatten.Name = "zigzag"
 	zigZagPatten.Number = 3
 	zigZagPatten.Label = "Zig.Zag"

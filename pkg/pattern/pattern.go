@@ -645,7 +645,7 @@ type scanner struct {
 
 // GeneratePattern takes an array of Coordinates and turns them into a pattern
 // which is the starting point for all sequence steps.
-func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool) common.Pattern {
+func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState map[int]common.ScannerState) common.Pattern {
 
 	NumberCoordinates := len(Coordinates)
 
@@ -739,7 +739,9 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		for fixture := 0; fixture < NumberFixtures; fixture++ {
 
 			if chase { // Flash the scanners in order.
-				shutterValue = CalulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates, false)
+				if scannerState[fixture].Enabled {
+					shutterValue = CalulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates, false)
+				}
 			} else {
 				shutterValue = 255 // Otherwise just turn on every scanner
 			}
@@ -758,11 +760,23 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 			fixtures = append(fixtures, newFixture)
 		}
 
-		newStep := common.Step{
-			Type:     "scanner",
-			Fixtures: fixtures,
+		// In chase mode, steps without any shutter vales need to be excluded.
+		var addStep bool
+		if chase {
+			for _, fixture := range fixtures {
+				if fixture.Shutter > 0 {
+					addStep = true
+				}
+			}
 		}
-		steps = append(steps, newStep)
+		if !chase || addStep {
+			newStep := common.Step{
+				Type:     "scanner",
+				Fixtures: fixtures,
+			}
+			steps = append(steps, newStep)
+		}
+
 		pattern.Steps = steps
 	}
 	return pattern

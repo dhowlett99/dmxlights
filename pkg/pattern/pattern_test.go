@@ -78,18 +78,48 @@ func Test_circleGenerator(t *testing.T) {
 }
 
 func Test_generatePattern(t *testing.T) {
+
+	allFixturesEnabled := map[int]common.ScannerState{
+		0: {
+			Enabled: true,
+		},
+		1: {
+			Enabled: true,
+		},
+		2: {
+			Enabled: true,
+		},
+		3: {
+			Enabled: true,
+		},
+		4: {
+			Enabled: true,
+		},
+		5: {
+			Enabled: true,
+		},
+		6: {
+			Enabled: true,
+		},
+		7: {
+			Enabled: true,
+		},
+	}
+
 	tests := []struct {
-		name        string
-		fixtures    int
-		shift       int
-		chase       bool
-		Coordinates []Coordinate
-		want        common.Pattern
+		name         string
+		fixtures     int
+		shift        int
+		chase        bool
+		scannerState map[int]common.ScannerState
+		Coordinates  []Coordinate
+		want         common.Pattern
 	}{
 		{
-			name:     "circle pattern - 8 point , no shift",
-			fixtures: 1,
-			shift:    0,
+			name:         "circle pattern - 8 point , no shift",
+			fixtures:     1,
+			shift:        0,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -178,9 +208,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "two fixtures, circle pattern - 8 point , with shift of 1/4",
-			fixtures: 2,
-			shift:    1,
+			name:         "two fixtures, circle pattern - 8 point , with shift of 1/4",
+			fixtures:     2,
+			shift:        1,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -277,9 +308,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "two fixtures, circle pattern - 8 point , with shift of zero",
-			fixtures: 2,
-			shift:    0,
+			name:         "two fixtures, circle pattern - 8 point , with shift of zero",
+			fixtures:     2,
+			shift:        0,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -376,10 +408,11 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle pattern - 8 point , with shift of 1/4 and chase turned on",
-			fixtures: 4,
-			shift:    1,
-			chase:    true,
+			name:         "four fixtures, circle pattern - 8 point , with shift of 1/4 and chase turned on",
+			fixtures:     4,
+			shift:        1,
+			scannerState: allFixturesEnabled,
+			chase:        true,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -492,9 +525,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "one fixture, circle pattern - 8 point shift of 1/4 ",
-			fixtures: 1,
-			shift:    1,
+			name:         "one fixture, circle pattern - 8 point shift of 1/4 ",
+			fixtures:     1,
+			shift:        1,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -583,9 +617,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "two scanners doing the same circle",
-			fixtures: 2,
-			shift:    0,
+			name:         "two scanners doing the same circle",
+			fixtures:     2,
+			shift:        0,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -627,9 +662,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle pattern - 8 point , with shift of 2 ie 1/2",
-			fixtures: 4,
-			shift:    2,
+			name:         "four fixtures, circle pattern - 8 point , with shift of 2 ie 1/2",
+			fixtures:     4,
+			shift:        2,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -742,9 +778,10 @@ func Test_generatePattern(t *testing.T) {
 			},
 		},
 		{
-			name:     "four fixtures, circle pattern - 8 point , with shift of 3 ie 3/4 shift",
-			fixtures: 4,
-			shift:    3,
+			name:         "four fixtures, circle pattern - 8 point , with shift of 3 ie 3/4 shift",
+			fixtures:     4,
+			shift:        3,
+			scannerState: allFixturesEnabled,
 			Coordinates: []Coordinate{
 				{
 					Tilt: 0,
@@ -859,7 +896,7 @@ func Test_generatePattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase, tt.scannerState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %+v", got)
 				t.Errorf("Want = %+v", tt.want)
 			}
@@ -880,7 +917,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 		{
 			name: "5000hz sawtooth",
 			args: args{
-				size:      255,
+				size:      128,
 				frequency: 5000,
 			},
 			wantOut: []Coordinate{
