@@ -208,7 +208,7 @@ type Sequence struct {
 	Number                     int                         // Sequence number.
 	Run                        bool                        // True if this sequence is running.
 	Bounce                     bool                        // True if this sequence is bouncing.
-	Invert                     bool                        // True if RGB sequence patten is inverted.
+	RGBInvert                  bool                        // True if RGB sequence patten is inverted.
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
@@ -472,28 +472,6 @@ func HideSequence(selectedSequence int, commandChannels []chan Command) {
 // returns the color array
 func GetColorButtonsArray(color int) Color {
 
-	// if color > 10 && color < 20 {
-	// 	color = color - 10
-	// }
-	// if color > 20 && color < 30 {
-	// 	color = color - 20
-	// }
-	// if color > 30 && color < 40 {
-	// 	color = color - 30
-	// }
-	// if color > 40 && color < 50 {
-	// 	color = color - 40
-	// }
-	// if color > 50 && color < 60 {
-	// 	color = color - 50
-	// }
-	// if color > 60 && color < 70 {
-	// 	color = color - 60
-	// }
-	// if color > 70 && color < 80 {
-	// 	color = color - 70
-	// }
-
 	switch color {
 	case 0:
 		return Color{R: 255, G: 0, B: 0} // Red
@@ -733,10 +711,14 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	}
 
 	// Map RGB invert function.
-	sequence.Invert = sequence.Functions[Function7_Invert_Chase].State
+	if sequence.Type == "rgb" {
+		sequence.RGBInvert = sequence.Functions[Function7_Invert_Chase].State
+	}
 
 	// Map scanner chase mode. Uses same function key as above.
-	sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
+	if sequence.Type == "scanner" {
+		sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
+	}
 
 	// Map music trigger function.
 	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State

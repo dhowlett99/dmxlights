@@ -1632,12 +1632,12 @@ func TestCalculatePositions(t *testing.T) {
 				slopeOn:  []int{255},
 				slopeOff: []int{0},
 				sequence: common.Sequence{
-					Type:     "Scanner",
-					Bounce:   false,
-					Invert:   false,
-					RGBShift: 0,
-					RGBSize:  255,
-					RGBFade:  10,
+					Type:      "Scanner",
+					Bounce:    false,
+					RGBInvert: false,
+					RGBShift:  0,
+					RGBSize:   255,
+					RGBFade:   10,
 					Steps: []common.Step{
 						{
 							Fixtures: []common.Fixture{

@@ -653,6 +653,7 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		fmt.Printf("Number Fixtures %d\n", NumberFixtures)
 		fmt.Printf("Number Coordinates %d\n", NumberCoordinates)
 	}
+
 	// First create the pattern.
 	pattern := common.Pattern{}
 
@@ -763,8 +764,8 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		// In chase mode, steps without any shutter vales need to be excluded.
 		var addStep bool
 		if chase {
-			for _, fixture := range fixtures {
-				if fixture.Shutter > 0 {
+			for fixtureNumber := range fixtures {
+				if scannerState[fixtureNumber].Enabled {
 					addStep = true
 				}
 			}
@@ -785,6 +786,10 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 func CalulateShutterValue(currentCoordinate int, fixture int, NumberFixtures int, NumberCoordinates int, bounce bool) int {
 
 	howOften := NumberCoordinates / NumberFixtures
+
+	if howOften == 0 {
+		howOften = 1
+	}
 
 	if currentCoordinate/howOften == fixture {
 		return 255

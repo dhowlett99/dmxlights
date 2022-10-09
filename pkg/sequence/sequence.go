@@ -82,9 +82,16 @@ func CreateSequence(
 	availableFixtures := setAvalableFixtures(fixturesConfig)
 
 	fixtureLabels := []string{}
+	shutterAddress := make(map[int]int16)
+
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "scanner" {
 			fixtureLabels = append(fixtureLabels, fixture.Label)
+			for channelNumber, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Shutter") {
+					shutterAddress[fixture.Number] = fixture.Address + int16(channelNumber)
+				}
+			}
 		}
 	}
 
@@ -288,7 +295,6 @@ func PlaySequence(sequence common.Sequence,
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
-
 	for {
 		sequence.UpdateShift = false
 
@@ -500,7 +506,7 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				if sequence.Invert && sequence.Type == "rgb" {
+				if sequence.RGBInvert && sequence.Type == "rgb" {
 					patterns := pattern.MakePatterns()
 					sequence.Steps = invertRGBColors(patterns[sequence.SelectedPattern].Steps, common.HowManyStepColors(patterns[sequence.SelectedPattern].Steps))
 				}
@@ -743,7 +749,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						// make space for a colored lamp.
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
 								newColor := common.FixtureBuffer{}
@@ -777,7 +783,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 							}
 						}
 					} else {
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
 							for range slopeOff {
@@ -842,7 +848,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						// make space for a colored lamp.
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
 								newColor := common.FixtureBuffer{}
@@ -876,7 +882,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 							}
 						}
 					} else {
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
 							for range slopeOff {
@@ -935,7 +941,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 
 					if color.R > 0 || color.G > 0 || color.B > 0 {
 						// make space for a colored lamp.
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
 								newColor := common.FixtureBuffer{}
@@ -969,7 +975,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 							}
 						}
 					} else {
-						if !sequence.Invert {
+						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
 							for range slopeOff {
@@ -1065,7 +1071,7 @@ func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 
 			// Optimisation is applied in this step. We only play out off's to the universe if the lamp is already on.
 			// And in the case of inverted playout only colors if the lamp is already on.
-			if !sequence.Invert {
+			if !sequence.RGBInvert {
 				// We've found a color.
 				if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 {
 					newFixture.Colors = append(newFixture.Colors, newColor)
