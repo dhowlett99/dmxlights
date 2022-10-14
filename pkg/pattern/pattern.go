@@ -654,15 +654,12 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		fmt.Printf("Number Coordinates %d\n", NumberCoordinates)
 	}
 
-	// First create the pattern.
-	pattern := common.Pattern{}
-
-	steps := []common.Step{}
-
 	// Storage space for the fixtures
 	scanners := []scanner{}
 
-	// First generate the values for all posible fixtures ie 8
+	// First generate the values for all posible fixtures ie assune 8 scanner, split into two pieces.
+	// This because we can only shift by four quaters of the scan.
+	// First four,
 	for fixture := 0; fixture < 4; fixture++ {
 
 		// new scanner
@@ -694,6 +691,8 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		scanners = append(scanners, s)
 	}
 
+	// Second four.
+	// But the same four quaters as the first pass.
 	for fixture := 0; fixture < 4; fixture++ {
 
 		// new scanner
@@ -731,75 +730,113 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		}
 	}
 
+	// Last phase is to create the actaual steps for the pattern.
+
+	// First create the actual pattern.
+	pattern := common.Pattern{}
+	// And then the array for the steps.
+	steps := []common.Step{}
 	var shutterValue int
+	var scannerChaseSequenceNumber int
+
+	// Should we turn on the shutter at this position?
+	// If all the scanners are enabled it's a straight forward task to switch them on in order.
+	// But if some are disabled, then we need to sequence only the enabled scanners.
+	// So first we make a list of the enabled scanners and place them in an array for easy access.
+	numberEnabledScanners := getNumberEnabledScanners(scannerState, NumberFixtures)
+	enabledScannersList := makeEnabledScannerList(scannerState, NumberCoordinates, numberEnabledScanners, NumberFixtures)
+
 	// Now create the steps in the pattern.
+	// Now using the actual number of scanners.
 	for stepNumber := 0; stepNumber < NumberCoordinates; stepNumber++ {
 
+		fmt.Printf("Step %d\n", stepNumber)
+
+		// Make space for the fixtures.
 		fixtures := []common.Fixture{}
 
-		for fixture := 0; fixture < NumberFixtures; fixture++ {
+		if scannerChaseSequenceNumber >= len(enabledScannersList) {
+			scannerChaseSequenceNumber = 0
+		}
 
-			if chase { // Flash the scanners in order.
-				if scannerState[fixture].Enabled {
-					shutterValue = CalulateShutterValue(stepNumber, fixture, NumberFixtures, NumberCoordinates, false)
+		// Now add the fixtures.
+		for fixture := 0; fixture < NumberFixtures; fixture++ {
+			shutterValue = 255 // Assume no chase so just turn on every scanner.
+
+			if chase {
+				if enabledScannersList[scannerChaseSequenceNumber] == fixture {
+					shutterValue = 255
+				} else {
+					shutterValue = 0
 				}
-			} else {
-				shutterValue = 255 // Otherwise just turn on every scanner
 			}
 
 			newFixture := common.Fixture{
 				Type:         "scanner",
 				MasterDimmer: full,
+				// Apply a color to represent each position in the pattern.
 				Colors: []common.Color{
 					common.GetColorButtonsArray(scanners[fixture].values[stepNumber]),
 				},
-				Pan:     Coordinates[scanners[fixture].values[stepNumber]].Pan,
-				Tilt:    Coordinates[scanners[fixture].values[stepNumber]].Tilt,
-				Shutter: shutterValue,
-				Gobo:    36,
+				Pan:          Coordinates[scanners[fixture].values[stepNumber]].Pan,
+				Tilt:         Coordinates[scanners[fixture].values[stepNumber]].Tilt,
+				ScannerColor: common.Color{R: 255, G: 255, B: 255}, // White
+				Shutter:      shutterValue,
+				Gobo:         0, // First gobo is usually open, TODO find this out in the config.
 			}
 			fixtures = append(fixtures, newFixture)
 		}
+		scannerChaseSequenceNumber++
 
-		// In chase mode, steps without any shutter vales need to be excluded.
-		var addStep bool
-		if chase {
-			for fixtureNumber := range fixtures {
-				if scannerState[fixtureNumber].Enabled {
-					addStep = true
-				}
-			}
+		newStep := common.Step{
+			Type:     "scanner",
+			Fixtures: fixtures,
 		}
-		if !chase || addStep {
-			newStep := common.Step{
-				Type:     "scanner",
-				Fixtures: fixtures,
-			}
-			steps = append(steps, newStep)
-		}
-
+		steps = append(steps, newStep)
 		pattern.Steps = steps
 	}
+
 	return pattern
-}
-
-func CalulateShutterValue(currentCoordinate int, fixture int, NumberFixtures int, NumberCoordinates int, bounce bool) int {
-
-	howOften := NumberCoordinates / NumberFixtures
-
-	if howOften == 0 {
-		howOften = 1
-	}
-
-	if currentCoordinate/howOften == fixture {
-		return 255
-	}
-	return 0
 }
 
 type Coordinate struct {
 	Tilt int
 	Pan  int
+}
+
+func getNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOfFixtures int) int {
+
+	var getNumberEnabledScanners int
+	for fixture := 0; fixture < numberOfFixtures; fixture++ {
+		if scannerState[fixture].Enabled {
+			getNumberEnabledScanners++
+		}
+	}
+	return getNumberEnabledScanners
+}
+
+func makeEnabledScannerList(scannerState map[int]common.ScannerState, NumberCoordinates int, numberEnabledScanners, numberScanners int) []int {
+
+	enabledScannerList := []int{}
+
+	size := findStepSize(NumberCoordinates, numberEnabledScanners)
+
+	for fixture := 0; fixture < numberScanners; fixture++ {
+		if scannerState[fixture].Enabled {
+			for s := 0; s < size; s++ {
+				enabledScannerList = append(enabledScannerList, fixture)
+			}
+		}
+	}
+	return enabledScannerList
+}
+
+func findStepSize(NumberCoordinates int, numberEnabledScanners int) int {
+
+	actualNumberCoodinates := float64(NumberCoordinates)
+	acutalnumberEnabledScanners := float64(numberEnabledScanners)
+
+	return int(math.Round(actualNumberCoodinates / acutalnumberEnabledScanners))
 }
 
 func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []Coordinate) {
