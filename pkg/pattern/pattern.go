@@ -750,8 +750,6 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 	// Now using the actual number of scanners.
 	for stepNumber := 0; stepNumber < NumberCoordinates; stepNumber++ {
 
-		fmt.Printf("Step %d\n", stepNumber)
-
 		// Make space for the fixtures.
 		fixtures := []common.Fixture{}
 
