@@ -896,7 +896,7 @@ func Test_generatePattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase, tt.scannerState); !reflect.DeepEqual(got, tt.want) {
+			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase, allFixturesEnabled); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %+v", got)
 				t.Errorf("Want = %+v", tt.want)
 			}
@@ -959,45 +959,40 @@ func TestScanGenerateSineWave(t *testing.T) {
 	}
 }
 
-func Test_calulateShutterValue(t *testing.T) {
+func Test_getEnabledScanner(t *testing.T) {
 	type args struct {
-		currentCoordinate int
-		currentStep       int
-		bounce            bool
-		NumberFixtures    int
-		NumberCoordinates int
+		scannerState          map[int]common.ScannerState
+		numberCoordinates     int
+		numberEnabledScanners int
 	}
 	tests := []struct {
 		name string
 		args args
-		want int
+		want []int
 	}{
 		{
-			name: "golden path",
+			name: "test 8 scanners 3 disabled",
 			args: args{
-				bounce:            false,
-				currentCoordinate: 0,
-				currentStep:       0,
-				NumberFixtures:    8,
-				NumberCoordinates: 8,
+				scannerState: map[int]common.ScannerState{
+					0: {Enabled: false, Inverted: false},
+					1: {Enabled: false, Inverted: false},
+					2: {Enabled: false, Inverted: false},
+					3: {Enabled: true, Inverted: false},
+					4: {Enabled: true, Inverted: false},
+					5: {Enabled: true, Inverted: false},
+					6: {Enabled: true, Inverted: false},
+					7: {Enabled: true, Inverted: false},
+				},
+				numberCoordinates:     64,
+				numberEnabledScanners: 5,
 			},
-			want: 255,
-		},
-		{
-			name: "golden path",
-			args: args{
-				currentCoordinate: 8,
-				currentStep:       0,
-				NumberFixtures:    8,
-				NumberCoordinates: 8,
-			},
-			want: 0,
+			want: []int{3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 3, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 4, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 5, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7, 7},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := CalulateShutterValue(tt.args.currentCoordinate, tt.args.currentStep, tt.args.NumberFixtures, tt.args.NumberCoordinates, tt.args.bounce); got != tt.want {
-				t.Errorf("calulateShutterValue() = %v, want %v", got, tt.want)
+			if got := makeEnabledScannerList(tt.args.scannerState, tt.args.numberCoordinates, tt.args.numberEnabledScanners, 8); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("getEnabledScanner() = %v, want %v", got, tt.want)
 			}
 		})
 	}

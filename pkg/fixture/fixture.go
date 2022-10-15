@@ -467,7 +467,7 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	}
 	// A map of the fixture colors.
 	cmd.ScannerColor = make(map[int]int)
-	cmd.ScannerColor[myFixtureNumber] = findColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
+	cmd.ScannerColor[myFixtureNumber] = FindColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
 
 	red := 255
 	green := 255
@@ -475,14 +475,15 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	pan := 128
 	tilt := 128
 	shutter := 255
-	gobo := findGobo(myFixtureNumber, mySequenceNumber, "Open", fixtures)
+	gobo := FindGobo(myFixtureNumber, mySequenceNumber, "Open", fixtures)
 	brightness := 255
 	master := 255
 
 	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, pan, tilt, shutter, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed)
 }
 
-func findGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
+// findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
+func FindGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, channel := range fixture.Channels {
@@ -502,7 +503,8 @@ func findGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fi
 	return 0
 }
 
-func findColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures, scannerColors map[int]int) int {
+// FindColor takes the name of a color channel setting like "White" and returns the color number for this type of scanner.
+func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures, scannerColors map[int]int) int {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, channel := range fixture.Channels {
