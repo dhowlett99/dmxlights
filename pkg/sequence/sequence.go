@@ -507,11 +507,6 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				if sequence.RGBInvert && sequence.Type == "rgb" {
-					patterns := pattern.MakePatterns()
-					sequence.Steps = invertRGBColors(patterns[sequence.SelectedPattern].Steps, common.HowManyStepColors(patterns[sequence.SelectedPattern].Steps))
-				}
-
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
 					slopeOn, slopeOff := calculateFadeValues(sequence.RGBFade, sequence.RGBSize)
@@ -568,6 +563,11 @@ func PlaySequence(sequence common.Sequence,
 					sequence.RGBPositions = replaceColors(sequence.RGBPositions, sequence.SequenceColors)
 				}
 
+				if sequence.RGBInvert {
+					sequence.SequenceColors = common.HowManyColors(sequence.RGBPositions)
+					sequence.RGBPositions = invertRGBcolorsInPositions(sequence.RGBPositions, sequence.SequenceColors)
+				}
+
 				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
 				// with the colors from that pattern.
 				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
@@ -593,7 +593,6 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					for fixtureNumber, fixture := range fixtureStepChannels {
-
 						if scannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
 								Step:                   step,
@@ -1185,6 +1184,44 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 	return steps
 }
 
+func invertRGBcolorsInPositions(positions map[int]common.Position, colors []common.Color) map[int]common.Position {
+
+	var insertColor int
+	numberColors := len(colors)
+	numberPositions := len(positions)
+
+	for positionNumber := 0; positionNumber < numberPositions; positionNumber++ {
+		position := positions[positionNumber]
+		for fixtureNumber, fixture := range position.Fixtures {
+			for colorNumber, color := range fixture.Colors {
+				// found a color.
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					// insert a black.
+					position.Fixtures[fixtureNumber].Colors[colorNumber] = common.Color{
+						R: 0,
+						G: 0,
+						B: 0,
+					}
+					insertColor++
+					continue
+				}
+				// found a black.
+				if color.R == 0 && color.G == 0 && color.B == 0 {
+					// insert one of the colors from the sequence.
+					if insertColor >= numberColors {
+						insertColor = 0
+					}
+					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
+					insertColor++
+					continue
+				}
+			}
+		}
+	}
+
+	return positions
+}
+
 // replaceColors can take a sequence and replace its current pattern colors with the colors specified.
 func replaceColors(positionsMap map[int]common.Position, colors []common.Color) map[int]common.Position {
 
@@ -1197,7 +1234,6 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 		if insertColor >= numberColors {
 			insertColor = 0
 		}
-		//fmt.Printf("Insert color %+v\n", colors[insertColor])
 		for fixtureNumber, fixture := range position.Fixtures {
 			for colorNumber, color := range fixture.Colors {
 				if color.R > 0 || color.G > 0 || color.B > 0 {
