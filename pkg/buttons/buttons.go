@@ -2501,9 +2501,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Tell the sequence to disable all the scanners.
 		if sequence.Type == "scanner" {
-			// Disable all scanners.
+			// Enable all scanners.
 			for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
-				this.ScannerState[scannerNumber][sequence.Number].Enabled = false
+				this.ScannerState[scannerNumber][sequence.Number].Enabled = true
 				this.ScannerState[scannerNumber][sequence.Number].Inverted = false
 			}
 			cmd := common.Command{
