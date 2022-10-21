@@ -14,21 +14,49 @@ const sampleRate = 44100
 var gainSelected = 4
 var gainCounters = make([]int, 10)
 
-func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) {
+type SoundConfig struct {
+	deviceName      string
+	availableInputs []string
+	stream          *portaudio.Stream
+	BPMChannel      chan bool
+	soundTriggers   []*common.Trigger
+	channels        common.Channels
+	gainSelected    int
+	gainCounters    []int
+	inputChannels   []*portaudio.HostApiInfo
+	stopChannel     chan bool
+	// Franework variables for the BPM Analyser.
+	BPMtimer         *time.Timer
+	BPMcounter       int
+	BPMactualCounter int
+	BPMsecondUp      bool
+}
 
-	BPMChannel := make(chan bool)
+func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) *SoundConfig {
+
+	soundConfig := SoundConfig{}
+	soundConfig.stopChannel = make(chan bool)
+	soundConfig.channels = channels
+	soundConfig.gainSelected = gainSelected
+	soundConfig.gainCounters = gainCounters
+	soundConfig.soundTriggers = soundTriggers
+	soundConfig.BPMChannel = make(chan bool)
+
+	soundConfig.getAvailableInputs()
+
+	soundConfig.StartSoundConfig("Built-in Microphone")
+
+	return &soundConfig
+
+}
+
+func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
+
+	fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
+
+	soundConfig.deviceName = deviceName
 
 	go func() {
-
-		// Franework variables for the BPM Analyser.
-		var BPMtimer *time.Timer
-		var BPMcounter int
-		var BPMactualCounter int
-		var BPMsecondUp bool
-
-		gain := []float32{0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15}
-
-		fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
 
 		err := portaudio.Initialize()
 		if err != nil {
@@ -36,88 +64,128 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 		}
 
 		defer portaudio.Terminate()
-		// Making the buffer bigger makes the music trigger have less latency.
-		in := make([]float32, 128)
+
+		in := make([]float32, 128) // Making the buffer bigger makes the music trigger have less latency.
 		out := make([]float32, 128)
-		stream, err := portaudio.OpenDefaultStream(1, 0, sampleRate, len(in), in)
-		if err != nil {
-			fmt.Printf("error: portaudio: failed to open default stream \n")
+		gain := []float32{0.05, 0.06, 0.07, 0.08, 0.09, 0.1, 0.11, 0.12, 0.13, 0.14, 0.15}
+
+		if deviceName == "Built-in Microphone" {
+			// Open the default input stream.
+			soundConfig.stream, err = portaudio.OpenDefaultStream(1, 0, sampleRate, len(in), in)
+			if err != nil {
+				fmt.Printf("error: portaudio: failed to open default stream \n")
+			}
+		} else {
+			inputChannels, err := portaudio.HostApis()
+			if err != nil {
+				fmt.Printf("error: portaudio: failed to list input channels \n")
+			}
+			for _, inputChannel := range inputChannels {
+				fmt.Printf("New Input Channel %v\n", *inputChannel)
+
+				for _, device := range inputChannel.Devices {
+					if device.MaxInputChannels > 0 {
+						if device.Name == deviceName {
+							fmt.Printf("FOund device %s\n", device.Name)
+							p := portaudio.HighLatencyParameters(device, nil)
+							fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
+							p.Input.Channels = device.MaxInputChannels
+							fmt.Printf("Output.Channels %d\n", device.MaxOutputChannels)
+							p.Output.Channels = device.MaxOutputChannels
+							fmt.Printf("SampleRate %f\n", device.DefaultSampleRate)
+							p.SampleRate = device.DefaultSampleRate
+							p.FramesPerBuffer = len(in)
+							soundConfig.stream, err = portaudio.OpenStream(p, in)
+							if err != nil {
+								fmt.Printf("error: portaudio: failed to open stream %s\n", device.Name)
+							}
+						}
+					}
+				}
+			}
 		}
 
 		// Start listening on the microphone input.
-		stream.Start()
+		soundConfig.stream.Start()
 		if err != nil {
 			fmt.Printf("error: portaudio: failed to start stream\n")
 		}
 
-		defer stream.Close()
+		defer soundConfig.stream.Close()
 
 		numSamples := 10
 
 		// Start the thread that reports the gain.
-		go gainChecker()
+		go soundConfig.gainChecker()
 
 		// Start a 20 second timer.
 		// And count the beats received in 20 seconds. Multiply by 3 to get beats per minute.
-		BPMtimer = time.NewTimer(20 * time.Second)
+		soundConfig.BPMtimer = time.NewTimer(20 * time.Second)
 
 		// A very simple Beat counter which needs more work to be a real BPM.
 		// List for the timer to finish and then report the number of beats.
 		go func() {
 			for {
 				select {
-				case <-BPMChannel:
-					BPMcounter++
+				case <-soundConfig.BPMChannel:
+					soundConfig.BPMcounter++
 					continue
-				case <-BPMtimer.C:
-					BPMsecondUp = true
-					BPMactualCounter = BPMcounter
+				case <-soundConfig.BPMtimer.C:
+					soundConfig.BPMsecondUp = true
+					soundConfig.BPMactualCounter = soundConfig.BPMcounter
 				}
 			}
 		}()
 
 		for {
-			stream.Read()
-			if err != nil {
-				fmt.Printf("error: portaudio: failed to read audio stream\n")
+			// We need a way to shutdown the sound trigger subsystem when we switch
+			// audio inputs in the settings dialog box.
+			select {
+			case <-soundConfig.stopChannel:
+				return
+			case <-time.After(1 * time.Millisecond):
 			}
+
+			// Read from the input stream.
+			soundConfig.stream.Read()
 
 			// Implenent a 800Hz low pass filter.
 			cutoff := float32(800)
 
 			// Now loop getting beats from portaudio.
 			for i := 1; i < numSamples; i++ {
-				out[i] = in[i-1] + filter(cutoff)*in[i] - in[i-1]
+
+				out[i] = in[i-1] + soundConfig.filter(cutoff)*in[i] - in[i-1]
 
 				// Tell the automatic gain control what level we're at.
-				reportLevels(out[i], soundTriggers)
+				soundConfig.reportLevels(out[i], soundConfig.soundTriggers)
 
 				// Allow fine adjustment.
-				actualGain := gain[gainSelected] + soundTriggers[0].Gain
+				actualGain := gain[gainSelected] + soundConfig.soundTriggers[0].Gain
 
 				if out[i] > actualGain {
 
 					// Send a message to BPM counter.
-					BPMChannel <- true
+					soundConfig.BPMChannel <- true
 
 					// If the BPM sample time is up, then we restart counters here.
-					if BPMsecondUp {
-						BPMcounter = 0
-						BPMsecondUp = false
-						BPMtimer = time.NewTimer(20 * time.Second)
+					if soundConfig.BPMsecondUp {
+						soundConfig.BPMcounter = 0
+						soundConfig.BPMsecondUp = false
+						soundConfig.BPMtimer = time.NewTimer(20 * time.Second)
 					}
 
 					cmd := common.Command{}
-					for index, trigger := range soundTriggers {
+					for index, trigger := range soundConfig.soundTriggers {
 						if trigger.SequenceNumber == index {
 							if trigger.State {
 								if debug {
 									fmt.Printf("%d: Index %d Gain %f   State %t  \n", trigger.SequenceNumber, index, trigger.Gain, trigger.State)
 								}
-								channels.SoundTriggerChannels[index] <- cmd
+								soundConfig.channels.SoundTriggerChannels[index] <- cmd
 							}
 							// Remember the BPM valuse so they don't get overwritten.
-							trigger.BPM = BPMactualCounter
+							trigger.BPM = soundConfig.BPMactualCounter
 						}
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
@@ -128,7 +196,52 @@ func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) 
 	}()
 }
 
-func gainChecker() {
+func (soundConfig *SoundConfig) GetDeviceName() string {
+	return soundConfig.deviceName
+}
+
+func (soundConfig *SoundConfig) getAvailableInputs() {
+
+	// Fire up the audio subsystem just to find the number of audio inputs.
+	err := portaudio.Initialize()
+	if err != nil {
+		fmt.Printf("error: portaudio: failed to initialise portaudio\n")
+	}
+
+	soundConfig.inputChannels, err = portaudio.HostApis()
+	if err != nil {
+		fmt.Printf("error: portaudio: failed to list input channels \n")
+	}
+
+	for _, inputChannel := range soundConfig.inputChannels {
+		fmt.Printf("inputChannel %v\n", *inputChannel)
+
+		for _, device := range inputChannel.Devices {
+			if device.MaxInputChannels > 0 {
+				fmt.Printf("device %s\n", device.Name)
+				soundConfig.availableInputs = append(soundConfig.availableInputs, device.Name)
+			}
+		}
+	}
+
+	portaudio.Terminate()
+}
+
+func (soundConfig *SoundConfig) StopSoundConfig() {
+
+	fmt.Printf("Stop sound config\n")
+
+	// Send a signal for the current sound triggers to stop.
+	soundConfig.stopChannel <- true
+
+}
+
+func (soundConfig *SoundConfig) GetSoundConfig() []string {
+	fmt.Printf("sound config avail ins %s\n", soundConfig.availableInputs)
+	return soundConfig.availableInputs
+}
+
+func (soundConfig *SoundConfig) gainChecker() {
 	for {
 		timer1 := time.NewTimer(3 * time.Second)
 		<-timer1.C
@@ -137,7 +250,7 @@ func gainChecker() {
 			fmt.Printf(">>>> I AM CHECKING THE GAIN \n")
 		}
 		// Calculate and the gain.
-		gain := findGain(gainCounters)
+		gain := soundConfig.findGain(gainCounters)
 
 		// Reset the counters.
 		for index := range gainCounters {
@@ -149,7 +262,7 @@ func gainChecker() {
 
 // findGain determine which counter has the largest value
 // and returns the element number i.e. what gain.
-func findGain(values []int) int {
+func (soundConfig *SoundConfig) findGain(values []int) int {
 	// Find minimum
 	min := values[0]
 	for _, v := range values {
@@ -170,7 +283,7 @@ func findGain(values []int) int {
 	return 0
 }
 
-func reportLevels(level float32, soundTriggers []*common.Trigger) {
+func (soundConfig *SoundConfig) reportLevels(level float32, soundTriggers []*common.Trigger) {
 
 	gain := []float32{
 		// Peak  Gain Set.
@@ -219,7 +332,7 @@ func reportLevels(level float32, soundTriggers []*common.Trigger) {
 	}
 }
 
-func filter(cutofFreq float32) float32 {
+func (soundConfig *SoundConfig) filter(cutofFreq float32) float32 {
 	M_PI := float32(3.14159265358979323846264338327950288)
 	RC := float32(1.0 / (cutofFreq * 2 * M_PI))
 	dt := float32(1.0 / sampleRate) // SAMPLE_RATE

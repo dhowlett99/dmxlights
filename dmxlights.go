@@ -38,11 +38,7 @@ func main() {
 	myApp := app.New()
 
 	myWindow := myApp.NewWindow("DMX Lights")
-	myLogo := panel.ConvertButtonImageToIcon("dmxlights.png")
 	myWindow.Resize(fyne.NewSize(400, 50))
-
-	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myLogo)
 
 	// Setup the current state.
 	this := buttons.CurrentState{}
@@ -206,7 +202,10 @@ func main() {
 	this.ButtonTimer = &time.Time{}
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
+	soundConfig := sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
+
+	// Generate the toolbar at the top.
+	toolbar := gui.MakeToolbar(myWindow, soundConfig)
 
 	// Create objects for bottom status bar.
 	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))

@@ -1,8 +1,16 @@
 package sound
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/dhowlett99/dmxlights/pkg/common"
+)
 
 func Test_findLargest(t *testing.T) {
+
+	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
+	soundTriggers := []*common.Trigger{}
+	channels := common.Channels{}
 	type args struct {
 		values []int
 	}
@@ -28,7 +36,8 @@ func Test_findLargest(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := findGain(tt.args.values); got != tt.want {
+			soundConfig := NewSoundTrigger(soundTriggers, channels)
+			if got := soundConfig.findGain(tt.args.values); got != tt.want {
 				t.Errorf("findGain() = %v, want %v", got, tt.want)
 			}
 		})

@@ -21,6 +21,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
 )
 
@@ -307,21 +308,50 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myLogo []byte) *widget.Toolbar {
-
+func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig) *widget.Toolbar {
 	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.DocumentCreateIcon(), func() {
-			log.Println("New document")
-		}),
-		widget.NewToolbarSeparator(),
-		widget.NewToolbarAction(theme.ContentCutIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentCopyIcon(), func() {}),
-		widget.NewToolbarAction(theme.ContentPasteIcon(), func() {}),
-		widget.NewToolbarSpacer(),
-		widget.NewToolbarAction(theme.ContentRedoIcon(), func() {}),
-		widget.NewToolbarAction(fyne.NewStaticResource("icon", myLogo), func() {
-			log.Println("Display help")
+		widget.NewToolbarAction(theme.SettingsIcon(), func() {
+			modal := runSettingsPopUp(myWindow, soundConfig)
+			modal.Resize(fyne.NewSize(250, 250))
+			modal.Show()
 		}),
 	)
 	return toolbar
+}
+
+func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig) (modal *widget.PopUp) {
+
+	selectedInput := soundConfig.GetDeviceName()
+
+	combo := widget.NewSelect(soundConfig.GetSoundConfig(), func(value string) {
+		selectedInput = value
+	})
+
+	combo.PlaceHolder = selectedInput
+
+	title := widget.NewLabel("Settings")
+	title.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
+
+	label := widget.NewLabel("Select Audio Input")
+
+	button := widget.NewButton("OK", func() {
+		modal.Hide()
+		soundConfig.StopSoundConfig()
+		soundConfig.StartSoundConfig(selectedInput)
+	})
+
+	spacer := layout.NewSpacer()
+
+	modal = widget.NewModalPopUp(
+		container.NewVBox(
+			title,
+			container.NewHBox(label, combo),
+			widget.NewLabel(""),
+			container.NewHBox(spacer, button),
+		),
+		w.Canvas(),
+	)
+	return modal
 }
