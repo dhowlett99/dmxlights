@@ -965,7 +965,7 @@ fixtures:
   switches:
   - name: switch
     number: 1
-    label: Oil.Wheel
+    label: SW1.Oil
     description: Projector1
     states:
     - name: Off
@@ -992,7 +992,7 @@ fixtures:
         blue: 0  
   - name: switch
     number: 2
-    label: Flame.Wheel
+    label: SW2.Flame
     description: Projector2
     states:
     - name: Off
@@ -1019,7 +1019,7 @@ fixtures:
         blue: 0
   - name: switch
     number: 3
-    label: Deluge
+    label: SW3.Deluge
     description: ACME Deluge
     states:
     - name: Off
@@ -1055,7 +1055,7 @@ fixtures:
           setting: 135 # Slow Clockwise
   - name: switch
     number: 4
-    label: Vue
+    label: SW4.Vue
     description: Chauvet Vue 1.1
     states:
     - name: Off
@@ -1215,7 +1215,7 @@ fixtures:
           setting: 255
   - name: QPar36
     number: 5
-    label: QPar36
+    label: SW5.QPar36
     description: Switch 5
     states:
     - name: Off
@@ -1281,7 +1281,7 @@ fixtures:
           setting: 32
   - name: switch
     number: 6
-    label: Swtch6
+    label: SW6.DERBY
     states:
     - name: Off
       label: Off
@@ -1296,34 +1296,7 @@ fixtures:
         green: 0
         blue: 0  
   - name: switch
-    number: 7
-    label: Booth
-    states:
-    - name: Off
-      label: Off
-      buttoncolor: 
-        red: 0
-        green: 255
-        blue: 0 
-    - name: On
-      label: On
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0 
-    - name: Slow 
-      label: Slow.Fade
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0 
-      values: 
-        - name: mode
-          description: Operating Mode
-          channel: 139
-          setting: 255
-  - name: switch
-    label: Swtch8
+    label: SW7.DERBY
     number: 8
     states:
     - name: Off
@@ -1338,3 +1311,30 @@ fixtures:
         red: 255
         green: 0
         blue: 0
+  - name: switch
+    number: 8
+    label: SW8.Booth
+    states:
+    - name: Off
+      label: Off
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0 
+    - name: On
+      label: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
+    - name: Slow 
+      label: Slow
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0 
+      values: 
+        - name: mode
+          description: Operating Mode
+          channel: 139
+          setting: 255

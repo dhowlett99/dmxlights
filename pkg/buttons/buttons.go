@@ -1886,11 +1886,13 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 }
 
 func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, strobeSpeed int) {
-	for x := 0; x < 8; x++ {
-		for y := 0; y < len(sequences); y++ {
-			common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
-			common.LabelButton(x, y, "", guiButtons)
+	for y := 0; y < len(sequences); y++ {
+		if sequences[y].Type != "switch" {
+			for x := 0; x < 8; x++ {
+				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
+				common.LabelButton(x, y, "", guiButtons)
+			}
 		}
 	}
 }
