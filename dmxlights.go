@@ -75,7 +75,7 @@ func main() {
 		this.ScannerState[x] = make([]common.ScannerState, 9)
 		for y := 0; y < 9; y++ {
 			newScanner := common.ScannerState{}
-			newScanner.Enabled = false
+			newScanner.Enabled = true
 			newScanner.Inverted = false
 			this.ScannerState[x][y] = newScanner
 		}

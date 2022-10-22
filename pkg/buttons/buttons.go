@@ -734,6 +734,12 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
+			// The scanner sequence has stopped, so show the status of the scanners.
+			if sequences[this.SelectedSequence].Type == "scanner" {
+				// Show the status.
+				ShowScannerStatus(this.SelectedSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
+			}
+
 			this.Running[this.SelectedSequence] = false
 			return
 		} else {
@@ -1744,6 +1750,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.FunctionSelectMode[this.SelectedSequence] = false
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = true
+
+		// Reveal the scanner State
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			// Show the status.
+			ShowScannerStatus(this.SelectedSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
+		}
 
 		return
 	}
