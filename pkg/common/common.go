@@ -71,6 +71,15 @@ type State struct {
 	Label       string
 	Values      []Value
 	ButtonColor Color
+	Actions     []Action
+}
+
+type Action struct {
+	Name   string
+	Colors []string
+	Mode   string
+	Fade   string
+	Speed  string
 }
 
 type Switch struct {
@@ -80,6 +89,7 @@ type Switch struct {
 	CurrentState int
 	Description  string
 	States       []State
+	Fixture      string
 }
 
 type StaticColorButton struct {

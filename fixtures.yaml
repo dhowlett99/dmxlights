@@ -240,24 +240,7 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-# - name: FOH XBRICK 2
-#   number: 1
-#   description: Stairville Xbrick
-#   type: rgb
-#   address: 114
-#   group: 1
-#   channels: 
-#   - number: 1
-#     name: Red1
-#   - number: 2
-#     name: Green1
-#   - number: 3
-#     name: Blue1
-#   - number: 4
-#     name: MasterDimmer
-#   - number: 5
-#     name: Strobe
-- name: FOH XBRICK 1
+- name: FOH XBRICK 2
   number: 1
   description: Stairville Xbrick
   type: rgb
@@ -436,6 +419,31 @@ fixtures:
   - number: 8
     name: Static
     value: 0
+- name: ADJ Dekker1
+  number: 1
+  label: dekker1
+  use_channels: 8
+  description: American DJ Dekker LED Derby
+  type: rgb
+  address: 300
+  group: 100 
+  channels:
+  - number: 1
+    name: Rotation
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White
+  - number: 6
+    name: Master
+  - number: 7
+    name: Programs
+  - number: 8
+    name: Program Speed / Sound Active
 - name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -1282,6 +1290,7 @@ fixtures:
   - name: switch
     number: 6
     label: SW6.DERBY
+    fixture: dekker1
     states:
     - name: Off
       label: Off
@@ -1289,12 +1298,24 @@ fixtures:
         red: 0
         green: 255
         blue: 0
+      actions:
+        - name: soft chase
+          mode: off
     - name: On
       label: On
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0  
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: music
   - name: switch
     label: SW7.DERBY
     number: 8

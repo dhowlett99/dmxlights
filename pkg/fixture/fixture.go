@@ -7,6 +7,7 @@ import (
 	"os"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/go-yaml/yaml"
@@ -33,11 +34,20 @@ type Value struct {
 }
 
 type State struct {
-	Name        string  `yaml:"name"`
-	Label       string  `yaml:"label"`
-	Values      []Value `yaml:"values"`
-	ButtonColor Color   `yaml:"buttoncolor"`
-	Master      int     `yaml:"master"`
+	Name        string   `yaml:"name"`
+	Label       string   `yaml:"label"`
+	Values      []Value  `yaml:"values"`
+	ButtonColor Color    `yaml:"buttoncolor"`
+	Master      int      `yaml:"master"`
+	Actions     []Action `yaml:"actions"`
+}
+
+type Action struct {
+	Name   string   `yaml:"name"`
+	Colors []string `yaml:"colors"`
+	Mode   string   `yaml:"mode"`
+	Fade   string   `yaml:"fade"`
+	Speed  string   `yaml:"speed"`
 }
 
 type Switch struct {
@@ -46,6 +56,7 @@ type Switch struct {
 	Number      int     `yaml:"number"`
 	Description string  `yaml:"description"`
 	States      []State `yaml:"states"`
+	Fixture     string  `yaml:"fixture"`
 }
 
 type Fixture struct {
@@ -355,16 +366,24 @@ func MapFixtures(mySequenceNumber int,
 func MapSwitchFixture(mySequenceNumber int,
 	dmxController *ft232.DMXController,
 	switchNumber int, currentState int,
-	fixtures *Fixtures, blackout bool, brightness int, master int) {
+	fixtures *Fixtures, blackout bool, brightness int, master int, stopChannel chan bool) {
+
+	var fixtureName string
 
 	// Step through the fixture config file looking for the group that matches mysequence number.
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, swiTch := range fixture.Switches {
+
+				if swiTch.Fixture != "" {
+					// start a fixture sequencer
+					fixtureName = swiTch.Fixture
+				}
 				if switchNumber+1 == swiTch.Number {
 					for stateNumber, state := range swiTch.States {
 						if stateNumber == currentState {
 
+							// Play DMX values directly to the univers.
 							for _, value := range state.Values {
 								if blackout {
 									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
@@ -382,12 +401,88 @@ func MapSwitchFixture(mySequenceNumber int,
 									}
 								}
 							}
+
+							// Play Actions which send messages to a dedicated mini sequencer.
+							for _, action := range state.Actions {
+
+								if action.Mode == "chase" {
+									newMiniSequencer(fixtureName, dmxController, fixtures, stopChannel)
+								}
+
+								if action.Mode == "off" {
+									select {
+									case stopChannel <- true:
+										stopFixture(fixtureName, fixtures, dmxController)
+									case <-time.After(2 * time.Second):
+									}
+								}
+							}
 						}
 					}
 				}
 			}
 		}
 	}
+}
+
+func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController) {
+	fixture := findFixtureByName(fixtureName, fixtures)
+	blackout := false
+	master := 255
+	strobeSpeed := 0
+	ScannerColor := make(map[int]int)
+	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+}
+
+func newMiniSequencer(fixtureName string, dmxController *ft232.DMXController, fixtures *Fixtures, stopChannel chan bool) {
+
+	fixture := findFixtureByName(fixtureName, fixtures)
+	blackout := false
+	master := 255
+	strobeSpeed := 0
+	ScannerColor := make(map[int]int)
+
+	go func() {
+		for {
+			select {
+			case <-stopChannel:
+				return
+
+			case <-time.After(1 * time.Second):
+			}
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			// Red
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 255, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			select {
+			case <-stopChannel:
+				return
+
+			case <-time.After(1 * time.Second):
+			}
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			// Green
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 255, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			select {
+			case <-stopChannel:
+				return
+
+			case <-time.After(1 * time.Second):
+			}
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			// Blue
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 255, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+		}
+	}()
+}
+
+func findFixtureByName(fixtureName string, fixtures *Fixtures) *Fixture {
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == fixtureName {
+			return &fixture
+		}
+	}
+	return nil
 }
 
 func reverse_dmx(n int) int {

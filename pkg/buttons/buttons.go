@@ -66,6 +66,7 @@ type CurrentState struct {
 	SelectedGobo             int                        // The selected GOBO.
 	ButtonTimer              *time.Time                 // Button Timer
 	SelectColorBar           int                        // Storage for color bar in static color selection.
+	SwitchStopChannel        chan bool                  // Used for controlling mini sequencer.
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -2273,7 +2274,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	// Restore any switch channels
 	for _, s := range sequences {
 		if s.Type == "switch" {
-			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchStopChannel)
 		}
 	}
 

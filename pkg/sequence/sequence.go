@@ -223,6 +223,7 @@ func CreateSequence(
 					newSwitch.Label = swiTch.Label
 					newSwitch.Number = swiTch.Number
 					newSwitch.Description = swiTch.Description
+					newSwitch.Fixture = swiTch.Fixture
 
 					newSwitch.States = []common.State{}
 					for _, state := range swiTch.States {
@@ -240,6 +241,18 @@ func CreateSequence(
 							newValue.Setting = value.Setting
 							newState.Values = append(newState.Values, newValue)
 						}
+
+						newState.Actions = []common.Action{}
+						for _, action := range state.Actions {
+							newAction := common.Action{}
+							newAction.Name = action.Name
+							newAction.Colors = action.Colors
+							newAction.Mode = action.Mode
+							newAction.Fade = action.Fade
+							newAction.Speed = action.Speed
+							newState.Actions = append(newState.Actions, newAction)
+						}
+
 						newSwitch.States = append(newSwitch.States, newState)
 					}
 					// Add new switch to the list.
@@ -264,7 +277,7 @@ func PlaySequence(sequence common.Sequence,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
-	soundTriggers []*common.Trigger) {
+	soundTriggers []*common.Trigger, switchStopChannel chan bool) {
 
 	// Create channels used for stepping the fixture threads for this sequnece.
 	fixtureStepChannels := []chan common.FixtureCommand{}
@@ -321,7 +334,7 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchStopChannel)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
@@ -681,7 +694,7 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 // The color of the lamp indicates which state you are in.
 // ShowSwitches relies on you giving the sequence number of the switch sequnence.
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures) {
+	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, stopChannel chan bool) {
 
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
@@ -698,7 +711,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
 
 				// Now play all the values for this state.
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master)
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, stopChannel)
 			}
 		}
 	}
