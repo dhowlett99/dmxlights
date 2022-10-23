@@ -429,7 +429,7 @@ fixtures:
   group: 100 
   channels:
   - number: 1
-    name: Rotation
+    name: Rotate
   - number: 2
     name: Red1
   - number: 3
@@ -1316,6 +1316,22 @@ fixtures:
           mode: chase
           fade: soft
           speed: music
+    - name: Rotate
+      label: Rotate
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: rotate
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: music
+          rotate: fast
   - name: switch
     label: SW7.DERBY
     number: 8

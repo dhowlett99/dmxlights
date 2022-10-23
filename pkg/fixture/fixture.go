@@ -48,6 +48,7 @@ type Action struct {
 	Mode   string   `yaml:"mode"`
 	Fade   string   `yaml:"fade"`
 	Speed  string   `yaml:"speed"`
+	Rotate string   `yaml:"rotate"`
 }
 
 type Switch struct {
@@ -137,12 +138,12 @@ func FixtureReceiver(
 				continue
 			}
 			if cmd.StartFlood {
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 				continue
 			}
 			if cmd.StopFlood {
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
@@ -169,7 +170,7 @@ func FixtureReceiver(
 				if !cmd.Hide {
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 			}
 		}
 
@@ -194,7 +195,7 @@ func FixtureReceiver(
 
 			// If this fixture is disabled then shut the shutter off.
 			if disableOnce && !enabled {
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
 				// Locking for write.
 				sequence.DisableOnceMutex.Lock()
 				sequence.DisableOnce[myFixtureNumber] = false
@@ -206,7 +207,7 @@ func FixtureReceiver(
 
 				// If enables activate the physical scanner.
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+					fixture.Shutter, cmd.Rotate, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 
 				if !cmd.Hide {
 					if cmd.ScannerChase {
@@ -281,7 +282,7 @@ func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXCont
 // This function maps the requested fixture into a DMX address.
 func MapFixtures(mySequenceNumber int,
 	dmxController *ft232.DMXController,
-	displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, selectedGobo int, scannerColor map[int]int,
+	displayFixture int, R int, G int, B int, Pan int, Tilt int, Shutter int, Rotate int, selectedGobo int, scannerColor map[int]int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, strobe int) {
 
 	// We control the brightness of each color with the brightness value.
@@ -310,6 +311,9 @@ func MapFixtures(mySequenceNumber int,
 					}
 					if strings.Contains(channel.Name, "Shutter") {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
+					}
+					if strings.Contains(channel.Name, "Rotate") {
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Rotate))
 					}
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
@@ -406,14 +410,19 @@ func MapSwitchFixture(mySequenceNumber int,
 							for _, action := range state.Actions {
 
 								if action.Mode == "chase" {
-									newMiniSequencer(fixtureName, dmxController, fixtures, stopChannel)
+									select {
+									case stopChannel <- true:
+										stopFixture(fixtureName, fixtures, dmxController)
+									case <-time.After(100 * time.Millisecond):
+									}
+									newMiniSequencer(fixtureName, action, dmxController, fixtures, stopChannel)
 								}
 
 								if action.Mode == "off" {
 									select {
 									case stopChannel <- true:
 										stopFixture(fixtureName, fixtures, dmxController)
-									case <-time.After(2 * time.Second):
+									case <-time.After(100 * time.Millisecond):
 									}
 								}
 							}
@@ -431,46 +440,53 @@ func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DM
 	master := 255
 	strobeSpeed := 0
 	ScannerColor := make(map[int]int)
-	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 }
 
-func newMiniSequencer(fixtureName string, dmxController *ft232.DMXController, fixtures *Fixtures, stopChannel chan bool) {
+func newMiniSequencer(fixtureName string, action Action, dmxController *ft232.DMXController, fixtures *Fixtures, stopChannel chan bool) {
 
 	fixture := findFixtureByName(fixtureName, fixtures)
 	blackout := false
 	master := 255
 	strobeSpeed := 0
 	ScannerColor := make(map[int]int)
+	rotate := 0
+
+	switch action.Rotate {
+	case "slow":
+		rotate = 1
+	case "medium":
+		rotate = 50
+	case "fast":
+		rotate = 127
+	}
 
 	go func() {
 		for {
 			select {
 			case <-stopChannel:
 				return
-
 			case <-time.After(1 * time.Second):
 			}
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 			// Red
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 255, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 255, 0, 0, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 			select {
 			case <-stopChannel:
 				return
-
 			case <-time.After(1 * time.Second):
 			}
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 			// Green
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 255, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 255, 0, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 			select {
 			case <-stopChannel:
 				return
-
 			case <-time.After(1 * time.Second):
 			}
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 			// Blue
-			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 255, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+			MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 255, 0, 0, 0, rotate, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 		}
 	}()
 }
@@ -511,7 +527,7 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
-	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
 
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
@@ -553,7 +569,7 @@ func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceN
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
-	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 }
 
 func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
@@ -573,8 +589,9 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	gobo := FindGobo(myFixtureNumber, mySequenceNumber, "Open", fixtures)
 	brightness := 255
 	master := 255
+	rotate := 0
 
-	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, pan, tilt, shutter, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed)
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, pan, tilt, shutter, rotate, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed)
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.

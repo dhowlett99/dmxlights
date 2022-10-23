@@ -250,6 +250,7 @@ func CreateSequence(
 							newAction.Mode = action.Mode
 							newAction.Fade = action.Fade
 							newAction.Speed = action.Speed
+							newAction.Rotate = action.Rotate
 							newState.Actions = append(newState.Actions, newAction)
 						}
 
@@ -609,6 +610,7 @@ func PlaySequence(sequence common.Sequence,
 						if scannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
 								Step:                   step,
+								Rotate:                 sequence.Rotate,
 								StrobeSpeed:            sequence.StrobeSpeed,
 								Master:                 sequence.Master,
 								Blackout:               sequence.Blackout,
