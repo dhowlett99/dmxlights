@@ -422,7 +422,6 @@ fixtures:
 - name: ADJ Dekker1
   number: 1
   label: dekker1
-  use_channels: 8
   description: American DJ Dekker LED Derby
   type: rgb
   address: 300
@@ -441,9 +440,9 @@ fixtures:
   - number: 6
     name: Master
   - number: 7
-    name: Programs
+    name: Program
   - number: 8
-    name: Program Speed / Sound Active
+    name: Music
 - name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -1315,9 +1314,41 @@ fixtures:
           - blue
           mode: chase
           fade: soft
+          speed: slow
+    - name: Music1
+      label: Music1
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: rotate
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
           speed: music
-    - name: Rotate
-      label: Rotate
+          rotate: slow
+    - name: Music2
+      label: Music2
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: rotate
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: music
+          rotate: medium
+    - name: Music3
+      label: Music3
       buttoncolor: 
         red: 255
         green: 255
@@ -1332,6 +1363,18 @@ fixtures:
           fade: soft
           speed: music
           rotate: fast
+    - name: Internal
+      label: Internal
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: internal
+          mode: static
+          music: internal
+          program: all
+          rotate: slow
   - name: switch
     label: SW7.DERBY
     number: 8

@@ -251,6 +251,8 @@ func CreateSequence(
 							newAction.Fade = action.Fade
 							newAction.Speed = action.Speed
 							newAction.Rotate = action.Rotate
+							newAction.Music = action.Music
+							newAction.Program = action.Program
 							newState.Actions = append(newState.Actions, newAction)
 						}
 
@@ -335,7 +337,7 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchStopChannel)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchStopChannel, soundTriggers, channels.SoundTriggerChannels)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
@@ -696,7 +698,7 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 // The color of the lamp indicates which state you are in.
 // ShowSwitches relies on you giving the sequence number of the switch sequnence.
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, stopChannel chan bool) {
+	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, stopChannel chan bool, SoundTriggers []*common.Trigger, soundTriggerChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
@@ -713,7 +715,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
 
 				// Now play all the values for this state.
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, stopChannel)
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, stopChannel, SoundTriggers, soundTriggerChannels)
 			}
 		}
 	}

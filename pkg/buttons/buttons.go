@@ -126,19 +126,24 @@ func ProcessButtons(X int, Y int,
 		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
 		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
 		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
+		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
+		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
+		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
 		pan := flashSequence.Pattern.Steps[X].Fixtures[X].Pan
 		tilt := flashSequence.Pattern.Steps[X].Fixtures[X].Tilt
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
 		rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
+		music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
 		gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
+		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, rotate, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+		fixture.MapFixtures(Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		}
 
 		return
@@ -164,7 +169,7 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		return
 	}
 
@@ -1904,7 +1909,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		if sequences[y].Type != "switch" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
+				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -1915,7 +1920,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0)
+				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
@@ -2275,7 +2280,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	// Restore any switch channels
 	for _, s := range sequences {
 		if s.Type == "switch" {
-			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchStopChannel)
+			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchStopChannel, this.SoundTriggers, this.SequenceChannels.SoundTriggerChannels)
 		}
 	}
 

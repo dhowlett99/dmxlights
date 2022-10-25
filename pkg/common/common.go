@@ -45,9 +45,12 @@ type ALight struct {
 }
 
 type Color struct {
-	R int
-	G int
-	B int
+	R  int
+	G  int
+	B  int
+	W  int
+	A  int
+	UV int
 }
 
 // Used in calculating Positions.
@@ -75,12 +78,14 @@ type State struct {
 }
 
 type Action struct {
-	Name   string
-	Colors []string
-	Mode   string
-	Fade   string
-	Speed  string
-	Rotate string
+	Name    string
+	Colors  []string
+	Mode    string
+	Fade    string
+	Speed   string
+	Rotate  string
+	Music   string
+	Program string
 }
 
 type Switch struct {
@@ -348,7 +353,9 @@ type FixtureCommand struct {
 	ScannerOffsetPan       int
 	ScannerOffsetTilt      int
 
-	Rotate int
+	Rotate  int
+	Music   int
+	Program int
 }
 
 type Position struct {
@@ -372,7 +379,9 @@ type Fixture struct {
 	Tilt         int
 	Shutter      int
 	Rotate       int
+	Music        int
 	Gobo         int
+	Program      int
 }
 
 type ButtonPresets struct {
