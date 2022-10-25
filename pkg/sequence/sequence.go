@@ -1,6 +1,8 @@
 package sequence
 
 import (
+	"bytes"
+	"encoding/gob"
 	"errors"
 	"fmt"
 	"io/ioutil"
@@ -1166,7 +1168,20 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 	return positionsOut
 }
 
+func MakeACopy(src, dist interface{}) (err error) {
+	buf := bytes.Buffer{}
+	if err = gob.NewEncoder(&buf).Encode(src); err != nil {
+		return
+	}
+	return gob.NewDecoder(&buf).Decode(dist)
+}
+
 func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
+	stepsOut := []common.Step{}
+	err := MakeACopy(steps, &stepsOut)
+	if err != nil {
+		fmt.Printf("replaceRGBcolorsInSteps: error failed to copy steps.\n")
+	}
 
 	var insertColor int
 	numberColors := len(colors)
@@ -1179,7 +1194,7 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 					if insertColor >= numberColors {
 						insertColor = 0
 					}
-					steps[stepNumber].Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
+					stepsOut[stepNumber].Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
 					insertColor++
 				}
 			}
@@ -1187,7 +1202,7 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 	}
 
 	if debug {
-		for stepNumber, step := range steps {
+		for stepNumber, step := range stepsOut {
 			fmt.Printf("Step %d\n", stepNumber)
 			for fixtureNumber, fixture := range step.Fixtures {
 				fmt.Printf("\tFixture %d\n", fixtureNumber)
@@ -1198,7 +1213,7 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 		}
 	}
 
-	return steps
+	return stepsOut
 }
 
 func invertRGBcolorsInPositions(positions map[int]common.Position, colors []common.Color) map[int]common.Position {

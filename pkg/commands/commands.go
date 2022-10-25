@@ -71,6 +71,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Patten to %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
+		sequence.UpdateSequenceColor = false
+		sequence.RecoverSequenceColors = false
 		sequence.UpdatePattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
