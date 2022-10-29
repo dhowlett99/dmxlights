@@ -2,6 +2,7 @@ package fixture
 
 import (
 	"errors"
+	"fmt"
 	"io/ioutil"
 	"math"
 	"os"
@@ -10,11 +11,13 @@ import (
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/pattern"
+	"github.com/dhowlett99/dmxlights/pkg/position"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 )
 
-//const debug = false
+const debug = false
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
@@ -24,13 +27,14 @@ type Color struct {
 	R int `yaml:"red"`
 	G int `yaml:"green"`
 	B int `yaml:"blue"`
+	W int `yaml:"white"`
 }
 
 type Value struct {
 	Name        string `yaml:"name"`
 	Description string `yaml:"description"`
-	Channel     int16  `yaml:"channel"`
-	Setting     int16  `yaml:"setting"`
+	Channel     string `yaml:"channel"`
+	Setting     string `yaml:"setting"`
 }
 
 type State struct {
@@ -40,6 +44,7 @@ type State struct {
 	ButtonColor Color    `yaml:"buttoncolor"`
 	Master      int      `yaml:"master"`
 	Actions     []Action `yaml:"actions"`
+	Flash       bool     `yaml:"flash"`
 }
 
 type Action struct {
@@ -94,8 +99,7 @@ type Channel struct {
 
 // LoadFixtures opens the fixtures config file and returns a pointer to the fixtures.
 // or an error.
-func LoadFixtures() (fixtures *Fixtures, err error) {
-	filename := "fixtures.yaml"
+func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
@@ -168,11 +172,12 @@ func FixtureReceiver(
 				red := color.R
 				green := color.G
 				blue := color.B
+				white := color.W
 
 				if !cmd.Hide {
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
 			}
 		}
 
@@ -263,6 +268,85 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 	}
 }
 
+func lookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelName string, name string, label string, fixtures *Fixtures) (int, error) {
+
+	if debug {
+		fmt.Printf("lookUpSettingLabelInFixtureDefinition for %s\n", channelName)
+	}
+
+	var fixtureName string
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == group {
+			if debug {
+				fmt.Printf("---> fixture %s\n", fixture.Name)
+				fmt.Printf("---> fixture.group %d group %d\n", fixture.Group, group)
+				fmt.Printf("---> channels %+v\n", fixture.Channels)
+			}
+			fixtureName = fixture.Name
+			for _, channel := range fixture.Channels {
+				if debug {
+					fmt.Printf("---> inspect channel %s for %s\n", channel.Name, name)
+				}
+				if channel.Name == name {
+					if debug {
+						fmt.Printf("---> channel.Settings %+v\n", channel.Settings)
+					}
+					for _, setting := range channel.Settings {
+						if debug {
+							fmt.Printf("---> inspect setting %+v \n", setting)
+							fmt.Printf("---> setting.Label %s = label %s\n", setting.Label, label)
+						}
+						if setting.Label == label {
+							if debug {
+								fmt.Printf("Fixture=%s Channel.Name=%s Label=%s Name=%s Setting %d\n", fixture.Name, channel.Name, label, name, setting.Setting)
+							}
+							return setting.Setting, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("label not found in fixture :%s", fixtureName)
+}
+
+func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, channelName string, fixtures *Fixtures) (int, error) {
+
+	if debug {
+		fmt.Printf("lookUpChannelNumberByName for %s\n", channelName)
+	}
+	var fixtureName string
+	for _, fixture := range fixtures.Fixtures {
+
+		if fixture.Group == group {
+			if debug {
+				fmt.Printf("---> fixture %s\n", fixture.Name)
+				fmt.Printf("---> fixture.group %d group %d\n", fixture.Group, group)
+				fmt.Printf("---> channels %+v\n", fixture.Channels)
+			}
+			//if fixture.Number == switchNumber {
+			fixtureName = fixture.Name
+			for channelNumber, channel := range fixture.Channels {
+				if debug {
+					fmt.Printf("---> inspect channel %s for %s\n", channel.Name, channelName)
+				}
+				if channel.Name == channelName {
+					if debug {
+						fmt.Printf("Fixture=%s Channel=%s Number %d\n", fixture.Name, channel.Name, channel.Number)
+					}
+					return int(channelNumber), nil
+				}
+			}
+		}
+	}
+
+	if debug {
+		fmt.Printf("channel not found in fixture :%s", fixtureName)
+	}
+	return 0, fmt.Errorf("channel not found in fixture :%s", fixtureName)
+}
+
 func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, selectedGobo int) {
 
 	for _, fixture := range fixtures.Fixtures {
@@ -326,6 +410,9 @@ func MapFixtures(mySequenceNumber int,
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Music))
 					}
 					if strings.Contains(channel.Name, "Program") {
+						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Program))
+					}
+					if strings.Contains(channel.Name, "ProgramSpeed") {
 						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Program))
 					}
 					if strings.Contains(channel.Name, "Gobo") {
@@ -410,28 +497,66 @@ func MapSwitchFixture(mySequenceNumber int,
 					for stateNumber, state := range swiTch.States {
 						if stateNumber == currentState {
 
-							// Play DMX values directly to the univers.
-							for _, value := range state.Values {
-								if blackout {
-									dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(0))
-								} else {
-									// This should be controlled by the master brightness
-									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
-										howBright := int((float64(value.Setting) / 100) * (float64(brightness) / 2.55))
-										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
-											dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(reverse_dmx(howBright)))
-										} else {
-											dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(howBright))
-										}
-									} else {
-										dmxController.SetChannel(fixture.Address+int16(value.Channel), byte(value.Setting))
-									}
-								}
-							}
-
 							// Play Actions which send messages to a dedicated mini sequencer.
 							for _, action := range state.Actions {
 								newMiniSequencer(fixtureName, action, dmxController, fixtures, stopChannel, SoundTriggers, soundTriggerChannels)
+							}
+
+							// Play DMX values directly to the univers.
+							for _, value := range state.Values {
+								if blackout {
+									v, _ := strconv.ParseFloat(value.Setting, 16)
+									dmxController.SetChannel(fixture.Address+int16(v), byte(0))
+								} else {
+									// This should be controlled by the master brightness
+									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
+										v, _ := strconv.ParseFloat(value.Setting, 32)
+										howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
+										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
+											c, _ := strconv.ParseFloat(value.Setting, 16)
+											dmxController.SetChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)))
+										} else {
+											c, _ := strconv.Atoi(value.Setting)
+											dmxController.SetChannel(fixture.Address+int16(c), byte(howBright))
+										}
+									} else {
+
+										if IsNumericOnly(value.Setting) {
+											// If the setting has is a number set it directly.
+											v, _ := strconv.ParseFloat(value.Setting, 32)
+
+											// Handle the fact that the channel may be a label as well.
+											if IsNumericOnly(value.Channel) {
+												c, _ := strconv.ParseFloat(value.Channel, 16)
+												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+											} else {
+												fixture := findFixtureByName(fixtureName, fixtures)
+												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
+												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+											}
+
+										} else {
+											// If the setting contains a label, look up the label in the fixture definition.
+											fixture := findFixtureByName(fixtureName, fixtures)
+											v, err := lookUpSettingLabelInFixtureDefinition(fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting, fixtures)
+											if err != nil {
+												fmt.Printf("dmxlights: error failed to find %s switch label %s in fixture config for switch no %d: %s\n", value.Name, value.Setting, swiTch.Number, err.Error())
+												fmt.Printf("fixture.Group=%d, swiTch.Number=%d, value.Channel=%s, value.Name=%s, value.Setting=%s\n", fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting)
+												os.Exit(1)
+											}
+
+											// Handle the fact that the channel may be a label as well.
+											if IsNumericOnly(value.Channel) {
+												c, _ := strconv.ParseFloat(value.Channel, 16)
+												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+											} else {
+												fixture := findFixtureByName(fixtureName, fixtures)
+												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
+												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+											}
+										}
+									}
+								}
 							}
 						}
 					}
@@ -439,6 +564,20 @@ func MapSwitchFixture(mySequenceNumber int,
 			}
 		}
 	}
+}
+
+func IsNumericOnly(str string) bool {
+
+	if len(str) == 0 {
+		return false
+	}
+
+	for _, s := range str {
+		if s < '0' || s > '9' {
+			return false
+		}
+	}
+	return true
 }
 
 func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController) {
@@ -450,18 +589,26 @@ func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DM
 	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 }
 
-func newMiniSequencer(fixtureName string, action Action, dmxController *ft232.DMXController, fixtures *Fixtures, stopChannel chan bool, SoundTriggers []*common.Trigger, soundTriggerChannels []chan common.Command) {
+func newMiniSequencer(fixtureName string, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures, stopChannel chan bool, SoundTriggers []*common.Trigger, soundTriggerChannels []chan common.Command) {
 
-	fixture := findFixtureByName(fixtureName, fixtures)
+	fixture := findFixtureByName(fixtureName, fixturesConfig)
 	blackout := false
 	master := 255
 	strobeSpeed := 0
 	ScannerColor := make(map[int]int)
 	rotate := 0
 
+	RGBFade := 1
+	RGBSize := 3
+
+	mySequenceNumber := fixture.Group - 1
+	myFixtureNumber := fixture.Number - 1
+
 	var speed time.Duration
 	var music int
 	var program int
+
+	stopRotateChannel := make(chan bool)
 
 	switch action.Program {
 	case "all":
@@ -491,7 +638,7 @@ func newMiniSequencer(fixtureName string, action Action, dmxController *ft232.DM
 		speed = 500 * time.Millisecond
 		SoundTriggers[3].State = false
 	case "fast":
-		speed = 100 * time.Millisecond
+		speed = 50 * time.Millisecond
 		SoundTriggers[3].State = false
 	case "music":
 		SoundTriggers[3].State = true
@@ -514,64 +661,131 @@ func newMiniSequencer(fixtureName string, action Action, dmxController *ft232.DM
 	if action.Mode == "off" {
 		select {
 		case stopChannel <- true:
-			stopFixture(fixtureName, fixtures, dmxController)
+			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
+		// Wait for threads to stop
+		time.Sleep(500 * time.Millisecond)
+
+		return
 	}
 
 	if action.Mode == "static" {
 		select {
 		case stopChannel <- true:
-			stopFixture(fixtureName, fixtures, dmxController)
+			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
-		MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 255, 255, 255, 255, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 255, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixturesConfig, blackout, master, master, strobeSpeed)
+		return
 	}
 
 	if action.Mode == "chase" {
 		select {
 		case stopChannel <- true:
-			stopFixture(fixtureName, fixtures, dmxController)
+			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
+
+		sequence := common.Sequence{
+			ScannerInvert: false,
+			RGBInvert:     false,
+			Bounce:        false,
+			ScannerChase:  false,
+			RGBShift:      1,
+		}
+		sequence.Pattern = pattern.MakeSingleFixtureChase()
+		sequence.Steps = sequence.Pattern.Steps
+		sequence.NumberFixtures = 1
+		// Calculate fade curve values.
+		slopeOn, slopeOff := common.CalculateFadeValues(RGBFade, RGBSize)
+		// Calulate positions for each RGB fixture.
+		optimisation := false
+		scannerState := map[int]common.ScannerState{
+			0: {
+				Enabled: true,
+			},
+			1: {
+				Enabled: true,
+			},
+			2: {
+				Enabled: true,
+			},
+			3: {
+				Enabled: true,
+			},
+			4: {
+				Enabled: true,
+			},
+		}
+
+		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
+
+		var rotateCounter int
+
 		go func() {
 
+			keepRotateAlive := make(chan bool)
+			go func() {
+				for {
+					value := FindRotate(myFixtureNumber, mySequenceNumber, fixturesConfig)
+
+					select {
+					case <-stopRotateChannel:
+						time.Sleep(1 * time.Millisecond)
+						dmxController.SetChannel(fixture.Address+int16(value), byte(0))
+						return
+					case <-keepRotateAlive:
+						time.Sleep(1 * time.Millisecond)
+						continue
+					case <-time.After(500 * time.Millisecond):
+						dmxController.SetChannel(fixture.Address+int16(value), byte(0))
+					}
+				}
+			}()
+
 			for {
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-				select {
-				case <-soundTriggerChannels[3]:
-				case <-stopChannel:
-					return
-				case <-time.After(speed):
+
+				// Run through the steps in the sequence.
+				// Remember every step contains infomation for all the fixtures in this group.
+				for step := 0; step < sequence.NumberSteps; step++ {
+
+					keepRotateAlive <- true
+
+					if rotateCounter > 500 {
+						rotateCounter = 1
+					}
+
+					if rotateCounter < 128 {
+						rotate = 127
+					} else {
+						rotate = 128
+					}
+
+					// This is were we set the speed of the sequence to current speed.
+					select {
+					case <-soundTriggerChannels[3]:
+					case <-stopChannel:
+						stopRotateChannel <- true
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixturesConfig, blackout, 0, 0, strobeSpeed)
+						return
+					case <-time.After(speed):
+					}
+
+					// Play out fixture to DMX channels.
+					position := sequence.RGBPositions[step]
+
+					fixtures := position.Fixtures
+
+					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+						fixture := fixtures[fixtureNumber]
+						for _, color := range fixture.Colors {
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, rotate, 0, 0, 0, ScannerColor, fixturesConfig, blackout, master, master, strobeSpeed)
+						}
+					}
+
+					rotateCounter++
 				}
-
-				// Red
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 255, 0, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-				time.Sleep(100 * time.Millisecond)
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-
-				select {
-				case <-soundTriggerChannels[3]:
-				case <-stopChannel:
-					return
-				case <-time.After(speed):
-				}
-				// Green
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 255, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-				time.Sleep(100 * time.Millisecond)
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-
-				select {
-				case <-soundTriggerChannels[3]:
-				case <-stopChannel:
-					return
-				case <-time.After(speed):
-				}
-				// Blue
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 255, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-				time.Sleep(100 * time.Millisecond)
-				MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, rotate, music, program, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
-
 			}
 		}()
 	}
@@ -720,6 +934,25 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 										return setting.Number
 									}
 								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
+func FindRotate(myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) int {
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == mySequenceNumber {
+			for _, channel := range fixture.Channels {
+				if fixture.Number == myFixtureNumber+1 {
+					if strings.Contains(channel.Name, "Rotate") {
+						for _, setting := range channel.Settings {
+							if setting.Number-1 == myFixtureNumber {
+								return setting.Number
 							}
 						}
 					}

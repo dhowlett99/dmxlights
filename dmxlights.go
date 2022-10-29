@@ -135,7 +135,7 @@ func main() {
 	}
 
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := fixture.LoadFixtures()
+	fixturesConfig, err := fixture.LoadFixtures("fixtures.yaml")
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 		os.Exit(1)

@@ -13,6 +13,66 @@ const (
 	full = 255
 )
 
+func MakeSingleFixtureChase() common.Pattern {
+
+	single := common.Pattern{
+		Name:   "Single",
+		Number: 0,
+		Label:  "Single.Chase",
+		Steps: []common.Step{
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 255}}},
+				},
+			},
+		},
+	}
+	return single
+}
+
 func MakePatterns() map[int]common.Pattern {
 
 	Patterns := make(map[int]common.Pattern)

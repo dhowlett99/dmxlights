@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -65,8 +66,8 @@ type FixtureBuffer struct {
 }
 
 type Value struct {
-	Channel int16
-	Setting int16
+	Channel string
+	Setting string
 }
 
 type State struct {
@@ -75,6 +76,7 @@ type State struct {
 	Values      []Value
 	ButtonColor Color
 	Actions     []Action
+	Flash       bool
 }
 
 type Action struct {
@@ -368,7 +370,6 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	//ScannerNumber int
 	Name         string
 	Label        string
 	Type         string
@@ -1157,4 +1158,141 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 	}
 
 	return staticColorsButtons
+}
+
+func Reverse(in int) int {
+	switch in {
+	case 0:
+		return 10
+	case 1:
+		return 9
+	case 2:
+		return 8
+	case 3:
+		return 7
+	case 4:
+		return 6
+	case 5:
+		return 5
+	case 6:
+		return 4
+	case 7:
+		return 3
+	case 8:
+		return 2
+	case 9:
+		return 1
+	case 10:
+		return 0
+	}
+
+	return 10
+}
+
+// CalculateFadeValues - calculate fade curve values.
+func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
+
+	fadeUpValues := GetFadeValues(float64(MaxBrightness), fade, false)
+	fadeOnValues := GetFadeOnValues(MaxBrightness, size)
+	fadeDownValues := GetFadeValues(float64(MaxBrightness), fade, true)
+
+	slopeOn = append(slopeOn, fadeUpValues...)
+	slopeOn = append(slopeOn, fadeOnValues...)
+	slopeOn = append(slopeOn, fadeDownValues...)
+
+	slopeOff = append(slopeOff, fadeDownValues...)
+	slopeOff = append(slopeOff, fadeUpValues...)
+
+	return slopeOn, slopeOff
+}
+
+func GetFadeValues(size float64, fade int, reverse bool) []int {
+
+	out := []int{}
+	outPadded := []int{}
+	size = size / 2
+
+	var numberCoordinates float64
+
+	if fade == 1 {
+		numberCoordinates = 20
+	}
+	if fade == 2 {
+		numberCoordinates = 25
+	}
+	if fade == 3 {
+		numberCoordinates = 30
+	}
+	if fade == 4 {
+		numberCoordinates = 35
+	}
+	if fade == 5 {
+		numberCoordinates = 40
+	}
+	if fade == 6 {
+		numberCoordinates = 45
+	}
+	if fade == 7 {
+		numberCoordinates = 50
+	}
+	if fade == 8 {
+		numberCoordinates = 55
+	}
+	if fade == 9 {
+		numberCoordinates = 60
+	}
+	if fade == 10 {
+		numberCoordinates = 65
+	}
+
+	var theta float64
+	var x float64
+	if reverse {
+		for x = 0; x <= 180; x += numberCoordinates {
+			theta = (x - 90) * math.Pi / 180
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	} else {
+		for x = 180; x >= 0; x -= numberCoordinates {
+			theta = (x - 90) * math.Pi / 180
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	}
+
+	if reverse {
+		for value := 10; value > 0; value-- {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[len(out)-value])
+			}
+		}
+
+	} else {
+		for value := 0; value < 10; value++ {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[value])
+			}
+		}
+	}
+
+	return outPadded
+}
+
+func GetFadeOnValues(size int, fade int) []int {
+
+	out := []int{}
+
+	var x int
+
+	for x = 0; x < fade; x++ {
+		x := size
+		out = append(out, x)
+	}
+
+	return out
 }

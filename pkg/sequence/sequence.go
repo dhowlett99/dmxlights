@@ -6,7 +6,6 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"math"
 	"os"
 	"strconv"
 	"strings"
@@ -17,6 +16,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
+	"github.com/dhowlett99/dmxlights/pkg/position"
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
@@ -235,7 +235,9 @@ func CreateSequence(
 						newState.ButtonColor.R = state.ButtonColor.R
 						newState.ButtonColor.G = state.ButtonColor.G
 						newState.ButtonColor.B = state.ButtonColor.B
+						newState.Flash = state.Flash
 
+						// Copy values.
 						newState.Values = []common.Value{}
 						for _, value := range state.Values {
 							newValue := common.Value{}
@@ -244,6 +246,7 @@ func CreateSequence(
 							newState.Values = append(newState.Values, newValue)
 						}
 
+						// Copy actions.
 						newState.Actions = []common.Action{}
 						for _, action := range state.Actions {
 							newAction := common.Action{}
@@ -496,7 +499,7 @@ func PlaySequence(sequence common.Sequence,
 						sequence.ScannerStateMutex.RUnlock()
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
-						positions, num := calculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
+						positions, num := position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
 						sequence.NumberSteps = num
 
 						sequence.ScannerPositions[fixture] = make(map[int]common.Position, 9)
@@ -527,14 +530,14 @@ func PlaySequence(sequence common.Sequence,
 
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
-					slopeOn, slopeOff := calculateFadeValues(sequence.RGBFade, sequence.RGBSize)
+					slopeOn, slopeOff := common.CalculateFadeValues(sequence.RGBFade, sequence.RGBSize)
 					// Calulate positions for each RGB fixture.
 					optimisation := true
 					// Retrieve the scanner state.
 					sequence.ScannerStateMutex.RLock()
 					scannerState := sequence.ScannerState
 					sequence.ScannerStateMutex.RUnlock()
-					sequence.RGBPositions, sequence.NumberSteps = calculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
+					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -645,23 +648,6 @@ func PlaySequence(sequence common.Sequence,
 	}
 }
 
-// calculateFadeValues - calculate fade curve values.
-func calculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
-
-	fadeUpValues := getFadeValues(float64(common.MaxBrightness), fade, false)
-	fadeOnValues := getFadeOnValues(common.MaxBrightness, size)
-	fadeDownValues := getFadeValues(float64(common.MaxBrightness), fade, true)
-
-	slopeOn = append(slopeOn, fadeUpValues...)
-	slopeOn = append(slopeOn, fadeOnValues...)
-	slopeOn = append(slopeOn, fadeDownValues...)
-
-	slopeOff = append(slopeOff, fadeDownValues...)
-	slopeOff = append(slopeOff, fadeUpValues...)
-
-	return slopeOn, slopeOff
-}
-
 func invertRGBColors(steps []common.Step, colors []common.Color) []common.Step {
 
 	var insertColor int
@@ -721,451 +707,6 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			}
 		}
 	}
-}
-
-func reverse(in int) int {
-	switch in {
-	case 0:
-		return 10
-	case 1:
-		return 9
-	case 2:
-		return 8
-	case 3:
-		return 7
-	case 4:
-		return 6
-	case 5:
-		return 5
-	case 6:
-		return 4
-	case 7:
-		return 3
-	case 8:
-		return 2
-	case 9:
-		return 1
-	case 10:
-		return 0
-	}
-
-	return 10
-}
-
-func calculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int, Optimisation bool, scannerState map[int]common.ScannerState) (map[int]common.Position, int) {
-
-	fadeColors := make(map[int][]common.FixtureBuffer)
-	shift := reverse(sequence.RGBShift)
-
-	var numberFixtures int
-	var numberFixturesInThisStep int
-	var shiftCounter int
-
-	if !sequence.ScannerInvert {
-		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.Steps {
-			numberFixturesInThisStep = 0
-			for fixtureNumber, fixture := range step.Fixtures {
-				for _, color := range fixture.Colors {
-					if color.R > 0 || color.G > 0 || color.B > 0 {
-						// make space for a colored lamp.
-						if !sequence.RGBInvert {
-							// A faded up and down color.
-							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						} else {
-							// A solid on color.
-							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					} else {
-						if !sequence.RGBInvert {
-							shiftCounter = 0
-							// make space for a off lamp.
-							for range slopeOff {
-								if shiftCounter == shift {
-									break
-								}
-								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-								shiftCounter++
-							}
-						} else {
-							// A fading to black lamp.
-							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					}
-				}
-				numberFixturesInThisStep++
-			}
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
-		}
-	}
-
-	if sequence.Bounce || sequence.ScannerInvert {
-		// Generate the positions in reverse.
-		// Reverse the steps.
-		for stepNumber := len(sequence.Steps); stepNumber > 0; stepNumber-- {
-			step := sequence.Steps[stepNumber-1]
-			numberFixturesInThisStep = 0
-			for fixtureNumber, fixture := range step.Fixtures {
-				// Reverse the colors.
-				noColors := len(fixture.Colors)
-				for colorNumber := noColors; colorNumber > 0; colorNumber-- {
-					color := fixture.Colors[colorNumber-1]
-					if color.R > 0 || color.G > 0 || color.B > 0 {
-						// make space for a colored lamp.
-						if !sequence.RGBInvert {
-							// A faded up and down color.
-							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						} else {
-							// A solid on color.
-							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					} else {
-						if !sequence.RGBInvert {
-							shiftCounter = 0
-							// make space for a off lamp.
-							for range slopeOff {
-								if shiftCounter == shift {
-									break
-								}
-								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-								shiftCounter++
-							}
-						} else {
-							// A fading to black lamp.
-							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					}
-				}
-				numberFixturesInThisStep++
-			}
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
-		}
-	}
-
-	if sequence.Bounce && sequence.ScannerInvert {
-		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.Steps {
-			numberFixturesInThisStep = 0
-			for fixtureNumber, fixture := range step.Fixtures {
-				for _, color := range fixture.Colors {
-					if color.R > 0 || color.G > 0 || color.B > 0 {
-						// make space for a colored lamp.
-						if !sequence.RGBInvert {
-							// A faded up and down color.
-							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						} else {
-							// A solid on color.
-							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					} else {
-						if !sequence.RGBInvert {
-							shiftCounter = 0
-							// make space for a off lamp.
-							for range slopeOff {
-								if shiftCounter == shift {
-									break
-								}
-								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-								shiftCounter++
-							}
-						} else {
-							// A fading to black lamp.
-							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
-								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							}
-						}
-					}
-				}
-				numberFixturesInThisStep++
-			}
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
-		}
-	}
-
-	// It appears counters arn't always the same.
-	counter1 := len(fadeColors[0])
-	counter2 := len(fadeColors[1])
-	counter3 := len(fadeColors[2])
-	counter4 := len(fadeColors[3])
-
-	// Use the shortest for safety.
-	counter := counter1
-	if counter2 < counter1 {
-		counter = counter2
-	}
-	if counter3 < counter {
-		counter = counter3
-	}
-	if counter4 < counter {
-		counter = counter4
-	}
-
-	if debug {
-		// Print out the fixtures so far.
-		for fixture := 0; fixture < numberFixtures; fixture++ {
-			fmt.Printf("Fixture ")
-			for out := 0; out < counter; out++ {
-				fmt.Printf("%v", fadeColors[fixture][out])
-			}
-			fmt.Printf("\n")
-		}
-	}
-
-	positionsOut := AssemblePositions(fadeColors, counter, numberFixtures, scannerState, sequence.RGBInvert, sequence.ScannerChase, Optimisation)
-	return positionsOut, len(positionsOut)
-
-}
-
-func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
-
-	positionsOut := make(map[int]common.Position)
-	lampOn := make(map[int]bool)
-
-	// Assemble the positions.
-	for step := 0; step < totalNumberOfSteps; step++ {
-		// Create a new position.
-		newPosition := common.Position{}
-		// Add some space for the fixtures.
-		newPosition.Fixtures = make(map[int]common.Fixture)
-
-		if debug {
-			fmt.Printf("totalNumberOfSteps %d\n", totalNumberOfSteps)
-		}
-
-		for fixture := 0; fixture < numberFixtures; fixture++ {
-			if scannerState[fixture].Enabled {
-				newFixture := common.Fixture{}
-
-				newColor := common.Color{}
-				newColor.R = fadeColors[fixture][step].Color.R
-				newColor.G = fadeColors[fixture][step].Color.G
-				newColor.B = fadeColors[fixture][step].Color.B
-
-				// Optimisation is applied in this step. We only play out off's to the universe if the lamp is already on.
-				// And in the case of inverted playout only colors if the lamp is already on.
-				if !RGBInvert {
-					// We've found a color.
-					if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 {
-						newFixture.Colors = append(newFixture.Colors, newColor)
-						newFixture.Gobo = fadeColors[fixture][step].Gobo
-						newFixture.Pan = fadeColors[fixture][step].Pan
-						newFixture.Tilt = fadeColors[fixture][step].Tilt
-						newFixture.Shutter = fadeColors[fixture][step].Shutter
-						lampOn[fixture] = true
-						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-						newPosition.Fixtures[fixture] = newFixture
-					} else {
-						// turn the lamp off, but only if its already on.
-						if lampOn[fixture] || !Optimisation {
-							newFixture.Colors = append(newFixture.Colors, common.Color{})
-							newFixture.Gobo = fadeColors[fixture][step].Gobo
-							newFixture.Pan = fadeColors[fixture][step].Pan
-							newFixture.Tilt = fadeColors[fixture][step].Tilt
-							newFixture.Shutter = fadeColors[fixture][step].Shutter
-							lampOn[fixture] = false
-							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-							newPosition.Fixtures[fixture] = newFixture
-						}
-					}
-				} else {
-					// We've found a color. turn it on but only if its already off.
-					if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 {
-						if !lampOn[fixture] || !Optimisation {
-							newFixture.Colors = append(newFixture.Colors, newColor)
-							newFixture.Gobo = fadeColors[fixture][step].Gobo
-							newFixture.Pan = fadeColors[fixture][step].Pan
-							newFixture.Tilt = fadeColors[fixture][step].Tilt
-							newFixture.Shutter = fadeColors[fixture][step].Shutter
-							lampOn[fixture] = true
-							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-							newPosition.Fixtures[fixture] = newFixture
-						}
-					} else {
-						// turn the lamp off
-						newFixture.Colors = append(newFixture.Colors, common.Color{})
-						newFixture.Gobo = fadeColors[fixture][step].Gobo
-						newFixture.Pan = fadeColors[fixture][step].Pan
-						newFixture.Tilt = fadeColors[fixture][step].Tilt
-						newFixture.Shutter = fadeColors[fixture][step].Shutter
-						lampOn[fixture] = false
-						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-						newPosition.Fixtures[fixture] = newFixture
-					}
-				}
-			}
-		}
-
-		// Only add a position if there are some enabled scanners in the fixture list.
-		if len(newPosition.Fixtures) != 0 {
-			positionsOut[step] = newPosition
-		}
-	}
-
-	if debug {
-		// Print out the positions in fixtures order.
-		for step := 0; step < len(positionsOut); step++ {
-			fmt.Printf("Position %d: Fixtures %+v\n", step, positionsOut[step].Fixtures)
-		}
-	}
-
-	return positionsOut
 }
 
 func MakeACopy(src, dist interface{}) (err error) {
@@ -1444,95 +985,4 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 	}
 	// Now turn pink the selected sequence select light.
 	common.LightLamp(common.ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-}
-
-func getFadeValues(size float64, fade int, reverse bool) []int {
-
-	out := []int{}
-	outPadded := []int{}
-	size = size / 2
-
-	var numberCoordinates float64
-
-	if fade == 1 {
-		numberCoordinates = 20
-	}
-	if fade == 2 {
-		numberCoordinates = 25
-	}
-	if fade == 3 {
-		numberCoordinates = 30
-	}
-	if fade == 4 {
-		numberCoordinates = 35
-	}
-	if fade == 5 {
-		numberCoordinates = 40
-	}
-	if fade == 6 {
-		numberCoordinates = 45
-	}
-	if fade == 7 {
-		numberCoordinates = 50
-	}
-	if fade == 8 {
-		numberCoordinates = 55
-	}
-	if fade == 9 {
-		numberCoordinates = 60
-	}
-	if fade == 10 {
-		numberCoordinates = 65
-	}
-
-	var theta float64
-	var x float64
-	if reverse {
-		for x = 0; x <= 180; x += numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
-		}
-	} else {
-		for x = 180; x >= 0; x -= numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
-		}
-	}
-
-	if reverse {
-		for value := 10; value > 0; value-- {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[len(out)-value])
-			}
-		}
-
-	} else {
-		for value := 0; value < 10; value++ {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[value])
-			}
-		}
-	}
-
-	return outPadded
-}
-
-func getFadeOnValues(size int, fade int) []int {
-
-	out := []int{}
-
-	var x int
-
-	for x = 0; x < fade; x++ {
-		x := size
-		out = append(out, x)
-	}
-
-	return out
 }
