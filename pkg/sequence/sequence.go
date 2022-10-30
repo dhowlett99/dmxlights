@@ -802,24 +802,26 @@ func replaceColors(positionsMap map[int]common.Position, colors []common.Color) 
 	numberColors := len(colors)
 
 	replace := make(map[int]common.Position)
-	for currentPosition, position := range positionsMap {
-
+	lengthPositions := len(positionsMap)
+	for currentPosition := 0; currentPosition < lengthPositions; currentPosition++ {
+		position := positionsMap[currentPosition]
 		if insertColor >= numberColors {
 			insertColor = 0
 		}
-		for fixtureNumber, fixture := range position.Fixtures {
-			for colorNumber, color := range fixture.Colors {
+		lengthFixtures := len(position.Fixtures)
+		for fixtureNumber := 0; fixtureNumber < lengthFixtures; fixtureNumber++ {
+			fixture := position.Fixtures[fixtureNumber]
+			lengthColors := len(fixture.Colors)
+			for colorNumber := 0; colorNumber < lengthColors; colorNumber++ {
+				color := fixture.Colors[colorNumber]
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
 					continue
 				}
 			}
 		}
-
 		insertColor++
-
 		replace[currentPosition] = position
-
 	}
 
 	if debug {
