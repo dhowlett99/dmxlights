@@ -540,7 +540,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											fixture := findFixtureByName(fixtureName, fixtures)
 											v, err := lookUpSettingLabelInFixtureDefinition(fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting, fixtures)
 											if err != nil {
-												fmt.Printf("dmxlights: error failed to find %s switch label %s in fixture config for switch no %d: %s\n", value.Name, value.Setting, swiTch.Number, err.Error())
+												fmt.Printf("dmxlights: error failed to find Name=%s in switch Setting=%s in fixture config for switch Number=%d: %s\n", value.Name, value.Setting, swiTch.Number, err.Error())
 												fmt.Printf("fixture.Group=%d, swiTch.Number=%d, value.Channel=%s, value.Name=%s, value.Setting=%s\n", fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting)
 												os.Exit(1)
 											}

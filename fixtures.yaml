@@ -393,6 +393,7 @@ fixtures:
     name: Blue8
 - name: ADJ QA PAR 38
   number: 1
+  label: par38
   use_channels: 8
   description: American DJ SPOT
   type: rgb
@@ -1274,6 +1275,7 @@ fixtures:
   - name: QPar36
     number: 5
     label: SW5.QPar36
+    fixture: par38
     description: Switch 5
     states:
     - name: Off
@@ -1284,9 +1286,55 @@ fixtures:
         blue: 0 
       values: 
         - name: mode
+          description: Red
+          channel: 150
+          setting: 0
+        - name: mode
+          description: Green
+          channel: 151
+          setting: 0
+        - name: mode
+          description: Blue
+          channel: 152
+          setting: 0
+        - name: mode
+          description: Amber
+          channel: 153
+          setting: 0
+        - name: mode
           description: Dimmer Off
           channel: 154
           setting: 0
+        - name: mode
+          description: ProgramSpeed
+          channel: 155
+          setting: 0
+        - name: mode
+          description: ColorSelect
+          channel: 156
+          setting: 0
+        - name: mode
+          description: ColorMacros
+          channel: 157
+          setting: 0
+      actions:
+        - name: soft chase
+          mode: off
+    - name: Sound
+      label: Sound
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: fast
     - name: Slow Color Fade
       label: Slow
       buttoncolor: 
@@ -1295,23 +1343,39 @@ fixtures:
         blue: 0 
       values: 
         - name: mode
+          description: Red
+          channel: 150
+          setting: 255
+        - name: mode
+          description: Green
+          channel: 151
+          setting: 255
+        - name: mode
+          description: Blue
+          channel: 152
+          setting: 255
+        - name: mode
+          description: Amber
+          channel: 153
+          setting: 255
+        - name: mode
           description: Dimmer
           channel: 154
           setting: 255
         - name: mode
-          description: Shutter
+          description: Speed
           channel: 155
-          setting: 0
+          setting: 200
         - name: mode
           description: MAcro Mode
           channel: 156
-          setting: 158
+          setting: 103
         - name: mode
           description: MAcro
           channel: 157
           setting: 250
     - name: Sound Trigger
-      label: Sound
+      label: Int
       buttoncolor: 
         red: 144
         green: 203
