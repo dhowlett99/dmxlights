@@ -340,10 +340,20 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Sequence in Switch Mode.
-		if sequence.PlaySwitchOnce && sequence.Type == "switch" {
+		// Show all switches.
+		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
 			// Show initial state of switches
 			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchStopChannel, soundTriggers, channels.SoundTriggerChannels)
 			sequence.PlaySwitchOnce = false
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
+			continue
+		}
+
+		// Show the selected switch.
+		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
+			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchStopChannel, soundTriggers, channels.SoundTriggerChannels)
+			sequence.PlaySwitchOnce = false
+			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
 		}
@@ -705,6 +715,33 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				// Now play all the values for this state.
 				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, stopChannel, SoundTriggers, soundTriggerChannels)
 			}
+		}
+	}
+}
+
+func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
+	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures, stopChannel chan bool, SoundTriggers []*common.Trigger, soundTriggerChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("ShowSingleSwitch for sequence %d\n", mySequenceNumber)
+	}
+
+	currentState := sequence.Switches[currentSwitch].CurrentState
+	switchNumber := sequence.Switches[currentSwitch].Number - 1
+	switchLabel := sequence.Switches[currentSwitch].Label
+
+	for stateNumber, state := range sequence.Switches[currentSwitch].States {
+
+		// For this state.
+		if stateNumber == currentState {
+			// Use the button color for this state to light the correct color on the launchpad.
+			common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: state.ButtonColor.R, Green: state.ButtonColor.G, Blue: state.ButtonColor.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+
+			// Label the switch.
+			common.LabelButton(switchNumber, mySequenceNumber, switchLabel+"\n"+state.Label, guiButtons)
+
+			// Now play all the values for this state.
+			fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, currentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, stopChannel, SoundTriggers, soundTriggerChannels)
 		}
 	}
 }

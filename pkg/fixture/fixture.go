@@ -484,6 +484,10 @@ func MapSwitchFixture(mySequenceNumber int,
 
 	var fixtureName string
 
+	if debug {
+		fmt.Printf("MapSwitchFixture switchNumber %d, currentState %d\n", switchNumber, currentState)
+	}
+
 	// Step through the fixture config file looking for the group that matches mysequence number.
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
@@ -513,23 +517,24 @@ func MapSwitchFixture(mySequenceNumber int,
 										v, _ := strconv.ParseFloat(value.Setting, 32)
 										howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
 										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
-											c, _ := strconv.ParseFloat(value.Setting, 16)
+											c, _ := strconv.ParseFloat(value.Channel, 16)
 											dmxController.SetChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)))
 										} else {
-											c, _ := strconv.Atoi(value.Setting)
+											c, _ := strconv.Atoi(value.Channel)
 											dmxController.SetChannel(fixture.Address+int16(c), byte(howBright))
 										}
 									} else {
 
+										// If the setting has is a number set it directly.
 										if IsNumericOnly(value.Setting) {
-											// If the setting has is a number set it directly.
-											v, _ := strconv.ParseFloat(value.Setting, 32)
 
-											// Handle the fact that the channel may be a label as well.
+											v, _ := strconv.ParseFloat(value.Setting, 32)
 											if IsNumericOnly(value.Channel) {
+												// If the channel has is a number set it directly.
 												c, _ := strconv.ParseFloat(value.Channel, 16)
 												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
 											} else {
+												// Handle the fact that the channel may be a label as well.
 												fixture := findFixtureByName(fixtureName, fixtures)
 												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
 												dmxController.SetChannel(fixture.Address+int16(c), byte(v))

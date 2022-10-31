@@ -169,7 +169,6 @@ const (
 	GetUpdatedSequence
 	ClearAllSwitchPositions
 	UpdateSwitch
-	UpdateSwitchPositions
 	Inverted
 	UpdateGobo
 	Flood
@@ -264,6 +263,7 @@ type Sequence struct {
 	Static                     bool                        // We're a static sequence.
 	PlayStaticOnce             bool                        // Play a static scene only once.
 	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
+	PlaySingleSwitch           bool                        // Play a single switch.
 	StartFlood                 bool                        // We're in flood mode.
 	StopFlood                  bool                        // We're not in flood mode.
 	StartStrobe                bool                        // We're in strobe mode.
@@ -296,6 +296,7 @@ type Sequence struct {
 	Functions                  []Function                  // Storage for the sequence functions.
 	FunctionMode               bool                        // This sequence is in function mode.
 	Switches                   []Switch                    // A switch sequence stores its data in here.
+	CurrentSwitch              int
 }
 
 type Function struct {

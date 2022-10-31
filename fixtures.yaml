@@ -398,7 +398,7 @@ fixtures:
   description: American DJ SPOT
   type: rgb
   address: 150
-  group: 2 
+  group: 101 
   channels:
   - number: 1
     name: Red1
@@ -1274,7 +1274,7 @@ fixtures:
           setting: 255
   - name: QPar36
     number: 5
-    label: SW5.QPar36
+    label: SW5.QPar38
     fixture: par38
     description: Switch 5
     states:
@@ -1320,21 +1320,6 @@ fixtures:
       actions:
         - name: soft chase
           mode: off
-    - name: Sound
-      label: Sound
-      buttoncolor: 
-        red: 255
-        green: 0
-        blue: 0
-      actions:
-        - name: soft chase
-          colors: 
-          - red
-          - green 
-          - blue
-          mode: chase
-          fade: soft
-          speed: fast
     - name: Slow Color Fade
       label: Slow
       buttoncolor: 
@@ -1365,7 +1350,7 @@ fixtures:
         - name: mode
           description: Speed
           channel: 155
-          setting: 200
+          setting: 50
         - name: mode
           description: MAcro Mode
           channel: 156
@@ -1401,6 +1386,30 @@ fixtures:
           description: Shutter Sound Active
           channel: 158
           setting: 32
+    - name: Sound
+      label: Sound
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: music
+      values: 
+        - name: mode
+          description: Red
+          channel: 150
+          setting: 0
+        - name: mode
+          description: MAcro
+          channel: 157
+          setting: 0
   - name: switch
     number: 6
     label: SW6.DERBY
