@@ -29,35 +29,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -70,36 +48,14 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 									break
 								}
 								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -129,35 +85,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -170,36 +104,14 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 									break
 								}
 								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -224,35 +136,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range slopeOn {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(255) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(255) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(255) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(255) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -265,36 +155,14 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 									break
 								}
 								// A black lamp.
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(0) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(0) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(0) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(0) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range slopeOff {
-								newColor := common.FixtureBuffer{}
-								newColor.Color = common.Color{}
-								newColor.Gobo = fixture.Gobo
-								newColor.Pan = fixture.Pan
-								newColor.Tilt = fixture.Tilt
-								newColor.Shutter = fixture.Shutter
-								newColor.ScannerNumber = fixtureNumber
-								newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(slope) / 2.55)))
-								newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(slope) / 2.55)))
-								newColor.MasterDimmer = fixture.MasterDimmer
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -340,6 +208,22 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 	positionsOut := AssemblePositions(fadeColors, counter, numberFixtures, scannerState, sequence.RGBInvert, sequence.ScannerChase, Optimisation)
 	return positionsOut, len(positionsOut)
 
+}
+
+func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color, insertValue int) common.FixtureBuffer {
+	newColor := common.FixtureBuffer{}
+	newColor.Color = common.Color{}
+	newColor.Gobo = fixture.Gobo
+	newColor.Pan = fixture.Pan
+	newColor.Tilt = fixture.Tilt
+	newColor.Shutter = fixture.Shutter
+	newColor.ScannerNumber = fixtureNumber
+	newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(insertValue) / 2.55)))
+	newColor.MasterDimmer = fixture.MasterDimmer
+	return newColor
 }
 
 func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
