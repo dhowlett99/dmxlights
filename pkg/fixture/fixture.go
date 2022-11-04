@@ -508,7 +508,7 @@ func MapSwitchFixture(mySequenceNumber int,
 
 							// Play Actions which send messages to a dedicated mini sequencer.
 							for _, action := range state.Actions {
-								newMiniSequencer(fixtureName, swiTch.Number, action, dmxController, fixtures, switchChannels, soundConfig, miniSequencerRunning)
+								newMiniSequencer(fixtureName, swiTch.Number, action, dmxController, fixtures, switchChannels, soundConfig, miniSequencerRunning, blackout, master)
 							}
 
 							// Play DMX values directly to the univers.
@@ -599,11 +599,11 @@ func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DM
 	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 }
 
-func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures, switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig, miniSequencerRunning map[int]bool) {
+func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
+	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig, miniSequencerRunning map[int]bool,
+	blackout bool, master int) {
 
 	fixture := findFixtureByName(fixtureName, fixturesConfig)
-	blackout := false
-	master := 255
 	strobeSpeed := 0
 	ScannerColor := make(map[int]int)
 	rotate := 0
@@ -811,7 +811,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 					case <-soundConfig.SoundTriggerChannels[trigger.SequenceNumber].TriggerChannel:
 					case <-switchChannels[switchNumber].Stop:
 						switchChannels[switchNumber].StopRotate <- true
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixturesConfig, blackout, 0, 0, strobeSpeed)
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixturesConfig, blackout, master, master, strobeSpeed)
 						return
 					case <-time.After(speed):
 					}
