@@ -1672,13 +1672,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("HANDLE: selectButtons[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
+		fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.SelectedSequence, this.EditSequenceColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
-		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
+		fmt.Printf("HANDLE: Function6_Static_Gobo[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
 	// Update status bar.
@@ -1703,8 +1703,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
 
 	// First time into function mode we head back to normal mode.
-	if this.FunctionSelectMode[this.SelectedSequence] && !this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] && !this.EditStaticColorsMode[this.SelectedSequence] {
+	if this.FunctionSelectMode[this.SelectedSequence] &&
+		!this.SelectButtonPressed[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode[this.SelectedSequence] {
 		if debug {
 			fmt.Printf("Handle 1 Function Bar off\n")
 		}
@@ -1740,6 +1742,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
 			common.SetMode(this.SelectedSequence, commandChannels, "Static")
+			sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 			return
 		}
 
@@ -1837,11 +1840,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// We are in function mode for this sequence.
 	if !this.FunctionSelectMode[this.SelectedSequence] &&
 		sequences[this.SelectedSequence].Type != "switch" || // Don't alow functions in switch mode.
-		!this.FunctionSelectMode[this.SelectedSequence] && this.EditStaticColorsMode[this.SelectedSequence] { // The case when we leave static colors edit mode.
+		!this.FunctionSelectMode[this.SelectedSequence] && // Function select mode is off
+			this.EditStaticColorsMode[this.SelectedSequence] { // The case when we leave static colors edit mode.
 
 		if debug {
 			fmt.Printf("Handle 4 - Function Bar On!\n")
 		}
+
+		// Unset the function key.
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 
 		// Unset the edit static color mode.
 		this.EditStaticColorsMode[this.SelectedSequence] = false
@@ -2222,6 +2229,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
+
+	sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,

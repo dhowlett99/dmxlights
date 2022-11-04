@@ -653,18 +653,16 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 			fmt.Printf("Stop mini sequence for switch number %d\n", switchNumber)
 		}
 
+		// DeRegister this mini sequencer with the sound service.
+		// Use the switch number as the unique sequence name.
+		soundConfig.DeRegisterSoundTrigger(fmt.Sprintf("switch%d", switchNumber))
+
 		miniSequencerRunning[switchNumber] = false
 		select {
 		case switchChannels[switchNumber].Stop <- true:
 			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
-		// Wait for threads to stop
-		time.Sleep(500 * time.Millisecond)
-
-		// DeRegister this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DeRegisterSoundTrigger(fmt.Sprintf("switch%d", switchNumber))
 
 		return
 	}
