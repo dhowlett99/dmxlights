@@ -289,8 +289,7 @@ func PlaySequence(sequence common.Sequence,
 	channels common.Channels,
 	soundTriggers []*common.Trigger,
 	SwitchChannels map[int]common.SwitchChannel,
-	soundConfig *sound.SoundConfig,
-	miniSequencerRunning map[int]bool) {
+	soundConfig *sound.SoundConfig) {
 
 	// Create channels used for stepping the fixture threads for this sequnece.
 	fixtureStepChannels := []chan common.FixtureCommand{}
@@ -348,7 +347,7 @@ func PlaySequence(sequence common.Sequence,
 		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, channels.SoundTriggerChannels, soundConfig, miniSequencerRunning)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, channels.SoundTriggerChannels, soundConfig)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
@@ -356,7 +355,7 @@ func PlaySequence(sequence common.Sequence,
 
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
-			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, channels.SoundTriggerChannels, soundConfig, miniSequencerRunning)
+			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, channels.SoundTriggerChannels, soundConfig)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
@@ -400,6 +399,12 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
+
+			// Turn off any music trigger for this sequence.
+			sequence.MusicTrigger = false
+			sequence.Functions[common.Function8_Music_Trigger].State = false
+			soundTriggers[mySequenceNumber].State = false
+
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:            sequence.Type,
@@ -703,8 +708,7 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
 	switchChannels map[int]common.SwitchChannel, SoundTriggers []*common.Trigger,
-	soundTriggerChannels []common.SoundTriggerChannel, soundConfig *sound.SoundConfig,
-	miniSequencerRunning map[int]bool) {
+	soundTriggerChannels []common.SoundTriggerChannel, soundConfig *sound.SoundConfig) {
 
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
@@ -721,7 +725,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
 
 				// Now play all the values for this state.
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundTriggerChannels, soundConfig, miniSequencerRunning)
+				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundTriggerChannels, soundConfig)
 			}
 		}
 	}
@@ -731,7 +735,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
 	switchChannels map[int]common.SwitchChannel, SoundTriggers []*common.Trigger,
 	soundTriggerChannels []common.SoundTriggerChannel,
-	soundConfig *sound.SoundConfig, miniSequencerRunning map[int]bool) {
+	soundConfig *sound.SoundConfig) {
 
 	if debug {
 		fmt.Printf("ShowSingleSwitch for sequence %d\n", mySequenceNumber)
@@ -752,7 +756,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 			common.LabelButton(switchNumber, mySequenceNumber, switchLabel+"\n"+state.Label, guiButtons)
 
 			// Now play all the values for this state.
-			fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, currentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundTriggerChannels, soundConfig, miniSequencerRunning)
+			fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, currentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundTriggerChannels, soundConfig)
 		}
 	}
 }

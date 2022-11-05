@@ -32,7 +32,6 @@ type CurrentState struct {
 	ScannerFade              map[int]int                  // Indexed by sequence.
 	ScannerCoordinates       map[int]int                  // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
 	Running                  map[int]bool                 // Which sequence is running. Indexed by sequence. True if running.
-	MiniSequencerRunning     map[int]bool                 // Keep track of which switch is running a mini-sequencer.
 	Strobe                   bool                         // We are in strobe mode. True if strobing
 	StrobeSpeed              int                          // Strobe speed. value is speed 0-255
 	SavePreset               bool                         // Save a preset flag.
@@ -2187,12 +2186,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Preserve this.Blackout.
-	// if !this.Blackout {
-	// 	cmd := common.Command{
-	// 		Action: common.Normal,
-	// 	}
-	// 	common.SendCommandToAllSequence(cmd, commandChannels)
-	// }
+	if !this.Blackout {
+		cmd := common.Command{
+			Action: common.Normal,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+	}
 
 	// Turn off the local copy of the this.Flood flag.
 	this.Flood = false
@@ -2291,7 +2290,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	// Restore any switch channels
 	for _, s := range sequences {
 		if s.Type == "switch" {
-			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SequenceChannels.SoundTriggerChannels, this.SoundConfig, this.MiniSequencerRunning)
+			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SequenceChannels.SoundTriggerChannels, this.SoundConfig)
 		}
 	}
 

@@ -16,7 +16,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
 	replyChannel := channels.ReplyChannels[mySequenceNumber]
-	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber].TriggerChannel
+	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber].Channel
 	updateChannel := channels.UpdateChannels[mySequenceNumber]
 
 	// Create an empty command.

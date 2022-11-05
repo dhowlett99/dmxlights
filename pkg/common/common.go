@@ -322,8 +322,9 @@ type SwitchChannel struct {
 }
 
 type SoundTriggerChannel struct {
-	TriggerName    string
-	TriggerChannel chan Command
+	Name    string
+	Number  int
+	Channel chan Command
 }
 
 type Hit struct {

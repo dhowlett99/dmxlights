@@ -177,6 +177,14 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 					}
 
 					cmd := common.Command{}
+					var counter int
+					for _, trigger := range soundConfig.SoundTriggers {
+						if trigger.State {
+							counter++
+						}
+					}
+					//fmt.Printf("--->counter %d\n", counter)
+
 					for index, trigger := range soundConfig.SoundTriggers {
 
 						if trigger.SequenceNumber == index {
@@ -184,7 +192,12 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 								if debug {
 									fmt.Printf("%d: Index %d Gain %f   State %t  \n", trigger.SequenceNumber, index, trigger.Gain, trigger.State)
 								}
-								soundConfig.SoundTriggerChannels[index].TriggerChannel <- cmd
+								select {
+								case soundConfig.SoundTriggerChannels[trigger.SequenceNumber].Channel <- cmd:
+								case <-time.After(1000 * time.Millisecond):
+									continue
+								}
+
 							}
 							// Remember the BPM valuse so they don't get overwritten.
 							trigger.BPM = soundConfig.BPMactualCounter
@@ -217,8 +230,9 @@ func (soundConfig *SoundConfig) RegisterSoundTrigger(name string) *common.Trigge
 
 	// Create a new sound trigger channel.
 	newSoundTriggerChannel := common.SoundTriggerChannel{}
-	newSoundTriggerChannel.TriggerChannel = make(chan common.Command)
-	newSoundTriggerChannel.TriggerName = name
+	newSoundTriggerChannel.Channel = make(chan common.Command)
+	newSoundTriggerChannel.Name = name
+	newSoundTriggerChannel.Number = lengthSoundTriggers
 	soundConfig.SoundTriggerChannels = append(soundConfig.SoundTriggerChannels, newSoundTriggerChannel)
 
 	if debug {
@@ -242,7 +256,6 @@ func (soundConfig *SoundConfig) DeRegisterSoundTrigger(name string) {
 		}
 		if trigger.Name != name {
 			current := soundConfig.SoundTriggers[triggerNumber]
-			//fmt.Printf("Current %+v\n", current)
 			newTriggers = append(newTriggers, current)
 		}
 	}
@@ -252,18 +265,18 @@ func (soundConfig *SoundConfig) DeRegisterSoundTrigger(name string) {
 	newSoundTriggerChannels := []common.SoundTriggerChannel{}
 	// Step through the existing sound triggers and find the one we want to deregister.
 	for channelNumber, channel := range soundConfig.SoundTriggerChannels {
-		if channel.TriggerName == name {
+		if channel.Name == name {
 			// Drain any outstanding messages.
-			for len(soundConfig.SoundTriggerChannels[channelNumber].TriggerChannel) > 0 {
+			for len(soundConfig.SoundTriggerChannels[channelNumber].Channel) > 0 {
 				if debug {
 					fmt.Printf("Draining message\n")
 				}
-				<-soundConfig.SoundTriggerChannels[channelNumber].TriggerChannel
+				<-soundConfig.SoundTriggerChannels[channelNumber].Channel
 			}
 
 		}
 
-		if channel.TriggerName != name {
+		if channel.Name != name {
 			current := soundConfig.SoundTriggerChannels[channelNumber]
 			newSoundTriggerChannels = append(newSoundTriggerChannels, current)
 		}

@@ -1480,8 +1480,6 @@ fixtures:
         green: 255
         blue: 0
       actions:
-        - name: any chase
-          mode: off
         - name: rotate
           colors: 
           - red
