@@ -9,6 +9,7 @@ import (
 )
 
 const debug = false
+const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -26,7 +27,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	select {
 	case command = <-soundTriggerChannel:
 		if sequence.MusicTrigger {
-			if debug {
+			if beatDebug {
 				fmt.Printf("%d: BEAT\n", mySequenceNumber)
 			}
 			break

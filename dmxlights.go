@@ -67,7 +67,7 @@ func main() {
 	this.ScannerShift = make(map[int]int, 4)        // Initialise storage for four sequences.
 	this.RGBFade = make(map[int]int, 4)             // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
+	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)

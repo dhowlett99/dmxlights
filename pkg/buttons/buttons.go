@@ -215,6 +215,9 @@ func ProcessButtons(X int, Y int,
 		} else {
 			// Short press means load the config.
 			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			this.SelectedSequence = 0
+			this.SelectButtonPressed[this.SelectedSequence] = false
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		}
 		return
 	}
@@ -470,6 +473,9 @@ func ProcessButtons(X int, Y int,
 						this.SavePreset = false
 					}
 					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+					this.SelectedSequence = 0
+					this.SelectButtonPressed[this.SelectedSequence] = false
+					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
@@ -925,6 +931,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
+		// Update Coordinates.
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.SelectedSequence]--
@@ -973,6 +980,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
+		// Update Coordinates.
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.SelectedSequence]++
@@ -1694,7 +1702,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
-		label = getScannerCoordinatesLabel(this.ScannerShift[this.SelectedSequence])
+		label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 	}
 
@@ -2177,6 +2185,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0)
 
 	// Load the config.
+	// Which forces all sequences to load their config.
 	config.AskToLoadConfig(commandChannels, X, Y)
 
 	// Turn the selected preset light flashing red / yellow.
@@ -2205,8 +2214,35 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
 	this.LastPreset = &last
 
-	// Get an upto date copy of the sequence.
-	sequences[0] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+	// Get an upto date copy of all of the sequences.
+	for sequenceNumber := range sequences {
+		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+
+		// restore the speed, shift, size, fade, coordinates label data.
+		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
+		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
+		this.ScannerShift[this.SelectedSequence] = sequences[sequenceNumber].ScannerShift
+		this.RGBSize[sequenceNumber] = sequences[sequenceNumber].RGBSize
+		this.ScannerSize[this.SelectedSequence] = sequences[sequenceNumber].ScannerSize
+		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
+		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
+
+		// switch off any color editing.
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
+
+		// If we are loading a switch sequence, update our local copy of the switch settings.
+		if sequences[sequenceNumber].Type == "switch" {
+			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+			for position := 0; position < 8; position++ {
+				swiTch := sequences[sequenceNumber].Switches[position]
+				this.SwitchPositions[sequenceNumber][position] = swiTch.CurrentState
+				if debug {
+					fmt.Printf("restoring switch %+v\n", this.SwitchPositions[sequenceNumber][position])
+				}
+			}
+		}
+	}
+
 	this.StrobeSpeed = sequences[this.SelectedSequence].StrobeSpeed
 	if this.StrobeSpeed > 0 {
 		this.Strobe = true
@@ -2218,34 +2254,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		common.ShowStrobeStatus(false, eventsForLaunchpad, guiButtons)
 	}
 
-	// restore the speed, shift, size and fade labels data.
-	for sequenceNumber, sequence := range sequences {
-		this.Speed[sequenceNumber] = sequence.Speed
-		this.RGBShift[sequenceNumber] = sequence.RGBShift
-		this.ScannerShift[this.SelectedSequence] = sequence.ScannerShift
-		this.RGBSize[sequenceNumber] = sequence.RGBSize
-		this.ScannerSize[this.SelectedSequence] = sequence.ScannerSize
-		this.RGBFade[sequenceNumber] = sequence.RGBFade
-
-		// If we are loading a switch sequence, update our local copy of the switch settings.
-		if sequence.Type == "switch" {
-			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-			for position := 0; position < 8; position++ {
-				swiTch := sequences[sequenceNumber].Switches[position]
-				this.SwitchPositions[sequenceNumber][position] = swiTch.CurrentState
-				if debug {
-					fmt.Printf("restoring switch %+v\n", this.SwitchPositions[sequenceNumber][position])
-				}
-			}
-		}
-	}
-	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
-
-	sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
-
+	// common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
