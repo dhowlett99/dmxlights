@@ -197,7 +197,7 @@ func ProcessButtons(X int, Y int,
 		// Stop the timer for this preset.
 		elapsed := time.Since(*this.ButtonTimer)
 
-		// If the timer is longer than 1 seconds then we have a long press.
+		// Delete a preset - If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
 
 			// Delete a config file
@@ -205,6 +205,9 @@ func ProcessButtons(X int, Y int,
 
 			// Delete from preset store
 			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: false, Selected: false, Label: ""}
+
+			// Update the copy of presets on disk.
+			presets.SavePresets(this.PresetsStore)
 
 			// Show presets again.
 			presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
