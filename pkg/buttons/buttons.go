@@ -2226,6 +2226,18 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		this.RGBSize[sequenceNumber] = sequence.RGBSize
 		this.ScannerSize[this.SelectedSequence] = sequence.ScannerSize
 		this.RGBFade[sequenceNumber] = sequence.RGBFade
+
+		// If we are loading a switch sequence, update our local copy of the switch settings.
+		if sequence.Type == "switch" {
+			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+			for position := 0; position < 8; position++ {
+				swiTch := sequences[sequenceNumber].Switches[position]
+				this.SwitchPositions[sequenceNumber][position] = swiTch.CurrentState
+				if debug {
+					fmt.Printf("restoring switch %+v\n", this.SwitchPositions[sequenceNumber][position])
+				}
+			}
+		}
 	}
 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
@@ -2233,6 +2245,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
 
 	sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
+
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
