@@ -1320,6 +1320,21 @@ fixtures:
       actions:
         - name: soft chase
           mode: off
+    - name: On
+      label: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: fast
     # - name: Slow Color Fade
     #   label: Slow
     #   buttoncolor: 
@@ -1458,23 +1473,23 @@ fixtures:
       actions:
         - name: soft chase
           mode: off
-    # - name: On
-    #   label: On
-    #   buttoncolor: 
-    #     red: 255
-    #     green: 0
-    #     blue: 0
-    #   actions:
-    #     - name: soft chase
-    #       colors: 
-    #       - red
-    #       - green 
-    #       - blue
-    #       mode: chase
-    #       fade: soft
-    #       speed: fast
-    - name: Music
-      label: Music
+    - name: On
+      label: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - red
+          - green 
+          - blue
+          mode: chase
+          fade: soft
+          speed: fast
+    - name: Sound
+      label: Sound
       buttoncolor: 
         red: 255
         green: 255
