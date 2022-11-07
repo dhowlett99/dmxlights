@@ -179,7 +179,6 @@ func main() {
 	// Create all the channels I need.
 	commandChannels := []chan common.Command{}
 	replyChannels := []chan common.Sequence{}
-	soundTriggerChannels := []common.SoundTriggerChannel{}
 	updateChannels := []chan common.Sequence{}
 
 	// Make four default channels for commands.
@@ -188,13 +187,6 @@ func main() {
 		commandChannels = append(commandChannels, commandChannel)
 		replyChannel := make(chan common.Sequence)
 		replyChannels = append(replyChannels, replyChannel)
-
-		soundTriggerChannel := common.SoundTriggerChannel{}
-		soundTriggerChannel.Name = fmt.Sprintf("sequence%d", sequenceNumber)
-		soundTriggerChannel.Number = sequenceNumber
-		soundTriggerChannel.Channel = make(chan common.Command)
-
-		soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel)
 		updateChannel := make(chan common.Sequence)
 		updateChannels = append(updateChannels, updateChannel)
 	}
@@ -203,15 +195,14 @@ func main() {
 	this.SequenceChannels = common.Channels{}
 	this.SequenceChannels.CommmandChannels = commandChannels
 	this.SequenceChannels.ReplyChannels = replyChannels
-	this.SequenceChannels.SoundTriggerChannels = soundTriggerChannels
 	this.SequenceChannels.UpdateChannels = updateChannels
 
 	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
-	this.SoundTriggers = []*common.Trigger{}
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 0, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 1, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 2, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 3, State: false, Gain: this.SoundGain})
+	this.SoundTriggers = make(map[int]*common.Trigger)
+	this.SoundTriggers[0] = &common.Trigger{Name: "sequence0", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[1] = &common.Trigger{Name: "sequence1", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[2] = &common.Trigger{Name: "sequence2", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[3] = &common.Trigger{Name: "sequence3", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
 
 	// Create a timer for timing buttons, long and short presses.
 	this.ButtonTimer = &time.Time{}

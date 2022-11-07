@@ -58,7 +58,7 @@ type CurrentState struct {
 	Pad                      *mk3.Launchpad               // Pointer to the Novation Launchpad object.
 	PresetsStore             map[string]presets.Preset    // Storage for the Presets.
 	LastPreset               *string                      // Last preset used.
-	SoundTriggers            []*common.Trigger            // Pointer to the Sound Triggers.
+	SoundTriggers            map[int]*common.Trigger      // Pointer to the Sound Triggers.
 	SoundConfig              *sound.SoundConfig           // Pointer to the sound config struct.
 	SequenceChannels         common.Channels              // Channles used to communicate with the sequence.
 	Patterns                 map[int]common.Pattern       // A indexed map of the available patterns for this sequence.
@@ -2318,7 +2318,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	// Restore any switch channels
 	for _, s := range sequences {
 		if s.Type == "switch" {
-			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SequenceChannels.SoundTriggerChannels, this.SoundConfig)
+			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig)
 		}
 	}
 

@@ -1318,7 +1318,7 @@ fixtures:
           channel: 157
           setting: 0
       actions:
-        - name: soft chase
+        - name: off
           mode: off
     - name: On
       label: On
@@ -1334,7 +1334,7 @@ fixtures:
           - blue
           mode: chase
           fade: soft
-          speed: fast
+          speed: medium
     # - name: Slow Color Fade
     #   label: Slow
     #   buttoncolor: 

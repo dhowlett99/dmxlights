@@ -309,22 +309,15 @@ type Function struct {
 }
 
 type Channels struct {
-	CommmandChannels     []chan Command
-	ReplyChannels        []chan Sequence
-	SoundTriggerChannels []SoundTriggerChannel
-	UpdateChannels       []chan Sequence
+	CommmandChannels []chan Command
+	ReplyChannels    []chan Sequence
+	UpdateChannels   []chan Sequence
 }
 
 type SwitchChannel struct {
 	Stop            chan bool
 	StopRotate      chan bool
 	KeepRotateAlive chan bool
-}
-
-type SoundTriggerChannel struct {
-	Name    string
-	Number  int
-	Channel chan Command
 }
 
 type Hit struct {
@@ -417,11 +410,11 @@ type Event struct {
 }
 
 type Trigger struct {
-	Name           string
-	SequenceNumber int
-	State          bool
-	Gain           float32
-	BPM            int
+	Name    string
+	State   bool
+	Gain    float32
+	BPM     int
+	Channel chan Command
 }
 
 // Define the function keys.

@@ -12,12 +12,11 @@ const debug = false
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
+func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels, soundTriggers map[int]*common.Trigger) common.Sequence {
 
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
 	replyChannel := channels.ReplyChannels[mySequenceNumber]
-	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber].Channel
 	updateChannel := channels.UpdateChannels[mySequenceNumber]
 
 	// Create an empty command.
@@ -25,7 +24,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// Wait for a trigger: sound, command or timeout.
 	select {
-	case command = <-soundTriggerChannel:
+	case command = <-soundTriggers[mySequenceNumber].Channel:
 		if sequence.MusicTrigger {
 			if beatDebug {
 				fmt.Printf("%d: BEAT\n", mySequenceNumber)
