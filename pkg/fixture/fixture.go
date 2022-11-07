@@ -896,15 +896,6 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			// Wait for rotator thread to start.
 			time.Sleep(100 * time.Millisecond)
 
-			// find the correct trigger for this switch number.
-			var useTriggerNumber int
-			for triggerNumber, trigger := range soundConfig.SoundTriggers {
-				if trigger.Name == switchName {
-					useTriggerNumber = triggerNumber
-					break
-				}
-			}
-
 			for {
 
 				// Run through the steps in the sequence.
@@ -932,13 +923,13 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 					}
 
 					if debug {
-						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", switchNumber, useTriggerNumber, cfg.Speed)
+						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", switchNumber, switchNumber+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", switchNumber, cfg.Speed)
 					}
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					case <-soundConfig.SoundTriggers[useTriggerNumber].Channel:
+					case <-soundConfig.SoundTriggers[switchNumber+10].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true
