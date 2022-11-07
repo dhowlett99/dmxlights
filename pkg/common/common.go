@@ -316,9 +316,13 @@ type Channels struct {
 }
 
 type SwitchChannel struct {
-	Stop            chan bool
-	StopRotate      chan bool
-	KeepRotateAlive chan bool
+	Stop             chan bool
+	StopRotate       chan bool
+	KeepRotateAlive  chan bool
+	SequencerRunning bool
+	Blackout         bool
+	Master           int
+	SwitchPosition   int
 }
 
 type Hit struct {

@@ -76,6 +76,7 @@ func main() {
 		newSwitch.Stop = make(chan bool)
 		newSwitch.KeepRotateAlive = make(chan bool)
 		newSwitch.StopRotate = make(chan bool)
+		newSwitch.SequencerRunning = false
 		this.SwitchChannels[switchChannel] = newSwitch
 	}
 

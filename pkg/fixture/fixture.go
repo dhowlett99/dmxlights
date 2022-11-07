@@ -61,6 +61,20 @@ type Action struct {
 	Strobe  string   `yaml:"strobe"`
 }
 
+type ActionConfig struct {
+	Name         string
+	Colors       []Color
+	Fade         int
+	Size         int
+	Speed        time.Duration
+	TriggerState bool
+	RotateSpeed  int
+	Rotatable    bool
+	Program      int
+	Music        int
+	Strobe       int
+}
+
 type Switch struct {
 	Name        string  `yaml:"name"`
 	Label       string  `yaml:"label"`
@@ -508,7 +522,7 @@ func MapSwitchFixture(mySequenceNumber int,
 
 							// Play Actions which send messages to a dedicated mini sequencer.
 							for _, action := range state.Actions {
-								newMiniSequencer(fixtureName, swiTch.Number, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master)
+								newMiniSequencer(fixtureName, swiTch.Number, currentState, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master)
 							}
 
 							// Play DMX values directly to the univers.
@@ -599,7 +613,119 @@ func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DM
 	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
 }
 
-func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
+func setSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber int, switchPosition int, state bool, blackout bool, master int) {
+
+	currentSwitchState := switchChannels[switchNumber]
+	newSwitchState := common.SwitchChannel{
+		Stop:             currentSwitchState.Stop,
+		StopRotate:       currentSwitchState.StopRotate,
+		KeepRotateAlive:  currentSwitchState.KeepRotateAlive,
+		SequencerRunning: state,
+		Blackout:         blackout,
+		Master:           master,
+		SwitchPosition:   switchPosition,
+	}
+	switchChannels[switchNumber] = newSwitchState
+
+}
+
+func getSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber int) bool {
+	return switchChannels[switchNumber].SequencerRunning
+}
+
+func getConfig(action Action) ActionConfig {
+
+	config := ActionConfig{}
+
+	switch action.Fade {
+	case "soft":
+		config.Fade = 1
+	case "sharp":
+		config.Fade = 10
+	default:
+		config.Fade = 1
+	}
+
+	switch action.Size {
+	case "short":
+		config.Size = 1
+	case "medium":
+		config.Size = 3
+	case "long":
+		config.Size = 10
+	default:
+		config.Size = 3
+	}
+
+	switch action.Program {
+	case "all":
+		config.Program = 255
+	default:
+		config.Program = 0
+	}
+
+	switch action.Rotate {
+	case "off":
+		config.RotateSpeed = 0
+		config.Rotatable = false
+	case "slow":
+		config.RotateSpeed = 1
+		config.Rotatable = true
+	case "medium":
+		config.RotateSpeed = 50
+		config.Rotatable = true
+	case "fast":
+		config.RotateSpeed = 127
+		config.Rotatable = true
+	default:
+		config.RotateSpeed = 0
+		config.Rotatable = false
+	}
+
+	switch action.Music {
+
+	case "internal":
+		config.Music = 255
+	case "off":
+		config.Music = 0
+	default:
+		config.Music = 0
+	}
+
+	switch action.Strobe {
+	case "off":
+		config.Strobe = 0
+	case "slow":
+		config.Strobe = 0
+	case "fast":
+		config.Strobe = 0
+	default:
+		config.Strobe = 0
+	}
+
+	switch action.Speed {
+	case "slow":
+		config.TriggerState = false
+		config.Speed = 1 * time.Second
+	case "medium":
+		config.TriggerState = false
+		config.Speed = 500 * time.Millisecond
+	case "fast":
+		config.TriggerState = false
+		config.Speed = 50 * time.Millisecond
+	case "music":
+		config.TriggerState = true
+		config.Speed = time.Duration(12 * time.Hour)
+	default:
+		config.TriggerState = false
+		config.Speed = time.Duration(12 * time.Hour)
+	}
+
+	return config
+}
+
+// newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
+func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig,
 	blackout bool, master int) {
 
@@ -610,89 +736,19 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
-	var speed time.Duration
-	var music int
-	var program int
-	var rotateSpeed int
-	var rotatable bool
-	var fade int
-	var size int
-	var strobe int
+	cfg := getConfig(action)
 
 	if debug {
 		fmt.Printf("Action %+v\n", action)
-	}
-
-	switch action.Fade {
-	case "soft":
-		fade = 1
-	case "sharp":
-		fade = 10
-	default:
-		fade = 1
-	}
-
-	switch action.Size {
-	case "short":
-		size = 1
-	case "medium":
-		size = 3
-	case "long":
-		size = 10
-	default:
-		size = 3
-	}
-
-	switch action.Program {
-	case "all":
-		program = 255
-	default:
-		program = 0
-	}
-
-	switch action.Rotate {
-	case "off":
-		rotateSpeed = 0
-		rotatable = false
-	case "slow":
-		rotateSpeed = 1
-		rotatable = true
-	case "medium":
-		rotateSpeed = 50
-		rotatable = true
-	case "fast":
-		rotateSpeed = 127
-		rotatable = true
-	default:
-		rotateSpeed = 0
-		rotatable = false
-	}
-
-	switch action.Music {
-
-	case "internal":
-		music = 255
-	case "off":
-		music = 0
-	default:
-		music = 0
-	}
-
-	switch action.Strobe {
-	case "off":
-		strobe = 0
-	case "slow":
-		strobe = 0
-	case "fast":
-		strobe = 0
-	default:
-		strobe = 0
 	}
 
 	if action.Mode == "off" {
 		if debug {
 			fmt.Printf("Stop mini sequence for switch number %d\n", switchNumber)
 		}
+
+		// Remember that we have stopped this mini sequencer.
+		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// DeRegister this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
@@ -713,17 +769,33 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 		}
 
 		// Remember that we have stopped this mini sequencer.
+		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		select {
 		case switchChannels[switchNumber].Stop <- true:
 			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 255, 0, 0, 0, 0, 0, rotateSpeed, music, program, 0, scannerColor, fixturesConfig, blackout, master, master, strobe)
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 255, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
 		return
 	}
 
 	if action.Mode == "chase" {
+
+		if debug {
+			fmt.Printf("Chase mini sequence for switch number %d\n", switchNumber)
+		}
+
+		// Don't stop this mini sequencer if there's one running already.
+		// Unless we are changing switch positions.
+		if getSwitchState(switchChannels, switchNumber) &&
+			switchChannels[switchNumber].SwitchPosition == switchPosition {
+			setSwitchState(switchChannels, switchNumber, switchPosition, true, blackout, master)
+			return
+		}
+
+		// Remember that we have started this mini sequencer.
+		setSwitchState(switchChannels, switchNumber, switchPosition, true, blackout, master)
 
 		// DeRegister this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
@@ -738,34 +810,13 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 		// Register this mini sequencer with the sound service.
 		channel := make(chan common.Command)
 		trigger := soundConfig.RegisterSoundTrigger(switchName, channel, switchNumber)
-
-		if debug {
-			fmt.Printf("Start mini sequence chase for switch number %d\n", switchNumber)
-		}
+		trigger.State = cfg.TriggerState
 
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
 			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
-		}
-
-		switch action.Speed {
-		case "slow":
-			speed = 1 * time.Second
-			trigger.State = false
-		case "medium":
-			speed = 500 * time.Millisecond
-			trigger.State = false
-		case "fast":
-			speed = 50 * time.Millisecond
-			trigger.State = false
-		case "music":
-			trigger.State = true
-			speed = time.Duration(12 * time.Hour)
-		default:
-			trigger.State = false
-			speed = time.Duration(12 * time.Hour)
 		}
 
 		sequence := common.Sequence{
@@ -779,7 +830,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 		sequence.Steps = sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
-		slopeOn, slopeOff := common.CalculateFadeValues(fade, size)
+		slopeOn, slopeOff := common.CalculateFadeValues(cfg.Fade, cfg.Size)
 		// Calulate positions for each RGB fixture.
 		optimisation := false
 		scannerState := map[int]common.ScannerState{
@@ -806,7 +857,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 
 		go func() {
 
-			if rotatable {
+			if cfg.Rotatable {
 				// Thread to run the rotator
 				go func(switchNumber int, switchChannels map[int]common.SwitchChannel) {
 
@@ -857,7 +908,10 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
 
-					if rotatable {
+					blackout = switchChannels[switchNumber].Blackout
+					master = switchChannels[switchNumber].Master
+
+					if cfg.Rotatable {
 						select {
 						case switchChannels[switchNumber].KeepRotateAlive <- true:
 						case <-time.After(10 * time.Millisecond):
@@ -869,25 +923,26 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 					}
 
 					if rotateCounter < 128 {
-						rotateSpeed = 127
+						cfg.RotateSpeed = 127
 					} else {
-						rotateSpeed = 128
+						cfg.RotateSpeed = 128
 					}
 
 					if debug {
-						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", switchNumber, useTriggerNumber, speed)
+						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", switchNumber, useTriggerNumber, cfg.Speed)
+						fmt.Printf("switch:%d speed %d\n", switchNumber, cfg.Speed)
 					}
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
 					case <-soundConfig.SoundTriggers[useTriggerNumber].Channel:
 					case <-switchChannels[switchNumber].Stop:
-						if rotatable {
+						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true
 						}
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, strobe)
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
 						return
-					case <-time.After(speed):
+					case <-time.After(cfg.Speed):
 					}
 
 					// Play out fixture to DMX channels.
@@ -898,7 +953,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, action Action, dmxCo
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						for _, color := range fixture.Colors {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, rotateSpeed, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, strobe)
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
 						}
 					}
 
