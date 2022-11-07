@@ -32,13 +32,13 @@ type SoundConfig struct {
 	BPMsecondUp      bool
 }
 
-func NewSoundTrigger(soundTriggers map[int]*common.Trigger, channels common.Channels) *SoundConfig {
+func NewSoundTrigger(channels common.Channels) *SoundConfig {
 
 	soundConfig := SoundConfig{}
 	soundConfig.stopChannel = make(chan bool)
 	soundConfig.gainSelected = gainSelected
 	soundConfig.gainCounters = gainCounters
-	soundConfig.SoundTriggers = soundTriggers
+	soundConfig.SoundTriggers = channels.SoundTriggers
 	soundConfig.BPMChannel = make(chan bool)
 
 	soundConfig.getAvailableInputs()
@@ -204,9 +204,9 @@ func (soundConfig *SoundConfig) GetDeviceName() string {
 	return soundConfig.deviceName
 }
 
+// RegisterSoundTrigger  - Register the Trigger.
 func (soundConfig *SoundConfig) RegisterSoundTrigger(name string, channel chan common.Command, switchNumber int) *common.Trigger {
 	// Create a new Trigger.
-	// lengthSoundTriggers := len(soundConfig.SoundTriggers)
 	newTrigger := common.Trigger{
 		Name:    name,
 		State:   true,
@@ -214,6 +214,8 @@ func (soundConfig *SoundConfig) RegisterSoundTrigger(name string, channel chan c
 		BPM:     0,
 		Channel: channel,
 	}
+	// We add 10 to the switch channels so that the channels used are outside
+	// the default 1-4 used by the default sequences.
 	soundConfig.SoundTriggers[switchNumber+10] = &newTrigger
 
 	if debug {

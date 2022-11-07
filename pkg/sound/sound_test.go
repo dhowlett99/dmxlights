@@ -124,7 +124,13 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 
 			soundConfig.RegisterSoundTrigger(tt.args.name, tt.args.channel, tt.args.switchNumber)
 
-			if !reflect.DeepEqual(soundConfig.SoundTriggers, tt.want1) {
+			// Resolve the pointers.
+			triggers := make(map[int]common.Trigger)
+			for triggerNumber, trigger := range soundConfig.SoundTriggers {
+				triggers[triggerNumber] = *trigger
+			}
+
+			if !reflect.DeepEqual(triggers, tt.want1) {
 				t.Errorf("SoundConfig.RegisterSoundTrigger() got = %+v, want %+v", soundConfig.SoundTriggers, tt.want1)
 			}
 		})

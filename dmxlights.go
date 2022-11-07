@@ -191,12 +191,6 @@ func main() {
 		updateChannels = append(updateChannels, updateChannel)
 	}
 
-	// Now add them all to a handy channels struct.
-	this.SequenceChannels = common.Channels{}
-	this.SequenceChannels.CommmandChannels = commandChannels
-	this.SequenceChannels.ReplyChannels = replyChannels
-	this.SequenceChannels.UpdateChannels = updateChannels
-
 	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
 	this.SoundTriggers = make(map[int]*common.Trigger)
 	this.SoundTriggers[0] = &common.Trigger{Name: "sequence0", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
@@ -204,11 +198,18 @@ func main() {
 	this.SoundTriggers[2] = &common.Trigger{Name: "sequence2", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
 	this.SoundTriggers[3] = &common.Trigger{Name: "sequence3", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
 
+	// Now add them all to a handy channels struct.
+	this.SequenceChannels = common.Channels{}
+	this.SequenceChannels.CommmandChannels = commandChannels
+	this.SequenceChannels.ReplyChannels = replyChannels
+	this.SequenceChannels.UpdateChannels = updateChannels
+	this.SequenceChannels.SoundTriggers = this.SoundTriggers
+
 	// Create a timer for timing buttons, long and short presses.
 	this.ButtonTimer = &time.Time{}
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	this.SoundConfig = sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
+	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels)
 
 	// Generate the toolbar at the top.
 	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig)
@@ -264,10 +265,10 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, statusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

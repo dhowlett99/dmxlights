@@ -287,7 +287,6 @@ func PlaySequence(sequence common.Sequence,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
-	soundTriggers map[int]*common.Trigger,
 	SwitchChannels map[int]common.SwitchChannel,
 	soundConfig *sound.SoundConfig) {
 
@@ -326,7 +325,7 @@ func PlaySequence(sequence common.Sequence,
 		sequence.UpdateShift = false
 
 		// Check for any waiting commands.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, soundTriggers)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 
 		// Clear all fixtures.
 		if sequence.Clear {
@@ -347,18 +346,18 @@ func PlaySequence(sequence common.Sequence,
 		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, soundConfig)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig)
 			sequence.PlaySwitchOnce = false
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, soundTriggers)
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
 		}
 
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
-			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, soundTriggers, soundConfig)
+			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, soundTriggers)
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
 		}
 
@@ -403,7 +402,7 @@ func PlaySequence(sequence common.Sequence,
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			sequence.Functions[common.Function8_Music_Trigger].State = false
-			soundTriggers[mySequenceNumber].State = false
+			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
@@ -433,7 +432,7 @@ func PlaySequence(sequence common.Sequence,
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 				// If the music trigger is being used then the timer is disabled.
-				for triggerNumber, trigger := range soundTriggers {
+				for triggerNumber, trigger := range channels.SoundTriggers {
 					if sequence.MusicTrigger {
 						sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 						// TODO eventually Music speed will be set by the BPM analyser.
@@ -500,7 +499,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Check is any commands are waiting.
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, soundTriggers)
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
 				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
@@ -628,7 +627,7 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels, soundTriggers)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}

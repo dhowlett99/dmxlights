@@ -312,6 +312,7 @@ type Channels struct {
 	CommmandChannels []chan Command
 	ReplyChannels    []chan Sequence
 	UpdateChannels   []chan Sequence
+	SoundTriggers    map[int]*Trigger
 }
 
 type SwitchChannel struct {
