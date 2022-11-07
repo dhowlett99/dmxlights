@@ -712,6 +712,9 @@ func getConfig(action Action) ActionConfig {
 		config.Speed = 500 * time.Millisecond
 	case "fast":
 		config.TriggerState = false
+		config.Speed = 250 * time.Millisecond
+	case "veryfast":
+		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 	case "music":
 		config.TriggerState = true

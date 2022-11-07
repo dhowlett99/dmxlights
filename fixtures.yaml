@@ -1334,7 +1334,7 @@ fixtures:
           - blue
           mode: chase
           fade: soft
-          speed: medium
+          speed: fast
     # - name: Slow Color Fade
     #   label: Slow
     #   buttoncolor: 
