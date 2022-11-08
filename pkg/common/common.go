@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"math"
 	"sync"
 	"time"
 
@@ -45,9 +46,12 @@ type ALight struct {
 }
 
 type Color struct {
-	R int
-	G int
-	B int
+	R  int
+	G  int
+	B  int
+	W  int
+	A  int
+	UV int
 }
 
 // Used in calculating Positions.
@@ -62,8 +66,8 @@ type FixtureBuffer struct {
 }
 
 type Value struct {
-	Channel int16
-	Setting int16
+	Channel string
+	Setting string
 }
 
 type State struct {
@@ -71,6 +75,19 @@ type State struct {
 	Label       string
 	Values      []Value
 	ButtonColor Color
+	Actions     []Action
+	Flash       bool
+}
+
+type Action struct {
+	Name    string
+	Colors  []string
+	Mode    string
+	Fade    string
+	Speed   string
+	Rotate  string
+	Music   string
+	Program string
 }
 
 type Switch struct {
@@ -80,6 +97,7 @@ type Switch struct {
 	CurrentState int
 	Description  string
 	States       []State
+	Fixture      string
 }
 
 type StaticColorButton struct {
@@ -151,7 +169,6 @@ const (
 	GetUpdatedSequence
 	ClearAllSwitchPositions
 	UpdateSwitch
-	UpdateSwitchPositions
 	Inverted
 	UpdateGobo
 	Flood
@@ -213,13 +230,11 @@ type Sequence struct {
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
 	StrobeSpeed                int                         // Strobe speed.
+	Rotate                     int                         // Rotate speed.
 	RGBShift                   int                         // RGB shift.
 	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
 	Speed                      int                         // Sequence speed represented by a short number.
 	MusicTrigger               bool                        // Is this sequence in music trigger mode.
-	Ring                       bool                        // A ring is when a music triggers a ring of events for a scannner.
-	Beat                       bool                        // Used by a ring to indicate the start of a ring.
-	RingCounter                int                         // Used to keep track of the number of events in this ring, usually a multiple of the number of steps in the sequence.
 	Blackout                   bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors              []Color                     // Storage for the colors in a sequence.
 	SequenceColors             []Color                     // Temporay storage for changing sequence colors.
@@ -248,6 +263,7 @@ type Sequence struct {
 	Static                     bool                        // We're a static sequence.
 	PlayStaticOnce             bool                        // Play a static scene only once.
 	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
+	PlaySingleSwitch           bool                        // Play a single switch.
 	StartFlood                 bool                        // We're in flood mode.
 	StopFlood                  bool                        // We're not in flood mode.
 	StartStrobe                bool                        // We're in strobe mode.
@@ -280,6 +296,7 @@ type Sequence struct {
 	Functions                  []Function                  // Storage for the sequence functions.
 	FunctionMode               bool                        // This sequence is in function mode.
 	Switches                   []Switch                    // A switch sequence stores its data in here.
+	CurrentSwitch              int
 }
 
 type Function struct {
@@ -292,10 +309,20 @@ type Function struct {
 }
 
 type Channels struct {
-	CommmandChannels     []chan Command
-	ReplyChannels        []chan Sequence
-	SoundTriggerChannels []chan Command
-	UpdateChannels       []chan Sequence
+	CommmandChannels []chan Command
+	ReplyChannels    []chan Sequence
+	UpdateChannels   []chan Sequence
+	SoundTriggers    map[int]*Trigger
+}
+
+type SwitchChannel struct {
+	Stop             chan bool
+	StopRotate       chan bool
+	KeepRotateAlive  chan bool
+	SequencerRunning bool
+	Blackout         bool
+	Master           int
+	SwitchPosition   int
 }
 
 type Hit struct {
@@ -338,6 +365,10 @@ type FixtureCommand struct {
 	ScannerSelectedGobo    int
 	ScannerOffsetPan       int
 	ScannerOffsetTilt      int
+
+	Rotate  int
+	Music   int
+	Program int
 }
 
 type Position struct {
@@ -350,7 +381,6 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	//ScannerNumber int
 	Name         string
 	Label        string
 	Type         string
@@ -360,7 +390,10 @@ type Fixture struct {
 	Pan          int
 	Tilt         int
 	Shutter      int
+	Rotate       int
+	Music        int
 	Gobo         int
+	Program      int
 }
 
 type ButtonPresets struct {
@@ -382,10 +415,11 @@ type Event struct {
 }
 
 type Trigger struct {
-	SequenceNumber int
-	State          bool
-	Gain           float32
-	BPM            int
+	Name    string
+	State   bool
+	Gain    float32
+	BPM     int
+	Channel chan Command
 }
 
 // Define the function keys.
@@ -617,43 +651,61 @@ func GetColorButtonsArray(color int) Color {
 	return Color{}
 }
 
-func GetRGBColorByName(color string) Color {
+func GetColorArrayByNames(names []string) ([]Color, error) {
+
+	colors := []Color{}
+	for _, color := range names {
+		// Find the color by name from the library of supported colors.
+		colorLibrary, err := GetRGBColorByName(color)
+		if err != nil {
+			return colors, err
+		}
+		newColor := Color{}
+		newColor = colorLibrary
+
+		// Add the color to the chase colors.
+		colors = append(colors, newColor)
+	}
+	return colors, nil
+}
+
+func GetRGBColorByName(color string) (Color, error) {
 	switch color {
 	case "Red":
-		return Color{R: 255, G: 0, B: 0}
+		return Color{R: 255, G: 0, B: 0}, nil
 
 	case "Orange":
-		return Color{R: 255, G: 111, B: 0}
+		return Color{R: 255, G: 111, B: 0}, nil
 
 	case "Yellow":
-		return Color{R: 255, G: 255, B: 0}
+		return Color{R: 255, G: 255, B: 0}, nil
 
 	case "Green":
-		return Color{R: 0, G: 255, B: 0}
+		return Color{R: 0, G: 255, B: 0}, nil
 
 	case "Cyan":
-		return Color{R: 0, G: 255, B: 255}
+		return Color{R: 0, G: 255, B: 255}, nil
 
 	case "Blue":
-		return Color{R: 0, G: 0, B: 255}
+		return Color{R: 0, G: 0, B: 255}, nil
 
 	case "Purple":
-		return Color{R: 100, G: 0, B: 255}
+		return Color{R: 100, G: 0, B: 255}, nil
 
 	case "Pink":
-		return Color{R: 255, G: 0, B: 255}
+		return Color{R: 255, G: 0, B: 255}, nil
 
 	case "White":
-		return Color{R: 255, G: 255, B: 255}
+		return Color{R: 255, G: 255, B: 255}, nil
 
 	case "Light Blue":
-		return Color{R: 0, G: 196, B: 255}
+		return Color{R: 0, G: 196, B: 255}, nil
 
 	case "Black":
-		return Color{R: 0, G: 0, B: 0}
+		return Color{R: 0, G: 0, B: 0}, nil
 
 	}
-	return Color{R: 0, G: 0, B: 0}
+	return Color{}, fmt.Errorf("color not found")
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
@@ -1136,4 +1188,141 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 	}
 
 	return staticColorsButtons
+}
+
+func Reverse(in int) int {
+	switch in {
+	case 0:
+		return 10
+	case 1:
+		return 9
+	case 2:
+		return 8
+	case 3:
+		return 7
+	case 4:
+		return 6
+	case 5:
+		return 5
+	case 6:
+		return 4
+	case 7:
+		return 3
+	case 8:
+		return 2
+	case 9:
+		return 1
+	case 10:
+		return 0
+	}
+
+	return 10
+}
+
+// CalculateFadeValues - calculate fade curve values.
+func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
+
+	fadeUpValues := GetFadeValues(float64(MaxBrightness), fade, false)
+	fadeOnValues := GetFadeOnValues(MaxBrightness, size)
+	fadeDownValues := GetFadeValues(float64(MaxBrightness), fade, true)
+
+	slopeOn = append(slopeOn, fadeUpValues...)
+	slopeOn = append(slopeOn, fadeOnValues...)
+	slopeOn = append(slopeOn, fadeDownValues...)
+
+	slopeOff = append(slopeOff, fadeDownValues...)
+	slopeOff = append(slopeOff, fadeUpValues...)
+
+	return slopeOn, slopeOff
+}
+
+func GetFadeValues(size float64, fade int, reverse bool) []int {
+
+	out := []int{}
+	outPadded := []int{}
+	size = size / 2
+
+	var numberCoordinates float64
+
+	if fade == 1 {
+		numberCoordinates = 20
+	}
+	if fade == 2 {
+		numberCoordinates = 25
+	}
+	if fade == 3 {
+		numberCoordinates = 30
+	}
+	if fade == 4 {
+		numberCoordinates = 35
+	}
+	if fade == 5 {
+		numberCoordinates = 40
+	}
+	if fade == 6 {
+		numberCoordinates = 45
+	}
+	if fade == 7 {
+		numberCoordinates = 50
+	}
+	if fade == 8 {
+		numberCoordinates = 55
+	}
+	if fade == 9 {
+		numberCoordinates = 60
+	}
+	if fade == 10 {
+		numberCoordinates = 65
+	}
+
+	var theta float64
+	var x float64
+	if reverse {
+		for x = 0; x <= 180; x += numberCoordinates {
+			theta = (x - 90) * math.Pi / 180
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	} else {
+		for x = 180; x >= 0; x -= numberCoordinates {
+			theta = (x - 90) * math.Pi / 180
+			x := int(-size*math.Sin(theta) + size)
+			out = append(out, x)
+		}
+	}
+
+	if reverse {
+		for value := 10; value > 0; value-- {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[len(out)-value])
+			}
+		}
+
+	} else {
+		for value := 0; value < 10; value++ {
+			if value >= len(out) {
+				outPadded = append(outPadded, 255)
+			} else {
+				outPadded = append(outPadded, out[value])
+			}
+		}
+	}
+
+	return outPadded
+}
+
+func GetFadeOnValues(size int, fade int) []int {
+
+	out := []int{}
+
+	var x int
+
+	for x = 0; x < fade; x++ {
+		x := size
+		out = append(out, x)
+	}
+
+	return out
 }

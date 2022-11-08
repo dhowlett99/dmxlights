@@ -9,6 +9,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
 	"github.com/rakyll/launchpad/mk3"
 )
@@ -20,52 +21,54 @@ const (
 )
 
 type CurrentState struct {
-	SelectedSequence         int                        // The currently selected sequence.
-	LastSelectedSequence     int                        // Store fof the last selected squence.
-	Speed                    map[int]int                // Local copy of sequence speed. Indexed by sequence.
-	RGBShift                 map[int]int                // Current rgb fixture shift. Indexed by sequence.
-	ScannerShift             map[int]int                // Current scanner shift for all fixtures.  Indexed by sequence
-	RGBSize                  map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
-	ScannerSize              map[int]int                // current scanner size for all fixtures. Indexed by sequence
-	RGBFade                  map[int]int                // Indexed by sequence.
-	ScannerFade              map[int]int                // Indexed by sequence.
-	ScannerCoordinates       map[int]int                // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
-	Running                  map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
-	Strobe                   bool                       // We are in strobe mode. True if strobing
-	StrobeSpeed              int                        // Strobe speed. value is speed 0-255
-	SavePreset               bool                       // Save a preset flag.
-	Blackout                 bool                       // Blackout all fixtures.
-	Flood                    bool                       // Flood all fixtures.
-	FunctionSelectMode       []bool                     // Which sequence is in function selection mode.
-	SelectButtonPressed      []bool                     // Which sequence has its Select button pressed.
-	SwitchPositions          [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorsMode   []bool                     // This flag is true when the sequence is in sequence colors editing mode.
-	EditScannerColorsMode    []bool                     // This flag is true when the sequence is in select scanner colors editing mode.
-	EditGoboSelectionMode    []bool                     // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode     []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditPatternMode          []bool                     // This flag is true when the sequence is in pattern editing mode.
-	EditFixtureSelectionMode bool                       // This flag is true when the sequence is in select fixture mode.
-	MasterBrightness         int                        // Affects all DMX fixtures and launchpad lamps.
-	LastStaticColorButtonX   int                        // Which Static Color button did we change last.
-	LastStaticColorButtonY   int                        // Which Static Color button did we change last.
-	SoundGain                float32                    // Fine gain -0.09 -> 0.09
-	ScannerState             [][]common.ScannerState    // Which fixture is enabled: bool and inverted: bool on which sequence.
-	SelectedFixture          int                        // Which fixture is selected when changing scanner color or gobo.
-	FollowingAction          string                     // String to find next function, used in selecting a fixture.
-	OffsetPan                int                        // Offset for Pan.
-	OffsetTilt               int                        // Offset for Tilt.
-	Pad                      *mk3.Launchpad             // Pointer to the Novation Launchpad object.
-	PresetsStore             map[string]presets.Preset  // Storage for the Presets.
-	LastPreset               *string                    // Last preset used.
-	SoundTriggers            []*common.Trigger          // Pointer to the Sound Triggers.
-	SequenceChannels         common.Channels            // Channles used to communicate with the sequence.
-	Patterns                 map[int]common.Pattern     // A indexed map of the available patterns for this sequence.
-	ScannerPattern           int                        // The selected scanner pattern Number. Used as the index for above.
-	RGBPattern               int                        // The selected RGB pattern Number. Used as the index for above.
-	StaticButtons            []common.StaticColorButton // Storage for the color of the static buttons.
-	SelectedGobo             int                        // The selected GOBO.
-	ButtonTimer              *time.Time                 // Button Timer
-	SelectColorBar           int                        // Storage for color bar in static color selection.
+	SelectedSequence         int                          // The currently selected sequence.
+	LastSelectedSequence     int                          // Store fof the last selected squence.
+	Speed                    map[int]int                  // Local copy of sequence speed. Indexed by sequence.
+	RGBShift                 map[int]int                  // Current rgb fixture shift. Indexed by sequence.
+	ScannerShift             map[int]int                  // Current scanner shift for all fixtures.  Indexed by sequence
+	RGBSize                  map[int]int                  // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
+	ScannerSize              map[int]int                  // current scanner size for all fixtures. Indexed by sequence
+	RGBFade                  map[int]int                  // Indexed by sequence.
+	ScannerFade              map[int]int                  // Indexed by sequence.
+	ScannerCoordinates       map[int]int                  // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
+	Running                  map[int]bool                 // Which sequence is running. Indexed by sequence. True if running.
+	Strobe                   bool                         // We are in strobe mode. True if strobing
+	StrobeSpeed              int                          // Strobe speed. value is speed 0-255
+	SavePreset               bool                         // Save a preset flag.
+	Blackout                 bool                         // Blackout all fixtures.
+	Flood                    bool                         // Flood all fixtures.
+	FunctionSelectMode       []bool                       // Which sequence is in function selection mode.
+	SelectButtonPressed      []bool                       // Which sequence has its Select button pressed.
+	SwitchPositions          [9][9]int                    // Sorage for switch positions.
+	EditSequenceColorsMode   []bool                       // This flag is true when the sequence is in sequence colors editing mode.
+	EditScannerColorsMode    []bool                       // This flag is true when the sequence is in select scanner colors editing mode.
+	EditGoboSelectionMode    []bool                       // This flag is true when the sequence is in sequence gobo selection mode.
+	EditStaticColorsMode     []bool                       // This flag is true when the sequence is in static colors editing mode.
+	EditPatternMode          []bool                       // This flag is true when the sequence is in pattern editing mode.
+	EditFixtureSelectionMode bool                         // This flag is true when the sequence is in select fixture mode.
+	MasterBrightness         int                          // Affects all DMX fixtures and launchpad lamps.
+	LastStaticColorButtonX   int                          // Which Static Color button did we change last.
+	LastStaticColorButtonY   int                          // Which Static Color button did we change last.
+	SoundGain                float32                      // Fine gain -0.09 -> 0.09
+	ScannerState             [][]common.ScannerState      // Which fixture is enabled: bool and inverted: bool on which sequence.
+	SelectedFixture          int                          // Which fixture is selected when changing scanner color or gobo.
+	FollowingAction          string                       // String to find next function, used in selecting a fixture.
+	OffsetPan                int                          // Offset for Pan.
+	OffsetTilt               int                          // Offset for Tilt.
+	Pad                      *mk3.Launchpad               // Pointer to the Novation Launchpad object.
+	PresetsStore             map[string]presets.Preset    // Storage for the Presets.
+	LastPreset               *string                      // Last preset used.
+	SoundTriggers            map[int]*common.Trigger      // Pointer to the Sound Triggers.
+	SoundConfig              *sound.SoundConfig           // Pointer to the sound config struct.
+	SequenceChannels         common.Channels              // Channles used to communicate with the sequence.
+	Patterns                 map[int]common.Pattern       // A indexed map of the available patterns for this sequence.
+	ScannerPattern           int                          // The selected scanner pattern Number. Used as the index for above.
+	RGBPattern               int                          // The selected RGB pattern Number. Used as the index for above.
+	StaticButtons            []common.StaticColorButton   // Storage for the color of the static buttons.
+	SelectedGobo             int                          // The selected GOBO.
+	ButtonTimer              *time.Time                   // Button Timer
+	SelectColorBar           int                          // Storage for color bar in static color selection.
+	SwitchChannels           map[int]common.SwitchChannel // Used for communicating with mini-sequencers on switches.
 }
 
 // main thread is used to get commands from the lauchpad.
@@ -125,18 +128,24 @@ func ProcessButtons(X int, Y int,
 		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
 		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
 		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
+		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
+		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
+		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
 		pan := flashSequence.Pattern.Steps[X].Fixtures[X].Pan
 		tilt := flashSequence.Pattern.Steps[X].Fixtures[X].Tilt
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
+		rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
+		music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
 		gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
+		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, red, green, blue, pan, tilt, shutter, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+		fixture.MapFixtures(Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		}
 
 		return
@@ -162,7 +171,7 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed)
 		return
 	}
 
@@ -188,7 +197,7 @@ func ProcessButtons(X int, Y int,
 		// Stop the timer for this preset.
 		elapsed := time.Since(*this.ButtonTimer)
 
-		// If the timer is longer than 1 seconds then we have a long press.
+		// Delete a preset - If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
 
 			// Delete a config file
@@ -197,12 +206,18 @@ func ProcessButtons(X int, Y int,
 			// Delete from preset store
 			this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: false, Selected: false, Label: ""}
 
+			// Update the copy of presets on disk.
+			presets.SavePresets(this.PresetsStore)
+
 			// Show presets again.
 			presets.InitPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 		} else {
 			// Short press means load the config.
 			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			this.SelectedSequence = 0
+			this.SelectButtonPressed[this.SelectedSequence] = false
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		}
 		return
 	}
@@ -458,6 +473,9 @@ func ProcessButtons(X int, Y int,
 						this.SavePreset = false
 					}
 					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+					this.SelectedSequence = 0
+					this.SelectButtonPressed[this.SelectedSequence] = false
+					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
@@ -913,6 +931,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
+		// Update Coordinates.
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.SelectedSequence]--
@@ -961,6 +980,7 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
+		// Update Coordinates.
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.SelectedSequence]++
@@ -1662,13 +1682,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("HANDLE: selectButtons[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
+		fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.SelectedSequence, this.EditSequenceColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
-		fmt.Printf("HANDLE: Func Static[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
+		fmt.Printf("HANDLE: Function6_Static_Gobo[%d] = %t\n", this.SelectedSequence, sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State)
 	}
 
 	// Update status bar.
@@ -1682,7 +1702,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
-		label = getScannerCoordinatesLabel(this.ScannerShift[this.SelectedSequence])
+		label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
 	}
 
@@ -1693,8 +1713,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
 
 	// First time into function mode we head back to normal mode.
-	if this.FunctionSelectMode[this.SelectedSequence] && !this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] && !this.EditStaticColorsMode[this.SelectedSequence] {
+	if this.FunctionSelectMode[this.SelectedSequence] &&
+		!this.SelectButtonPressed[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode[this.SelectedSequence] {
 		if debug {
 			fmt.Printf("Handle 1 Function Bar off\n")
 		}
@@ -1730,6 +1752,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
 			common.SetMode(this.SelectedSequence, commandChannels, "Static")
+			sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 			return
 		}
 
@@ -1827,11 +1850,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// We are in function mode for this sequence.
 	if !this.FunctionSelectMode[this.SelectedSequence] &&
 		sequences[this.SelectedSequence].Type != "switch" || // Don't alow functions in switch mode.
-		!this.FunctionSelectMode[this.SelectedSequence] && this.EditStaticColorsMode[this.SelectedSequence] { // The case when we leave static colors edit mode.
+		!this.FunctionSelectMode[this.SelectedSequence] && // Function select mode is off
+			this.EditStaticColorsMode[this.SelectedSequence] { // The case when we leave static colors edit mode.
 
 		if debug {
 			fmt.Printf("Handle 4 - Function Bar On!\n")
 		}
+
+		// Unset the function key.
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
 
 		// Unset the edit static color mode.
 		this.EditStaticColorsMode[this.SelectedSequence] = false
@@ -1902,7 +1929,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		if sequences[y].Type != "switch" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
+				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -1913,7 +1940,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0)
+				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
@@ -2158,6 +2185,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0)
 
 	// Load the config.
+	// Which forces all sequences to load their config.
 	config.AskToLoadConfig(commandChannels, X, Y)
 
 	// Turn the selected preset light flashing red / yellow.
@@ -2186,8 +2214,35 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
 	this.LastPreset = &last
 
-	// Get an upto date copy of the sequence.
-	sequences[0] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+	// Get an upto date copy of all of the sequences.
+	for sequenceNumber := range sequences {
+		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+
+		// restore the speed, shift, size, fade, coordinates label data.
+		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
+		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
+		this.ScannerShift[this.SelectedSequence] = sequences[sequenceNumber].ScannerShift
+		this.RGBSize[sequenceNumber] = sequences[sequenceNumber].RGBSize
+		this.ScannerSize[this.SelectedSequence] = sequences[sequenceNumber].ScannerSize
+		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
+		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
+
+		// switch off any color editing.
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State = false
+
+		// If we are loading a switch sequence, update our local copy of the switch settings.
+		if sequences[sequenceNumber].Type == "switch" {
+			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+			for position := 0; position < 8; position++ {
+				swiTch := sequences[sequenceNumber].Switches[position]
+				this.SwitchPositions[sequenceNumber][position] = swiTch.CurrentState
+				if debug {
+					fmt.Printf("restoring switch %+v\n", this.SwitchPositions[sequenceNumber][position])
+				}
+			}
+		}
+	}
+
 	this.StrobeSpeed = sequences[this.SelectedSequence].StrobeSpeed
 	if this.StrobeSpeed > 0 {
 		this.Strobe = true
@@ -2199,20 +2254,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		common.ShowStrobeStatus(false, eventsForLaunchpad, guiButtons)
 	}
 
-	// restore the speed, shift, size and fade labels data.
-	for sequenceNumber, sequence := range sequences {
-		this.Speed[sequenceNumber] = sequence.Speed
-		this.RGBShift[sequenceNumber] = sequence.RGBShift
-		this.ScannerShift[this.SelectedSequence] = sequence.ScannerShift
-		this.RGBSize[sequenceNumber] = sequence.RGBSize
-		this.ScannerSize[this.SelectedSequence] = sequence.ScannerSize
-		this.RGBFade[sequenceNumber] = sequence.RGBFade
-
-	}
-	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
+	// common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
@@ -2273,7 +2318,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	// Restore any switch channels
 	for _, s := range sequences {
 		if s.Type == "switch" {
-			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig)
+			sequence.ShowSwitches(s.Number, s, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig)
 		}
 	}
 

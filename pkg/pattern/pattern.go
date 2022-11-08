@@ -13,6 +13,35 @@ const (
 	full = 255
 )
 
+func MakeSingleFixtureChase(colors []common.Color) common.Pattern {
+
+	steps := []common.Step{}
+	for _, color := range colors {
+		fixture := common.Fixture{
+			MasterDimmer: full,
+			Colors:       []common.Color{color},
+		}
+		fixtures := []common.Fixture{}
+		// Create identical four fixtures
+		fixtures = append(fixtures, fixture)
+		fixtures = append(fixtures, fixture)
+		fixtures = append(fixtures, fixture)
+		fixtures = append(fixtures, fixture)
+		step := common.Step{
+			Fixtures: fixtures,
+		}
+		steps = append(steps, step)
+	}
+
+	single := common.Pattern{
+		Name:   "Single",
+		Number: 0,
+		Label:  "Single.Chase",
+		Steps:  steps,
+	}
+	return single
+}
+
 func MakePatterns() map[int]common.Pattern {
 
 	Patterns := make(map[int]common.Pattern)

@@ -240,24 +240,7 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-# - name: FOH XBRICK 2
-#   number: 1
-#   description: Stairville Xbrick
-#   type: rgb
-#   address: 114
-#   group: 1
-#   channels: 
-#   - number: 1
-#     name: Red1
-#   - number: 2
-#     name: Green1
-#   - number: 3
-#     name: Blue1
-#   - number: 4
-#     name: MasterDimmer
-#   - number: 5
-#     name: Strobe
-- name: FOH XBRICK 1
+- name: FOH XBRICK 2
   number: 1
   description: Stairville Xbrick
   type: rgb
@@ -410,11 +393,12 @@ fixtures:
     name: Blue8
 - name: ADJ QA PAR 38
   number: 1
+  label: par38
   use_channels: 8
   description: American DJ SPOT
   type: rgb
   address: 150
-  group: 2 
+  group: 101 
   channels:
   - number: 1
     name: Red1
@@ -436,6 +420,81 @@ fixtures:
   - number: 8
     name: Static
     value: 0
+- name: ADJ Dekker1
+  number: 1
+  label: dekker1
+  description: American DJ Dekker LED Derby
+  type: rgb
+  address: 300
+  group: 100 
+  channels:
+  - number: 1
+    name: Rotate
+    settings:
+      - name: Off
+        setting: 0
+        label: off
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White1
+  - number: 6
+    name: Master
+  - number: 7
+    name: Program
+    settings:
+      - name: Off
+        setting: 0
+        label: off
+      - name: 4 Color Loop Change
+        setting: 1
+        label: 4colorloop
+      - name: 9 Color Fade Change
+        setting: 27
+        label: 9colorloop
+      - name: 4 Color Loop Change
+        setting: 52
+        label: 4colorloop
+      - name: 9 Color Fade Change
+        setting: 77
+        label: 9colorloop
+      - name: Strobe 1 Dim - Bright
+        setting: 102
+        label: strobe1
+      - name: Strobe 2 Bright - Dim
+        setting: 127
+        label: strobe2
+      - name: Strobe 3 Dim - Bright - Dim
+        setting: 152
+        label: strobe3
+      - name: Strobe 4 W/O Dim Effect
+        setting: 177
+        label: strobe4
+      - name: Strobe 5 with 9 Color
+        setting: 202
+        label: strobe5
+      - name: Strobe 6 with Gradual Dim
+        setting: 227
+        label: strobe6
+      - name: All Programs will Cycle
+        setting: 255
+        label: cycle
+  - number: 8
+    name: ProgramSpeed
+    settings: 
+      - name: Slow
+        label: Slow
+        setting: 1
+      - name: Fast
+        label: Fast
+        setting: 254
+      - name: Sound Active
+        label: Music
+        setting: 255
 - name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -1215,7 +1274,8 @@ fixtures:
           setting: 255
   - name: QPar36
     number: 5
-    label: SW5.QPar36
+    label: SW5.QPar38
+    fixture: par38
     description: Switch 5
     states:
     - name: Off
@@ -1226,62 +1286,191 @@ fixtures:
         blue: 0 
       values: 
         - name: mode
+          description: Red
+          channel: 150
+          setting: 0
+        - name: mode
+          description: Green
+          channel: 151
+          setting: 0
+        - name: mode
+          description: Blue
+          channel: 152
+          setting: 0
+        - name: mode
+          description: Amber
+          channel: 153
+          setting: 0
+        - name: mode
           description: Dimmer Off
           channel: 154
           setting: 0
-    - name: Slow Color Fade
-      label: Slow
+        - name: mode
+          description: ProgramSpeed
+          channel: 155
+          setting: 0
+        - name: mode
+          description: ColorSelect
+          channel: 156
+          setting: 0
+        - name: mode
+          description: ColorMacros
+          channel: 157
+          setting: 0
+      actions:
+        - name: off
+          mode: off
+    - name: Red
+      label: Red
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0 
+        blue: 0
+      actions:
+        - name: static red
+          mode: static
+          colors:
+          - Red
+    - name: Green
+      label: Green
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+      actions:
+        - name: static Green
+          mode: static
+          colors:
+          - Green
+    - name: Blue
+      label: Blue
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+      actions:
+        - name: static Blue
+          mode: static
+          colors:
+          - Blue
+    - name: On
+      label: On
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: soft chase
+          colors:
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
+          mode: chase
+          fade: soft
+          speed: fast
+    # - name: Slow Color Fade
+    #   label: Slow
+    #   buttoncolor: 
+    #     red: 255
+    #     green: 0
+    #     blue: 0 
+    #   values: 
+    #     - name: mode
+    #       description: Red
+    #       channel: 150
+    #       setting: 255
+    #     - name: mode
+    #       description: Green
+    #       channel: 151
+    #       setting: 255
+    #     - name: mode
+    #       description: Blue
+    #       channel: 152
+    #       setting: 255
+    #     - name: mode
+    #       description: Amber
+    #       channel: 153
+    #       setting: 255
+    #     - name: mode
+    #       description: Dimmer
+    #       channel: 154
+    #       setting: 255
+    #     - name: mode
+    #       description: Speed
+    #       channel: 155
+    #       setting: 50
+    #     - name: mode
+    #       description: MAcro Mode
+    #       channel: 156
+    #       setting: 103
+    #     - name: mode
+    #       description: MAcro
+    #       channel: 157
+    #       setting: 250
+    # - name: Sound Trigger
+    #   label: Int
+    #   buttoncolor: 
+    #     red: 144
+    #     green: 203
+    #     blue: 77 
+    #   values: 
+    #     - name: mode
+    #       description: Dimmer
+    #       channel: 154
+    #       setting: 255
+    #     - name: mode
+    #       description: Shutter
+    #       channel: 155
+    #       setting: 100
+    #     - name: mode
+    #       description: Shutter Sound Active
+    #       channel: 156
+    #       setting: 255
+    #     - name: mode
+    #       description: Shutter Sound Active
+    #       channel: 157
+    #       setting: 0
+    #     - name: mode
+    #       description: Shutter Sound Active
+    #       channel: 158
+    #       setting: 32
+    - name: Sound
+      label: Sound
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
+          mode: chase
+          fade: soft
+          speed: music
+          rotate: off
       values: 
         - name: mode
-          description: Dimmer
-          channel: 154
-          setting: 255
-        - name: mode
-          description: Shutter
-          channel: 155
+          description: Red
+          channel: 150
           setting: 0
-        - name: mode
-          description: MAcro Mode
-          channel: 156
-          setting: 158
         - name: mode
           description: MAcro
           channel: 157
-          setting: 250
-    - name: Sound Trigger
-      label: Sound
-      buttoncolor: 
-        red: 144
-        green: 203
-        blue: 77 
-      values: 
-        - name: mode
-          description: Dimmer
-          channel: 154
-          setting: 255
-        - name: mode
-          description: Shutter
-          channel: 155
-          setting: 100
-        - name: mode
-          description: Shutter Sound Active
-          channel: 156
-          setting: 255
-        - name: mode
-          description: Shutter Sound Active
-          channel: 157
           setting: 0
-        - name: mode
-          description: Shutter Sound Active
-          channel: 158
-          setting: 32
   - name: switch
     number: 6
     label: SW6.DERBY
+    fixture: dekker1
     states:
     - name: Off
       label: Off
@@ -1289,12 +1478,192 @@ fixtures:
         red: 0
         green: 255
         blue: 0
+      values:
+      - name: Rotate
+        description: Rotate
+        channel: Rotate
+        setting: off
+      - name: Red1
+        description: Red1
+        channel: Red1
+        setting: 0
+      - name: Green1
+        description: Green1
+        channel: Green1
+        setting: 0
+      - name: Blue1
+        description: Blue1
+        channel: Blue1
+        setting: 0
+      - name: White1
+        description: White1
+        channel: White1
+        setting: 0
+      - name: Master
+        description: Master
+        channel: Master
+        setting: 0
+      - name: Program
+        description: Program
+        channel: Program
+        setting: 0
+      - name: ProgramSpeed
+        description: ProgramSpeed
+        channel: ProgramSpeed
+        setting: 0
+      actions:
+        - name: soft chase
+          mode: off
+    - name: Red
+      label: Red
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: static red
+          mode: static
+          colors:
+          - Red
+    - name: Green
+      label: Green
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+      actions:
+        - name: static Green
+          mode: static
+          colors:
+          - Green
+    - name: Blue
+      label: Blue
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+      actions:
+        - name: static Blue
+          mode: static
+          colors:
+          - Blue
     - name: On
       label: On
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0  
+        blue: 0
+      actions:
+        - name: soft chase
+          colors: 
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
+          mode: chase
+          fade: soft
+          speed: fast
+    - name: Sound
+      label: Sound
+      buttoncolor: 
+        red: 255
+        green: 255
+        blue: 0
+      actions:
+        - name: rotate
+          colors: 
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
+          mode: chase
+          fade: soft
+          speed: music
+          rotate: slow
+    # - name: Internal
+    #   label: Internal
+    #   buttoncolor: 
+    #     red: 255
+    #     green: 255
+    #     blue: 0
+    #   actions:
+    #     - name: any chase
+    #       mode: off
+    #   values: 
+    #     - name: Red1
+    #       description: Red1
+    #       channel: Red1
+    #       setting: 255
+    #     - name: Green
+    #       description: Green1
+    #       channel: Green1
+    #       setting: 255
+    #     - name: Blue1
+    #       description: Blue1
+    #       channel: Blue1
+    #       setting: 255
+    #     - name: White1
+    #       description: White1
+    #       channel: White1
+    #       setting: 255
+    #     - name: Master
+    #       description: Master Dimmer
+    #       channel: Master
+    #       setting: 255
+    #     - name: Program
+    #       description: Program
+    #       channel: Program
+    #       setting: cycle
+    #     - name: ProgramSpeed
+    #       description: Program Speed
+    #       channel: ProgramSpeed
+    #       setting: Music
+    # - name: Strobe
+    #   label: Strobe
+    #   buttoncolor: 
+    #     red: 255
+    #     green: 255
+    #     blue: 255
+    #   flash: true
+    #   values: 
+    #     - name: Rotate
+    #       description: rotate off
+    #       channel: Rotate
+    #       setting: 0
+    #     - name: Program
+    #       description: strobe fast
+    #       channel: Program
+    #       setting: strobe3
+    #     - name: ProgramSpeed
+    #       description: strobe fast
+    #       channel: ProgramSpeed
+    #       setting: Fast
+    #     - name: Red1
+    #       description: Red1
+    #       channel: Red1
+    #       setting: 255
+    #     - name: Green1
+    #       description: Green1
+    #       channel: Green1
+    #       setting: 255
+    #     - name: Blue1
+    #       description: Blue1
+    #       channel: Blue1
+    #       setting: 255
+    #     - name: White1
+    #       description: White1
+    #       channel: White1
+    #       setting: 255
+    #     - name: Master
+    #       description: Master Dimmer
+    #       channel: Master
+    #       setting: 255
   - name: switch
     label: SW7.DERBY
     number: 8
@@ -1306,11 +1675,11 @@ fixtures:
         green: 255
         blue: 0 
     - name: On
-      label: Off
+      label: On
       buttoncolor: 
         red: 255
         green: 0
-        blue: 0
+        blue: 0 
   - name: switch
     number: 8
     label: SW8.Booth

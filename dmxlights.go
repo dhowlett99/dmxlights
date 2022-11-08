@@ -67,7 +67,18 @@ func main() {
 	this.ScannerShift = make(map[int]int, 4)        // Initialise storage for four sequences.
 	this.RGBFade = make(map[int]int, 4)             // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32
+	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
+
+	// Now add channels to communicate with mini-sequencers on switch channels.
+	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
+	for switchChannel := 0; switchChannel < 10; switchChannel++ {
+		newSwitch := common.SwitchChannel{}
+		newSwitch.Stop = make(chan bool)
+		newSwitch.KeepRotateAlive = make(chan bool)
+		newSwitch.StopRotate = make(chan bool)
+		newSwitch.SequencerRunning = false
+		this.SwitchChannels[switchChannel] = newSwitch
+	}
 
 	// Initialize eight fixture states for the four sequences.
 	this.ScannerState = make([][]common.ScannerState, 9)
@@ -134,7 +145,7 @@ func main() {
 	}
 
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := fixture.LoadFixtures()
+	fixturesConfig, err := fixture.LoadFixtures("fixtures.yaml")
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 		os.Exit(1)
@@ -169,43 +180,40 @@ func main() {
 	// Create all the channels I need.
 	commandChannels := []chan common.Command{}
 	replyChannels := []chan common.Sequence{}
-	soundTriggerChannels := []chan common.Command{}
 	updateChannels := []chan common.Sequence{}
 
-	// Make channels for commands.
-	for sequence := 0; sequence < 4; sequence++ {
+	// Make four default channels for commands.
+	for sequenceNumber := 0; sequenceNumber < 4; sequenceNumber++ {
 		commandChannel := make(chan common.Command)
 		commandChannels = append(commandChannels, commandChannel)
 		replyChannel := make(chan common.Sequence)
 		replyChannels = append(replyChannels, replyChannel)
-		soundTriggerChannel := make(chan common.Command)
-		soundTriggerChannels = append(soundTriggerChannels, soundTriggerChannel)
 		updateChannel := make(chan common.Sequence)
 		updateChannels = append(updateChannels, updateChannel)
 	}
+
+	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
+	this.SoundTriggers = make(map[int]*common.Trigger)
+	this.SoundTriggers[0] = &common.Trigger{Name: "sequence0", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[1] = &common.Trigger{Name: "sequence1", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[2] = &common.Trigger{Name: "sequence2", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	this.SoundTriggers[3] = &common.Trigger{Name: "sequence3", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
 
 	// Now add them all to a handy channels struct.
 	this.SequenceChannels = common.Channels{}
 	this.SequenceChannels.CommmandChannels = commandChannels
 	this.SequenceChannels.ReplyChannels = replyChannels
-	this.SequenceChannels.SoundTriggerChannels = soundTriggerChannels
 	this.SequenceChannels.UpdateChannels = updateChannels
-
-	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
-	this.SoundTriggers = []*common.Trigger{}
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 0, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 1, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 2, State: false, Gain: this.SoundGain})
-	this.SoundTriggers = append(this.SoundTriggers, &common.Trigger{SequenceNumber: 3, State: false, Gain: this.SoundGain})
+	this.SequenceChannels.SoundTriggers = this.SoundTriggers
 
 	// Create a timer for timing buttons, long and short presses.
 	this.ButtonTimer = &time.Time{}
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	soundConfig := sound.NewSoundTrigger(this.SoundTriggers, this.SequenceChannels)
+	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, soundConfig)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig)
 
 	// Create objects for bottom status bar.
 	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
@@ -258,10 +266,10 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, statusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SoundTriggers)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

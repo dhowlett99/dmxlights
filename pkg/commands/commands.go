@@ -9,6 +9,7 @@ import (
 )
 
 const debug = false
+const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
@@ -16,7 +17,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
 	replyChannel := channels.ReplyChannels[mySequenceNumber]
-	soundTriggerChannel := channels.SoundTriggerChannels[mySequenceNumber]
 	updateChannel := channels.UpdateChannels[mySequenceNumber]
 
 	// Create an empty command.
@@ -24,9 +24,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// Wait for a trigger: sound, command or timeout.
 	select {
-	case command = <-soundTriggerChannel:
+	case command = <-channels.SoundTriggers[mySequenceNumber].Channel:
 		if sequence.MusicTrigger {
-			if debug {
+			if beatDebug {
 				fmt.Printf("%d: BEAT\n", mySequenceNumber)
 			}
 			break
@@ -71,6 +71,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Patten to %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
+		sequence.UpdateSequenceColor = false
+		sequence.RecoverSequenceColors = false
 		sequence.UpdatePattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
@@ -371,17 +373,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
 		}
 		sequence.Switches[command.Args[SWITCH_NUMBER].Value.(int)].CurrentState = command.Args[SWITCH_POSITION].Value.(int)
+		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
-		sequence.Run = false
-		sequence.Type = "switch"
-		return sequence
-
-	// Update switch positions so they get displayed.
-	case common.UpdateSwitchPositions:
-		if debug {
-			fmt.Printf("%d: Command Update Switch Positions \n", mySequenceNumber)
-		}
-		sequence.PlaySwitchOnce = true
+		sequence.PlaySingleSwitch = true
 		sequence.Run = false
 		sequence.Type = "switch"
 		return sequence

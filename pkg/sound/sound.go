@@ -9,6 +9,7 @@ import (
 )
 
 const debug = false
+
 const sampleRate = 44100
 
 var gainSelected = 4
@@ -19,8 +20,7 @@ type SoundConfig struct {
 	availableInputs []string
 	stream          *portaudio.Stream
 	BPMChannel      chan bool
-	soundTriggers   []*common.Trigger
-	channels        common.Channels
+	SoundTriggers   map[int]*common.Trigger
 	gainSelected    int
 	gainCounters    []int
 	inputChannels   []*portaudio.HostApiInfo
@@ -32,14 +32,13 @@ type SoundConfig struct {
 	BPMsecondUp      bool
 }
 
-func NewSoundTrigger(soundTriggers []*common.Trigger, channels common.Channels) *SoundConfig {
+func NewSoundTrigger(channels common.Channels) *SoundConfig {
 
 	soundConfig := SoundConfig{}
 	soundConfig.stopChannel = make(chan bool)
-	soundConfig.channels = channels
 	soundConfig.gainSelected = gainSelected
 	soundConfig.gainCounters = gainCounters
-	soundConfig.soundTriggers = soundTriggers
+	soundConfig.SoundTriggers = channels.SoundTriggers
 	soundConfig.BPMChannel = make(chan bool)
 
 	soundConfig.getAvailableInputs()
@@ -158,10 +157,10 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 				out[i] = in[i-1] + soundConfig.filter(cutoff)*in[i] - in[i-1]
 
 				// Tell the automatic gain control what level we're at.
-				soundConfig.reportLevels(out[i], soundConfig.soundTriggers)
+				soundConfig.reportLevels(out[i])
 
 				// Allow fine adjustment.
-				actualGain := gain[gainSelected] + soundConfig.soundTriggers[0].Gain
+				actualGain := gain[gainSelected] + soundConfig.SoundTriggers[0].Gain
 
 				if out[i] > actualGain {
 
@@ -176,17 +175,22 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 					}
 
 					cmd := common.Command{}
-					for index, trigger := range soundConfig.soundTriggers {
-						if trigger.SequenceNumber == index {
-							if trigger.State {
-								if debug {
-									fmt.Printf("%d: Index %d Gain %f   State %t  \n", trigger.SequenceNumber, index, trigger.Gain, trigger.State)
-								}
-								soundConfig.channels.SoundTriggerChannels[index] <- cmd
+
+					for triggerNumber, trigger := range soundConfig.SoundTriggers {
+						if trigger.State {
+							if debug {
+								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
-							// Remember the BPM valuse so they don't get overwritten.
-							trigger.BPM = soundConfig.BPMactualCounter
+							select {
+							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
+
+							case <-time.After(1000 * time.Millisecond):
+								continue
+							}
+
 						}
+						// Remember the BPM valuse so they don't get overwritten.
+						trigger.BPM = soundConfig.BPMactualCounter
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
@@ -200,8 +204,47 @@ func (soundConfig *SoundConfig) GetDeviceName() string {
 	return soundConfig.deviceName
 }
 
-func (soundConfig *SoundConfig) getAvailableInputs() {
+// RegisterSoundTrigger  - Register the Trigger.
+func (soundConfig *SoundConfig) RegisterSoundTrigger(name string, channel chan common.Command, switchNumber int) *common.Trigger {
+	// Create a new Trigger.
+	newTrigger := common.Trigger{
+		Name:    name,
+		State:   true,
+		Gain:    0,
+		BPM:     0,
+		Channel: channel,
+	}
+	// We add 10 to the switch channels so that the channels used are outside
+	// the default 1-4 used by the default sequences.
+	soundConfig.SoundTriggers[switchNumber+10] = &newTrigger
 
+	if debug {
+		fmt.Printf("----> Register %+v as Sequence Number %d \n", newTrigger.Name, switchNumber+10)
+	}
+
+	return &newTrigger
+}
+
+// DeRegisterSoundTrigger  - DeRegister the Trigger.
+func (soundConfig *SoundConfig) DeRegisterSoundTrigger(name string) {
+	newSoundTriggers := make(map[int]*common.Trigger)
+	// Step through the existing sound triggers and find the one we want to deregister.
+	for triggerNumber, trigger := range soundConfig.SoundTriggers {
+		if trigger.Name == name {
+			if debug {
+				fmt.Printf("----> DeRegister %+v\n", name)
+			}
+			soundConfig.SoundTriggers[triggerNumber].State = false
+		}
+		// If it exists put it in the new sound triggers map.
+		if trigger.Name != name {
+			newSoundTriggers[triggerNumber] = soundConfig.SoundTriggers[triggerNumber]
+		}
+	}
+	soundConfig.SoundTriggers = newSoundTriggers
+}
+
+func (soundConfig *SoundConfig) getAvailableInputs() {
 	// Fire up the audio subsystem just to find the number of audio inputs.
 	err := portaudio.Initialize()
 	if err != nil {
@@ -229,15 +272,18 @@ func (soundConfig *SoundConfig) getAvailableInputs() {
 
 func (soundConfig *SoundConfig) StopSoundConfig() {
 
-	fmt.Printf("Stop sound config\n")
-
+	if debug {
+		fmt.Printf("Stop sound config\n")
+	}
 	// Send a signal for the current sound triggers to stop.
 	soundConfig.stopChannel <- true
 
 }
 
 func (soundConfig *SoundConfig) GetSoundConfig() []string {
-	fmt.Printf("sound config avail ins %s\n", soundConfig.availableInputs)
+	if debug {
+		fmt.Printf("sound config avail ins %s\n", soundConfig.availableInputs)
+	}
 	return soundConfig.availableInputs
 }
 
@@ -283,7 +329,7 @@ func (soundConfig *SoundConfig) findGain(values []int) int {
 	return 0
 }
 
-func (soundConfig *SoundConfig) reportLevels(level float32, soundTriggers []*common.Trigger) {
+func (soundConfig *SoundConfig) reportLevels(level float32) {
 
 	gain := []float32{
 		// Peak  Gain Set.
