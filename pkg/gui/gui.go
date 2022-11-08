@@ -34,12 +34,18 @@ type Button struct {
 }
 
 type MyPanel struct {
-	Buttons    [][]Button
-	SpeedLabel *widget.Label
-	ShiftLabel *widget.Label
-	SizeLabel  *widget.Label
-	FadeLabel  *widget.Label
-	BPMLabel   *widget.Label
+	Buttons          [][]Button
+	SpeedLabel       *widget.Label
+	ShiftLabel       *widget.Label
+	SizeLabel        *widget.Label
+	FadeLabel        *widget.Label
+	BPMLabel         *widget.Label
+	TiltLabel        *widget.Label
+	RedLabel         *widget.Label
+	GreenLabel       *widget.Label
+	BlueLabel        *widget.Label
+	SensitivityLabel *widget.Label
+	MasterLabel      *widget.Label
 }
 
 func NewPanel() MyPanel {
@@ -204,6 +210,25 @@ func (panel *MyPanel) UpdateStatusBar(label string, which string) {
 	}
 	if which == "bpm" {
 		panel.BPMLabel.SetText(label)
+	}
+
+	if which == "tilt" {
+		panel.TiltLabel.SetText(label)
+	}
+	if which == "red" {
+		panel.RedLabel.SetText(label)
+	}
+	if which == "green" {
+		panel.GreenLabel.SetText(label)
+	}
+	if which == "blue" || which == "pan" {
+		panel.BlueLabel.SetText(label)
+	}
+	if which == "sensitivity" {
+		panel.SensitivityLabel.SetText(label)
+	}
+	if which == "master" {
+		panel.MasterLabel.SetText(label)
 	}
 }
 

@@ -1326,3 +1326,41 @@ func GetFadeOnValues(size int, fade int) []int {
 
 	return out
 }
+
+func FindSensitivity(soundGain float32) int {
+
+	in := fmt.Sprintf("%f", soundGain)
+
+	switch in {
+	case "-0.040000":
+		return 0
+	case "-0.030000":
+		return 1
+	case "-0.020000":
+		return 2
+	case "-0.010000":
+		return 3
+	case "0.000000":
+		return 4
+	case "0.010000":
+		return 5
+	case "0.020000":
+		return 6
+	case "0.030000":
+		return 7
+	case "0.040000":
+		return 8
+	case "0.050000":
+		return 9
+	case "0.060000":
+		return 10
+	case "0.070000":
+		return 11
+	case "0.080000":
+		return 12
+	case "0.090000":
+		return 13
+	}
+
+	return 99
+}

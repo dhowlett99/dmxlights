@@ -264,19 +264,22 @@ func ProcessButtons(X int, Y int,
 
 				buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 
-				this.OffsetPan = this.OffsetPan + 5
+				this.OffsetTilt = this.OffsetTilt + 5
 
-				if this.OffsetPan > 255 {
-					this.OffsetPan = 255
+				if this.OffsetTilt > 255 {
+					this.OffsetTilt = 255
 				}
 				// Clear the sequence colors for this sequence.
 				cmd := common.Command{
-					Action: common.UpdateOffsetPan,
+					Action: common.UpdateOffsetTilt,
 					Args: []common.Arg{
-						{Name: "OffsetPan", Value: this.OffsetPan},
+						{Name: "OffsetTilt", Value: this.OffsetTilt},
 					},
 				}
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+				// Update status bar.
+				common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
 			}
 		}
 		return
@@ -339,6 +342,10 @@ func ProcessButtons(X int, Y int,
 		for _, trigger := range this.SoundTriggers {
 			trigger.Gain = this.SoundGain
 		}
+		// Update the status bar
+		sensitivity := common.FindSensitivity(this.SoundGain)
+		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
+		return
 	}
 
 	// Sound sensitity down.
@@ -350,12 +357,16 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		this.SoundGain = this.SoundGain + 0.01
-		if this.SoundGain > 0.9 {
-			this.SoundGain = 0.9
+		if this.SoundGain > 0.09 {
+			this.SoundGain = 0.09
 		}
 		for _, trigger := range this.SoundTriggers {
 			trigger.Gain = this.SoundGain
 		}
+		// Update the status bar
+		sensitivity := common.FindSensitivity(this.SoundGain)
+		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
+		return
 	}
 
 	// Master brightness down.
@@ -378,6 +389,9 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
 		return
 	}
 
@@ -401,6 +415,9 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
 		return
 	}
 
@@ -1141,29 +1158,6 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 
-		this.OffsetPan = this.OffsetPan - 5
-
-		if this.OffsetPan < 0 {
-			this.OffsetPan = 0
-		}
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.UpdateOffsetPan,
-			Args: []common.Arg{
-				{Name: "OffsetPan", Value: this.OffsetPan},
-			},
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-	}
-
-	// LEFT ARROW
-	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
-		if debug {
-			fmt.Printf("LEFT ARROW\n")
-		}
-
-		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
-
 		this.OffsetTilt = this.OffsetTilt - 5
 
 		if this.OffsetTilt < 0 {
@@ -1177,6 +1171,39 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Update status bar.
+		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
+
+		return
+	}
+
+	// LEFT ARROW
+	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+		if debug {
+			fmt.Printf("LEFT ARROW\n")
+		}
+
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+
+		this.OffsetPan = this.OffsetPan - 5
+
+		if this.OffsetPan < 0 {
+			this.OffsetPan = 0
+		}
+		// Clear the sequence colors for this sequence.
+		cmd := common.Command{
+			Action: common.UpdateOffsetPan,
+			Args: []common.Arg{
+				{Name: "OffsetPan", Value: this.OffsetPan},
+			},
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Update status bar.
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
+
+		return
 	}
 
 	// RIGHT ARROW
@@ -1187,19 +1214,25 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 
-		this.OffsetTilt = this.OffsetTilt + 5
+		this.OffsetPan = this.OffsetPan + 5
 
-		if this.OffsetTilt > 255 {
-			this.OffsetTilt = 255
+		if this.OffsetPan > 255 {
+			this.OffsetPan = 255
 		}
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
-			Action: common.UpdateOffsetTilt,
+			Action: common.UpdateOffsetPan,
 			Args: []common.Arg{
-				{Name: "OffsetTilt", Value: this.OffsetTilt},
+				{Name: "OffsetPan", Value: this.OffsetPan},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Update status bar.
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
+
+		return
+
 	}
 
 	// S E L E C T   S T A T I C   C O L O R
@@ -1224,6 +1257,9 @@ func ProcessButtons(X int, Y int,
 			}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
+
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", guiButtons)
 			return
 		}
 	}
@@ -1248,6 +1284,9 @@ func ProcessButtons(X int, Y int,
 			}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
+
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", guiButtons)
 			return
 		}
 	}
@@ -1272,6 +1311,9 @@ func ProcessButtons(X int, Y int,
 			}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
+
+			// Update the status bar
+			common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", guiButtons)
 			return
 		}
 	}
@@ -1459,6 +1501,11 @@ func ProcessButtons(X int, Y int,
 		this.StaticButtons[this.SelectedSequence].Y = Y
 		this.StaticButtons[this.SelectedSequence].Color = sequences[this.SelectedSequence].StaticColors[X].Color
 		this.StaticButtons[this.SelectedSequence].SelectedColor = sequences[this.SelectedSequence].StaticColors[X].SelectedColor
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Red %02d", sequences[this.SelectedSequence].StaticColors[X].Color.R), "red", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Green %02d", sequences[this.SelectedSequence].StaticColors[X].Color.G), "green", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", sequences[this.SelectedSequence].StaticColors[X].Color.B), "blue", guiButtons)
 
 		// Tell the sequence about the new color and where we are in the
 		// color cycle.
@@ -1693,10 +1740,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+
+	sensitivity := common.FindSensitivity(this.SoundGain)
+	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
+
 	if sequences[this.SelectedSequence].Type == "rgb" {
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+		common.UpdateStatusBar("       ", "tilt", guiButtons)
+
+		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", guiButtons)
 	}
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
@@ -1704,6 +1761,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
 		label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
+
+		// Hide the color editing buttons.
+		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
+		common.UpdateStatusBar("        ", "red", guiButtons)
+		common.UpdateStatusBar("        ", "green", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
 	}
 
 	// Light the top buttons.
@@ -2253,11 +2316,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		this.Strobe = false
 		common.ShowStrobeStatus(false, eventsForLaunchpad, guiButtons)
 	}
-
-	// common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[0]), "speed", guiButtons)
-	// common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[0]), "shift", guiButtons)
-	// common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[0]), "size", guiButtons)
-	// common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[0]), "fade", guiButtons)
 }
 
 func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
@@ -2560,6 +2618,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Tell the sequence to disable all the scanners.
 		if sequence.Type == "scanner" {
+
+			// Reset pan and tilt to the center
+			this.OffsetPan = 120
+			this.OffsetTilt = 120
+
 			// Enable all scanners.
 			for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
 				this.ScannerState[scannerNumber][sequence.Number].Enabled = true
