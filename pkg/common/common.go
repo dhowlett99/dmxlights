@@ -651,43 +651,61 @@ func GetColorButtonsArray(color int) Color {
 	return Color{}
 }
 
-func GetRGBColorByName(color string) Color {
+func GetColorArrayByNames(names []string) ([]Color, error) {
+
+	colors := []Color{}
+	for _, color := range names {
+		// Find the color by name from the library of supported colors.
+		colorLibrary, err := GetRGBColorByName(color)
+		if err != nil {
+			return colors, err
+		}
+		newColor := Color{}
+		newColor = colorLibrary
+
+		// Add the color to the chase colors.
+		colors = append(colors, newColor)
+	}
+	return colors, nil
+}
+
+func GetRGBColorByName(color string) (Color, error) {
 	switch color {
 	case "Red":
-		return Color{R: 255, G: 0, B: 0}
+		return Color{R: 255, G: 0, B: 0}, nil
 
 	case "Orange":
-		return Color{R: 255, G: 111, B: 0}
+		return Color{R: 255, G: 111, B: 0}, nil
 
 	case "Yellow":
-		return Color{R: 255, G: 255, B: 0}
+		return Color{R: 255, G: 255, B: 0}, nil
 
 	case "Green":
-		return Color{R: 0, G: 255, B: 0}
+		return Color{R: 0, G: 255, B: 0}, nil
 
 	case "Cyan":
-		return Color{R: 0, G: 255, B: 255}
+		return Color{R: 0, G: 255, B: 255}, nil
 
 	case "Blue":
-		return Color{R: 0, G: 0, B: 255}
+		return Color{R: 0, G: 0, B: 255}, nil
 
 	case "Purple":
-		return Color{R: 100, G: 0, B: 255}
+		return Color{R: 100, G: 0, B: 255}, nil
 
 	case "Pink":
-		return Color{R: 255, G: 0, B: 255}
+		return Color{R: 255, G: 0, B: 255}, nil
 
 	case "White":
-		return Color{R: 255, G: 255, B: 255}
+		return Color{R: 255, G: 255, B: 255}, nil
 
 	case "Light Blue":
-		return Color{R: 0, G: 196, B: 255}
+		return Color{R: 0, G: 196, B: 255}, nil
 
 	case "Black":
-		return Color{R: 0, G: 0, B: 0}
+		return Color{R: 0, G: 0, B: 0}, nil
 
 	}
-	return Color{R: 0, G: 0, B: 0}
+	return Color{}, fmt.Errorf("color not found")
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {

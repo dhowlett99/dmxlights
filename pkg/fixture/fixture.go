@@ -63,7 +63,7 @@ type Action struct {
 
 type ActionConfig struct {
 	Name         string
-	Colors       []Color
+	Colors       []common.Color
 	Fade         int
 	Size         int
 	Speed        time.Duration
@@ -637,6 +637,15 @@ func getConfig(action Action) ActionConfig {
 
 	config := ActionConfig{}
 
+	if action.Colors != nil {
+		// Find the color by name from the library of supported colors.
+		colorLibrary, err := common.GetColorArrayByNames(action.Colors)
+		if err != nil {
+			fmt.Printf("error: %s\n", err.Error())
+		}
+		config.Colors = colorLibrary
+	}
+
 	switch action.Fade {
 	case "soft":
 		config.Fade = 1
@@ -779,7 +788,12 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			stopFixture(fixtureName, fixturesConfig, dmxController)
 		case <-time.After(100 * time.Millisecond):
 		}
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 255, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
+
+		color, err := common.GetRGBColorByName(action.Colors[0])
+		if err != nil {
+			fmt.Printf("error %d\n", err)
+		}
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
 		return
 	}
 
@@ -829,7 +843,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			ScannerChase:  false,
 			RGBShift:      1,
 		}
-		sequence.Pattern = pattern.MakeSingleFixtureChase()
+		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 		sequence.Steps = sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.

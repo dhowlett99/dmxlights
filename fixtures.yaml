@@ -1320,6 +1320,39 @@ fixtures:
       actions:
         - name: off
           mode: off
+    - name: Red
+      label: Red
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: static red
+          mode: static
+          colors:
+          - Red
+    - name: Green
+      label: Green
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+      actions:
+        - name: static Green
+          mode: static
+          colors:
+          - Green
+    - name: Blue
+      label: Blue
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+      actions:
+        - name: static Blue
+          mode: static
+          colors:
+          - Blue
     - name: On
       label: On
       buttoncolor: 
@@ -1328,10 +1361,14 @@ fixtures:
         blue: 0
       actions:
         - name: soft chase
-          colors: 
-          - red
-          - green 
-          - blue
+          colors:
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
           mode: chase
           fade: soft
           speed: fast
@@ -1410,9 +1447,13 @@ fixtures:
       actions:
         - name: soft chase
           colors: 
-          - red
-          - green 
-          - blue
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
           mode: chase
           fade: soft
           speed: music
@@ -1473,6 +1514,39 @@ fixtures:
       actions:
         - name: soft chase
           mode: off
+    - name: Red
+      label: Red
+      buttoncolor: 
+        red: 255
+        green: 0
+        blue: 0
+      actions:
+        - name: static red
+          mode: static
+          colors:
+          - Red
+    - name: Green
+      label: Green
+      buttoncolor: 
+        red: 0
+        green: 255
+        blue: 0
+      actions:
+        - name: static Green
+          mode: static
+          colors:
+          - Green
+    - name: Blue
+      label: Blue
+      buttoncolor: 
+        red: 0
+        green: 0
+        blue: 255
+      actions:
+        - name: static Blue
+          mode: static
+          colors:
+          - Blue
     - name: On
       label: On
       buttoncolor: 
@@ -1482,9 +1556,13 @@ fixtures:
       actions:
         - name: soft chase
           colors: 
-          - red
-          - green 
-          - blue
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
           mode: chase
           fade: soft
           speed: fast
@@ -1497,9 +1575,13 @@ fixtures:
       actions:
         - name: rotate
           colors: 
-          - red
-          - green 
-          - blue
+          - Orange
+          - Yellow
+          - Green
+          - Cyan
+          - Blue
+          - Purple
+          - Pink
           mode: chase
           fade: soft
           speed: music

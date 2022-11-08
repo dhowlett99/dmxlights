@@ -917,7 +917,12 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 				for _, setting := range channel.Settings {
 					newStaticColorButton := common.StaticColorButton{}
 					newStaticColorButton.SelectedColor = setting.Number
-					newStaticColorButton.Color = common.GetRGBColorByName(setting.Name)
+					settingColor, err := common.GetRGBColorByName(setting.Name)
+					if err != nil {
+						fmt.Printf("error: %d\n", err)
+						continue
+					}
+					newStaticColorButton.Color = settingColor
 					availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
 					scannerColors[fixture.Number-1] = 0
 				}
