@@ -221,3 +221,29 @@ func Test_getFadeOnValues(t *testing.T) {
 		})
 	}
 }
+
+func TestFindSensitivity(t *testing.T) {
+	type args struct {
+		soundGain float32
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "test for 0.05",
+			args: args{
+				soundGain: 0.05,
+			},
+			want: 9,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FindSensitivity(tt.args.soundGain); got != tt.want {
+				t.Errorf("FindSensitivity() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

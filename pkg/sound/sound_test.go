@@ -1,8 +1,8 @@
 package sound
 
 import (
-	"fmt"
 	"reflect"
+	"sort"
 	"testing"
 	"time"
 
@@ -71,7 +71,7 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want1  map[int]common.Trigger
+		want   []common.Trigger
 	}{
 		{
 			name: "add first trigger",
@@ -96,11 +96,11 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 					},
 				},
 			},
-			want1: map[int]common.Trigger{
-				0:  {Name: "sequence0", State: true, Gain: 0, BPM: 0},
-				1:  {Name: "sequence1", State: true, Gain: 0, BPM: 0},
-				2:  {Name: "sequence2", State: true, Gain: 0, BPM: 0},
-				11: {Name: "switch1", State: true, Gain: 0, BPM: 0},
+			want: []common.Trigger{
+				{Name: "sequence0", State: true, Gain: 0, BPM: 0, Channel: nil},
+				{Name: "sequence1", State: true, Gain: 0, BPM: 0, Channel: nil},
+				{Name: "sequence2", State: true, Gain: 0, BPM: 0, Channel: nil},
+				{Name: "switch1", State: true, Gain: 0, BPM: 0, Channel: nil},
 			},
 		},
 	}
@@ -124,14 +124,30 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 
 			soundConfig.RegisterSoundTrigger(tt.args.name, tt.args.channel, tt.args.switchNumber)
 
-			// Resolve the pointers.
-			triggers := make(map[int]common.Trigger)
-			for triggerNumber, trigger := range soundConfig.SoundTriggers {
-				triggers[triggerNumber] = *trigger
+			// Temporary storage.
+			type kv struct {
+				Key   int
+				Value *common.Trigger
+			}
+			// Find the keys.
+			var sortedKeys []kv
+			for key, value := range soundConfig.SoundTriggers {
+				sortedKeys = append(sortedKeys, kv{key, value})
 			}
 
-			if !reflect.DeepEqual(triggers, tt.want1) {
-				t.Errorf("SoundConfig.RegisterSoundTrigger() got = %+v, want %+v", soundConfig.SoundTriggers, tt.want1)
+			// Sort the keys so the results are returned in order. ( makes this test case work reliably )
+			sort.Slice(sortedKeys, func(i, j int) bool {
+				return sortedKeys[i].Key < sortedKeys[j].Key
+			})
+
+			// Resolve the pointers.
+			triggers := []common.Trigger{}
+			for _, trigger := range sortedKeys {
+				triggers = append(triggers, *trigger.Value)
+			}
+
+			if !reflect.DeepEqual(triggers, tt.want) {
+				t.Errorf("SoundConfig.RegisterSoundTrigger() got = %+v, want %+v", triggers, tt.want)
 			}
 		})
 	}
@@ -161,10 +177,10 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 		name   string
 		fields fields
 		args   args
-		want1  []common.Trigger
+		want   []common.Trigger
 	}{
 		{
-			name: "add first trigger",
+			name: "delete first trigger",
 			args: args{
 				name: "switch1",
 			},
@@ -188,7 +204,7 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 					},
 				},
 			},
-			want1: []common.Trigger{
+			want: []common.Trigger{
 				{Name: "sequence0", State: true, Gain: 0, BPM: 0},
 				{Name: "sequence1", State: true, Gain: 0, BPM: 0},
 				{Name: "sequence2", State: true, Gain: 0, BPM: 0},
@@ -215,14 +231,30 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 
 			soundConfig.DeRegisterSoundTrigger(tt.args.name)
 
-			triggers := []common.Trigger{}
-			for _, trigger := range soundConfig.SoundTriggers {
-				fmt.Printf("Trigger %+v\n", trigger)
-				triggers = append(triggers, *trigger)
+			// Temporary storage.
+			type kv struct {
+				Key   int
+				Value *common.Trigger
+			}
+			// Find the keys.
+			var sortedKeys []kv
+			for key, value := range soundConfig.SoundTriggers {
+				sortedKeys = append(sortedKeys, kv{key, value})
 			}
 
-			if !reflect.DeepEqual(triggers, tt.want1) {
-				t.Errorf("SoundConfig.RegisterSoundTrigger() got = %+v, want %+v", triggers, tt.want1)
+			// Sort the keys so the results are returned in order. ( makes this test case work reliably )
+			sort.Slice(sortedKeys, func(i, j int) bool {
+				return sortedKeys[i].Key < sortedKeys[j].Key
+			})
+
+			// Resolve the pointers.
+			triggers := []common.Trigger{}
+			for _, trigger := range sortedKeys {
+				triggers = append(triggers, *trigger.Value)
+			}
+
+			if !reflect.DeepEqual(triggers, tt.want) {
+				t.Errorf("SoundConfig.RegisterSoundTrigger() got = %+v, want %+v", triggers, tt.want)
 			}
 
 		})

@@ -231,6 +231,26 @@ func main() {
 	bpmLabel := widget.NewLabel(fmt.Sprintf("BPM %03d", 0))
 	panel.BPMLabel = bpmLabel
 
+	// Create objects for top status bar.
+	upLabel := widget.NewLabel(fmt.Sprintf("       "))
+	panel.TiltLabel = upLabel
+
+	redLabel := widget.NewLabel(fmt.Sprintf("Red %02d", 0))
+	panel.RedLabel = redLabel
+
+	greenLabel := widget.NewLabel(fmt.Sprintf("Green %02d", 0))
+	panel.GreenLabel = greenLabel
+
+	blueLabel := widget.NewLabel(fmt.Sprintf("Blue %02d", 0))
+	panel.BlueLabel = blueLabel
+
+	sensitivity := common.FindSensitivity(this.SoundGain)
+	sensitivityLabel := widget.NewLabel(fmt.Sprintf("Sensitivity %02d", sensitivity))
+	panel.SensitivityLabel = sensitivityLabel
+
+	masterLabel := widget.NewLabel(fmt.Sprintf("Master %02d", this.MasterBrightness))
+	panel.MasterLabel = masterLabel
+
 	// Create a thread to handle GUI button events.
 	go func(panel gui.MyPanel, guiButtons chan common.ALight, GuiFlashButtons [][]common.ALight) {
 		for {
@@ -258,12 +278,30 @@ func main() {
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
-	statusBar := fyne.NewContainerWithLayout(
+	topStatusBar := fyne.NewContainerWithLayout(
+		layout.NewHBoxLayout(),
+		layout.NewSpacer(),
+		upLabel,
+		redLabel,
+		greenLabel,
+		blueLabel,
+		layout.NewSpacer(),
+		layout.NewSpacer(),
+		layout.NewSpacer(),
+		sensitivityLabel,
+		layout.NewSpacer(),
+		masterLabel,
+		layout.NewSpacer(),
+		layout.NewSpacer(),
+		layout.NewSpacer(),
+		toolbar)
+
+	bottonStatusBar := fyne.NewContainerWithLayout(
 		layout.NewHBoxLayout(), speedLabel, layout.NewSpacer(), shiftLabel, layout.NewSpacer(), sizeLabel, layout.NewSpacer(), fadeLabel, layout.NewSpacer(), bpmLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
-	main := container.NewBorder(toolbar, nil, nil, nil, squares)
-	content := container.NewBorder(main, nil, nil, nil, statusBar)
+	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)
+	content := container.NewBorder(main, nil, nil, nil, bottonStatusBar)
 
 	// Start threads for each sequence.
 	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
