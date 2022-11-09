@@ -39,7 +39,7 @@ type MyPanel struct {
 	ShiftLabel       *widget.Label
 	SizeLabel        *widget.Label
 	FadeLabel        *widget.Label
-	BPMLabel         *widget.Label
+	BeatLabel        *widget.Button
 	TiltLabel        *widget.Label
 	RedLabel         *widget.Label
 	GreenLabel       *widget.Label
@@ -92,7 +92,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 	// Shortcut to label a status bar item.
 	if alight.UpdateStatus {
-		panel.UpdateStatusBar(alight.Status, alight.Which)
+		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
 		return
 	}
 
@@ -195,7 +195,7 @@ func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
 	panel.Buttons[X][Y].button.Refresh()
 }
 
-func (panel *MyPanel) UpdateStatusBar(label string, which string) {
+func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {
 	if which == "speed" {
 		panel.SpeedLabel.SetText(label)
 	}
@@ -208,10 +208,9 @@ func (panel *MyPanel) UpdateStatusBar(label string, which string) {
 	if which == "fade" {
 		panel.FadeLabel.SetText(label)
 	}
-	if which == "bpm" {
-		panel.BPMLabel.SetText(label)
+	if which == "beat" {
+		panel.BeatLabel.Hidden = hide
 	}
-
 	if which == "tilt" {
 		panel.TiltLabel.SetText(label)
 	}
@@ -333,10 +332,10 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig) *widget.Toolbar {
+func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) *widget.Toolbar {
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := runSettingsPopUp(myWindow, soundConfig)
+			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -344,7 +343,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig) *widget.T
 	return toolbar
 }
 
-func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig) (modal *widget.PopUp) {
+func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) (modal *widget.PopUp) {
 
 	selectedInput := soundConfig.GetDeviceName()
 
@@ -364,7 +363,7 @@ func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig) (modal *wid
 	button := widget.NewButton("OK", func() {
 		modal.Hide()
 		soundConfig.StopSoundConfig()
-		soundConfig.StartSoundConfig(selectedInput)
+		soundConfig.StartSoundConfig(selectedInput, guiButtons)
 	})
 
 	spacer := layout.NewSpacer()

@@ -435,11 +435,6 @@ func PlaySequence(sequence common.Sequence,
 				for triggerNumber, trigger := range channels.SoundTriggers {
 					if sequence.MusicTrigger {
 						sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-						// TODO eventually Music speed will be set by the BPM analyser.
-						// But this hasn't been written yet. We just have some framework code
-						// in pkg/sound which counts peaks and this is where we display them.
-						common.UpdateStatusBar(fmt.Sprintf("BPM %03d", trigger.BPM), "bpm", guiButtons)
-
 						if triggerNumber == mySequenceNumber {
 							trigger.State = true
 						}

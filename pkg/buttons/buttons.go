@@ -279,7 +279,7 @@ func ProcessButtons(X int, Y int,
 				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 				// Update status bar.
-				common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
+				common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
 			}
 		}
 		return
@@ -344,7 +344,7 @@ func ProcessButtons(X int, Y int,
 		}
 		// Update the status bar
 		sensitivity := common.FindSensitivity(this.SoundGain)
-		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 		return
 	}
 
@@ -365,7 +365,7 @@ func ProcessButtons(X int, Y int,
 		}
 		// Update the status bar
 		sensitivity := common.FindSensitivity(this.SoundGain)
-		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 		return
 	}
 
@@ -391,7 +391,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToAllSequence(cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 		return
 	}
 
@@ -417,7 +417,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToAllSequence(cmd, commandChannels)
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 		return
 	}
 
@@ -529,7 +529,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
 			return
 		}
 
@@ -548,7 +548,7 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
 	}
@@ -576,7 +576,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
 			return
 		}
 
@@ -595,7 +595,7 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
 			return
 		}
 	}
@@ -627,7 +627,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -659,7 +659,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -848,7 +848,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
 			return
 		}
 
@@ -867,7 +867,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", false, guiButtons)
 			return
 		}
 	}
@@ -895,7 +895,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
 			return
 		}
 
@@ -914,7 +914,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", false, guiButtons)
 
 			return
 		}
@@ -943,7 +943,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
 
 			return
 		}
@@ -964,7 +964,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 
@@ -993,7 +993,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
 			return
 		}
 
@@ -1013,7 +1013,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 	}
@@ -1173,7 +1173,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update status bar.
-		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
 
 		return
 	}
@@ -1201,7 +1201,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update status bar.
-		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
 
 		return
 	}
@@ -1229,7 +1229,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// Update status bar.
-		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
 
 		return
 
@@ -1259,7 +1259,7 @@ func ProcessButtons(X int, Y int,
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", false, guiButtons)
 			return
 		}
 	}
@@ -1286,7 +1286,7 @@ func ProcessButtons(X int, Y int,
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", false, guiButtons)
 			return
 		}
 	}
@@ -1313,7 +1313,7 @@ func ProcessButtons(X int, Y int,
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", false, guiButtons)
 			return
 		}
 	}
@@ -1503,9 +1503,9 @@ func ProcessButtons(X int, Y int,
 		this.StaticButtons[this.SelectedSequence].SelectedColor = sequences[this.SelectedSequence].StaticColors[X].SelectedColor
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Red %02d", sequences[this.SelectedSequence].StaticColors[X].Color.R), "red", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Green %02d", sequences[this.SelectedSequence].StaticColors[X].Color.G), "green", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", sequences[this.SelectedSequence].StaticColors[X].Color.B), "blue", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Red %02d", sequences[this.SelectedSequence].StaticColors[X].Color.R), "red", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Green %02d", sequences[this.SelectedSequence].StaticColors[X].Color.G), "green", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", sequences[this.SelectedSequence].StaticColors[X].Color.B), "blue", false, guiButtons)
 
 		// Tell the sequence about the new color and where we are in the
 		// color cycle.
@@ -1739,34 +1739,34 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Update status bar.
-	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
 
 	sensitivity := common.FindSensitivity(this.SoundGain)
-	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
 	if sequences[this.SelectedSequence].Type == "rgb" {
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", guiButtons)
-		common.UpdateStatusBar("       ", "tilt", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+		common.UpdateStatusBar("       ", "tilt", false, guiButtons)
 
-		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.SelectedSequence].Color.R), "red", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.SelectedSequence].Color.G), "green", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.SelectedSequence].Color.B), "blue", false, guiButtons)
 	}
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
-		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", false, guiButtons)
 		label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
-		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 
 		// Hide the color editing buttons.
-		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", guiButtons)
-		common.UpdateStatusBar("        ", "red", guiButtons)
-		common.UpdateStatusBar("        ", "green", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
+		common.UpdateStatusBar("        ", "red", false, guiButtons)
+		common.UpdateStatusBar("        ", "green", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
 	}
 
 	// Light the top buttons.
@@ -2566,6 +2566,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	for _, trigger := range this.SoundTriggers {
 		trigger.State = false
 	}
+	// Update status bar.
+	common.UpdateStatusBar("BEAT", "beat", false, guiButtons)
 
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {

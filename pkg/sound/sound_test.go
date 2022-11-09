@@ -4,7 +4,6 @@ import (
 	"reflect"
 	"sort"
 	"testing"
-	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/gordonklaus/portaudio"
@@ -48,19 +47,14 @@ func Test_findLargest(t *testing.T) {
 func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 
 	type fields struct {
-		deviceName       string
-		availableInputs  []string
-		stream           *portaudio.Stream
-		BPMChannel       chan bool
-		SoundTriggers    map[int]*common.Trigger
-		gainSelected     int
-		gainCounters     []int
-		inputChannels    []*portaudio.HostApiInfo
-		stopChannel      chan bool
-		BPMtimer         *time.Timer
-		BPMcounter       int
-		BPMactualCounter int
-		BPMsecondUp      bool
+		deviceName      string
+		availableInputs []string
+		stream          *portaudio.Stream
+		SoundTriggers   map[int]*common.Trigger
+		gainSelected    int
+		gainCounters    []int
+		inputChannels   []*portaudio.HostApiInfo
+		stopChannel     chan bool
 	}
 	type args struct {
 		name         string
@@ -97,29 +91,24 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 				},
 			},
 			want: []common.Trigger{
-				{Name: "sequence0", State: true, Gain: 0, BPM: 0, Channel: nil},
-				{Name: "sequence1", State: true, Gain: 0, BPM: 0, Channel: nil},
-				{Name: "sequence2", State: true, Gain: 0, BPM: 0, Channel: nil},
-				{Name: "switch1", State: true, Gain: 0, BPM: 0, Channel: nil},
+				{Name: "sequence0", State: true, Gain: 0, Channel: nil},
+				{Name: "sequence1", State: true, Gain: 0, Channel: nil},
+				{Name: "sequence2", State: true, Gain: 0, Channel: nil},
+				{Name: "switch1", State: true, Gain: 0, Channel: nil},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			soundConfig := &SoundConfig{
-				deviceName:       tt.fields.deviceName,
-				availableInputs:  tt.fields.availableInputs,
-				stream:           tt.fields.stream,
-				BPMChannel:       tt.fields.BPMChannel,
-				SoundTriggers:    tt.fields.SoundTriggers,
-				gainSelected:     tt.fields.gainSelected,
-				gainCounters:     tt.fields.gainCounters,
-				inputChannels:    tt.fields.inputChannels,
-				stopChannel:      tt.fields.stopChannel,
-				BPMtimer:         tt.fields.BPMtimer,
-				BPMcounter:       tt.fields.BPMcounter,
-				BPMactualCounter: tt.fields.BPMactualCounter,
-				BPMsecondUp:      tt.fields.BPMsecondUp,
+				deviceName:      tt.fields.deviceName,
+				availableInputs: tt.fields.availableInputs,
+				stream:          tt.fields.stream,
+				SoundTriggers:   tt.fields.SoundTriggers,
+				gainSelected:    tt.fields.gainSelected,
+				gainCounters:    tt.fields.gainCounters,
+				inputChannels:   tt.fields.inputChannels,
+				stopChannel:     tt.fields.stopChannel,
 			}
 
 			soundConfig.RegisterSoundTrigger(tt.args.name, tt.args.channel, tt.args.switchNumber)
@@ -156,19 +145,14 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 
 	type fields struct {
-		deviceName       string
-		availableInputs  []string
-		stream           *portaudio.Stream
-		BPMChannel       chan bool
-		SoundTriggers    map[int]*common.Trigger
-		gainSelected     int
-		gainCounters     []int
-		inputChannels    []*portaudio.HostApiInfo
-		stopChannel      chan bool
-		BPMtimer         *time.Timer
-		BPMcounter       int
-		BPMactualCounter int
-		BPMsecondUp      bool
+		deviceName      string
+		availableInputs []string
+		stream          *portaudio.Stream
+		SoundTriggers   map[int]*common.Trigger
+		gainSelected    int
+		gainCounters    []int
+		inputChannels   []*portaudio.HostApiInfo
+		stopChannel     chan bool
 	}
 	type args struct {
 		name string
@@ -205,28 +189,23 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 				},
 			},
 			want: []common.Trigger{
-				{Name: "sequence0", State: true, Gain: 0, BPM: 0},
-				{Name: "sequence1", State: true, Gain: 0, BPM: 0},
-				{Name: "sequence2", State: true, Gain: 0, BPM: 0},
+				{Name: "sequence0", State: true, Gain: 0},
+				{Name: "sequence1", State: true, Gain: 0},
+				{Name: "sequence2", State: true, Gain: 0},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			soundConfig := &SoundConfig{
-				deviceName:       tt.fields.deviceName,
-				availableInputs:  tt.fields.availableInputs,
-				stream:           tt.fields.stream,
-				BPMChannel:       tt.fields.BPMChannel,
-				SoundTriggers:    tt.fields.SoundTriggers,
-				gainSelected:     tt.fields.gainSelected,
-				gainCounters:     tt.fields.gainCounters,
-				inputChannels:    tt.fields.inputChannels,
-				stopChannel:      tt.fields.stopChannel,
-				BPMtimer:         tt.fields.BPMtimer,
-				BPMcounter:       tt.fields.BPMcounter,
-				BPMactualCounter: tt.fields.BPMactualCounter,
-				BPMsecondUp:      tt.fields.BPMsecondUp,
+				deviceName:      tt.fields.deviceName,
+				availableInputs: tt.fields.availableInputs,
+				stream:          tt.fields.stream,
+				SoundTriggers:   tt.fields.SoundTriggers,
+				gainSelected:    tt.fields.gainSelected,
+				gainCounters:    tt.fields.gainCounters,
+				inputChannels:   tt.fields.inputChannels,
+				stopChannel:     tt.fields.stopChannel,
 			}
 
 			soundConfig.DeRegisterSoundTrigger(tt.args.name)

@@ -19,37 +19,29 @@ type SoundConfig struct {
 	deviceName      string
 	availableInputs []string
 	stream          *portaudio.Stream
-	BPMChannel      chan bool
 	SoundTriggers   map[int]*common.Trigger
 	gainSelected    int
 	gainCounters    []int
 	inputChannels   []*portaudio.HostApiInfo
 	stopChannel     chan bool
-	// Franework variables for the BPM Analyser.
-	BPMtimer         *time.Timer
-	BPMcounter       int
-	BPMactualCounter int
-	BPMsecondUp      bool
 }
 
-func NewSoundTrigger(channels common.Channels) *SoundConfig {
+func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight) *SoundConfig {
 
 	soundConfig := SoundConfig{}
 	soundConfig.stopChannel = make(chan bool)
 	soundConfig.gainSelected = gainSelected
 	soundConfig.gainCounters = gainCounters
 	soundConfig.SoundTriggers = channels.SoundTriggers
-	soundConfig.BPMChannel = make(chan bool)
 
 	soundConfig.getAvailableInputs()
-
-	soundConfig.StartSoundConfig("Built-in Microphone")
+	soundConfig.StartSoundConfig("Built-in Microphone", guiButtons)
 
 	return &soundConfig
 
 }
 
-func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
+func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons chan common.ALight) {
 
 	fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
 
@@ -117,25 +109,6 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 		// Start the thread that reports the gain.
 		go soundConfig.gainChecker()
 
-		// Start a 20 second timer.
-		// And count the beats received in 20 seconds. Multiply by 3 to get beats per minute.
-		soundConfig.BPMtimer = time.NewTimer(20 * time.Second)
-
-		// A very simple Beat counter which needs more work to be a real BPM.
-		// List for the timer to finish and then report the number of beats.
-		go func() {
-			for {
-				select {
-				case <-soundConfig.BPMChannel:
-					soundConfig.BPMcounter++
-					continue
-				case <-soundConfig.BPMtimer.C:
-					soundConfig.BPMsecondUp = true
-					soundConfig.BPMactualCounter = soundConfig.BPMcounter
-				}
-			}
-		}()
-
 		for {
 			// We need a way to shutdown the sound trigger subsystem when we switch
 			// audio inputs in the settings dialog box.
@@ -164,16 +137,6 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 
 				if out[i] > actualGain {
 
-					// Send a message to BPM counter.
-					soundConfig.BPMChannel <- true
-
-					// If the BPM sample time is up, then we restart counters here.
-					if soundConfig.BPMsecondUp {
-						soundConfig.BPMcounter = 0
-						soundConfig.BPMsecondUp = false
-						soundConfig.BPMtimer = time.NewTimer(20 * time.Second)
-					}
-
 					cmd := common.Command{}
 
 					for triggerNumber, trigger := range soundConfig.SoundTriggers {
@@ -181,6 +144,9 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 							if debug {
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
+							// Update status bar.
+							common.UpdateStatusBar("BEAT", "beat", false, guiButtons)
+
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
 
@@ -189,11 +155,10 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string) {
 							}
 
 						}
-						// Remember the BPM valuse so they don't get overwritten.
-						trigger.BPM = soundConfig.BPMactualCounter
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
+					common.UpdateStatusBar("XXXX", "beat", true, guiButtons)
 				}
 			}
 		}
@@ -211,7 +176,6 @@ func (soundConfig *SoundConfig) RegisterSoundTrigger(name string, channel chan c
 		Name:    name,
 		State:   true,
 		Gain:    0,
-		BPM:     0,
 		Channel: channel,
 	}
 	// We add 10 to the switch channels so that the channels used are outside

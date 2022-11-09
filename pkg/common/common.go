@@ -43,6 +43,7 @@ type ALight struct {
 	Status           string
 	Which            string
 	FlashStopChannel chan bool
+	Hidden           bool
 }
 
 type Color struct {
@@ -418,7 +419,6 @@ type Trigger struct {
 	Name    string
 	State   bool
 	Gain    float32
-	BPM     int
 	Channel chan Command
 }
 
@@ -1114,12 +1114,13 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 	guiButtons <- event
 }
 
-func UpdateStatusBar(status string, which string, guiButtons chan ALight) {
+func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALight) {
 	// Send message to fyne.io GUI.
 	event := ALight{
 		UpdateStatus: true,
 		Status:       status,
 		Which:        which,
+		Hidden:       hide,
 	}
 	guiButtons <- event
 }

@@ -210,26 +210,18 @@ func main() {
 	this.ButtonTimer = &time.Time{}
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels)
+	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons)
 
 	// Create objects for bottom status bar.
-	speedLabel := widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
-	panel.SpeedLabel = speedLabel
-
-	shiftLabel := widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultRGBShift))
-	panel.ShiftLabel = shiftLabel
-
-	sizeLabel := widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
-	panel.SizeLabel = sizeLabel
-
-	fadeLabel := widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultRGBFade))
-	panel.FadeLabel = fadeLabel
-
-	bpmLabel := widget.NewLabel(fmt.Sprintf("BPM %03d", 0))
-	panel.BPMLabel = bpmLabel
+	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
+	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultRGBShift))
+	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
+	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultRGBFade))
+	panel.BeatLabel = widget.NewButton("BEAT", func() {})
+	panel.BeatLabel.Hidden = true
 
 	// Create objects for top status bar.
 	upLabel := widget.NewLabel(fmt.Sprintf("       "))
@@ -297,7 +289,7 @@ func main() {
 		toolbar)
 
 	bottonStatusBar := fyne.NewContainerWithLayout(
-		layout.NewHBoxLayout(), speedLabel, layout.NewSpacer(), shiftLabel, layout.NewSpacer(), sizeLabel, layout.NewSpacer(), fadeLabel, layout.NewSpacer(), bpmLabel)
+		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.BeatLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
 	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)
