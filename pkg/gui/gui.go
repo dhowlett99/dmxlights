@@ -260,7 +260,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence) *fyne.Container {
+	updateChannels []chan common.Sequence,
+	dmxInterfacePresent bool) *fyne.Container {
 
 	containers := []*fyne.Container{}
 	for columnNumber := 0; columnNumber < ColumnWidth; columnNumber++ {
@@ -298,7 +299,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					popup.Show()
 				}
 			}
-			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
+			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true, dmxInterfacePresent)
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
