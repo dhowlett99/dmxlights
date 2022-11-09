@@ -2306,6 +2306,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState, X int, Y int, 
 		}
 	}
 
+	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
+	// So the master we retrive from this selected sequence will be the same for all the others.
+	this.MasterBrightness = sequences[this.SelectedSequence].Master
+
 	this.StrobeSpeed = sequences[this.SelectedSequence].StrobeSpeed
 	if this.StrobeSpeed > 0 {
 		this.Strobe = true
