@@ -1,5 +1,6 @@
 # Makefile to build dmxlights.
 
+GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
 
