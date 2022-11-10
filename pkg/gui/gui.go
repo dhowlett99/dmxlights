@@ -22,6 +22,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
 )
 
@@ -333,10 +334,11 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) *widget.Toolbar {
+func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
+	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons)
+			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, config, launchPadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -344,37 +346,62 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig, guiButton
 	return toolbar
 }
 
-func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) (modal *widget.PopUp) {
+func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
+	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
+	fmt.Printf("---> launchPadName %s\n", launchPadName)
 	selectedInput := soundConfig.GetDeviceName()
-
-	combo := widget.NewSelect(soundConfig.GetSoundConfig(), func(value string) {
-		selectedInput = value
-	})
-
-	combo.PlaceHolder = selectedInput
 
 	title := widget.NewLabel("Settings")
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
-	label := widget.NewLabel("Select Audio Input")
+	launchpadLabel := widget.NewLabel("Midi Interface Installed")
 
+	// Launchpad configuration.
+	var launchPads []string
+	launchPads = append(launchPads, launchPadName)
+	launchpadSelect := widget.NewSelect(launchPads, func(value string) {
+		selectedInput = launchPadName
+	})
+	launchpadSelect.PlaceHolder = launchPadName
+
+	// DMX interface configuration.
+	dmxInterfaceLabel := widget.NewLabel("DMX Interface Installed ")
+	var dmxLabels []string
+	dmxLabels = append(dmxLabels, "No Found")
+	if config != nil {
+		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.InputInterfaceID)
+	}
+	dmxInterfaceSelect := widget.NewSelect(dmxLabels, func(value string) {
+		selectedInput = dmxLabels[0]
+	})
+	dmxInterfaceSelect.PlaceHolder = dmxLabels[0]
+
+	// Audio interface configuration.
+	audioInterfaceLabel := widget.NewLabel("Select Audio Input")
+	audioInterfaceSelect := widget.NewSelect(soundConfig.GetSoundConfig(), func(value string) {
+		selectedInput = value
+	})
+	audioInterfaceSelect.PlaceHolder = selectedInput
+
+	// Ok button.
 	button := widget.NewButton("OK", func() {
 		modal.Hide()
 		soundConfig.StopSoundConfig()
 		soundConfig.StartSoundConfig(selectedInput, guiButtons)
 	})
 
-	spacer := layout.NewSpacer()
-
+	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
 		container.NewVBox(
 			title,
-			container.NewHBox(label, combo),
+			container.NewHBox(dmxInterfaceLabel, dmxInterfaceSelect),
+			container.NewHBox(launchpadLabel, launchpadSelect),
+			container.NewHBox(audioInterfaceLabel, audioInterfaceSelect),
 			widget.NewLabel(""),
-			container.NewHBox(spacer, button),
+			container.NewHBox(layout.NewSpacer(), button),
 		),
 		w.Canvas(),
 	)

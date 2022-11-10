@@ -42,34 +42,34 @@ func main() {
 	// Setup the current state.
 	this := buttons.CurrentState{}
 
-	this.Blackout = false                           // Blackout starts in off.
-	this.Flood = false                              // Flood starts in off.
-	this.Running = make(map[int]bool, 4)            // Initialise storage for four sequences.
-	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
-	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
-	this.OffsetPan = 120                            // Start pan from the center
-	this.OffsetTilt = 120                           // Start tilt from the center.
-	this.Patterns = pattern.MakePatterns()          // Build the default set of Patterns.
-	this.SelectButtonPressed = make([]bool, 4)      // Initialise four select buttons.
-	this.FunctionSelectMode = make([]bool, 4)       // Initialise four function mode states.
-	this.EditSequenceColorsMode = make([]bool, 4)   // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = make([]bool, 4)    // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = make([]bool, 4)    // Remember when we are in selecting gobo mode.
-	this.EditStaticColorsMode = make([]bool, 4)     // Remember when we are in editing static colors mode.
-	this.EditPatternMode = make([]bool, 4)          // Remember when we are in editing pattern mode.
-	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
-	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
-	this.Speed = make(map[int]int, 4)               // Initialise storage for four sequences.
-	this.RGBSize = make(map[int]int, 4)             // Initialise storage for four sequences.
-	this.ScannerSize = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.RGBShift = make(map[int]int, 4)            // Initialise storage for four sequences.
-	this.ScannerShift = make(map[int]int, 4)        // Initialise storage for four sequences.
-	this.RGBFade = make(map[int]int, 4)             // Initialise storage for four sequences.
-	this.ScannerFade = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
-	this.LaunchPadConnected = true                  // Assume launchpad is present, until tested.
-	this.DmxInterfacePresent = true                 // Assume DMX interface card is present, until tested.
-
+	this.Blackout = false                              // Blackout starts in off.
+	this.Flood = false                                 // Flood starts in off.
+	this.Running = make(map[int]bool, 4)               // Initialise storage for four sequences.
+	this.MasterBrightness = 255                        // Affects all DMX fixtures and launchpad lamps.
+	this.SoundGain = 0                                 // Fine gain -0.09 -> 0.09
+	this.OffsetPan = 120                               // Start pan from the center
+	this.OffsetTilt = 120                              // Start tilt from the center.
+	this.Patterns = pattern.MakePatterns()             // Build the default set of Patterns.
+	this.SelectButtonPressed = make([]bool, 4)         // Initialise four select buttons.
+	this.FunctionSelectMode = make([]bool, 4)          // Initialise four function mode states.
+	this.EditSequenceColorsMode = make([]bool, 4)      // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = make([]bool, 4)       // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = make([]bool, 4)       // Remember when we are in selecting gobo mode.
+	this.EditStaticColorsMode = make([]bool, 4)        // Remember when we are in editing static colors mode.
+	this.EditPatternMode = make([]bool, 4)             // Remember when we are in editing pattern mode.
+	this.StaticButtons = makeStaticButtonsStorage()    // Make storgage for color editing button results.
+	this.PresetsStore = presets.LoadPresets()          // Load the presets from their json files.
+	this.Speed = make(map[int]int, 4)                  // Initialise storage for four sequences.
+	this.RGBSize = make(map[int]int, 4)                // Initialise storage for four sequences.
+	this.ScannerSize = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.RGBShift = make(map[int]int, 4)               // Initialise storage for four sequences.
+	this.ScannerShift = make(map[int]int, 4)           // Initialise storage for four sequences.
+	this.RGBFade = make(map[int]int, 4)                // Initialise storage for four sequences.
+	this.ScannerFade = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.ScannerCoordinates = make(map[int]int, 4)     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
+	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
+	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
+	this.LaunchpadName = "Novation Launchpad Mk3 Mini" // Name of launchpad.
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
 	for switchChannel := 0; switchChannel < 10; switchChannel++ {
@@ -95,7 +95,7 @@ func main() {
 
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
-	dmxController, err := dmx.NewDmXController()
+	dmxController, dmxInterfaceConfig, err := dmx.NewDmXController()
 	if err != nil {
 		fmt.Printf("dmx interface: %v\n", err)
 		this.DmxInterfacePresent = false
@@ -117,6 +117,7 @@ func main() {
 	if err != nil {
 		fmt.Printf("launchpad: %v", err)
 		this.LaunchPadConnected = false
+		this.LaunchpadName = "Not Found"
 	}
 
 	if this.LaunchPadConnected {
@@ -220,7 +221,7 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, dmxInterfaceConfig, this.LaunchpadName)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
