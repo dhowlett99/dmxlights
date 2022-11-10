@@ -5,7 +5,7 @@ SHELL := /usr/bin/env bash
 
 all: test build deploy
 
-legacy: legacy-test legacy-build legacy-deplop
+legacy: legacy-test legacy-build legacy-deploy
 
 legacy-test:
 	go test --tags legacy `go list ./...` ${COVERAGE}

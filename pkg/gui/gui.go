@@ -252,6 +252,53 @@ func (panel *MyPanel) GetButtonColor(X int, Y int) color.Color {
 	return panel.Buttons[X][Y].rectangle.FillColor
 }
 
+type Device struct {
+	Name   string
+	Status bool
+}
+
+func (panel *MyPanel) PopupNotFoundMessage(myWindow fyne.Window, dmxInterface Device, launchPad Device) (modal *widget.PopUp) {
+
+	title := widget.NewLabel("Information")
+
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		modal.Hide()
+	})
+
+	var dmxStatus *widget.Label
+	dmxName := widget.NewLabel(dmxInterface.Name)
+	if dmxInterface.Status {
+		dmxStatus = widget.NewLabel("Connected")
+	} else {
+		dmxStatus = widget.NewLabel("Not Connected")
+	}
+
+	var launchpadStatus *widget.Label
+	launchpadName := widget.NewLabel(launchPad.Name)
+	if launchPad.Status {
+		launchpadStatus = widget.NewLabel("Connected")
+	} else {
+		launchpadStatus = widget.NewLabel("Not Connected")
+	}
+
+	modal = widget.NewModalPopUp(
+		container.NewVBox(
+			title,
+			container.NewHBox(dmxName, dmxStatus),
+			container.NewHBox(launchpadName, launchpadStatus),
+			widget.NewLabel(""),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		myWindow.Canvas(),
+	)
+
+	modal.Show()
+
+	return modal
+
+}
+
 func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	sequences []*common.Sequence,
 	this *buttons.CurrentState,
@@ -300,7 +347,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					popup.Show()
 				}
 			}
-			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true, dmxInterfacePresent)
+			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
@@ -349,7 +396,6 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
-	fmt.Printf("---> launchPadName %s\n", launchPadName)
 	selectedInput := soundConfig.GetDeviceName()
 
 	title := widget.NewLabel("Settings")
@@ -370,7 +416,7 @@ func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	// DMX interface configuration.
 	dmxInterfaceLabel := widget.NewLabel("DMX Interface Installed ")
 	var dmxLabels []string
-	dmxLabels = append(dmxLabels, "No Found")
+	dmxLabels = append(dmxLabels, "Not Found")
 	if config != nil {
 		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.InputInterfaceID)
 	}

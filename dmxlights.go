@@ -124,6 +124,15 @@ func main() {
 		defer this.Pad.Close()
 	}
 
+	// Report on connected devices.
+	panel.PopupNotFoundMessage(myWindow,
+		gui.Device{
+			Name:   "DMX Interface",
+			Status: this.DmxInterfacePresent},
+		gui.Device{
+			Name:   "LaunchPad",
+			Status: this.LaunchPadConnected})
+
 	// Create a channel to send events to the launchpad.
 	eventsForLaunchpad := make(chan common.ALight)
 

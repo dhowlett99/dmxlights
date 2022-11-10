@@ -88,7 +88,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, seq
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 		hit := <-buttonChannel
-		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false, dmxInterfaceCardPresent)
+		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
 	}
 }
 
@@ -102,8 +102,7 @@ func ProcessButtons(X int, Y int,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
 	updateChannels []chan common.Sequence,
-	gui bool,
-	dmxInterfaceCardPresent bool) {
+	gui bool) {
 
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
