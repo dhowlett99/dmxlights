@@ -403,9 +403,7 @@ func PlaySequence(sequence common.Sequence,
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			sequence.Functions[common.Function8_Music_Trigger].State = false
-			soundConfig.SoundTriggerMutex.Lock()
 			channels.SoundTriggers[mySequenceNumber].State = false
-			soundConfig.SoundTriggerMutex.Unlock()
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{

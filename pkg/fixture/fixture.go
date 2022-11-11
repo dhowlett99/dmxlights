@@ -845,7 +845,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 		// Register this mini sequencer with the sound service.
 		if cfg.MusicTrigger {
-			soundConfig.EnableSoundTrigger(switchName, switchNumber)
+			soundConfig.EnableSoundTrigger(switchName)
 		}
 
 		// Stop any left over sequence left over for this switch.

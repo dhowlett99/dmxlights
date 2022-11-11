@@ -2,7 +2,6 @@ package sound
 
 import (
 	"reflect"
-	"sort"
 	"testing"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -44,7 +43,7 @@ func Test_findLargest(t *testing.T) {
 	}
 }
 
-func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
+func TestSoundConfig_EnableSoundTrigger(t *testing.T) {
 
 	type fields struct {
 		deviceName      string
@@ -68,7 +67,7 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 		want   []common.Trigger
 	}{
 		{
-			name: "add first trigger",
+			name: "enable first trigger",
 			args: args{
 				name:         "switch1",
 				channel:      nil,
@@ -88,12 +87,21 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 						Name:  "sequence2",
 						State: true,
 					},
+					{
+						Name:  "switch0",
+						State: false,
+					},
+					{
+						Name:  "switch1",
+						State: false,
+					},
 				},
 			},
 			want: []common.Trigger{
 				{Name: "sequence0", State: true, Gain: 0, Channel: nil},
 				{Name: "sequence1", State: true, Gain: 0, Channel: nil},
 				{Name: "sequence2", State: true, Gain: 0, Channel: nil},
+				{Name: "switch0", State: false, Gain: 0, Channel: nil},
 				{Name: "switch1", State: true, Gain: 0, Channel: nil},
 			},
 		},
@@ -111,28 +119,12 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 				stopChannel:     tt.fields.stopChannel,
 			}
 
-			soundConfig.EnableSoundTrigger(tt.args.name, tt.args.switchNumber)
-
-			// Temporary storage.
-			type kv struct {
-				Key   int
-				Value *common.Trigger
-			}
-			// Find the keys.
-			var sortedKeys []kv
-			for key, value := range soundConfig.SoundTriggers {
-				sortedKeys = append(sortedKeys, kv{key, value})
-			}
-
-			// Sort the keys so the results are returned in order. ( makes this test case work reliably )
-			sort.Slice(sortedKeys, func(i, j int) bool {
-				return sortedKeys[i].Key < sortedKeys[j].Key
-			})
+			soundConfig.EnableSoundTrigger(tt.args.name)
 
 			// Resolve the pointers.
 			triggers := []common.Trigger{}
-			for _, trigger := range sortedKeys {
-				triggers = append(triggers, *trigger.Value)
+			for _, trigger := range soundConfig.SoundTriggers {
+				triggers = append(triggers, *trigger)
 			}
 
 			if !reflect.DeepEqual(triggers, tt.want) {
@@ -142,7 +134,7 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 	}
 }
 
-func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
+func TestSoundConfig_DisableSoundTrigger(t *testing.T) {
 
 	type fields struct {
 		deviceName      string
@@ -164,7 +156,7 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 		want   []common.Trigger
 	}{
 		{
-			name: "delete first trigger",
+			name: "disable switch1 trigger",
 			args: args{
 				name: "switch1",
 			},
@@ -183,6 +175,10 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 						State: true,
 					},
 					{
+						Name:  "switch0",
+						State: false,
+					},
+					{
 						Name:  "switch1",
 						State: true,
 					},
@@ -192,6 +188,8 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 				{Name: "sequence0", State: true, Gain: 0},
 				{Name: "sequence1", State: true, Gain: 0},
 				{Name: "sequence2", State: true, Gain: 0},
+				{Name: "switch0", State: false, Gain: 0},
+				{Name: "switch1", State: false, Gain: 0},
 			},
 		},
 	}
@@ -210,26 +208,10 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 
 			soundConfig.DisableSoundTrigger(tt.args.name)
 
-			// Temporary storage.
-			type kv struct {
-				Key   int
-				Value *common.Trigger
-			}
-			// Find the keys.
-			var sortedKeys []kv
-			for key, value := range soundConfig.SoundTriggers {
-				sortedKeys = append(sortedKeys, kv{key, value})
-			}
-
-			// Sort the keys so the results are returned in order. ( makes this test case work reliably )
-			sort.Slice(sortedKeys, func(i, j int) bool {
-				return sortedKeys[i].Key < sortedKeys[j].Key
-			})
-
 			// Resolve the pointers.
 			triggers := []common.Trigger{}
-			for _, trigger := range sortedKeys {
-				triggers = append(triggers, *trigger.Value)
+			for _, trigger := range soundConfig.SoundTriggers {
+				triggers = append(triggers, *trigger)
 			}
 
 			if !reflect.DeepEqual(triggers, tt.want) {

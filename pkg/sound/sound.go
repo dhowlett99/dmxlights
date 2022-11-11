@@ -2,7 +2,6 @@ package sound
 
 import (
 	"fmt"
-	"sync"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -17,15 +16,14 @@ var gainSelected = 4
 var gainCounters = make([]int, 10)
 
 type SoundConfig struct {
-	deviceName        string
-	availableInputs   []string
-	stream            *portaudio.Stream
-	SoundTriggers     []*common.Trigger
-	SoundTriggerMutex *sync.RWMutex
-	gainSelected      int
-	gainCounters      []int
-	inputChannels     []*portaudio.HostApiInfo
-	stopChannel       chan bool
+	deviceName      string
+	availableInputs []string
+	stream          *portaudio.Stream
+	SoundTriggers   []*common.Trigger
+	gainSelected    int
+	gainCounters    []int
+	inputChannels   []*portaudio.HostApiInfo
+	stopChannel     chan bool
 }
 
 func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight) *SoundConfig {
@@ -171,8 +169,8 @@ func (soundConfig *SoundConfig) GetDeviceName() string {
 	return soundConfig.deviceName
 }
 
-// RegisterSoundTrigger  - Register the Trigger.
-func (soundConfig *SoundConfig) EnableSoundTrigger(name string, switchNumber int) {
+// EnableSoundTrigger  - Register the Trigger.
+func (soundConfig *SoundConfig) EnableSoundTrigger(name string) {
 	// Step through the existing sound triggers and find the one we want to enable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
