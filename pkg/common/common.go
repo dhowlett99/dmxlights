@@ -313,7 +313,7 @@ type Channels struct {
 	CommmandChannels []chan Command
 	ReplyChannels    []chan Sequence
 	UpdateChannels   []chan Sequence
-	SoundTriggers    map[int]*Trigger
+	SoundTriggers    []*Trigger
 }
 
 type SwitchChannel struct {
@@ -660,8 +660,7 @@ func GetColorArrayByNames(names []string) ([]Color, error) {
 		if err != nil {
 			return colors, err
 		}
-		newColor := Color{}
-		newColor = colorLibrary
+		newColor := colorLibrary
 
 		// Add the color to the chase colors.
 		colors = append(colors, newColor)
@@ -1026,41 +1025,42 @@ func ShowStrobeStatus(state bool, eventsForLaunchpad chan ALight, guiButtons cha
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad, LaunchPadConnected bool) {
 	for {
 
 		// Wait for the event.
 		alight := <-eventsForLauchpad
 
-		// Wait for a few millisecond so the launchpad and the gui step at the same time
-		time.Sleep(14 * time.Microsecond)
+		if LaunchPadConnected {
+			// Wait for a few millisecond so the launchpad and the gui step at the same time
+			time.Sleep(14 * time.Microsecond)
 
-		// We're in standard turn the light on.
-		if !alight.Flash {
+			// We're in standard turn the light on.
+			if !alight.Flash {
 
-			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-			Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-			Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-			Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+				Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
 
-			// Now light the launchpad button.
-			err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
-			if err != nil {
-				fmt.Printf("error writing to launchpad %e\n" + err.Error())
+				// Now light the launchpad button.
+				err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+				if err != nil {
+					fmt.Printf("error writing to launchpad %e\n" + err.Error())
+				}
+
+				// Now we're been asked go flash this button.
+			} else {
+				// Now light the launchpad button.
+				if debug {
+					fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
+					fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
+				}
+				err := pad.FlashLight(alight.X, alight.Y, int(GetLaunchPadColorCodeByRGB(alight.OnColor)), int(GetLaunchPadColorCodeByRGB(alight.OffColor)))
+				if err != nil {
+					fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
+				}
 			}
-
-			// Now we're been asked go flash this button.
-		} else {
-			// Now light the launchpad button.
-			if debug {
-				fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
-				fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
-			}
-			err := pad.FlashLight(alight.X, alight.Y, int(GetLaunchPadColorCodeByRGB(alight.OnColor)), int(GetLaunchPadColorCodeByRGB(alight.OffColor)))
-			if err != nil {
-				fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
-			}
-
 		}
 	}
 }

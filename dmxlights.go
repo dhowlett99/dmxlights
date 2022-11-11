@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"log"
 	"os"
 	"os/signal"
 	"syscall"
@@ -43,32 +42,34 @@ func main() {
 	// Setup the current state.
 	this := buttons.CurrentState{}
 
-	this.Blackout = false                           // Blackout starts in off.
-	this.Flood = false                              // Flood starts in off.
-	this.Running = make(map[int]bool, 4)            // Initialise storage for four sequences.
-	this.MasterBrightness = 255                     // Affects all DMX fixtures and launchpad lamps.
-	this.SoundGain = 0                              // Fine gain -0.09 -> 0.09
-	this.OffsetPan = 120                            // Start pan from the center
-	this.OffsetTilt = 120                           // Start tilt from the center.
-	this.Patterns = pattern.MakePatterns()          // Build the default set of Patterns.
-	this.SelectButtonPressed = make([]bool, 4)      // Initialise four select buttons.
-	this.FunctionSelectMode = make([]bool, 4)       // Initialise four function mode states.
-	this.EditSequenceColorsMode = make([]bool, 4)   // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = make([]bool, 4)    // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = make([]bool, 4)    // Remember when we are in selecting gobo mode.
-	this.EditStaticColorsMode = make([]bool, 4)     // Remember when we are in editing static colors mode.
-	this.EditPatternMode = make([]bool, 4)          // Remember when we are in editing pattern mode.
-	this.StaticButtons = makeStaticButtonsStorage() // Make storgage for color editing button results.
-	this.PresetsStore = presets.LoadPresets()       // Load the presets from their json files.
-	this.Speed = make(map[int]int, 4)               // Initialise storage for four sequences.
-	this.RGBSize = make(map[int]int, 4)             // Initialise storage for four sequences.
-	this.ScannerSize = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.RGBShift = make(map[int]int, 4)            // Initialise storage for four sequences.
-	this.ScannerShift = make(map[int]int, 4)        // Initialise storage for four sequences.
-	this.RGBFade = make(map[int]int, 4)             // Initialise storage for four sequences.
-	this.ScannerFade = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, 4)  // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
-
+	this.Blackout = false                              // Blackout starts in off.
+	this.Flood = false                                 // Flood starts in off.
+	this.Running = make(map[int]bool, 4)               // Initialise storage for four sequences.
+	this.MasterBrightness = 255                        // Affects all DMX fixtures and launchpad lamps.
+	this.SoundGain = 0                                 // Fine gain -0.09 -> 0.09
+	this.OffsetPan = 120                               // Start pan from the center
+	this.OffsetTilt = 120                              // Start tilt from the center.
+	this.Patterns = pattern.MakePatterns()             // Build the default set of Patterns.
+	this.SelectButtonPressed = make([]bool, 4)         // Initialise four select buttons.
+	this.FunctionSelectMode = make([]bool, 4)          // Initialise four function mode states.
+	this.EditSequenceColorsMode = make([]bool, 4)      // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = make([]bool, 4)       // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = make([]bool, 4)       // Remember when we are in selecting gobo mode.
+	this.EditStaticColorsMode = make([]bool, 4)        // Remember when we are in editing static colors mode.
+	this.EditPatternMode = make([]bool, 4)             // Remember when we are in editing pattern mode.
+	this.StaticButtons = makeStaticButtonsStorage()    // Make storgage for color editing button results.
+	this.PresetsStore = presets.LoadPresets()          // Load the presets from their json files.
+	this.Speed = make(map[int]int, 4)                  // Initialise storage for four sequences.
+	this.RGBSize = make(map[int]int, 4)                // Initialise storage for four sequences.
+	this.ScannerSize = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.RGBShift = make(map[int]int, 4)               // Initialise storage for four sequences.
+	this.ScannerShift = make(map[int]int, 4)           // Initialise storage for four sequences.
+	this.RGBFade = make(map[int]int, 4)                // Initialise storage for four sequences.
+	this.ScannerFade = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.ScannerCoordinates = make(map[int]int, 4)     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
+	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
+	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
+	this.LaunchpadName = "Novation Launchpad Mk3 Mini" // Name of launchpad.
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
 	for switchChannel := 0; switchChannel < 10; switchChannel++ {
@@ -94,10 +95,10 @@ func main() {
 
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
-	dmxController, err := dmx.NewDmXController()
+	dmxController, dmxInterfaceConfig, err := dmx.NewDmXController()
 	if err != nil {
-		fmt.Printf("error initializing dmx interface: %v\n", err)
-		os.Exit(1)
+		fmt.Printf("dmx interface: %v\n", err)
+		this.DmxInterfacePresent = false
 	}
 
 	// Save the presets on exit.
@@ -114,15 +115,31 @@ func main() {
 	fmt.Println("Setup Novation Launchpad")
 	this.Pad, err = mk3.Open()
 	if err != nil {
-		log.Fatalf("error initializing launchpad: %v", err)
+		fmt.Printf("launchpad: %v", err)
+		this.LaunchPadConnected = false
+		this.LaunchpadName = "Not Found"
 	}
-	defer this.Pad.Close()
+
+	if this.LaunchPadConnected {
+		defer this.Pad.Close()
+	}
+
+	// Report on connected devices.
+	panel.PopupNotFoundMessage(myWindow,
+		gui.Device{
+			Name:   "DMX Interface",
+			Status: this.DmxInterfacePresent},
+		gui.Device{
+			Name:   "LaunchPad",
+			Status: this.LaunchPadConnected})
 
 	// Create a channel to send events to the launchpad.
 	eventsForLaunchpad := make(chan common.ALight)
 
 	// We need to be in programmers mode to use the launchpad.
-	this.Pad.Program()
+	if this.LaunchPadConnected {
+		this.Pad.Program()
+	}
 
 	// Create a channel to send events to the GUI.
 	guiButtons := make(chan common.ALight)
@@ -192,12 +209,27 @@ func main() {
 		updateChannels = append(updateChannels, updateChannel)
 	}
 
-	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
-	this.SoundTriggers = make(map[int]*common.Trigger)
-	this.SoundTriggers[0] = &common.Trigger{Name: "sequence0", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[1] = &common.Trigger{Name: "sequence1", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[2] = &common.Trigger{Name: "sequence2", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[3] = &common.Trigger{Name: "sequence3", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
+	this.SoundTriggers = []*common.Trigger{}
+
+	for triggerNumber := 0; triggerNumber < 10; triggerNumber++ {
+		newChannel := make(chan common.Command)
+		var name string
+		var newTrigger common.Trigger
+		if triggerNumber < 3 {
+			name = fmt.Sprintf("sequence%d", triggerNumber)
+		} else {
+			name = fmt.Sprintf("switch%d", triggerNumber-3)
+		}
+		newTrigger = common.Trigger{
+			Name:    name,
+			State:   false,
+			Gain:    this.SoundGain,
+			Channel: newChannel,
+		}
+
+		this.SoundTriggers = append(this.SoundTriggers, &newTrigger)
+	}
 
 	// Now add them all to a handy channels struct.
 	this.SequenceChannels = common.Channels{}
@@ -213,7 +245,7 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, dmxInterfaceConfig, this.LaunchpadName)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
@@ -224,7 +256,7 @@ func main() {
 	panel.BeatLabel.Hidden = true
 
 	// Create objects for top status bar.
-	upLabel := widget.NewLabel(fmt.Sprintf("       "))
+	upLabel := widget.NewLabel("       ")
 	panel.TiltLabel = upLabel
 
 	redLabel := widget.NewLabel(fmt.Sprintf("Red %02d", 0))
@@ -253,19 +285,19 @@ func main() {
 
 	// Now create a thread to handle launchpad light button events.
 	go func() {
-		common.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad)
+		common.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 	}()
 
 	// Add buttons to the main panel.
-	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
-	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
@@ -296,10 +328,10 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, bottonStatusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig)
+	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
@@ -309,22 +341,25 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0)
+	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0, this.DmxInterfacePresent)
 
-	// Listen to launchpad buttons.
-	go func(guiButtons chan common.ALight,
-		this *buttons.CurrentState,
-		sequences []*common.Sequence,
-		eventsForLaunchpad chan common.ALight,
-		dmxController *ft232.DMXController,
-		fixturesConfig *fixture.Fixtures,
-		commandChannels []chan common.Command,
-		replyChannels []chan common.Sequence,
-		updateChannels []chan common.Sequence) {
+	if this.LaunchPadConnected {
+		// Listen to launchpad buttons.
+		go func(guiButtons chan common.ALight,
+			this *buttons.CurrentState,
+			sequences []*common.Sequence,
+			eventsForLaunchpad chan common.ALight,
+			dmxController *ft232.DMXController,
+			fixturesConfig *fixture.Fixtures,
+			commandChannels []chan common.Command,
+			replyChannels []chan common.Sequence,
+			updateChannels []chan common.Sequence,
+			dmxInterfaceCardPresent bool) {
 
-		buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+			buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
 
-	}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	}
 
 	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
 	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)

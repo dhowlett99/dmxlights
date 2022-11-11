@@ -22,6 +22,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
 )
 
@@ -251,6 +252,53 @@ func (panel *MyPanel) GetButtonColor(X int, Y int) color.Color {
 	return panel.Buttons[X][Y].rectangle.FillColor
 }
 
+type Device struct {
+	Name   string
+	Status bool
+}
+
+func (panel *MyPanel) PopupNotFoundMessage(myWindow fyne.Window, dmxInterface Device, launchPad Device) (modal *widget.PopUp) {
+
+	title := widget.NewLabel("Information")
+
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		modal.Hide()
+	})
+
+	var dmxStatus *widget.Label
+	dmxName := widget.NewLabel(dmxInterface.Name)
+	if dmxInterface.Status {
+		dmxStatus = widget.NewLabel("Connected")
+	} else {
+		dmxStatus = widget.NewLabel("Not Connected")
+	}
+
+	var launchpadStatus *widget.Label
+	launchpadName := widget.NewLabel(launchPad.Name)
+	if launchPad.Status {
+		launchpadStatus = widget.NewLabel("Connected")
+	} else {
+		launchpadStatus = widget.NewLabel("Not Connected")
+	}
+
+	modal = widget.NewModalPopUp(
+		container.NewVBox(
+			title,
+			container.NewHBox(dmxName, dmxStatus),
+			container.NewHBox(launchpadName, launchpadStatus),
+			widget.NewLabel(""),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		myWindow.Canvas(),
+	)
+
+	modal.Show()
+
+	return modal
+
+}
+
 func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	sequences []*common.Sequence,
 	this *buttons.CurrentState,
@@ -260,7 +308,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence) *fyne.Container {
+	updateChannels []chan common.Sequence,
+	dmxInterfacePresent bool) *fyne.Container {
 
 	containers := []*fyne.Container{}
 	for columnNumber := 0; columnNumber < ColumnWidth; columnNumber++ {
@@ -332,10 +381,11 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) *widget.Toolbar {
+func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
+	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons)
+			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, config, launchPadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -343,37 +393,61 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig, guiButton
 	return toolbar
 }
 
-func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig, guiButtons chan common.ALight) (modal *widget.PopUp) {
+func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
+	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
 	selectedInput := soundConfig.GetDeviceName()
-
-	combo := widget.NewSelect(soundConfig.GetSoundConfig(), func(value string) {
-		selectedInput = value
-	})
-
-	combo.PlaceHolder = selectedInput
 
 	title := widget.NewLabel("Settings")
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
-	label := widget.NewLabel("Select Audio Input")
+	launchpadLabel := widget.NewLabel("Midi Interface Installed")
 
+	// Launchpad configuration.
+	var launchPads []string
+	launchPads = append(launchPads, launchPadName)
+	launchpadSelect := widget.NewSelect(launchPads, func(value string) {
+		selectedInput = launchPadName
+	})
+	launchpadSelect.PlaceHolder = launchPadName
+
+	// DMX interface configuration.
+	dmxInterfaceLabel := widget.NewLabel("DMX Interface Installed ")
+	var dmxLabels []string
+	dmxLabels = append(dmxLabels, "Not Found")
+	if config != nil {
+		dmxLabels[0] = fmt.Sprintf("FT323:%d", config.InputInterfaceID)
+	}
+	dmxInterfaceSelect := widget.NewSelect(dmxLabels, func(value string) {
+		selectedInput = dmxLabels[0]
+	})
+	dmxInterfaceSelect.PlaceHolder = dmxLabels[0]
+
+	// Audio interface configuration.
+	audioInterfaceLabel := widget.NewLabel("Select Audio Input")
+	audioInterfaceSelect := widget.NewSelect(soundConfig.GetSoundConfig(), func(value string) {
+		selectedInput = value
+	})
+	audioInterfaceSelect.PlaceHolder = selectedInput
+
+	// Ok button.
 	button := widget.NewButton("OK", func() {
 		modal.Hide()
 		soundConfig.StopSoundConfig()
 		soundConfig.StartSoundConfig(selectedInput, guiButtons)
 	})
 
-	spacer := layout.NewSpacer()
-
+	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
 		container.NewVBox(
 			title,
-			container.NewHBox(label, combo),
+			container.NewHBox(dmxInterfaceLabel, dmxInterfaceSelect),
+			container.NewHBox(launchpadLabel, launchpadSelect),
+			container.NewHBox(audioInterfaceLabel, audioInterfaceSelect),
 			widget.NewLabel(""),
-			container.NewHBox(spacer, button),
+			container.NewHBox(layout.NewSpacer(), button),
 		),
 		w.Canvas(),
 	)

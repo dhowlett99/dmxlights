@@ -19,7 +19,7 @@ type SoundConfig struct {
 	deviceName      string
 	availableInputs []string
 	stream          *portaudio.Stream
-	SoundTriggers   map[int]*common.Trigger
+	SoundTriggers   []*common.Trigger
 	gainSelected    int
 	gainCounters    []int
 	inputChannels   []*portaudio.HostApiInfo
@@ -77,7 +77,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 				for _, device := range inputChannel.Devices {
 					if device.MaxInputChannels > 0 {
 						if device.Name == deviceName {
-							fmt.Printf("FOund device %s\n", device.Name)
+							fmt.Printf("Found device %s\n", device.Name)
 							p := portaudio.HighLatencyParameters(device, nil)
 							fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
 							p.Input.Channels = device.MaxInputChannels
@@ -169,43 +169,25 @@ func (soundConfig *SoundConfig) GetDeviceName() string {
 	return soundConfig.deviceName
 }
 
-// RegisterSoundTrigger  - Register the Trigger.
-func (soundConfig *SoundConfig) RegisterSoundTrigger(name string, channel chan common.Command, switchNumber int) *common.Trigger {
-	// Create a new Trigger.
-	newTrigger := common.Trigger{
-		Name:    name,
-		State:   true,
-		Gain:    0,
-		Channel: channel,
-	}
-	// We add 10 to the switch channels so that the channels used are outside
-	// the default 1-4 used by the default sequences.
-	soundConfig.SoundTriggers[switchNumber+10] = &newTrigger
-
-	if debug {
-		fmt.Printf("----> Register %+v as Sequence Number %d \n", newTrigger.Name, switchNumber+10)
-	}
-
-	return &newTrigger
-}
-
-// DeRegisterSoundTrigger  - DeRegister the Trigger.
-func (soundConfig *SoundConfig) DeRegisterSoundTrigger(name string) {
-	newSoundTriggers := make(map[int]*common.Trigger)
-	// Step through the existing sound triggers and find the one we want to deregister.
+// EnableSoundTrigger  - Register the Trigger.
+func (soundConfig *SoundConfig) EnableSoundTrigger(name string) {
+	// Step through the existing sound triggers and find the one we want to enable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
-			if debug {
-				fmt.Printf("----> DeRegister %+v\n", name)
-			}
-			soundConfig.SoundTriggers[triggerNumber].State = false
-		}
-		// If it exists put it in the new sound triggers map.
-		if trigger.Name != name {
-			newSoundTriggers[triggerNumber] = soundConfig.SoundTriggers[triggerNumber]
+			soundConfig.SoundTriggers[triggerNumber].State = true
 		}
 	}
-	soundConfig.SoundTriggers = newSoundTriggers
+}
+
+// DisableSoundTrigger  - Disable the Trigger.
+func (soundConfig *SoundConfig) DisableSoundTrigger(name string) {
+
+	// Step through the existing sound triggers and find the one we want to disable.
+	for triggerNumber, trigger := range soundConfig.SoundTriggers {
+		if trigger.Name == name {
+			soundConfig.SoundTriggers[triggerNumber].State = false
+		}
+	}
 }
 
 func (soundConfig *SoundConfig) getAvailableInputs() {

@@ -72,6 +72,7 @@ type ActionConfig struct {
 	Rotatable    bool
 	Program      int
 	Music        int
+	MusicTrigger bool
 	Strobe       int
 }
 
@@ -146,7 +147,8 @@ func FixtureReceiver(
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
-	fixtures *Fixtures) {
+	fixtures *Fixtures,
+	dmxInterfacePresent bool) {
 
 	// Outer loop wait for configuration.
 	for {
@@ -157,16 +159,16 @@ func FixtureReceiver(
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 			if cmd.Clear {
-				turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+				turnOffFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				continue
 			}
 			if cmd.StartFlood {
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 255, 255, 255, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 				continue
 			}
 			if cmd.StopFlood {
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
@@ -180,7 +182,7 @@ func FixtureReceiver(
 				sequence.StaticColors = cmd.RGBStaticColors
 				sequence.Static = cmd.RGBStatic
 				sequence.StrobeSpeed = cmd.StrobeSpeed
-				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true)
+				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
 			// Play out fixture to DMX channels.
@@ -194,7 +196,7 @@ func FixtureReceiver(
 				if !cmd.Hide {
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed, dmxInterfacePresent)
 			}
 		}
 
@@ -202,7 +204,7 @@ func FixtureReceiver(
 
 			// Turn off the scanners in flood mode.
 			if cmd.StartFlood {
-				turnOnFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons)
+				turnOnFixtures(cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				continue
 			}
 
@@ -219,7 +221,7 @@ func FixtureReceiver(
 
 			// If this fixture is disabled then shut the shutter off.
 			if disableOnce && !enabled {
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0)
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixtures, cmd.Blackout, 0, 0, 0, dmxInterfacePresent)
 				// Locking for write.
 				sequence.DisableOnceMutex.Lock()
 				sequence.DisableOnce[myFixtureNumber] = false
@@ -231,7 +233,7 @@ func FixtureReceiver(
 
 				// If enables activate the physical scanner.
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerSelectedGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
 					if cmd.ScannerChase {
@@ -269,14 +271,15 @@ func FixtureReceiver(
 	}
 }
 
-func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, scannerColor int) {
+func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXController,
+	fixtures *Fixtures, scannerColor int, dmxInterfacePresent bool) {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequence.Number {
 			for channelNumber, channel := range fixture.Channels {
 				if strings.Contains(channel.Name, "Color") {
 					for _, setting := range channel.Settings {
 						if setting.Number-1 == scannerColor {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+							setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -364,7 +367,8 @@ func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, c
 	return 0, fmt.Errorf("channel not found in fixture :%s", fixtureName)
 }
 
-func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, selectedGobo int) {
+func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController,
+	fixtures *Fixtures, selectedGobo int, dmxInterfacePresent bool) {
 
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequence.Number {
@@ -372,7 +376,7 @@ func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXCont
 				if strings.Contains(channel.Name, "Gobo") {
 					for _, setting := range channel.Settings {
 						if setting.Number == selectedGobo {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+							setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -388,7 +392,8 @@ func MapFixtures(mySequenceNumber int,
 	displayFixture int, R int, G int, B int, W int, A int, uv int,
 	Pan int, Tilt int, Shutter int, Rotate int, Music int, Program int,
 	selectedGobo int, scannerColor map[int]int,
-	fixtures *Fixtures, blackout bool, brightness int, master int, strobe int) {
+	fixtures *Fixtures, blackout bool, brightness int, master int, strobe int,
+	dmxInterfacePresent bool) {
 
 	// We control the brightness of each color with the brightness value.
 	// The overall fixture brightness is set from the master value.
@@ -406,36 +411,36 @@ func MapFixtures(mySequenceNumber int,
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
 						if channel.Offset != nil {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan+*channel.Offset)))
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan+*channel.Offset)), dmxController, dmxInterfacePresent)
 						} else {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)))
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Tilt") {
 						if channel.Offset != nil {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt+*channel.Offset)))
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
 						}
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)))
+						setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Shutter") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Shutter))
+						setChannel(fixture.Address+int16(channelNumber), byte(Shutter), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Rotate") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Rotate))
+						setChannel(fixture.Address+int16(channelNumber), byte(Rotate), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Music") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Music))
+						setChannel(fixture.Address+int16(channelNumber), byte(Music), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Program") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Program))
+						setChannel(fixture.Address+int16(channelNumber), byte(Program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "ProgramSpeed") {
-						dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(Program))
+						setChannel(fixture.Address+int16(channelNumber), byte(Program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
 							if setting.Number == selectedGobo {
-								dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+								setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
@@ -444,7 +449,7 @@ func MapFixtures(mySequenceNumber int,
 							if colorNumber == displayFixture {
 								for _, setting := range channel.Settings {
 									if setting.Number-1 == scannerColor[displayFixture] {
-										dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(setting.Setting))
+										setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
 									}
 								}
 							}
@@ -452,44 +457,50 @@ func MapFixtures(mySequenceNumber int,
 					}
 					if strings.Contains(channel.Name, "Strobe") {
 						if blackout {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
+							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 						} else {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(strobe))
+							setChannel(fixture.Address+int16(channelNumber), byte(strobe), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
 						if blackout {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(0))
+							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 						} else {
-							dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(master))
+							setChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
 				// Static value.
 				if strings.Contains(channel.Name, "Static") {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(channel.Value))
+					setChannel(fixture.Address+int16(channelNumber), byte(channel.Value), dmxController, dmxInterfacePresent)
 				}
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Green)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "White"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(White)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(White)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Amber"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(Amber)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(Amber)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "UV"+strconv.Itoa(displayFixture+1)) {
-					dmxController.SetChannel(fixture.Address+int16(channelNumber), byte(int(UV)))
+					setChannel(fixture.Address+int16(channelNumber), byte(int(UV)), dmxController, dmxInterfacePresent)
 				}
 			}
 		}
+	}
+}
+
+func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	if dmxInterfacePresent {
+		dmxController.SetChannel(index, data)
 	}
 }
 
@@ -498,8 +509,9 @@ func MapSwitchFixture(mySequenceNumber int,
 	switchNumber int, currentState int,
 	fixtures *Fixtures, blackout bool, brightness int, master int,
 	switchChannels map[int]common.SwitchChannel,
-	SoundTriggers map[int]*common.Trigger,
-	soundConfig *sound.SoundConfig) {
+	SoundTriggers []*common.Trigger,
+	soundConfig *sound.SoundConfig,
+	dmxInterfacePresent bool) {
 
 	var fixtureName string
 
@@ -522,25 +534,25 @@ func MapSwitchFixture(mySequenceNumber int,
 
 							// Play Actions which send messages to a dedicated mini sequencer.
 							for _, action := range state.Actions {
-								newMiniSequencer(fixtureName, swiTch.Number, currentState, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master)
+								newMiniSequencer(fixtureName, swiTch.Number, currentState, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master, dmxInterfacePresent)
 							}
 
 							// Play DMX values directly to the univers.
 							for _, value := range state.Values {
 								if blackout {
-									v, _ := strconv.ParseFloat(value.Setting, 16)
-									dmxController.SetChannel(fixture.Address+int16(v), byte(0))
+									v, _ := strconv.ParseFloat(value.Setting, 32)
+									setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
 								} else {
 									// This should be controlled by the master brightness
 									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
 										v, _ := strconv.ParseFloat(value.Setting, 32)
 										howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
 										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
-											c, _ := strconv.ParseFloat(value.Channel, 16)
-											dmxController.SetChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)))
+											c, _ := strconv.ParseFloat(value.Channel, 32)
+											setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 										} else {
 											c, _ := strconv.Atoi(value.Channel)
-											dmxController.SetChannel(fixture.Address+int16(c), byte(howBright))
+											setChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
 										}
 									} else {
 
@@ -550,13 +562,13 @@ func MapSwitchFixture(mySequenceNumber int,
 											v, _ := strconv.ParseFloat(value.Setting, 32)
 											if IsNumericOnly(value.Channel) {
 												// If the channel has is a number set it directly.
-												c, _ := strconv.ParseFloat(value.Channel, 16)
-												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+												c, _ := strconv.ParseFloat(value.Channel, 32)
+												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											} else {
 												// Handle the fact that the channel may be a label as well.
 												fixture := findFixtureByName(fixtureName, fixtures)
 												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
-												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											}
 
 										} else {
@@ -571,12 +583,12 @@ func MapSwitchFixture(mySequenceNumber int,
 
 											// Handle the fact that the channel may be a label as well.
 											if IsNumericOnly(value.Channel) {
-												c, _ := strconv.ParseFloat(value.Channel, 16)
-												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+												c, _ := strconv.ParseFloat(value.Channel, 32)
+												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											} else {
 												fixture := findFixtureByName(fixtureName, fixtures)
 												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
-												dmxController.SetChannel(fixture.Address+int16(c), byte(v))
+												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											}
 										}
 									}
@@ -604,13 +616,13 @@ func IsNumericOnly(str string) bool {
 	return true
 }
 
-func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController) {
+func turnOffFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	fixture := findFixtureByName(fixtureName, fixtures)
 	blackout := false
 	master := 255
 	strobeSpeed := 0
 	ScannerColor := make(map[int]int)
-	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed)
+	MapFixtures(fixture.Group-1, dmxController, fixture.Number-1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, ScannerColor, fixtures, blackout, master, master, strobeSpeed, dmxInterfacePresent)
 }
 
 func setSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber int, switchPosition int, state bool, blackout bool, master int) {
@@ -716,21 +728,27 @@ func getConfig(action Action) ActionConfig {
 	case "slow":
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
+		config.MusicTrigger = false
 	case "medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
+		config.MusicTrigger = false
 	case "fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
+		config.MusicTrigger = false
 	case "veryfast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
+		config.MusicTrigger = false
 	case "music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = true
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = false
 	}
 
 	return config
@@ -739,7 +757,7 @@ func getConfig(action Action) ActionConfig {
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
 func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig,
-	blackout bool, master int) {
+	blackout bool, master int, dmxInterfacePresent bool) {
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
 	fixture := findFixtureByName(fixtureName, fixturesConfig)
@@ -762,13 +780,13 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Remember that we have stopped this mini sequencer.
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
-		// DeRegister this mini sequencer with the sound service.
+		// Disable this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
-		soundConfig.DeRegisterSoundTrigger(switchName)
+		soundConfig.DisableSoundTrigger(switchName)
 
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -785,7 +803,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -793,7 +811,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		if err != nil {
 			fmt.Printf("error %d\n", err)
 		}
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
 		return
 	}
 
@@ -816,23 +834,24 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 		// DeRegister this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
-		soundConfig.DeRegisterSoundTrigger(switchName)
+		soundConfig.DisableSoundTrigger(switchName)
 
+		// Turn off the fixture.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Register this mini sequencer with the sound service.
-		channel := make(chan common.Command)
-		trigger := soundConfig.RegisterSoundTrigger(switchName, channel, switchNumber)
-		trigger.State = cfg.TriggerState
+		if cfg.MusicTrigger {
+			soundConfig.EnableSoundTrigger(switchName)
+		}
 
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -893,15 +912,15 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 						select {
 						case <-switchChannels[switchNumber].StopRotate:
 							time.Sleep(1 * time.Millisecond)
-							dmxController.SetChannel(fixture.Address+int16(rotateChannel), byte(0))
+							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							return
 						case <-switchChannels[switchNumber].KeepRotateAlive:
 							time.Sleep(1 * time.Millisecond)
 							continue
 						case <-time.After(1500 * time.Millisecond):
-							dmxController.SetChannel(fixture.Address+int16(rotateChannel), byte(0))
+							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							time.Sleep(250 * time.Millisecond)
-							dmxController.SetChannel(fixture.Address+int16(masterChannel), byte(0))
+							setChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 						}
 					}
 				}(switchNumber, switchChannels)
@@ -943,12 +962,12 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					case <-soundConfig.SoundTriggers[switchNumber+10].Channel:
+					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true
 						}
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
 					}
@@ -961,7 +980,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						for _, color := range fixture.Colors {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe)
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, scannerColor, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
 						}
 					}
 
@@ -995,7 +1014,7 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool) {
+func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxInterfacePresent bool) {
 
 	lamp := sequence.StaticColors[myFixtureNumber]
 
@@ -1008,7 +1027,7 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
-	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed)
+	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.StrobeSpeed, dmxInterfacePresent)
 
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
@@ -1046,14 +1065,14 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 }
 
 // turnOffFixtures is used to turn off a fixture when we stop a sequence.
-func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func turnOffFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxInterfacePresent bool) {
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
-	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed)
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
-func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxInterfacePresent bool) {
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
@@ -1077,7 +1096,7 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	music := 0
 	program := 0
 
-	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed)
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, cmd.ScannerColor, fixtures, false, brightness, master, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
