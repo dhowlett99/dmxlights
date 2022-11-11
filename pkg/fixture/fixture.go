@@ -72,6 +72,7 @@ type ActionConfig struct {
 	Rotatable    bool
 	Program      int
 	Music        int
+	MusicTrigger bool
 	Strobe       int
 }
 
@@ -508,7 +509,7 @@ func MapSwitchFixture(mySequenceNumber int,
 	switchNumber int, currentState int,
 	fixtures *Fixtures, blackout bool, brightness int, master int,
 	switchChannels map[int]common.SwitchChannel,
-	SoundTriggers map[int]*common.Trigger,
+	SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
@@ -539,7 +540,7 @@ func MapSwitchFixture(mySequenceNumber int,
 							// Play DMX values directly to the univers.
 							for _, value := range state.Values {
 								if blackout {
-									v, _ := strconv.ParseFloat(value.Setting, 16)
+									v, _ := strconv.ParseFloat(value.Setting, 32)
 									setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
 								} else {
 									// This should be controlled by the master brightness
@@ -547,7 +548,7 @@ func MapSwitchFixture(mySequenceNumber int,
 										v, _ := strconv.ParseFloat(value.Setting, 32)
 										howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
 										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
-											c, _ := strconv.ParseFloat(value.Channel, 16)
+											c, _ := strconv.ParseFloat(value.Channel, 32)
 											setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 										} else {
 											c, _ := strconv.Atoi(value.Channel)
@@ -561,7 +562,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											v, _ := strconv.ParseFloat(value.Setting, 32)
 											if IsNumericOnly(value.Channel) {
 												// If the channel has is a number set it directly.
-												c, _ := strconv.ParseFloat(value.Channel, 16)
+												c, _ := strconv.ParseFloat(value.Channel, 32)
 												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											} else {
 												// Handle the fact that the channel may be a label as well.
@@ -582,7 +583,7 @@ func MapSwitchFixture(mySequenceNumber int,
 
 											// Handle the fact that the channel may be a label as well.
 											if IsNumericOnly(value.Channel) {
-												c, _ := strconv.ParseFloat(value.Channel, 16)
+												c, _ := strconv.ParseFloat(value.Channel, 32)
 												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 											} else {
 												fixture := findFixtureByName(fixtureName, fixtures)
@@ -615,7 +616,7 @@ func IsNumericOnly(str string) bool {
 	return true
 }
 
-func stopFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func turnOffFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	fixture := findFixtureByName(fixtureName, fixtures)
 	blackout := false
 	master := 255
@@ -727,21 +728,27 @@ func getConfig(action Action) ActionConfig {
 	case "slow":
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
+		config.MusicTrigger = false
 	case "medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
+		config.MusicTrigger = false
 	case "fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
+		config.MusicTrigger = false
 	case "veryfast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
+		config.MusicTrigger = false
 	case "music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = true
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = false
 	}
 
 	return config
@@ -773,13 +780,13 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Remember that we have stopped this mini sequencer.
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
-		// DeRegister this mini sequencer with the sound service.
+		// Disable this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
-		soundConfig.DeRegisterSoundTrigger(switchName)
+		soundConfig.DisableSoundTrigger(switchName)
 
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -796,7 +803,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -827,23 +834,24 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 		// DeRegister this mini sequencer with the sound service.
 		// Use the switch number as the unique sequence name.
-		soundConfig.DeRegisterSoundTrigger(switchName)
+		soundConfig.DisableSoundTrigger(switchName)
 
+		// Turn off the fixture.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Register this mini sequencer with the sound service.
-		channel := make(chan common.Command)
-		trigger := soundConfig.RegisterSoundTrigger(switchName, channel, switchNumber)
-		trigger.State = cfg.TriggerState
+		if cfg.MusicTrigger {
+			soundConfig.EnableSoundTrigger(switchName, switchNumber)
+		}
 
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			stopFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -954,7 +962,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					case <-soundConfig.SoundTriggers[switchNumber+10].Channel:
+					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true

@@ -59,7 +59,7 @@ type CurrentState struct {
 	Pad                       *mk3.Launchpad               // Pointer to the Novation Launchpad object.
 	PresetsStore              map[string]presets.Preset    // Storage for the Presets.
 	LastPreset                *string                      // Last preset used.
-	SoundTriggers             map[int]*common.Trigger      // Pointer to the Sound Triggers.
+	SoundTriggers             []*common.Trigger            // Pointer to the Sound Triggers.
 	SoundConfig               *sound.SoundConfig           // Pointer to the sound config struct.
 	SequenceChannels          common.Channels              // Channles used to communicate with the sequence.
 	Patterns                  map[int]common.Pattern       // A indexed map of the available patterns for this sequence.

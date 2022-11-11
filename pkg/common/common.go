@@ -313,7 +313,7 @@ type Channels struct {
 	CommmandChannels []chan Command
 	ReplyChannels    []chan Sequence
 	UpdateChannels   []chan Sequence
-	SoundTriggers    map[int]*Trigger
+	SoundTriggers    []*Trigger
 }
 
 type SwitchChannel struct {
@@ -660,8 +660,7 @@ func GetColorArrayByNames(names []string) ([]Color, error) {
 		if err != nil {
 			return colors, err
 		}
-		newColor := Color{}
-		newColor = colorLibrary
+		newColor := colorLibrary
 
 		// Add the color to the chase colors.
 		colors = append(colors, newColor)

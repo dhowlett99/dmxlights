@@ -403,7 +403,9 @@ func PlaySequence(sequence common.Sequence,
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			sequence.Functions[common.Function8_Music_Trigger].State = false
+			soundConfig.SoundTriggerMutex.Lock()
 			channels.SoundTriggers[mySequenceNumber].State = false
+			soundConfig.SoundTriggerMutex.Unlock()
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
@@ -702,7 +704,7 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 // ShowSwitches relies on you giving the sequence number of the switch sequnence.
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
-	switchChannels map[int]common.SwitchChannel, SoundTriggers map[int]*common.Trigger,
+	switchChannels map[int]common.SwitchChannel, SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig, dmxInterfacePresent bool) {
 
 	if debug {
@@ -728,7 +730,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
-	switchChannels map[int]common.SwitchChannel, SoundTriggers map[int]*common.Trigger,
+	switchChannels map[int]common.SwitchChannel, SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig, dmxInterfacePresent bool) {
 
 	if debug {

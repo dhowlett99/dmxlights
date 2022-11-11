@@ -50,7 +50,7 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 		deviceName      string
 		availableInputs []string
 		stream          *portaudio.Stream
-		SoundTriggers   map[int]*common.Trigger
+		SoundTriggers   []*common.Trigger
 		gainSelected    int
 		gainCounters    []int
 		inputChannels   []*portaudio.HostApiInfo
@@ -75,16 +75,16 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 				switchNumber: 1,
 			},
 			fields: fields{
-				SoundTriggers: map[int]*common.Trigger{
-					0: {
+				SoundTriggers: []*common.Trigger{
+					{
 						Name:  "sequence0",
 						State: true,
 					},
-					1: {
+					{
 						Name:  "sequence1",
 						State: true,
 					},
-					2: {
+					{
 						Name:  "sequence2",
 						State: true,
 					},
@@ -111,7 +111,7 @@ func TestSoundConfig_RegisterSoundTrigger(t *testing.T) {
 				stopChannel:     tt.fields.stopChannel,
 			}
 
-			soundConfig.RegisterSoundTrigger(tt.args.name, tt.args.channel, tt.args.switchNumber)
+			soundConfig.EnableSoundTrigger(tt.args.name, tt.args.switchNumber)
 
 			// Temporary storage.
 			type kv struct {
@@ -148,7 +148,7 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 		deviceName      string
 		availableInputs []string
 		stream          *portaudio.Stream
-		SoundTriggers   map[int]*common.Trigger
+		SoundTriggers   []*common.Trigger
 		gainSelected    int
 		gainCounters    []int
 		inputChannels   []*portaudio.HostApiInfo
@@ -169,20 +169,20 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 				name: "switch1",
 			},
 			fields: fields{
-				SoundTriggers: map[int]*common.Trigger{
-					0: {
+				SoundTriggers: []*common.Trigger{
+					{
 						Name:  "sequence0",
 						State: true,
 					},
-					1: {
+					{
 						Name:  "sequence1",
 						State: true,
 					},
-					2: {
+					{
 						Name:  "sequence2",
 						State: true,
 					},
-					3: {
+					{
 						Name:  "switch1",
 						State: true,
 					},
@@ -208,7 +208,7 @@ func TestSoundConfig_DeRegisterSoundTrigger(t *testing.T) {
 				stopChannel:     tt.fields.stopChannel,
 			}
 
-			soundConfig.DeRegisterSoundTrigger(tt.args.name)
+			soundConfig.DisableSoundTrigger(tt.args.name)
 
 			// Temporary storage.
 			type kv struct {

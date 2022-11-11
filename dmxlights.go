@@ -209,12 +209,27 @@ func main() {
 		updateChannels = append(updateChannels, updateChannel)
 	}
 
-	// this.SoundTriggers  is a an array of switches which control which sequence gets a music trigger.
-	this.SoundTriggers = make(map[int]*common.Trigger)
-	this.SoundTriggers[0] = &common.Trigger{Name: "sequence0", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[1] = &common.Trigger{Name: "sequence1", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[2] = &common.Trigger{Name: "sequence2", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
-	this.SoundTriggers[3] = &common.Trigger{Name: "sequence3", State: false, Gain: this.SoundGain, Channel: make(chan common.Command)}
+	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
+	this.SoundTriggers = []*common.Trigger{}
+
+	for triggerNumber := 0; triggerNumber < 10; triggerNumber++ {
+		newChannel := make(chan common.Command)
+		var name string
+		var newTrigger common.Trigger
+		if triggerNumber < 3 {
+			name = fmt.Sprintf("sequence%d", triggerNumber)
+		} else {
+			name = fmt.Sprintf("switch%d", triggerNumber-3)
+		}
+		newTrigger = common.Trigger{
+			Name:    name,
+			State:   false,
+			Gain:    this.SoundGain,
+			Channel: newChannel,
+		}
+
+		this.SoundTriggers = append(this.SoundTriggers, &newTrigger)
+	}
 
 	// Now add them all to a handy channels struct.
 	this.SequenceChannels = common.Channels{}
@@ -241,7 +256,7 @@ func main() {
 	panel.BeatLabel.Hidden = true
 
 	// Create objects for top status bar.
-	upLabel := widget.NewLabel(fmt.Sprintf("       "))
+	upLabel := widget.NewLabel("       ")
 	panel.TiltLabel = upLabel
 
 	redLabel := widget.NewLabel(fmt.Sprintf("Red %02d", 0))
