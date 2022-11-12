@@ -310,7 +310,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Find the color bar for this selection.
 		color := common.GetColorButtonsArray(command.Args[SELECTED_COLOR].Value.(int) - 1)
 		newStaticColor := common.StaticColorButton{
-			Color: color,
+			Color:         color,
+			SelectedColor: command.Args[SELECTED_COLOR].Value.(int) - 1,
 		}
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			sequence.StaticColors[fixture] = newStaticColor

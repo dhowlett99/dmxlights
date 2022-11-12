@@ -1255,12 +1255,14 @@ func ProcessButtons(X int, Y int,
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
-
-			if this.StaticButtons[this.SelectedSequence].Color.R > 254 {
+			this.StaticButtons[this.SelectedSequence].Color.R = this.StaticButtons[this.SelectedSequence].Color.R - 10
+			if this.StaticButtons[this.SelectedSequence].Color.R > 255 {
 				this.StaticButtons[this.SelectedSequence].Color.R = 0
-			} else {
-				this.StaticButtons[this.SelectedSequence].Color.R = this.StaticButtons[this.SelectedSequence].Color.R + 10
 			}
+			if this.StaticButtons[this.SelectedSequence].Color.R < 0 {
+				this.StaticButtons[this.SelectedSequence].Color.R = 255
+			}
+
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
@@ -1282,11 +1284,12 @@ func ProcessButtons(X int, Y int,
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
-
-			if this.StaticButtons[this.SelectedSequence].Color.G > 254 {
+			this.StaticButtons[this.SelectedSequence].Color.G = this.StaticButtons[this.SelectedSequence].Color.G - 10
+			if this.StaticButtons[this.SelectedSequence].Color.G > 255 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 0
-			} else {
-				this.StaticButtons[this.SelectedSequence].Color.G = this.StaticButtons[this.SelectedSequence].Color.G + 10
+			}
+			if this.StaticButtons[this.SelectedSequence].Color.G < 0 {
+				this.StaticButtons[this.SelectedSequence].Color.G = 255
 			}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
@@ -1309,11 +1312,12 @@ func ProcessButtons(X int, Y int,
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
-
-			if this.StaticButtons[this.SelectedSequence].Color.B > 254 {
+			this.StaticButtons[this.SelectedSequence].Color.B = this.StaticButtons[this.SelectedSequence].Color.B - 10
+			if this.StaticButtons[this.SelectedSequence].Color.B > 255 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 0
-			} else {
-				this.StaticButtons[this.SelectedSequence].Color.B = this.StaticButtons[this.SelectedSequence].Color.B + 10
+			}
+			if this.StaticButtons[this.SelectedSequence].Color.B < 0 {
+				this.StaticButtons[this.SelectedSequence].Color.B = 255
 			}
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: full, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
@@ -1493,7 +1497,9 @@ func ProcessButtons(X int, Y int,
 		// For this button increment the color.
 		sequences[this.SelectedSequence].StaticColors[X].X = X
 		sequences[this.SelectedSequence].StaticColors[X].Y = Y
-		sequences[this.SelectedSequence].StaticColors[X].SelectedColor++
+		if sequences[this.SelectedSequence].StaticColors[X].FirstPress {
+			sequences[this.SelectedSequence].StaticColors[X].SelectedColor++
+		}
 		if sequences[this.SelectedSequence].StaticColors[X].SelectedColor > 10 {
 			sequences[this.SelectedSequence].StaticColors[X].SelectedColor = 0
 		}
@@ -1528,6 +1534,12 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		this.LastStaticColorButtonX = X
 		this.LastStaticColorButtonY = Y
+
+		// Set the first pressed for only this fixture and cancel any others
+		for x := 0; x < 8; x++ {
+			sequences[this.SelectedSequence].StaticColors[x].FirstPress = false
+		}
+		sequences[this.SelectedSequence].StaticColors[X].FirstPress = true
 
 		return
 	}
@@ -1639,6 +1651,7 @@ func ProcessButtons(X int, Y int,
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = true
+			sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
 			this.FollowingAction = "ShowScannerColorSelectionButtons"
 			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 		}
@@ -1654,6 +1667,7 @@ func ProcessButtons(X int, Y int,
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = true
+			sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
 			this.FollowingAction = "ShowGoboSelectionButtons"
 			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 
@@ -2489,6 +2503,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Rotate around solid colors.
 		if this.SelectColorBar > 0 {
+
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.SetStaticColorBar,
@@ -2504,6 +2519,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+		// Clear the pressed flag for all the fixtures.
+		for x := 0; x < 8; x++ {
+			sequences[this.SelectedSequence].StaticColors[x].FirstPress = false
+		}
 
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)

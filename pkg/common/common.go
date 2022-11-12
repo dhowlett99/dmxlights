@@ -111,6 +111,7 @@ type StaticColorButton struct {
 	SelectedColor int
 	Flash         bool
 	Setting       int
+	FirstPress    bool
 }
 
 type ScannerState struct {
