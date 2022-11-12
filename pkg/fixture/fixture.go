@@ -156,6 +156,9 @@ func FixtureReceiver(
 		// Wait for first step
 		cmd := <-fixtureStepChannel
 
+		// Propogate the strobe speed.
+		sequence.StrobeSpeed = cmd.StrobeSpeed
+
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 			if cmd.Clear {

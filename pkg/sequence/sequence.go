@@ -370,6 +370,7 @@ func PlaySequence(sequence common.Sequence,
 				Type:           sequence.Type,
 				SequenceNumber: sequence.Number,
 				StartFlood:     sequence.StartFlood,
+				StrobeSpeed:    sequence.StrobeSpeed,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -388,6 +389,7 @@ func PlaySequence(sequence common.Sequence,
 				SequenceNumber: sequence.Number,
 				StartFlood:     sequence.StartFlood,
 				StopFlood:      sequence.StopFlood,
+				StrobeSpeed:    sequence.StrobeSpeed,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)

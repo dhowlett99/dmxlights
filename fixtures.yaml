@@ -16,8 +16,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: 
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: 
@@ -42,8 +42,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -68,8 +68,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -94,8 +94,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -120,8 +120,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -146,8 +146,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -172,8 +172,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
@@ -198,8 +198,8 @@ fixtures:
     value: 0
     comment: Color Macros
   - number: 5
-    name: Static
-    value: 0
+    name: Strobe
+    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
   - number: 6
     name: Static
