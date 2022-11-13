@@ -491,8 +491,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		x := command.Args[X].Value.(int)
 		y := command.Args[Y].Value.(int)
 		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", x, y))
-		seq := common.Sequence{}
-		for _, seq = range config {
+		//seq := common.Sequence{}
+		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
 				// Assume we're blacked out.

@@ -342,7 +342,7 @@ type FixtureCommand struct {
 	Type           string
 	SequenceNumber int
 
-	// Command commands.
+	// Common commands.
 	StrobeSpeed int
 	Master      int
 	Blackout    bool
@@ -368,6 +368,7 @@ type FixtureCommand struct {
 	ScannerOffsetPan       int
 	ScannerOffsetTilt      int
 
+	// Derby Commands
 	Rotate  int
 	Music   int
 	Program int
@@ -376,7 +377,6 @@ type FixtureCommand struct {
 type Position struct {
 	// RGB
 	Fixtures map[int]Fixture
-	//PositionNumber int
 }
 
 // A fixture can have any or some of the
