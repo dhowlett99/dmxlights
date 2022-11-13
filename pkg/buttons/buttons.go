@@ -1759,7 +1759,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Update status bar.
-	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+	if sequences[this.SelectedSequence].Functions[common.Function8_Music_Trigger].State {
+		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+	} else {
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+	}
 
 	sensitivity := common.FindSensitivity(this.SoundGain)
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
