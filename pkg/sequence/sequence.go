@@ -330,6 +330,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Clear all fixtures.
 		if sequence.Clear {
+			if debug {
+				fmt.Printf("sequence %d CLEAR\n", mySequenceNumber)
+			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
@@ -346,6 +349,9 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Switch Mode.
 		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
+			}
 			// Show initial state of switches
 			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
@@ -355,6 +361,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Play single switch mode\n", mySequenceNumber)
+			}
 			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
@@ -364,7 +373,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Start flood mode.
 		if sequence.StartFlood && sequence.FloodPlayOnce {
-			sequence.Run = false
+			if debug {
+				fmt.Printf("sequence %d Start flood mode\n", mySequenceNumber)
+			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:            sequence.Type,
@@ -378,12 +389,14 @@ func PlaySequence(sequence common.Sequence,
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.FloodPlayOnce = false
-			sequence.Run = false
 			continue
 		}
 
 		// Stop flood mode.
 		if sequence.StopFlood && sequence.FloodPlayOnce {
+			if debug {
+				fmt.Printf("sequence %d Stop flood mode\n", mySequenceNumber)
+			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
@@ -395,14 +408,16 @@ func PlaySequence(sequence common.Sequence,
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.StartFlood = false
+			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
-			sequence.Run = true
 			continue
 		}
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
-
+			if debug {
+				fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
+			}
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			sequence.Functions[common.Function8_Music_Trigger].State = false
@@ -423,7 +438,6 @@ func PlaySequence(sequence common.Sequence,
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.PlayStaticOnce = false
-			sequence.Run = false
 			continue
 		}
 
@@ -431,7 +445,9 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
 			for sequence.Run && !sequence.Static {
-
+				if debug {
+					fmt.Printf("sequence %d Running mode\n", mySequenceNumber)
+				}
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
@@ -499,7 +515,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
-				if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+				if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
 
@@ -627,7 +643,7 @@ func PlaySequence(sequence common.Sequence,
 
 					// This is were we set the speed of the sequence to current speed.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
-					if !sequence.Run || sequence.StartFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+					if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}
 

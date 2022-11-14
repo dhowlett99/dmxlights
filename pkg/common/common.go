@@ -175,7 +175,7 @@ const (
 	UpdateGobo
 	Flood
 	StopFlood
-	StartStrobe
+	Strobe
 	StopStrobe
 	UpdateAutoColor
 	AutoColor

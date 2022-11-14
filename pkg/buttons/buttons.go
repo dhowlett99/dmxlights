@@ -33,7 +33,7 @@ type CurrentState struct {
 	ScannerFade               map[int]int                  // Indexed by sequence.
 	ScannerCoordinates        map[int]int                  // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
 	Running                   map[int]bool                 // Which sequence is running. Indexed by sequence. True if running.
-	Strobe                    bool                         // We are in strobe mode. True if strobing
+	Strobe                    map[int]bool                 // We are in strobe mode. True if strobing
 	StrobeSpeed               map[int]int                  // Strobe speed. value is speed 0-255, indexed by sequence number.
 	SavePreset                bool                         // Save a preset flag.
 	Blackout                  bool                         // Blackout all fixtures.
@@ -301,6 +301,10 @@ func ProcessButtons(X int, Y int,
 
 	// F L O O D
 	if X == 8 && Y == 3 && !this.SavePreset {
+
+		// Shutdown any function bars.
+		clearAllModes(sequences, this)
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
 			if debug {
@@ -615,7 +619,7 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if this.Strobe {
+		if this.Strobe[this.SelectedSequence] {
 			this.StrobeSpeed[this.SelectedSequence] -= 10
 			if this.StrobeSpeed[this.SelectedSequence] < 0 {
 				this.StrobeSpeed[this.SelectedSequence] = 0
@@ -662,7 +666,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Speed \n")
 		}
 
-		if this.Strobe {
+		if this.Strobe[this.SelectedSequence] {
 			this.StrobeSpeed[this.SelectedSequence] += 10
 			if this.StrobeSpeed[this.SelectedSequence] > 255 {
 				this.StrobeSpeed[this.SelectedSequence] = 255
@@ -839,15 +843,20 @@ func ProcessButtons(X int, Y int,
 
 	// S T O B E - Strobe.
 	if X == 8 && Y == 6 {
+
+		// Shutdown any function bars.
+		clearAllModes(sequences, this)
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
 		// If strobing, stop it
-		if this.Strobe {
+		if this.Strobe[this.SelectedSequence] {
 			// Stop strobing this sequence.
 			cmd := common.Command{
 				Action: common.StopStrobe,
 			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
-			this.Strobe = false
+			this.Strobe[this.SelectedSequence] = false
 			this.StrobeSpeed[this.SelectedSequence] = 0
 			// Update the status bar
 			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
@@ -855,20 +864,20 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// Start strobing for all sequences.
-			this.Strobe = true
+			this.Strobe[this.SelectedSequence] = true
 			for sequence := range sequences {
 				this.StrobeSpeed[sequence] = 255
 			}
 			cmd := common.Command{
-				Action: common.StartStrobe,
+				Action: common.Strobe,
 				Args: []common.Arg{
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
 			// Store the strobe flag in all sequences.
-			common.SendCommandToAllSequence(cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
-			this.Running[this.SelectedSequence] = false
+
 			// Update the status bar
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
 			return
@@ -1803,7 +1812,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Update the status bar
-	if this.Strobe {
+	if this.Strobe[this.SelectedSequence] {
 		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
 	} else {
 		// Update status bar.
@@ -1847,6 +1856,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Light the sequence selector button.
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+
+	// Light the strobe button.
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+	//Light the start stop button.
+	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 	// First time into function mode we head back to normal mode.
 	if this.FunctionSelectMode[this.SelectedSequence] &&
@@ -2394,12 +2409,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Show the correct running and strobe buttons.
 	this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 	if this.StrobeSpeed[this.SelectedSequence] > 0 {
-		this.Strobe = true
+		this.Strobe[this.SelectedSequence] = true
 		// Show this sequence running status in the start/stop button.
 		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 		common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
 	} else {
-		this.Strobe = false
+		this.Strobe[this.SelectedSequence] = false
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
 }
@@ -2621,8 +2636,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	for sequence := range sequences {
 		this.StrobeSpeed[sequence] = 255 // Reset to fastest strobe.
 	}
-	if this.Strobe {
-		this.Strobe = false
+	if this.Strobe[this.SelectedSequence] {
+		this.Strobe[this.SelectedSequence] = false
 		cmd := common.Command{
 			Action: common.StopStrobe,
 			Args: []common.Arg{
@@ -2820,9 +2835,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditStaticColorsMode[this.SelectedSequence] = false
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		// Show this sequence running status in the start/stop button.
-		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 	}
 }
 
@@ -2865,4 +2877,18 @@ func getScannerCoordinatesLabel(shift int) string {
 
 	}
 	return ""
+}
+
+func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
+	for sequenceNumber, sequence := range sequences {
+		this.SelectButtonPressed[sequenceNumber] = false
+		this.FunctionSelectMode[sequenceNumber] = true
+		this.EditSequenceColorsMode[sequenceNumber] = false
+		this.EditStaticColorsMode[sequenceNumber] = false
+		this.EditGoboSelectionMode[sequenceNumber] = false
+		this.EditPatternMode[sequenceNumber] = false
+		for function := range sequence.Functions {
+			sequences[sequenceNumber].Functions[function].State = false
+		}
+	}
 }

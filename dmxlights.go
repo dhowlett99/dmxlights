@@ -45,6 +45,7 @@ func main() {
 	this.Blackout = false                              // Blackout starts in off.
 	this.Flood = false                                 // Flood starts in off.
 	this.Running = make(map[int]bool, 4)               // Initialise storage for four sequences.
+	this.Strobe = make(map[int]bool, 4)                // Initialise storage for four sequences.
 	this.MasterBrightness = 255                        // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                                 // Fine gain -0.09 -> 0.09
 	this.OffsetPan = 120                               // Start pan from the center
@@ -186,7 +187,7 @@ func main() {
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Selected speed for the sequence. Common to all types of sequence.
 		this.Running[sequenceNumber] = true                                        // Set this sequence to be in the running state. Common to all types of sequence.
-		this.Strobe = false                                                        // Set strobe to be off for all sequences.
+		this.Strobe[sequenceNumber] = false                                        // Set strobe to be off for all sequences.
 		this.StrobeSpeed[sequenceNumber] = 255                                     // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Default RGB shift size.
 		this.ScannerShift[sequenceNumber] = common.DefaultScannerShift             // Default scanner shift size.
