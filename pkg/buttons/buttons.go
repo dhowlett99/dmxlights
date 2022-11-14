@@ -855,6 +855,10 @@ func ProcessButtons(X int, Y int,
 
 		} else {
 			// Start strobing for all sequences.
+			this.Strobe = true
+			for sequence := range sequences {
+				this.StrobeSpeed[sequence] = 255
+			}
 			cmd := common.Command{
 				Action: common.StartStrobe,
 				Args: []common.Arg{
@@ -864,10 +868,6 @@ func ProcessButtons(X int, Y int,
 			// Store the strobe flag in all sequences.
 			common.SendCommandToAllSequence(cmd, commandChannels)
 			common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
-			this.Strobe = true
-			for sequence := range sequences {
-				this.StrobeSpeed[sequence] = 255
-			}
 			this.Running[this.SelectedSequence] = false
 			// Update the status bar
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
