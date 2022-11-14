@@ -175,7 +175,7 @@ const (
 	UpdateGobo
 	Flood
 	StopFlood
-	Strobe
+	StartStrobe
 	StopStrobe
 	UpdateAutoColor
 	AutoColor
@@ -186,6 +186,7 @@ const (
 	UpdateRGBShift
 	UpdateScannerShift
 	UpdateScannerColor
+	UpdateStrobeSpeed
 	ClearSequenceColor
 	ClearStaticColor
 	SetStaticColorBar
@@ -1015,7 +1016,7 @@ func ShowRunningStatus(sequenceNumber int, runningState map[int]bool, eventsForL
 	}
 }
 
-func ShowStrobeStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
 		FlashLight(8, 6, White, Black, eventsForLaunchpad, guiButtons)
 		return

@@ -367,15 +367,16 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Run = false
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Type:           sequence.Type,
-				SequenceNumber: sequence.Number,
-				StartFlood:     sequence.StartFlood,
-				StrobeSpeed:    sequence.StrobeSpeed,
+				Type:            sequence.Type,
+				SequenceNumber:  sequence.Number,
+				RGBStatic:       sequence.Static,
+				RGBStaticColors: sequence.StaticColors,
+				StartFlood:      sequence.StartFlood,
+				StrobeSpeed:     sequence.StrobeSpeed,
 			}
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = false
 			continue
@@ -393,7 +394,7 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-			sequence.StopFlood = false
+			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 			sequence.Run = true
 			continue

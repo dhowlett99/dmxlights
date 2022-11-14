@@ -66,6 +66,7 @@ func main() {
 	this.ScannerShift = make(map[int]int, 4)           // Initialise storage for four sequences.
 	this.RGBFade = make(map[int]int, 4)                // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.StrobeSpeed = make(map[int]int, 4)            // Initialise storage for four sequences.
 	this.ScannerCoordinates = make(map[int]int, 4)     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
 	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
 	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
@@ -185,6 +186,8 @@ func main() {
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Selected speed for the sequence. Common to all types of sequence.
 		this.Running[sequenceNumber] = true                                        // Set this sequence to be in the running state. Common to all types of sequence.
+		this.Strobe = false                                                        // Set strobe to be off for all sequences.
+		this.StrobeSpeed[sequenceNumber] = 255                                     // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Default RGB shift size.
 		this.ScannerShift[sequenceNumber] = common.DefaultScannerShift             // Default scanner shift size.
 		this.RGBSize[sequenceNumber] = common.DefaultRGBSize                       // Set the defaults size for the RGB fixtures.
