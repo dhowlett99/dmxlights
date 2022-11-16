@@ -76,15 +76,6 @@ type ActionConfig struct {
 	Strobe       int
 }
 
-type Switch struct {
-	Name        string  `yaml:"name"`
-	Label       string  `yaml:"label"`
-	Number      int     `yaml:"number"`
-	Description string  `yaml:"description"`
-	States      []State `yaml:"states"`
-	Fixture     string  `yaml:"fixture"`
-}
-
 type Fixture struct {
 	Name           string    `yaml:"name"`
 	Label          string    `yaml:"label"`
@@ -94,8 +85,9 @@ type Fixture struct {
 	Group          int       `yaml:"group"`
 	Address        int16     `yaml:"address"`
 	Channels       []Channel `yaml:"channels"`
-	Switches       []Switch  `yaml:"switches"`
+	States         []State   `yaml:"states"`
 	NumberChannels int       `yaml:"use_channels"`
+	UseFixture     string    `yaml:"use_fixture"`
 }
 
 type Setting struct {
@@ -115,25 +107,90 @@ type Channel struct {
 	Settings   []Setting `yaml:"settings"`
 }
 
-// LoadFixtures opens the fixtures config file and returns a pointer to the fixtures.
-// or an error.
+// LoadFixtures opens the fixtures config file.
+// Returns a pointer to the fixtures config.
+// Returns an error.
 func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
+	// Open the fixtures.yaml file.
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, errors.New("error: loading fixtures.yaml file: " + err.Error())
 	}
+
+	// Reads the fixtures.yaml file.
 	data, err := ioutil.ReadFile(filename)
 	if err != nil {
 		return nil, errors.New("error: reading fixtures.yaml file: " + err.Error())
 	}
 
+	// Unmarshals the fixtures.yaml file into a data struct
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
 		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
 	}
 	return fixtures, nil
+}
+
+// SaveFixtures - saves a complete list of fixtures to fixtures.yaml
+// Returns an error.
+func SaveFixtures(filename string, fixtures *Fixtures) error {
+
+	// Marshal the fixtures data into a yaml data structure.
+	data, err := yaml.Marshal(fixtures)
+	if err != nil {
+		return errors.New("error: marshalling fixtures.yaml file: " + err.Error())
+	}
+
+	// Open the fixtures.yaml file.
+	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
+	if err != nil {
+		return errors.New("error: opening fixtures.yaml file: " + err.Error())
+	}
+
+	// Write the fixtures.yaml file.
+	err = ioutil.WriteFile(filename, data, 0644)
+	if err != nil {
+		return errors.New("error: writing fixtures.yaml file: " + err.Error())
+	}
+
+	// Fixtures file saved, no errors.
+	return nil
+}
+
+// GetFixureDetails - find a fixture in the fixtures config.
+// Returns details of the fixture.
+// Returns an error.
+func GetFixureDetails(group int, number int, fixtures *Fixtures) (Fixture, error) {
+	// scan the fixtures structure for the selected fixture.
+	if debug {
+		fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
+		}
+		if fixture.Group == group && fixture.Number == number+1 {
+			return fixture, nil
+		}
+	}
+	return Fixture{}, fmt.Errorf("error: fixture not found")
+}
+
+// EditFixture - allows you to change the fixture details for the selected fixture.
+// Returns a complete list of fixtures.
+// Returns an error.
+func EditFixture(groupNumber int, fixtureNumber int, newFixture Fixture, fixtures *Fixtures) (*Fixtures, error) {
+	// scan the fixtures structure for the selected fixture.
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == groupNumber && fixture.Number == fixtureNumber {
+			fixture = newFixture
+			return fixtures, nil
+		}
+	}
+	return fixtures, fmt.Errorf("error: fixture not found")
 }
 
 // FixtureReceivers are created by the sequence and are used to receive step instructions.
@@ -523,7 +580,7 @@ func MapSwitchFixture(mySequenceNumber int,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
-	var fixtureName string
+	var useFixture string
 
 	if debug {
 		fmt.Printf("MapSwitchFixture switchNumber %d, currentState %d\n", switchNumber, currentState)
@@ -532,74 +589,73 @@ func MapSwitchFixture(mySequenceNumber int,
 	// Step through the fixture config file looking for the group that matches mysequence number.
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
-			for _, swiTch := range fixture.Switches {
+			if fixture.UseFixture != "" {
+				// use this fixture for the sequencer actions
+				useFixture = fixture.UseFixture
 
-				if swiTch.Fixture != "" {
-					// start a fixture sequencer
-					fixtureName = swiTch.Fixture
-				}
-				if switchNumber+1 == swiTch.Number {
-					for stateNumber, state := range swiTch.States {
-						if stateNumber == currentState {
+				// Look through the switch states for this switch.
+				for stateNumber, state := range fixture.States {
+					if stateNumber == currentState {
 
-							// Play Actions which send messages to a dedicated mini sequencer.
-							for _, action := range state.Actions {
-								newMiniSequencer(fixtureName, swiTch.Number, currentState, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master, dmxInterfacePresent)
-							}
+						// Play Actions which send messages to a dedicated mini sequencer.
+						for _, action := range state.Actions {
+							newMiniSequencer(useFixture, fixture.Number, currentState, action, dmxController, fixtures, switchChannels, soundConfig, blackout, master, dmxInterfacePresent)
+						}
 
-							// Play DMX values directly to the univers.
-							for _, value := range state.Values {
-								if blackout {
+						// Play DMX values directly to the univers.
+						for _, value := range state.Values {
+							if blackout {
+								v, _ := strconv.ParseFloat(value.Setting, 32)
+								setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
+							} else {
+								// This should be controlled by the master brightness
+								if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
 									v, _ := strconv.ParseFloat(value.Setting, 32)
-									setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
-								} else {
-									// This should be controlled by the master brightness
-									if strings.Contains(value.Name, "master") || strings.Contains(value.Name, "dimmer") {
-										v, _ := strconv.ParseFloat(value.Setting, 32)
-										howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
-										if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
-											c, _ := strconv.ParseFloat(value.Channel, 32)
-											setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
-										} else {
-											c, _ := strconv.Atoi(value.Channel)
-											setChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
-										}
+									howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
+									if strings.Contains(value.Name, "reverse") || strings.Contains(value.Name, "invert") {
+										c, _ := strconv.ParseFloat(value.Channel, 32)
+										setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 									} else {
+										c, _ := strconv.Atoi(value.Channel)
+										setChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
+									}
+								} else {
 
-										// If the setting has is a number set it directly.
-										if IsNumericOnly(value.Setting) {
+									// If the setting has is a number set it directly.
+									if IsNumericOnly(value.Setting) {
 
-											v, _ := strconv.ParseFloat(value.Setting, 32)
-											if IsNumericOnly(value.Channel) {
-												// If the channel has is a number set it directly.
-												c, _ := strconv.ParseFloat(value.Channel, 32)
-												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
-											} else {
-												// Handle the fact that the channel may be a label as well.
-												fixture := findFixtureByName(fixtureName, fixtures)
-												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
-												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
-											}
-
+										v, _ := strconv.ParseFloat(value.Setting, 32)
+										if IsNumericOnly(value.Channel) {
+											// If the channel has is a number set it directly.
+											c, _ := strconv.ParseFloat(value.Channel, 32)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
-											// If the setting contains a label, look up the label in the fixture definition.
-											fixture := findFixtureByName(fixtureName, fixtures)
-											v, err := lookUpSettingLabelInFixtureDefinition(fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting, fixtures)
-											if err != nil {
-												fmt.Printf("dmxlights: error failed to find Name=%s in switch Setting=%s in fixture config for switch Number=%d: %s\n", value.Name, value.Setting, swiTch.Number, err.Error())
-												fmt.Printf("fixture.Group=%d, swiTch.Number=%d, value.Channel=%s, value.Name=%s, value.Setting=%s\n", fixture.Group, swiTch.Number, value.Channel, value.Name, value.Setting)
-												os.Exit(1)
-											}
-
 											// Handle the fact that the channel may be a label as well.
-											if IsNumericOnly(value.Channel) {
-												c, _ := strconv.ParseFloat(value.Channel, 32)
-												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
-											} else {
-												fixture := findFixtureByName(fixtureName, fixtures)
-												c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
-												setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
-											}
+											fixture := findFixtureByName(useFixture, fixtures)
+											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+										}
+
+									} else {
+										// If the setting contains a label, look up the label in the fixture definition.
+										fixture := findFixtureByName(useFixture, fixtures)
+										v, err := lookUpSettingLabelInFixtureDefinition(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
+										if err != nil {
+											fmt.Printf("lookUpSettingLabelInFixtureDefinition error: %s\n", err.Error())
+											fmt.Printf("dmxlights: error failed to find Name=%s in switch Setting=%s \n", value.Name, value.Setting)
+											fmt.Printf("fixture.Name %s, fixture.Number %d\n", fixture.Name, fixture.Number)
+											fmt.Printf("fixture.Group=%d, swiTch.Number=%d, value.Channel=%s, value.Name=%s, value.Setting=%s\n", fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting)
+											os.Exit(1)
+										}
+
+										// Handle the fact that the channel may be a label as well.
+										if IsNumericOnly(value.Channel) {
+											c, _ := strconv.ParseFloat(value.Channel, 32)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+										} else {
+											fixture := findFixtureByName(useFixture, fixtures)
+											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 									}
 								}

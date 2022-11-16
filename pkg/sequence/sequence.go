@@ -221,53 +221,51 @@ func CreateSequence(
 		for _, fixture := range fixturesConfig.Fixtures {
 			if fixture.Group == mySequenceNumber+1 {
 				// find switch data.
-				for _, swiTch := range fixture.Switches {
-					newSwitch := common.Switch{}
-					newSwitch.Name = swiTch.Name
-					newSwitch.Label = swiTch.Label
-					newSwitch.Number = swiTch.Number
-					newSwitch.Description = swiTch.Description
-					newSwitch.Fixture = swiTch.Fixture
+				newSwitch := common.Switch{}
+				newSwitch.Name = fixture.Name
+				newSwitch.Label = fixture.Label
+				newSwitch.Number = fixture.Number
+				newSwitch.Description = fixture.Description
+				newSwitch.UseFixture = fixture.UseFixture
 
-					newSwitch.States = []common.State{}
-					for _, state := range swiTch.States {
-						newState := common.State{}
-						newState.Name = state.Name
-						newState.Label = state.Label
-						newState.ButtonColor.R = state.ButtonColor.R
-						newState.ButtonColor.G = state.ButtonColor.G
-						newState.ButtonColor.B = state.ButtonColor.B
-						newState.Flash = state.Flash
+				newSwitch.States = []common.State{}
+				for _, state := range fixture.States {
+					newState := common.State{}
+					newState.Name = state.Name
+					newState.Label = state.Label
+					newState.ButtonColor.R = state.ButtonColor.R
+					newState.ButtonColor.G = state.ButtonColor.G
+					newState.ButtonColor.B = state.ButtonColor.B
+					newState.Flash = state.Flash
 
-						// Copy values.
-						newState.Values = []common.Value{}
-						for _, value := range state.Values {
-							newValue := common.Value{}
-							newValue.Channel = value.Channel
-							newValue.Setting = value.Setting
-							newState.Values = append(newState.Values, newValue)
-						}
-
-						// Copy actions.
-						newState.Actions = []common.Action{}
-						for _, action := range state.Actions {
-							newAction := common.Action{}
-							newAction.Name = action.Name
-							newAction.Colors = action.Colors
-							newAction.Mode = action.Mode
-							newAction.Fade = action.Fade
-							newAction.Speed = action.Speed
-							newAction.Rotate = action.Rotate
-							newAction.Music = action.Music
-							newAction.Program = action.Program
-							newState.Actions = append(newState.Actions, newAction)
-						}
-
-						newSwitch.States = append(newSwitch.States, newState)
+					// Copy values.
+					newState.Values = []common.Value{}
+					for _, value := range state.Values {
+						newValue := common.Value{}
+						newValue.Channel = value.Channel
+						newValue.Setting = value.Setting
+						newState.Values = append(newState.Values, newValue)
 					}
-					// Add new switch to the list.
-					newSwitchList = append(newSwitchList, newSwitch)
+
+					// Copy actions.
+					newState.Actions = []common.Action{}
+					for _, action := range state.Actions {
+						newAction := common.Action{}
+						newAction.Name = action.Name
+						newAction.Colors = action.Colors
+						newAction.Mode = action.Mode
+						newAction.Fade = action.Fade
+						newAction.Speed = action.Speed
+						newAction.Rotate = action.Rotate
+						newAction.Music = action.Music
+						newAction.Program = action.Program
+						newState.Actions = append(newState.Actions, newAction)
+					}
+
+					newSwitch.States = append(newSwitch.States, newState)
 				}
+				// Add new switch to the list.
+				newSwitchList = append(newSwitchList, newSwitch)
 			}
 		}
 		sequence.Type = sequenceType

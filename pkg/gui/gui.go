@@ -320,6 +320,16 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		var skipPopup bool
 		button.button = widget.NewButton("     ", func() {
 
+			if this.Config {
+				modal, err := runConfigPopUp(myWindow, Y, X, fixturesConfig)
+				if err != nil {
+					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
+					return
+				}
+				modal.Resize(fyne.NewSize(500, 300))
+				modal.Show()
+			}
+
 			if X == 8 && Y == 5 || X > 7 || Y < 5 {
 				skipPopup = true
 			}
@@ -351,7 +361,13 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
-			button := widget.NewButton("MYDMX", nil) // button widget
+			button := widget.NewButton("MYDMX", func() {
+				if this.Config {
+					this.Config = false
+				} else {
+					this.Config = true
+				}
+			}) // button widget
 			myLogo := canvas.NewImageFromFile("dmxlights.png")
 			container1 := container.NewMax(
 				button,
@@ -452,4 +468,69 @@ func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 		w.Canvas(),
 	)
 	return modal
+}
+
+func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+
+	fixture, err := fixture.GetFixureDetails(group, number, fixtures)
+	if err != nil {
+		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
+	}
+
+	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", fixture.Group, fixture.Number))
+	title.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
+
+	nameInput := widget.NewEntry()
+	nameInput.SetPlaceHolder(fixture.Name)
+	descInput := widget.NewEntry()
+	descInput.SetPlaceHolder(fixture.Description)
+	addrInput := widget.NewEntry()
+	addrInput.SetPlaceHolder(fmt.Sprintf("%d", fixture.Address))
+
+	var formItems []*widget.FormItem
+
+	if fixture.Type == "rgb" || fixture.Type == "scanner" {
+		for _, channel := range fixture.Channels {
+			name := widget.NewEntry()
+			name.SetText(channel.Name)
+			formItem := widget.NewFormItem(fmt.Sprintf("%d", channel.Number), name)
+			formItems = append(formItems, formItem)
+		}
+	}
+
+	if fixture.Type == "switch" {
+		for _, state := range fixture.States {
+			name := widget.NewEntry()
+			name.SetText(state.Name)
+			formItem := widget.NewFormItem(state.Label, name)
+			formItems = append(formItems, formItem)
+		}
+	}
+
+	form := &widget.Form{
+		Items: formItems,
+		OnCancel: func() {
+			modal.Hide()
+		},
+		SubmitText: "Save",
+		OnSubmit: func() {
+			modal.Hide()
+		},
+	}
+
+	// Layout of settings panel.
+	modal = widget.NewModalPopUp(
+		container.NewVBox(
+			title,
+			nameInput,
+			descInput,
+			addrInput,
+			form,
+			widget.NewLabel(""),
+		),
+		w.Canvas(),
+	)
+	return modal, nil
 }

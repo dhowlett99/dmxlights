@@ -99,6 +99,7 @@ type Switch struct {
 	Description  string
 	States       []State
 	Fixture      string
+	UseFixture   string
 }
 
 type StaticColorButton struct {

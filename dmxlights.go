@@ -170,6 +170,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Update the fixture list with the sequence type.
+	for _, sequence := range sequencesConfig.Sequences {
+		for fixtureNumber, fixture := range fixturesConfig.Fixtures {
+			if sequence.Group == fixture.Group {
+				fixturesConfig.Fixtures[fixtureNumber].Type = sequence.Type
+			}
+		}
+	}
+
 	// Create the sequences from config file.
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
@@ -181,6 +190,7 @@ func main() {
 		newSequence.Name = sequenceConf.Name
 		newSequence.Description = sequenceConf.Description
 		newSequence.Label = sequenceConf.Label
+		newSequence.Type = sequenceConf.Type
 
 		sequences = append(sequences, &newSequence)
 

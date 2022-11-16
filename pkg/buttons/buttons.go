@@ -36,6 +36,7 @@ type CurrentState struct {
 	Strobe                    map[int]bool                 // We are in strobe mode. True if strobing
 	StrobeSpeed               map[int]int                  // Strobe speed. value is speed 0-255, indexed by sequence number.
 	SavePreset                bool                         // Save a preset flag.
+	Config                    bool                         // Flag to indicate we are in fixture config mode.
 	Blackout                  bool                         // Blackout all fixtures.
 	Flood                     bool                         // Flood all fixtures.
 	FunctionSelectMode        []bool                       // Which sequence is in function selection mode.
