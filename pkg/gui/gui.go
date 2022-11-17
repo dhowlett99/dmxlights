@@ -326,7 +326,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
 				}
-				modal.Resize(fyne.NewSize(500, 300))
+				modal.Resize(fyne.NewSize(500, 500))
 				modal.Show()
 			}
 
@@ -509,28 +509,40 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 		}
 	}
 
+	// Form.
 	form := &widget.Form{
 		Items: formItems,
-		OnCancel: func() {
-			modal.Hide()
-		},
-		SubmitText: "Save",
-		OnSubmit: func() {
-			modal.Hide()
-		},
 	}
+	scrollableForm := container.NewScroll(form)
+	scrollableForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
+
+	// Layout of main panel.
+	main := container.NewVBox(
+		title,
+		nameInput,
+		descInput,
+		addrInput,
+	)
+
+	// Save button.
+	buttonSave := widget.NewButton("Save", func() {
+		modal.Hide()
+	})
+	// Cancel button.
+	buttonCancel := widget.NewButton("Cancel", func() {
+		modal.Hide()
+	})
+
+	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
+
+	top := container.NewBorder(main, nil, nil, nil, scrollableForm)
+	content := container.NewBorder(top, nil, nil, nil, saveCancel)
 
 	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
-		container.NewVBox(
-			title,
-			nameInput,
-			descInput,
-			addrInput,
-			form,
-			widget.NewLabel(""),
-		),
+		content,
 		w.Canvas(),
 	)
+
 	return modal, nil
 }
