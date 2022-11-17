@@ -489,6 +489,27 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 	addrInput := widget.NewEntry()
 	addrInput.SetPlaceHolder(fmt.Sprintf("%d", fixture.Address))
 
+	var formTopItems []*widget.FormItem
+	// Top Form.
+	name1 := widget.NewEntry()
+	name1.SetText(fixture.Name)
+	formTopItem := widget.NewFormItem("Name", name1)
+	formTopItems = append(formTopItems, formTopItem)
+
+	name2 := widget.NewEntry()
+	name2.SetText(fixture.Description)
+	formTopItem2 := widget.NewFormItem("Description", name2)
+	formTopItems = append(formTopItems, formTopItem2)
+
+	name3 := widget.NewEntry()
+	name3.SetText(fmt.Sprintf("%d", fixture.Address))
+	formTopItem3 := widget.NewFormItem("DMX Address", name3)
+	formTopItems = append(formTopItems, formTopItem3)
+
+	formTop := &widget.Form{
+		Items: formTopItems,
+	}
+
 	var formItems []*widget.FormItem
 
 	if fixture.Type == "rgb" || fixture.Type == "scanner" {
@@ -509,20 +530,12 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 		}
 	}
 
-	// Form.
+	// Channels Form.
 	form := &widget.Form{
 		Items: formItems,
 	}
 	scrollableForm := container.NewScroll(form)
 	scrollableForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
-
-	// Layout of main panel.
-	main := container.NewVBox(
-		title,
-		nameInput,
-		descInput,
-		addrInput,
-	)
 
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
@@ -535,7 +548,7 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
 
-	top := container.NewBorder(main, nil, nil, nil, scrollableForm)
+	top := container.NewBorder(formTop, nil, nil, nil, scrollableForm)
 	content := container.NewBorder(top, nil, nil, nil, saveCancel)
 
 	// Layout of settings panel.
