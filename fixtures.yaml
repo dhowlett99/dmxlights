@@ -1025,6 +1025,7 @@ fixtures:
   label: SW1.Oil
   states:
   - name: Off
+    number: 1
     label: Off
     values:
       - name: master dimmer
@@ -1036,6 +1037,7 @@ fixtures:
       green: 255
       blue: 0
   - name: On
+    number: 2
     label: On
     values: 
       - name: master dimmer
@@ -1055,6 +1057,7 @@ fixtures:
   states:
   - name: Off
     label: Off
+    number: 1
     values:
       - name: master dimmer
         description: Dimmer
@@ -1065,6 +1068,7 @@ fixtures:
       green: 255
       blue: 0
   - name: On
+    number: 2
     label: On
     values: 
       - name: master dimmer
@@ -1083,6 +1087,7 @@ fixtures:
   label: SW3.Deluge
   states:
   - name: Off
+    number: 1
     label: Off
     master: 
     buttoncolor: 
@@ -1095,6 +1100,7 @@ fixtures:
         channel: 145 # Base address of Deluge Fixture
         setting: 0 # 100% Brightness
   - name: On
+    number: 2
     label: On
     buttoncolor: 
       red: 255
@@ -1121,6 +1127,7 @@ fixtures:
   label: SW4.Vue
   states:
   - name: Off
+    number: 1
     label: Off
     buttoncolor: 
       red: 0
@@ -1152,6 +1159,7 @@ fixtures:
         channel: 144
         setting: 0
   - name: Red
+    number: 2
     label: Red
     buttoncolor: 
       red: 255
@@ -1183,6 +1191,7 @@ fixtures:
         channel: 144
         setting: 255
   - name: Slow Color Change
+    number: 3
     label: SlwChg
     buttoncolor: 
       red: 255
@@ -1214,6 +1223,7 @@ fixtures:
         channel: 144
         setting: 255
   - name: Meduim Color Change
+    number: 4
     label: MdChg
     buttoncolor: 
       red: 0
@@ -1245,6 +1255,7 @@ fixtures:
         channel: 144
         setting: 255
   - name: Sound Triggered Color Change
+    number: 5
     label: Sound
     buttoncolor: 
       red: 128
@@ -1284,6 +1295,7 @@ fixtures:
   fixture: par38
   states:
   - name: Off
+    number: 1
     label: Off
     buttoncolor: 
       red: 0
@@ -1326,6 +1338,7 @@ fixtures:
       - name: off
         mode: off
   - name: Red
+    number: 2
     label: Red
     buttoncolor: 
       red: 255
@@ -1337,6 +1350,7 @@ fixtures:
         colors:
         - Red
   - name: Green
+    number: 3
     label: Green
     buttoncolor: 
       red: 0
@@ -1348,6 +1362,7 @@ fixtures:
         colors:
         - Green
   - name: Blue
+    number: 4
     label: Blue
     buttoncolor: 
       red: 0
@@ -1359,6 +1374,7 @@ fixtures:
         colors:
         - Blue
   - name: On
+    number: 5
     label: On
     buttoncolor: 
       red: 255
@@ -1378,6 +1394,7 @@ fixtures:
         fade: soft
         speed: fast
   - name: Sound
+    number: 6
     label: Sound
     buttoncolor: 
       red: 255
@@ -1414,7 +1431,8 @@ fixtures:
   label: SW6.DERBY
   usefixture: dekker1
   states:
-  - name: Off
+  - name: 
+    number: 1
     label: Off
     buttoncolor: 
       red: 0
@@ -1457,6 +1475,7 @@ fixtures:
       - name: soft chase
         mode: off
   - name: Red
+    number: 2
     label: Red
     buttoncolor: 
       red: 255
@@ -1468,6 +1487,7 @@ fixtures:
         colors:
         - Red
   - name: Green
+    number: 3
     label: Green
     buttoncolor: 
       red: 0
@@ -1479,6 +1499,7 @@ fixtures:
         colors:
         - Green
   - name: Blue
+    number: 4
     label: Blue
     buttoncolor: 
       red: 0
@@ -1490,6 +1511,7 @@ fixtures:
         colors:
         - Blue
   - name: On
+    number: 5
     label: On
     buttoncolor: 
       red: 255
@@ -1509,6 +1531,7 @@ fixtures:
         fade: soft
         speed: fast
   - name: Sound
+    number: 6
     label: Sound
     buttoncolor: 
       red: 255
@@ -1536,12 +1559,14 @@ fixtures:
   number: 7
   states:
   - name: Off
+    number: 1
     label: Off
     buttoncolor: 
       red: 0
       green: 255
       blue: 0 
   - name: On
+    number: 2
     label: On
     buttoncolor: 
       red: 255
@@ -1555,18 +1580,21 @@ fixtures:
   label: SW8.Booth
   states:
   - name: Off
+    number: 1
     label: Off
     buttoncolor: 
       red: 0
       green: 255
       blue: 0 
   - name: On
+    number: 2
     label: On
     buttoncolor: 
       red: 255
       green: 0
       blue: 0 
   - name: Slow 
+    number: 3
     label: Slow
     buttoncolor: 
       red: 255

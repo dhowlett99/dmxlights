@@ -490,7 +490,7 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 	addrInput.SetPlaceHolder(fmt.Sprintf("%d", fixture.Address))
 
 	var formTopItems []*widget.FormItem
-	// Top Form.
+	//Top Form.
 	name1 := widget.NewEntry()
 	name1.SetText(fixture.Name)
 	formTopItem := widget.NewFormItem("Name", name1)
@@ -510,31 +510,72 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 		Items: formTopItems,
 	}
 
-	var formItems []*widget.FormItem
+	type channelSelect struct {
+		Number  int16
+		Label   string
+		Options []string
+	}
+
+	var options []string
+
+	channelList := []channelSelect{}
+
+	channelOptions := []string{"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Programs"}
 
 	if fixture.Type == "rgb" || fixture.Type == "scanner" {
 		for _, channel := range fixture.Channels {
-			name := widget.NewEntry()
-			name.SetText(channel.Name)
-			formItem := widget.NewFormItem(fmt.Sprintf("%d", channel.Number), name)
-			formItems = append(formItems, formItem)
+			newSelect := channelSelect{}
+			newSelect.Number = channel.Number
+			newSelect.Label = channel.Name
+			newSelect.Options = channelOptions
+			channelList = append(channelList, newSelect)
 		}
+		options = channelOptions
 	}
+
+	switchOptions := []string{"On", "Off"}
 
 	if fixture.Type == "switch" {
 		for _, state := range fixture.States {
-			name := widget.NewEntry()
-			name.SetText(state.Name)
-			formItem := widget.NewFormItem(state.Label, name)
-			formItems = append(formItems, formItem)
+			newSelect := channelSelect{}
+			newSelect.Number = state.Number
+			newSelect.Label = state.Name
+			newSelect.Options = switchOptions
+			channelList = append(channelList, newSelect)
 		}
+		options = switchOptions
 	}
 
-	// Channels Form.
-	form := &widget.Form{
-		Items: formItems,
-	}
-	scrollableForm := container.NewScroll(form)
+	// Channel Selection Panel.
+	channelPanel := widget.NewList(
+		func() int {
+			return len(channelList)
+		},
+		func() fyne.CanvasObject {
+			return container.NewHBox(
+				widget.NewLabel("template"),
+
+				widget.NewSelect(options, func(value string) {
+					log.Println("Select set to", value)
+				}),
+			)
+		},
+		// Function to update item in this list.
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			fmt.Printf("Channel ID is %d   Channel Setting is %s\n", i, channelOptions[i])
+			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", channelList[i].Number))
+			// find the selected option in the options list.
+			for _, option := range channelList[i].Options {
+				if option == channelList[i].Label {
+					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
+				}
+			}
+			// o.(*fyne.Container).Objects[1].(*widget.Button).OnTapped = func() {
+			// 	fmt.Printf("I have selected channel %s\n", componentsList[i])
+			// }
+		})
+
+	scrollableForm := container.NewScroll(channelPanel)
 	scrollableForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
 
 	// Save button.
@@ -553,6 +594,7 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 
 	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
+		//content,
 		content,
 		w.Canvas(),
 	)

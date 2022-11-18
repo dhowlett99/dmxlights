@@ -40,6 +40,7 @@ type Value struct {
 
 type State struct {
 	Name        string   `yaml:"name"`
+	Number      int16    `yaml:"number"`
 	Label       string   `yaml:"label"`
 	Values      []Value  `yaml:"values"`
 	ButtonColor Color    `yaml:"buttoncolor"`

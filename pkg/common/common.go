@@ -73,6 +73,7 @@ type Value struct {
 
 type State struct {
 	Name        string
+	Number      int16
 	Label       string
 	Values      []Value
 	ButtonColor Color

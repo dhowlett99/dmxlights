@@ -232,6 +232,7 @@ func CreateSequence(
 				for _, state := range fixture.States {
 					newState := common.State{}
 					newState.Name = state.Name
+					newState.Number = state.Number
 					newState.Label = state.Label
 					newState.ButtonColor.R = state.ButtonColor.R
 					newState.ButtonColor.G = state.ButtonColor.G
