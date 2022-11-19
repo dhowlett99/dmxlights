@@ -510,21 +510,24 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 		Items: formTopItems,
 	}
 
-	type channelSelect struct {
+	type itemSelect struct {
 		Number  int16
 		Label   string
 		Options []string
 	}
 
 	var options []string
+	var actionsAvailable bool
+	//var statesAvailable bool
+	actionPanel := &widget.List{}
 
-	channelList := []channelSelect{}
+	channelList := []itemSelect{}
 
 	channelOptions := []string{"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Programs"}
 
 	if fixture.Type == "rgb" || fixture.Type == "scanner" {
 		for _, channel := range fixture.Channels {
-			newSelect := channelSelect{}
+			newSelect := itemSelect{}
 			newSelect.Number = channel.Number
 			newSelect.Label = channel.Name
 			newSelect.Options = channelOptions
@@ -533,20 +536,36 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 		options = channelOptions
 	}
 
-	switchOptions := []string{"On", "Off"}
+	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "Softchase", "Hardchase", "Soundchase", "Rotate"}
+	actionOptions := []string{"Off", "On", "Red", "Green", "Blue", "Softchase", "Hardchase", "Soundchase", "Rotate"}
+	//actions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
 
+	actionList := []itemSelect{}
+
+	// Populate switch state settings and actions.
 	if fixture.Type == "switch" {
 		for _, state := range fixture.States {
-			newSelect := channelSelect{}
+			//statesAvailable = true
+			newSelect := itemSelect{}
 			newSelect.Number = state.Number
 			newSelect.Label = state.Name
 			newSelect.Options = switchOptions
+			if state.Actions != nil {
+				actionsAvailable = true
+				for actionNumber, action := range state.Actions {
+					newAction := itemSelect{}
+					newAction.Number = int16(actionNumber)
+					newAction.Label = action.Name
+					newAction.Options = actionOptions
+					actionList = append(actionList, newAction)
+				}
+			}
 			channelList = append(channelList, newSelect)
 		}
 		options = switchOptions
 	}
 
-	// Channel Selection Panel.
+	// Channel or Switch State Selection Panel.
 	channelPanel := widget.NewList(
 		func() int {
 			return len(channelList)
@@ -575,8 +594,48 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 			// }
 		})
 
-	scrollableForm := container.NewScroll(channelPanel)
-	scrollableForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
+	// Action Selection Panel.
+	if actionsAvailable {
+		actionPanel = widget.NewList(
+			func() int {
+				return len(channelList)
+			},
+			func() fyne.CanvasObject {
+				return container.NewHBox(
+					widget.NewLabel("template"),
+
+					widget.NewSelect(actionOptions, func(value string) {
+						log.Println("Select set to", value)
+					}),
+				)
+			},
+			// Function to update item in this list.
+			func(i widget.ListItemID, o fyne.CanvasObject) {
+				fmt.Printf("Action ID is %d   Action Setting is %s\n", i, actionOptions[i])
+				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", actionList[i].Number))
+				// find the selected option in the options list.
+				for _, action := range actionList[i].Options {
+					fmt.Printf("Action=%s Label=%s\n", action, actionList[i].Label)
+					if action == actionList[i].Label {
+						o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(action)
+					}
+				}
+				// o.(*fyne.Container).Objects[1].(*widget.Button).OnTapped = func() {
+				// 	fmt.Printf("I have selected channel %s\n", componentsList[i])
+				// }
+			})
+	}
+
+	scrollableTopForm := container.NewScroll(channelPanel)
+	scrollableBottomForm := container.NewScroll(actionPanel)
+	scrollableTopForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
+	scrollableBottomForm.SetMinSize(fyne.Size{Height: 0, Width: 0})
+
+	// Size accordingly
+	if actionsAvailable {
+		scrollableTopForm.SetMinSize(fyne.Size{Height: 250, Width: 200})
+		scrollableBottomForm.SetMinSize(fyne.Size{Height: 250, Width: 200})
+	}
 
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
@@ -589,13 +648,14 @@ func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixt
 
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
 
-	top := container.NewBorder(formTop, nil, nil, nil, scrollableForm)
-	content := container.NewBorder(top, nil, nil, nil, saveCancel)
+	top := container.NewBorder(formTop, nil, nil, nil, scrollableTopForm)
+	content := container.NewBorder(top, nil, nil, nil, scrollableBottomForm)
+	bottom := container.NewBorder(content, nil, nil, nil, saveCancel)
 
 	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
 		//content,
-		content,
+		bottom,
 		w.Canvas(),
 	)
 
