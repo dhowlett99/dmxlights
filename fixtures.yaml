@@ -12,7 +12,7 @@ fixtures:
   - number: 3
     name: Blue1
   - number: 4
-    name: Color Macros
+    name: ColorMacros
     value: 0
     comment: Color Macros
   - number: 5
