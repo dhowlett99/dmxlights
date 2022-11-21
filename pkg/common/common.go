@@ -83,6 +83,7 @@ type State struct {
 
 type Action struct {
 	Name    string
+	Number  int
 	Colors  []string
 	Mode    string
 	Fade    string

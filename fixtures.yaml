@@ -1336,7 +1336,7 @@ fixtures:
         setting: 0
     actions:
       - name: Off
-        mode: off
+        mode: Off
   - name: Red
     number: 2
     label: Red
@@ -1346,7 +1346,7 @@ fixtures:
       blue: 0
     actions:
       - name: Red
-        mode: static
+        mode: Static
         colors:
         - Red
   - name: Green
@@ -1358,7 +1358,7 @@ fixtures:
       blue: 0
     actions:
       - name: Green
-        mode: static
+        mode: Static
         colors:
         - Green
   - name: Blue
@@ -1370,7 +1370,7 @@ fixtures:
       blue: 255
     actions:
       - name: Blue
-        mode: static
+        mode: Static
         colors:
         - Blue
   - name: On
@@ -1390,7 +1390,7 @@ fixtures:
         - Blue
         - Purple
         - Pink
-        mode: chase
+        mode: Chase
         fade: soft
         speed: fast
   - name: Soundchase
@@ -1410,7 +1410,7 @@ fixtures:
         - Blue
         - Purple
         - Pink
-        mode: chase
+        mode: Chase
         fade: soft
         speed: music
         rotate: off
@@ -1430,6 +1430,74 @@ fixtures:
   group: 4
   label: SW6.DERBY
   usefixture: dekker1
+  channels:
+  - number: 1
+    name: Rotate
+    settings:
+      - name: Off
+        setting: 0
+        label: off
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White1
+  - number: 6
+    name: Master
+  - number: 7
+    name: Program
+    settings:
+      - name: Off
+        setting: 0
+        label: off
+      - name: 4 Color Loop Change
+        setting: 1
+        label: 4colorloop
+      - name: 9 Color Fade Change
+        setting: 27
+        label: 9colorloop
+      - name: 4 Color Loop Change
+        setting: 52
+        label: 4colorloop
+      - name: 9 Color Fade Change
+        setting: 77
+        label: 9colorloop
+      - name: Strobe 1 Dim - Bright
+        setting: 102
+        label: strobe1
+      - name: Strobe 2 Bright - Dim
+        setting: 127
+        label: strobe2
+      - name: Strobe 3 Dim - Bright - Dim
+        setting: 152
+        label: strobe3
+      - name: Strobe 4 W/O Dim Effect
+        setting: 177
+        label: strobe4
+      - name: Strobe 5 with 9 Color
+        setting: 202
+        label: strobe5
+      - name: Strobe 6 with Gradual Dim
+        setting: 227
+        label: strobe6
+      - name: All Programs will Cycle
+        setting: 255
+        label: cycle
+  - number: 8
+    name: ProgramSpeed
+    settings: 
+      - name: Slow
+        label: Slow
+        setting: 1
+      - name: Fast
+        label: Fast
+        setting: 254
+      - name: Sound Active
+        label: Music
+        setting: 255
   states:
   - name: Off
     number: 1
@@ -1473,7 +1541,7 @@ fixtures:
       setting: 0
     actions:
       - name: Off
-        mode: off
+        mode: Off
   - name: Red
     number: 2
     label: Red
@@ -1483,7 +1551,7 @@ fixtures:
       blue: 0
     actions:
       - name: Red
-        mode: static
+        mode: Static
         colors:
         - Red
   - name: Green
@@ -1495,7 +1563,7 @@ fixtures:
       blue: 0
     actions:
       - name: Green
-        mode: static
+        mode: Static
         colors:
         - Green
   - name: Blue
@@ -1507,7 +1575,7 @@ fixtures:
       blue: 255
     actions:
       - name: Blue
-        mode: static
+        mode: Static
         colors:
         - Blue
   - name: SoundChase
@@ -1527,7 +1595,7 @@ fixtures:
         - Blue
         - Purple
         - Pink
-        mode: chase
+        mode: Chase
         fade: soft
         speed: fast
   - name: SoundChase
@@ -1547,7 +1615,7 @@ fixtures:
         - Blue
         - Purple
         - Pink
-        mode: chase
+        mode: Chase
         fade: soft
         speed: music
         rotate: slow

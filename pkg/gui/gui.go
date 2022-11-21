@@ -7,8 +7,6 @@ import (
 	"io/ioutil"
 	"log"
 	"os"
-	"sort"
-	"strconv"
 	"strings"
 	"time"
 
@@ -21,6 +19,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/editor"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
@@ -34,12 +33,6 @@ type Button struct {
 	button    *widget.Button
 	rectangle *canvas.Rectangle
 	container *fyne.Container
-}
-
-type itemSelect struct {
-	Number  int16
-	Label   string
-	Options []string
 }
 
 type MyPanel struct {
@@ -329,12 +322,12 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		button.button = widget.NewButton("     ", func() {
 
 			if this.Config {
-				modal, err := runConfigPopUp(myWindow, Y, X, fixturesConfig)
+				modal, err := editor.NewEditor(myWindow, Y, X, fixturesConfig)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
 				}
-				modal.Resize(fyne.NewSize(500, 500))
+				modal.Resize(fyne.NewSize(600, 500))
 				modal.Show()
 			}
 
@@ -476,309 +469,4 @@ func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 		w.Canvas(),
 	)
 	return modal
-}
-
-func runConfigPopUp(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
-
-	fixture, err := fixture.GetFixureDetails(group, number, fixtures)
-	if err != nil {
-		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
-	}
-
-	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", fixture.Group, fixture.Number))
-	title.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-
-	nameInput := widget.NewEntry()
-	nameInput.SetPlaceHolder(fixture.Name)
-	descInput := widget.NewEntry()
-	descInput.SetPlaceHolder(fixture.Description)
-	addrInput := widget.NewEntry()
-	addrInput.SetPlaceHolder(fmt.Sprintf("%d", fixture.Address))
-
-	var formTopItems []*widget.FormItem
-	//Top Form.
-	name1 := widget.NewEntry()
-	name1.SetText(fixture.Name)
-	formTopItem := widget.NewFormItem("Name", name1)
-	formTopItems = append(formTopItems, formTopItem)
-
-	name2 := widget.NewEntry()
-	name2.SetText(fixture.Description)
-	formTopItem2 := widget.NewFormItem("Description", name2)
-	formTopItems = append(formTopItems, formTopItem2)
-
-	name3 := widget.NewEntry()
-	name3.SetText(fmt.Sprintf("%d", fixture.Address))
-	formTopItem3 := widget.NewFormItem("DMX Address", name3)
-	formTopItems = append(formTopItems, formTopItem3)
-
-	formTop := &widget.Form{
-		Items: formTopItems,
-	}
-
-	var options []string
-	var actionsAvailable bool
-	label := widget.NewLabel("label")
-	actionPanel := &widget.List{}
-	channelList := []itemSelect{}
-
-	channelOptions := []string{"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Programs", "ColorMacros"}
-
-	// Populate RGB and Scanner Channels.
-	if fixture.Type == "rgb" || fixture.Type == "scanner" {
-		label.Text = "Channels"
-		for _, channel := range fixture.Channels {
-			newSelect := itemSelect{}
-			newSelect.Number = channel.Number
-			newSelect.Label = channel.Name
-			newSelect.Options = channelOptions
-			channelList = append(channelList, newSelect)
-		}
-		options = channelOptions
-	}
-
-	// Describe the options.
-	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "Softchase", "Hardchase", "Soundchase", "Rotate"}
-	actionOptions := []string{"Off", "On", "Red", "Green", "Blue", "Softchase", "Hardchase", "Soundchase", "Rotate"}
-	//actions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
-
-	// Channel or Switch label.
-	label.TextStyle = fyne.TextStyle{
-		Bold: true,
-	}
-
-	actionList := []itemSelect{}
-
-	// Populate switch state settings and actions.
-	if fixture.Type == "switch" {
-		label.Text = "Switch States"
-		for _, state := range fixture.States {
-			//statesAvailable = true
-			newSelect := itemSelect{}
-			newSelect.Number = state.Number
-			newSelect.Label = state.Name
-			newSelect.Options = switchOptions
-			if state.Actions != nil {
-				actionsAvailable = true
-				for actionNumber, action := range state.Actions {
-					newAction := itemSelect{}
-					newAction.Number = int16(actionNumber)
-					newAction.Label = action.Name
-					newAction.Options = actionOptions
-					actionList = append(actionList, newAction)
-				}
-			}
-			channelList = append(channelList, newSelect)
-		}
-		options = switchOptions
-	}
-
-	var channelPanel *widget.List
-
-	// Channel or Switch State Selection Panel.
-	channelPanel = widget.NewList(
-		// Function to find length.
-		func() int {
-			return len(channelList)
-		},
-		// Function to create item.
-		func() (o fyne.CanvasObject) {
-			return container.NewHBox(
-				widget.NewLabel("template"),
-
-				widget.NewSelect(options, func(value string) {
-					lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
-					fmt.Printf("We just pressed channel %d and set it to %s\n", lastChannel, value)
-					item := itemSelect{}
-					item.Number = int16(lastChannel)
-					item.Label = value
-					item.Options = channelOptions
-					channelList = updateChannel(channelList, item.Number, item)
-				}),
-
-				widget.NewButton("-", func() {
-					log.Println("Delete Button pressed for ")
-				}),
-				widget.NewButton("+", func() {
-					log.Println("Add Button pressed for ")
-				}),
-			)
-		},
-		// Function to update item in this list.
-		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", channelList[i].Number))
-
-			// find the selected option in the options list.
-			for _, option := range channelList[i].Options {
-				if option == channelList[i].Label {
-					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
-				}
-			}
-
-			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				channelList = deleteChannel(channelList, channelList[i].Number)
-				channelPanel.Refresh()
-			}
-
-			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				channelList = addChannel(channelList, channelList[i].Number, channelOptions)
-				channelPanel.Refresh()
-			}
-
-		})
-
-	// Action Selection Panel.
-	if actionsAvailable {
-		actionPanel = widget.NewList(
-			func() int {
-				return len(channelList)
-			},
-			func() fyne.CanvasObject {
-				return container.NewHBox(
-					widget.NewLabel("template"),
-
-					widget.NewSelect(actionOptions, func(value string) {
-						log.Println("Select set to", value)
-					}),
-				)
-			},
-			// Function to update item in this list.
-			func(i widget.ListItemID, o fyne.CanvasObject) {
-				fmt.Printf("Action ID is %d   Action Setting is %s\n", i, actionOptions[i])
-				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", actionList[i].Number))
-				// find the selected option in the options list.
-				for _, action := range actionList[i].Options {
-					fmt.Printf("Action=%s Label=%s\n", action, actionList[i].Label)
-					if action == actionList[i].Label {
-						o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(action)
-					}
-				}
-				// o.(*fyne.Container).Objects[1].(*widget.Button).OnTapped = func() {
-				// 	fmt.Printf("I have selected channel %s\n", componentsList[i])
-				// }
-			})
-	}
-
-	scrollableTopForm := container.NewScroll(channelPanel)
-	scrollableBottomForm := container.NewScroll(actionPanel)
-	scrollableTopForm.SetMinSize(fyne.Size{Height: 400, Width: 200})
-	scrollableBottomForm.SetMinSize(fyne.Size{Height: 0, Width: 0})
-
-	// Size accordingly
-	if actionsAvailable {
-		scrollableTopForm.SetMinSize(fyne.Size{Height: 250, Width: 200})
-		scrollableBottomForm.SetMinSize(fyne.Size{Height: 250, Width: 200})
-	}
-
-	// Save button.
-	buttonSave := widget.NewButton("Save", func() {
-		for _, channel := range channelList {
-			fmt.Printf("---> channel \n")
-			fmt.Printf("\t number %d\n", channel.Number)
-			fmt.Printf("\t name   %s\n", channel.Label)
-		}
-		modal.Hide()
-	})
-	// Cancel button.
-	buttonCancel := widget.NewButton("Cancel", func() {
-		modal.Hide()
-	})
-
-	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
-
-	top := container.NewBorder(formTop, nil, nil, nil, label)
-	middle := container.NewBorder(top, nil, nil, nil, scrollableTopForm)
-	content := container.NewBorder(middle, nil, nil, nil, scrollableBottomForm)
-	bottom := container.NewBorder(content, nil, nil, nil, saveCancel)
-
-	// Layout of settings panel.
-	modal = widget.NewModalPopUp(
-		//content,
-		bottom,
-		w.Canvas(),
-	)
-
-	return modal, nil
-}
-
-func deleteChannel(channelList []itemSelect, id int16) []itemSelect {
-
-	newChannelList := []itemSelect{}
-
-	for _, item := range channelList {
-
-		if item.Number != id {
-			newChannelList = append(newChannelList, item)
-		}
-	}
-	return newChannelList
-}
-
-func allreadyExists(number int16, channelList []itemSelect) bool {
-
-	// look through the channel list for the id's
-	for _, item := range channelList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func findLargest(channelList []itemSelect) int16 {
-
-	var number int16
-	for _, item := range channelList {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
-}
-
-func addChannel(channelList []itemSelect, id int16, options []string) []itemSelect {
-
-	newChannelList := []itemSelect{}
-
-	newItem := itemSelect{}
-	newItem.Number = id + 1
-	if allreadyExists(newItem.Number, channelList) {
-		newItem.Number = findLargest(channelList) + 1
-	}
-	newItem.Label = "New"
-	newItem.Options = options
-
-	for _, item := range channelList {
-
-		if item.Number == id {
-			newChannelList = append(newChannelList, newItem)
-		}
-		newChannelList = append(newChannelList, item)
-	}
-
-	sort.Slice(newChannelList, func(i, j int) bool {
-		return newChannelList[i].Number < newChannelList[j].Number
-	})
-
-	return newChannelList
-}
-
-func updateChannel(channelList []itemSelect, id int16, newItem itemSelect) []itemSelect {
-
-	newChannelList := []itemSelect{}
-
-	for _, item := range channelList {
-
-		if item.Number == id {
-			// update the channel information.
-			newChannelList = append(newChannelList, newItem)
-		} else {
-			// just add what was there before.
-			newChannelList = append(newChannelList, item)
-		}
-	}
-
-	return newChannelList
 }

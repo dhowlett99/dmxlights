@@ -50,7 +50,8 @@ type State struct {
 }
 
 type Action struct {
-	Name    string   `yaml:"name"`
+	Name    string `yaml:"name"`
+	Number  int
 	Colors  []string `yaml:"colors"`
 	Mode    string   `yaml:"mode"`
 	Fade    string   `yaml:"fade"`
@@ -165,14 +166,14 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 // Returns an error.
 func GetFixureDetails(group int, number int, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
-	if debug {
-		fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
-	}
+	//if debug {
+	fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
+	//}
 
 	for _, fixture := range fixtures.Fixtures {
-		if debug {
-			fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
-		}
+		//if debug {
+		fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
+		//}
 		if fixture.Group == group && fixture.Number == number+1 {
 			return fixture, nil
 		}
@@ -839,7 +840,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		fmt.Printf("Action %+v\n", action)
 	}
 
-	if action.Mode == "off" {
+	if action.Mode == "Off" {
 		if debug {
 			fmt.Printf("Stop mini sequence for switch number %d\n", switchNumber)
 		}
@@ -860,7 +861,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		return
 	}
 
-	if action.Mode == "static" {
+	if action.Mode == "Static" {
 		if debug {
 			fmt.Printf("Static mini sequence for switch number %d\n", switchNumber)
 		}
@@ -882,7 +883,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		return
 	}
 
-	if action.Mode == "chase" {
+	if action.Mode == "Chase" {
 
 		if debug {
 			fmt.Printf("Chase mini sequence for switch number %d\n", switchNumber)
