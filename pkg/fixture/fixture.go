@@ -727,43 +727,43 @@ func getConfig(action Action) ActionConfig {
 	}
 
 	switch action.Fade {
-	case "soft":
+	case "Soft":
 		config.Fade = 1
-	case "sharp":
+	case "Sharp":
 		config.Fade = 10
 	default:
 		config.Fade = 1
 	}
 
 	switch action.Size {
-	case "short":
+	case "Short":
 		config.Size = 1
-	case "medium":
+	case "Medium":
 		config.Size = 3
-	case "long":
+	case "Long":
 		config.Size = 10
 	default:
 		config.Size = 3
 	}
 
 	switch action.Program {
-	case "all":
+	case "All":
 		config.Program = 255
 	default:
 		config.Program = 0
 	}
 
 	switch action.Rotate {
-	case "off":
+	case "Off":
 		config.RotateSpeed = 0
 		config.Rotatable = false
-	case "slow":
+	case "Slow":
 		config.RotateSpeed = 1
 		config.Rotatable = true
-	case "medium":
+	case "Medium":
 		config.RotateSpeed = 50
 		config.Rotatable = true
-	case "fast":
+	case "Fast":
 		config.RotateSpeed = 127
 		config.Rotatable = true
 	default:
@@ -773,43 +773,43 @@ func getConfig(action Action) ActionConfig {
 
 	switch action.Music {
 
-	case "internal":
+	case "Internal":
 		config.Music = 255
-	case "off":
+	case "Off":
 		config.Music = 0
 	default:
 		config.Music = 0
 	}
 
 	switch action.Strobe {
-	case "off":
+	case "Off":
 		config.Strobe = 0
-	case "slow":
+	case "Slow":
 		config.Strobe = 0
-	case "fast":
+	case "Fast":
 		config.Strobe = 0
 	default:
 		config.Strobe = 0
 	}
 
 	switch action.Speed {
-	case "slow":
+	case "Slow":
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
 		config.MusicTrigger = false
-	case "medium":
+	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
-	case "fast":
+	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
-	case "veryfast":
+	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
-	case "music":
+	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true

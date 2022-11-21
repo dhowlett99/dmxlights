@@ -49,6 +49,7 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOpt
 						ap.ActionsList = append(ap.ActionsList, newAction)
 					}
 					fmt.Printf("I am button %d actions %+v\n", switchesList[i].Number, ap.ActionsList)
+					ap.ActionsPanel.Hidden = false
 					ap.ActionsPanel.Refresh()
 				}
 			})

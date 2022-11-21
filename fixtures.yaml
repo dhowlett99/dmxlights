@@ -1381,7 +1381,7 @@ fixtures:
       green: 0
       blue: 0
     actions:
-      - name: Softchase
+      - name: SoftChase
         colors:
         - Orange
         - Yellow
@@ -1391,8 +1391,8 @@ fixtures:
         - Purple
         - Pink
         mode: Chase
-        fade: soft
-        speed: fast
+        fade: Soft
+        speed: Fast
   - name: Soundchase
     number: 6
     label: Soundchase
@@ -1411,7 +1411,7 @@ fixtures:
         - Purple
         - Pink
         mode: Chase
-        fade: soft
+        fade: Soft
         speed: music
         rotate: off
     values: 
@@ -1420,7 +1420,7 @@ fixtures:
         channel: 150
         setting: 0
       - name: mode
-        description: MAcro
+        description: Macro
         channel: 157
         setting: 0
 - name: switch6
@@ -1586,7 +1586,7 @@ fixtures:
       green: 0
       blue: 0
     actions:
-      - name: Softchase
+      - name: SoftChase
         colors: 
         - Orange
         - Yellow
@@ -1596,8 +1596,8 @@ fixtures:
         - Purple
         - Pink
         mode: Chase
-        fade: soft
-        speed: fast
+        fade: Soft
+        speed: Fast
   - name: SoundChase
     number: 6
     label: SoundChase
@@ -1616,9 +1616,9 @@ fixtures:
         - Purple
         - Pink
         mode: Chase
-        fade: soft
-        speed: music
-        rotate: slow
+        fade: Soft
+        speed: Music
+        rotate: Slow
 - name: switch7
   description: ADJ DEKKER 2
   label: SW7.DERBY

@@ -89,8 +89,8 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	actionsList := []itemSelect{}
 
 	// Describe the options.
-	channelOptions := []string{"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Programs", "ColorMacros"}
-	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "Softchase", "Hardchase", "Soundchase", "Rotate"}
+	channelOptions := []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
+	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 	//actionOptions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
 	actionOptions := []string{"Off", "Chase", "Static"}
 	// Populate fixture channels form.
@@ -132,6 +132,8 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	}
 
 	ap := NewActionsPanel(actionsAvailable, actionsList, actionOptions)
+	ap.ActionsPanel.Hide()
+
 	switchesPanel := NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
 
 	// Setup forms.
