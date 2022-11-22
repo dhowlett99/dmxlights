@@ -9,28 +9,37 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
-func NewChannelPanel(channelList []itemSelect, channelOptions []string) *widget.List {
+type ChannelPanel struct {
+	ChannelPanel   *widget.List
+	ChannelList    []itemSelect
+	ChannelOptions []string
+}
+
+func NewChannelPanel(channelList []itemSelect, channelOptions []string) *ChannelPanel {
+
+	cp := ChannelPanel{}
+	cp.ChannelList = channelList
+	cp.ChannelOptions = channelOptions
 
 	// Channel or Switch State Selection Panel.
-	var channelPanel *widget.List
-	channelPanel = widget.NewList(
+	cp.ChannelPanel = widget.NewList(
 		// Function to find length.
 		func() int {
-			return len(channelList)
+			return len(cp.ChannelList)
 		},
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
 			return container.NewHBox(
 				widget.NewLabel("template"),
 
-				widget.NewSelect(channelOptions, func(value string) {
+				widget.NewSelect(cp.ChannelOptions, func(value string) {
 					lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
 					//fmt.Printf("We just pressed channel %d and set it to %s\n", lastChannel, value)
 					item := itemSelect{}
 					item.Number = int16(lastChannel)
 					item.Label = value
-					item.Options = channelOptions
-					channelList = UpdateItem(channelList, item.Number, item)
+					item.Options = cp.ChannelOptions
+					cp.ChannelList = UpdateItem(cp.ChannelList, item.Number, item)
 				}),
 
 				widget.NewButton("-", func() {
@@ -43,26 +52,26 @@ func NewChannelPanel(channelList []itemSelect, channelOptions []string) *widget.
 		},
 		// Function to update item in this list.
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", channelList[i].Number))
+			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", cp.ChannelList[i].Number))
 
 			// find the selected option in the options list.
-			for _, option := range channelList[i].Options {
-				if option == channelList[i].Label {
+			for _, option := range cp.ChannelList[i].Options {
+				if option == cp.ChannelList[i].Label {
 					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
 				}
 			}
 
 			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				channelList = DeleteItem(channelList, channelList[i].Number)
-				channelPanel.Refresh()
+				cp.ChannelList = DeleteItem(cp.ChannelList, cp.ChannelList[i].Number)
+				cp.ChannelPanel.Refresh()
 			}
 
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				channelList = AddItem(channelList, channelList[i].Number, channelOptions)
-				channelPanel.Refresh()
+				cp.ChannelList = AddItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
+				cp.ChannelPanel.Refresh()
 			}
 
 		})
 
-	return channelPanel
+	return &cp
 }

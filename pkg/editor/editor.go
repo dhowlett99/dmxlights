@@ -108,7 +108,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 		channelList = append(channelList, newSelect)
 	}
 
-	channelPanel := NewChannelPanel(channelList, channelOptions)
+	cp := NewChannelPanel(channelList, channelOptions)
 
 	// Populate switch state settings and actions.
 	if fixture.Type == "switch" {
@@ -147,11 +147,12 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	var switchesPanel *widget.List
 	if switchesAvailable {
-		switchesPanel = NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
+		sw := NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
+		switchesPanel = sw.SwitchPanel
 	}
 
 	// Setup forms.
-	scrollableChannelList := container.NewScroll(channelPanel)
+	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
 	scrollableDevicesList := container.NewScroll(switchesPanel)
 
 	scrollableChannelList.SetMinSize(fyne.Size{Height: 400, Width: 300})
@@ -166,7 +167,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
-		for _, channel := range channelList {
+		for _, channel := range cp.ChannelList {
 			fmt.Printf("---> channel \n")
 			fmt.Printf("\t number %d\n", channel.Number)
 			fmt.Printf("\t name   %s\n", channel.Label)
