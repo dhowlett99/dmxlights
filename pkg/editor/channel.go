@@ -7,6 +7,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 type ChannelPanel struct {
@@ -74,4 +75,17 @@ func NewChannelPanel(channelList []itemSelect, channelOptions []string) *Channel
 		})
 
 	return &cp
+}
+
+func PopulateChannels(fixture fixture.Fixture, channelOptions []string) []itemSelect {
+	channelList := []itemSelect{}
+	// Populate fixture channels form.
+	for _, channel := range fixture.Channels {
+		newSelect := itemSelect{}
+		newSelect.Number = channel.Number
+		newSelect.Label = channel.Name
+		newSelect.Options = channelOptions
+		channelList = append(channelList, newSelect)
+	}
+	return channelList
 }

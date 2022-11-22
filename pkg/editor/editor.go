@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"sort"
-	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -75,19 +74,13 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 		Items: formTopItems,
 	}
 
-	var actionsAvailable bool
-	var switchesAvailable bool
-
 	labelChannels := widget.NewLabel("Channels")
 	// Channel or Switch label.
 	labelChannels.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
-	labelSwitch := widget.NewLabel("switch")
-	channelList := []itemSelect{}
-	switchesList := []itemSelect{}
-	actionsList := []actionItems{}
+	labelSwitch := widget.NewLabel("Switch States")
 
 	// Describe the options.
 	channelOptions := []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
@@ -100,51 +93,22 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	actionSpeedOptions := []string{"Slow", "Medium", "Fast", "VeryFast", "Music"}
 
 	// Populate fixture channels form.
-	for _, channel := range fixture.Channels {
-		newSelect := itemSelect{}
-		newSelect.Number = channel.Number
-		newSelect.Label = channel.Name
-		newSelect.Options = channelOptions
-		channelList = append(channelList, newSelect)
-	}
+	channelList := PopulateChannels(fixture, channelOptions)
 
+	// Create Channel Panel.
 	cp := NewChannelPanel(channelList, channelOptions)
 
 	// Populate switch state settings and actions.
-	if fixture.Type == "switch" {
-		labelSwitch.Text = "Switch States"
-		for _, state := range fixture.States {
-			switchesAvailable = true
-			newSelect := itemSelect{}
-			newSelect.Number = state.Number
-			newSelect.Label = state.Name
-			newSelect.Options = switchOptions
-			if state.Actions != nil {
-				actionsAvailable = true
-				actionsList = []actionItems{}
-				for _, action := range state.Actions {
-					fmt.Printf("----->Add action %+v\n", action)
-					newAction := actionItems{}
-					newAction.Name = action.Name
-					newAction.Colors = strings.Join(action.Colors[:], ",")
-					newAction.Mode = action.Mode
-					newAction.Fade = action.Fade
-					newAction.Speed = action.Speed
-					actionsList = append(actionsList, newAction)
-				}
-			}
-			newSelect.Actions = actionsList
-			fmt.Printf("----->Actions %+v\n", newSelect.Actions)
-			switchesList = append(switchesList, newSelect)
-		}
-	}
+	switchesAvailable, actionsAvailable, actionsList, switchesList := PopulateSwitches(switchOptions, fixture)
 
+	// Create Actions Panel.
 	var ap *ActionPanel
 	if actionsAvailable {
 		ap = NewActionsPanel(actionsAvailable, actionsList, actionNameOptions, actionColorOptions, actionModeOptions, actionFadeOptions, actionSpeedOptions)
 		ap.ActionsPanel.Hide()
 	}
 
+	// Create Switches Panel.
 	var switchesPanel *widget.List
 	if switchesAvailable {
 		sw := NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
@@ -155,14 +119,12 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
 	scrollableDevicesList := container.NewScroll(switchesPanel)
 
+	// Size accordingly
 	scrollableChannelList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 	scrollableDevicesList.SetMinSize(fyne.Size{Height: 0, Width: 0})
-
-	// Size accordingly
 	if actionsAvailable {
 		scrollableChannelList.SetMinSize(fyne.Size{Height: 250, Width: 300})
 		scrollableDevicesList.SetMinSize(fyne.Size{Height: 250, Width: 300})
-
 	}
 
 	// Save button.
@@ -186,7 +148,6 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	top := container.NewBorder(formTop, nil, nil, nil, labelChannels)
 	middle := container.NewBorder(top, nil, nil, nil, scrollableChannelList)
 	if switchesAvailable {
-
 		var states *fyne.Container
 		if actionsAvailable {
 			scrollableActionsList := container.NewScroll(ap.ActionsPanel)
@@ -210,14 +171,11 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 		&content,
 		w.Canvas(),
 	)
-
 	return modal, nil
 }
 
 func DeleteItem(channelList []itemSelect, id int16) []itemSelect {
-
 	newItems := []itemSelect{}
-
 	for _, item := range channelList {
 
 		if item.Number != id {
@@ -228,7 +186,6 @@ func DeleteItem(channelList []itemSelect, id int16) []itemSelect {
 }
 
 func ItemAllreadyExists(number int16, channelList []itemSelect) bool {
-
 	// look through the channel list for the id's
 	for _, item := range channelList {
 		if item.Number == number {
@@ -239,7 +196,6 @@ func ItemAllreadyExists(number int16, channelList []itemSelect) bool {
 }
 
 func FindLargest(items []itemSelect) int16 {
-
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -250,9 +206,7 @@ func FindLargest(items []itemSelect) int16 {
 }
 
 func AddItem(items []itemSelect, id int16, options []string) []itemSelect {
-
 	newItems := []itemSelect{}
-
 	newItem := itemSelect{}
 	newItem.Number = id + 1
 	if ItemAllreadyExists(newItem.Number, items) {
@@ -268,20 +222,15 @@ func AddItem(items []itemSelect, id int16, options []string) []itemSelect {
 		}
 		newItems = append(newItems, item)
 	}
-
 	sort.Slice(newItems, func(i, j int) bool {
 		return newItems[i].Number < newItems[j].Number
 	})
-
 	return newItems
 }
 
 func UpdateItem(items []itemSelect, id int16, newItem itemSelect) []itemSelect {
-
 	newItems := []itemSelect{}
-
 	for _, item := range items {
-
 		if item.Number == id {
 			// update the channel information.
 			newItems = append(newItems, newItem)
@@ -290,6 +239,5 @@ func UpdateItem(items []itemSelect, id int16, newItem itemSelect) []itemSelect {
 			newItems = append(newItems, item)
 		}
 	}
-
 	return newItems
 }

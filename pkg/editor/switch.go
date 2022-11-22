@@ -2,10 +2,12 @@ package editor
 
 import (
 	"fmt"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 type SwitchPanel struct {
@@ -69,4 +71,39 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOpt
 			})
 	}
 	return &sw
+}
+
+func PopulateSwitches(switchOptions []string, fixture fixture.Fixture) (switchesAvailable bool, actionsAvailable bool,
+	actionsList []actionItems, switchesList []itemSelect) {
+
+	// Populate switch state settings and actions.
+	if fixture.Type == "switch" {
+		//labelSwitch.Text = "Switch States"
+		for _, state := range fixture.States {
+			switchesAvailable = true
+			newSelect := itemSelect{}
+			newSelect.Number = state.Number
+			newSelect.Label = state.Name
+			newSelect.Options = switchOptions
+			if state.Actions != nil {
+				actionsAvailable = true
+				actionsList = []actionItems{}
+				for _, action := range state.Actions {
+					fmt.Printf("----->Add action %+v\n", action)
+					newAction := actionItems{}
+					newAction.Name = action.Name
+					newAction.Colors = strings.Join(action.Colors[:], ",")
+					newAction.Mode = action.Mode
+					newAction.Fade = action.Fade
+					newAction.Speed = action.Speed
+					actionsList = append(actionsList, newAction)
+				}
+			}
+			newSelect.Actions = actionsList
+			fmt.Printf("----->Actions %+v\n", newSelect.Actions)
+			switchesList = append(switchesList, newSelect)
+		}
+	}
+
+	return switchesAvailable, actionsAvailable, actionsList, switchesList
 }
