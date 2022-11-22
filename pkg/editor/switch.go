@@ -42,10 +42,14 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOpt
 
 				// new part
 				o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-					ap.ActionsList = []itemSelect{}
+					ap.ActionsList = []actionItems{}
 					for _, action := range switchesList[i].Actions {
-						newAction := itemSelect{}
-						newAction.Label = action.Label
+						newAction := actionItems{}
+						newAction.Name = action.Name
+						newAction.Colors = action.Colors
+						newAction.Mode = action.Mode
+						newAction.Fade = action.Fade
+						newAction.Speed = action.Speed
 						ap.ActionsList = append(ap.ActionsList, newAction)
 					}
 					fmt.Printf("I am button %d actions %+v\n", switchesList[i].Number, ap.ActionsList)

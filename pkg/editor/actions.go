@@ -1,76 +1,88 @@
 package editor
 
 import (
-	"fmt"
-
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 )
 
-type ActionPanel struct {
-	ActionsPanel  *widget.List
-	ActionsList   []itemSelect
-	ActionOptions []string
+type actionItems struct {
+	Name   string
+	Colors string
+	Mode   string
+	Fade   string
+	Speed  string
 }
 
-func NewActionsPanel(actionsAvailable bool, actionsList []itemSelect, actionOptions []string) *ActionPanel {
+type ActionPanel struct {
+	ActionsPanel        *widget.List
+	ActionsList         []actionItems
+	ActionNameOptions   []string
+	ActionColorsOptions []string
+	ActionModeOptions   []string
+	ActionFadeOptions   []string
+	ActionSpeedOptions  []string
+}
+
+func NewActionsPanel(actionsAvailable bool, actionsList []actionItems,
+	actionNameOptions []string,
+	actionColorsOptions []string,
+	actionModeOptions []string,
+	actionFadeOptions []string,
+	actionSpeedOptions []string) *ActionPanel {
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
-	ap.ActionOptions = actionOptions
+	ap.ActionNameOptions = actionNameOptions
+	ap.ActionColorsOptions = actionColorsOptions
+	ap.ActionModeOptions = actionModeOptions
+	ap.ActionFadeOptions = actionFadeOptions
+	ap.ActionSpeedOptions = actionSpeedOptions
 
 	// Actions Selection Panel.
-	var actionsPanel *widget.List
 	if actionsAvailable {
 		ap.ActionsPanel = widget.NewList(
 			func() int {
 				return len(ap.ActionsList)
 			},
 			func() fyne.CanvasObject {
-				return container.NewHBox(
-					widget.NewLabel("template"),
-
-					widget.NewSelect(ap.ActionOptions, func(value string) {
-						//fmt.Printf("Select action set to %s\n", value)
-					}),
-
-					widget.NewButton("-", func() {
-						//fmt.Printf("Delete action Button pressed for action\n")
-					}),
-					widget.NewButton("+", func() {
-						//fmt.Printf("Add action Button pressed for action\n")
-					}),
+				return container.NewVBox(
+					container.NewHBox(
+						widget.NewLabel("Name"),
+						widget.NewSelect(ap.ActionNameOptions, func(value string) {}),
+					),
+					container.NewHBox(
+						widget.NewLabel("Colors"),
+						widget.NewSelect(ap.ActionColorsOptions, func(value string) {}),
+					),
+					container.NewHBox(
+						widget.NewLabel("Mode"),
+						widget.NewSelect(ap.ActionModeOptions, func(value string) {}),
+					),
+					container.NewHBox(
+						widget.NewLabel("Fade"),
+						widget.NewSelect(ap.ActionFadeOptions, func(value string) {}),
+					),
+					container.NewHBox(
+						widget.NewLabel("Speed"),
+						widget.NewSelect(ap.ActionSpeedOptions, func(value string) {}),
+					),
 				)
 			},
 			// Function to update item in this list.
 			func(i widget.ListItemID, o fyne.CanvasObject) {
-				//fmt.Printf("Action ID is %d   Action Setting is %s\n", i, actionOptions[i])
-				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", ap.ActionsList[i].Number))
+				o.(*fyne.Container).Objects[0].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Name)
+				o.(*fyne.Container).Objects[1].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Colors)
+				o.(*fyne.Container).Objects[2].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
+				o.(*fyne.Container).Objects[3].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
+				o.(*fyne.Container).Objects[4].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Speed)
 
-				// find the selected option in the options list.
-				//for _, option := range actionsList[i].Options {
-				//if option == actionsList[i].Label {
-				fmt.Printf("---> Found %s\n", ap.ActionsList[i].Label)
-				o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Label)
-				//}
-				//}
-
-				o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-					ap.ActionsList = DeleteItem(ap.ActionsList, ap.ActionsList[i].Number)
-					actionsPanel.Refresh()
-				}
-
-				o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-					ap.ActionsList = AddItem(ap.ActionsList, ap.ActionsList[i].Number, ap.ActionOptions)
-					actionsPanel.Refresh()
-				}
 			})
 	}
 	return &ap
 }
 
-func (ap *ActionPanel) UpdateActionList(actionList []itemSelect) {
+func (ap *ActionPanel) UpdateActionList(actionList []actionItems) {
 
 	ap.ActionsList = actionList
 

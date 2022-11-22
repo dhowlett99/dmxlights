@@ -20,6 +20,7 @@ package editor
 import (
 	"fmt"
 	"sort"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -32,7 +33,7 @@ type itemSelect struct {
 	Number  int16
 	Label   string
 	Options []string
-	Actions []itemSelect
+	Actions []actionItems
 }
 
 func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
@@ -86,13 +87,18 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	labelSwitch := widget.NewLabel("switch")
 	channelList := []itemSelect{}
 	switchesList := []itemSelect{}
-	actionsList := []itemSelect{}
+	actionsList := []actionItems{}
 
 	// Describe the options.
 	channelOptions := []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
 	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 	//actionOptions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
-	actionOptions := []string{"Off", "Chase", "Static"}
+	actionNameOptions := switchOptions
+	actionModeOptions := []string{"Off", "Chase", "Static"}
+	actionColorOptions := []string{"Red", "Green", "Blue"}
+	actionFadeOptions := []string{"Off", "Soft", "Sharp"}
+	actionSpeedOptions := []string{"Slow", "Medium", "Fast", "VeryFast", "Music"}
+
 	// Populate fixture channels form.
 	for _, channel := range fixture.Channels {
 		newSelect := itemSelect{}
@@ -115,13 +121,15 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 			newSelect.Options = switchOptions
 			if state.Actions != nil {
 				actionsAvailable = true
-				actionsList = []itemSelect{}
-				for actionNumber, action := range state.Actions {
+				actionsList = []actionItems{}
+				for _, action := range state.Actions {
 					fmt.Printf("----->Add action %+v\n", action)
-					newAction := itemSelect{}
-					newAction.Number = int16(actionNumber)
-					newAction.Label = action.Mode
-					newAction.Options = actionOptions
+					newAction := actionItems{}
+					newAction.Name = action.Name
+					newAction.Colors = strings.Join(action.Colors[:], ",")
+					newAction.Mode = action.Mode
+					newAction.Fade = action.Fade
+					newAction.Speed = action.Speed
 					actionsList = append(actionsList, newAction)
 				}
 			}
@@ -131,24 +139,29 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 		}
 	}
 
-	ap := NewActionsPanel(actionsAvailable, actionsList, actionOptions)
-	ap.ActionsPanel.Hide()
+	var ap *ActionPanel
+	if actionsAvailable {
+		ap = NewActionsPanel(actionsAvailable, actionsList, actionNameOptions, actionColorOptions, actionModeOptions, actionFadeOptions, actionSpeedOptions)
+		ap.ActionsPanel.Hide()
+	}
 
-	switchesPanel := NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
+	var switchesPanel *widget.List
+	if switchesAvailable {
+		switchesPanel = NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
+	}
 
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(channelPanel)
 	scrollableDevicesList := container.NewScroll(switchesPanel)
-	scrollableActionsList := container.NewScroll(ap.ActionsPanel)
+
 	scrollableChannelList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 	scrollableDevicesList.SetMinSize(fyne.Size{Height: 0, Width: 0})
-	scrollableActionsList.SetMinSize(fyne.Size{Height: 0, Width: 0})
 
 	// Size accordingly
 	if actionsAvailable {
 		scrollableChannelList.SetMinSize(fyne.Size{Height: 250, Width: 300})
 		scrollableDevicesList.SetMinSize(fyne.Size{Height: 250, Width: 300})
-		scrollableActionsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+
 	}
 
 	// Save button.
@@ -172,10 +185,21 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	top := container.NewBorder(formTop, nil, nil, nil, labelChannels)
 	middle := container.NewBorder(top, nil, nil, nil, scrollableChannelList)
 	if switchesAvailable {
+
+		var states *fyne.Container
+		if actionsAvailable {
+			scrollableActionsList := container.NewScroll(ap.ActionsPanel)
+			scrollableActionsList.SetMinSize(fyne.Size{Height: 0, Width: 0})
+			scrollableActionsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+			states = container.NewHBox(scrollableDevicesList, scrollableActionsList)
+		}
 		main := container.NewBorder(middle, nil, nil, nil, labelSwitch)
-		states := container.NewHBox(scrollableDevicesList, scrollableActionsList)
-		bottom := container.NewBorder(main, nil, nil, nil, states)
-		content = *container.NewBorder(bottom, nil, nil, nil, saveCancel)
+		if actionsAvailable {
+			bottom := container.NewBorder(main, nil, nil, nil, states)
+			content = *container.NewBorder(bottom, nil, nil, nil, saveCancel)
+		} else {
+			content = *container.NewBorder(main, nil, nil, nil, saveCancel)
+		}
 	} else {
 		content = *container.NewBorder(middle, nil, nil, nil, saveCancel)
 	}
