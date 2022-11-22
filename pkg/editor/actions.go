@@ -76,14 +76,11 @@ func NewActionsPanel(actionsAvailable bool, actionsList []actionItems,
 				o.(*fyne.Container).Objects[2].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 				o.(*fyne.Container).Objects[3].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
 				o.(*fyne.Container).Objects[4].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Speed)
-
 			})
 	}
 	return &ap
 }
 
 func (ap *ActionPanel) UpdateActionList(actionList []actionItems) {
-
 	ap.ActionsList = actionList
-
 }

@@ -88,9 +88,9 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	//actionOptions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
 	actionNameOptions := switchOptions
 	actionModeOptions := []string{"Off", "Chase", "Static"}
-	actionColorOptions := []string{"Red", "Green", "Blue"}
+	actionColorOptions := []string{"None", "Red", "Green", "Blue"}
 	actionFadeOptions := []string{"Off", "Soft", "Sharp"}
-	actionSpeedOptions := []string{"Slow", "Medium", "Fast", "VeryFast", "Music"}
+	actionSpeedOptions := []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 
 	// Populate fixture channels form.
 	channelList := PopulateChannels(fixture, channelOptions)

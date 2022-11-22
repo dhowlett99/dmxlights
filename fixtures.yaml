@@ -1541,7 +1541,11 @@ fixtures:
       setting: 0
     actions:
       - name: Off
+        colors: 
+        - None
         mode: Off
+        fade: Off
+        speed: Off
   - name: Red
     number: 2
     label: Red
@@ -1554,6 +1558,8 @@ fixtures:
         mode: Static
         colors:
         - Red
+        fade: Off
+        speed: Off
   - name: Green
     number: 3
     label: Green
@@ -1566,6 +1572,8 @@ fixtures:
         mode: Static
         colors:
         - Green
+        fade: Off
+        speed: Off
   - name: Blue
     number: 4
     label: Blue
@@ -1578,6 +1586,8 @@ fixtures:
         mode: Static
         colors:
         - Blue
+        fade: Off
+        speed: Off
   - name: SoundChase
     number: 5
     label: On

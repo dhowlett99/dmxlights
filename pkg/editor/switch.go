@@ -95,7 +95,12 @@ func PopulateSwitches(switchOptions []string, fixture fixture.Fixture) (switches
 					newAction.Colors = strings.Join(action.Colors[:], ",")
 					newAction.Mode = action.Mode
 					newAction.Fade = action.Fade
-					newAction.Speed = action.Speed
+					if action.Speed != "" {
+						newAction.Speed = action.Speed
+					} else {
+						newAction.Speed = "none"
+					}
+
 					actionsList = append(actionsList, newAction)
 				}
 			}
