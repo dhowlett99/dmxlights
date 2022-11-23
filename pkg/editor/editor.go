@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"os"
 	"sort"
 
 	"fyne.io/fyne/v2"
@@ -32,42 +33,42 @@ type itemSelect struct {
 	Number  int16
 	Label   string
 	Options []string
-	Actions []actionItems
+	Actions []fixture.Action
 }
 
 func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
-	fixture, err := fixture.GetFixureDetails(group, number, fixtures)
+	thisFixture, err := fixture.GetFixureDetails(group, number, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
 	}
 
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", fixture.Group, fixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
 	// Name, description and DMX address
 	nameInput := widget.NewEntry()
-	nameInput.SetPlaceHolder(fixture.Name)
+	nameInput.SetPlaceHolder(thisFixture.Name)
 	descInput := widget.NewEntry()
-	descInput.SetPlaceHolder(fixture.Description)
+	descInput.SetPlaceHolder(thisFixture.Description)
 	addrInput := widget.NewEntry()
-	addrInput.SetPlaceHolder(fmt.Sprintf("%d", fixture.Address))
+	addrInput.SetPlaceHolder(fmt.Sprintf("%d", thisFixture.Address))
 
 	// Top Form.
 	var formTopItems []*widget.FormItem
 	name1 := widget.NewEntry()
-	name1.SetText(fixture.Name)
+	name1.SetText(thisFixture.Name)
 	formTopItem := widget.NewFormItem("Name", name1)
 	formTopItems = append(formTopItems, formTopItem)
 	name2 := widget.NewEntry()
-	name2.SetText(fixture.Description)
+	name2.SetText(thisFixture.Description)
 	formTopItem2 := widget.NewFormItem("Description", name2)
 	formTopItems = append(formTopItems, formTopItem2)
 	name3 := widget.NewEntry()
-	name3.SetText(fmt.Sprintf("%d", fixture.Address))
+	name3.SetText(fmt.Sprintf("%d", thisFixture.Address))
 	formTopItem3 := widget.NewFormItem("DMX Address", name3)
 	formTopItems = append(formTopItems, formTopItem3)
 	formTop := &widget.Form{
@@ -75,43 +76,38 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	}
 
 	labelChannels := widget.NewLabel("Channels")
-	// Channel or Switch label.
 	labelChannels.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
 	labelSwitch := widget.NewLabel("Switch States")
+	labelSwitch.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
 
 	// Describe the options.
 	channelOptions := []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
-	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
-	//actionOptions := []string{"Colors", "Fade", "Mode", "Music", "Program", "Rotate", "Size", "Speed"}
-	actionNameOptions := switchOptions
-	actionModeOptions := []string{"Off", "Chase", "Static"}
-	actionColorOptions := []string{"None", "Red", "Green", "Blue"}
-	actionFadeOptions := []string{"Off", "Soft", "Sharp"}
-	actionSpeedOptions := []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 
 	// Populate fixture channels form.
-	channelList := PopulateChannels(fixture, channelOptions)
+	channelList := PopulateChannels(thisFixture, channelOptions)
 
 	// Create Channel Panel.
 	cp := NewChannelPanel(channelList, channelOptions)
 
 	// Populate switch state settings and actions.
-	switchesAvailable, actionsAvailable, actionsList, switchesList := PopulateSwitches(switchOptions, fixture)
+	switchesAvailable, actionsAvailable, actionsList, switchesList := PopulateSwitches(thisFixture)
 
 	// Create Actions Panel.
 	var ap *ActionPanel
 	if actionsAvailable {
-		ap = NewActionsPanel(actionsAvailable, actionsList, actionNameOptions, actionColorOptions, actionModeOptions, actionFadeOptions, actionSpeedOptions)
+		ap = NewActionsPanel(actionsAvailable, actionsList)
 		ap.ActionsPanel.Hide()
 	}
 
 	// Create Switches Panel.
 	var switchesPanel *widget.List
 	if switchesAvailable {
-		sw := NewSwitchPanel(switchesAvailable, switchesList, switchOptions, ap)
+		sw := NewSwitchPanel(switchesAvailable, switchesList, ap)
 		switchesPanel = sw.SwitchPanel
 	}
 
@@ -129,11 +125,32 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
+
 		for _, channel := range cp.ChannelList {
 			fmt.Printf("---> channel \n")
 			fmt.Printf("\t number %d\n", channel.Number)
-			fmt.Printf("\t name   %s\n", channel.Label)
+			fmt.Printf("\t name   %s\n", channel.Name)
 		}
+
+		// Insert updated fixture into fixtures.
+		newFixtures := fixture.Fixtures{}
+		for _, fixture := range fixtures.Fixtures {
+			if fixture.Group == group && fixture.Number == number+1 {
+				// Insert new channels into fixture.
+				thisFixture.Channels = cp.ChannelList
+				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
+			} else {
+				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
+			}
+		}
+
+		// Save the new fixtures file.
+		err := fixture.SaveFixtures("newfixtures.yaml", &newFixtures)
+		if err != nil {
+			fmt.Printf("error saving fixtures %s\n", err.Error())
+			os.Exit(1)
+		}
+
 		modal.Hide()
 	})
 
@@ -145,7 +162,8 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
 
 	content := fyne.Container{}
-	top := container.NewBorder(formTop, nil, nil, nil, labelChannels)
+	t := container.NewBorder(title, nil, nil, nil, formTop)
+	top := container.NewBorder(t, nil, nil, nil, labelChannels)
 	middle := container.NewBorder(top, nil, nil, nil, scrollableChannelList)
 	if switchesAvailable {
 		var states *fyne.Container
@@ -174,10 +192,9 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	return modal, nil
 }
 
-func DeleteItem(channelList []itemSelect, id int16) []itemSelect {
-	newItems := []itemSelect{}
+func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
+	newItems := []fixture.Channel{}
 	for _, item := range channelList {
-
 		if item.Number != id {
 			newItems = append(newItems, item)
 		}
@@ -185,7 +202,7 @@ func DeleteItem(channelList []itemSelect, id int16) []itemSelect {
 	return newItems
 }
 
-func ItemAllreadyExists(number int16, channelList []itemSelect) bool {
+func ChannelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
 	// look through the channel list for the id's
 	for _, item := range channelList {
 		if item.Number == number {
@@ -195,7 +212,7 @@ func ItemAllreadyExists(number int16, channelList []itemSelect) bool {
 	return false
 }
 
-func FindLargest(items []itemSelect) int16 {
+func FindLargestChannelNumber(items []fixture.Channel) int16 {
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -205,15 +222,14 @@ func FindLargest(items []itemSelect) int16 {
 	return number
 }
 
-func AddItem(items []itemSelect, id int16, options []string) []itemSelect {
-	newItems := []itemSelect{}
-	newItem := itemSelect{}
+func AddChannelItem(items []fixture.Channel, id int16, options []string) []fixture.Channel {
+	newItems := []fixture.Channel{}
+	newItem := fixture.Channel{}
 	newItem.Number = id + 1
-	if ItemAllreadyExists(newItem.Number, items) {
-		newItem.Number = FindLargest(items) + 1
+	if ChannelItemAllreadyExists(newItem.Number, items) {
+		newItem.Number = FindLargestChannelNumber(items) + 1
 	}
-	newItem.Label = "New"
-	newItem.Options = options
+	newItem.Name = "New"
 
 	for _, item := range items {
 
@@ -228,8 +244,8 @@ func AddItem(items []itemSelect, id int16, options []string) []itemSelect {
 	return newItems
 }
 
-func UpdateItem(items []itemSelect, id int16, newItem itemSelect) []itemSelect {
-	newItems := []itemSelect{}
+func UpdateItem(items []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
+	newItems := []fixture.Channel{}
 	for _, item := range items {
 		if item.Number == id {
 			// update the channel information.

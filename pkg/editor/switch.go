@@ -1,8 +1,24 @@
+// Copyright (C) 2022 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package editor
 
 import (
 	"fmt"
-	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -16,11 +32,11 @@ type SwitchPanel struct {
 	SwitchOptions []string
 }
 
-func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOptions []string, ap *ActionPanel) *SwitchPanel {
+func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *ActionPanel) *SwitchPanel {
 
 	sw := SwitchPanel{}
 	sw.SwitchesList = switchesList
-	sw.SwitchOptions = switchOptions
+	sw.SwitchOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 
 	// Switches Selection Panel.
 	if switchesAvailable {
@@ -54,9 +70,9 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOpt
 
 				// new part
 				o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-					ap.ActionsList = []actionItems{}
+					ap.ActionsList = []fixture.Action{}
 					for _, action := range sw.SwitchesList[i].Actions {
-						newAction := actionItems{}
+						newAction := fixture.Action{}
 						newAction.Name = action.Name
 						newAction.Colors = action.Colors
 						newAction.Mode = action.Mode
@@ -73,13 +89,15 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, switchOpt
 	return &sw
 }
 
-func PopulateSwitches(switchOptions []string, fixture fixture.Fixture) (switchesAvailable bool, actionsAvailable bool,
-	actionsList []actionItems, switchesList []itemSelect) {
+func PopulateSwitches(thisFixture fixture.Fixture) (switchesAvailable bool, actionsAvailable bool,
+	actionsList []fixture.Action, switchesList []itemSelect) {
+
+	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 
 	// Populate switch state settings and actions.
-	if fixture.Type == "switch" {
+	if thisFixture.Type == "switch" {
 		//labelSwitch.Text = "Switch States"
-		for _, state := range fixture.States {
+		for _, state := range thisFixture.States {
 			switchesAvailable = true
 			newSelect := itemSelect{}
 			newSelect.Number = state.Number
@@ -87,12 +105,11 @@ func PopulateSwitches(switchOptions []string, fixture fixture.Fixture) (switches
 			newSelect.Options = switchOptions
 			if state.Actions != nil {
 				actionsAvailable = true
-				actionsList = []actionItems{}
+				actionsList = []fixture.Action{}
 				for _, action := range state.Actions {
-					fmt.Printf("----->Add action %+v\n", action)
-					newAction := actionItems{}
+					newAction := fixture.Action{}
 					newAction.Name = action.Name
-					newAction.Colors = strings.Join(action.Colors[:], ",")
+					newAction.Colors = action.Colors
 					newAction.Mode = action.Mode
 					newAction.Fade = action.Fade
 					if action.Speed != "" {
@@ -100,12 +117,15 @@ func PopulateSwitches(switchOptions []string, fixture fixture.Fixture) (switches
 					} else {
 						newAction.Speed = "none"
 					}
+					newAction.Rotate = action.Rotate
+					newAction.Music = action.Music
+					newAction.Program = action.Program
+					newAction.Strobe = action.Strobe
 
 					actionsList = append(actionsList, newAction)
 				}
 			}
 			newSelect.Actions = actionsList
-			fmt.Printf("----->Actions %+v\n", newSelect.Actions)
 			switchesList = append(switchesList, newSelect)
 		}
 	}

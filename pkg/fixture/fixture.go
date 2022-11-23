@@ -1,3 +1,20 @@
+// Copyright (C) 2022 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package fixture
 
 import (
@@ -42,10 +59,10 @@ type State struct {
 	Name        string   `yaml:"name"`
 	Number      int16    `yaml:"number"`
 	Label       string   `yaml:"label"`
-	Values      []Value  `yaml:"values"`
+	Values      []Value  `yaml:"values,omitempty"`
 	ButtonColor Color    `yaml:"buttoncolor"`
 	Master      int      `yaml:"master"`
-	Actions     []Action `yaml:"actions"`
+	Actions     []Action `yaml:"actions,omitempty"`
 	Flash       bool     `yaml:"flash"`
 }
 
@@ -87,7 +104,7 @@ type Fixture struct {
 	Group          int       `yaml:"group"`
 	Address        int16     `yaml:"address"`
 	Channels       []Channel `yaml:"channels"`
-	States         []State   `yaml:"states"`
+	States         []State   `yaml:"states,omitempty"`
 	NumberChannels int       `yaml:"use_channels"`
 	UseFixture     string    `yaml:"use_fixture"`
 }
@@ -105,8 +122,8 @@ type Channel struct {
 	Value      int16     `yaml:"value"`
 	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
 	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
-	Comment    string    `yaml:"comment"`
-	Settings   []Setting `yaml:"settings"`
+	Comment    string    `yaml:"comment,omitempty"`
+	Settings   []Setting `yaml:"settings,omitempty"`
 }
 
 // LoadFixtures opens the fixtures config file.
@@ -146,7 +163,7 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	}
 
 	// Open the fixtures.yaml file.
-	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
+	_, err = os.Create(filename)
 	if err != nil {
 		return errors.New("error: opening fixtures.yaml file: " + err.Error())
 	}
@@ -166,14 +183,14 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 // Returns an error.
 func GetFixureDetails(group int, number int, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
-	//if debug {
-	fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
-	//}
+	if debug {
+		fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
+	}
 
 	for _, fixture := range fixtures.Fixtures {
-		//if debug {
-		fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
-		//}
+		if debug {
+			fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
+		}
 		if fixture.Group == group && fixture.Number == number+1 {
 			return fixture, nil
 		}
