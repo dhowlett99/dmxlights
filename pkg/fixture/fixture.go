@@ -97,7 +97,7 @@ type ActionConfig struct {
 
 type Fixture struct {
 	Name           string    `yaml:"name"`
-	Label          string    `yaml:"label"`
+	Label          string    `yaml:"label,omitempty"`
 	Number         int       `yaml:"number"`
 	Description    string    `yaml:"description"`
 	Type           string    `yaml:"type"`
@@ -105,8 +105,8 @@ type Fixture struct {
 	Address        int16     `yaml:"address"`
 	Channels       []Channel `yaml:"channels"`
 	States         []State   `yaml:"states,omitempty"`
-	NumberChannels int       `yaml:"use_channels"`
-	UseFixture     string    `yaml:"use_fixture"`
+	NumberChannels int       `yaml:"use_channels,omitempty"`
+	UseFixture     string    `yaml:"use_fixture,omitempty"`
 }
 
 type Setting struct {
@@ -119,7 +119,7 @@ type Setting struct {
 type Channel struct {
 	Number     int16     `yaml:"number"`
 	Name       string    `yaml:"name"`
-	Value      int16     `yaml:"value"`
+	Value      int16     `yaml:"value,omitempty"`
 	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
 	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
 	Comment    string    `yaml:"comment,omitempty"`

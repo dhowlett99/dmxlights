@@ -33,11 +33,11 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(channelList []fixture.Channel, channelOptions []string) *ChannelPanel {
+func NewChannelPanel(channelList []fixture.Channel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelList = channelList
-	cp.ChannelOptions = channelOptions
+	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
 
 	// Channel or Switch State Selection Panel.
 	cp.ChannelPanel = widget.NewList(
@@ -54,8 +54,14 @@ func NewChannelPanel(channelList []fixture.Channel, channelOptions []string) *Ch
 					lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
 					//fmt.Printf("We just pressed channel %d and set it to %s\n", lastChannel, value)
 					item := fixture.Channel{}
-					item.Number = int16(lastChannel)
 					item.Name = value
+					item.Number = int16(lastChannel)
+					itemNumber := item.Number - 1
+					item.Comment = cp.ChannelList[itemNumber].Comment
+					item.MaxDegrees = cp.ChannelList[itemNumber].MaxDegrees
+					item.Offset = cp.ChannelList[itemNumber].Offset
+					item.Settings = cp.ChannelList[itemNumber].Settings
+					item.Value = cp.ChannelList[itemNumber].Value
 					cp.ChannelList = UpdateItem(cp.ChannelList, item.Number, item)
 				}),
 
@@ -93,7 +99,7 @@ func NewChannelPanel(channelList []fixture.Channel, channelOptions []string) *Ch
 	return &cp
 }
 
-func PopulateChannels(thisFixture fixture.Fixture, channelOptions []string) []fixture.Channel {
+func PopulateChannels(thisFixture fixture.Fixture) []fixture.Channel {
 	channelList := []fixture.Channel{}
 	// Populate fixture channels form.
 	for _, channel := range thisFixture.Channels {
@@ -104,7 +110,7 @@ func PopulateChannels(thisFixture fixture.Fixture, channelOptions []string) []fi
 		newSelect.MaxDegrees = channel.MaxDegrees
 		newSelect.Settings = channel.Settings
 		newSelect.Value = channel.Value
-		newSelect.Comment = channel.Name
+		newSelect.Comment = channel.Comment
 		channelList = append(channelList, newSelect)
 	}
 	return channelList
