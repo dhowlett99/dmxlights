@@ -86,7 +86,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	}
 
 	// Populate fixture channels form.
-	channelList := PopulateChannels(thisFixture)
+	channelList, settingsList, settingsAvailable := PopulateChannels(thisFixture)
 
 	// Create Channel Panel.
 	cp := NewChannelPanel(channelList)
@@ -106,6 +106,13 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	if switchesAvailable {
 		sw := NewSwitchPanel(switchesAvailable, switchesList, ap)
 		switchesPanel = sw.SwitchPanel
+	}
+
+	// Create Settings Panel
+	var settingsPanel *widget.List
+	if settingsAvailable {
+		st := NewSettingsPanel(settingsAvailable, settingsList, ap)
+		settingsPanel = st.SettingsPanel
 	}
 
 	// Setup forms.
@@ -162,6 +169,13 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	t := container.NewBorder(title, nil, nil, nil, formTop)
 	top := container.NewBorder(t, nil, nil, nil, labelChannels)
 	middle := container.NewBorder(top, nil, nil, nil, scrollableChannelList)
+
+	if settingsAvailable {
+		scrollableSettingsList := container.NewScroll(settingsPanel)
+		scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+		box := container.NewHBox(scrollableChannelList, scrollableSettingsList)
+		middle = container.NewBorder(top, nil, nil, nil, box)
+	}
 	if switchesAvailable {
 		var states *fyne.Container
 		if actionsAvailable {

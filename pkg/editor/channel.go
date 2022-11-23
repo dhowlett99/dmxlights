@@ -99,8 +99,7 @@ func NewChannelPanel(channelList []fixture.Channel) *ChannelPanel {
 	return &cp
 }
 
-func PopulateChannels(thisFixture fixture.Fixture) []fixture.Channel {
-	channelList := []fixture.Channel{}
+func PopulateChannels(thisFixture fixture.Fixture) (channelList []fixture.Channel, settingsList []fixture.Setting, settingsAvailable bool) {
 	// Populate fixture channels form.
 	for _, channel := range thisFixture.Channels {
 		newSelect := fixture.Channel{}
@@ -108,10 +107,21 @@ func PopulateChannels(thisFixture fixture.Fixture) []fixture.Channel {
 		newSelect.Name = channel.Name
 		newSelect.Offset = channel.Offset
 		newSelect.MaxDegrees = channel.MaxDegrees
+		if channel.Settings != nil {
+			settingsAvailable = true
+			for _, setting := range channel.Settings {
+				newSetting := fixture.Setting{}
+				newSetting.Name = setting.Name
+				newSetting.Number = setting.Number
+				newSetting.Label = setting.Label
+				newSetting.Setting = setting.Setting
+				settingsList = append(settingsList, newSetting)
+			}
+		}
 		newSelect.Settings = channel.Settings
 		newSelect.Value = channel.Value
 		newSelect.Comment = channel.Comment
 		channelList = append(channelList, newSelect)
 	}
-	return channelList
+	return channelList, settingsList, settingsAvailable
 }
