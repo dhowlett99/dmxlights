@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"os"
-	"sort"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -86,10 +85,14 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	}
 
 	// Populate fixture channels form.
-	channelList, settingsList, settingsAvailable := PopulateChannels(thisFixture)
-
-	// Create Channel Panel.
-	cp := NewChannelPanel(channelList)
+	//channelList, settingsList, settingsAvailable := PopulateChannels(thisFixture)
+	var settingsAvailable bool
+	channelList := thisFixture.Channels
+	settingsList := thisFixture.Channels[thisFixture.Number].Settings
+	if settingsList != nil {
+		settingsAvailable = true
+	}
+	var st *SettingsPanel
 
 	// Populate switch state settings and actions.
 	switchesAvailable, actionsAvailable, actionsList, switchesList := PopulateSwitches(thisFixture)
@@ -111,9 +114,12 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	// Create Settings Panel
 	var settingsPanel *widget.List
 	if settingsAvailable {
-		st := NewSettingsPanel(settingsAvailable, settingsList, ap)
+		st = NewSettingsPanel(settingsAvailable, settingsList, ap)
 		settingsPanel = st.SettingsPanel
 	}
+
+	// Create Channel Panel.
+	cp := NewChannelPanel(channelList, st)
 
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
@@ -207,62 +213,6 @@ func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channe
 	newItems := []fixture.Channel{}
 	for _, item := range channelList {
 		if item.Number != id {
-			newItems = append(newItems, item)
-		}
-	}
-	return newItems
-}
-
-func ChannelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
-	// look through the channel list for the id's
-	for _, item := range channelList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func FindLargestChannelNumber(items []fixture.Channel) int16 {
-	var number int16
-	for _, item := range items {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
-}
-
-func AddChannelItem(items []fixture.Channel, id int16, options []string) []fixture.Channel {
-	newItems := []fixture.Channel{}
-	newItem := fixture.Channel{}
-	newItem.Number = id + 1
-	if ChannelItemAllreadyExists(newItem.Number, items) {
-		newItem.Number = FindLargestChannelNumber(items) + 1
-	}
-	newItem.Name = "New"
-
-	for _, item := range items {
-
-		if item.Number == id {
-			newItems = append(newItems, newItem)
-		}
-		newItems = append(newItems, item)
-	}
-	sort.Slice(newItems, func(i, j int) bool {
-		return newItems[i].Number < newItems[j].Number
-	})
-	return newItems
-}
-
-func UpdateItem(items []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
-	newItems := []fixture.Channel{}
-	for _, item := range items {
-		if item.Number == id {
-			// update the channel information.
-			newItems = append(newItems, newItem)
-		} else {
-			// just add what was there before.
 			newItems = append(newItems, item)
 		}
 	}

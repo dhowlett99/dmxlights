@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"sort"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -28,45 +29,102 @@ import (
 
 type SettingsPanel struct {
 	SettingsPanel   *widget.List
-	SettingsesList  []fixture.Setting
+	SettingsList    []fixture.Setting
 	SettingsOptions []string
 }
 
-func NewSettingsPanel(SettingsesAvailable bool, SettingsesList []fixture.Setting, ap *ActionPanel) *SettingsPanel {
+func NewSettingsPanel(SettingsesAvailable bool, SettingsList []fixture.Setting, ap *ActionPanel) *SettingsPanel {
 
 	st := SettingsPanel{}
-	st.SettingsesList = SettingsesList
+	st.SettingsList = SettingsList
 	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 
 	// Settingses Selection Panel.
 	if SettingsesAvailable {
 		st.SettingsPanel = widget.NewList(
 			func() int {
-				return len(st.SettingsesList)
+				return len(st.SettingsList)
 			},
 			// Function to create item.
 			func() fyne.CanvasObject {
 				return container.NewHBox(
 					widget.NewLabel("template"),
 					widget.NewEntry(),
-					widget.NewButton("Select", nil),
+					widget.NewEntry(),
+					//widget.NewButton("Select", nil),
 				)
 			},
 
 			// Function to update item in this list.
 			func(i widget.ListItemID, o fyne.CanvasObject) {
-				//fmt.Printf("Settings ID is %d   Settings Setting is %s\n", i, SettingsOptions[i])
-				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsesList[i].Number))
 
-				// find the selected option in the options list.
-				o.(*fyne.Container).Objects[1].(*widget.Entry).Text = st.SettingsesList[i].Name
+				// Give the setting a number.
+				st.SettingsList[i].Number = i + 1 // +1 so we count from 1 instead of 0.
+				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
+				o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(st.SettingsList[i].Name)
+				o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
 
 				// new part
-				o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-					fmt.Printf("I am button %d actions %+v\n", st.SettingsesList[i].Number, ap.ActionsList)
-				}
+				// o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
+				// 	fmt.Printf("I am button %d actions %+v\n", st.SettingsesList[i].Number, ap.ActionsList)
+				// }
 			},
 		)
 	}
 	return &st
+}
+
+func SettingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
+	// look through the settings list for the id's
+	for _, item := range settingsList {
+		if item.Number == number {
+			return true
+		}
+	}
+	return false
+}
+
+func FindLargestsettingsNumber(items []fixture.Setting) int {
+	var number int
+	for _, item := range items {
+		if item.Number > number {
+			number = item.Number
+		}
+	}
+	return number
+}
+
+func AddSettingsItem(items []fixture.Setting, id int, options []string) []fixture.Setting {
+	newItems := []fixture.Setting{}
+	newItem := fixture.Setting{}
+	newItem.Number = int(id) + 1
+	if SettingItemAllreadyExists(newItem.Number, items) {
+		newItem.Number = FindLargestsettingsNumber(items) + 1
+	}
+	newItem.Name = "New"
+
+	for _, item := range items {
+		if item.Number == id {
+			newItems = append(newItems, newItem)
+		}
+		newItems = append(newItems, item)
+	}
+	sort.Slice(newItems, func(i, j int) bool {
+		return newItems[i].Number < newItems[j].Number
+	})
+	return newItems
+}
+
+func UpdateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting) []fixture.Setting {
+	newItems := []fixture.Setting{}
+	for _, item := range items {
+		if item.Number == id {
+			// update the settings information.
+			newItems = append(newItems, newItem)
+		} else {
+			// just add what was there before.
+			newItems = append(newItems, item)
+		}
+	}
+	return newItems
 }

@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"sort"
 	"strconv"
 
 	"fyne.io/fyne/v2"
@@ -33,7 +34,7 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(channelList []fixture.Channel) *ChannelPanel {
+func NewChannelPanel(channelList []fixture.Channel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelList = channelList
@@ -71,6 +72,10 @@ func NewChannelPanel(channelList []fixture.Channel) *ChannelPanel {
 				widget.NewButton("+", func() {
 					//log.Println("Add Button pressed for ")
 				}),
+
+				widget.NewButton("settings", func() {
+					//log.Println("Add Button pressed for ")
+				}),
 			)
 		},
 		// Function to update item in this list.
@@ -94,34 +99,78 @@ func NewChannelPanel(channelList []fixture.Channel) *ChannelPanel {
 				cp.ChannelPanel.Refresh()
 			}
 
+			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
+				st.SettingsList = PopulateSettingList(channelList, cp.ChannelList[i].Number)
+				st.SettingsPanel.Refresh()
+			}
+
 		})
 
 	return &cp
 }
 
-func PopulateChannels(thisFixture fixture.Fixture) (channelList []fixture.Channel, settingsList []fixture.Setting, settingsAvailable bool) {
-	// Populate fixture channels form.
-	for _, channel := range thisFixture.Channels {
-		newSelect := fixture.Channel{}
-		newSelect.Number = channel.Number
-		newSelect.Name = channel.Name
-		newSelect.Offset = channel.Offset
-		newSelect.MaxDegrees = channel.MaxDegrees
-		if channel.Settings != nil {
-			settingsAvailable = true
-			for _, setting := range channel.Settings {
-				newSetting := fixture.Setting{}
-				newSetting.Name = setting.Name
-				newSetting.Number = setting.Number
-				newSetting.Label = setting.Label
-				newSetting.Setting = setting.Setting
-				settingsList = append(settingsList, newSetting)
-			}
+func PopulateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
+
+	for _, channel := range channelList {
+		if channelNumber == channel.Number {
+			return channel.Settings
 		}
-		newSelect.Settings = channel.Settings
-		newSelect.Value = channel.Value
-		newSelect.Comment = channel.Comment
-		channelList = append(channelList, newSelect)
 	}
-	return channelList, settingsList, settingsAvailable
+	return settingsList
+}
+
+func ChannelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
+	// look through the channel list for the id's
+	for _, item := range channelList {
+		if item.Number == number {
+			return true
+		}
+	}
+	return false
+}
+
+func FindLargestChannelNumber(items []fixture.Channel) int16 {
+	var number int16
+	for _, item := range items {
+		if item.Number > number {
+			number = item.Number
+		}
+	}
+	return number
+}
+
+func AddChannelItem(items []fixture.Channel, id int16, options []string) []fixture.Channel {
+	newItems := []fixture.Channel{}
+	newItem := fixture.Channel{}
+	newItem.Number = id + 1
+	if ChannelItemAllreadyExists(newItem.Number, items) {
+		newItem.Number = FindLargestChannelNumber(items) + 1
+	}
+	newItem.Name = "New"
+
+	for _, item := range items {
+
+		if item.Number == id {
+			newItems = append(newItems, newItem)
+		}
+		newItems = append(newItems, item)
+	}
+	sort.Slice(newItems, func(i, j int) bool {
+		return newItems[i].Number < newItems[j].Number
+	})
+	return newItems
+}
+
+func UpdateItem(items []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
+	newItems := []fixture.Channel{}
+	for _, item := range items {
+		if item.Number == id {
+			// update the channel information.
+			newItems = append(newItems, newItem)
+		} else {
+			// just add what was there before.
+			newItems = append(newItems, item)
+		}
+	}
+	return newItems
 }
