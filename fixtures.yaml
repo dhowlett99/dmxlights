@@ -1437,6 +1437,18 @@ fixtures:
       - name: Off
         setting: 0
         label: off
+      - name: Rotate Clockwise Slow
+        setting: 1
+        label: clockwiseslow
+      - name: Rotate Clockwise Fast
+        setting: 127
+        label: clockwisesfast
+      - name: Rotate Anti Clockwise Slow
+        setting: 128
+        label: anticlockwisesslow
+      - name: Rotate Anti Clockwise Fast
+        setting: 255
+        label: anticlockwisessfast
   - number: 2
     name: Red1
   - number: 3
