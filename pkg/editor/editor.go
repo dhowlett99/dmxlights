@@ -129,8 +129,8 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	scrollableChannelList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 	scrollableDevicesList.SetMinSize(fyne.Size{Height: 0, Width: 0})
 	if actionsAvailable {
-		scrollableChannelList.SetMinSize(fyne.Size{Height: 250, Width: 300})
-		scrollableDevicesList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+		scrollableChannelList.SetMinSize(fyne.Size{Height: 250, Width: 400})
+		scrollableDevicesList.SetMinSize(fyne.Size{Height: 250, Width: 400})
 	}
 
 	// Save button.
@@ -178,7 +178,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	if settingsAvailable {
 		scrollableSettingsList := container.NewScroll(settingsPanel)
-		scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+		scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 400})
 		box := container.NewHBox(scrollableChannelList, scrollableSettingsList)
 		middle = container.NewBorder(top, nil, nil, nil, box)
 	}

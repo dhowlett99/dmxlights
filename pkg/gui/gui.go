@@ -327,7 +327,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
 				}
-				modal.Resize(fyne.NewSize(600, 500))
+				modal.Resize(fyne.NewSize(800, 600))
 				modal.Show()
 			}
 
