@@ -47,7 +47,7 @@ func NewSettingsPanel(SettingsesAvailable bool, SettingsList []fixture.Setting, 
 			},
 			// Function to create item.
 			func() fyne.CanvasObject {
-				return container.NewHBox(
+				return container.NewGridWithColumns(3,
 					widget.NewLabel("template"),
 					widget.NewEntry(),
 					widget.NewEntry(),

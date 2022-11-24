@@ -179,7 +179,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	if settingsAvailable {
 		scrollableSettingsList := container.NewScroll(settingsPanel)
 		scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 400})
-		box := container.NewHBox(scrollableChannelList, scrollableSettingsList)
+		box := container.NewAdaptiveGrid(2, scrollableChannelList, scrollableSettingsList)
 		middle = container.NewBorder(top, nil, nil, nil, box)
 	}
 	if switchesAvailable {
