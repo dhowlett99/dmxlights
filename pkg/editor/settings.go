@@ -29,12 +29,15 @@ import (
 )
 
 type SettingsPanel struct {
-	SettingsPanel   *widget.List
-	SettingsList    []fixture.Setting
-	SettingsOptions []string
+	SettingsPanel      *widget.List
+	SettingsList       []fixture.Setting
+	SettingsOptions    []string
+	CurrentChannel     int
+	Update             bool
+	UpdatedChannelList []fixture.Channel
 }
 
-func NewSettingsPanel(SettingsList []fixture.Setting, channelList []fixture.Channel, ap *ActionPanel) *SettingsPanel {
+func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting, channelList []fixture.Channel, ap *ActionPanel) *SettingsPanel {
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
@@ -69,6 +72,9 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelList []fixture.Chan
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting = st.SettingsList[i].Setting
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+				channelList[st.CurrentChannel-1].Settings = st.SettingsList
+				st.Update = true
+				st.UpdatedChannelList = channelList
 			}
 
 			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
@@ -79,6 +85,9 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelList []fixture.Chan
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting, _ = strconv.Atoi(value)
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+				channelList[st.CurrentChannel-1].Settings = st.SettingsList
+				st.Update = true
+				st.UpdatedChannelList = channelList
 			}
 		},
 	)

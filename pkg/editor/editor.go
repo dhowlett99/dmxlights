@@ -109,7 +109,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	// Create Settings Panel
 	var settingsPanel *widget.List
-	st = NewSettingsPanel(settingsList, channelList, ap)
+	st = NewSettingsPanel(thisFixture, &currentChannel, settingsList, channelList, ap)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
@@ -130,19 +130,12 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
-		for _, setting := range st.SettingsList {
-			fmt.Printf("Setting %+v\n", setting)
-		}
-
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == group && fixture.Number == number+1 {
-				// Insert new settings into channel.
-				// s
 				// Insert new channels into fixture.
-				cp.ChannelList[currentChannel].Settings = st.SettingsList
-				thisFixture.Channels = cp.ChannelList
+				thisFixture.Channels = channelList
 				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
@@ -201,11 +194,11 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 }
 
 func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
-	newItems := []fixture.Channel{}
-	for _, item := range channelList {
-		if item.Number != id {
-			newItems = append(newItems, item)
+	newChannels := []fixture.Channel{}
+	for _, channel := range channelList {
+		if channel.Number != id {
+			newChannels = append(newChannels, channel)
 		}
 	}
-	return newItems
+	return newChannels
 }

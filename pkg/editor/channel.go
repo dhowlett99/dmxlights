@@ -30,21 +30,23 @@ import (
 
 type ChannelPanel struct {
 	ChannelPanel   *widget.List
-	ChannelList    []fixture.Channel
 	ChannelOptions []string
 }
 
 func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
-	cp.ChannelList = channelList
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
 
 	// Channel or Switch State Selection Panel.
 	cp.ChannelPanel = widget.NewList(
 		// Function to find length.
 		func() int {
-			return len(cp.ChannelList)
+			if st.Update {
+				channelList = st.UpdatedChannelList
+				st.Update = false
+			}
+			return len(channelList)
 		},
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
@@ -58,12 +60,12 @@ func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *Act
 					item.Name = value
 					item.Number = int16(lastChannel)
 					itemNumber := item.Number - 1
-					item.Comment = cp.ChannelList[itemNumber].Comment
-					item.MaxDegrees = cp.ChannelList[itemNumber].MaxDegrees
-					item.Offset = cp.ChannelList[itemNumber].Offset
-					item.Settings = cp.ChannelList[itemNumber].Settings
-					item.Value = cp.ChannelList[itemNumber].Value
-					cp.ChannelList = UpdateItem(cp.ChannelList, item.Number, item)
+					item.Comment = channelList[itemNumber].Comment
+					item.MaxDegrees = channelList[itemNumber].MaxDegrees
+					item.Offset = channelList[itemNumber].Offset
+					item.Settings = channelList[itemNumber].Settings
+					item.Value = channelList[itemNumber].Value
+					channelList = UpdateItem(channelList, item.Number, item)
 				}),
 
 				widget.NewButton("-", func() {
@@ -80,29 +82,31 @@ func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *Act
 		},
 		// Function to update item in this list.
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", cp.ChannelList[i].Number))
+
+			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", channelList[i].Number))
 
 			// find the selected option in the options list.
 			for _, option := range cp.ChannelOptions {
-				if option == cp.ChannelList[i].Name {
+				if option == channelList[i].Name {
 					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
 				}
 			}
 
 			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = DeleteChannelItem(cp.ChannelList, cp.ChannelList[i].Number)
+				channelList = DeleteChannelItem(channelList, channelList[i].Number)
 				cp.ChannelPanel.Refresh()
 			}
 
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = AddChannelItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
+				channelList = AddChannelItem(channelList, channelList[i].Number, cp.ChannelOptions)
 				cp.ChannelPanel.Refresh()
 			}
 
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
-				if cp.ChannelList != nil {
+				if channelList != nil {
 					if st != nil {
-						st.SettingsList = PopulateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
+						st.SettingsList = PopulateSettingList(channelList, channelList[i].Number)
+						st.CurrentChannel = int(channelList[i].Number)
 						st.SettingsPanel.Refresh()
 					}
 				}
@@ -141,38 +145,38 @@ func FindLargestChannelNumber(items []fixture.Channel) int16 {
 	return number
 }
 
-func AddChannelItem(items []fixture.Channel, id int16, options []string) []fixture.Channel {
-	newItems := []fixture.Channel{}
+func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fixture.Channel {
+	newChannels := []fixture.Channel{}
 	newItem := fixture.Channel{}
 	newItem.Number = id + 1
-	if ChannelItemAllreadyExists(newItem.Number, items) {
-		newItem.Number = FindLargestChannelNumber(items) + 1
+	if ChannelItemAllreadyExists(newItem.Number, channels) {
+		newItem.Number = FindLargestChannelNumber(channels) + 1
 	}
 	newItem.Name = "New"
 
-	for _, item := range items {
+	for _, item := range channels {
 
 		if item.Number == id {
-			newItems = append(newItems, newItem)
+			newChannels = append(newChannels, newItem)
 		}
-		newItems = append(newItems, item)
+		newChannels = append(newChannels, item)
 	}
-	sort.Slice(newItems, func(i, j int) bool {
-		return newItems[i].Number < newItems[j].Number
+	sort.Slice(newChannels, func(i, j int) bool {
+		return newChannels[i].Number < newChannels[j].Number
 	})
-	return newItems
+	return newChannels
 }
 
-func UpdateItem(items []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
-	newItems := []fixture.Channel{}
-	for _, item := range items {
-		if item.Number == id {
+func UpdateItem(channels []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
+	newChannels := []fixture.Channel{}
+	for _, channel := range channels {
+		if channel.Number == id {
 			// update the channel information.
-			newItems = append(newItems, newItem)
+			newChannels = append(newChannels, newItem)
 		} else {
 			// just add what was there before.
-			newItems = append(newItems, item)
+			newChannels = append(newChannels, channel)
 		}
 	}
-	return newItems
+	return newChannels
 }
