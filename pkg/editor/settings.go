@@ -20,6 +20,7 @@ package editor
 import (
 	"fmt"
 	"sort"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -33,44 +34,55 @@ type SettingsPanel struct {
 	SettingsOptions []string
 }
 
-func NewSettingsPanel(SettingsesAvailable bool, SettingsList []fixture.Setting, ap *ActionPanel) *SettingsPanel {
+func NewSettingsPanel(SettingsList []fixture.Setting, channelList []fixture.Channel, ap *ActionPanel) *SettingsPanel {
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
 	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
 
 	// Settingses Selection Panel.
-	if SettingsesAvailable {
-		st.SettingsPanel = widget.NewList(
-			func() int {
-				return len(st.SettingsList)
-			},
-			// Function to create item.
-			func() fyne.CanvasObject {
-				return container.NewGridWithColumns(3,
-					widget.NewLabel("template"),
-					widget.NewEntry(),
-					widget.NewEntry(),
-					//widget.NewButton("Select", nil),
-				)
-			},
+	st.SettingsPanel = widget.NewList(
+		func() int {
+			return len(st.SettingsList)
+		},
+		// Function to create item.
+		func() fyne.CanvasObject {
+			return container.NewGridWithColumns(3,
+				widget.NewLabel("template"),
+				widget.NewEntry(),
+				widget.NewEntry(),
+				//widget.NewButton("Select", nil),
+			)
+		},
 
-			// Function to update item in this list.
-			func(i widget.ListItemID, o fyne.CanvasObject) {
+		// Function to update item in this list.
+		func(i widget.ListItemID, o fyne.CanvasObject) {
 
-				// Give the setting a number.
-				st.SettingsList[i].Number = i + 1 // +1 so we count from 1 instead of 0.
-				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
-				o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(st.SettingsList[i].Name)
-				o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
+			// Give the setting a number.
+			st.SettingsList[i].Number = i + 1 // +1 so we count from 1 instead of 0.
+			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
+			o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(st.SettingsList[i].Name)
+			o.(*fyne.Container).Objects[1].(*widget.Entry).OnChanged = func(value string) {
+				newSetting := fixture.Setting{}
+				newSetting.Label = st.SettingsList[i].Label
+				newSetting.Name = value
+				newSetting.Number = st.SettingsList[i].Number
+				newSetting.Setting = st.SettingsList[i].Setting
+				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+			}
 
-				// new part
-				// o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				// 	fmt.Printf("I am button %d actions %+v\n", st.SettingsesList[i].Number, ap.ActionsList)
-				// }
-			},
-		)
-	}
+			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
+			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
+				newSetting := fixture.Setting{}
+				newSetting.Label = st.SettingsList[i].Label
+				newSetting.Name = st.SettingsList[i].Name
+				newSetting.Number = st.SettingsList[i].Number
+				newSetting.Setting, _ = strconv.Atoi(value)
+				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+			}
+		},
+	)
+
 	return &st
 }
 

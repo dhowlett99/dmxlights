@@ -384,23 +384,23 @@ func lookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelN
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group == group {
 			if debug {
-				fmt.Printf("---> fixture %s\n", fixture.Name)
-				fmt.Printf("---> fixture.group %d group %d\n", fixture.Group, group)
-				fmt.Printf("---> channels %+v\n", fixture.Channels)
+				fmt.Printf("fixture %s\n", fixture.Name)
+				fmt.Printf("fixture.group %d group %d\n", fixture.Group, group)
+				fmt.Printf("channels %+v\n", fixture.Channels)
 			}
 			fixtureName = fixture.Name
 			for _, channel := range fixture.Channels {
 				if debug {
-					fmt.Printf("---> inspect channel %s for %s\n", channel.Name, name)
+					fmt.Printf("inspect channel %s for %s\n", channel.Name, name)
 				}
 				if channel.Name == name {
 					if debug {
-						fmt.Printf("---> channel.Settings %+v\n", channel.Settings)
+						fmt.Printf("channel.Settings %+v\n", channel.Settings)
 					}
 					for _, setting := range channel.Settings {
 						if debug {
-							fmt.Printf("---> inspect setting %+v \n", setting)
-							fmt.Printf("---> setting.Label %s = label %s\n", setting.Label, label)
+							fmt.Printf("inspect setting %+v \n", setting)
+							fmt.Printf("setting.Label %s = label %s\n", setting.Label, label)
 						}
 						if setting.Label == label {
 							if debug {
@@ -427,15 +427,15 @@ func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, c
 
 		if fixture.Group == group {
 			if debug {
-				fmt.Printf("---> fixture %s\n", fixture.Name)
-				fmt.Printf("---> fixture.group %d group %d\n", fixture.Group, group)
-				fmt.Printf("---> channels %+v\n", fixture.Channels)
+				fmt.Printf("fixture %s\n", fixture.Name)
+				fmt.Printf("fixture.group %d group %d\n", fixture.Group, group)
+				fmt.Printf("channels %+v\n", fixture.Channels)
 			}
 			//if fixture.Number == switchNumber {
 			fixtureName = fixture.Name
 			for channelNumber, channel := range fixture.Channels {
 				if debug {
-					fmt.Printf("---> inspect channel %s for %s\n", channel.Name, channelName)
+					fmt.Printf("inspect channel %s for %s\n", channel.Name, channelName)
 				}
 				if channel.Name == channelName {
 					if debug {

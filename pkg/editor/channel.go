@@ -34,7 +34,7 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(channelList []fixture.Channel, st *SettingsPanel) *ChannelPanel {
+func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelList = channelList
@@ -100,17 +100,19 @@ func NewChannelPanel(channelList []fixture.Channel, st *SettingsPanel) *ChannelP
 			}
 
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
-				st.SettingsList = PopulateSettingList(channelList, cp.ChannelList[i].Number)
-				st.SettingsPanel.Refresh()
+				if cp.ChannelList != nil {
+					if st != nil {
+						st.SettingsList = PopulateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
+						st.SettingsPanel.Refresh()
+					}
+				}
 			}
-
 		})
 
 	return &cp
 }
 
 func PopulateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
-
 	for _, channel := range channelList {
 		if channelNumber == channel.Number {
 			return channel.Settings

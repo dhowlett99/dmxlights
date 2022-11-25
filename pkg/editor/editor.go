@@ -37,6 +37,7 @@ type itemSelect struct {
 
 func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
+	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(group, number, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
@@ -85,13 +86,8 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	}
 
 	// Populate fixture channels form.
-	//channelList, settingsList, settingsAvailable := PopulateChannels(thisFixture)
-	var settingsAvailable bool
 	channelList := thisFixture.Channels
-	settingsList := thisFixture.Channels[thisFixture.Number].Settings
-	if settingsList != nil {
-		settingsAvailable = true
-	}
+	settingsList := []fixture.Setting{}
 	var st *SettingsPanel
 
 	// Populate switch state settings and actions.
@@ -113,13 +109,11 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 
 	// Create Settings Panel
 	var settingsPanel *widget.List
-	if settingsAvailable {
-		st = NewSettingsPanel(settingsAvailable, settingsList, ap)
-		settingsPanel = st.SettingsPanel
-	}
+	st = NewSettingsPanel(settingsList, channelList, ap)
+	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
-	cp := NewChannelPanel(channelList, st)
+	cp := NewChannelPanel(&currentChannel, channelList, ap, st)
 
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
@@ -136,17 +130,18 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
-		for _, channel := range cp.ChannelList {
-			fmt.Printf("---> channel \n")
-			fmt.Printf("\t number %d\n", channel.Number)
-			fmt.Printf("\t name   %s\n", channel.Name)
+		for _, setting := range st.SettingsList {
+			fmt.Printf("Setting %+v\n", setting)
 		}
 
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == group && fixture.Number == number+1 {
+				// Insert new settings into channel.
+				// s
 				// Insert new channels into fixture.
+				cp.ChannelList[currentChannel].Settings = st.SettingsList
 				thisFixture.Channels = cp.ChannelList
 				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
 			} else {
@@ -174,14 +169,10 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	content := fyne.Container{}
 	t := container.NewBorder(title, nil, nil, nil, formTop)
 	top := container.NewBorder(t, nil, nil, nil, labelChannels)
-	middle := container.NewBorder(top, nil, nil, nil, scrollableChannelList)
-
-	if settingsAvailable {
-		scrollableSettingsList := container.NewScroll(settingsPanel)
-		scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 400})
-		box := container.NewAdaptiveGrid(2, scrollableChannelList, scrollableSettingsList)
-		middle = container.NewBorder(top, nil, nil, nil, box)
-	}
+	scrollableSettingsList := container.NewScroll(settingsPanel)
+	scrollableSettingsList.SetMinSize(fyne.Size{Height: 250, Width: 400})
+	box := container.NewAdaptiveGrid(2, scrollableChannelList, scrollableSettingsList)
+	middle := container.NewBorder(top, nil, nil, nil, box)
 	if switchesAvailable {
 		var states *fyne.Container
 		if actionsAvailable {
