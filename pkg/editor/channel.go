@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"sort"
-	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -54,18 +53,18 @@ func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *Act
 				widget.NewLabel("template"),
 
 				widget.NewSelect(cp.ChannelOptions, func(value string) {
-					lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
+					//lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
 					//fmt.Printf("We just pressed channel %d and set it to %s\n", lastChannel, value)
-					item := fixture.Channel{}
-					item.Name = value
-					item.Number = int16(lastChannel)
-					itemNumber := item.Number - 1
-					item.Comment = channelList[itemNumber].Comment
-					item.MaxDegrees = channelList[itemNumber].MaxDegrees
-					item.Offset = channelList[itemNumber].Offset
-					item.Settings = channelList[itemNumber].Settings
-					item.Value = channelList[itemNumber].Value
-					channelList = UpdateItem(channelList, item.Number, item)
+					//item := fixture.Channel{}
+					// item.Name = value
+					// item.Number = int16(lastChannel)
+					// itemNumber := item.Number - 1
+					// item.Comment = channelList[itemNumber].Comment
+					// item.MaxDegrees = channelList[itemNumber].MaxDegrees
+					// item.Offset = channelList[itemNumber].Offset
+					// item.Settings = channelList[itemNumber].Settings
+					// item.Value = channelList[itemNumber].Value
+					// channelList = UpdateItem(channelList, item.Number, item)
 				}),
 
 				widget.NewButton("-", func() {
@@ -167,6 +166,17 @@ func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 	return newChannels
 }
 
+func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
+	newChannels := []fixture.Channel{}
+	for _, channel := range channelList {
+		if channel.Number != id {
+			newChannels = append(newChannels, channel)
+		}
+	}
+	return newChannels
+}
+
+// UpdateItem replaces the selected item by id with newItem.
 func UpdateItem(channels []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
 	newChannels := []fixture.Channel{}
 	for _, channel := range channels {

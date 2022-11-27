@@ -448,51 +448,66 @@ fixtures:
     name: Program
     settings:
       - name: Off
+        number: 1
         setting: 0
         label: off
       - name: 4 Color Loop Change
+        number: 2
         setting: 1
         label: 4colorloop
       - name: 9 Color Fade Change
+        number: 3
         setting: 27
         label: 9colorloop
       - name: 4 Color Loop Change
+        number: 4
         setting: 52
         label: 4colorloop
       - name: 9 Color Fade Change
+        number: 5
         setting: 77
         label: 9colorloop
       - name: Strobe 1 Dim - Bright
+        number: 6
         setting: 102
         label: strobe1
       - name: Strobe 2 Bright - Dim
+        number: 7
         setting: 127
         label: strobe2
       - name: Strobe 3 Dim - Bright - Dim
+        number: 8
         setting: 152
         label: strobe3
       - name: Strobe 4 W/O Dim Effect
+        number: 9
         setting: 177
         label: strobe4
       - name: Strobe 5 with 9 Color
+        number: 10
         setting: 202
         label: strobe5
       - name: Strobe 6 with Gradual Dim
+        number: 11
         setting: 227
         label: strobe6
       - name: All Programs will Cycle
+        number: 12
         setting: 255
         label: cycle
   - number: 8
     name: ProgramSpeed
     settings: 
       - name: Slow
+        number: 1
         label: Slow
         setting: 1
       - name: Fast
+        number: 2
         label: Fast
         setting: 254
       - name: Sound Active
+        number: 3
         label: Music
         setting: 255
 - name: Scanner 1
@@ -511,10 +526,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 4
     name: Gobo
@@ -573,10 +591,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 4
     name: Gobo
@@ -635,10 +656,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 4
     name: Gobo
@@ -697,10 +721,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 4
     name: Gobo
@@ -759,10 +786,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 4
     name: Gobo
@@ -900,16 +930,19 @@ fixtures:
     name: Speed
     settings:
       - name: Fast
+        number: 1
         setting: 255
   - number: 10
     name: SoundActive
     settings:
       - name: Off
+        number: 1
         setting: 1
   - number: 11
     name: Dimmer Curves
     settings:
       - name: Default Curve
+        number: 1
         setting: 255
 - name: Scanner 7
   label: ADJ.Inno.Spot1
@@ -995,10 +1028,13 @@ fixtures:
     name: Shutter
     settings:
       - name: Open
+        number: 1
         setting: 255
       - name: Closed
+        number: 2
         setting: 0
       - name: Strobe
+        number: 3
         setting: 100
   - number: 8
     name: Master
@@ -1006,16 +1042,19 @@ fixtures:
     name: Speed
     settings:
       - name: Fast
+        number: 1
         setting: 255
   - number: 10
     name: SoundActive
     settings:
       - name: Off
+        number: 1
         setting: 1
   - number: 11
     name: Dimmer Curves
     settings:
       - name: Default Curve
+        number: 1
         setting: 255
 - name: switch1
   number: 1
@@ -1463,51 +1502,66 @@ fixtures:
     name: Program
     settings:
       - name: Off
+        number: 1
         setting: 0
         label: off
       - name: 4 Color Loop Change
+        number: 2
         setting: 1
         label: 4colorloop
       - name: 9 Color Fade Change
+        number: 3
         setting: 27
         label: 9colorloop
       - name: 4 Color Loop Change
+        number: 4
         setting: 52
         label: 4colorloop
       - name: 9 Color Fade Change
+        number: 5
         setting: 77
         label: 9colorloop
       - name: Strobe 1 Dim - Bright
+        number: 6
         setting: 102
         label: strobe1
       - name: Strobe 2 Bright - Dim
+        number: 7
         setting: 127
         label: strobe2
       - name: Strobe 3 Dim - Bright - Dim
+        number: 8
         setting: 152
         label: strobe3
       - name: Strobe 4 W/O Dim Effect
+        number: 9
         setting: 177
         label: strobe4
       - name: Strobe 5 with 9 Color
+        number: 10
         setting: 202
         label: strobe5
       - name: Strobe 6 with Gradual Dim
+        number: 11
         setting: 227
         label: strobe6
       - name: All Programs will Cycle
+        number: 12
         setting: 255
         label: cycle
   - number: 8
     name: ProgramSpeed
     settings: 
       - name: Slow
+        number: 1
         label: Slow
         setting: 1
       - name: Fast
+        number: 2
         label: Fast
         setting: 254
       - name: Sound Active
+        number: 3
         label: Music
         setting: 255
   states:

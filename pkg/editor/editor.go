@@ -192,13 +192,3 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	)
 	return modal, nil
 }
-
-func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
-	newChannels := []fixture.Channel{}
-	for _, channel := range channelList {
-		if channel.Number != id {
-			newChannels = append(newChannels, channel)
-		}
-	}
-	return newChannels
-}
