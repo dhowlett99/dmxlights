@@ -42,7 +42,7 @@ deploy:
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png
 	# fix the Info.plist
-	fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
+	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
 	# sign the app:
 	codesign --force --deep --entitlements entitlements.plist --verbose=2 --options runtime --sign ${CERT} -i ${APP_ID} ${APP_NAME}.app
