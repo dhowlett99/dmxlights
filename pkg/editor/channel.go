@@ -102,13 +102,13 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channelLi
 			}
 
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
-				fmt.Printf("---->Setting OnTapped Settings are %+v\n", st.SettingsList)
-				fmt.Printf("---->Channel List is  %+v\n", channelList)
 				// Highlight this channel
 				cp.ChannelPanel.Select(i)
 				if channelList != nil {
+					// Get Existing Settings for channel.
+					st.SettingsList = PopulateSettingList(channelList, channelList[i].Number)
+					// If the settings are empty create a new set of settings.
 					if len(st.SettingsList) == 0 {
-						fmt.Printf("---->Create New Setting for channel %d\n", channelList[i].Number)
 						// Create new settings.
 						st.SettingsList = CreateSettingList(channelList, channelList[i].Number)
 						st.CurrentChannel = int(channelList[i].Number)
@@ -116,7 +116,6 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channelLi
 						st.SettingsPanel.Refresh()
 					} else {
 						// Edit existing settings.
-						st.SettingsList = PopulateSettingList(channelList, channelList[i].Number)
 						st.CurrentChannel = int(channelList[i].Number)
 						st.SettingsPanel.Refresh()
 					}
