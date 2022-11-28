@@ -32,7 +32,7 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
+func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channelList []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
@@ -102,8 +102,20 @@ func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *Act
 			}
 
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
+				fmt.Printf("---->Setting OnTapped Settings are %+v\n", st.SettingsList)
+				fmt.Printf("---->Channel List is  %+v\n", channelList)
+				// Highlight this channel
+				cp.ChannelPanel.Select(i)
 				if channelList != nil {
-					if st != nil {
+					if len(st.SettingsList) == 0 {
+						fmt.Printf("---->Create New Setting for channel %d\n", channelList[i].Number)
+						// Create new settings.
+						st.SettingsList = CreateSettingList(channelList, channelList[i].Number)
+						st.CurrentChannel = int(channelList[i].Number)
+						st.SettingsPanel.Hidden = false
+						st.SettingsPanel.Refresh()
+					} else {
+						// Edit existing settings.
 						st.SettingsList = PopulateSettingList(channelList, channelList[i].Number)
 						st.CurrentChannel = int(channelList[i].Number)
 						st.SettingsPanel.Refresh()
@@ -113,6 +125,16 @@ func NewChannelPanel(currentChannel *int, channelList []fixture.Channel, ap *Act
 		})
 
 	return &cp
+}
+
+func CreateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
+
+	newItem := fixture.Setting{}
+	newItem.Name = "New Setting"
+	newItem.Number = 1
+	newItem.Setting = 0
+	settingsList = append(settingsList, newItem)
+	return settingsList
 }
 
 func PopulateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {

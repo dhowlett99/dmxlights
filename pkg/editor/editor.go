@@ -113,7 +113,7 @@ func NewEditor(w fyne.Window, group int, number int, fixtures *fixture.Fixtures)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
-	cp := NewChannelPanel(&currentChannel, channelList, ap, st)
+	cp := NewChannelPanel(thisFixture, &currentChannel, channelList, ap, st)
 
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
