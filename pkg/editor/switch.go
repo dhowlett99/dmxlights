@@ -36,7 +36,7 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 
 	sw := SwitchPanel{}
 	sw.SwitchesList = switchesList
-	sw.SwitchOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
+	sw.SwitchOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 
 	// Switches Selection Panel.
 	if switchesAvailable {
@@ -92,7 +92,7 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 func PopulateSwitches(thisFixture fixture.Fixture) (switchesAvailable bool, actionsAvailable bool,
 	actionsList []fixture.Action, switchesList []itemSelect) {
 
-	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
+	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 
 	// Populate switch state settings and actions.
 	if thisFixture.Type == "switch" {

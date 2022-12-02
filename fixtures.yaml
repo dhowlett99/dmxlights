@@ -1348,7 +1348,7 @@ fixtures:
   address: 500
   group: 4
   label: SW5.QPar38
-  fixture: par38
+  use_fixture: par38
   states:
   - name: Off
     number: 1
@@ -1437,7 +1437,7 @@ fixtures:
       green: 0
       blue: 0
     actions:
-      - name: SoftChase
+      - name: Soft
         colors:
         - Orange
         - Yellow
@@ -1449,15 +1449,15 @@ fixtures:
         mode: Chase
         fade: Soft
         speed: Fast
-  - name: Soundchase
+  - name: Sound
     number: 6
-    label: Soundchase
+    label: Sound
     buttoncolor: 
       red: 255
       green: 255
       blue: 0
     actions:
-      - name: Soundchase
+      - name: Sound
         colors: 
         - Orange
         - Yellow
@@ -1468,8 +1468,8 @@ fixtures:
         - Pink
         mode: Chase
         fade: Soft
-        speed: music
-        rotate: off
+        speed: Music
+        rotate: Off
     values: 
       - name: mode
         description: Red
@@ -1482,10 +1482,10 @@ fixtures:
 - name: switch6
   number: 6
   description: ADJ DEKKER 1
-  address: 500
+  address: 300
   group: 4
   label: SW6.DERBY
-  usefixture: dekker1
+  use_fixture: dekker1
   channels:
   - number: 1
     name: Rotate
@@ -1676,15 +1676,15 @@ fixtures:
         - Blue
         fade: Off
         speed: Off
-  - name: SoundChase
+  - name: Soft
     number: 5
-    label: On
+    label: Soft
     buttoncolor: 
       red: 255
       green: 0
       blue: 0
     actions:
-      - name: SoftChase
+      - name: Soft
         colors: 
         - Orange
         - Yellow
@@ -1696,9 +1696,9 @@ fixtures:
         mode: Chase
         fade: Soft
         speed: Fast
-  - name: SoundChase
+  - name: Sound
     number: 6
-    label: SoundChase
+    label: Sound
     buttoncolor: 
       red: 255
       green: 255

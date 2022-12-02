@@ -44,7 +44,7 @@ func NewActionsPanel(actionsAvailable bool, actionsList []fixture.Action) *Actio
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
-	ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
+	ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	ap.ActionModeOptions = []string{"Off", "Chase", "Static"}
 	ap.ActionColorsOptions = []string{"None", "Red", "Green", "Blue"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}

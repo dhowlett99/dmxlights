@@ -36,6 +36,7 @@ import (
 )
 
 const debug = false
+const dmxDebug = false
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
@@ -586,6 +587,9 @@ func MapFixtures(mySequenceNumber int,
 
 func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	if dmxInterfacePresent {
+		if dmxDebug {
+			fmt.Printf("DMX Debug    Channel %d Value %d\n", index, data)
+		}
 		dmxController.SetChannel(index, data)
 	}
 }
@@ -607,10 +611,14 @@ func MapSwitchFixture(mySequenceNumber int,
 
 	// Step through the fixture config file looking for the group that matches mysequence number.
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == mySequenceNumber {
+		if fixture.Group-1 == mySequenceNumber && fixture.Number-1 == switchNumber {
 			if fixture.UseFixture != "" {
 				// use this fixture for the sequencer actions
 				useFixture = fixture.UseFixture
+
+				if debug {
+					fmt.Printf("useFixture %s\n", fixture.UseFixture)
+				}
 
 				// Look through the switch states for this switch.
 				for stateNumber, state := range fixture.States {
@@ -1077,9 +1085,14 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 }
 
 func findFixtureByName(fixtureName string, fixtures *Fixtures) *Fixture {
-
+	if debug {
+		fmt.Printf("Look for fixture by Name %s\n", fixtureName)
+	}
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Label == fixtureName {
+			if debug {
+				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+			}
 			return &fixture
 		}
 	}

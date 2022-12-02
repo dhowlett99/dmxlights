@@ -41,7 +41,7 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
-	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "SoftChase", "SharpChase", "SoundChase", "Rotate"}
+	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 
 	// Settingses Selection Panel.
 	st.SettingsPanel = widget.NewList(
