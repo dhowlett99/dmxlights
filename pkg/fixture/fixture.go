@@ -1178,7 +1178,8 @@ func turnOnFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtu
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
-	// A map of the fixture colors.
+	// Create a temporary map of fixture colors.
+	cmd.ScannerColor = make(map[int]int)
 	sequence.ScannerColorMutex.Lock()
 	cmd.ScannerColor[myFixtureNumber] = FindColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
 	sequence.ScannerColorMutex.Unlock()
