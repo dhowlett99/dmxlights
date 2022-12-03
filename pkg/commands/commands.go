@@ -295,7 +295,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.SaveColors = true
+		sequence.ScannerColorMutex.Lock()
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.ScannerColorMutex.Unlock()
 		return sequence
 
 	case common.ClearSequenceColor:

@@ -1694,6 +1694,7 @@ fixtures:
         mode: Chase
         fade: Soft
         speed: Fast
+        rotate: Slow
   - name: Sound
     number: 6
     label: Sound
