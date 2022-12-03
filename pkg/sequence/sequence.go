@@ -40,10 +40,11 @@ type SequenceConfig struct {
 
 // LoadSequences loads sequence configuration information.
 // Each sequence has a :-
-//       name: sequence name,  a singe word.
-//       description: free text describing the sequence.
-//       group: assignes to one of the top 4 rows of the launchpad. 1-4
-//       type:  rgb, scanner or switch
+//
+//	name: sequence name,  a singe word.
+//	description: free text describing the sequence.
+//	group: assignes to one of the top 4 rows of the launchpad. 1-4
+//	type:  rgb, scanner or switch
 func LoadSequences() (sequences *SequencesConfig, err error) {
 	filename := "sequences.yaml"
 
@@ -102,7 +103,8 @@ func CreateSequence(
 	// Every scanner has a number of gobos in its wheel.
 	availableScannerGobos := make(map[int][]common.StaticColorButton)
 
-	// A map of the fixture colors.
+	// Create a map of the fixture colors.
+	// This will be protected from synchronous access by sequence.ScannerColorMutex
 	scannerColors := make(map[int]int)
 
 	if sequenceType == "scanner" {
@@ -173,6 +175,7 @@ func CreateSequence(
 	// We need to protect the maps from syncronous access.
 	sequence.ScannerStateMutex = &sync.RWMutex{}
 	sequence.DisableOnceMutex = &sync.RWMutex{}
+	sequence.ScannerColorMutex = &sync.RWMutex{}
 
 	if sequence.Type == "rgb" {
 		sequence.GuiFunctionLabels[0] = "Set\nPatten"
@@ -491,6 +494,7 @@ func PlaySequence(sequence common.Sequence,
 
 						scannerLastColor := 0
 
+						sequence.ScannerStateMutex.Lock()
 						// AvailableFixtures give the real number of configured scanners.
 						for _, fixture := range sequence.ScannersAvailable {
 							// First check that this fixture has some configured colors.
@@ -509,6 +513,7 @@ func PlaySequence(sequence common.Sequence,
 								}
 							}
 						}
+						sequence.ScannerStateMutex.Unlock()
 					}
 				}
 
@@ -636,6 +641,10 @@ func PlaySequence(sequence common.Sequence,
 				disabledOnce := sequence.DisableOnce
 				sequence.DisableOnceMutex.RUnlock()
 
+				sequence.ScannerStateMutex.RLock()
+				scannerColor := sequence.ScannerColor
+				sequence.ScannerStateMutex.RUnlock()
+
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
@@ -665,7 +674,7 @@ func PlaySequence(sequence common.Sequence,
 								ScannerState:           scannerState,
 								ScannerDisableOnce:     disabledOnce,
 								ScannerChase:           sequence.ScannerChase,
-								ScannerColor:           sequence.ScannerColor,
+								ScannerColor:           scannerColor,
 								ScannerAvailableColors: sequence.ScannerAvailableColors,
 								ScannerOffsetPan:       sequence.ScannerOffsetPan,
 								ScannerOffsetTilt:      sequence.ScannerOffsetTilt,

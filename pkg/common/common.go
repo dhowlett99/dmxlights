@@ -286,6 +286,7 @@ type Sequence struct {
 	ScannerGobo                int                         // The selected gobo.
 	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
 	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
+	ScannerColorMutex          *sync.RWMutex               // Mutex to protect the scanner color maps from syncronous access.
 	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates         []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
