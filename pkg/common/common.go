@@ -832,6 +832,16 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	return colors
 }
 
+func MapCopy(scannerColor map[int]int, scannerColorMutex *sync.RWMutex) map[int]int {
+	newMap := make(map[int]int)
+	scannerColorMutex.RLock()
+	for key, value := range scannerColor {
+		newMap[key] = value
+	}
+	scannerColorMutex.RUnlock()
+	return newMap
+}
+
 func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
