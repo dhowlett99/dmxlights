@@ -886,6 +886,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		case <-time.After(100 * time.Millisecond):
 		}
 
+		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		return
 	}
 

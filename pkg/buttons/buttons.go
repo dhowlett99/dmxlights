@@ -232,6 +232,7 @@ func ProcessButtons(X int, Y int,
 	// C L E A R  - clear all from the GUI.
 	if X == 0 && Y == -1 && gui {
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		return
 	}
 
@@ -247,6 +248,7 @@ func ProcessButtons(X int, Y int,
 	//  C L E A R - clear all if we're not in the scanner mode.
 	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type != "scanner" {
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		return
 	}
 
@@ -259,6 +261,7 @@ func ProcessButtons(X int, Y int,
 		// If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
 			clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		} else {
 
 			// S E L E C T   P O S I T I O N
@@ -2076,12 +2079,12 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 }
 
-func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, strobeSpeed int, dmxInterfacePresent bool) {
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
 	for y := 0; y < len(sequences); y++ {
 		if sequences[y].Type != "switch" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed, dmxInterfacePresent)
+				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0, dmxInterfacePresent)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -2342,7 +2345,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0, dmxInterfacePresent)
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// Load the config.
 	// Which forces all sequences to load their config.

@@ -355,7 +355,7 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0, this.DmxInterfacePresent)
+	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 
 	if this.LaunchPadConnected {
 		// Listen to launchpad buttons.
