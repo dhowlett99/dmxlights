@@ -26,6 +26,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
+const debug = false
+
 type SwitchPanel struct {
 	SwitchPanel   *widget.List
 	SwitchesList  []itemSelect
@@ -80,7 +82,9 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 						newAction.Speed = action.Speed
 						ap.ActionsList = append(ap.ActionsList, newAction)
 					}
-					fmt.Printf("I am button %d actions %+v\n", sw.SwitchesList[i].Number, ap.ActionsList)
+					if debug {
+						fmt.Printf("I am button %d actions %+v\n", sw.SwitchesList[i].Number, ap.ActionsList)
+					}
 					ap.ActionsPanel.Hidden = false
 					ap.ActionsPanel.Refresh()
 				}
