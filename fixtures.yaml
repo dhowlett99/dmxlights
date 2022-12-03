@@ -1629,8 +1629,6 @@ fixtures:
       setting: 0
     actions:
       - name: Off
-        colors: 
-        - None
         mode: Off
         fade: Off
         speed: Off

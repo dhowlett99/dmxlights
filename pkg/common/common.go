@@ -710,7 +710,7 @@ func GetRGBColorByName(color string) (Color, error) {
 		return Color{R: 0, G: 0, B: 0}, nil
 
 	}
-	return Color{}, fmt.Errorf("color not found")
+	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
