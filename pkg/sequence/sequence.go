@@ -145,7 +145,7 @@ func CreateSequence(
 		Number:                 mySequenceNumber,
 		RGBFade:                common.DefaultRGBFade,
 		MusicTrigger:           false,
-		Run:                    true,
+		Run:                    false,
 		Bounce:                 false,
 		RGBAvailablePatterns:   availableRGBPatterns,
 		ScannerSize:            common.DefaultScannerSize,
