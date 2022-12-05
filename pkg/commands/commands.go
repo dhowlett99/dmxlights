@@ -565,23 +565,5 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	if commandSpeed == 12 {
 		Speed = 75
 	}
-	if commandSpeed == 13 {
-		Speed = 50
-	}
-	if commandSpeed == 14 {
-		Speed = 25
-	}
-	if commandSpeed == 15 {
-		Speed = 20
-	}
-	if commandSpeed == 16 {
-		Speed = 15
-	}
-	if commandSpeed == 17 {
-		Speed = 10
-	}
-	if commandSpeed == 18 {
-		Speed = 7
-	}
 	return Speed * time.Millisecond
 }

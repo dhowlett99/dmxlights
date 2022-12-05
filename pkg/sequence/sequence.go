@@ -650,7 +650,11 @@ func PlaySequence(sequence common.Sequence,
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
+					speed := sequence.CurrentSpeed / 10
+					if sequence.Type == "scanner" {
+						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
+					}
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}
