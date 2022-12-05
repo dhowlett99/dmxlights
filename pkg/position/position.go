@@ -230,6 +230,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 
 	positionsOut := make(map[int]common.Position)
 	lampOn := make(map[int]bool)
+	lampOff := make(map[int]bool)
 
 	// Assemble the positions.
 	for step := 0; step < totalNumberOfSteps; step++ {
@@ -263,11 +264,12 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 						newFixture.Tilt = fadeColors[fixture][step].Tilt
 						newFixture.Shutter = fadeColors[fixture][step].Shutter
 						lampOn[fixture] = true
+						lampOff[fixture] = false
 						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 						newPosition.Fixtures[fixture] = newFixture
 					} else {
 						// turn the lamp off, but only if its already on.
-						if lampOn[fixture] || !Optimisation {
+						if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
 							newFixture.Colors = append(newFixture.Colors, common.Color{})
 							newFixture.Gobo = fadeColors[fixture][step].Gobo
 							newFixture.Pan = fadeColors[fixture][step].Pan
@@ -277,6 +279,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 							newPosition.Fixtures[fixture] = newFixture
 						}
+						lampOff[fixture] = true
 					}
 				} else {
 					// We've found a color. turn it on but only if its already off.
