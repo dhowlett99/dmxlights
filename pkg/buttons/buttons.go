@@ -232,7 +232,6 @@ func ProcessButtons(X int, Y int,
 	// C L E A R  - clear all from the GUI.
 	if X == 0 && Y == -1 && gui {
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
-		AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		return
 	}
 
@@ -248,7 +247,6 @@ func ProcessButtons(X int, Y int,
 	//  C L E A R - clear all if we're not in the scanner mode.
 	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type != "scanner" {
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
-		AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		return
 	}
 
@@ -261,7 +259,6 @@ func ProcessButtons(X int, Y int,
 		// If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
 			clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
-			AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 		} else {
 
 			// S E L E C T   P O S I T I O N
@@ -2840,6 +2837,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditStaticColorsMode[this.SelectedSequence] = false
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 }
 
 func getScannerShiftLabel(shift int) string {
