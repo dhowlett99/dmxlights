@@ -20,7 +20,6 @@ package fixture
 import (
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"math"
 	"os"
 	"strconv"
@@ -97,6 +96,7 @@ type ActionConfig struct {
 }
 
 type Fixture struct {
+	UUID           string    `yaml:"uuid"`
 	Name           string    `yaml:"name"`
 	Label          string    `yaml:"label,omitempty"`
 	Number         int       `yaml:"number"`
@@ -139,7 +139,7 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 	}
 
 	// Reads the fixtures.yaml file.
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, errors.New("error: reading fixtures.yaml file: " + err.Error())
 	}
@@ -164,13 +164,13 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	}
 
 	// Open the fixtures.yaml file.
-	_, err = os.Create(filename)
+	_, err = os.Open(filename)
 	if err != nil {
 		return errors.New("error: opening fixtures.yaml file: " + err.Error())
 	}
 
 	// Write the fixtures.yaml file.
-	err = ioutil.WriteFile(filename, data, 0644)
+	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
 		return errors.New("error: writing fixtures.yaml file: " + err.Error())
 	}

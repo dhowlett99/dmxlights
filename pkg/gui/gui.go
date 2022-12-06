@@ -320,17 +320,6 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 		var skipPopup bool
 		button.button = widget.NewButton("     ", func() {
-
-			if this.Config {
-				modal, err := editor.NewEditor(myWindow, Y, X, fixturesConfig)
-				if err != nil {
-					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
-					return
-				}
-				modal.Resize(fyne.NewSize(800, 600))
-				modal.Show()
-			}
-
 			if X == 8 && Y == 5 || X > 7 || Y < 5 {
 				skipPopup = true
 			}
@@ -363,11 +352,14 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("MYDMX", func() {
-				if this.Config {
-					this.Config = false
-				} else {
-					this.Config = true
+				modal, err := editor.NewFixturePickList(myWindow, Y, X, fixturesConfig)
+				if err != nil {
+					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
+					return
 				}
+				modal.Resize(fyne.NewSize(800, 600))
+				modal.Show()
+
 			}) // button widget
 			myLogo := canvas.NewImageFromFile("dmxlights.png")
 			container1 := container.NewMax(
