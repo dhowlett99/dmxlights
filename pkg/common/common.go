@@ -344,6 +344,7 @@ type Step struct {
 
 type FixtureCommand struct {
 	Step           int
+	NumberSteps    int
 	Type           string
 	SequenceNumber int
 
@@ -363,15 +364,16 @@ type FixtureCommand struct {
 	RGBStaticColors []StaticColorButton
 
 	// Scanner Commands.
-	ScannerColor           map[int]int
-	ScannerPosition        Position
-	ScannerState           map[int]ScannerState
-	ScannerDisableOnce     map[int]bool
-	ScannerChase           bool
-	ScannerAvailableColors map[int][]StaticColorButton
-	ScannerSelectedGobo    int
-	ScannerOffsetPan       int
-	ScannerOffsetTilt      int
+	ScannerColor             map[int]int
+	ScannerPosition          Position
+	ScannerState             map[int]ScannerState
+	ScannerDisableOnce       map[int]bool
+	ScannerChase             bool
+	ScannerAvailableColors   map[int][]StaticColorButton
+	ScannerSelectedGobo      int
+	ScannerOffsetPan         int
+	ScannerOffsetTilt        int
+	ScannerNumberCoordinates int
 
 	// Derby Commands
 	Rotate  int

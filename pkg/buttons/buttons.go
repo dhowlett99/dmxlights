@@ -2611,7 +2611,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Get the pad back into sane mode.
 	if this.LaunchPadConnected {
-		this.Pad.Reset()
+		this.Pad.Program()
 	}
 
 	// Turn off the flashing save button.
