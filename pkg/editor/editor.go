@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"os"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -125,8 +124,8 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 		scrollableDevicesList.SetMinSize(fyne.Size{Height: 250, Width: 400})
 	}
 
-	// Save button.
-	buttonSave := widget.NewButton("Save", func() {
+	// OK button.
+	buttonSave := widget.NewButton("OK", func() {
 
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
@@ -142,13 +141,6 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
 			}
-		}
-
-		// Save the new fixtures file.
-		err := fixture.SaveFixtures("fixtures.yaml", &newFixtures)
-		if err != nil {
-			fmt.Printf("error saving fixtures %s\n", err.Error())
-			os.Exit(1)
 		}
 
 		modal.Hide()
