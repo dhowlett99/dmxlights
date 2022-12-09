@@ -8,7 +8,7 @@ fixtures:
   address: 1
   channels:
   - number: 1
-    name: Color
+    name: Red1
   - number: 2
     name: Green1
   - number: 3
