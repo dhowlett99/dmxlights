@@ -31,7 +31,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-func NewFixturePickList(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	groupOptions := []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
 	// Title.
@@ -120,7 +120,7 @@ func NewFixturePickList(w fyne.Window, group int, number int, fixtures *fixture.
 			}
 			o.(*fyne.Container).Objects[5].(*widget.Entry).SetText(fixtureList[i].Description)
 			o.(*fyne.Container).Objects[6].(*widget.Button).OnTapped = func() {
-				modal, err := NewEditor(w, fixtureList[i].UUID, fixtureList[i].Group, fixtureList[i].Number, fixtures)
+				modal, err := NewChannelEditor(w, fixtureList[i].UUID, fixtureList[i].Group, fixtureList[i].Number, fixtures)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fixtureList[i].Group, fixtureList[i].Number, err)
 					return

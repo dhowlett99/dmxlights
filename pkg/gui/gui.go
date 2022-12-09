@@ -352,7 +352,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("MYDMX", func() {
-				modal, err := editor.NewFixturePickList(myWindow, Y, X, fixturesConfig)
+				modal, err := editor.NewFixturePanel(myWindow, Y, X, fixturesConfig)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return

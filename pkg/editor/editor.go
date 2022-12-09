@@ -35,7 +35,7 @@ type itemSelect struct {
 	Actions []fixture.Action
 }
 
-func NewEditor(w fyne.Window, id string, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewChannelEditor(w fyne.Window, id string, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
