@@ -25,6 +25,7 @@ legacy-build:
 	go build --tags legacy dmxlights.go
 
 build:
+	go mod tidy
 	go build dmxlights.go
 
 legacy-deploy:

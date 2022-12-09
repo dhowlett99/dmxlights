@@ -182,17 +182,17 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 // GetFixureDetails - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixureDetails(group int, number int, fixtures *Fixtures) (Fixture, error) {
+func GetFixureDetails(id string, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
 	if debug {
-		fmt.Printf("Looking for Fixture Group %d, Number %d\n", group, number)
+		fmt.Printf("Looking for Fixture UUID %s\n", id)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
 		if debug {
-			fmt.Printf("Fixture Group %d, Number %d\n", fixture.Group, fixture.Number)
+			fmt.Printf("Fixture UUID %s\n", fixture.UUID)
 		}
-		if fixture.Group == group && fixture.Number == number+1 {
+		if fixture.UUID == id {
 			return fixture, nil
 		}
 	}

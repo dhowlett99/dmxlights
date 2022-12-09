@@ -46,10 +46,10 @@ func NewFixturePickList(w fyne.Window, group int, number int, fixtures *fixture.
 
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
-		if len(f.UUID) != 0 {
+		if len(f.UUID) == 0 { // We have a empty UUID for this fixture.
+			fmt.Printf("Generating UUID for Fixture: %s\n", f.Name)
 			newItem.UUID = uuid.New().String()[:7]
 		} else {
-			fmt.Printf("Generating UUID for Fixture: %s\n", f.Name)
 			newItem.UUID = f.UUID
 		}
 		newItem.Name = f.Name
@@ -120,7 +120,13 @@ func NewFixturePickList(w fyne.Window, group int, number int, fixtures *fixture.
 			}
 			o.(*fyne.Container).Objects[5].(*widget.Entry).SetText(fixtureList[i].Description)
 			o.(*fyne.Container).Objects[6].(*widget.Button).OnTapped = func() {
-				fmt.Printf("Selected UUID %s\n", fixtureList[i].UUID)
+				modal, err := NewEditor(w, fixtureList[i].UUID, fixtureList[i].Group, fixtureList[i].Number, fixtures)
+				if err != nil {
+					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fixtureList[i].Group, fixtureList[i].Number, err)
+					return
+				}
+				modal.Resize(fyne.NewSize(800, 600))
+				modal.Show()
 			}
 		},
 	)
