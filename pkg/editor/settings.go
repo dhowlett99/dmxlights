@@ -29,15 +29,15 @@ import (
 )
 
 type SettingsPanel struct {
-	SettingsPanel      *widget.List
-	SettingsList       []fixture.Setting
-	SettingsOptions    []string
-	CurrentChannel     int
-	Update             bool
-	UpdatedChannelList []fixture.Channel
+	SettingsPanel     *widget.List
+	SettingsList      []fixture.Setting
+	SettingsOptions   []string
+	CurrentChannel    int
+	Update            bool
+	UpdateThisChannel int
 }
 
-func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting, channelList []fixture.Channel, ap *ActionPanel) *SettingsPanel {
+func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting, ap *ActionPanel) *SettingsPanel {
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
@@ -51,20 +51,21 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 		// Function to create item.
 		func() fyne.CanvasObject {
 			return container.NewGridWithColumns(5,
-				widget.NewLabel("template"),
-				widget.NewEntry(),
-				widget.NewEntry(),
-				//widget.NewButton("Select", nil),
-				widget.NewButton("-", func() {}),
-				widget.NewButton("+", func() {}),
+				widget.NewLabel("template"),      // Setting Number.
+				widget.NewEntry(),                // Setting Name.
+				widget.NewEntry(),                // Setting Value.
+				widget.NewButton("-", func() {}), // Delete this Setting.
+				widget.NewButton("+", func() {}), // Add a new Setting below.
 			)
 		},
 
 		// Function to update item in this list.
 		func(i widget.ListItemID, o fyne.CanvasObject) {
 
-			// Give the setting a number.
+			// Show the setting a number.
 			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
+
+			// Show and Edit the Name.
 			o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(st.SettingsList[i].Name)
 			o.(*fyne.Container).Objects[1].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
@@ -73,11 +74,11 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting = st.SettingsList[i].Setting
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				channelList[st.CurrentChannel-1].Settings = st.SettingsList
 				st.Update = true
-				st.UpdatedChannelList = channelList
+				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
+			// Show and Edit the Setting Value.
 			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
 			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
@@ -86,27 +87,25 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting, _ = strconv.Atoi(value)
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				channelList[st.CurrentChannel-1].Settings = st.SettingsList
 				st.Update = true
-				st.UpdatedChannelList = channelList
+				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
+			// Show the Delete Setting Button.
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
 				st.SettingsList = DeleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
-				channelList[st.CurrentChannel-1].Settings = st.SettingsList
 				st.Update = true
-				st.UpdatedChannelList = channelList
+				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
 			}
 
+			// Show the Add Setting Button.
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
 				st.SettingsList = AddSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
-				channelList[st.CurrentChannel-1].Settings = st.SettingsList
 				st.Update = true
-				st.UpdatedChannelList = channelList
+				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
 			}
-
 		},
 	)
 

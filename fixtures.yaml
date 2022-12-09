@@ -8,7 +8,7 @@ fixtures:
   address: 1
   channels:
   - number: 1
-    name: Red1
+    name: Color
   - number: 2
     name: Green1
   - number: 3
@@ -18,8 +18,16 @@ fixtures:
     comment: Color Macros
   - number: 5
     name: Strobe
-    value: 16
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+    settings:
+    - name: "Off"
+      label: "off"
+      number: 1
+      setting: 0
+    - name: Slow
+      label: slow
+      number: 2
+      setting: 16
   - number: 6
     name: Programs
     comment: Automatic Programs/ Sound-Active Mode

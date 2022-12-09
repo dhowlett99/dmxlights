@@ -29,94 +29,108 @@ import (
 
 type ChannelPanel struct {
 	ChannelPanel   *widget.List
+	ChannelList    []fixture.Channel
 	ChannelOptions []string
 }
 
-func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channelList []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
+func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
+	cp.ChannelList = []fixture.Channel{}
+
+	// Populate fixture channels form.
+	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
 	cp.ChannelPanel = widget.NewList(
 		// Function to find length.
 		func() int {
 			if st.Update {
-				channelList = st.UpdatedChannelList
+				cp.ChannelList[st.UpdateThisChannel].Settings = st.SettingsList
 				st.Update = false
 			}
-			return len(channelList)
+			return len(cp.ChannelList)
 		},
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
 			return container.NewHBox(
+
+				// Channel Number.
 				widget.NewLabel("template"),
 
-				widget.NewSelect(cp.ChannelOptions, func(value string) {
-					//lastChannel, _ := strconv.Atoi(o.(*fyne.Container).Objects[0].(*widget.Label).Text)
-					//fmt.Printf("We just pressed channel %d and set it to %s\n", lastChannel, value)
-					//item := fixture.Channel{}
-					// item.Name = value
-					// item.Number = int16(lastChannel)
-					// itemNumber := item.Number - 1
-					// item.Comment = channelList[itemNumber].Comment
-					// item.MaxDegrees = channelList[itemNumber].MaxDegrees
-					// item.Offset = channelList[itemNumber].Offset
-					// item.Settings = channelList[itemNumber].Settings
-					// item.Value = channelList[itemNumber].Value
-					// channelList = UpdateItem(channelList, item.Number, item)
-				}),
+				// Channel Value as a selectable dialog box.
+				widget.NewSelect(cp.ChannelOptions, func(value string) {}),
 
+				// Chanell delete button.
 				widget.NewButton("-", func() {
 					//log.Println("Delete Button pressed for ")
 				}),
-				widget.NewButton("+", func() {
-					//log.Println("Add Button pressed for ")
-				}),
 
-				widget.NewButton("settings", func() {
-					//log.Println("Add Button pressed for ")
-				}),
+				// Channel add button
+				widget.NewButton("+", func() {}),
+
+				// Channel access settings for this channel button.
+				widget.NewButton("settings", func() {}),
 			)
 		},
 		// Function to update item in this list.
 		func(i widget.ListItemID, o fyne.CanvasObject) {
 
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", channelList[i].Number))
+			// Show the Channel Number.
+			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", cp.ChannelList[i].Number))
 
-			// find the selected option in the options list.
+			// Show the currently selected Channel option.
 			for _, option := range cp.ChannelOptions {
-				if option == channelList[i].Name {
+				if option == cp.ChannelList[i].Name {
 					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
 				}
 			}
+			// Edit the channel Value.
+			o.(*fyne.Container).Objects[1].(*widget.Select).OnChanged = func(value string) {
+				newChannel := fixture.Channel{}
+				newChannel.Name = value
+				newChannel.Number = cp.ChannelList[i].Number
+				newChannel.Settings = cp.ChannelList[i].Settings
+				newChannel.Comment = cp.ChannelList[i].Comment
+				newChannel.MaxDegrees = cp.ChannelList[i].MaxDegrees
+				newChannel.Offset = cp.ChannelList[i].Offset
+				fmt.Printf("Trying to update channel no:%d with value %s\n", cp.ChannelList[i].Number, value)
+				cp.ChannelList = UpdateChannelItem(cp.ChannelList, cp.ChannelList[i].Number, newChannel)
+				for no := range cp.ChannelList {
+					fmt.Printf("At Setting Channel no:%d value:%s\n", no, value)
+				}
+			}
 
+			// Channel Delete Button.
 			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				channelList = DeleteChannelItem(channelList, channelList[i].Number)
+				cp.ChannelList = DeleteChannelItem(cp.ChannelList, cp.ChannelList[i].Number)
 				cp.ChannelPanel.Refresh()
 			}
 
+			// Channel Add Button.
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				channelList = AddChannelItem(channelList, channelList[i].Number, cp.ChannelOptions)
+				cp.ChannelList = AddChannelItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
 				cp.ChannelPanel.Refresh()
 			}
 
+			// Channel Access Settings Button.
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
 				// Highlight this channel
 				cp.ChannelPanel.Select(i)
-				if channelList != nil {
+				if cp.ChannelList != nil {
 					// Get Existing Settings for channel.
-					st.SettingsList = PopulateSettingList(channelList, channelList[i].Number)
+					st.SettingsList = PopulateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
 					// If the settings are empty create a new set of settings.
 					if len(st.SettingsList) == 0 {
 						// Create new settings.
-						st.SettingsList = CreateSettingList(channelList, channelList[i].Number)
-						st.CurrentChannel = int(channelList[i].Number)
+						st.SettingsList = CreateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
+						st.CurrentChannel = int(cp.ChannelList[i].Number)
 						st.SettingsPanel.Hidden = false
 						st.SettingsPanel.Refresh()
 					} else {
 						// Edit existing settings.
-						st.CurrentChannel = int(channelList[i].Number)
+						st.CurrentChannel = int(cp.ChannelList[i].Number)
 						st.SettingsPanel.Refresh()
 					}
 				}
@@ -198,12 +212,12 @@ func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channe
 }
 
 // UpdateItem replaces the selected item by id with newItem.
-func UpdateItem(channels []fixture.Channel, id int16, newItem fixture.Channel) []fixture.Channel {
+func UpdateChannelItem(channels []fixture.Channel, id int16, newChannel fixture.Channel) []fixture.Channel {
 	newChannels := []fixture.Channel{}
 	for _, channel := range channels {
 		if channel.Number == id {
 			// update the channel information.
-			newChannels = append(newChannels, newItem)
+			newChannels = append(newChannels, newChannel)
 		} else {
 			// just add what was there before.
 			newChannels = append(newChannels, channel)

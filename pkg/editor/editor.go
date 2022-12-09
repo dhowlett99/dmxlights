@@ -35,7 +35,7 @@ type itemSelect struct {
 	Actions []fixture.Action
 }
 
-func NewChannelEditor(w fyne.Window, id string, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
@@ -85,8 +85,6 @@ func NewChannelEditor(w fyne.Window, id string, group int, number int, fixtures 
 		Bold: true,
 	}
 
-	// Populate fixture channels form.
-	channelList := thisFixture.Channels
 	settingsList := []fixture.Setting{}
 	var st *SettingsPanel
 
@@ -109,11 +107,11 @@ func NewChannelEditor(w fyne.Window, id string, group int, number int, fixtures 
 
 	// Create Settings Panel
 	var settingsPanel *widget.List
-	st = NewSettingsPanel(thisFixture, &currentChannel, settingsList, channelList, ap)
+	st = NewSettingsPanel(thisFixture, &currentChannel, settingsList, ap)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
-	cp := NewChannelPanel(thisFixture, &currentChannel, channelList, ap, st)
+	cp := NewChannelPanel(thisFixture, &currentChannel, channels, ap, st)
 
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
@@ -132,18 +130,29 @@ func NewChannelEditor(w fyne.Window, id string, group int, number int, fixtures 
 
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
-		for _, fixture := range fixtures.Fixtures {
-			if fixture.Group == group && fixture.Number == number+1 {
-				// Insert new channels into fixture.
-				thisFixture.Channels = channelList
+		for fixtureNumber, fixture := range fixtures.Fixtures {
+			// fmt.Printf("fixture.Group %d = group %d \n", fixture.Group, group)
+			// fmt.Printf("fixture.Number %d = number %d \n", fixture.Number, number)
+			if fixture.UUID == id {
+				// Insert new channels into fixture above us, in the fixture selection panel.
+				fmt.Printf("---> Insert fixture no %d\n", fixture.Number)
+				fp.UpdateFixture = true
+				fp.UpdateThisFixture = fixtureNumber
+				fp.UpdateChannelList = cp.ChannelList
+				// Update our copy of the channel list.
+				thisFixture.Channels = cp.ChannelList
 				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
 			}
 		}
 
+		for no, c := range cp.ChannelList {
+			fmt.Printf("At SAVE Channel no:%d value:%s\n", no, c.Name)
+		}
+
 		// Save the new fixtures file.
-		err := fixture.SaveFixtures("newfixtures.yaml", &newFixtures)
+		err := fixture.SaveFixtures("fixtures.yaml", &newFixtures)
 		if err != nil {
 			fmt.Printf("error saving fixtures %s\n", err.Error())
 			os.Exit(1)

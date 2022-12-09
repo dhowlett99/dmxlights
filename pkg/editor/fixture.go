@@ -31,7 +31,18 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
+type FixturesPanel struct {
+	FixturePanel      *widget.List
+	FixtureList       []fixture.Fixture
+	UpdateFixture     bool
+	UpdateChannelList []fixture.Channel
+	UpdateThisFixture int
+}
+
 func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+
+	fp := FixturesPanel{}
+	fp.FixtureList = []fixture.Fixture{}
 
 	groupOptions := []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
 	// Title.
@@ -41,8 +52,6 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	}
 
 	label := container.NewGridWithColumns(7, widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX Address"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
-
-	fixtureList := []fixture.Fixture{}
 
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
@@ -63,24 +72,30 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		newItem.States = f.States
 		newItem.NumberChannels = f.NumberChannels
 		newItem.UseFixture = f.UseFixture
-		fixtureList = append(fixtureList, newItem)
+		fp.FixtureList = append(fp.FixtureList, newItem)
 	}
 
 	// Create a new list.
-	listPanel := widget.NewList(
+	fp.FixturePanel = widget.NewList(
 		func() int {
-			return len(fixtureList)
+			if fp.UpdateFixture {
+				fmt.Printf("Fixure Panel received and update for fixture %d\n", fp.UpdateThisFixture)
+				fmt.Printf("Channels %+v \n", fp.UpdateChannelList)
+				fp.FixtureList[fp.UpdateThisFixture].Channels = fp.UpdateChannelList
+				fp.UpdateFixture = false
+			}
+			return len(fp.FixtureList)
 		},
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
 			return container.NewGridWithColumns(7,
-				widget.NewSelect(groupOptions, func(value string) {}),
-				widget.NewEntry(),
-				widget.NewEntry(),
-				widget.NewEntry(),
-				widget.NewEntry(),
-				widget.NewEntry(),
-				widget.NewButton("Channels", func() {}),
+				widget.NewSelect(groupOptions, func(value string) {}), // Group Number.
+				widget.NewEntry(),                       // Number.
+				widget.NewEntry(),                       // Name.
+				widget.NewEntry(),                       // Label.
+				widget.NewEntry(),                       // DMX Address.
+				widget.NewEntry(),                       // Description
+				widget.NewButton("Channels", func() {}), // Channel Button
 			)
 		},
 		// Function to update item in this list.
@@ -88,41 +103,49 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// find the selected group in the options list.
 			for _, option := range groupOptions {
-				if option == strconv.Itoa(fixtureList[i].Group) {
+				if option == strconv.Itoa(fp.FixtureList[i].Group) {
 					o.(*fyne.Container).Objects[0].(*widget.Select).SetSelected(option)
 
 				}
 			}
 
-			o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(strconv.Itoa(fixtureList[i].Number))
-			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fixtureList[i].Name)
-			o.(*fyne.Container).Objects[3].(*widget.Entry).SetText(fixtureList[i].Label)
-			o.(*fyne.Container).Objects[4].(*widget.Entry).SetText(strconv.Itoa(int(fixtureList[i].Address)))
+			// Show the Fixture Number.
+			o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(strconv.Itoa(fp.FixtureList[i].Number))
+
+			// Show the Fixture Name.
+			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fp.FixtureList[i].Name)
+
+			// Show the Fixture Label.
+			o.(*fyne.Container).Objects[3].(*widget.Entry).SetText(fp.FixtureList[i].Label)
+
+			// Show and Edit the Fixture DMX label.
+			o.(*fyne.Container).Objects[4].(*widget.Entry).SetText(strconv.Itoa(int(fp.FixtureList[i].Address)))
 			o.(*fyne.Container).Objects[4].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Fixture{}
-				newSetting.UUID = fixtureList[i].UUID
-				newSetting.Label = fixtureList[i].Label
-				newSetting.Name = fixtureList[i].Name
-				newSetting.Number = fixtureList[i].Number
-				newSetting.Group = fixtureList[i].Group
-				newSetting.Description = fixtureList[i].Description
-				newSetting.Type = fixtureList[i].Type
-				newSetting.Channels = fixtureList[i].Channels
-				newSetting.States = fixtureList[i].States
-				newSetting.NumberChannels = fixtureList[i].NumberChannels
-				newSetting.UseFixture = fixtureList[i].UseFixture
+				newSetting.UUID = fp.FixtureList[i].UUID
+				newSetting.Label = fp.FixtureList[i].Label
+				newSetting.Name = fp.FixtureList[i].Name
+				newSetting.Number = fp.FixtureList[i].Number
+				newSetting.Group = fp.FixtureList[i].Group
+				newSetting.Description = fp.FixtureList[i].Description
+				newSetting.Type = fp.FixtureList[i].Type
+				newSetting.Channels = fp.FixtureList[i].Channels
+				newSetting.States = fp.FixtureList[i].States
+				newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+				newSetting.UseFixture = fp.FixtureList[i].UseFixture
 				i, _ := strconv.Atoi(value)
 				newSetting.Address = int16(i)
-				fixtureList = UpdateListItem(fixtureList, newSetting.UUID, newSetting)
-				// channelList[st.CurrentChannel-1].Settings = st.fixtureList
-				// st.Update = true
-				// st.UpdatedChannelList = channelList
+				fp.FixtureList = UpdateListItem(fp.FixtureList, newSetting.UUID, newSetting)
 			}
-			o.(*fyne.Container).Objects[5].(*widget.Entry).SetText(fixtureList[i].Description)
+
+			// Show Fixture Description.
+			o.(*fyne.Container).Objects[5].(*widget.Entry).SetText(fp.FixtureList[i].Description)
+
+			// Show and Edit Channel Definitions using the Channel Editor.
 			o.(*fyne.Container).Objects[6].(*widget.Button).OnTapped = func() {
-				modal, err := NewChannelEditor(w, fixtureList[i].UUID, fixtureList[i].Group, fixtureList[i].Number, fixtures)
+				modal, err := NewChannelEditor(w, fp.FixtureList[i].UUID, fp.FixtureList[i].Channels, &fp, fixtures)
 				if err != nil {
-					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fixtureList[i].Group, fixtureList[i].Number, err)
+					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i].Group, fp.FixtureList[i].Number, err)
 					return
 				}
 				modal.Resize(fyne.NewSize(800, 600))
@@ -134,12 +157,20 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
-		// for fixtureNumber := range fixtureList {
-		// 	fixtures.Fixtures[fixtureNumber] = fixtureList[fixtureNumber]
+		// for n, f := range fp.FixtureList {
+		// 	if n == 1 {
+		// 		fmt.Printf("fixture1 channel 1 %+v\n", f.Channels[0])
+		// 	}
 		// }
-
 		// Insert updated fixture into fixtures.
-		copy(fixtures.Fixtures, fixtureList)
+		copy(fixtures.Fixtures, fp.FixtureList)
+
+		for n, f := range fixtures.Fixtures {
+			fmt.Printf("fixture %d\n", n)
+			for _, c := range f.Channels {
+				fmt.Printf("\t channel no %d  %+v\n", c.Number, f.Channels[0])
+			}
+		}
 
 		// Save the new fixtures file.
 		err := fixture.SaveFixtures("fixtures.yaml", fixtures)
@@ -155,7 +186,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		modal.Hide()
 	})
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
-	scrollableList := container.NewVScroll(listPanel)
+	scrollableList := container.NewVScroll(fp.FixturePanel)
 	scrollableList.SetMinSize(fyne.Size{Height: 430, Width: 600})
 
 	content := fyne.Container{}
