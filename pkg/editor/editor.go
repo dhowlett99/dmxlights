@@ -131,11 +131,8 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for fixtureNumber, fixture := range fixtures.Fixtures {
-			// fmt.Printf("fixture.Group %d = group %d \n", fixture.Group, group)
-			// fmt.Printf("fixture.Number %d = number %d \n", fixture.Number, number)
 			if fixture.UUID == id {
 				// Insert new channels into fixture above us, in the fixture selection panel.
-				fmt.Printf("---> Insert fixture no %d\n", fixture.Number)
 				fp.UpdateFixture = true
 				fp.UpdateThisFixture = fixtureNumber
 				fp.UpdateChannelList = cp.ChannelList
@@ -145,10 +142,6 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
 			}
-		}
-
-		for no, c := range cp.ChannelList {
-			fmt.Printf("At SAVE Channel no:%d value:%s\n", no, c.Name)
 		}
 
 		// Save the new fixtures file.

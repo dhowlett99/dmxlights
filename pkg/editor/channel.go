@@ -95,11 +95,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels 
 				newChannel.Comment = cp.ChannelList[i].Comment
 				newChannel.MaxDegrees = cp.ChannelList[i].MaxDegrees
 				newChannel.Offset = cp.ChannelList[i].Offset
-				fmt.Printf("Trying to update channel no:%d with value %s\n", cp.ChannelList[i].Number, value)
 				cp.ChannelList = UpdateChannelItem(cp.ChannelList, cp.ChannelList[i].Number, newChannel)
-				for no := range cp.ChannelList {
-					fmt.Printf("At Setting Channel no:%d value:%s\n", no, value)
-				}
 			}
 
 			// Channel Delete Button.

@@ -56,7 +56,9 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
 		if len(f.UUID) == 0 { // We have a empty UUID for this fixture.
-			fmt.Printf("Generating UUID for Fixture: %s\n", f.Name)
+			if debug {
+				fmt.Printf("Generating UUID for Fixture: %s\n", f.Name)
+			}
 			newItem.UUID = uuid.New().String()[:7]
 		} else {
 			newItem.UUID = f.UUID
@@ -79,8 +81,6 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	fp.FixturePanel = widget.NewList(
 		func() int {
 			if fp.UpdateFixture {
-				fmt.Printf("Fixure Panel received and update for fixture %d\n", fp.UpdateThisFixture)
-				fmt.Printf("Channels %+v \n", fp.UpdateChannelList)
 				fp.FixtureList[fp.UpdateThisFixture].Channels = fp.UpdateChannelList
 				fp.UpdateFixture = false
 			}
@@ -157,20 +157,8 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
-		// for n, f := range fp.FixtureList {
-		// 	if n == 1 {
-		// 		fmt.Printf("fixture1 channel 1 %+v\n", f.Channels[0])
-		// 	}
-		// }
 		// Insert updated fixture into fixtures.
 		copy(fixtures.Fixtures, fp.FixtureList)
-
-		for n, f := range fixtures.Fixtures {
-			fmt.Printf("fixture %d\n", n)
-			for _, c := range f.Channels {
-				fmt.Printf("\t channel no %d  %+v\n", c.Number, f.Channels[0])
-			}
-		}
 
 		// Save the new fixtures file.
 		err := fixture.SaveFixtures("fixtures.yaml", fixtures)
