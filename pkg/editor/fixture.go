@@ -51,7 +51,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		Bold: true,
 	}
 
-	label := container.NewGridWithColumns(8, widget.NewLabel("UUID"), widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX Address"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
+	label := container.NewGridWithColumns(7, widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX Address"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
 
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
@@ -104,6 +104,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// Show the UUID.
 			o.(*fyne.Container).Objects[0].(*widget.Entry).SetText(fp.FixtureList[i].UUID)
+			o.(*fyne.Container).Objects[0].(*widget.Entry).Hidden = true
 
 			// find the selected group in the options list.
 			for _, option := range groupOptions {
