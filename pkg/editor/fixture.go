@@ -45,6 +45,8 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	fp.FixtureList = []fixture.Fixture{}
 
 	groupOptions := []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
+	numberOptions := []string{"1", "2", "3", "4", "5", "6", "7", "8"}
+
 	// Title.
 	title := widget.NewLabel("Fixture List")
 	title.TextStyle = fyne.TextStyle{
@@ -90,8 +92,8 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		func() (o fyne.CanvasObject) {
 			return container.NewGridWithColumns(8,
 				widget.NewEntry(), // UUID.
-				widget.NewSelect(groupOptions, func(value string) {}), // Group Number.
-				widget.NewEntry(),                       // Number.
+				widget.NewSelect(groupOptions, func(value string) {}),  // Group Number.
+				widget.NewSelect(numberOptions, func(value string) {}), // Number.
 				widget.NewEntry(),                       // Name.
 				widget.NewEntry(),                       // Label.
 				widget.NewEntry(),                       // DMX Address.
@@ -136,9 +138,15 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 				}
 			}
 
-			// Show and Edit the Fixture Number.
-			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(strconv.Itoa(fp.FixtureList[i].Number))
-			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
+			// find the selected number in the number list.
+			for _, option := range numberOptions {
+				if option == strconv.Itoa(fp.FixtureList[i].Number) {
+					o.(*fyne.Container).Objects[2].(*widget.Select).SetSelected(option)
+				}
+			}
+
+			// Edit the Fixture Number.
+			o.(*fyne.Container).Objects[2].(*widget.Select).OnChanged = func(value string) {
 				// if value isn't what we expect it to be ignore.
 				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
 					newSetting := fixture.Fixture{}
