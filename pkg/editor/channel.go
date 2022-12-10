@@ -91,6 +91,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels 
 				newChannel := fixture.Channel{}
 				newChannel.Name = value
 				newChannel.Number = cp.ChannelList[i].Number
+				newChannel.Value = cp.ChannelList[i].Value
 				newChannel.Settings = cp.ChannelList[i].Settings
 				newChannel.Comment = cp.ChannelList[i].Comment
 				newChannel.MaxDegrees = cp.ChannelList[i].MaxDegrees
