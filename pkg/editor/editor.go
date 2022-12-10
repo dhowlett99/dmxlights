@@ -112,6 +112,12 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 	// Create Channel Panel.
 	cp := NewChannelPanel(thisFixture, &currentChannel, channels, ap, st)
 
+	// Talyor the panel to show the switches
+	if switchesAvailable {
+		formTopItem2.Text = "Use Fixture"
+		cp.ChannelPanel.Hidden = true
+	}
+
 	// Setup forms.
 	scrollableChannelList := container.NewScroll(cp.ChannelPanel)
 	scrollableDevicesList := container.NewScroll(switchesPanel)

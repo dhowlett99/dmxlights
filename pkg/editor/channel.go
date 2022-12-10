@@ -36,7 +36,7 @@ type ChannelPanel struct {
 func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
-	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros"}
+	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurves", "Speed"}
 	cp.ChannelList = []fixture.Channel{}
 
 	// Populate fixture channels form.
@@ -63,9 +63,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels 
 				widget.NewSelect(cp.ChannelOptions, func(value string) {}),
 
 				// Chanell delete button.
-				widget.NewButton("-", func() {
-					//log.Println("Delete Button pressed for ")
-				}),
+				widget.NewButton("-", func() {}),
 
 				// Channel add button
 				widget.NewButton("+", func() {}),
@@ -200,6 +198,9 @@ func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 
 func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
 	newChannels := []fixture.Channel{}
+	if id == 1 {
+		return channelList
+	}
 	for _, channel := range channelList {
 		if channel.Number != id {
 			newChannels = append(newChannels, channel)
