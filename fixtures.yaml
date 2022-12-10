@@ -1,6 +1,7 @@
 fixtures:
 - uuid: e1b7a5a
   name: FOH PAR 1
+  label: PAR1
   number: 1
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -35,6 +36,7 @@ fixtures:
     name: Dimmer
 - uuid: aa71bf3
   name: FOH PAR 2
+  label: PAR2
   number: 2
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -61,6 +63,7 @@ fixtures:
     name: Dimmer
 - uuid: 22ef43b
   name: FOH PAR 3
+  label: PAR3
   number: 3
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -87,6 +90,7 @@ fixtures:
     name: Dimmer
 - uuid: 8038fc6
   name: FOH PAR 4
+  label: PAR4
   number: 4
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -113,6 +117,7 @@ fixtures:
     name: Dimmer
 - uuid: 428a021
   name: FOH PAR 5
+  label: PAR5
   number: 5
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -139,6 +144,7 @@ fixtures:
     name: Dimmer
 - uuid: 449c9b7
   name: FOH PAR 6
+  label: PAR6
   number: 6
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -165,6 +171,7 @@ fixtures:
     name: Dimmer
 - uuid: d59647f
   name: FOH PAR 7
+  label: PAR7
   number: 7
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -191,6 +198,7 @@ fixtures:
     name: Dimmer
 - uuid: ae7a829
   name: FOH PAR 8
+  label: PAR8
   number: 8
   description: Chauvet Slimpar 56 7 channel mode.
   type: rgb
@@ -217,6 +225,7 @@ fixtures:
     name: Dimmer
 - uuid: 6ee702b
   name: FOH XBRICK 1
+  label: XBRICK1
   number: 1
   description: Stairville Xbrick
   type: rgb
@@ -251,6 +260,7 @@ fixtures:
     name: Master
 - uuid: 55ff391
   name: FOH XBRICK 2
+  label: XBRICK2
   number: 1
   description: Stairville Xbrick
   type: rgb
@@ -285,6 +295,7 @@ fixtures:
     name: Master
 - uuid: e2ab6ac
   name: Uplighter1
+  label: RAIL1
   number: 1
   description: Chauvet Color Rail IRC
   type: rgb
@@ -346,6 +357,7 @@ fixtures:
   use_channels: 8
 - uuid: e0e6706
   name: Uplighter2
+  label: RAIL2
   number: 2
   description: Fluxia DLB100
   type: rgb
