@@ -53,7 +53,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		Bold: true,
 	}
 
-	label := container.NewGridWithColumns(8, widget.NewLabel("UUID"), widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
+	label := container.NewGridWithColumns(8, widget.NewLabel("UUID"), widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX"), widget.NewLabel("Desc"), widget.NewLabel("Channels"))
 
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
