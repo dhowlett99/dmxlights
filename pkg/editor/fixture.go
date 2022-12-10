@@ -53,7 +53,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		Bold: true,
 	}
 
-	label := container.NewGridWithColumns(7, widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX Address"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
+	label := container.NewGridWithColumns(8, widget.NewLabel("UUID"), widget.NewLabel("Group"), widget.NewLabel("Number"), widget.NewLabel("Name"), widget.NewLabel("Label"), widget.NewLabel("DMX"), widget.NewLabel("Description"), widget.NewLabel("Channels"))
 
 	for _, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
@@ -90,7 +90,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		},
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
-			return container.NewGridWithColumns(8,
+			return container.NewAdaptiveGrid(8,
 				widget.NewEntry(), // UUID.
 				widget.NewSelect(groupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(numberOptions, func(value string) {}), // Number.
@@ -106,7 +106,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// Show the UUID.
 			o.(*fyne.Container).Objects[0].(*widget.Entry).SetText(fp.FixtureList[i].UUID)
-			o.(*fyne.Container).Objects[0].(*widget.Entry).Hidden = true
+			//o.(*fyne.Container).Objects[0].(*widget.Entry).Hidden = true
 
 			// find the selected group in the options list.
 			for _, option := range groupOptions {
@@ -137,6 +137,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
+			o.(*fyne.Container).Objects[1].(*widget.Select).PlaceHolder = "X"
 
 			// find the selected number in the number list.
 			for _, option := range numberOptions {
@@ -166,9 +167,11 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
+			o.(*fyne.Container).Objects[2].(*widget.Select).PlaceHolder = "X"
 
 			// Show and Edit the Fixture Name.
 			o.(*fyne.Container).Objects[3].(*widget.Entry).SetText(fp.FixtureList[i].Name)
+			o.(*fyne.Container).Objects[3].(*widget.Entry).PlaceHolder = "XXXXXXXXXXXXX"
 			o.(*fyne.Container).Objects[3].(*widget.Entry).OnChanged = func(value string) {
 				// if value isn't what we expect it to be ignore.
 				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
@@ -291,12 +294,11 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		modal.Hide()
 	})
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
-	scrollableList := container.NewVScroll(fp.FixturePanel)
-	scrollableList.SetMinSize(fyne.Size{Height: 430, Width: 600})
+	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 430, Width: 750}), fp.FixturePanel)
 
 	content := fyne.Container{}
 	main := container.NewBorder(title, nil, nil, nil, label)
-	two := container.NewBorder(main, nil, nil, nil, scrollableList)
+	two := container.NewBorder(main, nil, nil, nil, panel)
 	content = *container.NewBorder(two, nil, nil, nil, saveCancel)
 
 	// Layout of settings panel.
