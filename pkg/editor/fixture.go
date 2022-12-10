@@ -112,6 +112,8 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
 				}
 			}
+
+			// Show and Edit the Fixture Group.
 			o.(*fyne.Container).Objects[1].(*widget.Select).OnChanged = func(value string) {
 				// if value isn't what we expect it to be ignore.
 				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
@@ -134,14 +136,72 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 				}
 			}
 
-			// Show the Fixture Number.
+			// Show and Edit the Fixture Number.
 			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(strconv.Itoa(fp.FixtureList[i].Number))
+			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
+				// if value isn't what we expect it to be ignore.
+				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
+					newSetting := fixture.Fixture{}
+					newSetting.UUID = fp.FixtureList[i].UUID
+					newSetting.Label = fp.FixtureList[i].Label
+					newSetting.Name = fp.FixtureList[i].Name
+					v, _ := strconv.Atoi(value)
+					newSetting.Number = v
+					newSetting.Group = fp.FixtureList[i].Group
+					newSetting.Description = fp.FixtureList[i].Description
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Channels = fp.FixtureList[i].Channels
+					newSetting.States = fp.FixtureList[i].States
+					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+					newSetting.UseFixture = fp.FixtureList[i].UseFixture
+					newSetting.Address = fp.FixtureList[i].Address
+					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+				}
+			}
 
-			// Show the Fixture Name.
+			// Show and Edit the Fixture Name.
 			o.(*fyne.Container).Objects[3].(*widget.Entry).SetText(fp.FixtureList[i].Name)
+			o.(*fyne.Container).Objects[3].(*widget.Entry).OnChanged = func(value string) {
+				// if value isn't what we expect it to be ignore.
+				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
+					newSetting := fixture.Fixture{}
+					newSetting.UUID = fp.FixtureList[i].UUID
+					newSetting.Label = fp.FixtureList[i].Label
+					newSetting.Name = value
+					newSetting.Number = fp.FixtureList[i].Number
+					newSetting.Group = fp.FixtureList[i].Group
+					newSetting.Description = fp.FixtureList[i].Description
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Channels = fp.FixtureList[i].Channels
+					newSetting.States = fp.FixtureList[i].States
+					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+					newSetting.UseFixture = fp.FixtureList[i].UseFixture
+					newSetting.Address = fp.FixtureList[i].Address
+					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+				}
+			}
 
-			// Show the Fixture Label.
+			// Show and Edit the Fixture Label.
 			o.(*fyne.Container).Objects[4].(*widget.Entry).SetText(fp.FixtureList[i].Label)
+			o.(*fyne.Container).Objects[4].(*widget.Entry).OnChanged = func(value string) {
+				// if value isn't what we expect it to be ignore.
+				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
+					newSetting := fixture.Fixture{}
+					newSetting.UUID = fp.FixtureList[i].UUID
+					newSetting.Label = value
+					newSetting.Name = fp.FixtureList[i].Name
+					newSetting.Number = fp.FixtureList[i].Number
+					newSetting.Group = fp.FixtureList[i].Group
+					newSetting.Description = fp.FixtureList[i].Description
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Channels = fp.FixtureList[i].Channels
+					newSetting.States = fp.FixtureList[i].States
+					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+					newSetting.UseFixture = fp.FixtureList[i].UseFixture
+					newSetting.Address = fp.FixtureList[i].Address
+					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+				}
+			}
 
 			// Show and Edit the Fixture DMX label.
 			o.(*fyne.Container).Objects[5].(*widget.Entry).SetText(strconv.Itoa(int(fp.FixtureList[i].Address)))
@@ -167,8 +227,28 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 				}
 			}
 
-			// Show Fixture Description.
+			// Show and Edit the Fixture Description.
 			o.(*fyne.Container).Objects[6].(*widget.Entry).SetText(fp.FixtureList[i].Description)
+			o.(*fyne.Container).Objects[6].(*widget.Entry).OnChanged = func(value string) {
+				// if value isn't what we expect it to be ignore.
+				if o.(*fyne.Container).Objects[0].(*widget.Entry).Text == fp.FixtureList[i].UUID {
+					o.(*fyne.Container).Objects[6].(*widget.Entry).FocusGained()
+					newSetting := fixture.Fixture{}
+					newSetting.UUID = fp.FixtureList[i].UUID
+					newSetting.Label = fp.FixtureList[i].Label
+					newSetting.Name = fp.FixtureList[i].Name
+					newSetting.Number = fp.FixtureList[i].Number
+					newSetting.Group = fp.FixtureList[i].Group
+					newSetting.Description = value
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Channels = fp.FixtureList[i].Channels
+					newSetting.States = fp.FixtureList[i].States
+					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+					newSetting.UseFixture = fp.FixtureList[i].UseFixture
+					newSetting.Address = fp.FixtureList[i].Address
+					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+				}
+			}
 
 			// Show and Edit Channel Definitions using the Channel Editor.
 			o.(*fyne.Container).Objects[7].(*widget.Button).OnTapped = func() {
