@@ -1,6 +1,5 @@
 fixtures:
 - id: 1
-  uuid: e1b7a5a
   name: FOH PAR 1
   label: PAR1
   number: 1
@@ -64,7 +63,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 3
-  uuid: 22ef43b
   name: FOH PAR 3
   label: PAR3
   number: 3
@@ -92,7 +90,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 4
-  uuid: 8038fc6
   name: FOH PAR 4
   label: PAR4
   number: 4
@@ -120,7 +117,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 5
-  uuid: 428a021
   name: FOH PAR 5
   label: PAR5
   number: 5
@@ -148,7 +144,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 6
-  uuid: 449c9b7
   name: FOH PAR 6
   label: PAR6
   number: 6
@@ -176,7 +171,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 7
-  uuid: d59647f
   name: FOH PAR 7
   label: PAR7
   number: 7
@@ -204,7 +198,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 8
-  uuid: ae7a829
   name: FOH PAR 8
   label: PAR8
   number: 8
@@ -232,7 +225,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 9
-  uuid: 6ee702b
   name: FOH XBRICK 1
   label: XBRICK1
   number: 1
@@ -268,7 +260,6 @@ fixtures:
   - number: 13
     name: Master
 - id: 10
-  uuid: 55ff391
   name: FOH XBRICK 2
   label: XBRICK2
   number: 1
@@ -304,7 +295,6 @@ fixtures:
   - number: 13
     name: Master
 - id: 11
-  uuid: e2ab6ac
   name: Uplighter1
   label: RAIL1
   number: 1
@@ -367,7 +357,6 @@ fixtures:
     name: Strobe
   use_channels: 8
 - id: 12
-  uuid: e0e6706
   name: Uplighter2
   label: RAIL2
   number: 2
@@ -426,7 +415,6 @@ fixtures:
     name: Blue8
   use_channels: 8
 - id: 13
-  uuid: 4e5373f
   name: ADJ QA PAR 38
   label: par38
   number: 1
@@ -453,7 +441,6 @@ fixtures:
     name: Static
   use_channels: 8
 - id: 14
-  uuid: b3cc7b2
   name: ADJ Dekker1
   label: dekker1
   number: 1
@@ -562,7 +549,6 @@ fixtures:
       number: 3
       setting: 255
 - id: 15
-  uuid: 475e827
   name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -632,7 +618,6 @@ fixtures:
   - number: 5
     name: Master
 - id: 16
-  uuid: 67dc307
   name: Scanner 2
   label: ADJ.Com.Scan2
   number: 2
@@ -702,7 +687,6 @@ fixtures:
   - number: 5
     name: Master
 - id: 17
-  uuid: 1f2eace
   name: Scanner 3
   label: ADJ.Com.Scan3
   number: 3
@@ -772,7 +756,6 @@ fixtures:
   - number: 5
     name: Master
 - id: 18
-  uuid: 9d621ca
   name: Scanner 4
   label: ADJ.Com.Scan4
   number: 4
@@ -842,7 +825,6 @@ fixtures:
   - number: 5
     name: Master
 - id: 19
-  uuid: "2070394"
   name: Scanner 5
   label: ADJ.Com.Scan5
   number: 5
@@ -912,7 +894,6 @@ fixtures:
   - number: 5
     name: Master
 - id: 20
-  uuid: bc72883
   name: Scanner 6
   label: ADJ.Inno.Spot1
   number: 6
@@ -1040,7 +1021,6 @@ fixtures:
       number: 1
       setting: 255
 - id: 21
-  uuid: b2227bd
   name: Scanner 7
   label: ADJ.Inno.Spot1
   number: 7
@@ -1168,7 +1148,6 @@ fixtures:
       number: 1
       setting: 255
 - id: 22
-  uuid: 73b6d87
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1209,7 +1188,6 @@ fixtures:
     master: 0
     flash: false
 - id: 23
-  uuid: e2c51c4
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1250,7 +1228,6 @@ fixtures:
     master: 0
     flash: false
 - id: 24
-  uuid: e5a0531
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1299,7 +1276,6 @@ fixtures:
     master: 0
     flash: false
 - id: 25
-  uuid: ea28eaa
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1485,7 +1461,6 @@ fixtures:
     master: 0
     flash: false
 - id: 26
-  uuid: e7549a7
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -1688,7 +1663,6 @@ fixtures:
     flash: false
   use_fixture: par38
 - id: 27
-  uuid: 408de46
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -1882,7 +1856,6 @@ fixtures:
     flash: false
   use_fixture: dekker1
 - id: 28
-  uuid: "0085548"
   name: switch7
   label: SW7.DERBY
   number: 7
@@ -1913,7 +1886,6 @@ fixtures:
     master: 0
     flash: false
 - id: 29
-  uuid: b04e54c
   name: switch8
   label: SW8.Booth
   number: 8

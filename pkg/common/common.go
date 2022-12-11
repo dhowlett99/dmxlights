@@ -391,7 +391,6 @@ type Position struct {
 // a scanner.
 type Fixture struct {
 	ID           string
-	UUID         string
 	Name         string
 	Label        string
 	Type         string

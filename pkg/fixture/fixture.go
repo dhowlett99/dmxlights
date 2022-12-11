@@ -97,7 +97,6 @@ type ActionConfig struct {
 
 type Fixture struct {
 	ID             int       `yaml:"id"`
-	UUID           string    `yaml:"uuid"`
 	Name           string    `yaml:"name"`
 	Label          string    `yaml:"label,omitempty"`
 	Number         int       `yaml:"number"`
@@ -183,17 +182,17 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 // GetFixureDetails - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixureDetails(id string, fixtures *Fixtures) (Fixture, error) {
+func GetFixureDetails(id int, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
 	if debug {
-		fmt.Printf("Looking for Fixture UUID %s\n", id)
+		fmt.Printf("Looking for Fixture ID %d\n", id)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
 		if debug {
-			fmt.Printf("Fixture UUID %s\n", fixture.UUID)
+			fmt.Printf("Fixture ID %d\n", fixture.ID)
 		}
-		if fixture.UUID == id {
+		if fixture.ID == id {
 			return fixture, nil
 		}
 	}

@@ -34,7 +34,7 @@ type itemSelect struct {
 	Actions []fixture.Action
 }
 
-func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
@@ -136,7 +136,7 @@ func NewChannelEditor(w fyne.Window, id string, channels []fixture.Channel, fp *
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for fixtureNumber, fixture := range fixtures.Fixtures {
-			if fixture.UUID == id {
+			if fixture.ID == id {
 				// Insert new channels into fixture above us, in the fixture selection panel.
 				fp.UpdateFixture = true
 				fp.UpdateThisFixture = fixtureNumber
