@@ -38,18 +38,20 @@ type FixturesPanel struct {
 	UpdateThisFixture int
 	GroupOptions      []string
 	NumberOptions     []string
+	TypeOptions       []string
 }
 
 const FIXTURE_ID int = 0
-const FIXTURE_NUMBER int = 1
+const FIXTURE_TYPE int = 1
 const FIXTURE_GROUP int = 2
-const FIXTURE_NAME int = 3
-const FIXTURE_LABEL int = 4
-const FIXTURE_ADDRESS int = 5
-const FIXTURE_DESCRIPTION int = 6
-const FIXTURE_DELETE int = 7
-const FIXTURE_ADD int = 8
-const FIXTURE_CHANNELS int = 9
+const FIXTURE_NUMBER int = 3
+const FIXTURE_NAME int = 4
+const FIXTURE_LABEL int = 5
+const FIXTURE_ADDRESS int = 6
+const FIXTURE_DESCRIPTION int = 7
+const FIXTURE_DELETE int = 8
+const FIXTURE_ADD int = 9
+const FIXTURE_CHANNELS int = 10
 
 func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
@@ -58,6 +60,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 	fp.GroupOptions = []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
 	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
+	fp.TypeOptions = []string{"rgb", "scanner", "switch"}
 
 	// Title.
 	title := widget.NewLabel("Fixture List")
@@ -65,8 +68,9 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 		Bold: true,
 	}
 
-	label := container.NewGridWithColumns(10,
+	label := container.NewGridWithColumns(11,
 		widget.NewLabel("ID"),
+		widget.NewLabel("Type"),
 		widget.NewLabel("Group"),
 		widget.NewLabel("Number"),
 		widget.NewLabel("Name"),
@@ -113,8 +117,9 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
-			return container.NewAdaptiveGrid(10,
+			return container.NewAdaptiveGrid(11,
 				widget.NewLabel("id"), // ID.
+				widget.NewSelect(fp.TypeOptions, func(value string) {}),   // Type rgb, scanner or switch.
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
 				widget.NewEntry(),                       // Name.
@@ -134,6 +139,34 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// Show and Edit the Fixture Group.
 			// find the selected group in the options list.
+			for _, option := range fp.TypeOptions {
+				if option == fp.FixtureList[i].Type {
+					o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).SetSelected(option)
+				}
+			}
+			o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).OnChanged = func(value string) {
+				// if value isn't what we expect it to be ignore.
+				if o.(*fyne.Container).Objects[FIXTURE_ID].(*widget.Label).Text == fmt.Sprintf("%d", fp.FixtureList[i].ID) {
+					newSetting := fixture.Fixture{}
+					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Label = fp.FixtureList[i].Label
+					newSetting.Name = fp.FixtureList[i].Name
+					newSetting.Number = fp.FixtureList[i].Number
+					newSetting.Group = fp.FixtureList[i].Group
+					newSetting.Description = fp.FixtureList[i].Description
+					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Channels = fp.FixtureList[i].Channels
+					newSetting.States = fp.FixtureList[i].States
+					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
+					newSetting.UseFixture = fp.FixtureList[i].UseFixture
+					newSetting.Address = fp.FixtureList[i].Address
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].ID, newSetting)
+				}
+			}
+
+			// Show and Edit the Fixture Group.
+			// find the selected group in the options list.
 			for _, option := range fp.GroupOptions {
 				if option == strconv.Itoa(fp.FixtureList[i].Group) {
 					o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).SetSelected(option)
@@ -144,6 +177,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 				if o.(*fyne.Container).Objects[FIXTURE_ID].(*widget.Label).Text == fmt.Sprintf("%d", fp.FixtureList[i].ID) {
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = fp.FixtureList[i].Label
 					newSetting.Name = fp.FixtureList[i].Name
 					newSetting.Number = fp.FixtureList[i].Number
@@ -173,6 +207,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 				if o.(*fyne.Container).Objects[FIXTURE_ID].(*widget.Label).Text == fmt.Sprintf("%d", fp.FixtureList[i].ID) {
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = fp.FixtureList[i].Label
 					newSetting.Name = fp.FixtureList[i].Name
 					v, _ := strconv.Atoi(value)
@@ -196,15 +231,15 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 			o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = func(value string) {
 				// if value isn't what we expect it to be ignore.
 				if o.(*fyne.Container).Objects[FIXTURE_ID].(*widget.Label).Text == fmt.Sprintf("%d", fp.FixtureList[i].ID) {
-					o.(*fyne.Container).Objects[3].(*widget.Entry).FocusGained()
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).FocusGained()
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = fp.FixtureList[i].Label
 					newSetting.Name = value
 					newSetting.Number = fp.FixtureList[i].Number
 					newSetting.Group = fp.FixtureList[i].Group
 					newSetting.Description = fp.FixtureList[i].Description
-					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Channels = fp.FixtureList[i].Channels
 					newSetting.States = fp.FixtureList[i].States
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
@@ -222,12 +257,12 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).FocusGained()
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = value
 					newSetting.Name = fp.FixtureList[i].Name
 					newSetting.Number = fp.FixtureList[i].Number
 					newSetting.Group = fp.FixtureList[i].Group
 					newSetting.Description = fp.FixtureList[i].Description
-					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Channels = fp.FixtureList[i].Channels
 					newSetting.States = fp.FixtureList[i].States
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
@@ -245,12 +280,12 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).FocusGained()
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = fp.FixtureList[i].Label
 					newSetting.Name = fp.FixtureList[i].Name
 					newSetting.Number = fp.FixtureList[i].Number
 					newSetting.Group = fp.FixtureList[i].Group
 					newSetting.Description = fp.FixtureList[i].Description
-					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Channels = fp.FixtureList[i].Channels
 					newSetting.States = fp.FixtureList[i].States
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
@@ -269,12 +304,12 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).FocusGained()
 					newSetting := fixture.Fixture{}
 					newSetting.ID = fp.FixtureList[i].ID
+					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Label = fp.FixtureList[i].Label
 					newSetting.Name = fp.FixtureList[i].Name
 					newSetting.Number = fp.FixtureList[i].Number
 					newSetting.Group = fp.FixtureList[i].Group
 					newSetting.Description = value
-					newSetting.Type = fp.FixtureList[i].Type
 					newSetting.Channels = fp.FixtureList[i].Channels
 					newSetting.States = fp.FixtureList[i].States
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
@@ -286,7 +321,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// Fixture Delete Button.
 			o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).OnTapped = func() {
-				fp.FixtureList = DeleteFixture(fp.FixtureList, fp.FixtureList[i].Number)
+				fp.FixtureList = DeleteFixture(fp.FixtureList, fp.FixtureList[i].ID)
 				fp.FixturePanel.Refresh()
 			}
 
@@ -366,6 +401,7 @@ func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 		newFixture.ID = FindLargestFixtureNumber(fixtures) + 1
 	}
 	newFixture.Name = "New"
+	newFixture.Type = "rgb"
 
 	for _, fixture := range fixtures {
 		if fixture.ID == id {

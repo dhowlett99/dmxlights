@@ -35,7 +35,6 @@ fixtures:
   - number: 7
     name: Dimmer
 - id: 2
-  uuid: aa71bf3
   name: FOH PAR 2
   label: PAR2
   number: 2
