@@ -162,7 +162,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 			o.(*fyne.Container).Objects[2].(*widget.Select).PlaceHolder = "X"
@@ -192,7 +192,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 			o.(*fyne.Container).Objects[3].(*widget.Select).PlaceHolder = "X"
@@ -217,7 +217,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 
@@ -240,7 +240,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 
@@ -265,7 +265,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					v, _ := strconv.Atoi(value)
 					newSetting.Address = int16(v)
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 
@@ -289,7 +289,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
-					fp.FixtureList = UpdateListItem(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
 
@@ -322,7 +322,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	buttonSave := widget.NewButton("Save", func() {
 
 		// Insert updated fixture into fixtures.
-		copy(fixtures.Fixtures, fp.FixtureList)
+		fixtures.Fixtures = fp.FixtureList
 
 		// Save the new fixtures file.
 		err := fixture.SaveFixtures("fixtures.yaml", fixtures)
@@ -353,18 +353,18 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	return modal, nil
 }
 
-func UpdateListItem(items []fixture.Fixture, id string, newItem fixture.Fixture) []fixture.Fixture {
-	newItems := []fixture.Fixture{}
-	for _, item := range items {
-		if item.UUID == id {
+func UpdateFixture(fixtures []fixture.Fixture, id string, newItem fixture.Fixture) []fixture.Fixture {
+	newFixtures := []fixture.Fixture{}
+	for _, fixture := range fixtures {
+		if fixture.UUID == id {
 			// update the settings information.
-			newItems = append(newItems, newItem)
+			newFixtures = append(newFixtures, newItem)
 		} else {
 			// just add what was there before.
-			newItems = append(newItems, item)
+			newFixtures = append(newFixtures, fixture)
 		}
 	}
-	return newItems
+	return newFixtures
 }
 
 func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
@@ -389,13 +389,13 @@ func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 	return newFixtures
 }
 
-func DeleteFixture(FixtureList []fixture.Fixture, id int) []fixture.Fixture {
+func DeleteFixture(fixtureList []fixture.Fixture, id int) []fixture.Fixture {
 	newFixtures := []fixture.Fixture{}
 	if id == 1 {
-		return FixtureList
+		return fixtureList
 	}
-	for _, fixture := range FixtureList {
-		if fixture.Number != id {
+	for _, fixture := range fixtureList {
+		if fixture.ID != id {
 			newFixtures = append(newFixtures, fixture)
 		}
 	}
