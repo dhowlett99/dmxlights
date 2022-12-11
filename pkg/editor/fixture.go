@@ -165,7 +165,7 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].UUID, newSetting)
 				}
 			}
-			o.(*fyne.Container).Objects[2].(*widget.Select).PlaceHolder = "X"
+			o.(*fyne.Container).Objects[2].(*widget.Select).PlaceHolder = "XXX"
 
 			// Edit the Fixture Number.
 			// find the selected number in the number list.
