@@ -1,5 +1,6 @@
 fixtures:
-- uuid: e1b7a5a
+- id: 1
+  uuid: e1b7a5a
   name: FOH PAR 1
   label: PAR1
   number: 1
@@ -34,7 +35,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: aa71bf3
+- id: 2
+  uuid: aa71bf3
   name: FOH PAR 2
   label: PAR2
   number: 2
@@ -61,7 +63,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: 22ef43b
+- id: 3
+  uuid: 22ef43b
   name: FOH PAR 3
   label: PAR3
   number: 3
@@ -88,7 +91,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: 8038fc6
+- id: 4
+  uuid: 8038fc6
   name: FOH PAR 4
   label: PAR4
   number: 4
@@ -115,7 +119,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: 428a021
+- id: 5
+  uuid: 428a021
   name: FOH PAR 5
   label: PAR5
   number: 5
@@ -142,7 +147,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: 449c9b7
+- id: 6
+  uuid: 449c9b7
   name: FOH PAR 6
   label: PAR6
   number: 6
@@ -169,7 +175,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: d59647f
+- id: 7
+  uuid: d59647f
   name: FOH PAR 7
   label: PAR7
   number: 7
@@ -196,7 +203,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: ae7a829
+- id: 8
+  uuid: ae7a829
   name: FOH PAR 8
   label: PAR8
   number: 8
@@ -223,7 +231,8 @@ fixtures:
     comment: Automatic Programs/ Sound-Active Mode
   - number: 7
     name: Dimmer
-- uuid: 6ee702b
+- id: 9
+  uuid: 6ee702b
   name: FOH XBRICK 1
   label: XBRICK1
   number: 1
@@ -258,7 +267,8 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-- uuid: 55ff391
+- id: 10
+  uuid: 55ff391
   name: FOH XBRICK 2
   label: XBRICK2
   number: 1
@@ -293,7 +303,8 @@ fixtures:
     name: Blue4
   - number: 13
     name: Master
-- uuid: e2ab6ac
+- id: 11
+  uuid: e2ab6ac
   name: Uplighter1
   label: RAIL1
   number: 1
@@ -355,7 +366,8 @@ fixtures:
   - number: 26
     name: Strobe
   use_channels: 8
-- uuid: e0e6706
+- id: 12
+  uuid: e0e6706
   name: Uplighter2
   label: RAIL2
   number: 2
@@ -413,7 +425,8 @@ fixtures:
   - number: 24
     name: Blue8
   use_channels: 8
-- uuid: 4e5373f
+- id: 13
+  uuid: 4e5373f
   name: ADJ QA PAR 38
   label: par38
   number: 1
@@ -439,7 +452,8 @@ fixtures:
   - number: 8
     name: Static
   use_channels: 8
-- uuid: b3cc7b2
+- id: 14
+  uuid: b3cc7b2
   name: ADJ Dekker1
   label: dekker1
   number: 1
@@ -547,7 +561,8 @@ fixtures:
       label: Music
       number: 3
       setting: 255
-- uuid: 475e827
+- id: 15
+  uuid: 475e827
   name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -616,7 +631,8 @@ fixtures:
       setting: 57
   - number: 5
     name: Master
-- uuid: 67dc307
+- id: 16
+  uuid: 67dc307
   name: Scanner 2
   label: ADJ.Com.Scan2
   number: 2
@@ -685,7 +701,8 @@ fixtures:
       setting: 57
   - number: 5
     name: Master
-- uuid: 1f2eace
+- id: 17
+  uuid: 1f2eace
   name: Scanner 3
   label: ADJ.Com.Scan3
   number: 3
@@ -754,7 +771,8 @@ fixtures:
       setting: 57
   - number: 5
     name: Master
-- uuid: 9d621ca
+- id: 18
+  uuid: 9d621ca
   name: Scanner 4
   label: ADJ.Com.Scan4
   number: 4
@@ -823,7 +841,8 @@ fixtures:
       setting: 57
   - number: 5
     name: Master
-- uuid: "2070394"
+- id: 19
+  uuid: "2070394"
   name: Scanner 5
   label: ADJ.Com.Scan5
   number: 5
@@ -892,7 +911,8 @@ fixtures:
       setting: 57
   - number: 5
     name: Master
-- uuid: bc72883
+- id: 20
+  uuid: bc72883
   name: Scanner 6
   label: ADJ.Inno.Spot1
   number: 6
@@ -1019,7 +1039,8 @@ fixtures:
       label: ""
       number: 1
       setting: 255
-- uuid: b2227bd
+- id: 21
+  uuid: b2227bd
   name: Scanner 7
   label: ADJ.Inno.Spot1
   number: 7
@@ -1146,7 +1167,8 @@ fixtures:
       label: ""
       number: 1
       setting: 255
-- uuid: 73b6d87
+- id: 22
+  uuid: 73b6d87
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1186,7 +1208,8 @@ fixtures:
       white: 0
     master: 0
     flash: false
-- uuid: e2c51c4
+- id: 23
+  uuid: e2c51c4
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1226,7 +1249,8 @@ fixtures:
       white: 0
     master: 0
     flash: false
-- uuid: e5a0531
+- id: 24
+  uuid: e5a0531
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1274,7 +1298,8 @@ fixtures:
       white: 0
     master: 0
     flash: false
-- uuid: ea28eaa
+- id: 25
+  uuid: ea28eaa
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1459,7 +1484,8 @@ fixtures:
       white: 0
     master: 0
     flash: false
-- uuid: e7549a7
+- id: 26
+  uuid: e7549a7
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -1661,13 +1687,16 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: par38
-- uuid: 408de46
+- id: 27
+  uuid: 408de46
   name: switch6
   label: SW6.DERBY
   number: 6
   description: ADJ DEKKER 1
   type: switch
   group: 4
+  address: 0
+  channels: []
   states:
   - name: "Off"
     number: 1
@@ -1852,7 +1881,8 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker1
-- uuid: "0085548"
+- id: 28
+  uuid: "0085548"
   name: switch7
   label: SW7.DERBY
   number: 7
@@ -1882,7 +1912,8 @@ fixtures:
       white: 0
     master: 0
     flash: false
-- uuid: b04e54c
+- id: 29
+  uuid: b04e54c
   name: switch8
   label: SW8.Booth
   number: 8

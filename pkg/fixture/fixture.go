@@ -96,6 +96,7 @@ type ActionConfig struct {
 }
 
 type Fixture struct {
+	ID             int       `yaml:"id"`
 	UUID           string    `yaml:"uuid"`
 	Name           string    `yaml:"name"`
 	Label          string    `yaml:"label,omitempty"`

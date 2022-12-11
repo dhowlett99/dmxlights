@@ -184,7 +184,6 @@ func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 	newItem.Name = "New"
 
 	for _, item := range channels {
-
 		if item.Number == id {
 			newChannels = append(newChannels, newItem)
 		}
