@@ -403,6 +403,14 @@ func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 	newFixture.Name = "New"
 	newFixture.Type = "rgb"
 
+	// Create a empty channel for this fixture.
+	newChannels := []fixture.Channel{}
+	newChannel := fixture.Channel{
+		Number: 1,
+	}
+	newChannels = append(newChannels, newChannel)
+	newFixture.Channels = newChannels
+
 	for _, fixture := range fixtures {
 		if fixture.ID == id {
 			newFixtures = append(newFixtures, newFixture)
