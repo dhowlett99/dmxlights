@@ -38,9 +38,25 @@ type ActionPanel struct {
 	ActionMusicOptions   []string
 	ActionProgramOptions []string
 	ActionStrobeOptions  []string
+	UpdateActions        bool
+	UpdateThisAction     int
+	CurrentState         int
 }
 
-func NewActionsPanel(actionsAvailable bool, actionsList []fixture.Action) *ActionPanel {
+const LABEL = 0
+const SELECT = 1
+
+const ACTIONS_NAME = 0
+const ACTIONS_COLORS = 1
+const ACTIONS_MODE = 2
+const ACTIONS_FADE = 3
+const ACTIONS_SPEED = 4
+const ACTIONS_ROTATE = 5
+const ACTIONS_MUSIC = 6
+const ACTIONS_PROGRAM = 7
+const ACTIONS_STROBE = 8
+
+func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
@@ -55,67 +71,242 @@ func NewActionsPanel(actionsAvailable bool, actionsList []fixture.Action) *Actio
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
 	// Actions Selection Panel.
-	if actionsAvailable {
-		ap.ActionsPanel = widget.NewList(
-			func() int {
-				return len(ap.ActionsList)
-			},
-			func() fyne.CanvasObject {
-				return container.NewVBox(
-					container.NewHBox(
-						widget.NewLabel("Name"),
-						widget.NewSelect(ap.ActionNameOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Colors"),
-						widget.NewSelect(ap.ActionColorsOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Mode"),
-						widget.NewSelect(ap.ActionModeOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Fade"),
-						widget.NewSelect(ap.ActionFadeOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Speed"),
-						widget.NewSelect(ap.ActionSpeedOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Rotate"),
-						widget.NewSelect(ap.ActionRotateOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Music"),
-						widget.NewSelect(ap.ActionMusicOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Program"),
-						widget.NewSelect(ap.ActionProgramOptions, func(value string) {}),
-					),
-					container.NewHBox(
-						widget.NewLabel("Strobe"),
-						widget.NewSelect(ap.ActionStrobeOptions, func(value string) {}),
-					),
-				)
-			},
-			// Function to update item in this list.
-			func(i widget.ListItemID, o fyne.CanvasObject) {
-				o.(*fyne.Container).Objects[0].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Name)
-				o.(*fyne.Container).Objects[1].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(strings.Join(ap.ActionsList[i].Colors[:], ","))
-				o.(*fyne.Container).Objects[2].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
-				o.(*fyne.Container).Objects[3].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
-				o.(*fyne.Container).Objects[4].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Speed)
-				o.(*fyne.Container).Objects[5].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Rotate)
-				o.(*fyne.Container).Objects[6].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Music)
-				o.(*fyne.Container).Objects[7].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Program)
-				o.(*fyne.Container).Objects[8].(*fyne.Container).Objects[1].(*widget.Select).SetSelected(ap.ActionsList[i].Strobe)
-			})
-	}
+	ap.ActionsPanel = widget.NewList(
+		func() int {
+			return len(ap.ActionsList)
+		},
+		func() fyne.CanvasObject {
+			return container.NewVBox(
+				container.NewHBox(
+					widget.NewLabel("Name"),
+					widget.NewSelect(ap.ActionNameOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Colors"),
+					widget.NewSelect(ap.ActionColorsOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Mode"),
+					widget.NewSelect(ap.ActionModeOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Fade"),
+					widget.NewSelect(ap.ActionFadeOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Speed"),
+					widget.NewSelect(ap.ActionSpeedOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Rotate"),
+					widget.NewSelect(ap.ActionRotateOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Music"),
+					widget.NewSelect(ap.ActionMusicOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Program"),
+					widget.NewSelect(ap.ActionProgramOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Strobe"),
+					widget.NewSelect(ap.ActionStrobeOptions, func(value string) {}),
+				),
+			)
+		},
+
+		// Function to update item in this list.
+		func(i widget.ListItemID, o fyne.CanvasObject) {
+			o.(*fyne.Container).Objects[ACTIONS_NAME].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Name)
+			o.(*fyne.Container).Objects[ACTIONS_NAME].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = value
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(strings.Join(ap.ActionsList[i].Colors[:], ","))
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = strings.Split(value, ",")
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
+			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = value
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
+			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = value
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Speed)
+			o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = value
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Rotate)
+			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = value
+				newAction.Music = ap.ActionsList[i].Music
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Music)
+			o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = value
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Program)
+			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Program
+				newAction.Program = value
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Strobe)
+			o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = ap.ActionsList[i].Size
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Music = ap.ActionsList[i].Program
+				newAction.Program = ap.ActionsList[i].Strobe
+				newAction.Strobe = value
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+		})
 	return &ap
 }
 
 func (ap *ActionPanel) UpdateActionList(actionList []fixture.Action) {
 	ap.ActionsList = actionList
+}
+
+// UpdateItem replaces the selected item by id with newItem.
+func UpdateAction(actions []fixture.Action, id int, newChannel fixture.Action) []fixture.Action {
+	newActions := []fixture.Action{}
+	for _, action := range actions {
+		if action.Number == id {
+			// update the channel information.
+			newActions = append(newActions, newChannel)
+		} else {
+			// just add what was there before.
+			newActions = append(newActions, action)
+		}
+	}
+	return newActions
 }

@@ -190,13 +190,13 @@ func GetFixureDetails(id int, fixtures *Fixtures) (Fixture, error) {
 
 	for _, fixture := range fixtures.Fixtures {
 		if debug {
-			fmt.Printf("Fixture ID %d\n", fixture.ID)
+			fmt.Printf("Fixture ID %d and Name %s States %+v\n", fixture.ID, fixture.Name, fixture.States)
 		}
 		if fixture.ID == id {
 			return fixture, nil
 		}
 	}
-	return Fixture{}, fmt.Errorf("error: fixture not found")
+	return Fixture{}, fmt.Errorf("error: fixture id %d not found", id)
 }
 
 // EditFixture - allows you to change the fixture details for the selected fixture.

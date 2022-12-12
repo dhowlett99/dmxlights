@@ -27,16 +27,9 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-type itemSelect struct {
-	Number  int16
-	Label   string
-	Options []string
-	Actions []fixture.Action
-}
+// Show a list of Statees
+func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
-func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
-
-	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
@@ -48,13 +41,13 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		Bold: true,
 	}
 
-	// Name, description and DMX address
+	// Name, description and which Fixture to use.
 	nameInput := widget.NewEntry()
 	nameInput.SetPlaceHolder(thisFixture.Name)
 	descInput := widget.NewEntry()
 	descInput.SetPlaceHolder(thisFixture.Description)
 	addrInput := widget.NewEntry()
-	addrInput.SetPlaceHolder(fmt.Sprintf("%d", thisFixture.Address))
+	addrInput.SetPlaceHolder(thisFixture.UseFixture)
 
 	// Top Form.
 	var formTopItems []*widget.FormItem
@@ -68,33 +61,34 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	formTopItems = append(formTopItems, formTopItem2)
 	name3 := widget.NewEntry()
 	name3.SetText(fmt.Sprintf("%d", thisFixture.Address))
-	formTopItem3 := widget.NewFormItem("DMX Address", name3)
+	formTopItem3 := widget.NewFormItem("Use Fixture", name3)
 	formTopItems = append(formTopItems, formTopItem3)
 	formTop := &widget.Form{
 		Items: formTopItems,
 	}
 
-	labelChannels := widget.NewLabel("Channels")
-	labelChannels.TextStyle = fyne.TextStyle{
+	labelStates := widget.NewLabel("Switch States")
+	labelStates.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
-	settingsList := []fixture.Setting{}
-	var st *SettingsPanel
+	// Populate State state settings and actions.
+	actionsList, statesList := populateStates(thisFixture)
 
-	// Create Settings Panel
-	var settingsPanel *widget.List
-	st = NewSettingsPanel(thisFixture, &currentChannel, settingsList)
-	settingsPanel = st.SettingsPanel
+	// Create Actions Panel.
+	ap := NewActionsPanel(actionsList)
+	ap.ActionsPanel.Hide()
 
-	// Create Channel Panel.
-	cp := NewChannelPanel(thisFixture, &currentChannel, channels, st)
+	// Create States Panel.
+	var StatesPanel *widget.List
+	sp := NewStatePanel(statesList, ap)
+	StatesPanel = sp.StatePanel
 
 	// Setup forms.
-	scrollableChannelList := container.NewVScroll(cp.ChannelPanel)
-	scrollableChannelList.SetMinSize(fyne.Size{Height: 400, Width: 250})
-	scrollableSettingsList := container.NewVScroll(settingsPanel)
-	scrollableSettingsList.SetMinSize(fyne.Size{Height: 400, Width: 250})
+	scrollableStateList := container.NewScroll(StatesPanel)
+	scrollableStateList.SetMinSize(fyne.Size{Height: 250, Width: 400})
+	scrollableActionsList := container.NewScroll(ap.ActionsPanel)
+	scrollableActionsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
 
 	// OK button.
 	buttonSave := widget.NewButton("OK", func() {
@@ -103,12 +97,11 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		newFixtures := fixture.Fixtures{}
 		for fixtureNumber, fixture := range fixtures.Fixtures {
 			if fixture.ID == id {
-				// Insert new channels into fixture above us, in the fixture selection panel.
-				fp.UpdateChannels = true
+				// Insert new states into fixture above us, in the fixture selection panel.
+				fp.UpdateStates = true
 				fp.UpdateThisFixture = fixtureNumber
-				fp.UpdatedChannelsList = cp.ChannelList
-				// Update our copy of the channel list.
-				thisFixture.Channels = cp.ChannelList
+				// Update our copy of the state list.
+				fp.UpdatedStatesList = sp.StatesList
 				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
@@ -126,11 +119,12 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
 
 	content := fyne.Container{}
-	t := container.NewBorder(title, nil, nil, nil, formTop)
-	top := container.NewBorder(t, nil, nil, nil, labelChannels)
-	box := container.NewAdaptiveGrid(2, scrollableChannelList, scrollableSettingsList)
-	middle := container.NewBorder(top, nil, nil, nil, box)
-	content = *container.NewBorder(middle, nil, nil, nil, saveCancel)
+
+	top := container.NewBorder(title, nil, nil, nil, formTop)
+	main := container.NewBorder(top, nil, nil, nil, labelStates)
+	forms := container.NewAdaptiveGrid(2, scrollableStateList, scrollableActionsList)
+	bottom := container.NewBorder(main, nil, nil, nil, forms)
+	content = *container.NewBorder(bottom, nil, nil, nil, saveCancel)
 
 	// Layout of settings panel.
 	modal = widget.NewModalPopUp(
@@ -138,4 +132,5 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		w.Canvas(),
 	)
 	return modal, nil
+
 }

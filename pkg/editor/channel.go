@@ -33,22 +33,19 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels []fixture.Channel, ap *ActionPanel, st *SettingsPanel) *ChannelPanel {
+func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurves", "Speed"}
-	cp.ChannelList = []fixture.Channel{}
-
-	// Populate fixture channels form.
 	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
 	cp.ChannelPanel = widget.NewList(
 		// Function to find length.
 		func() int {
-			if st.Update {
+			if st.UpdateSettings {
 				cp.ChannelList[st.UpdateThisChannel].Settings = st.SettingsList
-				st.Update = false
+				st.UpdateSettings = false
 			}
 			return len(cp.ChannelList)
 		},

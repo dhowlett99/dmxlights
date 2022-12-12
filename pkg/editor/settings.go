@@ -33,11 +33,11 @@ type SettingsPanel struct {
 	SettingsList      []fixture.Setting
 	SettingsOptions   []string
 	CurrentChannel    int
-	Update            bool
+	UpdateSettings    bool
 	UpdateThisChannel int
 }
 
-func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting, ap *ActionPanel) *SettingsPanel {
+func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting) *SettingsPanel {
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
@@ -74,7 +74,7 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting = st.SettingsList[i].Setting
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				st.Update = true
+				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
@@ -87,14 +87,14 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 				newSetting.Number = st.SettingsList[i].Number
 				newSetting.Setting, _ = strconv.Atoi(value)
 				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				st.Update = true
+				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
 			// Show the Delete Setting Button.
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
 				st.SettingsList = DeleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
-				st.Update = true
+				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
 			}
@@ -102,7 +102,7 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 			// Show the Add Setting Button.
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
 				st.SettingsList = AddSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
-				st.Update = true
+				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
 			}

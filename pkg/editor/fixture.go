@@ -33,12 +33,16 @@ import (
 type FixturesPanel struct {
 	FixturePanel      *widget.List
 	FixtureList       []fixture.Fixture
-	UpdateFixture     bool
-	UpdateChannelList []fixture.Channel
 	UpdateThisFixture int
-	GroupOptions      []string
-	NumberOptions     []string
-	TypeOptions       []string
+
+	UpdateChannels      bool
+	UpdateStates        bool
+	UpdatedChannelsList []fixture.Channel
+	UpdatedStatesList   []fixture.State
+
+	GroupOptions  []string
+	NumberOptions []string
+	TypeOptions   []string
 }
 
 const FIXTURE_ID int = 0
@@ -108,9 +112,13 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 	// Create a new list.
 	fp.FixturePanel = widget.NewList(
 		func() int {
-			if fp.UpdateFixture {
-				fp.FixtureList[fp.UpdateThisFixture].Channels = fp.UpdateChannelList
-				fp.UpdateFixture = false
+			if fp.UpdateChannels {
+				fp.FixtureList[fp.UpdateThisFixture].Channels = fp.UpdatedChannelsList
+				fp.UpdateChannels = false
+			}
+			if fp.UpdateStates {
+				fp.FixtureList[fp.UpdateThisFixture].States = fp.UpdatedStatesList
+				fp.UpdateChannels = false
 			}
 			return len(fp.FixtureList)
 		},
@@ -155,12 +163,24 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 					newSetting.Number = fp.FixtureList[i].Number
 					newSetting.Group = fp.FixtureList[i].Group
 					newSetting.Description = fp.FixtureList[i].Description
-					newSetting.Type = fp.FixtureList[i].Type
+					newSetting.Type = value
 					newSetting.Channels = fp.FixtureList[i].Channels
 					newSetting.States = fp.FixtureList[i].States
 					newSetting.NumberChannels = fp.FixtureList[i].NumberChannels
 					newSetting.UseFixture = fp.FixtureList[i].UseFixture
 					newSetting.Address = fp.FixtureList[i].Address
+
+					if newSetting.Type == "switch" && newSetting.States == nil {
+						newSetting.Channels = []fixture.Channel{}
+						// Create some default states
+						newSetting.States = []fixture.State{}
+						newState := fixture.State{
+							Number: 1,
+							Name:   "New",
+						}
+						newSetting.States = append(newSetting.States, newState)
+					}
+
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].ID, newSetting)
 				}
 			}
@@ -333,10 +353,20 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 			// Show and Edit Channel Definitions using the Channel Editor.
 			o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = func() {
-				modal, err := NewChannelEditor(w, fp.FixtureList[i].ID, fp.FixtureList[i].Channels, &fp, fixtures)
-				if err != nil {
-					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i].Group, fp.FixtureList[i].Number, err)
-					return
+				fixtures.Fixtures = fp.FixtureList
+				var modal *widget.PopUp
+				if fp.FixtureList[i].Type == "switch" {
+					modal, err = NewStateEditor(w, fp.FixtureList[i].ID, &fp, fixtures)
+					if err != nil {
+						fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i].Group, fp.FixtureList[i].Number, err)
+						return
+					}
+				} else {
+					modal, err = NewChannelEditor(w, fp.FixtureList[i].ID, fp.FixtureList[i].Channels, &fp, fixtures)
+					if err != nil {
+						fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i].Group, fp.FixtureList[i].Number, err)
+						return
+					}
 				}
 				modal.Resize(fyne.NewSize(800, 600))
 				modal.Show()
