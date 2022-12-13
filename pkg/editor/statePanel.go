@@ -92,68 +92,27 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[i].Number, newState)
 			}
 
-			// Show the Actions Button.
+			// State Access to the Actions Button.
 			o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).OnTapped = func() {
-				ap.ActionsList = []fixture.Action{}
-				for _, action := range sp.StatesList[i].Actions {
-					newAction := fixture.Action{}
-					newAction.Name = action.Name
-					newAction.Colors = action.Colors
-					newAction.Mode = action.Mode
-					newAction.Fade = action.Fade
-					newAction.Speed = action.Speed
-					ap.ActionsList = append(ap.ActionsList, newAction)
+				// Highlight this channel
+				sp.StatePanel.Select(i)
+				if sp.StatesList != nil {
+					// Get Existing Actions for this state.
+					index := sp.StatesList[i].Number - 1
+					ap.ActionsList = sp.StatesList[index].Actions
+
+					// If the settings are empty create a new set of settings.
+					if len(ap.ActionsList) == 0 {
+						// Create new settings.
+						ap.ActionsList = CreateActionsList(sp.StatesList)
+					}
 				}
-				if debug {
-					fmt.Printf("I am button %d actions %+v\n", sp.StatesList[i].Number, ap.ActionsList)
-				}
+				ap.CurrentState = int(sp.StatesList[i].Number - 1)
 				ap.ActionsPanel.Hidden = false
-				ap.CurrentState = int(sp.StatesList[i].Number)
 				ap.ActionsPanel.Refresh()
 			}
 		})
 	return &sp
-}
-
-func populateStates(thisFixture fixture.Fixture) (actionsList []fixture.Action, statesList []fixture.State) {
-
-	// Populate state state settings and actions.
-	for _, state := range thisFixture.States {
-		newState := fixture.State{}
-		newState.Name = state.Name
-		newState.Number = state.Number
-		newState.Label = state.Label
-		newState.Values = state.Values
-		newState.ButtonColor = state.ButtonColor
-		newState.Master = state.Master
-		newState.Actions = state.Actions
-		newState.Flash = state.Flash
-		if state.Actions != nil {
-			actionsList = []fixture.Action{}
-			for _, action := range state.Actions {
-				newAction := fixture.Action{}
-				newAction.Name = action.Name
-				newAction.Colors = action.Colors
-				newAction.Mode = action.Mode
-				newAction.Fade = action.Fade
-				if action.Speed != "" {
-					newAction.Speed = action.Speed
-				} else {
-					newAction.Speed = "none"
-				}
-				newAction.Rotate = action.Rotate
-				newAction.Music = action.Music
-				newAction.Program = action.Program
-				newAction.Strobe = action.Strobe
-
-				actionsList = append(actionsList, newAction)
-			}
-		}
-		newState.Actions = actionsList
-		statesList = append(statesList, newState)
-	}
-
-	return actionsList, statesList
 }
 
 // UpdateItem replaces the selected item by id with newItem.

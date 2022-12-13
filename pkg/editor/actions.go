@@ -62,7 +62,7 @@ func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 	ap.ActionsList = actionsList
 	ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	ap.ActionModeOptions = []string{"Off", "Chase", "Static"}
-	ap.ActionColorsOptions = []string{"None", "Red", "Green", "Blue"}
+	ap.ActionColorsOptions = []string{"Off", "Red", "Green", "Blue"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 	ap.ActionRotateOptions = []string{"Off", "Forward", "Reverse", "Auto"}
@@ -292,21 +292,36 @@ func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 	return &ap
 }
 
-func (ap *ActionPanel) UpdateActionList(actionList []fixture.Action) {
-	ap.ActionsList = actionList
-}
-
 // UpdateItem replaces the selected item by id with newItem.
-func UpdateAction(actions []fixture.Action, id int, newChannel fixture.Action) []fixture.Action {
+func UpdateAction(actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
 	newActions := []fixture.Action{}
 	for _, action := range actions {
 		if action.Number == id {
 			// update the channel information.
-			newActions = append(newActions, newChannel)
+			newActions = append(newActions, newAction)
 		} else {
 			// just add what was there before.
 			newActions = append(newActions, action)
 		}
 	}
 	return newActions
+}
+
+func CreateActionsList(stateList []fixture.State) (actionsList []fixture.Action) {
+
+	newAction := fixture.Action{}
+	newAction.Name = "Off"
+	newAction.Number = 1
+	newAction.Size = "Short"
+	newAction.Rotate = "Off"
+	newAction.Music = "Off"
+	newAction.Program = "Off"
+	newAction.Strobe = "Off"
+	newAction.Colors = []string{"Off"}
+	newAction.Mode = "Off"
+	newAction.Fade = "Off"
+	newAction.Speed = "Off"
+
+	actionsList = append(actionsList, newAction)
+	return actionsList
 }
