@@ -86,9 +86,9 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	// Setup forms.
 	scrollableStateList := container.NewScroll(StatesPanel)
-	scrollableStateList.SetMinSize(fyne.Size{Height: 250, Width: 400})
+	scrollableStateList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 	scrollableActionsList := container.NewScroll(ap.ActionsPanel)
-	scrollableActionsList.SetMinSize(fyne.Size{Height: 250, Width: 300})
+	scrollableActionsList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 
 	// OK button.
 	buttonSave := widget.NewButton("OK", func() {
