@@ -60,7 +60,7 @@ type State struct {
 	Number      int16    `yaml:"number"`
 	Label       string   `yaml:"label"`
 	Values      []Value  `yaml:"values,omitempty"`
-	ButtonColor Color    `yaml:"buttoncolor"`
+	ButtonColor string   `yaml:"buttoncolor"`
 	Master      int      `yaml:"master"`
 	Actions     []Action `yaml:"actions,omitempty"`
 	Flash       bool     `yaml:"flash"`

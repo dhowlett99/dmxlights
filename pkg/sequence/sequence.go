@@ -237,9 +237,11 @@ func CreateSequence(
 					newState.Name = state.Name
 					newState.Number = state.Number
 					newState.Label = state.Label
-					newState.ButtonColor.R = state.ButtonColor.R
-					newState.ButtonColor.G = state.ButtonColor.G
-					newState.ButtonColor.B = state.ButtonColor.B
+
+					buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+					newState.ButtonColor.R = buttonColor.R
+					newState.ButtonColor.G = buttonColor.G
+					newState.ButtonColor.B = buttonColor.B
 					newState.Flash = state.Flash
 
 					// Copy values.

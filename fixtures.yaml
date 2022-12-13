@@ -1164,11 +1164,7 @@ fixtures:
       description: Dimmer
       channel: "69"
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: "On"
@@ -1179,11 +1175,7 @@ fixtures:
       description: Dimmer
       channel: "69"
       setting: "255"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
 - id: 23
@@ -1204,11 +1196,7 @@ fixtures:
       description: Dimmer
       channel: "57"
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: "On"
@@ -1219,11 +1207,7 @@ fixtures:
       description: Dimmer
       channel: "57"
       setting: "255"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
 - id: 24
@@ -1244,11 +1228,7 @@ fixtures:
       description: Dimmer
       channel: "145"
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: "On"
@@ -1267,11 +1247,7 @@ fixtures:
       description: Color Change Speed
       channel: "147"
       setting: "135"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
 - id: 25
@@ -1312,11 +1288,7 @@ fixtures:
       description: Dimmer
       channel: "144"
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: Red
@@ -1347,11 +1319,7 @@ fixtures:
       description: Dimmer
       channel: "144"
       setting: "255"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
   - name: Slow Color Change
@@ -1382,11 +1350,7 @@ fixtures:
       description: Dimmer
       channel: "144"
       setting: "255"
-    buttoncolor:
-      red: 255
-      green: 100
-      blue: 100
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
   - name: Meduim Color Change
@@ -1417,11 +1381,7 @@ fixtures:
       description: Dimmer
       channel: "144"
       setting: "255"
-    buttoncolor:
-      red: 0
-      green: 0
-      blue: 255
-      white: 0
+    buttoncolor: Blue
     master: 0
     flash: false
   - name: Sound Triggered Color Change
@@ -1452,11 +1412,7 @@ fixtures:
       description: Dimmer
       channel: "144"
       setting: "255"
-    buttoncolor:
-      red: 128
-      green: 47
-      blue: 187
-      white: 0
+    buttoncolor: Yellow
     master: 0
     flash: false
 - id: 26
@@ -1505,11 +1461,7 @@ fixtures:
       description: ColorMacros
       channel: "157"
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     actions:
     - name: "Off"
@@ -1527,11 +1479,7 @@ fixtures:
   - name: Red
     number: 2
     label: Red
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     actions:
     - name: Red
@@ -1550,11 +1498,7 @@ fixtures:
   - name: Green
     number: 3
     label: Green
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     actions:
     - name: Green
@@ -1573,11 +1517,7 @@ fixtures:
   - name: Blue
     number: 4
     label: Blue
-    buttoncolor:
-      red: 0
-      green: 0
-      blue: 255
-      white: 0
+    buttoncolor: Blue
     master: 0
     actions:
     - name: Blue
@@ -1596,11 +1536,7 @@ fixtures:
   - name: "On"
     number: 5
     label: "On"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     actions:
     - name: Soft
@@ -1634,11 +1570,7 @@ fixtures:
       description: Macro
       channel: "157"
       setting: "0"
-    buttoncolor:
-      red: 255
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Yellow
     master: 0
     actions:
     - name: Sound
@@ -1707,11 +1639,7 @@ fixtures:
       description: ProgramSpeed
       channel: ProgramSpeed
       setting: "0"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     actions:
     - name: "Off"
@@ -1729,11 +1657,7 @@ fixtures:
   - name: Red
     number: 2
     label: Red
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     actions:
     - name: Red
@@ -1752,11 +1676,7 @@ fixtures:
   - name: Green
     number: 3
     label: Green
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     actions:
     - name: Green
@@ -1775,11 +1695,7 @@ fixtures:
   - name: Blue
     number: 4
     label: Blue
-    buttoncolor:
-      red: 0
-      green: 0
-      blue: 255
-      white: 0
+    buttoncolor: Blue
     master: 0
     actions:
     - name: Blue
@@ -1798,11 +1714,7 @@ fixtures:
   - name: Soft
     number: 5
     label: Soft
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     actions:
     - name: Soft
@@ -1827,11 +1739,7 @@ fixtures:
   - name: Sound
     number: 6
     label: Sound
-    buttoncolor:
-      red: 255
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Yellow
     master: 0
     actions:
     - name: Rotate
@@ -1867,21 +1775,13 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: "On"
     number: 2
     label: "On"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
 - id: 29
@@ -1897,21 +1797,13 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    buttoncolor:
-      red: 0
-      green: 255
-      blue: 0
-      white: 0
+    buttoncolor: Green
     master: 0
     flash: false
   - name: "On"
     number: 2
     label: "On"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
   - name: Slow
@@ -1922,10 +1814,6 @@ fixtures:
       description: Operating Mode
       channel: "139"
       setting: "255"
-    buttoncolor:
-      red: 255
-      green: 0
-      blue: 0
-      white: 0
+    buttoncolor: Red
     master: 0
     flash: false
