@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"sort"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -34,7 +35,9 @@ type StatePanel struct {
 
 const STATE_ID int = 0
 const STATE_NAME int = 1
-const STATE_ACTIONS int = 2
+const STATE_DELETE int = 2
+const STATE_ADD int = 3
+const STATE_ACTIONS int = 4
 
 func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 
@@ -63,6 +66,12 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				widget.NewSelect(sp.StateOptions, func(value string) {
 				}),
 
+				// Chanell delete button.
+				widget.NewButton("-", func() {}),
+
+				// Channel add button
+				widget.NewButton("+", func() {}),
+
 				// Select Actions.
 				widget.NewButton("Select", nil),
 			)
@@ -90,6 +99,18 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Values = sp.StatesList[i].Values
 				newState.Actions = sp.StatesList[i].Actions
 				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[i].Number, newState)
+			}
+
+			// Channel Delete Button.
+			o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).OnTapped = func() {
+				sp.StatesList = DeleteState(sp.StatesList, sp.StatesList[i].Number)
+				sp.StatePanel.Refresh()
+			}
+
+			// Channel Add Button.
+			o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).OnTapped = func() {
+				sp.StatesList = AddState(sp.StatesList, sp.StatesList[i].Number, sp.StateOptions)
+				sp.StatePanel.Refresh()
 			}
 
 			// State Access to the Actions Button.
@@ -128,4 +149,58 @@ func UpdateStateItem(states []fixture.State, id int16, newState fixture.State) [
 		}
 	}
 	return newStates
+}
+
+func AddState(states []fixture.State, id int16, options []string) []fixture.State {
+	newStates := []fixture.State{}
+	newItem := fixture.State{}
+	newItem.Number = id + 1
+	if StateItemAllreadyExists(newItem.Number, states) {
+		newItem.Number = FindLargestStateNumber(states) + 1
+	}
+	newItem.Name = "New"
+
+	for _, item := range states {
+		if item.Number == id {
+			newStates = append(newStates, newItem)
+		}
+		newStates = append(newStates, item)
+	}
+	sort.Slice(newStates, func(i, j int) bool {
+		return newStates[i].Number < newStates[j].Number
+	})
+	return newStates
+}
+
+func DeleteState(stateList []fixture.State, id int16) []fixture.State {
+	newStates := []fixture.State{}
+	if id == 1 {
+		return stateList
+	}
+	for _, channel := range stateList {
+		if channel.Number != id {
+			newStates = append(newStates, channel)
+		}
+	}
+	return newStates
+}
+
+func StateItemAllreadyExists(number int16, stateList []fixture.State) bool {
+	// look through the state list for the id's
+	for _, item := range stateList {
+		if item.Number == number {
+			return true
+		}
+	}
+	return false
+}
+
+func FindLargestStateNumber(items []fixture.State) int16 {
+	var number int16
+	for _, item := range items {
+		if item.Number > number {
+			number = item.Number
+		}
+	}
+	return number
 }
