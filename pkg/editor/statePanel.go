@@ -28,10 +28,10 @@ import (
 )
 
 type StatePanel struct {
-	StatePanel   *widget.List
-	StatesList   []fixture.State
-	ColorOptions []string
-	StateOptions []string
+	StatePanel         *widget.List
+	StatesList         []fixture.State
+	ButtonColorOptions []string
+	StateOptions       []string
 }
 
 const (
@@ -46,7 +46,7 @@ const (
 func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 
 	sp := StatePanel{}
-	sp.ColorOptions = []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
+	sp.ButtonColorOptions = []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
 	sp.StateOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	sp.StatesList = statesList
 
@@ -73,7 +73,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				}),
 
 				// Button Color.
-				widget.NewSelect(sp.ColorOptions, func(value string) {}),
+				widget.NewSelect(sp.ButtonColorOptions, func(value string) {}),
 
 				// Chanell delete button.
 				widget.NewButton("-", func() {}),
@@ -113,7 +113,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Select).PlaceHolder = "Select"
 
 			// Show the selection box for button color.
-			for _, option := range sp.ColorOptions {
+			for _, option := range sp.ButtonColorOptions {
 				if option == sp.StatesList[i].ButtonColor {
 					o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).SetSelected(option)
 				}
@@ -124,8 +124,8 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Name = sp.StatesList[i].Name
 				newState.Number = sp.StatesList[i].Number
 				newState.Master = sp.StatesList[i].Master
-				newState.Label = value
-				newState.ButtonColor = sp.StatesList[i].ButtonColor
+				newState.Label = sp.StatesList[i].Label
+				newState.ButtonColor = value
 				newState.Flash = sp.StatesList[i].Flash
 				newState.Values = sp.StatesList[i].Values
 				newState.Actions = sp.StatesList[i].Actions

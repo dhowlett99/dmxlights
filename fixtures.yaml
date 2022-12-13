@@ -1639,7 +1639,7 @@ fixtures:
       description: ProgramSpeed
       channel: ProgramSpeed
       setting: "0"
-    buttoncolor: Green
+    buttoncolor: Black
     master: 0
     actions:
     - name: "Off"
@@ -1714,7 +1714,7 @@ fixtures:
   - name: Soft
     number: 5
     label: Soft
-    buttoncolor: Red
+    buttoncolor: Yellow
     master: 0
     actions:
     - name: Soft
@@ -1739,7 +1739,7 @@ fixtures:
   - name: Sound
     number: 6
     label: Sound
-    buttoncolor: Yellow
+    buttoncolor: White
     master: 0
     actions:
     - name: Rotate
