@@ -213,69 +213,8 @@ func CreateSequence(
 	}
 
 	if sequenceType == "switch" {
-
-		if debug {
-			fmt.Printf("Load switch data\n")
-		}
-
 		// Load the switch information in from the fixtures.yaml file.
-		// A new group of switches.
-		newSwitchList := []common.Switch{}
-		for _, fixture := range fixturesConfig.Fixtures {
-			if fixture.Group == mySequenceNumber+1 {
-				// find switch data.
-				newSwitch := common.Switch{}
-				newSwitch.Name = fixture.Name
-				newSwitch.Label = fixture.Label
-				newSwitch.Number = fixture.Number
-				newSwitch.Description = fixture.Description
-				newSwitch.UseFixture = fixture.UseFixture
-
-				newSwitch.States = []common.State{}
-				for _, state := range fixture.States {
-					newState := common.State{}
-					newState.Name = state.Name
-					newState.Number = state.Number
-					newState.Label = state.Label
-
-					buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
-					newState.ButtonColor.R = buttonColor.R
-					newState.ButtonColor.G = buttonColor.G
-					newState.ButtonColor.B = buttonColor.B
-					newState.Flash = state.Flash
-
-					// Copy values.
-					newState.Values = []common.Value{}
-					for _, value := range state.Values {
-						newValue := common.Value{}
-						newValue.Channel = value.Channel
-						newValue.Setting = value.Setting
-						newState.Values = append(newState.Values, newValue)
-					}
-
-					// Copy actions.
-					newState.Actions = []common.Action{}
-					for _, action := range state.Actions {
-						newAction := common.Action{}
-						newAction.Name = action.Name
-						newAction.Colors = action.Colors
-						newAction.Mode = action.Mode
-						newAction.Fade = action.Fade
-						newAction.Speed = action.Speed
-						newAction.Rotate = action.Rotate
-						newAction.Music = action.Music
-						newAction.Program = action.Program
-						newState.Actions = append(newState.Actions, newAction)
-					}
-
-					newSwitch.States = append(newSwitch.States, newState)
-				}
-				// Add new switch to the list.
-				newSwitchList = append(newSwitchList, newSwitch)
-			}
-		}
-		sequence.Type = sequenceType
-		sequence.Switches = newSwitchList
+		sequence.Switches = LoadSwitchConfiguration(mySequenceNumber, fixturesConfig)
 		sequence.PlaySwitchOnce = true
 	}
 
@@ -1073,4 +1012,69 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 	}
 	// Now turn pink the selected sequence select light.
 	common.LightLamp(common.ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+}
+
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
+
+	if debug {
+		fmt.Printf("Load switch data\n")
+	}
+
+	// A new group of switches.
+	newSwitchList := []common.Switch{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Group == mySequenceNumber+1 {
+			// find switch data.
+			newSwitch := common.Switch{}
+			newSwitch.Name = fixture.Name
+			newSwitch.Label = fixture.Label
+			newSwitch.Number = fixture.Number
+			newSwitch.Description = fixture.Description
+			newSwitch.UseFixture = fixture.UseFixture
+
+			newSwitch.States = []common.State{}
+			for _, state := range fixture.States {
+				newState := common.State{}
+				newState.Name = state.Name
+				newState.Number = state.Number
+				newState.Label = state.Label
+
+				buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+				newState.ButtonColor.R = buttonColor.R
+				newState.ButtonColor.G = buttonColor.G
+				newState.ButtonColor.B = buttonColor.B
+				newState.Flash = state.Flash
+
+				// Copy values.
+				newState.Values = []common.Value{}
+				for _, value := range state.Values {
+					newValue := common.Value{}
+					newValue.Channel = value.Channel
+					newValue.Setting = value.Setting
+					newState.Values = append(newState.Values, newValue)
+				}
+
+				// Copy actions.
+				newState.Actions = []common.Action{}
+				for _, action := range state.Actions {
+					newAction := common.Action{}
+					newAction.Name = action.Name
+					newAction.Colors = action.Colors
+					newAction.Mode = action.Mode
+					newAction.Fade = action.Fade
+					newAction.Speed = action.Speed
+					newAction.Rotate = action.Rotate
+					newAction.Music = action.Music
+					newAction.Program = action.Program
+					newState.Actions = append(newState.Actions, newAction)
+				}
+
+				newSwitch.States = append(newSwitch.States, newState)
+			}
+			// Add new switch to the list.
+			newSwitchList = append(newSwitchList, newSwitch)
+		}
+	}
+
+	return newSwitchList
 }
