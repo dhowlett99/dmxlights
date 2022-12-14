@@ -1639,7 +1639,7 @@ fixtures:
       description: ProgramSpeed
       channel: ProgramSpeed
       setting: "0"
-    buttoncolor: Black
+    buttoncolor: Green
     master: 0
     actions:
     - name: "Off"
