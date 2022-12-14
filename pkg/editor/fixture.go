@@ -27,6 +27,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
@@ -57,7 +58,7 @@ const FIXTURE_DELETE int = 8
 const FIXTURE_ADD int = 9
 const FIXTURE_CHANNELS int = 10
 
-func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (modal *widget.PopUp, err error) {
 
 	fp := FixturesPanel{}
 	fp.FixtureList = []fixture.Fixture{}
@@ -379,6 +380,21 @@ func NewFixturePanel(w fyne.Window, group int, number int, fixtures *fixture.Fix
 
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
+
+		// Clear switch positions to their first positions.
+		for _, seq := range sequences {
+			if seq.Type == "switch" {
+				fmt.Printf("Send a message to seq %d\n", seq.Number)
+				cmd := common.Command{
+					Action: common.ResetAllSwitchPositions,
+					Args: []common.Arg{
+						{Name: "Fixtures", Value: fixtures},
+					},
+				}
+				// Send a message to the switch sequence.
+				common.SendCommandToSequence(seq.Number, cmd, commandChannels)
+			}
+		}
 
 		// Save the new fixtures file.
 		err := fixture.SaveFixtures("fixtures.yaml", fixtures)

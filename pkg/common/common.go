@@ -76,7 +76,7 @@ type State struct {
 	Number      int16
 	Label       string
 	Values      []Value
-	ButtonColor Color
+	ButtonColor string
 	Actions     []Action
 	Flash       bool
 }
@@ -173,6 +173,7 @@ const (
 	UpdateFunctions
 	GetUpdatedSequence
 	ClearAllSwitchPositions
+	ResetAllSwitchPositions
 	UpdateSwitch
 	Inverted
 	UpdateGobo
