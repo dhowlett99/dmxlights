@@ -384,7 +384,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		// Clear switch positions to their first positions.
 		for _, seq := range sequences {
 			if seq.Type == "switch" {
-				fmt.Printf("Send a message to seq %d\n", seq.Number)
 				cmd := common.Command{
 					Action: common.ResetAllSwitchPositions,
 					Args: []common.Arg{

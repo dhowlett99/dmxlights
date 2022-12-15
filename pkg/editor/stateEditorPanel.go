@@ -76,7 +76,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	statesList := thisFixture.States
 
 	// Create Actions Panel.
-	ap := NewActionsPanel([]fixture.Action{})
+	ap := NewActionsPanel(w, []fixture.Action{})
 	ap.ActionsPanel.Hide()
 
 	// Create States Panel.

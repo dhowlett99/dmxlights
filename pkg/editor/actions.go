@@ -18,9 +18,11 @@
 package editor
 
 import (
+	"image/color"
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -43,6 +45,13 @@ type ActionPanel struct {
 	CurrentState         int
 }
 
+type ColorPanel struct {
+	UpdateThisAction int
+	UpdateColors     bool
+	ColorSelection   string // Coma seperated string of color names, Upcase first letter.
+	Rectanges        []*canvas.Rectangle
+}
+
 const LABEL = 0
 const SELECT = 1
 
@@ -56,13 +65,12 @@ const ACTIONS_MUSIC = 6
 const ACTIONS_PROGRAM = 7
 const ACTIONS_STROBE = 8
 
-func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
+func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
 	ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	ap.ActionModeOptions = []string{"Off", "Chase", "Static"}
-	ap.ActionColorsOptions = []string{"Off", "Red", "Green", "Blue"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 	ap.ActionRotateOptions = []string{"Off", "Forward", "Reverse", "Auto"}
@@ -70,9 +78,30 @@ func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 	ap.ActionProgramOptions = []string{"Off", "Slow", "Medium", "Fast"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
+	cp := ColorPanel{}
+
 	// Actions Selection Panel.
 	ap.ActionsPanel = widget.NewList(
 		func() int {
+			if cp.UpdateColors {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[cp.UpdateThisAction].Name
+				newAction.Number = ap.ActionsList[cp.UpdateThisAction].Number
+				newAction.Colors = strings.Split(cp.ColorSelection, ",")
+				newAction.Mode = ap.ActionsList[cp.UpdateThisAction].Mode
+				newAction.Fade = ap.ActionsList[cp.UpdateThisAction].Fade
+				newAction.Size = ap.ActionsList[cp.UpdateThisAction].Size
+				newAction.Speed = ap.ActionsList[cp.UpdateThisAction].Speed
+				newAction.Rotate = ap.ActionsList[cp.UpdateThisAction].Rotate
+				newAction.Music = ap.ActionsList[cp.UpdateThisAction].Music
+				newAction.Program = ap.ActionsList[cp.UpdateThisAction].Program
+				newAction.Strobe = ap.ActionsList[cp.UpdateThisAction].Strobe
+				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[cp.UpdateThisAction].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+				cp.UpdateColors = false
+			}
+
 			return len(ap.ActionsList)
 		},
 		func() fyne.CanvasObject {
@@ -83,7 +112,17 @@ func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 				),
 				container.NewHBox(
 					widget.NewLabel("Colors"),
-					widget.NewSelect(ap.ActionColorsOptions, func(value string) {}),
+					widget.NewButton("Select", func() {}),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(color.White),
 				),
 				container.NewHBox(
 					widget.NewLabel("Mode"),
@@ -137,24 +176,43 @@ func NewActionsPanel(actionsList []fixture.Action) *ActionPanel {
 				ap.UpdateThisAction = ap.CurrentState
 			}
 
-			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(strings.Join(ap.ActionsList[i].Colors[:], ","))
-			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
-				newAction := fixture.Action{}
-				newAction.Name = ap.ActionsList[i].Name
-				newAction.Number = ap.ActionsList[i].Number
-				newAction.Colors = strings.Split(value, ",")
-				newAction.Mode = ap.ActionsList[i].Mode
-				newAction.Fade = ap.ActionsList[i].Fade
-				newAction.Size = ap.ActionsList[i].Size
-				newAction.Speed = ap.ActionsList[i].Speed
-				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Music
-				newAction.Program = ap.ActionsList[i].Program
-				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
-				ap.UpdateActions = true
-				ap.UpdateThisAction = ap.CurrentState
+			// Button for Color Selection.
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).OnTapped = func() {
+				modal := NewColorPicker(w, &cp, i)
+				modal.Show()
 			}
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle))
+
+			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
+			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle))
+
+			SetRectangleColors(&cp, ap.ActionsList[i].Colors)
 
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {

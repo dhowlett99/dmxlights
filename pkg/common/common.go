@@ -2,6 +2,7 @@ package common
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 	"sync"
 	"time"
@@ -676,6 +677,16 @@ func GetColorArrayByNames(names []string) ([]Color, error) {
 		colors = append(colors, newColor)
 	}
 	return colors, nil
+}
+
+// Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
+func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
+	NRGBAcolor := color.NRGBA{}
+	NRGBAcolor.R = uint8(alight.R)
+	NRGBAcolor.G = uint8(alight.G)
+	NRGBAcolor.B = uint8(alight.B)
+	NRGBAcolor.A = 255
+	return NRGBAcolor
 }
 
 func GetRGBColorByName(color string) (Color, error) {

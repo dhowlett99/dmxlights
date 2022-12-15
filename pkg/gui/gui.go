@@ -155,7 +155,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 			for {
 				// Turn on.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OnColor)
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OnColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
@@ -167,7 +167,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 				// Turn off.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OffColor)
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OffColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
@@ -179,16 +179,6 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 			}
 		}()
 	}
-}
-
-// Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
-func convertRGBtoNRGBA(alight common.Color) color.NRGBA {
-	NRGBAcolor := color.NRGBA{}
-	NRGBAcolor.R = uint8(alight.R)
-	NRGBAcolor.G = uint8(alight.G)
-	NRGBAcolor.B = uint8(alight.B)
-	NRGBAcolor.A = 255
-	return NRGBAcolor
 }
 
 func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
