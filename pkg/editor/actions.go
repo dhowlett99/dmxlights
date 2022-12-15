@@ -49,6 +49,7 @@ type ColorPanel struct {
 	UpdateThisAction int
 	UpdateColors     bool
 	ColorSelection   string // Coma seperated string of color names, Upcase first letter.
+	Result           Result
 	Rectanges        []*canvas.Rectangle
 }
 
@@ -212,7 +213,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
 			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle))
 
-			SetRectangleColors(&cp, ap.ActionsList[i].Colors)
+			cp.Result = SetRectangleColors(&cp, ap.ActionsList[i].Colors)
 
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {

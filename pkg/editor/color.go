@@ -45,7 +45,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	redButton.check = widget.NewCheck("", func(value bool) {
 		result.red = true
 	})
-	redButton.container = container.NewMax(redButton.rectangle, redButton.button, redButton.check)
+	if cp.Result.red {
+		redButton.check.SetChecked(true)
+	}
+	redButton.container = container.NewMax(redButton.rectangle, redButton.check)
 
 	orangeButton := Button{}
 	orangeButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
@@ -57,7 +60,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	orangeButton.check = widget.NewCheck("", func(value bool) {
 		result.orange = true
 	})
-	orangeButton.container = container.NewMax(orangeButton.rectangle, orangeButton.button, orangeButton.check)
+	if cp.Result.orange {
+		orangeButton.check.SetChecked(true)
+	}
+	orangeButton.container = container.NewMax(orangeButton.rectangle, orangeButton.check)
 
 	yellowButton := Button{}
 	yellowButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
@@ -69,7 +75,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	yellowButton.check = widget.NewCheck("", func(value bool) {
 		result.yellow = true
 	})
-	yellowButton.container = container.NewMax(yellowButton.rectangle, yellowButton.button, yellowButton.check)
+	if cp.Result.yellow {
+		yellowButton.check.SetChecked(true)
+	}
+	yellowButton.container = container.NewMax(yellowButton.rectangle, yellowButton.check)
 
 	greenButton := Button{}
 	greenButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
@@ -81,7 +90,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	greenButton.check = widget.NewCheck("", func(value bool) {
 		result.green = true
 	})
-	greenButton.container = container.NewMax(greenButton.rectangle, greenButton.button, greenButton.check)
+	if cp.Result.green {
+		greenButton.check.SetChecked(true)
+	}
+	greenButton.container = container.NewMax(greenButton.rectangle, greenButton.check)
 
 	cyanButton := Button{}
 	cyanButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
@@ -93,7 +105,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	cyanButton.check = widget.NewCheck("", func(value bool) {
 		result.cyan = true
 	})
-	cyanButton.container = container.NewMax(cyanButton.rectangle, cyanButton.button, cyanButton.check)
+	if cp.Result.cyan {
+		cyanButton.check.SetChecked(true)
+	}
+	cyanButton.container = container.NewMax(cyanButton.rectangle, cyanButton.check)
 
 	blueButton := Button{}
 	blueButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
@@ -105,7 +120,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	blueButton.check = widget.NewCheck("", func(value bool) {
 		result.blue = true
 	})
-	blueButton.container = container.NewMax(blueButton.rectangle, blueButton.button, blueButton.check)
+	if cp.Result.blue {
+		blueButton.check.SetChecked(true)
+	}
+	blueButton.container = container.NewMax(blueButton.rectangle, blueButton.check)
 
 	purpleButton := Button{}
 	purpleButton.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
@@ -117,7 +135,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	purpleButton.check = widget.NewCheck("", func(value bool) {
 		result.purple = true
 	})
-	purpleButton.container = container.NewMax(purpleButton.rectangle, purpleButton.button, purpleButton.check)
+	if cp.Result.purple {
+		purpleButton.check.SetChecked(true)
+	}
+	purpleButton.container = container.NewMax(purpleButton.rectangle, purpleButton.check)
 
 	pinkButton := Button{}
 	pinkButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
@@ -129,7 +150,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	pinkButton.check = widget.NewCheck("", func(value bool) {
 		result.pink = true
 	})
-	pinkButton.container = container.NewMax(pinkButton.rectangle, pinkButton.button, pinkButton.check)
+	if cp.Result.pink {
+		pinkButton.check.SetChecked(true)
+	}
+	pinkButton.container = container.NewMax(pinkButton.rectangle, pinkButton.check)
 
 	whiteButton := Button{}
 	whiteButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
@@ -141,7 +165,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	whiteButton.check = widget.NewCheck("", func(value bool) {
 		result.white = true
 	})
-	whiteButton.container = container.NewMax(whiteButton.rectangle, whiteButton.button, whiteButton.check)
+	if cp.Result.white {
+		whiteButton.check.SetChecked(true)
+	}
+	whiteButton.container = container.NewMax(whiteButton.rectangle, whiteButton.check)
 
 	blackButton := Button{}
 	blackButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 0, A: 255})
@@ -153,7 +180,10 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 	blackButton.check = widget.NewCheck("", func(value bool) {
 		result.black = true
 	})
-	blackButton.container = container.NewMax(blackButton.rectangle, blackButton.button, blackButton.check)
+	if cp.Result.black {
+		blackButton.check.SetChecked(true)
+	}
+	blackButton.container = container.NewMax(blackButton.rectangle, blackButton.check)
 
 	colors := []string{}
 	ok := widget.NewButton("OK", func() {
@@ -192,6 +222,7 @@ func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *wid
 		// Now tell the Actions panel to update
 		cp.ColorSelection = strings.Join(colors, ",")
 		cp.UpdateColors = true
+		cp.Result = result
 		cp.UpdateThisAction = actionNumber
 
 		SetRectangleColors(cp, colors)
