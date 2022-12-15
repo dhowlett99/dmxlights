@@ -41,6 +41,12 @@ type FixturesPanel struct {
 	UpdatedChannelsList []fixture.Channel
 	UpdatedStatesList   []fixture.State
 
+	UpdateUseFixture bool
+	UseFixture       string
+
+	UpdateDescription bool
+	Description       string
+
 	GroupOptions  []string
 	NumberOptions []string
 	TypeOptions   []string
@@ -121,6 +127,13 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				fp.FixtureList[fp.UpdateThisFixture].States = fp.UpdatedStatesList
 				fp.UpdateChannels = false
 			}
+			if fp.UpdateUseFixture {
+				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
+			}
+			if fp.UpdateDescription {
+				fp.FixtureList[fp.UpdateThisFixture].Description = fp.Description
+			}
+
 			return len(fp.FixtureList)
 		},
 
@@ -422,6 +435,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		w.Canvas(),
 	)
 	return modal, nil
+}
+
+func GetFixtureLabelsForSwitches(fixtures *fixture.Fixtures) []string {
+	fixturesAvailable := []string{}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Type != "switch" {
+			fixturesAvailable = append(fixturesAvailable, fixture.Label)
+		}
+	}
+	return fixturesAvailable
 }
 
 func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) []fixture.Fixture {

@@ -35,37 +35,51 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
 	}
 
+	// Generate a list of functions that switches can use.
+	fixturesAvailable := GetFixtureLabelsForSwitches(fixtures)
+
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("ID:%d Edit Config for Sequence %d Fixture %d", thisFixture.ID, thisFixture.Group, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
 
-	// Name, description and which Fixture to use.
-	nameInput := widget.NewEntry()
-	nameInput.SetPlaceHolder(thisFixture.Name)
+	// Name.
+	nameInput := widget.NewLabel(thisFixture.Name)
+	nameLabel := widget.NewLabel("Name")
+	name := container.NewAdaptiveGrid(3, nameLabel, nameInput, layout.NewSpacer())
+
+	// Description.
 	descInput := widget.NewEntry()
 	descInput.SetPlaceHolder(thisFixture.Description)
-	addrInput := widget.NewEntry()
-	addrInput.SetPlaceHolder(thisFixture.UseFixture)
-
-	// Top Form.
-	var formTopItems []*widget.FormItem
-	name1 := widget.NewEntry()
-	name1.SetText(thisFixture.Name)
-	formTopItem := widget.NewFormItem("Name", name1)
-	formTopItems = append(formTopItems, formTopItem)
-	name2 := widget.NewEntry()
-	name2.SetText(thisFixture.Description)
-	formTopItem2 := widget.NewFormItem("Description", name2)
-	formTopItems = append(formTopItems, formTopItem2)
-	name3 := widget.NewEntry()
-	name3.SetText(fmt.Sprintf("%d", thisFixture.Address))
-	formTopItem3 := widget.NewFormItem("Use Fixture", name3)
-	formTopItems = append(formTopItems, formTopItem3)
-	formTop := &widget.Form{
-		Items: formTopItems,
+	descLabel := widget.NewLabel("Description")
+	desc := container.NewAdaptiveGrid(3, descLabel, descInput, layout.NewSpacer())
+	// Update the Description.
+	descInput.OnChanged = func(value string) {
+		fp.UpdateThisFixture = thisFixture.ID - 1
+		fp.UpdateDescription = true
+		fp.Description = value
 	}
+
+	// Use Fixture.
+	useInput := widget.NewSelect(fixturesAvailable, func(value string) {})
+	useLabel := widget.NewLabel("Use Fixture")
+	use := container.NewAdaptiveGrid(3, useLabel, useInput, layout.NewSpacer())
+	// Update Use Fixture.
+	useInput.OnChanged = func(value string) {
+		fp.UpdateThisFixture = thisFixture.ID - 1
+		fp.UpdateUseFixture = true
+		fp.UseFixture = value
+	}
+
+	// Show the currently selected fixture option.
+	for _, option := range fixturesAvailable {
+		if option == thisFixture.UseFixture {
+			useInput.SetSelected(option)
+		}
+	}
+
+	formTop := container.NewVBox(name, desc, use)
 
 	labelStates := widget.NewLabel("Switch States")
 	labelStates.TextStyle = fyne.TextStyle{

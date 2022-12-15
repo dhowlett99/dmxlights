@@ -383,7 +383,7 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 	}
 }
 
-func lookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelName string, name string, label string, fixtures *Fixtures) (int, error) {
+func LookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelName string, name string, label string, fixtures *Fixtures) (int, error) {
 
 	if debug {
 		fmt.Printf("lookUpSettingLabelInFixtureDefinition for %s\n", channelName)
@@ -674,13 +674,12 @@ func MapSwitchFixture(mySequenceNumber int,
 									} else {
 										// If the setting contains a label, look up the label in the fixture definition.
 										fixture := findFixtureByName(useFixture, fixtures)
-										v, err := lookUpSettingLabelInFixtureDefinition(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
+										v, err := LookUpSettingLabelInFixtureDefinition(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
 										if err != nil {
-											fmt.Printf("lookUpSettingLabelInFixtureDefinition error: %s\n", err.Error())
+											fmt.Printf("LookUpSettingLabelInFixtureDefinition error: %s\n", err.Error())
 											fmt.Printf("dmxlights: error failed to find Name=%s in switch Setting=%s \n", value.Name, value.Setting)
 											fmt.Printf("fixture.Name %s, fixture.Number %d\n", fixture.Name, fixture.Number)
 											fmt.Printf("fixture.Group=%d, swiTch.Number=%d, value.Channel=%s, value.Name=%s, value.Setting=%s\n", fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting)
-											os.Exit(1)
 										}
 
 										// Handle the fact that the channel may be a label as well.
