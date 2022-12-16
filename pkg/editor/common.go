@@ -1,6 +1,7 @@
 package editor
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -49,9 +50,10 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 
 	var count int
 	for _, c := range colors {
-		if c != "" {
+		if c != "" && c != "Off" {
 			RGBcolor, _ := common.GetRGBColorByName(c)
 			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBcolor)
+			fmt.Printf("Color is %s\n", c)
 			cp.Buttons[c].check.Checked = true
 		} else {
 			cp.Rectanges[count].FillColor = color.White
