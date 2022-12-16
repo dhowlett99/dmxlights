@@ -108,7 +108,9 @@ func NewColorPickerPanel(w fyne.Window) *ColorPanel {
 		cp.ColorSelection = strings.Join(colors, ",")
 		cp.UpdateColors = true
 		cp.UpdateThisAction = cp.ActionNumber
-		SetRectangleColorsFromCheckState(&cp)
+
+		// Set the Rectangle display and update the color selection string.
+		SetFromCheckState(&cp)
 		cp.Modal.Hide()
 	})
 
