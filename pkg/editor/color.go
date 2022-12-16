@@ -11,244 +11,121 @@ import (
 	"fyne.io/fyne/v2/widget"
 )
 
+type ColorPanel struct {
+	Panel            *fyne.Container
+	UpdateThisAction int
+	UpdateColors     bool
+	ColorSelection   string // Coma seperated string of color names, Upcase first letter.
+	Buttons          map[string]Button
+	ActionNumber     int
+	Rectanges        []*canvas.Rectangle // Display rectangles.
+	Modal            *widget.PopUp
+}
+
 type Button struct {
-	button    *widget.Button
 	rectangle *canvas.Rectangle
 	check     *widget.Check
 	container *fyne.Container
 }
 
-type Result struct {
-	red    bool
-	orange bool
-	yellow bool
-	green  bool
-	blue   bool
-	cyan   bool
-	purple bool
-	pink   bool
-	white  bool
-	black  bool
-}
+func NewColorPickerPanel(w fyne.Window) *ColorPanel {
 
-func NewColorPicker(w fyne.Window, cp *ColorPanel, actionNumber int) (modal *widget.PopUp) {
+	cp := ColorPanel{}
+	cp.Buttons = make(map[string]Button, 10)
 
-	result := Result{}
+	red := Button{}
+	red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	red.check = widget.NewCheck("", func(value bool) {})
+	red.container = container.NewMax(red.rectangle, red.check)
+	cp.Buttons["Red"] = red
 
-	redButton := Button{}
-	redButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
-	redButton.button = widget.NewButton("Red", func() {})
-	size := fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	redButton.rectangle.SetMinSize(size)
-	redButton.check = widget.NewCheck("", func(value bool) {
-		result.red = true
-	})
-	if cp.Result.red {
-		redButton.check.SetChecked(true)
-	}
-	redButton.container = container.NewMax(redButton.rectangle, redButton.check)
+	orange := Button{}
+	orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
+	orange.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	orange.check = widget.NewCheck("", func(value bool) {})
+	orange.container = container.NewMax(orange.rectangle, orange.check)
+	cp.Buttons["Orange"] = orange
 
-	orangeButton := Button{}
-	orangeButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
-	orangeButton.button = widget.NewButton("Orange", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	orangeButton.rectangle.SetMinSize(size)
-	orangeButton.check = widget.NewCheck("", func(value bool) {
-		result.orange = true
-	})
-	if cp.Result.orange {
-		orangeButton.check.SetChecked(true)
-	}
-	orangeButton.container = container.NewMax(orangeButton.rectangle, orangeButton.check)
+	yellow := Button{}
+	yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
+	yellow.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	yellow.check = widget.NewCheck("", func(value bool) {})
+	yellow.container = container.NewMax(yellow.rectangle, yellow.check)
+	cp.Buttons["Yellow"] = yellow
 
-	yellowButton := Button{}
-	yellowButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
-	yellowButton.button = widget.NewButton("Yellow", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	yellowButton.rectangle.SetMinSize(size)
-	yellowButton.check = widget.NewCheck("", func(value bool) {
-		result.yellow = true
-	})
-	if cp.Result.yellow {
-		yellowButton.check.SetChecked(true)
-	}
-	yellowButton.container = container.NewMax(yellowButton.rectangle, yellowButton.check)
+	green := Button{}
+	green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	green.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	green.check = widget.NewCheck("", func(value bool) {})
+	green.container = container.NewMax(green.rectangle, green.check)
+	cp.Buttons["Green"] = green
 
-	greenButton := Button{}
-	greenButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
-	greenButton.button = widget.NewButton("Green", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	greenButton.rectangle.SetMinSize(size)
-	greenButton.check = widget.NewCheck("", func(value bool) {
-		result.green = true
-	})
-	if cp.Result.green {
-		greenButton.check.SetChecked(true)
-	}
-	greenButton.container = container.NewMax(greenButton.rectangle, greenButton.check)
+	cyan := Button{}
+	cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
+	cyan.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	cyan.check = widget.NewCheck("", func(value bool) {})
+	cyan.container = container.NewMax(cyan.rectangle, cyan.check)
+	cp.Buttons["Cyan"] = cyan
 
-	cyanButton := Button{}
-	cyanButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
-	cyanButton.button = widget.NewButton("Cyan", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	cyanButton.rectangle.SetMinSize(size)
-	cyanButton.check = widget.NewCheck("", func(value bool) {
-		result.cyan = true
-	})
-	if cp.Result.cyan {
-		cyanButton.check.SetChecked(true)
-	}
-	cyanButton.container = container.NewMax(cyanButton.rectangle, cyanButton.check)
+	blue := Button{}
+	blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	blue.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	blue.check = widget.NewCheck("", func(value bool) {})
+	blue.container = container.NewMax(blue.rectangle, blue.check)
+	cp.Buttons["Blue"] = blue
 
-	blueButton := Button{}
-	blueButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
-	blueButton.button = widget.NewButton("Blue", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	blueButton.rectangle.SetMinSize(size)
-	blueButton.check = widget.NewCheck("", func(value bool) {
-		result.blue = true
-	})
-	if cp.Result.blue {
-		blueButton.check.SetChecked(true)
-	}
-	blueButton.container = container.NewMax(blueButton.rectangle, blueButton.check)
+	purple := Button{}
+	purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
+	purple.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	purple.check = widget.NewCheck("", func(value bool) {})
+	purple.container = container.NewMax(purple.rectangle, purple.check)
+	cp.Buttons["Purple"] = purple
 
-	purpleButton := Button{}
-	purpleButton.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
-	purpleButton.button = widget.NewButton("Purple", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	purpleButton.rectangle.SetMinSize(size)
-	purpleButton.check = widget.NewCheck("", func(value bool) {
-		result.purple = true
-	})
-	if cp.Result.purple {
-		purpleButton.check.SetChecked(true)
-	}
-	purpleButton.container = container.NewMax(purpleButton.rectangle, purpleButton.check)
+	pink := Button{}
+	pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	pink.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	pink.check = widget.NewCheck("", func(value bool) {})
+	pink.container = container.NewMax(pink.rectangle, pink.check)
+	cp.Buttons["Pink"] = pink
 
-	pinkButton := Button{}
-	pinkButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
-	pinkButton.button = widget.NewButton("Pink", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	pinkButton.rectangle.SetMinSize(size)
-	pinkButton.check = widget.NewCheck("", func(value bool) {
-		result.pink = true
-	})
-	if cp.Result.pink {
-		pinkButton.check.SetChecked(true)
-	}
-	pinkButton.container = container.NewMax(pinkButton.rectangle, pinkButton.check)
+	white := Button{}
+	white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
+	white.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	white.check = widget.NewCheck("", func(value bool) {})
+	white.container = container.NewMax(white.rectangle, white.check)
+	cp.Buttons["White"] = white
 
-	whiteButton := Button{}
-	whiteButton.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
-	whiteButton.button = widget.NewButton("White", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	whiteButton.rectangle.SetMinSize(size)
-	whiteButton.check = widget.NewCheck("", func(value bool) {
-		result.white = true
-	})
-	if cp.Result.white {
-		whiteButton.check.SetChecked(true)
-	}
-	whiteButton.container = container.NewMax(whiteButton.rectangle, whiteButton.check)
-
-	blackButton := Button{}
-	blackButton.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 0, A: 255})
-	blackButton.button = widget.NewButton("Black", func() {})
-	size = fyne.Size{}
-	size.Height = 20
-	size.Width = 20
-	blackButton.rectangle.SetMinSize(size)
-	blackButton.check = widget.NewCheck("", func(value bool) {
-		result.black = true
-	})
-	if cp.Result.black {
-		blackButton.check.SetChecked(true)
-	}
-	blackButton.container = container.NewMax(blackButton.rectangle, blackButton.check)
+	black := Button{}
+	black.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 0, A: 255})
+	black.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
+	black.check = widget.NewCheck("", func(value bool) {})
+	black.container = container.NewMax(black.rectangle, black.check)
+	cp.Buttons["Black"] = black
 
 	colors := []string{}
 	ok := widget.NewButton("OK", func() {
-
-		if result.red {
-			colors = append(colors, "Red")
-		}
-		if result.orange {
-			colors = append(colors, "Orange")
-		}
-		if result.yellow {
-			colors = append(colors, "Yellow")
-		}
-		if result.green {
-			colors = append(colors, "Green")
-		}
-		if result.blue {
-			colors = append(colors, "Blue")
-		}
-		if result.cyan {
-			colors = append(colors, "Cyan")
-		}
-		if result.purple {
-			colors = append(colors, "Purple")
-		}
-		if result.pink {
-			colors = append(colors, "Pink")
-		}
-		if result.white {
-			colors = append(colors, "White")
-		}
-		if result.black {
-			colors = append(colors, "Black")
-		}
-
 		// Now tell the Actions panel to update
 		cp.ColorSelection = strings.Join(colors, ",")
 		cp.UpdateColors = true
-		cp.Result = result
-		cp.UpdateThisAction = actionNumber
-
-		SetRectangleColors(cp, colors)
-
-		modal.Hide()
+		cp.UpdateThisAction = cp.ActionNumber
+		SetRectangleColorsFromCheckState(&cp)
+		cp.Modal.Hide()
 	})
 
-	panel := container.NewAdaptiveGrid(3,
-		redButton.container,
-		orangeButton.container,
-		yellowButton.container,
-		greenButton.container,
-		cyanButton.container,
-		blueButton.container,
-		purpleButton.container,
-		pinkButton.container,
-		whiteButton.container,
-		blackButton.container,
+	cp.Panel = container.NewAdaptiveGrid(3,
+		red.container,
+		orange.container,
+		yellow.container,
+		green.container,
+		cyan.container,
+		blue.container,
+		purple.container,
+		pink.container,
+		white.container,
+		black.container,
 		layout.NewSpacer(),
 		ok,
 	)
 
-	// Layout of settings panel.
-	modal = widget.NewModalPopUp(
-		panel,
-		w.Canvas(),
-	)
-	return modal
+	return &cp
 }

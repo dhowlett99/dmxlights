@@ -1,12 +1,12 @@
 package editor
 
 import (
+	"fmt"
+
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func SetRectangleColors(cp *ColorPanel, colors []string) Result {
-
-	result := Result{}
+func SetRectangleColorsFromCheckState(cp *ColorPanel) {
 
 	// Clear the color display boxes.
 	for x := 0; x < 10; x++ {
@@ -15,41 +15,37 @@ func SetRectangleColors(cp *ColorPanel, colors []string) Result {
 	}
 	// Now set the selected colors in the display.
 	var count int
-	for _, color := range colors {
-		if color == "Red" {
-			result.red = true
+	for key, button := range cp.Buttons {
+		fmt.Printf("Setting Color %s\n", key)
+		if button.check.Checked {
+			// Light the first available display rectangle
+			color, _ := common.GetRGBColorByName(key)
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(color)
+			count++
 		}
-		if color == "Orange" {
-			result.orange = true
-		}
-		if color == "Yellow" {
-			result.yellow = true
-		}
-		if color == "Purple" {
-			result.purple = true
-		}
-		if color == "Green" {
-			result.green = true
-		}
-		if color == "Blue" {
-			result.blue = true
-		}
-		if color == "Pink" {
-			result.pink = true
-		}
-		if color == "Cyan" {
-			result.cyan = true
-		}
-		if color == "White" {
-			result.white = true
-		}
-		if color == "Black" {
-			result.black = true
-		}
-		RGBColor, _ := common.GetRGBColorByName(color)
-		cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBColor)
-		count++
 	}
 
-	return result
+}
+
+func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
+	// Now set the selected colors in the rectanges display.
+	if len(colors) == 0 {
+		// Clear the color display boxes.
+		for x := 0; x < 10; x++ {
+			RGBColor, _ := common.GetRGBColorByName("White")
+			cp.Rectanges[x].FillColor = common.ConvertRGBtoNRGBA(RGBColor)
+		}
+		return
+	}
+	var count int
+	for _, color := range colors {
+		if color == "" {
+			return
+		}
+		fmt.Printf("Setting Color FromString %s\n", color)
+		RGBcolor, _ := common.GetRGBColorByName(color)
+		cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBcolor)
+		cp.Buttons[color].check.Checked = true
+		count++
+	}
 }

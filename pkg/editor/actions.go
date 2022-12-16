@@ -45,14 +45,6 @@ type ActionPanel struct {
 	CurrentState         int
 }
 
-type ColorPanel struct {
-	UpdateThisAction int
-	UpdateColors     bool
-	ColorSelection   string // Coma seperated string of color names, Upcase first letter.
-	Result           Result
-	Rectanges        []*canvas.Rectangle
-}
-
 const LABEL = 0
 const SELECT = 1
 
@@ -79,7 +71,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 	ap.ActionProgramOptions = []string{"Off", "Slow", "Medium", "Fast"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
-	cp := ColorPanel{}
+	cp := NewColorPickerPanel(w)
 
 	// Actions Selection Panel.
 	ap.ActionsPanel = widget.NewList(
@@ -179,8 +171,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
 			// Button for Color Selection.
 			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).OnTapped = func() {
-				modal := NewColorPicker(w, &cp, i)
-				modal.Show()
+				cp.ActionNumber = i
+				cp.Modal = widget.NewModalPopUp(
+					cp.Panel,
+					w.Canvas(),
+				)
+				cp.Modal.Show()
 			}
 
 			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
@@ -213,8 +209,9 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 			o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).SetMinSize(fyne.Size{Height: 5, Width: 8})
 			cp.Rectanges = append(cp.Rectanges, o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle))
 
-			cp.Result = SetRectangleColors(&cp, ap.ActionsList[i].Colors)
+			SetRectangleColorsFromString(cp, ap.ActionsList[i].Colors)
 
+			// Mode
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
@@ -234,6 +231,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				ap.UpdateThisAction = ap.CurrentState
 			}
 
+			// Fade
 			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
 			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
