@@ -664,14 +664,22 @@ func MapSwitchFixture(mySequenceNumber int,
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											// Handle the fact that the channel may be a label as well.
-											fixture := findFixtureByName(useFixture, fixtures)
+											fixture, err := findFixtureByName(useFixture, fixtures)
+											if err != nil {
+												fmt.Printf("error %s\n", err.Error())
+												return
+											}
 											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 
 									} else {
 										// If the setting contains a label, look up the label in the fixture definition.
-										fixture := findFixtureByName(useFixture, fixtures)
+										fixture, err := findFixtureByName(useFixture, fixtures)
+										if err != nil {
+											fmt.Printf("error %s\n", err.Error())
+											return
+										}
 										v, err := LookUpSettingLabelInFixtureDefinition(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
 										if err != nil {
 											fmt.Printf("LookUpSettingLabelInFixtureDefinition error: %s\n", err.Error())
@@ -685,7 +693,11 @@ func MapSwitchFixture(mySequenceNumber int,
 											c, _ := strconv.ParseFloat(value.Channel, 32)
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
-											fixture := findFixtureByName(useFixture, fixtures)
+											fixture, err := findFixtureByName(useFixture, fixtures)
+											if err != nil {
+												fmt.Printf("error %s\n", err.Error())
+												return
+											}
 											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, value.Channel, fixtures)
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
@@ -715,7 +727,11 @@ func IsNumericOnly(str string) bool {
 }
 
 func turnOffFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
-	fixture := findFixtureByName(fixtureName, fixtures)
+	fixture, err := findFixtureByName(fixtureName, fixtures)
+	if err != nil {
+		fmt.Printf("error %s\n", err.Error())
+		return
+	}
 	blackout := false
 	master := 255
 	strobeSpeed := 0
@@ -852,19 +868,19 @@ func getConfig(action Action) ActionConfig {
 	return config
 }
 
-func findFixtureByName(fixtureName string, fixtures *Fixtures) *Fixture {
+func findFixtureByName(fixtureName string, fixtures *Fixtures) (*Fixture, error) {
 	if debug {
 		fmt.Printf("Look for fixture by Name %s\n", fixtureName)
 	}
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Label == fixtureName {
+		if strings.Contains(fixture.Label, fixtureName) {
 			if debug {
 				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
 			}
-			return &fixture
+			return &fixture, nil
 		}
 	}
-	return nil
+	return nil, fmt.Errorf("failed to find fixture %s", fixtureName)
 }
 
 func reverse_dmx(n int) int {

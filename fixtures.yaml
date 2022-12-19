@@ -268,29 +268,29 @@ fixtures:
   address: 114
   channels:
   - number: 1
-    name: Red1
+    name: Red5
   - number: 2
-    name: Green1
+    name: Green5
   - number: 3
-    name: Blue1
+    name: Blue5
   - number: 4
-    name: Red2
+    name: Red6
   - number: 5
-    name: Green2
+    name: Green6
   - number: 6
-    name: Blue2
+    name: Blue6
   - number: 7
-    name: Red3
+    name: Red7
   - number: 8
-    name: Green3
+    name: Green7
   - number: 9
-    name: Blue3
+    name: Blue7
   - number: 10
-    name: Red4
+    name: Red8
   - number: 11
-    name: Green4
+    name: Green8
   - number: 12
-    name: Blue4
+    name: Blue8
   - number: 13
     name: Master
 - id: 11

@@ -11,25 +11,31 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
+const debug_mini bool = true
+
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
 func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig,
 	blackout bool, master int, dmxInterfacePresent bool) {
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
-	fixture := findFixtureByName(fixtureName, fixturesConfig)
+	fixture, err := findFixtureByName(fixtureName, fixturesConfig)
+	if err != nil {
+		fmt.Printf("error %s\n", err.Error())
+		return
+	}
 
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
 	cfg := getConfig(action)
 
-	if debug {
+	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
 	}
 
 	if action.Mode == "Off" {
-		if debug {
+		if debug_mini {
 			fmt.Printf("Stop mini sequence for switch number %d\n", switchNumber)
 		}
 
@@ -40,8 +46,16 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Use the switch number as the unique sequence name.
 		soundConfig.DisableSoundTrigger(switchName)
 
+		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		case <-time.After(100 * time.Millisecond):
+		}
+
+		// Stop any rotates.
+		select {
+		case switchChannels[switchNumber].StopRotate <- true:
 			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
@@ -51,30 +65,44 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 	}
 
 	if action.Mode == "Static" {
-		if debug {
+		if debug_mini {
 			fmt.Printf("Static mini sequence for switch number %d\n", switchNumber)
 		}
 
 		// Remember that we have stopped this mini sequencer.
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
+		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
 			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
+		// Stop any rotates.
+		select {
+		case switchChannels[switchNumber].StopRotate <- true:
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		case <-time.After(100 * time.Millisecond):
+		}
+
+		fmt.Printf("Looking for Color %s\n", action.Colors[0])
 		color, err := common.GetRGBColorByName(action.Colors[0])
+		fmt.Printf("FOund Color %+v\n", color)
 		if err != nil {
 			fmt.Printf("error %d\n", err)
 		}
+		fmt.Printf("Master is %d\n", master)
+
+		fmt.Printf("Fixture is group  %d  fixture %d \n", mySequenceNumber, myFixtureNumber)
 		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, nil, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
+
 		return
 	}
 
 	if action.Mode == "Chase" {
 
-		if debug {
+		if debug_mini {
 			fmt.Printf("Chase mini sequence for switch number %d\n", switchNumber)
 		}
 
@@ -212,7 +240,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 						cfg.RotateSpeed = 128
 					}
 
-					if debug {
+					if debug_mini {
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", switchNumber, switchNumber+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", switchNumber, cfg.Speed)
 					}

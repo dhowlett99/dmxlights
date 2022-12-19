@@ -103,7 +103,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Name = value
 				newState.Number = sp.StatesList[i].Number
 				newState.Master = sp.StatesList[i].Master
-				newState.Label = sp.StatesList[i].Label
+				newState.Label = value
 				newState.ButtonColor = sp.StatesList[i].ButtonColor
 				newState.Flash = sp.StatesList[i].Flash
 				newState.Values = sp.StatesList[i].Values
