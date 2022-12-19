@@ -11,7 +11,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug_mini bool = true
+const debug_mini bool = false
 
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
 func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
@@ -86,15 +86,11 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		fmt.Printf("Looking for Color %s\n", action.Colors[0])
 		color, err := common.GetRGBColorByName(action.Colors[0])
-		fmt.Printf("FOund Color %+v\n", color)
 		if err != nil {
 			fmt.Printf("error %d\n", err)
 		}
-		fmt.Printf("Master is %d\n", master)
 
-		fmt.Printf("Fixture is group  %d  fixture %d \n", mySequenceNumber, myFixtureNumber)
 		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, nil, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
 
 		return

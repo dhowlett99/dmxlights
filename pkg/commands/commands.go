@@ -9,7 +9,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = false
+const debug = true
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -395,6 +395,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Switches = LoadSwitchConfiguration(mySequenceNumber, command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures))
 		sequence.PlaySwitchOnce = true
+		sequence.PlaySingleSwitch = false
 		return sequence
 
 	// Update the named switch position for the current sequence.

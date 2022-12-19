@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -1087,6 +1088,9 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
+
+		// Get an upto date copy of the switch
+		sequences[Y].Switches = commands.LoadSwitchConfiguration(Y, fixturesConfig)
 
 		// We have a valid switch.
 		if X < len(sequences[Y].Switches) {
