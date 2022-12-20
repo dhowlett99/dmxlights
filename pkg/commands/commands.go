@@ -9,7 +9,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = true
+const debug = false
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
