@@ -63,14 +63,13 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
 
-			return container.NewHBox(
+			return container.NewGridWithColumns(6,
 
 				// State Id.
 				widget.NewLabel("template"),
 
 				// State Name.
-				widget.NewSelect(sp.StateOptions, func(value string) {
-				}),
+				container.NewWithoutLayout(widget.NewEntry()),
 
 				// Button Color.
 				widget.NewSelect(sp.ButtonColorOptions, func(value string) {}),
@@ -91,14 +90,9 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 			// Show the state Number.
 			o.(*fyne.Container).Objects[STATE_ID].(*widget.Label).SetText(fmt.Sprintf("%d", sp.StatesList[i].Number))
 
-			// Show the currently selected state from the options list.
-			for _, option := range sp.StateOptions {
-				if option == sp.StatesList[i].Label {
-					o.(*fyne.Container).Objects[STATE_NAME].(*widget.Select).SetSelected(option)
-				}
-			}
 			// Show the state name.
-			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Select).OnChanged = func(value string) {
+			o.(*fyne.Container).Objects[STATE_NAME].(*fyne.Container).Objects[0].(*widget.Entry).SetText(sp.StatesList[i].Name)
+			o.(*fyne.Container).Objects[STATE_NAME].(*fyne.Container).Objects[0].(*widget.Entry).OnChanged = func(value string) {
 				newState := fixture.State{}
 				newState.Name = value
 				newState.Number = sp.StatesList[i].Number
@@ -110,7 +104,6 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Actions = sp.StatesList[i].Actions
 				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[i].Number, newState)
 			}
-			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Select).PlaceHolder = "Select"
 
 			// Show the selection box for button color.
 			for _, option := range sp.ButtonColorOptions {
