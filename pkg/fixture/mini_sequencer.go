@@ -2,6 +2,7 @@ package fixture
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -28,7 +29,13 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
-	cfg := getConfig(action)
+	// Find all the specified settings for the program channel
+	programSettings, err := GetProgramSettins(fixtureName, fixturesConfig)
+	if err != nil {
+		fmt.Printf("newMiniSequencer: no program settings found for fixture %s\n", fixtureName)
+	}
+
+	cfg := getConfig(action, programSettings)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -61,6 +68,37 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		}
 
 		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		return
+	}
+
+	if action.Mode == "Control" {
+		if debug_mini {
+			fmt.Printf("Control selected for switch number %d\n", switchNumber)
+		}
+
+		// Remember that we have stopped this mini sequencer.
+		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
+
+		// Disable this mini sequencer with the sound service.
+		// Use the switch number as the unique sequence name.
+		soundConfig.DisableSoundTrigger(switchName)
+
+		// Stop any running chases.
+		select {
+		case switchChannels[switchNumber].Stop <- true:
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		case <-time.After(100 * time.Millisecond):
+		}
+
+		// Stop any rotates.
+		select {
+		case switchChannels[switchNumber].StopRotate <- true:
+			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		case <-time.After(100 * time.Millisecond):
+		}
+
+		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+
 		return
 	}
 
@@ -270,4 +308,175 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			}
 		}()
 	}
+}
+
+func getConfig(action Action, programSettings []common.Setting) ActionConfig {
+
+	config := ActionConfig{}
+
+	if action.Colors != nil {
+		// Find the color by name from the library of supported colors.
+		colorLibrary, err := common.GetColorArrayByNames(action.Colors)
+		if err != nil {
+			fmt.Printf("error: %s\n", err.Error())
+		}
+		config.Colors = colorLibrary
+	}
+
+	switch action.Fade {
+	case "Soft":
+		config.Fade = 1
+	case "Sharp":
+		config.Fade = 10
+	default:
+		config.Fade = 1
+	}
+
+	switch action.Size {
+	case "Short":
+		config.Size = 1
+	case "Medium":
+		config.Size = 3
+	case "Long":
+		config.Size = 10
+	default:
+		config.Size = 3
+	}
+
+	// Look through the available settins and see if you can find the specified program action.
+	for _, setting := range programSettings {
+		if action.Program == setting.Name || setting.Name == "Default" {
+			config.Program = int(setting.Value)
+		}
+	}
+
+	switch action.Rotate {
+	case "Off":
+		config.RotateSpeed = 0
+		config.Rotatable = false
+	case "Slow":
+		config.RotateSpeed = 1
+		config.Rotatable = true
+	case "Medium":
+		config.RotateSpeed = 50
+		config.Rotatable = true
+	case "Fast":
+		config.RotateSpeed = 127
+		config.Rotatable = true
+	default:
+		config.RotateSpeed = 0
+		config.Rotatable = false
+	}
+
+	switch action.Music {
+
+	case "Internal":
+		config.Music = 255
+	case "Off":
+		config.Music = 0
+	default:
+		config.Music = 0
+	}
+
+	switch action.Strobe {
+	case "Off":
+		config.Strobe = 0
+	case "Slow":
+		config.Strobe = 0
+	case "Fast":
+		config.Strobe = 0
+	default:
+		config.Strobe = 0
+	}
+
+	switch action.Speed {
+	case "Slow":
+		config.TriggerState = false
+		config.Speed = 1 * time.Second
+		config.MusicTrigger = false
+	case "Medium":
+		config.TriggerState = false
+		config.Speed = 500 * time.Millisecond
+		config.MusicTrigger = false
+	case "Fast":
+		config.TriggerState = false
+		config.Speed = 250 * time.Millisecond
+		config.MusicTrigger = false
+	case "VeryFast":
+		config.TriggerState = false
+		config.Speed = 50 * time.Millisecond
+		config.MusicTrigger = false
+	case "Music":
+		config.TriggerState = true
+		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = true
+	default:
+		config.TriggerState = false
+		config.Speed = time.Duration(12 * time.Hour)
+		config.MusicTrigger = false
+	}
+
+	return config
+}
+
+func GetProgramSettins(fixtureName string, fixtures *Fixtures) ([]common.Setting, error) {
+	if debug_mini {
+		fmt.Printf("GetProgramSettins: Looking for program settings for fixture %s\n", fixtureName)
+	}
+
+	settingNames := []common.Setting{}
+
+	// Find the fixture by name.
+	for _, fixture := range fixtures.Fixtures {
+		if debug_mini {
+			fmt.Printf("GetProgramSettins: matching on fixture %s with name %s\n", fixture.Label, fixtureName)
+		}
+		if strings.Contains(fixture.Label, fixtureName) {
+
+			// Find the channel by name.
+			for _, channel := range fixture.Channels {
+				if debug_mini {
+					fmt.Printf("GetProgramSettins: looking at channel %s\n", channel.Name)
+				}
+				if channel.Name == "Program" {
+					if debug_mini {
+						fmt.Printf("Found a Program Channel\n")
+					}
+					// If the program has a hard coded value return that as a default.
+					if channel.Value != nil {
+						if debug_mini {
+							fmt.Printf("Found a Default Program Value of %d\n", *channel.Value)
+						}
+						value := common.Setting{
+							Name:  "Default",
+							Value: *channel.Value,
+						}
+						settingNames = append(settingNames, value)
+						return settingNames, nil
+					}
+					// Otherwise find the settings available for this channel.
+					for _, setting := range channel.Settings {
+						if debug_mini {
+							fmt.Printf("Looking through Settings %s\n", setting.Name)
+						}
+						value := common.Setting{
+							Name:  setting.Name,
+							Value: int16(setting.Setting),
+						}
+						settingNames = append(settingNames, value)
+					}
+				}
+			}
+		}
+	}
+	// found some settings.
+	if len(settingNames) > 0 {
+		if debug_mini {
+			fmt.Printf("Found Settings %+v\n", settingNames)
+		}
+		return settingNames, nil
+	}
+
+	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixtureName)
+
 }

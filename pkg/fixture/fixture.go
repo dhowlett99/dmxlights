@@ -118,7 +118,7 @@ type Setting struct {
 type Channel struct {
 	Number     int16     `yaml:"number"`
 	Name       string    `yaml:"name"`
-	Value      int16     `yaml:"value,omitempty"`
+	Value      *int16    `yaml:"value,omitempty"`
 	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
 	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
 	Comment    string    `yaml:"comment,omitempty"`
@@ -565,7 +565,9 @@ func MapFixtures(mySequenceNumber int,
 				}
 				// Static value.
 				if strings.Contains(channel.Name, "Static") {
-					setChannel(fixture.Address+int16(channelNumber), byte(channel.Value), dmxController, dmxInterfacePresent)
+					if channel.Value != nil {
+						setChannel(fixture.Address+int16(channelNumber), byte(*channel.Value), dmxController, dmxInterfacePresent)
+					}
 				}
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
@@ -759,115 +761,6 @@ func getSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber in
 	return switchChannels[switchNumber].SequencerRunning
 }
 
-func getConfig(action Action) ActionConfig {
-
-	config := ActionConfig{}
-
-	if action.Colors != nil {
-		// Find the color by name from the library of supported colors.
-		colorLibrary, err := common.GetColorArrayByNames(action.Colors)
-		if err != nil {
-			fmt.Printf("error: %s\n", err.Error())
-		}
-		config.Colors = colorLibrary
-	}
-
-	switch action.Fade {
-	case "Soft":
-		config.Fade = 1
-	case "Sharp":
-		config.Fade = 10
-	default:
-		config.Fade = 1
-	}
-
-	switch action.Size {
-	case "Short":
-		config.Size = 1
-	case "Medium":
-		config.Size = 3
-	case "Long":
-		config.Size = 10
-	default:
-		config.Size = 3
-	}
-
-	switch action.Program {
-	case "All":
-		config.Program = 255
-	default:
-		config.Program = 0
-	}
-
-	switch action.Rotate {
-	case "Off":
-		config.RotateSpeed = 0
-		config.Rotatable = false
-	case "Slow":
-		config.RotateSpeed = 1
-		config.Rotatable = true
-	case "Medium":
-		config.RotateSpeed = 50
-		config.Rotatable = true
-	case "Fast":
-		config.RotateSpeed = 127
-		config.Rotatable = true
-	default:
-		config.RotateSpeed = 0
-		config.Rotatable = false
-	}
-
-	switch action.Music {
-
-	case "Internal":
-		config.Music = 255
-	case "Off":
-		config.Music = 0
-	default:
-		config.Music = 0
-	}
-
-	switch action.Strobe {
-	case "Off":
-		config.Strobe = 0
-	case "Slow":
-		config.Strobe = 0
-	case "Fast":
-		config.Strobe = 0
-	default:
-		config.Strobe = 0
-	}
-
-	switch action.Speed {
-	case "Slow":
-		config.TriggerState = false
-		config.Speed = 1 * time.Second
-		config.MusicTrigger = false
-	case "Medium":
-		config.TriggerState = false
-		config.Speed = 500 * time.Millisecond
-		config.MusicTrigger = false
-	case "Fast":
-		config.TriggerState = false
-		config.Speed = 250 * time.Millisecond
-		config.MusicTrigger = false
-	case "VeryFast":
-		config.TriggerState = false
-		config.Speed = 50 * time.Millisecond
-		config.MusicTrigger = false
-	case "Music":
-		config.TriggerState = true
-		config.Speed = time.Duration(12 * time.Hour)
-		config.MusicTrigger = true
-	default:
-		config.TriggerState = false
-		config.Speed = time.Duration(12 * time.Hour)
-		config.MusicTrigger = false
-	}
-
-	return config
-}
-
 func findFixtureByName(fixtureName string, fixtures *Fixtures) (*Fixture, error) {
 	if debug {
 		fmt.Printf("Look for fixture by Name %s\n", fixtureName)
@@ -1030,17 +923,19 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 	return 0
 }
 
-func FindChannel(name string, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) (int, error) {
+// FindChannel - takes a channel name and returns the channel number of the fixture.
+// Returns an error if not found.
+func FindChannel(channelName string, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) (int, error) {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for channelNumber, channel := range fixture.Channels {
 				if fixture.Number == myFixtureNumber+1 {
-					if strings.Contains(channel.Name, name) {
+					if strings.Contains(channel.Name, channelName) {
 						return channelNumber, nil
 					}
 				}
 			}
 		}
 	}
-	return 0, fmt.Errorf("error looking for rotate channel")
+	return 0, fmt.Errorf("error looking for channel %s", channelName)
 }

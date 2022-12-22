@@ -43,32 +43,31 @@ type ActionPanel struct {
 	UpdateActions        bool
 	UpdateThisAction     int
 	CurrentState         int
+	CurrentStateName     string
 }
 
 const LABEL = 0
 const SELECT = 1
 
-const ACTIONS_NAME = 0
+const ACTIONS_MODE = 0
 const ACTIONS_COLORS = 1
-const ACTIONS_MODE = 2
-const ACTIONS_FADE = 3
-const ACTIONS_SPEED = 4
-const ACTIONS_ROTATE = 5
-const ACTIONS_MUSIC = 6
-const ACTIONS_PROGRAM = 7
-const ACTIONS_STROBE = 8
+const ACTIONS_FADE = 2
+const ACTIONS_SPEED = 3
+const ACTIONS_ROTATE = 4
+const ACTIONS_MUSIC = 5
+const ACTIONS_PROGRAM = 6
+const ACTIONS_STROBE = 7
 
 func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
-	ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
-	ap.ActionModeOptions = []string{"Off", "Chase", "Static"}
+	//ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
+	ap.ActionModeOptions = []string{"Off", "Static", "Chase", "Control"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 	ap.ActionRotateOptions = []string{"Off", "Forward", "Reverse", "Auto"}
 	ap.ActionMusicOptions = []string{"Off", "On"}
-	ap.ActionProgramOptions = []string{"Off", "Slow", "Medium", "Fast"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
 	cp := NewColorPickerPanel(w)
@@ -89,7 +88,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[cp.UpdateThisAction].Music
 				newAction.Program = ap.ActionsList[cp.UpdateThisAction].Program
 				newAction.Strobe = ap.ActionsList[cp.UpdateThisAction].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[cp.UpdateThisAction].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[cp.UpdateThisAction].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 				cp.UpdateColors = false
@@ -99,10 +98,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 		},
 		func() fyne.CanvasObject {
 			return container.NewVBox(
+
 				container.NewHBox(
-					widget.NewLabel("Name"),
-					widget.NewSelect(ap.ActionNameOptions, func(value string) {}),
+					widget.NewLabel("Mode"),
+					widget.NewSelect(ap.ActionModeOptions, func(value string) {}),
 				),
+
 				container.NewHBox(
 					widget.NewLabel("Colors"),
 					widget.NewButton("Select", func() {}),
@@ -117,10 +118,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					canvas.NewRectangle(color.White),
 					canvas.NewRectangle(color.White),
 				),
-				container.NewHBox(
-					widget.NewLabel("Mode"),
-					widget.NewSelect(ap.ActionModeOptions, func(value string) {}),
-				),
+
 				container.NewHBox(
 					widget.NewLabel("Fade"),
 					widget.NewSelect(ap.ActionFadeOptions, func(value string) {}),
@@ -150,23 +148,209 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
 		// Function to update item in this list.
 		func(i widget.ListItemID, o fyne.CanvasObject) {
-			o.(*fyne.Container).Objects[ACTIONS_NAME].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Name)
-			o.(*fyne.Container).Objects[ACTIONS_NAME].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+
+			// Mode
+			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
+			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
-				newAction.Name = value
-				newAction.Number = ap.ActionsList[i].Number
-				newAction.Colors = ap.ActionsList[i].Colors
-				newAction.Mode = ap.ActionsList[i].Mode
-				newAction.Fade = ap.ActionsList[i].Fade
-				newAction.Size = ap.ActionsList[i].Size
-				newAction.Speed = ap.ActionsList[i].Speed
-				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Music
-				newAction.Program = ap.ActionsList[i].Program
-				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
-				ap.UpdateActions = true
-				ap.UpdateThisAction = ap.CurrentState
+				if value == "Off" || value == "" {
+					newAction.Name = ap.ActionsList[i].Name
+					newAction.Number = ap.ActionsList[i].Number
+					newAction.Colors = []string{}
+					newAction.Mode = value
+					newAction.Fade = ""
+					newAction.Size = ""
+					newAction.Speed = ""
+					newAction.Rotate = ""
+					newAction.Music = ""
+					newAction.Program = ""
+					newAction.Strobe = ""
+					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+					ap.UpdateActions = true
+					ap.UpdateThisAction = ap.CurrentState
+
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
+
+				if value == "Static" {
+					newAction.Name = ap.ActionsList[i].Name
+					newAction.Number = ap.ActionsList[i].Number
+					newAction.Colors = ap.ActionsList[i].Colors
+					newAction.Mode = value
+					newAction.Fade = ""
+					newAction.Size = ""
+					newAction.Speed = ""
+					newAction.Rotate = ""
+					newAction.Music = ""
+					newAction.Program = ""
+					newAction.Strobe = ""
+					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+					ap.UpdateActions = true
+					ap.UpdateThisAction = ap.CurrentState
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = false
+
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = false
+
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
+
+				if value == "Chase" {
+					newAction.Name = ap.ActionsList[i].Name
+					newAction.Number = ap.ActionsList[i].Number
+					newAction.Colors = ap.ActionsList[i].Colors
+					newAction.Mode = value
+					newAction.Fade = "Soft"
+					newAction.Size = "Short"
+					newAction.Speed = ""
+					newAction.Rotate = "Off"
+					newAction.Music = "Off"
+					newAction.Program = ""
+					newAction.Strobe = ""
+					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+					ap.UpdateActions = true
+					ap.UpdateThisAction = ap.CurrentState
+					// Color Selection.
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = false
+					// Color Display Boxes.
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = false
+					// Fade
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Speed
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Rotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Music Trigger
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Program
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Strobe
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
+
+				if value == "Control" {
+					newAction.Name = ap.ActionsList[i].Name
+					newAction.Number = ap.ActionsList[i].Number
+					newAction.Colors = []string{}
+					newAction.Mode = value
+					newAction.Fade = ""
+					newAction.Size = ""
+					newAction.Speed = ""
+					newAction.Rotate = ""
+					newAction.Music = ""
+					newAction.Program = ap.ActionsList[i].Program
+					newAction.Strobe = ""
+					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+					ap.UpdateActions = true
+					ap.UpdateThisAction = ap.CurrentState
+
+					// Color Selection
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = true
+					// Color Display Boxes
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = true
+					// Fade
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Speed
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Rotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Music
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Program
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Strobe
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
 			}
 
 			// Button for Color Selection.
@@ -211,26 +395,6 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
 			SetRectangleColorsFromString(cp, ap.ActionsList[i].Colors)
 
-			// Mode
-			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
-			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
-				newAction := fixture.Action{}
-				newAction.Name = ap.ActionsList[i].Name
-				newAction.Number = ap.ActionsList[i].Number
-				newAction.Colors = ap.ActionsList[i].Colors
-				newAction.Mode = value
-				newAction.Fade = ap.ActionsList[i].Fade
-				newAction.Size = ap.ActionsList[i].Size
-				newAction.Speed = ap.ActionsList[i].Speed
-				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Music
-				newAction.Program = ap.ActionsList[i].Program
-				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
-				ap.UpdateActions = true
-				ap.UpdateThisAction = ap.CurrentState
-			}
-
 			// Fade
 			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Fade)
 			o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
@@ -246,7 +410,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[i].Music
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
@@ -265,7 +429,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[i].Music
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
@@ -283,7 +447,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[i].Music
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
@@ -302,11 +466,11 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = value
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
-
+			// Program
 			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Program)
 			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
@@ -321,7 +485,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[i].Program
 				newAction.Program = value
 				newAction.Strobe = ap.ActionsList[i].Strobe
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
@@ -340,7 +504,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Music = ap.ActionsList[i].Program
 				newAction.Program = ap.ActionsList[i].Strobe
 				newAction.Strobe = value
-				ap.ActionsList = UpdateAction(ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
@@ -350,11 +514,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 }
 
 // UpdateItem replaces the selected item by id with newItem.
-func UpdateAction(actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
+func UpdateAction(currentStateName string, actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
 	newActions := []fixture.Action{}
 	for _, action := range actions {
 		if action.Number == id {
 			// update the channel information.
+			newAction.Name = currentStateName
 			newActions = append(newActions, newAction)
 		} else {
 			// just add what was there before.
@@ -364,10 +529,10 @@ func UpdateAction(actions []fixture.Action, id int, newAction fixture.Action) []
 	return newActions
 }
 
-func CreateActionsList(stateList []fixture.State) (actionsList []fixture.Action) {
+func CreateActionsList(stateList []fixture.State, selectedState int) (actionsList []fixture.Action) {
 
 	newAction := fixture.Action{}
-	newAction.Name = "Off"
+	newAction.Name = stateList[selectedState].Name // Action Name has the same name as the state.
 	newAction.Number = 1
 	newAction.Size = "Short"
 	newAction.Rotate = "Off"

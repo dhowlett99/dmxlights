@@ -72,6 +72,11 @@ type Value struct {
 	Setting string
 }
 
+type Setting struct {
+	Name  string
+	Value int16
+}
+
 type State struct {
 	Name        string
 	Number      int16

@@ -1153,7 +1153,7 @@ fixtures:
   description: Oil Wheel Projector
   type: switch
   group: 4
-  address: 500
+  address: 0
   channels: []
   states:
   - name: "Off"
@@ -1166,6 +1166,18 @@ fixtures:
       setting: "0"
     buttoncolor: Green
     master: 0
+    actions:
+    - name: "Off"
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      music: "Off"
+      program: "Off"
+      strobe: ""
     flash: false
   - name: "On"
     number: 2
@@ -1177,7 +1189,20 @@ fixtures:
       setting: "255"
     buttoncolor: Red
     master: 0
+    actions:
+    - name: "On"
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      music: "On"
+      program: "On"
+      strobe: ""
     flash: false
+  use_fixture: Oil1
 - id: 23
   name: switch2
   label: SW2.Flame
@@ -1817,3 +1842,23 @@ fixtures:
     buttoncolor: Red
     master: 0
     flash: false
+- id: 30
+  name: Oil
+  label: Oil1
+  number: 1
+  description: Oil
+  type: projector
+  group: 110
+  address: 0
+  channels:
+  - number: 1
+    name: Program
+    settings:
+    - name: "Off"
+      label: ""
+      number: 1
+      setting: 0
+    - name: "On"
+      label: ""
+      number: 2
+      setting: 255

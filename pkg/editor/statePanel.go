@@ -63,13 +63,13 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 		// Function to create item.
 		func() (o fyne.CanvasObject) {
 
-			return container.NewGridWithColumns(6,
+			return container.NewHBox(
 
 				// State Id.
-				widget.NewLabel("template"),
+				container.NewWithoutLayout(widget.NewLabel("template")),
 
 				// State Name.
-				container.NewWithoutLayout(widget.NewEntry()),
+				widget.NewEntry(),
 
 				// Button Color.
 				widget.NewSelect(sp.ButtonColorOptions, func(value string) {}),
@@ -85,75 +85,77 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 			)
 		},
 		// Function to update item in this list.
-		func(i widget.ListItemID, o fyne.CanvasObject) {
+		func(thisState widget.ListItemID, o fyne.CanvasObject) {
 
 			// Show the state Number.
-			o.(*fyne.Container).Objects[STATE_ID].(*widget.Label).SetText(fmt.Sprintf("%d", sp.StatesList[i].Number))
+			o.(*fyne.Container).Objects[STATE_ID].(*fyne.Container).Objects[0].Resize(fyne.Size{Height: 50, Width: 30})
+			o.(*fyne.Container).Objects[STATE_ID].(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", sp.StatesList[thisState].Number))
 
 			// Show the state name.
-			o.(*fyne.Container).Objects[STATE_NAME].(*fyne.Container).Objects[0].(*widget.Entry).SetText(sp.StatesList[i].Name)
-			o.(*fyne.Container).Objects[STATE_NAME].(*fyne.Container).Objects[0].(*widget.Entry).OnChanged = func(value string) {
+			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).SetText(sp.StatesList[thisState].Name)
+			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).OnChanged = func(value string) {
 				newState := fixture.State{}
 				newState.Name = value
-				newState.Number = sp.StatesList[i].Number
-				newState.Master = sp.StatesList[i].Master
+				newState.Number = sp.StatesList[thisState].Number
+				newState.Master = sp.StatesList[thisState].Master
 				newState.Label = value
-				newState.ButtonColor = sp.StatesList[i].ButtonColor
-				newState.Flash = sp.StatesList[i].Flash
-				newState.Values = sp.StatesList[i].Values
-				newState.Actions = sp.StatesList[i].Actions
-				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[i].Number, newState)
+				newState.ButtonColor = sp.StatesList[thisState].ButtonColor
+				newState.Flash = sp.StatesList[thisState].Flash
+				newState.Values = sp.StatesList[thisState].Values
+				newState.Actions = sp.StatesList[thisState].Actions
+				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
 			}
 
 			// Show the selection box for button color.
 			for _, option := range sp.ButtonColorOptions {
-				if option == sp.StatesList[i].ButtonColor {
+				if option == sp.StatesList[thisState].ButtonColor {
 					o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).SetSelected(option)
 				}
 			}
 
 			o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).OnChanged = func(value string) {
 				newState := fixture.State{}
-				newState.Name = sp.StatesList[i].Name
-				newState.Number = sp.StatesList[i].Number
-				newState.Master = sp.StatesList[i].Master
-				newState.Label = sp.StatesList[i].Label
+				newState.Name = sp.StatesList[thisState].Name
+				newState.Number = sp.StatesList[thisState].Number
+				newState.Master = sp.StatesList[thisState].Master
+				newState.Label = sp.StatesList[thisState].Label
 				newState.ButtonColor = value
-				newState.Flash = sp.StatesList[i].Flash
-				newState.Values = sp.StatesList[i].Values
-				newState.Actions = sp.StatesList[i].Actions
-				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[i].Number, newState)
+				newState.Flash = sp.StatesList[thisState].Flash
+				newState.Values = sp.StatesList[thisState].Values
+				newState.Actions = sp.StatesList[thisState].Actions
+				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
 			}
 			o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).PlaceHolder = "Select"
 
 			// Channel Delete Button.
 			o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).OnTapped = func() {
-				sp.StatesList = DeleteState(sp.StatesList, sp.StatesList[i].Number)
+				sp.StatesList = DeleteState(sp.StatesList, sp.StatesList[thisState].Number)
 				sp.StatePanel.Refresh()
 			}
 
 			// Channel Add Button.
 			o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).OnTapped = func() {
-				sp.StatesList = AddState(sp.StatesList, sp.StatesList[i].Number)
+				sp.StatesList = AddState(sp.StatesList, sp.StatesList[thisState].Number)
 				sp.StatePanel.Refresh()
 			}
 
 			// Actions Button.
 			o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).OnTapped = func() {
 				// Highlight this channel
-				sp.StatePanel.Select(i)
+				sp.StatePanel.Select(thisState)
 				if sp.StatesList != nil {
 					// Get Existing Actions for this state.
-					index := sp.StatesList[i].Number - 1
+					index := sp.StatesList[thisState].Number - 1
 					ap.ActionsList = sp.StatesList[index].Actions
 
 					// If the settings are empty create a new set of settings.
 					if len(ap.ActionsList) == 0 {
 						// Create new settings.
-						ap.ActionsList = CreateActionsList(sp.StatesList)
+						ap.ActionsList = CreateActionsList(sp.StatesList, thisState)
 					}
 				}
-				ap.CurrentState = int(sp.StatesList[i].Number - 1)
+				ap.CurrentState = int(sp.StatesList[thisState].Number - 1)
+				ap.CurrentStateName = sp.StatesList[thisState].Name
 				ap.ActionsPanel.Hidden = false
 				ap.ActionsPanel.Refresh()
 			}

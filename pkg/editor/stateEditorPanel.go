@@ -61,6 +61,10 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.Description = value
 	}
 
+	// Create Actions Panel.
+	ap := NewActionsPanel(w, []fixture.Action{})
+	ap.ActionsPanel.Hide()
+
 	// Use Fixture.
 	useInput := widget.NewSelect(fixturesAvailable, func(value string) {})
 	useLabel := widget.NewLabel("Use Fixture")
@@ -70,6 +74,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
 		fp.UseFixture = value
+		// Try again to populate the program options as available for this states action.
+		ap.ActionProgramOptions = populateProgramOptions(value, fixtures)
 	}
 
 	// Show the currently selected fixture option.
@@ -88,10 +94,6 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	// Populate State settings.
 	statesList := thisFixture.States
-
-	// Create Actions Panel.
-	ap := NewActionsPanel(w, []fixture.Action{})
-	ap.ActionsPanel.Hide()
 
 	// Create States Panel.
 	var StatesPanel *widget.List
@@ -147,4 +149,22 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	)
 	return modal, nil
 
+}
+
+func populateProgramOptions(fixtureName string, fixtures *fixture.Fixtures) []string {
+
+	programOptions := []string{}
+	programSettings, err := fixture.GetProgramSettins(fixtureName, fixtures)
+	if err != nil {
+		fmt.Printf("populateProgramOptions: no program settings found for fixture %s\n", fixtureName)
+	} else {
+		for _, setting := range programSettings {
+			programOptions = append(programOptions, setting.Name)
+		}
+	}
+	if len(programOptions) == 0 {
+		programOptions = append(programOptions, "None")
+	}
+
+	return programOptions
 }
