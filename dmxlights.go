@@ -196,7 +196,7 @@ func main() {
 
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Selected speed for the sequence. Common to all types of sequence.
-		this.Running[sequenceNumber] = true                                        // Set this sequence to be in the running state. Common to all types of sequence.
+		this.Running[sequenceNumber] = false                                       // Set this sequence to be in the not running state. Common to all types of sequence.
 		this.Strobe[sequenceNumber] = false                                        // Set strobe to be off for all sequences.
 		this.StrobeSpeed[sequenceNumber] = 255                                     // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Default RGB shift size.
