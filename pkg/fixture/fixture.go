@@ -776,6 +776,24 @@ func findFixtureByName(fixtureName string, fixtures *Fixtures) (*Fixture, error)
 	return nil, fmt.Errorf("failed to find fixture %s", fixtureName)
 }
 
+func FindFixtureAddressByName(fixtureName string, fixtures *Fixtures) string {
+	if debug {
+		fmt.Printf("Looking for fixture by Name %s\n", fixtureName)
+	}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == fixtureName {
+			if debug {
+				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+			}
+			return fmt.Sprintf("%d", fixture.Address)
+		}
+	}
+	if debug {
+		fmt.Printf("fixture %s not found\n", fixtureName)
+	}
+	return "Not Set"
+}
+
 func reverse_dmx(n int) int {
 
 	in := make(map[int]int, 255)

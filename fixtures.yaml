@@ -1849,7 +1849,7 @@ fixtures:
   description: Oil
   type: projector
   group: 110
-  address: 0
+  address: 69
   channels:
   - number: 1
     name: Program

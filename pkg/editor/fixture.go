@@ -329,6 +329,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i].ID, newSetting)
 				}
 			}
+			if fp.FixtureList[i].Type == "switch" {
+				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).Disable()
+				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).SetText(fixture.FindFixtureAddressByName(fp.FixtureList[i].UseFixture, fixtures))
+			}
 
 			// Show and Edit the Fixture Description.
 			o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).SetText(fp.FixtureList[i].Description)
@@ -365,7 +369,11 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				fp.FixturePanel.Refresh()
 			}
 
-			// Show and Edit Channel Definitions using the Channel Editor.
+			// Show either the channels button or state settings button for switches.
+			if fp.FixtureList[i].Type == "switch" {
+				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("States")
+			}
+
 			o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = func() {
 				fixtures.Fixtures = fp.FixtureList
 				var modal *widget.PopUp
