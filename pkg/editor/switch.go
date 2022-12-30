@@ -26,8 +26,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = false
-
 type SwitchPanel struct {
 	SwitchPanel   *widget.List
 	SwitchesList  []itemSelect
@@ -51,8 +49,6 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 					widget.NewLabel("template"),
 
 					widget.NewSelect(sw.SwitchOptions, func(value string) {
-						//label := o.(*fyne.Container).Objects[0].(*widget.Label).Text
-						//fmt.Printf("Select set to %s number %s\n", value, label)
 					}),
 
 					widget.NewButton("Select", nil),
@@ -60,7 +56,7 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 			},
 			// Function to update item in this list.
 			func(i widget.ListItemID, o fyne.CanvasObject) {
-				//fmt.Printf("Switch ID is %d   Switch Setting is %s\n", i, switchOptions[i])
+
 				o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", sw.SwitchesList[i].Number))
 
 				// find the selected option in the options list.
