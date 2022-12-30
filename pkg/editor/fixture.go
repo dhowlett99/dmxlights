@@ -94,6 +94,31 @@ func makeArray(fixtures *fixture.Fixtures) [][]string {
 	return data
 }
 
+func updateArray(fixtures []fixture.Fixture) [][]string {
+
+	var data = [][]string{}
+
+	// scan the fixtures structure for the selected fixture.
+	for _, fixture := range fixtures {
+		newFixture := []string{}
+		newFixture = append(newFixture, fmt.Sprintf("%d", fixture.ID))
+		newFixture = append(newFixture, fixture.Type)
+		newFixture = append(newFixture, fmt.Sprintf("%d", fixture.Group))
+		newFixture = append(newFixture, fmt.Sprintf("%d", fixture.Number))
+		newFixture = append(newFixture, fixture.Name)
+		newFixture = append(newFixture, fixture.Label)
+		newFixture = append(newFixture, fmt.Sprintf("%d", fixture.Address))
+		newFixture = append(newFixture, fixture.Description)
+		newFixture = append(newFixture, "-")
+		newFixture = append(newFixture, "+")
+		newFixture = append(newFixture, "Channels")
+
+		data = append(data, newFixture)
+	}
+
+	return data
+}
+
 func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (modal *widget.PopUp, err error) {
 
 	fp := FixturesPanel{}
@@ -128,16 +153,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		})
 
 	header.SetColumnWidth(0, 40)  // Id
-	header.SetColumnWidth(1, 120) // Type
+	header.SetColumnWidth(1, 100) // Type
 	header.SetColumnWidth(2, 60)  // Sequence Number
 	header.SetColumnWidth(3, 60)  // Fixture Number
-	header.SetColumnWidth(4, 120) // Name
-	header.SetColumnWidth(5, 120) // Label
+	header.SetColumnWidth(4, 100) // Name
+	header.SetColumnWidth(5, 100) // Label
 	header.SetColumnWidth(6, 50)  // DMX Address
-	header.SetColumnWidth(7, 300) // Description
-	header.SetColumnWidth(8, 40)  // Delete Button
-	header.SetColumnWidth(9, 40)  // Add Button
-	header.SetColumnWidth(10, 80) // Channels Button
+	header.SetColumnWidth(7, 150) // Description
+	header.SetColumnWidth(8, 20)  // Delete Button
+	header.SetColumnWidth(9, 20)  // Add Button
+	header.SetColumnWidth(10, 40) // Channels Button
 
 	// Geneate the fixture list.
 	for no, f := range fixtures.Fixtures {
@@ -219,20 +244,20 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 			o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
-					newSetting := makeNewFixture(data, i, FIXTURE_TYPE, value, fp.FixtureList)
+					newFixture := makeNewFixture(data, i, FIXTURE_TYPE, value, fp.FixtureList)
 
-					if newSetting.Type == "switch" && newSetting.States == nil {
-						newSetting.Channels = []fixture.Channel{}
+					if newFixture.Type == "switch" && newFixture.States == nil {
+						newFixture.Channels = []fixture.Channel{}
 						// Create some default states
-						newSetting.States = []fixture.State{}
+						newFixture.States = []fixture.State{}
 						newState := fixture.State{
 							Number: 1,
 							Name:   "New",
 						}
-						newSetting.States = append(newSetting.States, newState)
+						newFixture.States = append(newFixture.States, newState)
 					}
 
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 
@@ -244,8 +269,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 			o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
-					newSetting := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 			o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).PlaceHolder = "XXX"
@@ -257,8 +282,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 			o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
-					newSetting := makeNewFixture(data, i, FIXTURE_NUMBER, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_NUMBER, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 			o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).PlaceHolder = "X"
@@ -271,8 +296,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
 					o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).FocusGained()
-					newSetting := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 			o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).PlaceHolder = "XXXXXXXXXXXXX"
@@ -285,8 +310,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
 					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).FocusGained()
-					newSetting := makeNewFixture(data, i, FIXTURE_LABEL, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_LABEL, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 
@@ -298,8 +323,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).FocusGained()
-					newSetting := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 			if data[i.Row][i.Col] == "switch" {
@@ -315,8 +340,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).OnChanged = func(value string) {
 				if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
 					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).FocusGained()
-					newSetting := makeNewFixture(data, i, FIXTURE_DESCRIPTION, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newSetting)
+					newFixture := makeNewFixture(data, i, FIXTURE_DESCRIPTION, value, fp.FixtureList)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 
@@ -327,6 +352,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 			o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).OnTapped = func() {
 				fp.FixtureList = DeleteFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
+				data = updateArray(fp.FixtureList)
 				fp.FixturePanel.Refresh()
 			}
 
@@ -337,18 +363,14 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 			o.(*fyne.Container).Objects[FIXTURE_ADD].(*widget.Button).OnTapped = func() {
 				fp.FixtureList = AddFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
+				data = updateArray(fp.FixtureList)
 				fp.FixturePanel.Refresh()
 			}
 
 			// Fixture Channels or States Button.
 			if i.Col == FIXTURE_CHANNELS {
 				showField(FIXTURE_CHANNELS, o)
-				// Show either the channels button or state settings button for switches.
-				if fp.FixtureList[i.Row].Type == "switch" {
-					o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("States")
-				} else {
-					o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("Channels")
-				}
+				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("->")
 			}
 			o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = func() {
 				fixtures.Fixtures = fp.FixtureList
@@ -373,16 +395,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	)
 
 	fp.FixturePanel.SetColumnWidth(0, 40)  // Id
-	fp.FixturePanel.SetColumnWidth(1, 120) // Type
+	fp.FixturePanel.SetColumnWidth(1, 100) // Type
 	fp.FixturePanel.SetColumnWidth(2, 60)  // Sequence Number
 	fp.FixturePanel.SetColumnWidth(3, 60)  // Fixture Number
-	fp.FixturePanel.SetColumnWidth(4, 120) // Name
-	fp.FixturePanel.SetColumnWidth(5, 120) // Label
+	fp.FixturePanel.SetColumnWidth(4, 100) // Name
+	fp.FixturePanel.SetColumnWidth(5, 100) // Label
 	fp.FixturePanel.SetColumnWidth(6, 50)  // DMX Address
-	fp.FixturePanel.SetColumnWidth(7, 300) // Description
-	fp.FixturePanel.SetColumnWidth(8, 40)  // Delete Button
-	fp.FixturePanel.SetColumnWidth(9, 40)  // Add Button
-	fp.FixturePanel.SetColumnWidth(10, 80) // Channels Button
+	fp.FixturePanel.SetColumnWidth(7, 150) // Description
+	fp.FixturePanel.SetColumnWidth(8, 20)  // Delete Button
+	fp.FixturePanel.SetColumnWidth(9, 20)  // Add Button
+	fp.FixturePanel.SetColumnWidth(10, 40) // Channels Button
 
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
@@ -568,57 +590,56 @@ func showField(field int, o fyne.CanvasObject) {
 func makeNewFixture(data [][]string, i widget.TableCellID, field int, value string, fixtureList []fixture.Fixture) fixture.Fixture {
 
 	// Set up all the default values.
-	newSetting := fixture.Fixture{}
-	newSetting.ID, _ = strconv.Atoi(data[i.Row][FIXTURE_ID])
+	newFixture := fixture.Fixture{}
+	newFixture.ID, _ = strconv.Atoi(data[i.Row][FIXTURE_ID])
 
-	fmt.Printf("DEBUG --->  data[i.Row][FIXTURE_TYPE]%s\n", data[i.Row][FIXTURE_TYPE])
-	newSetting.Type = data[i.Row][FIXTURE_TYPE]
-	newSetting.Label = data[i.Row][FIXTURE_LABEL]
-	newSetting.Name = data[i.Row][FIXTURE_NAME]
+	newFixture.Type = data[i.Row][FIXTURE_TYPE]
+	newFixture.Label = data[i.Row][FIXTURE_LABEL]
+	newFixture.Name = data[i.Row][FIXTURE_NAME]
 	number, _ := strconv.Atoi(data[i.Row][FIXTURE_NUMBER])
-	newSetting.Number = number
+	newFixture.Number = number
 	group, _ := strconv.Atoi(data[i.Row][FIXTURE_GROUP])
-	newSetting.Group = group
-	newSetting.Description = data[i.Row][FIXTURE_DESCRIPTION]
+	newFixture.Group = group
+	newFixture.Description = data[i.Row][FIXTURE_DESCRIPTION]
 	address, _ := strconv.Atoi(data[i.Row][FIXTURE_ADDRESS])
-	newSetting.Address = int16(address)
+	newFixture.Address = int16(address)
 
 	// Set up the pointers to further data.
-	newSetting.Channels = fixtureList[i.Row].Channels
-	newSetting.States = fixtureList[i.Row].States
-	newSetting.NumberChannels = fixtureList[i.Row].NumberChannels
-	newSetting.UseFixture = fixtureList[i.Row].UseFixture
+	newFixture.Channels = fixtureList[i.Row].Channels
+	newFixture.States = fixtureList[i.Row].States
+	newFixture.NumberChannels = fixtureList[i.Row].NumberChannels
+	newFixture.UseFixture = fixtureList[i.Row].UseFixture
 
 	// Now setup the new selected value.
 	switch {
 	case field == FIXTURE_ID:
 		id, _ := strconv.Atoi(value)
-		newSetting.ID = id
+		newFixture.ID = id
 
 	case field == FIXTURE_TYPE:
-		newSetting.Type = value
+		newFixture.Type = value
 
 	case field == FIXTURE_GROUP:
 		group, _ := strconv.Atoi(value)
-		newSetting.Group = group
+		newFixture.Group = group
 
 	case field == FIXTURE_NUMBER:
 		number, _ := strconv.Atoi(value)
-		newSetting.Number = number
+		newFixture.Number = number
 
 	case field == FIXTURE_NAME:
-		newSetting.Name = value
+		newFixture.Name = value
 
 	case field == FIXTURE_LABEL:
-		newSetting.Label = value
+		newFixture.Label = value
 
 	case field == FIXTURE_ADDRESS:
 		address, _ := strconv.Atoi(value)
-		newSetting.Address = int16(address)
+		newFixture.Address = int16(address)
 
 	case field == FIXTURE_DESCRIPTION:
-		newSetting.Description = value
+		newFixture.Description = value
 
 	}
-	return newSetting
+	return newFixture
 }
