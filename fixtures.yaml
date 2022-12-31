@@ -1153,17 +1153,12 @@ fixtures:
   description: Oil Wheel Projector
   type: switch
   group: 4
-  address: 0
+  address: 69
   channels: []
   states:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
-    - name: master dimmer
-      description: Dimmer
-      channel: "69"
-      setting: "0"
     buttoncolor: Green
     master: 0
     actions:
@@ -1182,11 +1177,6 @@ fixtures:
   - name: "On"
     number: 2
     label: "On"
-    values:
-    - name: master dimmer
-      description: Dimmer
-      channel: "69"
-      setting: "255"
     buttoncolor: Red
     master: 0
     actions:
@@ -1625,7 +1615,7 @@ fixtures:
   description: ADJ DEKKER 1
   type: switch
   group: 4
-  address: 0
+  address: 300
   channels: []
   states:
   - name: "Off"
@@ -1671,9 +1661,9 @@ fixtures:
       number: 0
       colors: []
       mode: "Off"
-      fade: "Off"
+      fade: ""
       size: ""
-      speed: "Off"
+      speed: ""
       rotate: ""
       music: ""
       program: ""
@@ -1690,9 +1680,9 @@ fixtures:
       colors:
       - Red
       mode: Static
-      fade: "Off"
+      fade: ""
       size: ""
-      speed: "Off"
+      speed: ""
       rotate: ""
       music: ""
       program: ""

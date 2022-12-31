@@ -20,6 +20,8 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 	blackout bool, master int, dmxInterfacePresent bool) {
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
+
+	// Find the fixture for this switch mini sequence.
 	fixture, err := findFixtureByName(fixtureName, fixturesConfig)
 	if err != nil {
 		fmt.Printf("error %s\n", err.Error())
@@ -98,6 +100,23 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		}
 
 		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+
+		// Find the program channel for this fixture.
+		programChannel, err := FindChannel("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
+		if err != nil {
+			fmt.Printf("fixture %s program channel not found: %s,", fixtureName, err)
+			return
+		}
+
+		// Look up the program state required.
+		v, err := LookUpSettingNameInFixtureDefinition(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
+		if err != nil {
+			fmt.Printf("fixture %s program state not found: %s,", fixtureName, err)
+			return
+		}
+
+		// Now play that DMX value on the program channel of this fixture.
+		setChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
 
 		return
 	}

@@ -213,10 +213,15 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				fp.UpdateChannels = false
 			}
 			if fp.UpdateUseFixture {
-				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
+				address := fixture.FindFixtureAddressByName(fp.UseFixture, fixtures)
+				data[fp.UpdateThisFixture][FIXTURE_ADDRESS] = address
+				dmx, _ := strconv.Atoi(address)
+				fp.FixtureList[fp.UpdateThisFixture].Address = int16(dmx)
+				fp.UpdateUseFixture = false
 			}
 			if fp.UpdateDescription {
 				fp.FixtureList[fp.UpdateThisFixture].Description = fp.Description
+				fp.UpdateDescription = false
 			}
 
 			return len(data), len(data[0])
@@ -335,9 +340,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 					newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
-				if data[i.Row][i.Col] == "switch" {
+				// Switch addresses are the address of the fixture being used.
+				// So this comes from the state panel's usefixture field.
+				if data[i.Row][FIXTURE_TYPE] == "switch" {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).Disable()
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).SetText(fixture.FindFixtureAddressByName(fp.UseFixture, fixtures))
 				}
 			}
 

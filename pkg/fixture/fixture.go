@@ -424,6 +424,49 @@ func LookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelN
 	return 0, fmt.Errorf("label not found in fixture :%s", fixtureName)
 }
 
+func LookUpSettingNameInFixtureDefinition(group int, switchNumber int, channelName string, settingName string, fixtures *Fixtures) (int, error) {
+
+	if debug {
+		fmt.Printf("LookUpSettingValueInFixtureDefinition for %s\n", channelName)
+	}
+
+	var fixtureName string
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == group {
+			if debug {
+				fmt.Printf("fixture %s\n", fixture.Name)
+				fmt.Printf("fixture.group %d group %d\n", fixture.Group, group)
+				fmt.Printf("channels %+v\n", fixture.Channels)
+			}
+			fixtureName = fixture.Name
+			for _, channel := range fixture.Channels {
+				if debug {
+					fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)
+				}
+				if channel.Name == channelName {
+					if debug {
+						fmt.Printf("channel.Settings %+v\n", channel.Settings)
+					}
+					for _, setting := range channel.Settings {
+						if debug {
+							fmt.Printf("inspect setting %+v \n", setting)
+							fmt.Printf("setting.Name %s = name %s\n", setting.Name, settingName)
+						}
+						if setting.Name == settingName {
+							if debug {
+								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingValue=%d\n", fixture.Name, channel.Name, settingName, setting.Setting)
+							}
+							return setting.Setting, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("label not found in fixture :%s", fixtureName)
+}
+
 func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, channelName string, fixtures *Fixtures) (int, error) {
 
 	if debug {

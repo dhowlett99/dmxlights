@@ -69,11 +69,15 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	useInput := widget.NewSelect(fixturesAvailable, func(value string) {})
 	useLabel := widget.NewLabel("Use Fixture")
 	use := container.NewAdaptiveGrid(3, useLabel, useInput, layout.NewSpacer())
+
 	// Update Use Fixture.
 	useInput.OnChanged = func(value string) {
+
+		// Update the address from the use fixture field in the fixture panel.
+		fp.UseFixture = useInput.Selected
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
-		fp.UseFixture = value
+
 		// Try again to populate the program options as available for this states action.
 		ap.ActionProgramOptions = populateProgramOptions(value, fixtures)
 	}
@@ -109,6 +113,14 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	// OK button.
 	buttonSave := widget.NewButton("OK", func() {
 
+		// Populate the fixture used by this switch.
+		fp.UseFixture = useInput.Selected
+
+		// Update the address from the use fixture field in the fixture panel.
+		fp.UseFixture = useInput.Selected
+		fp.UpdateThisFixture = thisFixture.ID - 1
+		fp.UpdateUseFixture = true
+
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for fixtureNumber, fixture := range fixtures.Fixtures {
@@ -125,6 +137,9 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		}
 
 		modal.Hide()
+
+		// Refresh the fixtures panel incase something has changed.
+		fp.FixturePanel.Refresh()
 	})
 
 	// Cancel button.
