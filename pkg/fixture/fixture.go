@@ -65,17 +65,17 @@ type State struct {
 }
 
 type Action struct {
-	Name    string `yaml:"name"`
-	Number  int
-	Colors  []string `yaml:"colors"`
-	Mode    string   `yaml:"mode"`
-	Fade    string   `yaml:"fade"`
-	Size    string   `yaml:"size"`
-	Speed   string   `yaml:"speed"`
-	Rotate  string   `yaml:"rotate"`
-	Music   string   `yaml:"music"`
-	Program string   `yaml:"program"`
-	Strobe  string   `yaml:"strobe"`
+	Name      string `yaml:"name"`
+	Number    int
+	Colors    []string `yaml:"colors"`
+	Mode      string   `yaml:"mode"`
+	Fade      string   `yaml:"fade"`
+	Size      string   `yaml:"size"`
+	Speed     string   `yaml:"speed"`
+	Rotate    string   `yaml:"rotate"`
+	Direction string   `yaml:"direction"`
+	Program   string   `yaml:"program"`
+	Strobe    string   `yaml:"strobe"`
 }
 
 type ActionConfig struct {

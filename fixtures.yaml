@@ -1170,7 +1170,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: "Off"
+      direction: ""
       program: "Off"
       strobe: ""
     flash: false
@@ -1188,7 +1188,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: "On"
+      direction: ""
       program: "On"
       strobe: ""
     flash: false
@@ -1437,7 +1437,7 @@ fixtures:
   description: ADJ QA PAR38
   type: switch
   group: 4
-  address: 500
+  address: 150
   channels: []
   states:
   - name: "Off"
@@ -1487,7 +1487,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1506,7 +1506,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1525,7 +1525,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1544,7 +1544,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1554,7 +1554,7 @@ fixtures:
     buttoncolor: Red
     master: 0
     actions:
-    - name: Soft
+    - name: "On"
       number: 0
       colors:
       - Orange
@@ -1566,10 +1566,10 @@ fixtures:
       - Pink
       mode: Chase
       fade: Soft
-      size: ""
+      size: Long
       speed: Fast
-      rotate: ""
-      music: ""
+      rotate: "Off"
+      direction: "Off"
       program: ""
       strobe: ""
     flash: false
@@ -1603,7 +1603,7 @@ fixtures:
       size: ""
       speed: Music
       rotate: "Off"
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1665,7 +1665,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1684,7 +1684,7 @@ fixtures:
       size: ""
       speed: ""
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1703,7 +1703,7 @@ fixtures:
       size: ""
       speed: "Off"
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1722,7 +1722,7 @@ fixtures:
       size: ""
       speed: "Off"
       rotate: ""
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1747,7 +1747,7 @@ fixtures:
       size: ""
       speed: Fast
       rotate: Slow
-      music: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false
@@ -1757,22 +1757,44 @@ fixtures:
     buttoncolor: White
     master: 0
     actions:
-    - name: Rotate
+    - name: Sound
       number: 0
       colors:
-      - Orange
       - Yellow
+      - White
+      - Pink
+      - Black
+      - Red
+      - Orange
       - Green
       - Cyan
       - Blue
       - Purple
-      - Pink
       mode: Chase
       fade: Soft
-      size: ""
+      size: Short
       speed: Music
-      rotate: Slow
-      music: ""
+      rotate: "Off"
+      direction: Forward
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Puple
+    number: 7
+    label: Puple
+    buttoncolor: Purple
+    master: 0
+    actions:
+    - name: Puple
+      number: 1
+      colors:
+      - Purple
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      direction: ""
       program: ""
       strobe: ""
     flash: false

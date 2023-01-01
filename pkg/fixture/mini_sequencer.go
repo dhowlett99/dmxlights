@@ -342,7 +342,10 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Colors = colorLibrary
 	}
 
+	// Fade - Time taken to fade up and down.
 	switch action.Fade {
+	case "Off":
+		config.Fade = 1
 	case "Soft":
 		config.Fade = 1
 	case "Sharp":
@@ -351,7 +354,10 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Fade = 1
 	}
 
+	// Size - How long does the lamp stay on.
 	switch action.Size {
+	case "Off":
+		config.Size = 0
 	case "Short":
 		config.Size = 1
 	case "Medium":
@@ -385,16 +391,6 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	default:
 		config.RotateSpeed = 0
 		config.Rotatable = false
-	}
-
-	switch action.Music {
-
-	case "Internal":
-		config.Music = 255
-	case "Off":
-		config.Music = 0
-	default:
-		config.Music = 0
 	}
 
 	switch action.Strobe {

@@ -118,7 +118,6 @@ func PopulateSwitches(thisFixture fixture.Fixture) (switchesAvailable bool, acti
 						newAction.Speed = "none"
 					}
 					newAction.Rotate = action.Rotate
-					newAction.Music = action.Music
 					newAction.Program = action.Program
 					newAction.Strobe = action.Strobe
 

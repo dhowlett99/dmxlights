@@ -29,21 +29,23 @@ import (
 )
 
 type ActionPanel struct {
-	ActionsPanel         *widget.List
-	ActionsList          []fixture.Action
-	ActionNameOptions    []string
-	ActionColorsOptions  []string
-	ActionModeOptions    []string
-	ActionFadeOptions    []string
-	ActionSpeedOptions   []string
-	ActionRotateOptions  []string
-	ActionMusicOptions   []string
-	ActionProgramOptions []string
-	ActionStrobeOptions  []string
-	UpdateActions        bool
-	UpdateThisAction     int
-	CurrentState         int
-	CurrentStateName     string
+	ActionsPanel                 *widget.List
+	ActionsList                  []fixture.Action
+	ActionNameOptions            []string
+	ActionColorsOptions          []string
+	ActionModeOptions            []string
+	ActionFadeOptions            []string
+	ActionSizeOptions            []string
+	ActionSpeedOptions           []string
+	ActionRotateOptions          []string
+	ActionRotateDirectionOptions []string
+	ActionMusicOptions           []string
+	ActionProgramOptions         []string
+	ActionStrobeOptions          []string
+	UpdateActions                bool
+	UpdateThisAction             int
+	CurrentState                 int
+	CurrentStateName             string
 }
 
 const LABEL = 0
@@ -52,11 +54,12 @@ const SELECT = 1
 const ACTIONS_MODE = 0
 const ACTIONS_COLORS = 1
 const ACTIONS_FADE = 2
-const ACTIONS_SPEED = 3
-const ACTIONS_ROTATE = 4
-const ACTIONS_MUSIC = 5
-const ACTIONS_PROGRAM = 6
-const ACTIONS_STROBE = 7
+const ACTIONS_SIZE = 3
+const ACTIONS_SPEED = 4
+const ACTIONS_ROTATE = 5
+const ACTIONS_DIRECTION = 6
+const ACTIONS_PROGRAM = 7
+const ACTIONS_STROBE = 8
 
 func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 
@@ -64,9 +67,11 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 	ap.ActionsList = actionsList
 	//ap.ActionNameOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	ap.ActionModeOptions = []string{"Off", "Static", "Chase", "Control"}
+	ap.ActionSizeOptions = []string{"Off", "Short", "Medium", "Long"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
-	ap.ActionRotateOptions = []string{"Off", "Forward", "Reverse", "Auto"}
+	ap.ActionRotateOptions = []string{"Off", "Slow", "Medium", "Fast"}
+	ap.ActionRotateDirectionOptions = []string{"Off", "Forward", "Reverse", "Auto"}
 	ap.ActionMusicOptions = []string{"Off", "On"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
@@ -85,7 +90,6 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[cp.UpdateThisAction].Size
 				newAction.Speed = ap.ActionsList[cp.UpdateThisAction].Speed
 				newAction.Rotate = ap.ActionsList[cp.UpdateThisAction].Rotate
-				newAction.Music = ap.ActionsList[cp.UpdateThisAction].Music
 				newAction.Program = ap.ActionsList[cp.UpdateThisAction].Program
 				newAction.Strobe = ap.ActionsList[cp.UpdateThisAction].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[cp.UpdateThisAction].Number, newAction)
@@ -124,6 +128,10 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					widget.NewSelect(ap.ActionFadeOptions, func(value string) {}),
 				),
 				container.NewHBox(
+					widget.NewLabel("Size"),
+					widget.NewSelect(ap.ActionSizeOptions, func(value string) {}),
+				),
+				container.NewHBox(
 					widget.NewLabel("Speed"),
 					widget.NewSelect(ap.ActionSpeedOptions, func(value string) {}),
 				),
@@ -132,8 +140,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					widget.NewSelect(ap.ActionRotateOptions, func(value string) {}),
 				),
 				container.NewHBox(
-					widget.NewLabel("Music"),
-					widget.NewSelect(ap.ActionMusicOptions, func(value string) {}),
+					widget.NewLabel("Direction"),
+					widget.NewSelect(ap.ActionRotateDirectionOptions, func(value string) {}),
 				),
 				container.NewHBox(
 					widget.NewLabel("Program"),
@@ -162,7 +170,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					newAction.Size = ""
 					newAction.Speed = ""
 					newAction.Rotate = ""
-					newAction.Music = ""
+					newAction.Direction = ""
 					newAction.Program = ""
 					newAction.Strobe = ""
 					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -186,17 +194,17 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
-
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
@@ -214,7 +222,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					newAction.Size = ""
 					newAction.Speed = ""
 					newAction.Rotate = ""
-					newAction.Music = ""
+					newAction.Direction = ""
 					newAction.Program = ""
 					newAction.Strobe = ""
 					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -237,14 +245,17 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
@@ -258,13 +269,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					newAction.Number = ap.ActionsList[i].Number
 					newAction.Colors = ap.ActionsList[i].Colors
 					newAction.Mode = value
-					newAction.Fade = "Soft"
-					newAction.Size = "Short"
-					newAction.Speed = ""
-					newAction.Rotate = "Off"
-					newAction.Music = "Off"
-					newAction.Program = ""
-					newAction.Strobe = ""
+					newAction.Fade = ap.ActionsList[i].Fade
+					newAction.Size = ap.ActionsList[i].Size
+					newAction.Speed = ap.ActionsList[i].Speed
+					newAction.Rotate = ap.ActionsList[i].Rotate
+					newAction.Direction = ap.ActionsList[i].Direction
+					newAction.Program = ap.ActionsList[i].Program
+					newAction.Strobe = ap.ActionsList[i].Strobe
 					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
@@ -285,15 +296,18 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					// Fade
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Size
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 					// Speed
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 					// Rotate
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
-					// Music Trigger
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Rotate Direction
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 					// Program
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
@@ -311,7 +325,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					newAction.Size = ""
 					newAction.Speed = ""
 					newAction.Rotate = ""
-					newAction.Music = ""
+					newAction.Direction = ""
 					newAction.Program = ap.ActionsList[i].Program
 					newAction.Strobe = ""
 					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -335,15 +349,18 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					// Fade
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Size
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 					// Speed
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 					// Rotate
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
-					// Music
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-					o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					// Rotate Direction
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 					// Program
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
@@ -407,7 +424,27 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = ap.ActionsList[i].Speed
 				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Music
+				newAction.Direction = ap.ActionsList[i].Direction
+				newAction.Program = ap.ActionsList[i].Program
+				newAction.Strobe = ap.ActionsList[i].Strobe
+				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			// Size
+			o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Size)
+			o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := fixture.Action{}
+				newAction.Name = ap.ActionsList[i].Name
+				newAction.Number = ap.ActionsList[i].Number
+				newAction.Colors = ap.ActionsList[i].Colors
+				newAction.Mode = ap.ActionsList[i].Mode
+				newAction.Fade = ap.ActionsList[i].Fade
+				newAction.Size = value
+				newAction.Speed = ap.ActionsList[i].Speed
+				newAction.Rotate = ap.ActionsList[i].Rotate
+				newAction.Direction = ap.ActionsList[i].Direction
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -426,13 +463,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = value
 				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Music
+				newAction.Direction = ap.ActionsList[i].Direction
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
+			// Rotate
 			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Rotate)
 			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
@@ -444,7 +482,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = ap.ActionsList[i].Speed
 				newAction.Rotate = value
-				newAction.Music = ap.ActionsList[i].Music
+				newAction.Direction = ap.ActionsList[i].Direction
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -452,8 +490,9 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				ap.UpdateThisAction = ap.CurrentState
 			}
 
-			o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Music)
-			o.(*fyne.Container).Objects[ACTIONS_MUSIC].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+			// Direction
+			o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Direction)
+			o.(*fyne.Container).Objects[ACTIONS_DIRECTION].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
 				newAction.Name = ap.ActionsList[i].Name
 				newAction.Number = ap.ActionsList[i].Number
@@ -463,13 +502,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = ap.ActionsList[i].Speed
 				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = value
+				newAction.Direction = value
 				newAction.Program = ap.ActionsList[i].Program
 				newAction.Strobe = ap.ActionsList[i].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
+
 			// Program
 			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Program)
 			o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
@@ -482,7 +522,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = ap.ActionsList[i].Speed
 				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Program
+				newAction.Direction = ap.ActionsList[i].Direction
 				newAction.Program = value
 				newAction.Strobe = ap.ActionsList[i].Strobe
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -501,7 +541,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 				newAction.Size = ap.ActionsList[i].Size
 				newAction.Speed = ap.ActionsList[i].Speed
 				newAction.Rotate = ap.ActionsList[i].Rotate
-				newAction.Music = ap.ActionsList[i].Program
+				newAction.Direction = ap.ActionsList[i].Direction
 				newAction.Program = ap.ActionsList[i].Strobe
 				newAction.Strobe = value
 				ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
@@ -534,9 +574,9 @@ func CreateActionsList(stateList []fixture.State, selectedState int) (actionsLis
 	newAction := fixture.Action{}
 	newAction.Name = stateList[selectedState].Name // Action Name has the same name as the state.
 	newAction.Number = 1
-	newAction.Size = "Short"
+	newAction.Size = "Off"
 	newAction.Rotate = "Off"
-	newAction.Music = "Off"
+	newAction.Direction = "Off"
 	newAction.Program = "Off"
 	newAction.Strobe = "Off"
 	newAction.Colors = []string{"Off"}
