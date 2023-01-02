@@ -65,32 +65,35 @@ type State struct {
 }
 
 type Action struct {
-	Name      string `yaml:"name"`
-	Number    int
-	Colors    []string `yaml:"colors"`
-	Mode      string   `yaml:"mode"`
-	Fade      string   `yaml:"fade"`
-	Size      string   `yaml:"size"`
-	Speed     string   `yaml:"speed"`
-	Rotate    string   `yaml:"rotate"`
-	Direction string   `yaml:"direction"`
-	Program   string   `yaml:"program"`
-	Strobe    string   `yaml:"strobe"`
+	Name        string `yaml:"name"`
+	Number      int
+	Colors      []string `yaml:"colors"`
+	Mode        string   `yaml:"mode"`
+	Fade        string   `yaml:"fade"`
+	Size        string   `yaml:"size"`
+	Speed       string   `yaml:"speed"`
+	Rotate      string   `yaml:"rotate"`
+	RotateSpeed string   `yaml:"rotatespeed"`
+	Program     string   `yaml:"program"`
+	Strobe      string   `yaml:"strobe"`
 }
 
 type ActionConfig struct {
-	Name         string
-	Colors       []common.Color
-	Fade         int
-	Size         int
-	Speed        time.Duration
-	TriggerState bool
-	RotateSpeed  int
-	Rotatable    bool
-	Program      int
-	Music        int
-	MusicTrigger bool
-	Strobe       int
+	Name          string
+	Colors        []common.Color
+	Fade          int
+	Size          int
+	Speed         time.Duration
+	TriggerState  bool
+	RotateSpeed   int
+	Rotatable     bool
+	Clockwise     bool
+	AntiClockwise bool
+	Auto          bool
+	Program       int
+	Music         int
+	MusicTrigger  bool
+	Strobe        int
 }
 
 type Fixture struct {
@@ -381,10 +384,10 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 	}
 }
 
-func LookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelName string, name string, label string, fixtures *Fixtures) (int, error) {
+func findChannelSettingByLabel(group int, switchNumber int, channelName string, name string, label string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("lookUpSettingLabelInFixtureDefinition for %s\n", channelName)
+		fmt.Printf("findChannelSettingByLabel for %s\n", channelName)
 	}
 
 	var fixtureName string
@@ -424,10 +427,10 @@ func LookUpSettingLabelInFixtureDefinition(group int, switchNumber int, channelN
 	return 0, fmt.Errorf("label not found in fixture :%s", fixtureName)
 }
 
-func LookUpSettingNameInFixtureDefinition(group int, switchNumber int, channelName string, settingName string, fixtures *Fixtures) (int, error) {
+func findChannelSettingByName(group int, switchNumber int, channelName string, settingName string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("LookUpSettingValueInFixtureDefinition for %s\n", channelName)
+		fmt.Printf("findChannelSettingByName for %s\n", channelName)
 	}
 
 	var fixtureName string
@@ -465,6 +468,48 @@ func LookUpSettingNameInFixtureDefinition(group int, switchNumber int, channelNa
 	}
 
 	return 0, fmt.Errorf("label not found in fixture :%s", fixtureName)
+}
+
+func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
+
+	if debug {
+		fmt.Printf("findChannelSettingByNameAndSpeed for name %s and speed %s\n", settingName, settingSpeed)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+
+		if debug {
+			fmt.Printf("fixture %s\n", fixture.Name)
+			fmt.Printf("channels %+v\n", fixture.Channels)
+		}
+		if fixtureName == fixture.Name {
+			for _, channel := range fixture.Channels {
+				if debug {
+					fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)
+				}
+				if channel.Name == channelName {
+					if debug {
+						fmt.Printf("channel.Settings %+v\n", channel.Settings)
+					}
+					for _, setting := range channel.Settings {
+						if debug {
+							fmt.Printf("inspect setting %+v \n", setting)
+							fmt.Printf("got:setting.Name %s  want name %s speed %s\n", setting.Name, settingName, settingSpeed)
+						}
+						if strings.Contains(setting.Name, settingName) && strings.Contains(setting.Name, settingSpeed) {
+
+							if debug {
+								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%d\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Setting)
+							}
+							return setting.Setting, nil
+						}
+					}
+				}
+			}
+		}
+	}
+
+	return 0, fmt.Errorf("channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
 }
 
 func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, channelName string, fixtures *Fixtures) (int, error) {
@@ -725,7 +770,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											fmt.Printf("error %s\n", err.Error())
 											return
 										}
-										v, err := LookUpSettingLabelInFixtureDefinition(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
+										v, err := findChannelSettingByLabel(fixture.Group, fixture.Number, value.Channel, value.Name, value.Setting, fixtures)
 										if err != nil {
 											fmt.Printf("LookUpSettingLabelInFixtureDefinition error: %s\n", err.Error())
 											fmt.Printf("dmxlights: error failed to find Name=%s in switch Setting=%s \n", value.Name, value.Setting)

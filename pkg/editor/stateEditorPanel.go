@@ -78,8 +78,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
 
-		// Try again to populate the program options as available for this states action.
-		ap.ActionProgramOptions = populateProgramOptions(value, fixtures)
+		// Try again to populate the program and rotate options as available for this states action.
+		ap.ActionProgramOptions = populateOptions(value, "Program", fixtures)
 	}
 
 	// Show the currently selected fixture option.
@@ -166,20 +166,20 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 }
 
-func populateProgramOptions(fixtureName string, fixtures *fixture.Fixtures) []string {
+func populateOptions(fixtureName string, name string, fixtures *fixture.Fixtures) []string {
 
-	programOptions := []string{}
-	programSettings, err := fixture.GetProgramSettins(fixtureName, fixtures)
+	options := []string{}
+	programSettings, err := fixture.GetChannelSettinsByName(fixtureName, name, fixtures)
 	if err != nil {
-		fmt.Printf("populateProgramOptions: no program settings found for fixture %s\n", fixtureName)
+		fmt.Printf("populateOptions: no channel settings found for %s in fixture %s\n", name, fixtureName)
 	} else {
 		for _, setting := range programSettings {
-			programOptions = append(programOptions, setting.Name)
+			options = append(options, setting.Name)
 		}
 	}
-	if len(programOptions) == 0 {
-		programOptions = append(programOptions, "None")
+	if len(options) == 0 {
+		options = append(options, "None")
 	}
 
-	return programOptions
+	return options
 }

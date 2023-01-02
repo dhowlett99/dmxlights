@@ -32,7 +32,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 	myFixtureNumber := fixture.Number - 1
 
 	// Find all the specified settings for the program channel
-	programSettings, err := GetProgramSettins(fixtureName, fixturesConfig)
+	programSettings, err := GetChannelSettinsByName(fixtureName, "Program", fixturesConfig)
 	if err != nil {
 		fmt.Printf("newMiniSequencer: no program settings found for fixture %s\n", fixtureName)
 	}
@@ -109,7 +109,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		}
 
 		// Look up the program state required.
-		v, err := LookUpSettingNameInFixtureDefinition(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
+		v, err := findChannelSettingByName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
 		if err != nil {
 			fmt.Printf("fixture %s program state not found: %s,", fixtureName, err)
 			return
@@ -228,24 +228,40 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
 
 		var rotateCounter int
+		var clockwise int
+		var anti int
+
+		anti, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
+		if err != nil {
+			fmt.Printf("rotate speed: %s,", err)
+			return
+		}
+
+		clockwise, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
+		if err != nil {
+			fmt.Printf("rotate speed: %s,", err)
+			return
+		}
 
 		go func() {
 
 			if cfg.Rotatable {
+
+				rotateChannel, err := FindChannel("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				if err != nil {
+					fmt.Printf("rotator: %s,", err)
+					return
+				}
+				masterChannel, err := FindChannel("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				if err != nil {
+					fmt.Printf("master: %s,", err)
+					return
+				}
+
 				// Thread to run the rotator
 				go func(switchNumber int, switchChannels map[int]common.SwitchChannel) {
 
 					for {
-						rotateChannel, err := FindChannel("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
-						if err != nil {
-							fmt.Printf("rotator: %s,", err)
-							return
-						}
-						masterChannel, err := FindChannel("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
-						if err != nil {
-							fmt.Printf("rotator: %s,", err)
-							return
-						}
 
 						select {
 						case <-switchChannels[switchNumber].StopRotate:
@@ -281,16 +297,29 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 						case switchChannels[switchNumber].KeepRotateAlive <- true:
 						case <-time.After(10 * time.Millisecond):
 						}
-					}
 
-					if rotateCounter > 500 {
-						rotateCounter = 1
-					}
+						if rotateCounter > 500 {
+							rotateCounter = 1
+						}
+						if !cfg.Clockwise && !cfg.AntiClockwise {
+							cfg.RotateSpeed = 0
+						}
+						if cfg.Clockwise {
+							cfg.RotateSpeed = clockwise
+						}
+						if cfg.AntiClockwise {
+							cfg.RotateSpeed = anti
+						}
 
-					if rotateCounter < 128 {
-						cfg.RotateSpeed = 127
-					} else {
-						cfg.RotateSpeed = 128
+						if cfg.Auto {
+							if rotateCounter < 250 {
+								// Clockwise Speed.
+								cfg.RotateSpeed = clockwise
+							} else {
+								// Anti Clockwise Speed.
+								cfg.RotateSpeed = anti
+							}
+						}
 					}
 
 					if debug_mini {
@@ -302,9 +331,11 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 					select {
 					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
 					case <-switchChannels[switchNumber].Stop:
+						// Stop.
 						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true
 						}
+						// And turn the fixture off.
 						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
@@ -377,20 +408,30 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 
 	switch action.Rotate {
 	case "Off":
-		config.RotateSpeed = 0
 		config.Rotatable = false
-	case "Slow":
-		config.RotateSpeed = 1
+		config.Auto = false
+		config.Clockwise = false
+		config.AntiClockwise = false
+	case "Clockwise":
 		config.Rotatable = true
-	case "Medium":
-		config.RotateSpeed = 50
+		config.Auto = false
+		config.Clockwise = true
+		config.AntiClockwise = false
+	case "Anti Clockwise":
 		config.Rotatable = true
-	case "Fast":
-		config.RotateSpeed = 127
+		config.Auto = false
+		config.Clockwise = false
+		config.AntiClockwise = true
+	case "Auto":
 		config.Rotatable = true
+		config.Auto = true
+		config.Clockwise = false
+		config.AntiClockwise = false
 	default:
-		config.RotateSpeed = 0
 		config.Rotatable = false
+		config.Auto = false
+		config.Clockwise = false
+		config.AntiClockwise = false
 	}
 
 	switch action.Strobe {
@@ -434,9 +475,9 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	return config
 }
 
-func GetProgramSettins(fixtureName string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
-		fmt.Printf("GetProgramSettins: Looking for program settings for fixture %s\n", fixtureName)
+		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixtureName)
 	}
 
 	settingNames := []common.Setting{}
@@ -444,16 +485,16 @@ func GetProgramSettins(fixtureName string, fixtures *Fixtures) ([]common.Setting
 	// Find the fixture by name.
 	for _, fixture := range fixtures.Fixtures {
 		if debug_mini {
-			fmt.Printf("GetProgramSettins: matching on fixture %s with name %s\n", fixture.Label, fixtureName)
+			fmt.Printf("GetChannelSettinsByName: matching on fixture %s with name %s\n", fixture.Label, fixtureName)
 		}
 		if strings.Contains(fixture.Label, fixtureName) {
 
 			// Find the channel by name.
 			for _, channel := range fixture.Channels {
 				if debug_mini {
-					fmt.Printf("GetProgramSettins: looking at channel %s\n", channel.Name)
+					fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
 				}
-				if channel.Name == "Program" {
+				if channel.Name == name {
 					if debug_mini {
 						fmt.Printf("Found a Program Channel\n")
 					}
