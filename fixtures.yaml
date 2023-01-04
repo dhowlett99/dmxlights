@@ -1013,9 +1013,9 @@ fixtures:
       number: 1
       setting: 1
   - number: 11
-    name: Dimmer Curves
+    name: DimmerCurve
     settings:
-    - name: Default Curve
+    - name: DefaultCurve
       label: ""
       number: 1
       setting: 255
