@@ -22,6 +22,7 @@ import (
 	"os"
 	"sort"
 	"strconv"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -75,6 +76,10 @@ func makeArray(fixtures *fixture.Fixtures) [][]string {
 		fmt.Printf("makeArray\n")
 	}
 	var data = [][]string{}
+
+	sort.Slice(fixtures.Fixtures, func(i, j int) bool {
+		return fixtures.Fixtures[i].Address < fixtures.Fixtures[j].Address
+	})
 
 	// scan the fixtures structure for the selected fixture.
 	for _, fixture := range fixtures.Fixtures {
@@ -133,6 +138,23 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	if debug {
 		fmt.Printf("NewFixturePanel\n")
 	}
+
+	// Create a dialog for error messages.
+	var reports []string
+	message := &widget.PopUp{}
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		message.Hide()
+	})
+	message = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Title"),
+			widget.NewLabel("Error Message"),
+			widget.NewLabel("Report"),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		w.Canvas(),
+	)
 
 	fp := FixturesPanel{}
 	fp.FixtureList = []fixture.Fixture{}
@@ -243,7 +265,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				widget.NewButton("Channels", func() {}), // Channel Button
 			)
 		},
-		// Function to update item in this list.
+		// Function to update items in this list.
 		func(i widget.TableCellID, o fyne.CanvasObject) {
 
 			// Hide all field types.
@@ -275,7 +297,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							newFixture.States = append(newFixture.States, newState)
 						}
 
-						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 					}
 				}
 			}
@@ -288,7 +310,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).Options = fp.GroupOptions
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(value string) {
 					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).PlaceHolder = "XXX"
 			}
@@ -300,7 +322,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).SetSelected(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).OnChanged = func(value string) {
 					newFixture := makeNewFixture(data, i, FIXTURE_NUMBER, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).PlaceHolder = "X"
 			}
@@ -313,7 +335,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).PlaceHolder = "XXXXXXXXXXXXX"
 			}
@@ -326,7 +348,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_LABEL, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 
@@ -338,8 +360,20 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, reports, err = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					if err != nil {
+						message.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "DMX Address"
+						message.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+						message.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).SetText(data[i.Row][i.Col])
+						address, _ := strconv.Atoi(data[i.Row][i.Col])
+						fp.FixtureList[i.Row].Address = int16(address)
+						data = updateArray(fp.FixtureList)
+
+						message.Show()
+					}
 				}
+
 				// Switch addresses are the address of the fixture being used.
 				// So this comes from the state panel's usefixture field.
 				if data[i.Row][FIXTURE_TYPE] == "switch" {
@@ -355,7 +389,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_DESCRIPTION, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 				}
 			}
 
@@ -426,6 +460,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
+		sort.Slice(fp.FixtureList, func(i, j int) bool {
+			return fp.FixtureList[i].ID < fp.FixtureList[j].ID
+		})
+
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
 
@@ -487,11 +525,17 @@ func GetFixtureLabelsForSwitches(fixtures *fixture.Fixtures) []string {
 	return fixturesAvailable
 }
 
-func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) []fixture.Fixture {
+func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) ([]fixture.Fixture, []string, error) {
 
 	if debug {
 		fmt.Printf("UpdateFixture\n")
 	}
+
+	var lastAddress int
+	var lastNumberChannels int
+	var lastFixture string
+	var err error
+	var reports []string
 
 	newFixtures := []fixture.Fixture{}
 	for _, fixture := range fixtures {
@@ -502,8 +546,24 @@ func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) 
 			// just add what was there before.
 			newFixtures = append(newFixtures, fixture)
 		}
+		if fixture.Type != "switch" {
+			if CheckOverlap(lastAddress, lastAddress+lastNumberChannels, int(fixture.Address), int(fixture.Address)+len(fixture.Channels)) {
+				// We have an overlapping DMX address.
+				err = fmt.Errorf("overlapping DMX Address")
+				reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, lastFixture))
+			}
+		}
+
+		lastFixture = fixture.Name
+		lastAddress = int(fixture.Address)
+		lastNumberChannels = len(fixture.Channels)
 	}
-	return newFixtures
+	return newFixtures, reports, err
+}
+
+// CheckOverlap
+func CheckOverlap(as, ae, bs, be int) bool {
+	return (as >= be) != (ae > bs)
 }
 
 func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {

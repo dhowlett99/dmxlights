@@ -1200,7 +1200,7 @@ fixtures:
   description: Flame Projector
   type: switch
   group: 4
-  address: 500
+  address: 
   channels: []
   states:
   - name: "Off"
@@ -1232,7 +1232,7 @@ fixtures:
   description: ACME Deluge
   type: switch
   group: 4
-  address: 500
+  address: 
   channels: []
   states:
   - name: "Off"
@@ -1272,7 +1272,7 @@ fixtures:
   description: Chauvet Vue 1.1
   type: switch
   group: 4
-  address: 500
+  address: 
   channels: []
   states:
   - name: "Off"
@@ -1787,7 +1787,7 @@ fixtures:
   description: ADJ DEKKER 2
   type: switch
   group: 4
-  address: 500
+  address: 
   channels: []
   states:
   - name: "Off"
@@ -1809,7 +1809,7 @@ fixtures:
   description: Gibraltar Booth
   type: switch
   group: 4
-  address: 500
+  address: 
   channels: []
   states:
   - name: "Off"
