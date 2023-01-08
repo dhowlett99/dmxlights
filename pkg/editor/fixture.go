@@ -142,6 +142,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		fmt.Printf("NewFixturePanel\n")
 	}
 
+	fp := FixturesPanel{}
+	fp.FixtureList = []fixture.Fixture{}
+
+	fp.GroupOptions = []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
+	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
+	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
+
+	// Storage for error flags for each fixture.
+	fp.EntryError = make(map[int]bool, len(fp.FixtureList))
+
 	Red := color.RGBA{}
 	Red.R = uint8(255)
 	Red.G = uint8(0)
@@ -165,16 +175,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		),
 		w.Canvas(),
 	)
-
-	fp := FixturesPanel{}
-	fp.FixtureList = []fixture.Fixture{}
-
-	fp.GroupOptions = []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
-	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
-	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
-
-	// Storage for error flags for each fixture.
-	fp.EntryError = make(map[int]bool, len(fp.FixtureList))
 
 	// Load the fixtures into the array used by the table.
 	data := makeArray(fixtures)
@@ -392,7 +392,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 					data = updateArray(fp.FixtureList)
 					err := checkDMXAddress(value)
 					if err != nil {
-						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "DMX Address"
+						fp.EntryError[fp.FixtureList[i.Row].ID] = true
+						fp.FixturePanel.Refresh()
+						popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Out of Range"
 						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 						popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
