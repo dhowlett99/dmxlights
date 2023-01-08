@@ -19,12 +19,14 @@ package editor
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 	"sort"
 	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
@@ -51,9 +53,14 @@ type FixturesPanel struct {
 	GroupOptions  []string
 	NumberOptions []string
 	TypeOptions   []string
+
+	EntryError map[int]bool
 }
 
 const debug bool = false
+
+const RECTANGLE = 0
+const TEXT = 1
 
 const FIXTURE_ID int = 0
 const FIXTURE_TYPE int = 1
@@ -76,10 +83,6 @@ func makeArray(fixtures *fixture.Fixtures) [][]string {
 		fmt.Printf("makeArray\n")
 	}
 	var data = [][]string{}
-
-	sort.Slice(fixtures.Fixtures, func(i, j int) bool {
-		return fixtures.Fixtures[i].Address < fixtures.Fixtures[j].Address
-	})
 
 	// scan the fixtures structure for the selected fixture.
 	for _, fixture := range fixtures.Fixtures {
@@ -133,20 +136,27 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (modal *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturePanel\n")
 	}
 
+	Red := color.RGBA{}
+	Red.R = uint8(255)
+	Red.G = uint8(0)
+	Red.B = uint8(0)
+	Red.A = 255
+	White := color.White
+
 	// Create a dialog for error messages.
 	var reports []string
-	message := &widget.PopUp{}
+	popupErrorPanel := &widget.PopUp{}
 	// Ok button.
 	button := widget.NewButton("OK", func() {
-		message.Hide()
+		popupErrorPanel.Hide()
 	})
-	message = widget.NewModalPopUp(
+	popupErrorPanel = widget.NewModalPopUp(
 		container.NewVBox(
 			widget.NewLabel("Title"),
 			widget.NewLabel("Error Message"),
@@ -162,6 +172,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp.GroupOptions = []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
 	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
+
+	// Storage for error flags for each fixture.
+	fp.EntryError = make(map[int]bool, len(fp.FixtureList))
 
 	// Load the fixtures into the array used by the table.
 	data := makeArray(fixtures)
@@ -256,9 +269,12 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				widget.NewSelect(fp.TypeOptions, func(value string) {}),   // Type rgb, scanner or switch.
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
-				widget.NewEntry(),                       // Name.
-				widget.NewEntry(),                       // Label.
-				widget.NewEntry(),                       // DMX Address.
+				widget.NewEntry(), // Name.
+				widget.NewEntry(), // Label.
+				container.NewMax(
+					canvas.NewRectangle(color.White),
+					widget.NewEntry(), // DMX Address.
+				),
 				widget.NewEntry(),                       // Description
 				widget.NewButton("-", func() {}),        // Fixture delete button.
 				widget.NewButton("+", func() {}),        // Fixture add button
@@ -297,7 +313,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							newFixture.States = append(newFixture.States, newState)
 						}
 
-						fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						data = updateArray(fp.FixtureList)
 					}
 				}
 			}
@@ -310,7 +327,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).Options = fp.GroupOptions
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(value string) {
 					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
-					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					data = updateArray(fp.FixtureList)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).PlaceHolder = "XXX"
 			}
@@ -322,7 +340,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).SetSelected(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).OnChanged = func(value string) {
 					newFixture := makeNewFixture(data, i, FIXTURE_NUMBER, value, fp.FixtureList)
-					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					data = updateArray(fp.FixtureList)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).PlaceHolder = "X"
 			}
@@ -335,7 +354,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
-					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					data = updateArray(fp.FixtureList)
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).PlaceHolder = "XXXXXXXXXXXXX"
 			}
@@ -348,36 +368,44 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_LABEL, value, fp.FixtureList)
-					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					data = updateArray(fp.FixtureList)
 				}
 			}
 
 			// Fixture DMX Address.
 			if i.Col == FIXTURE_ADDRESS {
 				showField(FIXTURE_ADDRESS, o)
-				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).OnChanged = nil
-				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).SetText(data[i.Row][i.Col])
-				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).OnChanged = func(value string) {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).FocusGained()
+				if fp.EntryError[fp.FixtureList[i.Row].ID] {
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+				} else {
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+				}
+				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
+				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
 					newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
-					fp.FixtureList, reports, err = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.EntryError[fp.FixtureList[i.Row].ID] = false
+					data = updateArray(fp.FixtureList)
+					err := checkDMXAddress(value)
 					if err != nil {
-						message.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "DMX Address"
-						message.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
-						message.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
-						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).SetText(data[i.Row][i.Col])
+						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "DMX Address"
+						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+						popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 						address, _ := strconv.Atoi(data[i.Row][i.Col])
 						fp.FixtureList[i.Row].Address = int16(address)
-						data = updateArray(fp.FixtureList)
-
-						message.Show()
+						popupErrorPanel.Show()
 					}
 				}
 
 				// Switch addresses are the address of the fixture being used.
 				// So this comes from the state panel's usefixture field.
 				if data[i.Row][FIXTURE_TYPE] == "switch" {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).Disable()
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Disable()
 				}
 			}
 
@@ -389,7 +417,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).OnChanged = func(value string) {
 					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).FocusGained()
 					newFixture := makeNewFixture(data, i, FIXTURE_DESCRIPTION, value, fp.FixtureList)
-					fp.FixtureList, _, _ = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+					data = updateArray(fp.FixtureList)
 				}
 			}
 
@@ -460,10 +489,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	// Save button.
 	buttonSave := widget.NewButton("Save", func() {
 
-		sort.Slice(fp.FixtureList, func(i, j int) bool {
-			return fp.FixtureList[i].ID < fp.FixtureList[j].ID
-		})
-
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
 
@@ -481,18 +506,30 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 		}
 
-		// Save the new fixtures file.
-		err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+		// Check DMX addresses don't overlap.
+		reports, err = checkForNoOverlap(fixtures, fp)
 		if err != nil {
-			fmt.Printf("error saving fixtures %s\n", err.Error())
-			os.Exit(1)
+			fmt.Printf("DMX Address %s:%s \n", err, strings.Join(reports, "\n"))
+			fp.FixturePanel.Refresh()
+			popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Address"
+			popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+			popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+			popupErrorPanel.Show()
+		} else {
+			// OK to save.
+			// Save the new fixtures file.
+			err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+			if err != nil {
+				fmt.Printf("error saving fixtures %s\n", err.Error())
+				os.Exit(1)
+			}
+			popupFixturePanel.Hide()
 		}
-
-		modal.Hide()
 	})
+
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
-		modal.Hide()
+		popupFixturePanel.Hide()
 	})
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
 	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 430, Width: 750}), fp.FixturePanel)
@@ -502,12 +539,45 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	two := container.NewBorder(main, nil, nil, nil, panel)
 	content = *container.NewBorder(two, nil, nil, nil, saveCancel)
 
-	// Layout of settings panel.
-	modal = widget.NewModalPopUp(
+	// popup fixture panel.
+	popupFixturePanel = widget.NewModalPopUp(
 		&content,
 		w.Canvas(),
 	)
-	return modal, nil
+	return popupFixturePanel, nil
+}
+
+func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
+
+	var lastNumberChannels int
+	var lastFixture string
+	var lastAddress int
+	var err error
+	var reports []string
+
+	// sort.Slice(fp.FixtureList, func(i, j int) bool {
+	// 	return fp.FixtureList[i].Address < fp.FixtureList[j].Address
+	// })
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Type != "switch" {
+			if checkOverlap(lastAddress, lastAddress+lastNumberChannels, int(fixture.Address), int(fixture.Address)+len(fixture.Channels)) {
+				fp.EntryError[fixture.ID] = true
+				// We have an overlapping DMX address.
+				err = fmt.Errorf("overlapping DMX Address")
+				reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, lastFixture))
+			}
+		}
+		lastFixture = fixture.Name
+		lastAddress = int(fixture.Address)
+		lastNumberChannels = len(fixture.Channels)
+	}
+
+	// sort.Slice(fp.FixtureList, func(i, j int) bool {
+	// 	return fp.FixtureList[i].ID < fp.FixtureList[j].ID
+	// })
+
+	return reports, err
 }
 
 func GetFixtureLabelsForSwitches(fixtures *fixture.Fixtures) []string {
@@ -525,17 +595,11 @@ func GetFixtureLabelsForSwitches(fixtures *fixture.Fixtures) []string {
 	return fixturesAvailable
 }
 
-func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) ([]fixture.Fixture, []string, error) {
+func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) []fixture.Fixture {
 
 	if debug {
 		fmt.Printf("UpdateFixture\n")
 	}
-
-	var lastAddress int
-	var lastNumberChannels int
-	var lastFixture string
-	var err error
-	var reports []string
 
 	newFixtures := []fixture.Fixture{}
 	for _, fixture := range fixtures {
@@ -546,24 +610,21 @@ func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) 
 			// just add what was there before.
 			newFixtures = append(newFixtures, fixture)
 		}
-		if fixture.Type != "switch" {
-			if CheckOverlap(lastAddress, lastAddress+lastNumberChannels, int(fixture.Address), int(fixture.Address)+len(fixture.Channels)) {
-				// We have an overlapping DMX address.
-				err = fmt.Errorf("overlapping DMX Address")
-				reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, lastFixture))
-			}
-		}
-
-		lastFixture = fixture.Name
-		lastAddress = int(fixture.Address)
-		lastNumberChannels = len(fixture.Channels)
 	}
-	return newFixtures, reports, err
+	return newFixtures
 }
 
-// CheckOverlap
-func CheckOverlap(as, ae, bs, be int) bool {
+// checkOverlap
+func checkOverlap(as, ae, bs, be int) bool {
 	return (as >= be) != (ae > bs)
+}
+
+func checkDMXAddress(value string) error {
+	address, _ := strconv.Atoi(value)
+	if address > 255 {
+		return fmt.Errorf("DMX error, cannot be greater than 255")
+	}
+	return nil
 }
 
 func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
@@ -667,12 +728,12 @@ func hideAllFields(o fyne.CanvasObject) {
 	o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).Hidden = true
-	o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_ADD].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).Hidden = true
-
 }
 
 func showField(field int, o fyne.CanvasObject) {
@@ -696,7 +757,8 @@ func showField(field int, o fyne.CanvasObject) {
 	case field == FIXTURE_LABEL:
 		o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).Hidden = false
 	case field == FIXTURE_ADDRESS:
-		o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
 	case field == FIXTURE_DESCRIPTION:
 		o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*widget.Entry).Hidden = false
 	case field == FIXTURE_DELETE:

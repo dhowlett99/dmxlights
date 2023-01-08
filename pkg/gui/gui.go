@@ -86,18 +86,7 @@ func (panel *MyPanel) LabelRightHandButtons() {
 
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
 
-	// Shortcut to label a button.
-	if alight.UpdateLabel {
-		panel.UpdateButtonLabel(alight.X, alight.Y, alight.Label)
-		return
-	}
-
-	// Shortcut to label a status bar item.
-	if alight.UpdateStatus {
-		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
-		return
-	}
-
+	// Check for requests outside buttons avaialable.
 	if alight.X == -1 { // Addressing the top row.
 		fmt.Printf("error X is -1\n")
 		return
@@ -112,6 +101,18 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 	}
 	if alight.Y > 8 {
 		fmt.Printf("error Y is > 8 \n")
+		return
+	}
+
+	// Shortcut to label a button.
+	if alight.UpdateLabel {
+		panel.UpdateButtonLabel(alight.X, alight.Y, alight.Label)
+		return
+	}
+
+	// Shortcut to label a status bar item.
+	if alight.UpdateStatus {
+		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
 		return
 	}
 
