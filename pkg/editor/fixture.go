@@ -384,23 +384,25 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
-					newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
-					fp.EntryError[fp.FixtureList[i.Row].ID] = false
-					data = updateArray(fp.FixtureList)
-					err := checkDMXAddress(value)
-					if err != nil {
-						fp.EntryError[fp.FixtureList[i.Row].ID] = true
-						fp.FixturePanel.Refresh()
-						popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Out of Range"
-						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
-						popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
-						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-						address, _ := strconv.Atoi(data[i.Row][i.Col])
-						fp.FixtureList[i.Row].Address = int16(address)
-						popupErrorPanel.Show()
+					if value != "" {
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
+						newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
+						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						fp.EntryError[fp.FixtureList[i.Row].ID] = false
+						data = updateArray(fp.FixtureList)
+						err := checkDMXAddress(value)
+						if err != nil {
+							fp.EntryError[fp.FixtureList[i.Row].ID] = true
+							fp.FixturePanel.Refresh()
+							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Out of Range"
+							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+							popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+							o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+							address, _ := strconv.Atoi(data[i.Row][i.Col])
+							fp.FixtureList[i.Row].Address = int16(address)
+							popupErrorPanel.Show()
+						}
 					}
 				}
 
@@ -622,9 +624,14 @@ func checkOverlap(as, ae, bs, be int) bool {
 }
 
 func checkDMXAddress(value string) error {
+
+	if value == "" {
+		return fmt.Errorf("DMX error, value is empty")
+	}
+
 	address, err := strconv.Atoi(value)
 	if err != nil {
-		return fmt.Errorf("DMX error, can only be numbers")
+		return fmt.Errorf("DMX error, must only contain numbers")
 	}
 	if address > 255 {
 		return fmt.Errorf("DMX error, cannot be greater than 255")
