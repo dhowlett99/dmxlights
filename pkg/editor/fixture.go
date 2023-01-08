@@ -622,7 +622,10 @@ func checkOverlap(as, ae, bs, be int) bool {
 }
 
 func checkDMXAddress(value string) error {
-	address, _ := strconv.Atoi(value)
+	address, err := strconv.Atoi(value)
+	if err != nil {
+		return fmt.Errorf("DMX error, can only be numbers")
+	}
 	if address > 255 {
 		return fmt.Errorf("DMX error, cannot be greater than 255")
 	}
