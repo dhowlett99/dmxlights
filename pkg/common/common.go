@@ -11,7 +11,7 @@ import (
 )
 
 const debug = false
-
+const MaxDMXAddress = 512
 const DefaultScannerSize = 120
 const MaxScannerSize = 120
 const MaxRGBSize = 120

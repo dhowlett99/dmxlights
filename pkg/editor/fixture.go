@@ -389,7 +389,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
 						newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
 						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
-						fp.EntryError[fp.FixtureList[i.Row].ID] = false
+						// Clear all errors in all rows.
+						for row := 0; row < len(data); row++ {
+							fp.EntryError[row] = false
+						}
 						data = updateArray(fp.FixtureList)
 						err := checkDMXAddress(value)
 						if err != nil {
@@ -402,6 +405,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							address, _ := strconv.Atoi(data[i.Row][i.Col])
 							fp.FixtureList[i.Row].Address = int16(address)
 							popupErrorPanel.Show()
+						} else {
+							// And make sure we refresh every row, when we update this field.
+							// So all the red error rectangls will disappear
+							fp.FixturePanel.Refresh()
 						}
 					}
 				}
@@ -553,34 +560,21 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
 
-	var lastNumberChannels int
-	var lastFixture string
-	var lastAddress int
 	var err error
 	var reports []string
 
-	// sort.Slice(fp.FixtureList, func(i, j int) bool {
-	// 	return fp.FixtureList[i].Address < fp.FixtureList[j].Address
-	// })
-
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Type != "switch" {
-			if checkOverlap(lastAddress, lastAddress+lastNumberChannels, int(fixture.Address), int(fixture.Address)+len(fixture.Channels)) {
-				fp.EntryError[fixture.ID] = true
-				// We have an overlapping DMX address.
-				err = fmt.Errorf("overlapping DMX Address")
-				reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, lastFixture))
+		for _, testfixture := range fixtures.Fixtures {
+			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
+				if checkOverlap(int(fixture.Address), int(fixture.Address)+len(fixture.Channels), int(testfixture.Address), int(testfixture.Address)+len(testfixture.Channels)) {
+					fp.EntryError[fixture.ID] = true
+					// We have an overlapping DMX address.
+					err = fmt.Errorf("overlapping DMX Address")
+					reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, testfixture.Name))
+				}
 			}
 		}
-		lastFixture = fixture.Name
-		lastAddress = int(fixture.Address)
-		lastNumberChannels = len(fixture.Channels)
 	}
-
-	// sort.Slice(fp.FixtureList, func(i, j int) bool {
-	// 	return fp.FixtureList[i].ID < fp.FixtureList[j].ID
-	// })
-
 	return reports, err
 }
 
@@ -619,8 +613,8 @@ func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) 
 }
 
 // checkOverlap
-func checkOverlap(as, ae, bs, be int) bool {
-	return (as >= be) != (ae > bs)
+func checkOverlap(aStart int, aEnd int, bStart int, bEnd int) bool {
+	return (aStart >= bEnd) != (aEnd > bStart)
 }
 
 func checkDMXAddress(value string) error {
@@ -633,8 +627,8 @@ func checkDMXAddress(value string) error {
 	if err != nil {
 		return fmt.Errorf("DMX error, must only contain numbers")
 	}
-	if address > 255 {
-		return fmt.Errorf("DMX error, cannot be greater than 255")
+	if address > common.MaxDMXAddress {
+		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)
 	}
 	return nil
 }
