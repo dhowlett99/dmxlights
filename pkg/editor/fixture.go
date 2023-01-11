@@ -599,25 +599,37 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			popupErrorPanel.Show()
 		} else {
 
-			// Check Name is duplicated.
+			// Check Name is not duplicated.
 			reports, err = checkForDuplicateName(fixtures, fp)
 			if err != nil {
-				fmt.Printf("DMX Address %s:%s \n", err, strings.Join(reports, "\n"))
+				fmt.Printf("Name Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
 				fp.FixturePanel.Refresh()
-				popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Address"
+				popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Name Duplicated "
 				popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 				popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 				popupErrorPanel.Show()
 			} else {
 
-				// OK to save.
-				// Save the new fixtures file.
-				err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+				// Check Name is not duplicated.
+				reports, err = checkForDuplicateLabel(fixtures, fp)
 				if err != nil {
-					fmt.Printf("error saving fixtures %s\n", err.Error())
-					os.Exit(1)
+					fmt.Printf("Label Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
+					fp.FixturePanel.Refresh()
+					popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Label Duplicated "
+					popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+					popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+					popupErrorPanel.Show()
+				} else {
+
+					// OK to save.
+					// Save the new fixtures file.
+					err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+					if err != nil {
+						fmt.Printf("error saving fixtures %s\n", err.Error())
+						os.Exit(1)
+					}
+					popupFixturePanel.Hide()
 				}
-				popupFixturePanel.Hide()
 			}
 		}
 	})
@@ -655,6 +667,26 @@ func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]stri
 					// We have an duplicate name
 					err = fmt.Errorf("duplicate names")
 					reports = append(reports, fmt.Sprintf("duplicate names on fixture ID %d and ID %d with name %s", fixture.ID, testfixture.ID, fixture.Name))
+				}
+			}
+		}
+	}
+	return reports, err
+}
+
+func checkForDuplicateLabel(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
+
+	var err error
+	var reports []string
+
+	for _, fixture := range fixtures.Fixtures {
+		for _, testfixture := range fixtures.Fixtures {
+			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
+				if fixture.Label == testfixture.Label {
+					fp.LabelEntryError[fixture.ID] = true
+					// We have an duplicate label
+					err = fmt.Errorf("duplicate labels")
+					reports = append(reports, fmt.Sprintf("duplicate label on fixture ID %d and ID %d with label %s", fixture.ID, testfixture.ID, fixture.Label))
 				}
 			}
 		}
@@ -739,10 +771,10 @@ func checkDMXAddress(value string) error {
 
 func checkTextEntry(value string) error {
 
-	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \_]+$`).MatchString
+	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \.\_]+$`).MatchString
 
 	if !IsLetter(value) {
-		return fmt.Errorf("name error: must only contain letters and numbers")
+		return fmt.Errorf("name error: must only contain letters and numbers, underscore and dots are allowed")
 	}
 
 	if len(value) > common.MaxTextEntryLength {

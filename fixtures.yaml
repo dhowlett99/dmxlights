@@ -1021,7 +1021,7 @@ fixtures:
       setting: 255
 - id: 21
   name: Scanner 7
-  label: ADJ.Inno.Spot1
+  label: ADJ.Inno.Spot2
   number: 7
   description: American DJ Inno Pocket Spot
   type: scanner
