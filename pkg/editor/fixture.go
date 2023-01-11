@@ -566,14 +566,27 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 			popupErrorPanel.Show()
 		} else {
-			// OK to save.
-			// Save the new fixtures file.
-			err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+
+			// Check Name is duplicated.
+			reports, err = checkForDuplicateName(fixtures, fp)
 			if err != nil {
-				fmt.Printf("error saving fixtures %s\n", err.Error())
-				os.Exit(1)
+				fmt.Printf("DMX Address %s:%s \n", err, strings.Join(reports, "\n"))
+				fp.FixturePanel.Refresh()
+				popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Address"
+				popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+				popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+				popupErrorPanel.Show()
+			} else {
+
+				// OK to save.
+				// Save the new fixtures file.
+				err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+				if err != nil {
+					fmt.Printf("error saving fixtures %s\n", err.Error())
+					os.Exit(1)
+				}
+				popupFixturePanel.Hide()
 			}
-			popupFixturePanel.Hide()
 		}
 	})
 
@@ -595,6 +608,26 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		w.Canvas(),
 	)
 	return popupFixturePanel, nil
+}
+
+func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
+
+	var err error
+	var reports []string
+
+	for _, fixture := range fixtures.Fixtures {
+		for _, testfixture := range fixtures.Fixtures {
+			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
+				if fixture.Name == testfixture.Name {
+					fp.NameEntryError[fixture.ID] = true
+					// We have an duplicate name
+					err = fmt.Errorf("duplicate names")
+					reports = append(reports, fmt.Sprintf("duplicate names on fixture ID %d and ID %d with name %s", fixture.ID, testfixture.ID, fixture.Name))
+				}
+			}
+		}
+	}
+	return reports, err
 }
 
 func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
