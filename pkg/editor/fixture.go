@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"image/color"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -54,7 +55,8 @@ type FixturesPanel struct {
 	NumberOptions []string
 	TypeOptions   []string
 
-	EntryError map[int]bool
+	AddressEntryError map[int]bool
+	NameEntryError    map[int]bool
 }
 
 const debug bool = false
@@ -150,13 +152,15 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
 	// Storage for error flags for each fixture.
-	fp.EntryError = make(map[int]bool, len(fp.FixtureList))
+	fp.AddressEntryError = make(map[int]bool, len(fp.FixtureList))
+	fp.NameEntryError = make(map[int]bool, len(fp.FixtureList))
 
 	Red := color.RGBA{}
 	Red.R = uint8(255)
 	Red.G = uint8(0)
 	Red.B = uint8(0)
 	Red.A = 255
+
 	White := color.White
 
 	// Create a dialog for error messages.
@@ -269,7 +273,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				widget.NewSelect(fp.TypeOptions, func(value string) {}),   // Type rgb, scanner or switch.
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
-				widget.NewEntry(), // Name.
+				container.NewMax(
+					canvas.NewRectangle(color.White),
+					widget.NewEntry(), // Name.
+				),
 				widget.NewEntry(), // Label.
 				container.NewMax(
 					canvas.NewRectangle(color.White),
@@ -349,15 +356,44 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			// Fixture Name.
 			if i.Col == FIXTURE_NAME {
 				showField(FIXTURE_NAME, o)
-				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = nil
-				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).SetText(data[i.Row][i.Col])
-				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).OnChanged = func(value string) {
-					o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).FocusGained()
-					newFixture := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
-					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
-					data = updateArray(fp.FixtureList)
+				if fp.NameEntryError[fp.FixtureList[i.Row].ID] {
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+				} else {
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
 				}
-				o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).PlaceHolder = "XXXXXXXXXXXXX"
+				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
+				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
+					if value != "" {
+						o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
+						newFixture := makeNewFixture(data, i, FIXTURE_NAME, value, fp.FixtureList)
+						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						data = updateArray(fp.FixtureList)
+
+						// Clear all errors in all rows.
+						for row := 0; row < len(data); row++ {
+							fp.NameEntryError[row] = false
+						}
+
+						// Check the text entered.
+						err := checkTextEntry(value)
+						if err != nil {
+							fp.NameEntryError[fp.FixtureList[i.Row].ID] = true
+							fp.FixturePanel.Refresh()
+							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Text Entry"
+							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+							popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+							o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+							fp.FixtureList[i.Row].Name = data[i.Row][i.Col]
+							popupErrorPanel.Show()
+						} else {
+							// And make sure we refresh every row, when we update this field.
+							// So all the red error rectangls will disappear
+							fp.FixturePanel.Refresh()
+						}
+					}
+				}
+				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).PlaceHolder = "Name"
 			}
 
 			// Fixture Label.
@@ -376,7 +412,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			// Fixture DMX Address.
 			if i.Col == FIXTURE_ADDRESS {
 				showField(FIXTURE_ADDRESS, o)
-				if fp.EntryError[fp.FixtureList[i.Row].ID] {
+				if fp.AddressEntryError[fp.FixtureList[i.Row].ID] {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
@@ -389,14 +425,17 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
 						newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
 						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
+						data = updateArray(fp.FixtureList)
+
 						// Clear all errors in all rows.
 						for row := 0; row < len(data); row++ {
-							fp.EntryError[row] = false
+							fp.AddressEntryError[row] = false
 						}
-						data = updateArray(fp.FixtureList)
+
+						// Check DMX Address is valid.
 						err := checkDMXAddress(value)
 						if err != nil {
-							fp.EntryError[fp.FixtureList[i.Row].ID] = true
+							fp.AddressEntryError[fp.FixtureList[i.Row].ID] = true
 							fp.FixturePanel.Refresh()
 							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Out of Range"
 							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
@@ -567,7 +606,7 @@ func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, 
 		for _, testfixture := range fixtures.Fixtures {
 			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
 				if checkOverlap(int(fixture.Address), int(fixture.Address)+len(fixture.Channels), int(testfixture.Address), int(testfixture.Address)+len(testfixture.Channels)) {
-					fp.EntryError[fixture.ID] = true
+					fp.AddressEntryError[fixture.ID] = true
 					// We have an overlapping DMX address.
 					err = fmt.Errorf("overlapping DMX Address")
 					reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, testfixture.Name))
@@ -629,6 +668,20 @@ func checkDMXAddress(value string) error {
 	}
 	if address > common.MaxDMXAddress {
 		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)
+	}
+	return nil
+}
+
+func checkTextEntry(value string) error {
+
+	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \_]+$`).MatchString
+
+	if !IsLetter(value) {
+		return fmt.Errorf("name error: must only contain letters and numbers")
+	}
+
+	if len(value) > common.MaxTextEntryLength {
+		return fmt.Errorf("name error, cannot be greater than %d", common.MaxTextEntryLength)
 	}
 	return nil
 }
@@ -732,7 +785,8 @@ func hideAllFields(o fyne.CanvasObject) {
 	o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).Hidden = true
-	o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = true
 	o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = true
@@ -759,7 +813,8 @@ func showField(field int, o fyne.CanvasObject) {
 	case field == FIXTURE_NUMBER:
 		o.(*fyne.Container).Objects[FIXTURE_NUMBER].(*widget.Select).Hidden = false
 	case field == FIXTURE_NAME:
-		o.(*fyne.Container).Objects[FIXTURE_NAME].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
 	case field == FIXTURE_LABEL:
 		o.(*fyne.Container).Objects[FIXTURE_LABEL].(*widget.Entry).Hidden = false
 	case field == FIXTURE_ADDRESS:
