@@ -167,6 +167,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 	White := color.White
 
+	// Create the save widget.
+	var buttonSave *widget.Button
+
 	// Create a dialog for error messages.
 	var reports []string
 	popupErrorPanel := &widget.PopUp{}
@@ -396,10 +399,15 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 							fp.FixtureList[i.Row].Name = data[i.Row][i.Col]
 							popupErrorPanel.Show()
+							// Disable the save button.
+							buttonSave.Disable()
+
 						} else {
 							// And make sure we refresh every row, when we update this field.
 							// So all the red error rectangls will disappear
 							fp.FixturePanel.Refresh()
+							// Enable the save button.
+							buttonSave.Enable()
 						}
 					}
 				}
@@ -438,10 +446,14 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 						fp.FixtureList[i.Row].Label = data[i.Row][i.Col]
 						popupErrorPanel.Show()
+						// Disable the save button.
+						buttonSave.Disable()
 					} else {
 						// And make sure we refresh every row, when we update this field.
 						// So all the red error rectangls will disappear
 						fp.FixturePanel.Refresh()
+						// Enable the save button.
+						buttonSave.Enable()
 					}
 				}
 			}
@@ -481,10 +493,14 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							address, _ := strconv.Atoi(data[i.Row][i.Col])
 							fp.FixtureList[i.Row].Address = int16(address)
 							popupErrorPanel.Show()
+							// Disable the save button.
+							buttonSave.Disable()
 						} else {
 							// And make sure we refresh every row, when we update this field.
 							// So all the red error rectangls will disappear
 							fp.FixturePanel.Refresh()
+							// Enable the save button.
+							buttonSave.Enable()
 						}
 					}
 				}
@@ -528,10 +544,14 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 						fp.FixtureList[i.Row].Description = data[i.Row][i.Col]
 						popupErrorPanel.Show()
+						// Disable the save button.
+						buttonSave.Disable()
 					} else {
 						// And make sure we refresh every row, when we update this field.
 						// So all the red error rectangls will disappear
 						fp.FixturePanel.Refresh()
+						// Enable the save button.
+						buttonSave.Enable()
 					}
 				}
 			}
@@ -601,7 +621,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp.FixturePanel.SetColumnWidth(10, 40) // Channels Button
 
 	// Save button.
-	buttonSave := widget.NewButton("Save", func() {
+	buttonSave = widget.NewButton("Save", func() {
 
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
@@ -629,7 +649,12 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 			popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 			popupErrorPanel.Show()
+			// Disable the save button.
+			buttonSave.Disable()
 		} else {
+
+			// Enable the save button.
+			buttonSave.Enable()
 
 			// Check Name is not duplicated.
 			reports, err = checkForDuplicateName(fixtures, fp)
@@ -640,7 +665,11 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 				popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 				popupErrorPanel.Show()
+				// Disable the save button.
+				buttonSave.Disable()
 			} else {
+				// Enable the save button.
+				buttonSave.Enable()
 
 				// Check Name is not duplicated.
 				reports, err = checkForDuplicateLabel(fixtures, fp)
@@ -651,7 +680,11 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 					popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 					popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 					popupErrorPanel.Show()
+					// Disable the save button.
+					buttonSave.Disable()
 				} else {
+					// Enable the save button.
+					buttonSave.Enable()
 
 					// OK to save.
 					// Save the new fixtures file.
