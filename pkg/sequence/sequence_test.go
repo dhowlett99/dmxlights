@@ -1,3 +1,20 @@
+// Copyright (C) 2022 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package sequence
 
 import (
@@ -769,111 +786,111 @@ import (
 // 					{
 // 						Fixtures: []common.Fixture{
 
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
-// 							{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			want: map[int][]common.Position{
-// 				0: {
-// 					{ScannerNumber: 0, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 0, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 0, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 0, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 0, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				14: {
-// 					{ScannerNumber: 0, StartPosition: 14, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 14, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 14, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 14, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				28: {
-// 					{ScannerNumber: 0, StartPosition: 28, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 28, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 28, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 28, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				42: {
-// 					{ScannerNumber: 0, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 42, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 42, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 42, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 42, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				56: {
-// 					{ScannerNumber: 0, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 56, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 56, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 56, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 56, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				70: {
-// 					{ScannerNumber: 0, StartPosition: 70, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 70, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 70, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 70, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				84: {
-// 					{ScannerNumber: 0, StartPosition: 84, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 84, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 84, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 84, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 				98: {
-// 					{ScannerNumber: 0, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 1, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 2, StartPosition: 98, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 3, StartPosition: 98, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 4, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 5, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 6, StartPosition: 98, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 					{ScannerNumber: 7, StartPosition: 98, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
-// 				},
-// 			},
-// 		},
-// 	}
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			if got, _ := calculatePositions("scanner", tt.args.slopeOn, tt.args.slopeOff, false); !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("got = %+v", got)
-// 				t.Errorf("want =%+v", tt.want)
-// 			}
-// 		})
-// 	}
-// }
+//								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+//								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+//							},
+//						},
+//					},
+//				},
+//				want: map[int][]common.Position{
+//					0: {
+//						{ScannerNumber: 0, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 0, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 0, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 0, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 0, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 0, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 0, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					14: {
+//						{ScannerNumber: 0, StartPosition: 14, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 14, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 14, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 14, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 14, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 14, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					28: {
+//						{ScannerNumber: 0, StartPosition: 28, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 28, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 28, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 28, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 28, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 28, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					42: {
+//						{ScannerNumber: 0, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 42, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 42, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 42, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 42, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 42, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 42, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					56: {
+//						{ScannerNumber: 0, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 56, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 56, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 56, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 56, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 56, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 56, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					70: {
+//						{ScannerNumber: 0, StartPosition: 70, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 70, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 70, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 70, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 70, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 70, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					84: {
+//						{ScannerNumber: 0, StartPosition: 84, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 84, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 84, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 84, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 84, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 84, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//					98: {
+//						{ScannerNumber: 0, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 1, StartPosition: 98, Color: common.Color{R: 255, G: 0, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 2, StartPosition: 98, Color: common.Color{R: 255, G: 111, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 3, StartPosition: 98, Color: common.Color{R: 255, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 4, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 0}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 5, StartPosition: 98, Color: common.Color{R: 0, G: 255, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 6, StartPosition: 98, Color: common.Color{R: 0, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//						{ScannerNumber: 7, StartPosition: 98, Color: common.Color{R: 100, G: 0, B: 255}, Pan: 0, Tilt: 0, Shutter: 0, Gobo: 0},
+//					},
+//				},
+//			},
+//		}
+//		for _, tt := range tests {
+//			t.Run(tt.name, func(t *testing.T) {
+//				if got, _ := calculatePositions("scanner", tt.args.slopeOn, tt.args.slopeOff, false); !reflect.DeepEqual(got, tt.want) {
+//					t.Errorf("got = %+v", got)
+//					t.Errorf("want =%+v", tt.want)
+//				}
+//			})
+//		}
+//	}
 func Test_getNumberOfFixtures(t *testing.T) {
 
 	type args struct {

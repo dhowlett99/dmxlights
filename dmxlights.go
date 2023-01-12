@@ -1,3 +1,20 @@
+// Copyright (C) 2022 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -316,7 +333,7 @@ func main() {
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
-	topStatusBar := fyne.NewContainerWithLayout(
+	topStatusBar := container.New(
 		layout.NewHBoxLayout(),
 		layout.NewSpacer(),
 		upLabel,
@@ -334,7 +351,7 @@ func main() {
 		layout.NewSpacer(),
 		toolbar)
 
-	bottonStatusBar := fyne.NewContainerWithLayout(
+	bottonStatusBar := container.New(
 		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.BeatLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
