@@ -173,7 +173,6 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 			o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).OnTapped = func() {
 				// Highlight this channel
 				sp.StatePanel.Select(thisState)
-				fmt.Printf("--> settings pannel with list %+v\n", sp.StatesList[thisState])
 				if sp.StatesList != nil {
 					// Get Existing Settings for channel.
 					st.SettingsList = populateSettingList(sp.StatesList, sp.StatesList[thisState].Number)
@@ -186,7 +185,6 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 					} else {
 						// Edit existing settings.
 						st.CurrentChannel = int(sp.StatesList[thisState].Number)
-						fmt.Printf("Refresh the settings pannel with list %+v\n", st.SettingsList[thisState])
 					}
 					ap.ActionsPanel.Hidden = true
 					st.SettingsPanel.Hidden = false

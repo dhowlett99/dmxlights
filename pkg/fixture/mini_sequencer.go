@@ -250,14 +250,15 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		var clockwise int
 		var anti int
 
-		anti, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
-		if err != nil {
-			fmt.Printf("rotate speed: %s,", err)
-		}
-
-		clockwise, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
-		if err != nil {
-			fmt.Printf("rotate speed: %s,", err)
+		if cfg.Rotatable {
+			anti, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
+			if err != nil {
+				fmt.Printf("rotate speed: %s\n", err)
+			}
+			clockwise, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
+			if err != nil {
+				fmt.Printf("rotate speed: %s\n", err)
+			}
 		}
 
 		go func() {
