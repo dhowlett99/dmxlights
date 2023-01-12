@@ -37,7 +37,6 @@ import (
 
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -240,7 +239,7 @@ func CreateSequence(
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
-	pad *mk3.Launchpad,
+	//pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
