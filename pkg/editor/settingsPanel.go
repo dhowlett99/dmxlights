@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"sort"
-	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -33,11 +32,18 @@ type SettingsPanel struct {
 	SettingsList      []fixture.Setting
 	SettingsOptions   []string
 	CurrentChannel    int
-	UpdateSettings    bool
 	UpdateThisChannel int
+	UpdateSettings    bool
 }
 
-func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, SettingsList []fixture.Setting) *SettingsPanel {
+func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool) *SettingsPanel {
+
+	var SETTING_NUMBER int
+	var SETTING_NAME int
+	var SETTING_CHANNEL int
+	var SETTING_VALUE int
+	var SETTING_DELETE int
+	var SETTING_ADD int
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
@@ -50,9 +56,35 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 		},
 		// Function to create item.
 		func() fyne.CanvasObject {
+
+			if channelFieldDisabled {
+
+				SETTING_NUMBER = 0
+				SETTING_NAME = 1
+				SETTING_VALUE = 2
+				SETTING_DELETE = 3
+				SETTING_ADD = 4
+
+				return container.NewGridWithColumns(5,
+					widget.NewLabel("template"),      // Setting Number.
+					widget.NewEntry(),                // Setting Name.
+					widget.NewEntry(),                // Setting Value.
+					widget.NewButton("-", func() {}), // Delete this Setting.
+					widget.NewButton("+", func() {}), // Add a new Setting below.
+				)
+			}
+
+			SETTING_NUMBER = 0
+			SETTING_NAME = 1
+			SETTING_CHANNEL = 2
+			SETTING_VALUE = 3
+			SETTING_DELETE = 4
+			SETTING_ADD = 5
+
 			return container.NewGridWithColumns(5,
 				widget.NewLabel("template"),      // Setting Number.
 				widget.NewEntry(),                // Setting Name.
+				widget.NewEntry(),                // Channel Number.
 				widget.NewEntry(),                // Setting Value.
 				widget.NewButton("-", func() {}), // Delete this Setting.
 				widget.NewButton("+", func() {}), // Add a new Setting below.
@@ -63,45 +95,68 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 		func(i widget.ListItemID, o fyne.CanvasObject) {
 
 			// Show the setting a number.
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
+			o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
 
 			// Show and Edit the Name.
-			o.(*fyne.Container).Objects[1].(*widget.Entry).SetText(st.SettingsList[i].Name)
-			o.(*fyne.Container).Objects[1].(*widget.Entry).OnChanged = func(value string) {
+			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).SetText(st.SettingsList[i].Name)
+			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
 				newSetting.Label = st.SettingsList[i].Label
 				newSetting.Name = value
 				newSetting.Number = st.SettingsList[i].Number
+				if !channelFieldDisabled {
+					newSetting.Channel = st.SettingsList[i].Channel
+				}
 				newSetting.Setting = st.SettingsList[i].Setting
-				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
+			if !channelFieldDisabled {
+				// Channel value.
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).Hidden = channelFieldDisabled
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).SetText(st.SettingsList[i].Channel)
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).OnChanged = func(value string) {
+					newSetting := fixture.Setting{}
+					newSetting.Label = st.SettingsList[i].Label
+					newSetting.Name = st.SettingsList[i].Name
+					newSetting.Number = st.SettingsList[i].Number
+					newSetting.Channel = value
+					newSetting.Setting = st.SettingsList[i].Setting
+					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+					st.UpdateSettings = true
+					st.UpdateThisChannel = st.CurrentChannel - 1
+				}
+			}
+
 			// Show and Edit the Setting Value.
-			o.(*fyne.Container).Objects[2].(*widget.Entry).SetText(fmt.Sprintf("%d", st.SettingsList[i].Setting))
+			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).SetText(st.SettingsList[i].Setting)
 			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
 				newSetting.Label = st.SettingsList[i].Label
 				newSetting.Name = st.SettingsList[i].Name
 				newSetting.Number = st.SettingsList[i].Number
-				newSetting.Setting, _ = strconv.Atoi(value)
-				st.SettingsList = UpdateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+				if !channelFieldDisabled {
+					newSetting.Channel = st.SettingsList[i].Channel
+				}
+				newSetting.Setting = value
+				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
 			// Show the Delete Setting Button.
-			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				st.SettingsList = DeleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
+			o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
+				st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
 			}
 
 			// Show the Add Setting Button.
-			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
-				st.SettingsList = AddSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
+			o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
+				st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
 				st.SettingsPanel.Refresh()
@@ -112,7 +167,7 @@ func NewSettingsPanel(thisFixture fixture.Fixture, currentChannel *int, Settings
 	return &st
 }
 
-func SettingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
+func settingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
 	// look through the settings list for the id's
 	for _, item := range settingsList {
 		if item.Number == number {
@@ -122,7 +177,7 @@ func SettingItemAllreadyExists(number int, settingsList []fixture.Setting) bool 
 	return false
 }
 
-func FindLargestsettingsNumber(items []fixture.Setting) int {
+func findLargestsettingsNumber(items []fixture.Setting) int {
 	var number int
 	for _, item := range items {
 		if item.Number > number {
@@ -132,12 +187,12 @@ func FindLargestsettingsNumber(items []fixture.Setting) int {
 	return number
 }
 
-func AddSettingsItem(items []fixture.Setting, id int, options []string) []fixture.Setting {
+func addSettingsItem(items []fixture.Setting, id int, options []string) []fixture.Setting {
 	newItems := []fixture.Setting{}
 	newItem := fixture.Setting{}
 	newItem.Number = int(id) + 1
-	if SettingItemAllreadyExists(newItem.Number, items) {
-		newItem.Number = FindLargestsettingsNumber(items) + 1
+	if settingItemAllreadyExists(newItem.Number, items) {
+		newItem.Number = findLargestsettingsNumber(items) + 1
 	}
 	newItem.Name = "New"
 
@@ -153,7 +208,7 @@ func AddSettingsItem(items []fixture.Setting, id int, options []string) []fixtur
 	return newItems
 }
 
-func UpdateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting) []fixture.Setting {
+func updateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting) []fixture.Setting {
 	newItems := []fixture.Setting{}
 	for _, item := range items {
 		if item.Number == id {
@@ -167,7 +222,7 @@ func UpdateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting
 	return newItems
 }
 
-func DeleteSettingsItem(settingsList []fixture.Setting, id int) []fixture.Setting {
+func deleteSettingsItem(settingsList []fixture.Setting, id int) []fixture.Setting {
 	newSettings := []fixture.Setting{}
 	for settingNumber, setting := range settingsList {
 		if settingNumber != id {
@@ -175,23 +230,4 @@ func DeleteSettingsItem(settingsList []fixture.Setting, id int) []fixture.Settin
 		}
 	}
 	return newSettings
-}
-
-func SettingsItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
-	for _, item := range channelList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func FindLargestSettingsNumber(items []fixture.Channel) int16 {
-	var number int16
-	for _, item := range items {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
 }

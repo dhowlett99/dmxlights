@@ -47,22 +47,15 @@ type Color struct {
 	W int `yaml:"white"`
 }
 
-type Value struct {
-	Name        string `yaml:"name"`
-	Description string `yaml:"description"`
-	Channel     string `yaml:"channel"`
-	Setting     string `yaml:"setting"`
-}
-
 type State struct {
-	Name        string   `yaml:"name"`
-	Number      int16    `yaml:"number"`
-	Label       string   `yaml:"label"`
-	Values      []Value  `yaml:"values,omitempty"`
-	ButtonColor string   `yaml:"buttoncolor"`
-	Master      int      `yaml:"master"`
-	Actions     []Action `yaml:"actions,omitempty"`
-	Flash       bool     `yaml:"flash"`
+	Name        string    `yaml:"name"`
+	Number      int16     `yaml:"number"`
+	Label       string    `yaml:"label"`
+	ButtonColor string    `yaml:"buttoncolor"`
+	Master      int       `yaml:"master"`
+	Actions     []Action  `yaml:"actions,omitempty"`
+	Settings    []Setting `yaml:"settings,omitempty"`
+	Flash       bool      `yaml:"flash"`
 }
 
 type Action struct {
@@ -113,10 +106,12 @@ type Fixture struct {
 }
 
 type Setting struct {
-	Name    string `yaml:"name"`
-	Label   string `yaml:"label"`
-	Number  int    `yaml:"number"`
-	Setting int    `yaml:"setting"`
+	Name        string `yaml:"name"`
+	Label       string `yaml:"label"`
+	Number      int    `yaml:"number"`
+	Channel     string `yaml:"channel"`
+	Setting     string `yaml:"setting"`
+	Description string `yaml:"description"`
 }
 
 type Channel struct {
@@ -376,7 +371,8 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 				if strings.Contains(channel.Name, "Color") {
 					for _, setting := range channel.Settings {
 						if setting.Number-1 == scannerColor {
-							setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
+							v, _ := strconv.ParseFloat(setting.Setting, 32)
+							setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -415,9 +411,10 @@ func findChannelSettingByLabel(group int, switchNumber int, channelName string, 
 						}
 						if setting.Label == label {
 							if debug {
-								fmt.Printf("Fixture=%s Channel.Name=%s Label=%s Name=%s Setting %d\n", fixture.Name, channel.Name, label, name, setting.Setting)
+								fmt.Printf("Fixture=%s Channel.Name=%s Label=%s Name=%s Setting %s\n", fixture.Name, channel.Name, label, name, setting.Setting)
 							}
-							return setting.Setting, nil
+							v, _ := strconv.Atoi(setting.Setting)
+							return v, nil
 						}
 					}
 				}
@@ -458,9 +455,10 @@ func findChannelSettingByName(group int, switchNumber int, channelName string, s
 						}
 						if setting.Name == settingName {
 							if debug {
-								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingValue=%d\n", fixture.Name, channel.Name, settingName, setting.Setting)
+								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingValue=%s\n", fixture.Name, channel.Name, settingName, setting.Setting)
 							}
-							return setting.Setting, nil
+							v, _ := strconv.Atoi(setting.Setting)
+							return v, nil
 						}
 					}
 				}
@@ -500,9 +498,10 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 						if strings.Contains(setting.Name, settingName) && strings.Contains(setting.Name, settingSpeed) {
 
 							if debug {
-								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%d\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Setting)
+								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Setting)
 							}
-							return setting.Setting, nil
+							v, _ := strconv.Atoi(setting.Setting)
+							return v, nil
 						}
 					}
 				}
@@ -558,7 +557,8 @@ func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXCont
 				if strings.Contains(channel.Name, "Gobo") {
 					for _, setting := range channel.Settings {
 						if setting.Number == selectedGobo {
-							setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
+							v, _ := strconv.Atoi(setting.Setting)
+							setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -622,7 +622,8 @@ func MapFixtures(mySequenceNumber int,
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
 							if setting.Number == selectedGobo {
-								setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
+								v, _ := strconv.Atoi(setting.Setting)
+								setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
@@ -631,7 +632,8 @@ func MapFixtures(mySequenceNumber int,
 							if colorNumber == displayFixture {
 								for _, setting := range channel.Settings {
 									if setting.Number-1 == scannerColor[displayFixture] {
-										setChannel(fixture.Address+int16(channelNumber), byte(setting.Setting), dmxController, dmxInterfacePresent)
+										v, _ := strconv.Atoi(setting.Setting)
+										setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 									}
 								}
 							}
@@ -727,7 +729,7 @@ func MapSwitchFixture(mySequenceNumber int,
 						}
 
 						// Play DMX values directly to the univers.
-						for _, value := range state.Values {
+						for _, value := range state.Settings {
 							if blackout {
 								v, _ := strconv.ParseFloat(value.Setting, 32)
 								setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)

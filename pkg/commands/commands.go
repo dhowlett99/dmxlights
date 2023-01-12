@@ -19,6 +19,7 @@ package commands
 
 import (
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -628,10 +629,11 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 
 				// Copy values.
 				newState.Values = []common.Value{}
-				for _, value := range state.Values {
+				for _, setting := range state.Settings {
 					newValue := common.Value{}
-					newValue.Channel = value.Channel
-					newValue.Setting = value.Setting
+					newValue.Channel = setting.Channel
+					v, _ := strconv.Atoi(setting.Setting)
+					newValue.Setting = v
 					newState.Values = append(newState.Values, newValue)
 				}
 

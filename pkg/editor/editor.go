@@ -36,7 +36,6 @@ type itemSelect struct {
 
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
-	var currentChannel int
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
@@ -84,11 +83,11 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 
 	// Create Settings Panel
 	var settingsPanel *widget.List
-	st = NewSettingsPanel(thisFixture, &currentChannel, settingsList)
+	st = NewSettingsPanel(settingsList, true)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
-	cp := NewChannelPanel(thisFixture, &currentChannel, channels, st)
+	cp := NewChannelPanel(thisFixture, channels, st)
 
 	// Setup forms.
 	scrollableChannelList := container.NewVScroll(cp.ChannelPanel)

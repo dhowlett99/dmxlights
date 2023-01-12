@@ -33,7 +33,7 @@ type ChannelPanel struct {
 	ChannelOptions []string
 }
 
-func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {
+func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {
 
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurve", "Speed"}
@@ -91,32 +91,32 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels 
 				newChannel.Comment = cp.ChannelList[i].Comment
 				newChannel.MaxDegrees = cp.ChannelList[i].MaxDegrees
 				newChannel.Offset = cp.ChannelList[i].Offset
-				cp.ChannelList = UpdateChannelItem(cp.ChannelList, cp.ChannelList[i].Number, newChannel)
+				cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i].Number, newChannel)
 			}
 
 			// Channel Delete Button.
 			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = DeleteChannelItem(cp.ChannelList, cp.ChannelList[i].Number)
+				cp.ChannelList = deleteChannelItem(cp.ChannelList, cp.ChannelList[i].Number)
 				cp.ChannelPanel.Refresh()
 			}
 
 			// Channel Add Button.
 			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = AddChannelItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
+				cp.ChannelList = addChannelItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
 				cp.ChannelPanel.Refresh()
 			}
 
-			// Channel Access Settings Button.
+			// Settings Button.
 			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
 				// Highlight this channel
 				cp.ChannelPanel.Select(i)
 				if cp.ChannelList != nil {
 					// Get Existing Settings for channel.
-					st.SettingsList = PopulateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
+					st.SettingsList = populateChannelSettingList(cp.ChannelList, cp.ChannelList[i].Number)
 					// If the settings are empty create a new set of settings.
 					if len(st.SettingsList) == 0 {
 						// Create new settings.
-						st.SettingsList = CreateSettingList(cp.ChannelList, cp.ChannelList[i].Number)
+						st.SettingsList = createChannelSettingList(cp.ChannelList[i].Number)
 						st.CurrentChannel = int(cp.ChannelList[i].Number)
 						st.SettingsPanel.Hidden = false
 						st.SettingsPanel.Refresh()
@@ -132,17 +132,16 @@ func NewChannelPanel(thisFixture fixture.Fixture, currentChannel *int, channels 
 	return &cp
 }
 
-func CreateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
-
+func createChannelSettingList(channelNumber int16) (settingsList []fixture.Setting) {
 	newItem := fixture.Setting{}
 	newItem.Name = "New Setting"
 	newItem.Number = 1
-	newItem.Setting = 0
+	newItem.Setting = "0"
 	settingsList = append(settingsList, newItem)
 	return settingsList
 }
 
-func PopulateSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
+func populateChannelSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
 	for _, channel := range channelList {
 		if channelNumber == channel.Number {
 			return channel.Settings
@@ -151,7 +150,7 @@ func PopulateSettingList(channelList []fixture.Channel, channelNumber int16) (se
 	return settingsList
 }
 
-func ChannelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
+func channelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
 	// look through the channel list for the id's
 	for _, item := range channelList {
 		if item.Number == number {
@@ -161,7 +160,7 @@ func ChannelItemAllreadyExists(number int16, channelList []fixture.Channel) bool
 	return false
 }
 
-func FindLargestChannelNumber(items []fixture.Channel) int16 {
+func findLargestChannelNumber(items []fixture.Channel) int16 {
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -171,12 +170,12 @@ func FindLargestChannelNumber(items []fixture.Channel) int16 {
 	return number
 }
 
-func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fixture.Channel {
+func addChannelItem(channels []fixture.Channel, id int16, options []string) []fixture.Channel {
 	newChannels := []fixture.Channel{}
 	newItem := fixture.Channel{}
 	newItem.Number = id + 1
-	if ChannelItemAllreadyExists(newItem.Number, channels) {
-		newItem.Number = FindLargestChannelNumber(channels) + 1
+	if channelItemAllreadyExists(newItem.Number, channels) {
+		newItem.Number = findLargestChannelNumber(channels) + 1
 	}
 	newItem.Name = "New"
 
@@ -192,7 +191,7 @@ func AddChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 	return newChannels
 }
 
-func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
+func deleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
 	newChannels := []fixture.Channel{}
 	if id == 1 {
 		return channelList
@@ -206,7 +205,7 @@ func DeleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channe
 }
 
 // UpdateItem replaces the selected item by id with newItem.
-func UpdateChannelItem(channels []fixture.Channel, id int16, newChannel fixture.Channel) []fixture.Channel {
+func updateChannelItem(channels []fixture.Channel, id int16, newChannel fixture.Channel) []fixture.Channel {
 	newChannels := []fixture.Channel{}
 	for _, channel := range channels {
 		if channel.Number == id {

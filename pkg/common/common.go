@@ -84,7 +84,7 @@ type FixtureBuffer struct {
 
 type Value struct {
 	Channel string
-	Setting string
+	Setting int
 }
 
 type Setting struct {

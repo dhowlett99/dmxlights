@@ -1206,7 +1206,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
+    settings:
     - name: master dimmer
       description: Dimmer
       channel: "57"
@@ -1217,7 +1217,7 @@ fixtures:
   - name: "On"
     number: 2
     label: "On"
-    values:
+    settings:
     - name: master dimmer
       description: Dimmer
       channel: "57"
@@ -1238,7 +1238,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
+    settings:
     - name: master dimmer
       description: Dimmer
       channel: "145"
@@ -1249,7 +1249,7 @@ fixtures:
   - name: "On"
     number: 2
     label: "On"
-    values:
+    settings:
     - name: master dimmer
       description: Dimmer
       channel: "145"
@@ -1278,7 +1278,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"
@@ -1309,7 +1309,7 @@ fixtures:
   - name: Red
     number: 2
     label: Red
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"
@@ -1340,7 +1340,7 @@ fixtures:
   - name: Slow Color Change
     number: 3
     label: SlwChg
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"
@@ -1371,7 +1371,7 @@ fixtures:
   - name: Meduim Color Change
     number: 4
     label: MdChg
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"
@@ -1402,7 +1402,7 @@ fixtures:
   - name: Sound Triggered Color Change
     number: 5
     label: Sound
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"
@@ -1443,7 +1443,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
+    settings:
     - name: mode
       description: Red
       channel: "150"
@@ -1576,7 +1576,7 @@ fixtures:
   - name: Sound
     number: 6
     label: Sound
-    values:
+    settings:
     - name: mode
       description: Red
       channel: "150"
@@ -1621,7 +1621,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    values:
+    settings:
     - name: Rotate
       description: Rotate
       channel: Rotate
@@ -1827,7 +1827,7 @@ fixtures:
   - name: Slow
     number: 3
     label: Slow
-    values:
+    settings:
     - name: mode
       description: Operating Mode
       channel: "139"

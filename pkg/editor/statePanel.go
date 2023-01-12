@@ -41,9 +41,10 @@ const (
 	STATE_DELETE
 	STATE_ADD
 	STATE_ACTIONS
+	STATE_SETTINGS
 )
 
-func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
+func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPanel) *StatePanel {
 
 	sp := StatePanel{}
 	sp.ButtonColorOptions = []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
@@ -57,6 +58,10 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 			if ap.UpdateActions {
 				sp.StatesList[ap.UpdateThisAction].Actions = ap.ActionsList
 				ap.UpdateActions = false
+			}
+			if st.UpdateSettings {
+				sp.StatesList[st.UpdateThisChannel].Settings = st.SettingsList
+				st.UpdateSettings = false
 			}
 			return len(sp.StatesList)
 		},
@@ -80,8 +85,11 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				// Channel add button
 				widget.NewButton("+", func() {}),
 
-				// Setup Actions.
+				// Actions button.
 				widget.NewButton("Actions", nil),
+
+				// Settings button.
+				widget.NewButton("Settings", nil),
 			)
 		},
 		// Function to update item in this list.
@@ -101,9 +109,9 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Label = value
 				newState.ButtonColor = sp.StatesList[thisState].ButtonColor
 				newState.Flash = sp.StatesList[thisState].Flash
-				newState.Values = sp.StatesList[thisState].Values
+				newState.Settings = sp.StatesList[thisState].Settings
 				newState.Actions = sp.StatesList[thisState].Actions
-				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
+				sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
 			}
 
 			// Show the selection box for button color.
@@ -121,21 +129,21 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				newState.Label = sp.StatesList[thisState].Label
 				newState.ButtonColor = value
 				newState.Flash = sp.StatesList[thisState].Flash
-				newState.Values = sp.StatesList[thisState].Values
+				newState.Settings = sp.StatesList[thisState].Settings
 				newState.Actions = sp.StatesList[thisState].Actions
-				sp.StatesList = UpdateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
+				sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
 			}
 			o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).PlaceHolder = "Select"
 
 			// Channel Delete Button.
 			o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).OnTapped = func() {
-				sp.StatesList = DeleteState(sp.StatesList, sp.StatesList[thisState].Number)
+				sp.StatesList = deleteState(sp.StatesList, sp.StatesList[thisState].Number)
 				sp.StatePanel.Refresh()
 			}
 
 			// Channel Add Button.
 			o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).OnTapped = func() {
-				sp.StatesList = AddState(sp.StatesList, sp.StatesList[thisState].Number)
+				sp.StatesList = addState(sp.StatesList, sp.StatesList[thisState].Number)
 				sp.StatePanel.Refresh()
 			}
 
@@ -157,14 +165,40 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel) *StatePanel {
 				ap.CurrentState = int(sp.StatesList[thisState].Number - 1)
 				ap.CurrentStateName = sp.StatesList[thisState].Name
 				ap.ActionsPanel.Hidden = false
+				st.SettingsPanel.Hidden = true
 				ap.ActionsPanel.Refresh()
+			}
+
+			// Settings Button.
+			o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).OnTapped = func() {
+				// Highlight this channel
+				sp.StatePanel.Select(thisState)
+				fmt.Printf("--> settings pannel with list %+v\n", sp.StatesList[thisState])
+				if sp.StatesList != nil {
+					// Get Existing Settings for channel.
+					st.SettingsList = populateSettingList(sp.StatesList, sp.StatesList[thisState].Number)
+					// If the settings are empty create a new set of settings.
+					if len(st.SettingsList) == 0 {
+						// Create new settings.
+						st.SettingsList = createSettingList(sp.StatesList[thisState].Number)
+						st.CurrentChannel = int(sp.StatesList[thisState].Number)
+
+					} else {
+						// Edit existing settings.
+						st.CurrentChannel = int(sp.StatesList[thisState].Number)
+						fmt.Printf("Refresh the settings pannel with list %+v\n", st.SettingsList[thisState])
+					}
+					ap.ActionsPanel.Hidden = true
+					st.SettingsPanel.Hidden = false
+					st.SettingsPanel.Refresh()
+				}
 			}
 		})
 	return &sp
 }
 
 // UpdateItem replaces the selected item by id with newItem.
-func UpdateStateItem(states []fixture.State, id int16, newState fixture.State) []fixture.State {
+func updateStateItem(states []fixture.State, id int16, newState fixture.State) []fixture.State {
 	newStates := []fixture.State{}
 	for _, state := range states {
 		if state.Number == id {
@@ -178,12 +212,12 @@ func UpdateStateItem(states []fixture.State, id int16, newState fixture.State) [
 	return newStates
 }
 
-func AddState(states []fixture.State, id int16) []fixture.State {
+func addState(states []fixture.State, id int16) []fixture.State {
 	newStates := []fixture.State{}
 	newItem := fixture.State{}
 	newItem.Number = id + 1
-	if StateItemAllreadyExists(newItem.Number, states) {
-		newItem.Number = FindLargestStateNumber(states) + 1
+	if stateItemAllreadyExists(newItem.Number, states) {
+		newItem.Number = findLargestStateNumber(states) + 1
 	}
 	newItem.Name = "New"
 
@@ -199,7 +233,7 @@ func AddState(states []fixture.State, id int16) []fixture.State {
 	return newStates
 }
 
-func DeleteState(stateList []fixture.State, id int16) []fixture.State {
+func deleteState(stateList []fixture.State, id int16) []fixture.State {
 	newStates := []fixture.State{}
 	if id == 1 {
 		return stateList
@@ -212,7 +246,7 @@ func DeleteState(stateList []fixture.State, id int16) []fixture.State {
 	return newStates
 }
 
-func StateItemAllreadyExists(number int16, stateList []fixture.State) bool {
+func stateItemAllreadyExists(number int16, stateList []fixture.State) bool {
 	// look through the state list for the id's
 	for _, item := range stateList {
 		if item.Number == number {
@@ -222,7 +256,7 @@ func StateItemAllreadyExists(number int16, stateList []fixture.State) bool {
 	return false
 }
 
-func FindLargestStateNumber(items []fixture.State) int16 {
+func findLargestStateNumber(items []fixture.State) int16 {
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -230,4 +264,22 @@ func FindLargestStateNumber(items []fixture.State) int16 {
 		}
 	}
 	return number
+}
+
+func populateSettingList(statesList []fixture.State, stateNumber int16) (settingsList []fixture.Setting) {
+	for _, state := range statesList {
+		if stateNumber == state.Number {
+			return state.Settings
+		}
+	}
+	return settingsList
+}
+
+func createSettingList(channelNumber int16) (settingsList []fixture.Setting) {
+	newItem := fixture.Setting{}
+	newItem.Name = "New Setting"
+	newItem.Number = 1
+	newItem.Setting = "0"
+	settingsList = append(settingsList, newItem)
+	return settingsList
 }

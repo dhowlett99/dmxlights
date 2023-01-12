@@ -27,7 +27,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-// Show a list of Statees
+// Show a list of States.
 func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
@@ -65,6 +65,10 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	ap := NewActionsPanel(w, []fixture.Action{})
 	ap.ActionsPanel.Hide()
 
+	// Create Settings Panel.
+	st := NewSettingsPanel([]fixture.Setting{}, false)
+	st.SettingsPanel.Hide()
+
 	// Use Fixture.
 	useInput := widget.NewSelect(fixturesAvailable, func(value string) {})
 	useLabel := widget.NewLabel("Use Fixture")
@@ -101,14 +105,18 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	// Create States Panel.
 	var StatesPanel *widget.List
-	sp := NewStatePanel(statesList, ap)
+	sp := NewStatePanel(statesList, ap, st)
 	StatesPanel = sp.StatePanel
 
 	// Setup forms.
 	scrollableStateList := container.NewScroll(StatesPanel)
 	scrollableStateList.SetMinSize(fyne.Size{Height: 400, Width: 300})
+
 	scrollableActionsList := container.NewScroll(ap.ActionsPanel)
 	scrollableActionsList.SetMinSize(fyne.Size{Height: 400, Width: 300})
+
+	scrollableSettingsList := container.NewScroll(st.SettingsPanel)
+	scrollableSettingsList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 
 	// OK button.
 	buttonSave := widget.NewButton("OK", func() {
@@ -153,7 +161,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	top := container.NewBorder(title, nil, nil, nil, formTop)
 	main := container.NewBorder(top, nil, nil, nil, labelStates)
-	forms := container.NewAdaptiveGrid(2, scrollableStateList, scrollableActionsList)
+	scrollableList := container.New(layout.NewMaxLayout(), scrollableActionsList, scrollableSettingsList)
+	forms := container.NewAdaptiveGrid(2, scrollableStateList, scrollableList)
 	bottom := container.NewBorder(main, nil, nil, nil, forms)
 	content = *container.NewBorder(bottom, nil, nil, nil, saveCancel)
 
