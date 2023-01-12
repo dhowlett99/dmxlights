@@ -1,6 +1,7 @@
 // Copyright (C) 2022,2023 dhowlett99.
-// This is the dmxlights fixture editor it is attached to a fixture and
-// describes the fixtures properties which is then saved in the fixtures.yaml
+// This is the dmxlights fixture control code, it sends messages to fixtures
+// using the usb dmx library.
+// Implemented and depends on usbdmx.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
