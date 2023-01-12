@@ -94,22 +94,6 @@ type CurrentState struct {
 	LaunchpadName             string                       // Storage for launchpad config.
 }
 
-// main thread is used to get commands from the lauchpad.
-func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, sequences []*common.Sequence,
-	eventsForLaunchpad chan common.ALight, dmxController *ft232.DMXController,
-	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
-	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
-	dmxInterfaceCardPresent bool) {
-
-	buttonChannel := this.Pad.Listen()
-
-	// Main loop reading commands from the Novation Launchpad.
-	for {
-		hit := <-buttonChannel
-		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
-	}
-}
-
 func ProcessButtons(X int, Y int,
 	sequences []*common.Sequence,
 	this *CurrentState,

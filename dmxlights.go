@@ -33,12 +33,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
+	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 func main() {
@@ -131,7 +131,7 @@ func main() {
 	// Setup a connection to the Novation Launchpad.
 	// Tested with a Novation Launchpad mini mk3.
 	fmt.Println("Setup Novation Launchpad")
-	this.Pad, err = mk3.Open()
+	this.Pad, err = launchpad.NewLaunchPad()
 	if err != nil {
 		fmt.Printf("launchpad: %v", err)
 		this.LaunchPadConnected = false
@@ -141,7 +141,6 @@ func main() {
 	if this.LaunchPadConnected {
 		defer this.Pad.Close()
 	}
-
 	// Report on connected devices.
 	panel.PopupNotFoundMessage(myWindow,
 		gui.Device{
@@ -315,7 +314,7 @@ func main() {
 
 	// Now create a thread to handle launchpad light button events.
 	go func() {
-		common.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
+		launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 	}()
 
 	// Add buttons to the main panel.
@@ -386,7 +385,7 @@ func main() {
 			updateChannels []chan common.Sequence,
 			dmxInterfaceCardPresent bool) {
 
-			buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
+			launchpad.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
 
 		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 	}

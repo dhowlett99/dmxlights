@@ -1,0 +1,100 @@
+// Copyright (C) 2022,2025 dhowlett99.
+// This is the dmxlights launchpad interface.
+// Implemented by and depends on github.com/rakyll/launchpad/mk3
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+package launchpad
+
+import (
+	"fmt"
+	"time"
+
+	"github.com/dhowlett99/dmxlights/pkg/buttons"
+	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/oliread/usbdmx/ft232"
+	"github.com/rakyll/launchpad/mk3"
+)
+
+const debug = false
+
+func NewLaunchPad() (*mk3.Launchpad, error) {
+
+	// Setup a connection to the Novation Launchpad.
+	// Tested with a Novation Launchpad mini mk3.
+	pad, err := mk3.Open()
+	if err != nil {
+		return nil, fmt.Errorf("%v", err)
+	}
+	return pad, nil
+}
+
+// main thread is used to get commands from the lauchpad.
+func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentState, sequences []*common.Sequence,
+	eventsForLaunchpad chan common.ALight, dmxController *ft232.DMXController,
+	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
+	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
+	dmxInterfaceCardPresent bool) {
+
+	buttonChannel := this.Pad.Listen()
+
+	// Main loop reading commands from the Novation Launchpad.
+	for {
+		hit := <-buttonChannel
+		buttons.ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
+	}
+}
+
+// ListenAndSendToLaunchPad is the thread that listens for events to send to
+// the launch pad.  It is thread safe and is the only thread talking to the
+// launch pad. A channel is used to queue the events to be sent.
+func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad, LaunchPadConnected bool) {
+	for {
+
+		// Wait for the event.
+		alight := <-eventsForLauchpad
+
+		if LaunchPadConnected {
+			// Wait for a few millisecond so the launchpad and the gui step at the same time
+			time.Sleep(14 * time.Microsecond)
+
+			// We're in standard turn the light on.
+			if !alight.Flash {
+
+				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+				Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+
+				// Now light the launchpad button.
+				err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
+				if err != nil {
+					fmt.Printf("error writing to launchpad %e\n" + err.Error())
+				}
+
+				// Now we're been asked go flash this button.
+			} else {
+				// Now light the launchpad button.
+				if debug {
+					fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadColorCodeByRGB(alight.OnColor))
+					fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadColorCodeByRGB(alight.OffColor))
+				}
+				err := pad.FlashLight(alight.X, alight.Y, int(common.GetLaunchPadColorCodeByRGB(alight.OnColor)), int(common.GetLaunchPadColorCodeByRGB(alight.OffColor)))
+				if err != nil {
+					fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
+				}
+			}
+		}
+	}
+}
