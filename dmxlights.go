@@ -1,6 +1,5 @@
-// Copyright (C) 2022 dhowlett99.
-// This is the dmxlights fixture editor it is attached to a fixture and
-// describes the fixtures properties which is then saved in the fixtures.yaml
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is the dmxlights main program and calls all others.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

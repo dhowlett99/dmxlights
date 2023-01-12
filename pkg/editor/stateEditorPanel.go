@@ -1,4 +1,4 @@
-// Copyright (C) 2022 dhowlett99.
+// Copyright (C) 2022, 2023 dhowlett99.
 // This is the dmxlights fixture editor it is attached to a fixture and
 // describes the fixtures properties which is then saved in the fixtures.yaml
 //

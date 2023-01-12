@@ -1,6 +1,6 @@
-// Copyright (C) 2022 dhowlett99.
-// This is the dmxlights fixture editor it is attached to a fixture and
-// describes the fixtures properties which is then saved in the fixtures.yaml
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is the dmxlights position calculator, positions are generated from
+// patterns. Positions control size, fade times and shifts.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
