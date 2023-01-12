@@ -1,3 +1,20 @@
+// Copyright (C) 2022,2023 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package editor
 
 import (
@@ -9,6 +26,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
 type ColorPanel struct {
@@ -130,4 +148,57 @@ func NewColorPickerPanel(w fyne.Window) *ColorPanel {
 	)
 
 	return &cp
+}
+
+func SetFromCheckState(cp *ColorPanel) {
+
+	var colorSelection []string
+
+	// Clear Rectangles
+	for x := 0; x < 10; x++ {
+		cp.Rectanges[x].FillColor = color.White
+	}
+
+	// Now set the selected colors in the display.
+	var count int
+	for key, button := range cp.Buttons {
+		if button.check.Checked {
+			color, _ := common.GetRGBColorByName(key)
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(color)
+			colorSelection = append(colorSelection, key)
+			count++
+		}
+	}
+
+	cp.ColorSelection = strings.Join(colorSelection, ",")
+}
+
+func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
+	cp.Buttons["Red"].check.Checked = false
+	cp.Buttons["Orange"].check.Checked = false
+	cp.Buttons["Yellow"].check.Checked = false
+	cp.Buttons["Green"].check.Checked = false
+	cp.Buttons["Cyan"].check.Checked = false
+	cp.Buttons["Blue"].check.Checked = false
+	cp.Buttons["Purple"].check.Checked = false
+	cp.Buttons["Pink"].check.Checked = false
+	cp.Buttons["White"].check.Checked = false
+	cp.Buttons["Black"].check.Checked = false
+
+	// Clear Rectangles
+	for x := 0; x < 10; x++ {
+		cp.Rectanges[x].FillColor = color.White
+	}
+
+	var count int
+	for _, c := range colors {
+		if c != "" && c != "Off" {
+			RGBcolor, _ := common.GetRGBColorByName(c)
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBcolor)
+			cp.Buttons[c].check.Checked = true
+		} else {
+			cp.Rectanges[count].FillColor = color.White
+		}
+		count++
+	}
 }
