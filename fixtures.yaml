@@ -22,13 +22,11 @@ fixtures:
     comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
     settings:
     - name: "Off"
-      label: "off"
       number: 1
-      value: 0
+      value: "0"
     - name: Slow
-      label: slow
       number: 2
-      value: 16
+      value: "16"
   - number: 6
     name: Programs
     comment: Automatic Programs/ Sound-Active Mode
@@ -452,25 +450,20 @@ fixtures:
     name: Rotate
     settings:
     - name: "Off"
-      label: "off"
       number: 1
-      value: 0
+      value: "0"
     - name: Rotate Clockwise Slow
-      label: clockwiseslow
       number: 2
-      value: 1
+      value: "1"
     - name: Rotate Clockwise Fast
-      label: clockwisesfast
       number: 3
-      value: 127
+      value: "127"
     - name: Rotate Anti Clockwise Fast
-      label: anticlockwisessfast
       number: 4
-      value: 128
+      value: "128"
     - name: Rotate Anti Clockwise Slow
-      label: anticlockwisesslow
       number: 5
-      value: 255
+      value: "255"
   - number: 2
     name: Red1
   - number: 3
@@ -485,68 +478,53 @@ fixtures:
     name: Program
     settings:
     - name: "Off"
-      label: "off"
       number: 1
-      value: 0
+      value: "0"
     - name: 4 Color Loop Change
-      label: 4colorloop
       number: 2
-      value: 1
+      value: "1"
     - name: 9 Color Fade Change
-      label: 9colorloop
       number: 3
-      value: 27
+      value: "27"
     - name: 4 Color Loop Change
-      label: 4colorloop
       number: 4
-      value: 52
+      value: "52"
     - name: 9 Color Fade Change
-      label: 9colorloop
       number: 5
-      value: 77
+      value: "77"
     - name: Strobe 1 Dim - Bright
-      label: strobe1
       number: 6
-      value: 102
+      value: "102"
     - name: Strobe 2 Bright - Dim
-      label: strobe2
       number: 7
-      value: 127
+      value: "127"
     - name: Strobe 3 Dim - Bright - Dim
-      label: strobe3
       number: 8
-      value: 152
+      value: "152"
     - name: Strobe 4 W/O Dim Effect
-      label: strobe4
       number: 9
-      value: 177
+      value: "177"
     - name: Strobe 5 with 9 Color
-      label: strobe5
       number: 10
-      value: 202
+      value: "202"
     - name: Strobe 6 with Gradual Dim
-      label: strobe6
       number: 11
-      value: 227
+      value: "227"
     - name: All Programs will Cycle
-      label: cycle
       number: 12
-      value: 255
+      value: "255"
   - number: 8
     name: ProgramSpeed
     settings:
     - name: Slow
-      label: Slow
       number: 1
-      value: 1
+      value: "1"
     - name: Fast
-      label: Fast
       number: 2
-      value: 254
+      value: "254"
     - name: Sound Active
-      label: Music
       number: 3
-      value: 255
+      value: "255"
 - id: 15
   name: Scanner 1
   label: ADJ.Com.Scan1
@@ -564,56 +542,44 @@ fixtures:
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
-      label: White.Circle
       number: 1
-      value: 0
+      value: "0"
     - name: Yellow Cluster
-      label: Yellow.Cluster
       number: 2
-      value: 8
+      value: "8"
     - name: Red Swirl
-      label: Red.Swirl
       number: 3
-      value: 15
+      value: "15"
     - name: Green Strips
-      label: Green.Strips
       number: 4
-      value: 22
+      value: "22"
     - name: Blue Star
-      label: Blue.Star
       number: 5
-      value: 29
+      value: "29"
     - name: MultiColor Coma
-      label: Color.Com
       number: 6
-      value: 36
+      value: "36"
     - name: Purple Bub
-      label: Purple.Bub
       number: 7
-      value: 43
+      value: "43"
     - name: Cyan World
-      label: Cyan.World
       number: 8
-      value: 50
+      value: "50"
     - name: Blue Circle
-      label: Blue.Circle
       number: 9
-      value: 57
+      value: "57"
   - number: 5
     name: Master
 - id: 16
@@ -633,56 +599,44 @@ fixtures:
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
-      label: White.Circle
       number: 1
-      value: 0
+      value: "0"
     - name: Yellow Cluster
-      label: Yellow.Cluster
       number: 2
-      value: 8
+      value: "8"
     - name: Red Swirl
-      label: Red.Swirl
       number: 3
-      value: 15
+      value: "15"
     - name: Green Strips
-      label: Green.Strips
       number: 4
-      value: 22
+      value: "22"
     - name: Blue Star
-      label: Blue.Star
       number: 5
-      value: 29
+      value: "29"
     - name: MultiColor Coma
-      label: Color.Coma
       number: 6
-      value: 36
+      value: "36"
     - name: Purple Bub
-      label: Purple.Bub
       number: 7
-      value: 43
+      value: "43"
     - name: Cyan World
-      label: Cyan.World
       number: 8
-      value: 50
+      value: "50"
     - name: Blue Circle
-      label: Blue.Circle
       number: 9
-      value: 57
+      value: "57"
   - number: 5
     name: Master
 - id: 17
@@ -702,56 +656,44 @@ fixtures:
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
-      label: White.Circle
       number: 1
-      value: 0
+      value: "0"
     - name: Yellow Cluster
-      label: Yellow.Cluster
       number: 2
-      value: 8
+      value: "8"
     - name: Red Swirl
-      label: Red.Swirl
       number: 3
-      value: 15
+      value: "15"
     - name: Green Strips
-      label: Green.Strips
       number: 4
-      value: 22
+      value: "22"
     - name: Blue Star
-      label: Blue.Star
       number: 5
-      value: 29
+      value: "29"
     - name: MultiColor Coma
-      label: Color.Coma
       number: 6
-      value: 36
+      value: "36"
     - name: Purple Bub
-      label: Purple.Bub
       number: 7
-      value: 43
+      value: "43"
     - name: Cyan World
-      label: Cyan.World
       number: 8
-      value: 50
+      value: "50"
     - name: Blue Circle
-      label: Blue.Circle
       number: 9
-      value: 57
+      value: "57"
   - number: 5
     name: Master
 - id: 18
@@ -771,56 +713,44 @@ fixtures:
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
-      label: White.Circle
       number: 1
-      value: 0
+      value: "0"
     - name: Yellow Cluster
-      label: Yellow.Cluster
       number: 2
-      value: 8
+      value: "8"
     - name: Red Swirl
-      label: Red.Swirl
       number: 3
-      value: 15
+      value: "15"
     - name: Green Strips
-      label: Green.Strips
       number: 4
-      value: 22
+      value: "22"
     - name: Blue Star
-      label: Blue.Star
       number: 5
-      value: 29
+      value: "29"
     - name: MultiColor Coma
-      label: Color.Coma
       number: 6
-      value: 36
+      value: "36"
     - name: Purple Bub
-      label: Purple.Bub
       number: 7
-      value: 43
+      value: "43"
     - name: Cyan World
-      label: Cyan.World
       number: 8
-      value: 50
+      value: "50"
     - name: Blue Circle
-      label: Blue.Circle
       number: 9
-      value: 57
+      value: "57"
   - number: 5
     name: Master
 - id: 19
@@ -840,56 +770,44 @@ fixtures:
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
-      label: White.Circle
       number: 1
-      value: 0
+      value: "0"
     - name: Yellow Cluster
-      label: Yellow.Cluster
       number: 2
-      value: 8
+      value: "8"
     - name: Red Swirl
-      label: Red.Swirl
       number: 3
-      value: 15
+      value: "15"
     - name: Green Strips
-      label: Green.Strips
       number: 4
-      value: 22
+      value: "22"
     - name: Blue Star
-      label: Blue.Star
       number: 5
-      value: 29
+      value: "29"
     - name: MultiColor Coma
-      label: Color.Coma
       number: 6
-      value: 36
+      value: "36"
     - name: Purple Bub
-      label: Purple.Bub
       number: 7
-      value: 43
+      value: "43"
     - name: Cyan World
-      label: Cyan.World
       number: 8
-      value: 50
+      value: "50"
     - name: Blue Circle
-      label: Blue.Circle
       number: 9
-      value: 57
+      value: "57"
   - number: 5
     name: Master
 - id: 20
@@ -915,110 +833,88 @@ fixtures:
     name: Color
     settings:
     - name: White
-      label: ""
       number: 1
-      value: 0
+      value: "0"
     - name: Red
-      label: ""
       number: 2
-      value: 8
+      value: "8"
     - name: Orange
-      label: ""
       number: 3
-      value: 15
+      value: "15"
     - name: Yellow
-      label: ""
       number: 4
-      value: 22
+      value: "22"
     - name: Green
-      label: ""
       number: 5
-      value: 29
+      value: "29"
     - name: Blue
-      label: ""
       number: 6
-      value: 36
+      value: "36"
     - name: Light Blue
-      label: ""
       number: 7
-      value: 43
+      value: "43"
     - name: Pink
-      label: ""
       number: 8
-      value: 50
+      value: "50"
   - number: 6
     name: Gobo
     settings:
     - name: Open
-      label: Open
       number: 1
-      value: 0
+      value: "0"
     - name: Gobo 1
-      label: Gobo.1
       number: 2
-      value: 8
+      value: "8"
     - name: Gobo 2
-      label: Gobo.2
       number: 3
-      value: 16
+      value: "16"
     - name: Gobo 3
-      label: Gobo.3
       number: 4
-      value: 24
+      value: "24"
     - name: Gobo 4
-      label: Gobo.4
       number: 5
-      value: 32
+      value: "32"
     - name: Gobo 5
-      label: Gobo.5
       number: 6
-      value: 40
+      value: "40"
     - name: Gobo 6
-      label: Gobo.6
       number: 7
-      value: 48
+      value: "48"
     - name: Gobo 7
-      label: Gobo.7
       number: 8
-      value: 56
+      value: "56"
   - number: 7
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 0
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 0
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 0
-      value: 100
+      value: "100"
   - number: 8
     name: Master
   - number: 9
     name: Speed
     settings:
     - name: Fast
-      label: ""
       number: 1
-      value: 255
+      value: "255"
   - number: 10
     name: SoundActive
     settings:
     - name: "Off"
-      label: ""
       number: 1
-      value: 1
+      value: "1"
   - number: 11
     name: DimmerCurve
     settings:
     - name: DefaultCurve
-      label: ""
       number: 1
-      value: 255
+      value: "255"
 - id: 21
   name: Scanner 7
   label: ADJ.Inno.Spot2
@@ -1042,110 +938,88 @@ fixtures:
     name: Color
     settings:
     - name: White
-      label: ""
       number: 1
-      value: 0
+      value: "0"
     - name: Red
-      label: ""
       number: 2
-      value: 8
+      value: "8"
     - name: Orange
-      label: ""
       number: 3
-      value: 15
+      value: "15"
     - name: Yellow
-      label: ""
       number: 4
-      value: 22
+      value: "22"
     - name: Green
-      label: ""
       number: 5
-      value: 29
+      value: "29"
     - name: Blue
-      label: ""
       number: 6
-      value: 36
+      value: "36"
     - name: Light Blue
-      label: ""
       number: 7
-      value: 43
+      value: "43"
     - name: Pink
-      label: ""
       number: 8
-      value: 50
+      value: "50"
   - number: 6
     name: Gobo
     settings:
     - name: Open
-      label: Open
       number: 1
-      value: 0
+      value: "0"
     - name: Gobo 1
-      label: Gobo.1
       number: 2
-      value: 8
+      value: "8"
     - name: Gobo 2
-      label: Gobo.2
       number: 3
-      value: 16
+      value: "16"
     - name: Gobo 3
-      label: Gobo.3
       number: 4
-      value: 24
+      value: "24"
     - name: Gobo 4
-      label: Gobo.4
       number: 5
-      value: 32
+      value: "32"
     - name: Gobo 5
-      label: Gobo.5
       number: 6
-      value: 40
+      value: "40"
     - name: Gobo 6
-      label: Gobo.6
       number: 7
-      value: 48
+      value: "48"
     - name: Gobo 7
-      label: Gobo.7
       number: 8
-      value: 56
+      value: "56"
   - number: 7
     name: Shutter
     settings:
     - name: Open
-      label: ""
       number: 1
-      value: 255
+      value: "255"
     - name: Closed
-      label: ""
       number: 2
-      value: 0
+      value: "0"
     - name: Strobe
-      label: ""
       number: 3
-      value: 100
+      value: "100"
   - number: 8
     name: Master
   - number: 9
     name: Speed
     settings:
     - name: Fast
-      label: ""
       number: 1
-      value: 255
+      value: "255"
   - number: 10
     name: SoundActive
     settings:
     - name: "Off"
-      label: ""
       number: 1
-      value: 1
+      value: "1"
   - number: 11
     name: DimmerCurves
     settings:
     - name: Default Curve
-      label: ""
       number: 1
-      value: 255
+      value: "255"
 - id: 22
   name: switch1
   label: SW1.Oil
@@ -1206,24 +1080,24 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    settings:
-    - name: master dimmer
-      description: Dimmer
-      channel: "57"
-      value: "0"
     buttoncolor: Green
     master: 0
+    settings:
+    - name: master dimmer
+      number: 0
+      channel: "57"
+      value: "0"
     flash: false
   - name: "On"
     number: 2
     label: "On"
-    settings:
-    - name: master dimmer
-      description: Dimmer
-      channel: "57"
-      value: "255"
     buttoncolor: Red
     master: 0
+    settings:
+    - name: master dimmer
+      number: 0
+      channel: "57"
+      value: "255"
     flash: false
 - id: 24
   name: switch3
@@ -1238,32 +1112,32 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    settings:
-    - name: master dimmer
-      description: Dimmer
-      channel: "145"
-      value: "0"
     buttoncolor: Green
     master: 0
+    settings:
+    - name: master dimmer
+      number: 0
+      channel: "145"
+      value: "0"
     flash: false
   - name: "On"
     number: 2
     label: "On"
+    buttoncolor: Red
+    master: 0
     settings:
     - name: master dimmer
-      description: Dimmer
+      number: 0
       channel: "145"
       value: "255"
     - name: effect
-      description: Rotation
+      number: 0
       channel: "146"
       value: "135"
     - name: color
-      description: Color Change Speed
+      number: 0
       channel: "147"
       value: "135"
-    buttoncolor: Red
-    master: 0
     flash: false
 - id: 25
   name: switch4
@@ -1278,157 +1152,157 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
+    buttoncolor: Green
+    master: 0
     settings:
     - name: mode
-      description: Operating Mode
+      number: 1
       channel: "139"
       value: "0"
     - name: red
-      description: red
+      number: 2
       channel: "140"
       value: "0"
     - name: green
-      description: greeb
+      number: 3
       channel: "141"
       value: "0"
     - name: blue
-      description: blue
+      number: 4
       channel: "142"
       value: "0"
     - name: strobe
-      description: speed / strobe
+      number: 5
       channel: "143"
       value: "0"
     - name: master reverse dimmer
-      description: Dimmer
+      number: 6
       channel: "144"
       value: "0"
-    buttoncolor: Green
-    master: 0
     flash: false
   - name: Red
     number: 2
     label: Red
+    buttoncolor: Red
+    master: 0
     settings:
     - name: mode
-      description: Operating Mode
+      number: 1
       channel: "139"
       value: "0"
     - name: red
-      description: red
+      number: 2
       channel: "140"
       value: "255"
     - name: green
-      description: green
+      number: 3
       channel: "141"
       value: "0"
     - name: blue
-      description: blue
+      number: 4
       channel: "142"
       value: "0"
     - name: strobe
-      description: speed / strobe
+      number: 5
       channel: "143"
       value: "0"
     - name: master reverse dimmer
-      description: Dimmer
+      number: 6
       channel: "144"
       value: "255"
-    buttoncolor: Red
-    master: 0
     flash: false
   - name: Slow Color Change
     number: 3
     label: SlwChg
+    buttoncolor: Red
+    master: 0
     settings:
     - name: mode
-      description: Operating Mode
+      number: 1
       channel: "139"
       value: "25"
     - name: red
-      description: red
+      number: 2
       channel: "140"
       value: "0"
     - name: green
-      description: green
+      number: 3
       channel: "141"
       value: "0"
     - name: blue
-      description: blue
+      number: 4
       channel: "142"
       value: "0"
     - name: speed
-      description: speed / strobe
+      number: 5
       channel: "143"
       value: "0"
     - name: master reverse dimmer
-      description: Dimmer
+      number: 6
       channel: "144"
       value: "255"
-    buttoncolor: Red
-    master: 0
     flash: false
   - name: Meduim Color Change
     number: 4
     label: MdChg
+    buttoncolor: Blue
+    master: 0
     settings:
     - name: mode
-      description: Operating Mode
+      number: 1
       channel: "139"
       value: "25"
     - name: red
-      description: red
+      number: 2
       channel: "140"
       value: "0"
     - name: green
-      description: greeb
+      number: 3
       channel: "141"
       value: "0"
     - name: blue
-      description: blue
+      number: 4
       channel: "142"
       value: "0"
     - name: speed
-      description: speed / strobe
+      number: 5
       channel: "143"
       value: "100"
     - name: master reverse dimmer
-      description: Dimmer
+      number: 6
       channel: "144"
       value: "255"
-    buttoncolor: Blue
-    master: 0
     flash: false
   - name: Sound Triggered Color Change
     number: 5
     label: Sound
+    buttoncolor: Yellow
+    master: 0
     settings:
     - name: mode
-      description: Operating Mode
+      number: 1
       channel: "139"
       value: "255"
     - name: red
-      description: red
+      number: 2
       channel: "140"
       value: "0"
     - name: green
-      description: green
+      number: 3
       channel: "141"
       value: "0"
     - name: blue
-      description: blue
+      number: 4
       channel: "142"
       value: "0"
     - name: speed
-      description: speed / strobe
+      number: 5
       channel: "143"
       value: "100"
     - name: master reverse dimmer
-      description: Dimmer
+      number: 6
       channel: "144"
       value: "255"
-    buttoncolor: Yellow
-    master: 0
     flash: false
 - id: 26
   name: switch5
@@ -1443,39 +1317,6 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    settings:
-    - name: mode
-      description: Red
-      channel: "150"
-      value: "0"
-    - name: mode
-      description: Green
-      channel: "151"
-      value: "0"
-    - name: mode
-      description: Blue
-      channel: "152"
-      value: "0"
-    - name: mode
-      description: Amber
-      channel: "153"
-      value: "0"
-    - name: mode
-      description: Dimmer Off
-      channel: "154"
-      value: "0"
-    - name: mode
-      description: ProgramSpeed
-      channel: "155"
-      value: "0"
-    - name: mode
-      description: ColorSelect
-      channel: "156"
-      value: "0"
-    - name: mode
-      description: ColorMacros
-      channel: "157"
-      value: "0"
     buttoncolor: Green
     master: 0
     actions:
@@ -1490,6 +1331,39 @@ fixtures:
       rotatespeed: ""
       program: ""
       strobe: ""
+    settings:
+    - name: mode
+      number: 1
+      channel: "150"
+      value: "0"
+    - name: mode
+      number: 2
+      channel: "151"
+      value: "0"
+    - name: mode
+      number: 3
+      channel: "152"
+      value: "0"
+    - name: mode
+      number: 4
+      channel: "153"
+      value: "0"
+    - name: mode
+      number: 5
+      channel: "154"
+      value: "0"
+    - name: mode
+      number: 6
+      channel: "155"
+      value: "0"
+    - name: mode
+      number: 7
+      channel: "156"
+      value: "0"
+    - name: mode
+      number: 8
+      channel: "157"
+      value: "0"
     flash: false
   - name: Red
     number: 2
@@ -1576,15 +1450,6 @@ fixtures:
   - name: Sound
     number: 6
     label: Sound
-    settings:
-    - name: mode
-      description: Red
-      channel: "150"
-      value: "0"
-    - name: mode
-      description: Macro
-      channel: "157"
-      value: "0"
     buttoncolor: White
     master: 0
     actions:
@@ -1606,6 +1471,15 @@ fixtures:
       rotatespeed: ""
       program: ""
       strobe: ""
+    settings:
+    - name: mode
+      number: 0
+      channel: "150"
+      value: "0"
+    - name: mode
+      number: 0
+      channel: "157"
+      value: "0"
     flash: false
   use_fixture: par38
 - id: 27
@@ -1621,39 +1495,6 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    settings:
-    - name: Rotate
-      description: Rotate
-      channel: Rotate
-      value: "off"
-    - name: Red1
-      description: Red1
-      channel: Red1
-      value: "0"
-    - name: Green1
-      description: Green1
-      channel: Green1
-      value: "0"
-    - name: Blue1
-      description: Blue1
-      channel: Blue1
-      value: "0"
-    - name: White1
-      description: White1
-      channel: White1
-      value: "0"
-    - name: Master
-      description: Master
-      channel: Master
-      value: "0"
-    - name: Program
-      description: Program
-      channel: Program
-      value: "0"
-    - name: ProgramSpeed
-      description: ProgramSpeed
-      channel: ProgramSpeed
-      value: "0"
     buttoncolor: Green
     master: 0
     actions:
@@ -1668,6 +1509,39 @@ fixtures:
       rotatespeed: ""
       program: ""
       strobe: ""
+    settings:
+    - name: Rotate
+      number: 1
+      channel: Rotate
+      value: "off"
+    - name: Red1
+      number: 2
+      channel: Red1
+      value: "0"
+    - name: Green1
+      number: 3
+      channel: Green1
+      value: "0"
+    - name: Blue1
+      number: 4
+      channel: Blue1
+      value: "0"
+    - name: White1
+      number: 5
+      channel: White1
+      value: "0"
+    - name: Master
+      number: 6
+      channel: Master
+      value: "0"
+    - name: Program
+      number: 7
+      channel: Program
+      value: "0"
+    - name: ProgramSpeed
+      number: 8
+      channel: ProgramSpeed
+      value: "0"
     flash: false
   - name: Red
     number: 2
@@ -1827,13 +1701,13 @@ fixtures:
   - name: Slow
     number: 3
     label: Slow
-    settings:
-    - name: mode
-      description: Operating Mode
-      channel: "139"
-      value: "255"
     buttoncolor: Red
     master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "139"
+      value: "255"
     flash: false
 - id: 30
   name: Oil
@@ -1848,10 +1722,8 @@ fixtures:
     name: Program
     settings:
     - name: "Off"
-      label: ""
       number: 1
-      value: 0
+      value: "0"
     - name: "On"
-      label: ""
       number: 2
-      value: 255
+      value: "255"
