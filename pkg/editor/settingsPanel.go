@@ -36,7 +36,7 @@ type SettingsPanel struct {
 	UpdateSettings    bool
 }
 
-func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool) *SettingsPanel {
+func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool, buttonsOff bool) *SettingsPanel {
 
 	var SETTING_NUMBER int
 	var SETTING_NAME int
@@ -150,6 +150,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 			}
 
 			// Show the Delete Setting Button.
+			o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = buttonsOff
 			o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
 				st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
 				st.UpdateSettings = true
@@ -158,6 +159,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 			}
 
 			// Show the Add Setting Button.
+			o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).Hidden = buttonsOff
 			o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
 				st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
 				st.UpdateSettings = true

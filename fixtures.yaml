@@ -1146,7 +1146,7 @@ fixtures:
   description: Chauvet Vue 1.1
   type: switch
   group: 4
-  address: 0
+  address: 139
   channels: []
   states:
   - name: "Off"
@@ -1157,11 +1157,11 @@ fixtures:
     settings:
     - name: mode
       number: 1
-      channel: "139"
+      channel: Program
       value: "0"
     - name: red
       number: 2
-      channel: "140"
+      channel: Red1
       value: "0"
     - name: green
       number: 3
@@ -1727,3 +1727,24 @@ fixtures:
     - name: "On"
       number: 2
       value: "255"
+- id: 31
+  name: Vue1.1
+  label: Vue1.1
+  number: 1
+  description: Vuie1.1
+  type: rgb
+  group: 108
+  address: 139
+  channels:
+  - number: 1
+    name: Program
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: Speed
+  - number: 6
+    name: Master
