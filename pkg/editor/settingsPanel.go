@@ -98,6 +98,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 			o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
 
 			// Show and Edit the Name.
+			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = nil
 			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).SetText(st.SettingsList[i].Name)
 			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
@@ -107,7 +108,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 				if !channelFieldDisabled {
 					newSetting.Channel = st.SettingsList[i].Channel
 				}
-				newSetting.Setting = st.SettingsList[i].Setting
+				newSetting.Value = st.SettingsList[i].Value
 				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1
@@ -115,6 +116,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 
 			if !channelFieldDisabled {
 				// Channel value.
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).Hidden = channelFieldDisabled
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).SetText(st.SettingsList[i].Channel)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).OnChanged = func(value string) {
@@ -123,7 +125,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 					newSetting.Name = st.SettingsList[i].Name
 					newSetting.Number = st.SettingsList[i].Number
 					newSetting.Channel = value
-					newSetting.Setting = st.SettingsList[i].Setting
+					newSetting.Value = st.SettingsList[i].Value
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
@@ -131,8 +133,9 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 			}
 
 			// Show and Edit the Setting Value.
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).SetText(st.SettingsList[i].Setting)
-			o.(*fyne.Container).Objects[2].(*widget.Entry).OnChanged = func(value string) {
+			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = nil
+			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).SetText(st.SettingsList[i].Value)
+			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = func(value string) {
 				newSetting := fixture.Setting{}
 				newSetting.Label = st.SettingsList[i].Label
 				newSetting.Name = st.SettingsList[i].Name
@@ -140,7 +143,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 				if !channelFieldDisabled {
 					newSetting.Channel = st.SettingsList[i].Channel
 				}
-				newSetting.Setting = value
+				newSetting.Value = value
 				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 				st.UpdateSettings = true
 				st.UpdateThisChannel = st.CurrentChannel - 1

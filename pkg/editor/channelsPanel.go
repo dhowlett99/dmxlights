@@ -134,9 +134,11 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 
 func createChannelSettingList(channelNumber int16) (settingsList []fixture.Setting) {
 	newItem := fixture.Setting{}
-	newItem.Name = "New Setting"
+	newItem.Name = "New"
+	newItem.Label = "New"
+	newItem.Channel = "New"
 	newItem.Number = 1
-	newItem.Setting = "0"
+	newItem.Value = "0"
 	settingsList = append(settingsList, newItem)
 	return settingsList
 }

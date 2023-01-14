@@ -277,7 +277,7 @@ func createSettingList(channelNumber int16) (settingsList []fixture.Setting) {
 	newItem := fixture.Setting{}
 	newItem.Name = "New Setting"
 	newItem.Number = 1
-	newItem.Setting = "0"
+	newItem.Value = "0"
 	settingsList = append(settingsList, newItem)
 	return settingsList
 }

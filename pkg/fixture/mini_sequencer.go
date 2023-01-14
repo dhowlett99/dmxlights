@@ -532,7 +532,7 @@ func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures
 						if debug_mini {
 							fmt.Printf("Looking through Settings %s\n", setting.Name)
 						}
-						v, _ := strconv.Atoi(setting.Setting)
+						v, _ := strconv.Atoi(setting.Value)
 						value := common.Setting{
 							Name:  setting.Name,
 							Value: int16(v),
