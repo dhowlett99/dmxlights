@@ -193,22 +193,15 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 		}
 	}
 
-	// It appears counters arn't always the same.
-	counter1 := len(fadeColors[0])
-	counter2 := len(fadeColors[1])
-	counter3 := len(fadeColors[2])
-	counter4 := len(fadeColors[3])
-
+	// Setup the counters for the lengths for each fixture.
+	// The number of steps is different for each fixture, depending on how
+	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
-	counter := counter1
-	if counter2 < counter1 {
-		counter = counter2
-	}
-	if counter3 < counter {
-		counter = counter3
-	}
-	if counter4 < counter {
-		counter = counter4
+	counter := len(fadeColors[0])
+	for fixture := 0; fixture < numberFixtures; fixture++ {
+		if len(fadeColors[fixture]) < counter {
+			counter = len(fadeColors[fixture])
+		}
 	}
 
 	if debug {
