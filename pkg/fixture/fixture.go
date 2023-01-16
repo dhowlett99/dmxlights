@@ -352,11 +352,13 @@ func FixtureReceiver(
 					} else {
 						// Only fire every quarter turn of the scanner coordinates to save on launchpad mini traffic.
 						howOftern := cmd.NumberSteps / 4
-						if cmd.Step%howOftern == 0 {
-							// We're not in chase mode so use the color generated in the pattern generator.common.
-							for _, color := range fixture.Colors {
-								common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-								common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+						if howOftern != 0 {
+							if cmd.Step%howOftern == 0 {
+								// We're not in chase mode so use the color generated in the pattern generator.common.
+								for _, color := range fixture.Colors {
+									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+								}
 							}
 						}
 					}
