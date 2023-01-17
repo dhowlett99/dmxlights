@@ -261,6 +261,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			if fp.UpdateUseFixture {
 				address := fixture.FindFixtureAddressByName(fp.UseFixture, fixtures)
 				data[fp.UpdateThisFixture][FIXTURE_ADDRESS] = address
+				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
 				dmx, _ := strconv.Atoi(address)
 				fp.FixtureList[fp.UpdateThisFixture].Address = int16(dmx)
 				fp.UpdateUseFixture = false

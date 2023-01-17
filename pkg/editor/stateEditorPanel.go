@@ -30,9 +30,9 @@ import (
 // Show a list of States.
 func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
-	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
+	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
-		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
+		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
 	}
 
 	// Generate a list of functions that switches can use.
@@ -74,6 +74,11 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	useLabel := widget.NewLabel("Use Fixture")
 	use := container.NewAdaptiveGrid(3, useLabel, useInput, layout.NewSpacer())
 
+	// Fixture Address.
+	addressInput := widget.NewEntry()
+	addressLabel := widget.NewLabel("DMX Address")
+	address := container.NewAdaptiveGrid(3, addressLabel, addressInput, layout.NewSpacer())
+
 	// Update Use Fixture.
 	useInput.OnChanged = func(value string) {
 
@@ -81,6 +86,13 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.UseFixture = useInput.Selected
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
+
+		useFixture, err := fixture.GetFixureDetailsByLabel(useInput.Selected, fixtures)
+		if err != nil {
+			addressInput.SetText("Not Found")
+		} else {
+			addressInput.SetText(fmt.Sprintf("%d", useFixture.Address))
+		}
 
 		// Try again to populate the program and rotate options as available for this states action.
 		ap.ActionProgramOptions = populateOptions(value, "Program", fixtures)
@@ -93,7 +105,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		}
 	}
 
-	formTop := container.NewVBox(name, desc, use)
+	formTop := container.NewVBox(name, desc, use, address)
 
 	labelStates := widget.NewLabel("Switch States")
 	labelStates.TextStyle = fyne.TextStyle{

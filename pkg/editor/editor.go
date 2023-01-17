@@ -36,9 +36,9 @@ type itemSelect struct {
 
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
-	thisFixture, err := fixture.GetFixureDetails(id, fixtures)
+	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
-		return nil, fmt.Errorf("GetFixureDetails %s", err.Error())
+		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
 	}
 
 	// Title.

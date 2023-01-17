@@ -176,10 +176,10 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	return nil
 }
 
-// GetFixureDetails - find a fixture in the fixtures config.
+// GetFixureDetailsById - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixureDetails(id int, fixtures *Fixtures) (Fixture, error) {
+func GetFixureDetailsById(id int, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
 	if debug {
 		fmt.Printf("Looking for Fixture ID %d\n", id)
@@ -194,6 +194,26 @@ func GetFixureDetails(id int, fixtures *Fixtures) (Fixture, error) {
 		}
 	}
 	return Fixture{}, fmt.Errorf("error: fixture id %d not found", id)
+}
+
+// GetFixureDetailsByLabel - find a fixture in the fixtures config.
+// Returns details of the fixture.
+// Returns an error.
+func GetFixureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) {
+	// scan the fixtures structure for the selected fixture.
+	if debug {
+		fmt.Printf("Looking for Fixture by Label %s\n", label)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Fixture Label %s and Name %s States %+v\n", fixture.Label, fixture.Name, fixture.States)
+		}
+		if fixture.Label == label {
+			return fixture, nil
+		}
+	}
+	return Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
 }
 
 // EditFixture - allows you to change the fixture details for the selected fixture.
