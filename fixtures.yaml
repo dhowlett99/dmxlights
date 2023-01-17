@@ -429,13 +429,47 @@ fixtures:
   - number: 4
     name: Static
   - number: 5
-    name: Master Dimmer
+    name: Master
   - number: 6
-    name: Static
+    name: Program
+    settings:
+    - name: Dimmer Mode
+      labe: New
+      number: 1
+      value: "0"
+    - name: Color Macro Mode
+      number: 2
+      value: "52"
+    - name: Color Change Mode
+      number: 3
+      value: "103"
+    - name: Color Fade Mode
+      number: 4
+      value: "154"
+    - name: Sound Active Mode
+      number: 5
+      value: "205"
   - number: 7
     name: Static
+    settings:
+    - name: Color Macros
+      labe: New
+      number: 1
+      value: 1-255
+    - name: Colour Change 1
+      number: 2
+      value: "0"
+    - name: Colour Change 2
+      number: 3
+      value: "16"
+    - name: Colour Change 3
+      number: 4
+      value: "32"
+    - name: Colour Change 4
+      number: 5
+      value: "48"
   - number: 8
-    name: Static
+    name: Color
   use_channels: 8
 - id: 14
   name: ADJ Dekker1
@@ -999,7 +1033,7 @@ fixtures:
       value: "0"
     - name: Strobe
       number: 3
-      value: "16-131"
+      value: 16-131
   - number: 8
     name: Master
   - number: 9
