@@ -433,6 +433,25 @@ fixtures:
   - number: 6
     name: Program
     settings:
+    - name: Strobe Off
+      labe: New
+      number: 1
+      value: 0-15
+    - name: Strobe
+      number: 2
+      value: 16-255
+    - name: Program Speed
+      number: 3
+      value: 0-255
+    - name: Sound Off
+      number: 4
+      value: 0-31
+    - name: Sound Sensitivity
+      number: 5
+      value: 205-255
+  - number: 7
+    name: Static
+    settings:
     - name: Dimmer Mode
       labe: New
       number: 1
@@ -449,8 +468,8 @@ fixtures:
     - name: Sound Active Mode
       number: 5
       value: "205"
-  - number: 7
-    name: Static
+  - number: 8
+    name: Color
     settings:
     - name: Color Macros
       labe: New
@@ -468,8 +487,6 @@ fixtures:
     - name: Colour Change 4
       number: 5
       value: "48"
-  - number: 8
-    name: Color
   use_channels: 8
 - id: 14
   name: ADJ Dekker1
