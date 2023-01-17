@@ -167,7 +167,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			fmt.Printf("error %d\n", err)
 		}
 
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 
 		return
 	}
@@ -353,7 +353,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 							switchChannels[switchNumber].StopRotate <- true
 						}
 						// And turn the fixture off.
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
 					}
@@ -366,7 +366,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						for _, color := range fixture.Colors {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, dmxInterfacePresent)
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						}
 					}
 
@@ -451,17 +451,6 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.AntiClockwise = false
 	}
 
-	switch action.Strobe {
-	case "Off":
-		config.Strobe = 0
-	case "Slow":
-		config.Strobe = 0
-	case "Fast":
-		config.Strobe = 0
-	default:
-		config.Strobe = 0
-	}
-
 	switch action.Speed {
 	case "Slow":
 		config.TriggerState = false
@@ -487,6 +476,24 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
+	}
+
+	switch action.Strobe {
+	case "Off":
+		config.Strobe = false
+		config.StrobeSpeed = 0
+	case "Slow":
+		config.Strobe = true
+		config.StrobeSpeed = 0
+	case "Medium":
+		config.Strobe = true
+		config.StrobeSpeed = 127
+	case "Fast":
+		config.Strobe = true
+		config.StrobeSpeed = 255
+	default:
+		config.Strobe = false
+		config.StrobeSpeed = 0
 	}
 
 	return config

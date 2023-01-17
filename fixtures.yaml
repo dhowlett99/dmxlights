@@ -999,7 +999,7 @@ fixtures:
       value: "0"
     - name: Strobe
       number: 3
-      value: "100"
+      value: "16-131"
   - number: 8
     name: Master
   - number: 9

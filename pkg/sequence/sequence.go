@@ -342,6 +342,7 @@ func PlaySequence(sequence common.Sequence,
 				RGBStaticColors: sequence.StaticColors,
 				StartFlood:      sequence.StartFlood,
 				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -362,6 +363,7 @@ func PlaySequence(sequence common.Sequence,
 				StartFlood:     sequence.StartFlood,
 				StopFlood:      sequence.StopFlood,
 				StrobeSpeed:    sequence.StrobeSpeed,
+				Strobe:         sequence.Strobe,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
@@ -390,6 +392,7 @@ func PlaySequence(sequence common.Sequence,
 				Hide:            sequence.Hide,
 				Master:          sequence.Master,
 				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
 				Blackout:        sequence.Blackout,
 			}
 
@@ -622,6 +625,7 @@ func PlaySequence(sequence common.Sequence,
 								NumberSteps:              sequence.NumberSteps,
 								Rotate:                   sequence.Rotate,
 								StrobeSpeed:              sequence.StrobeSpeed,
+								Strobe:                   sequence.Strobe,
 								Master:                   sequence.Master,
 								Blackout:                 sequence.Blackout,
 								Hide:                     sequence.Hide,

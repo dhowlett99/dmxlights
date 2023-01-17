@@ -257,6 +257,7 @@ type Sequence struct {
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
+	Strobe                     bool                        // Strobe is enabled.
 	StrobeSpeed                int                         // Strobe speed.
 	Rotate                     int                         // Rotate speed.
 	RGBShift                   int                         // RGB shift.
@@ -371,6 +372,7 @@ type FixtureCommand struct {
 	SequenceNumber int
 
 	// Common commands.
+	Strobe      bool
 	StrobeSpeed int
 	Master      int
 	Blackout    bool
