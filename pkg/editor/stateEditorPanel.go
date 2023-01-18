@@ -67,6 +67,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	// Create Settings Panel.
 	st := NewSettingsPanel([]fixture.Setting{}, false, true)
+	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
 	st.SettingsPanel.Hide()
 
 	// Use Fixture.
@@ -94,8 +95,12 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 			addressInput.SetText(fmt.Sprintf("%d", useFixture.Address))
 		}
 
-		// Try again to populate the program and rotate options as available for this states action.
+		// Based on a new use fixure - Try again to populate the program and rotate options as available for this states action.
 		ap.ActionProgramOptions = populateOptions(value, "Program", fixtures)
+
+		// Based on a new use fixure - Try again to populate the channel names in the settings panel.
+		st.ChannelOptions = populateChannelNames(useFixture.Channels)
+
 	}
 
 	// Show the currently selected fixture option.
@@ -191,12 +196,28 @@ func populateOptions(fixtureName string, name string, fixtures *fixture.Fixtures
 
 	options := []string{}
 	programSettings, err := fixture.GetChannelSettinsByName(fixtureName, name, fixtures)
-	if err != nil {
-		fmt.Printf("populateOptions: no channel settings found for %s in fixture %s\n", name, fixtureName)
-	} else {
+	if err == nil {
 		for _, setting := range programSettings {
 			options = append(options, setting.Name)
 		}
+	}
+	if len(options) == 0 {
+		options = append(options, "None")
+	}
+
+	return options
+}
+
+func populateChannelNames(channels []fixture.Channel) []string {
+
+	if debug {
+		fmt.Printf("Channels available are %v\n", channels)
+	}
+
+	options := []string{}
+
+	for _, channel := range channels {
+		options = append(options, channel.Name)
 	}
 	if len(options) == 0 {
 		options = append(options, "None")

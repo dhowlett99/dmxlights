@@ -31,6 +31,7 @@ type SettingsPanel struct {
 	SettingsPanel     *widget.List
 	SettingsList      []fixture.Setting
 	SettingsOptions   []string
+	ChannelOptions    []string
 	CurrentChannel    int
 	UpdateThisChannel int
 	UpdateSettings    bool
@@ -48,6 +49,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
 	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
+	st.ChannelOptions = []string{"None"}
 
 	// Settingses Selection Panel.
 	st.SettingsPanel = widget.NewList(
@@ -82,9 +84,9 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 			SETTING_ADD = 5
 
 			return container.NewGridWithColumns(5,
-				widget.NewLabel("template"),      // Setting Number.
-				widget.NewEntry(),                // Setting Name.
-				widget.NewEntry(),                // Channel Number.
+				widget.NewLabel("template"), // Setting Number.
+				widget.NewEntry(),           // Setting Name.
+				widget.NewSelect(st.ChannelOptions, func(value string) {}), // Setting Value.// Channel Number.
 				widget.NewEntry(),                // Setting Value.
 				widget.NewButton("-", func() {}), // Delete this Setting.
 				widget.NewButton("+", func() {}), // Add a new Setting below.
@@ -116,10 +118,10 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 
 			if !channelFieldDisabled {
 				// Channel value.
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).OnChanged = nil
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).Hidden = channelFieldDisabled
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).SetText(st.SettingsList[i].Channel)
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Entry).OnChanged = func(value string) {
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = channelFieldDisabled
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(st.SettingsList[i].Channel)
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(value string) {
 					newSetting := fixture.Setting{}
 					newSetting.Label = st.SettingsList[i].Label
 					newSetting.Name = st.SettingsList[i].Name
