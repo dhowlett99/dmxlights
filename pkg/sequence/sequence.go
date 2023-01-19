@@ -453,6 +453,7 @@ func PlaySequence(sequence common.Sequence,
 
 						scannerLastColor := 0
 
+						sequence.ScannerColorMutex.Lock()
 						sequence.ScannerStateMutex.Lock()
 						// AvailableFixtures give the real number of configured scanners.
 						for _, fixture := range sequence.ScannersAvailable {
@@ -462,6 +463,7 @@ func PlaySequence(sequence common.Sequence,
 								// Found a scanner with some colors.
 								totalColorForThisFixture := len(colors)
 
+								// Now can mess with the scanner color map.
 								sequence.ScannerColor[fixture.Number-1]++
 								if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
 									if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
@@ -473,6 +475,7 @@ func PlaySequence(sequence common.Sequence,
 							}
 						}
 						sequence.ScannerStateMutex.Unlock()
+						sequence.ScannerColorMutex.Unlock()
 					}
 				}
 

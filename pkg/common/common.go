@@ -871,11 +871,9 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 
 func MapCopy(scannerColor map[int]int, scannerColorMutex *sync.RWMutex) map[int]int {
 	newMap := make(map[int]int)
-	scannerColorMutex.Lock()
 	for key, value := range scannerColor {
 		newMap[key] = value
 	}
-	scannerColorMutex.Unlock()
 	return newMap
 }
 

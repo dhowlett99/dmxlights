@@ -300,8 +300,8 @@ func FixtureReceiver(
 				if !cmd.Hide {
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
-				scannerColor := common.MapCopy(cmd.ScannerColor, sequence.ScannerColorMutex)
 				sequence.ScannerColorMutex.RLock()
+				scannerColor := common.MapCopy(cmd.ScannerColor, sequence.ScannerColorMutex)
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				sequence.ScannerColorMutex.RUnlock()
 			}
@@ -339,8 +339,8 @@ func FixtureReceiver(
 			if enabled {
 
 				// If enables activate the physical scanner.
-				scannerColor := common.MapCopy(cmd.ScannerColor, sequence.ScannerColorMutex)
 				sequence.ScannerColorMutex.RLock()
+				scannerColor := common.MapCopy(cmd.ScannerColor, sequence.ScannerColorMutex)
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
 					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerSelectedGobo, scannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				sequence.ScannerColorMutex.RUnlock()
@@ -1069,8 +1069,8 @@ func turnOnFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtu
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
 	// Create a temporary map of fixture colors.
-	cmd.ScannerColor = make(map[int]int)
 	sequence.ScannerColorMutex.Lock()
+	cmd.ScannerColor = make(map[int]int)
 	cmd.ScannerColor[myFixtureNumber] = FindColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
 	sequence.ScannerColorMutex.Unlock()
 
@@ -1090,8 +1090,10 @@ func turnOnFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtu
 	music := 0
 	program := 0
 
+	sequence.ScannerColorMutex.RLock()
 	scannerColor := common.MapCopy(cmd.ScannerColor, sequence.ScannerColorMutex)
 	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, scannerColor[myFixtureNumber], fixtures, false, brightness, master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+	sequence.ScannerColorMutex.RUnlock()
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
