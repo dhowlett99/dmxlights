@@ -1216,19 +1216,19 @@ fixtures:
       value: "0"
     - name: green
       number: 3
-      channel: "141"
+      channel: "3"
       value: "0"
     - name: blue
       number: 4
-      channel: "142"
+      channel: "4"
       value: "0"
     - name: strobe
       number: 5
-      channel: "143"
+      channel: "5"
       value: "0"
     - name: master reverse dimmer
       number: 6
-      channel: "144"
+      channel: "6"
       value: "0"
     flash: false
   - name: Red
@@ -1239,27 +1239,27 @@ fixtures:
     settings:
     - name: mode
       number: 1
-      channel: "139"
+      channel: "1"
       value: "0"
     - name: red
       number: 2
-      channel: "140"
+      channel: "2"
       value: "255"
     - name: green
       number: 3
-      channel: "141"
+      channel: "3"
       value: "0"
     - name: blue
       number: 4
-      channel: "142"
+      channel: "4"
       value: "0"
     - name: strobe
       number: 5
-      channel: "143"
+      channel: "5"
       value: "0"
     - name: master reverse dimmer
       number: 6
-      channel: "144"
+      channel: "6"
       value: "255"
     flash: false
   - name: Slow Color Change
@@ -1270,90 +1270,130 @@ fixtures:
     settings:
     - name: mode
       number: 1
-      channel: "139"
+      channel: "1"
       value: "25"
     - name: red
       number: 2
-      channel: "140"
+      channel: "2"
       value: "0"
     - name: green
       number: 3
-      channel: "141"
+      channel: "3"
       value: "0"
     - name: blue
       number: 4
-      channel: "142"
+      channel: "4"
       value: "0"
     - name: speed
       number: 5
-      channel: "143"
+      channel: "5"
       value: "0"
     - name: master reverse dimmer
       number: 6
-      channel: "144"
+      channel: "6"
       value: "255"
     flash: false
   - name: Meduim Color Change
     number: 4
     label: MdChg
-    buttoncolor: Blue
-    master: 0
-    settings:
-    - name: mode
-      number: 1
-      channel: "139"
-      value: "25"
-    - name: red
-      number: 2
-      channel: "140"
-      value: "0"
-    - name: green
-      number: 3
-      channel: "141"
-      value: "0"
-    - name: blue
-      number: 4
-      channel: "142"
-      value: "0"
-    - name: speed
-      number: 5
-      channel: "143"
-      value: "100"
-    - name: master reverse dimmer
-      number: 6
-      channel: "144"
-      value: "255"
-    flash: false
-  - name: Sound Triggered Color Change
-    number: 5
-    label: Sound
     buttoncolor: Yellow
     master: 0
     settings:
     - name: mode
       number: 1
-      channel: "139"
-      value: "255"
+      channel: "1"
+      value: "25"
     - name: red
       number: 2
-      channel: "140"
+      channel: "2"
       value: "0"
     - name: green
       number: 3
-      channel: "141"
+      channel: "3"
       value: "0"
     - name: blue
       number: 4
-      channel: "142"
+      channel: "4"
       value: "0"
     - name: speed
       number: 5
-      channel: "143"
+      channel: "5"
       value: "100"
     - name: master reverse dimmer
       number: 6
-      channel: "144"
+      channel: "6"
       value: "255"
+    flash: false
+  - name: Sound Triggered Color Change
+    number: 5
+    label: Sound
+    buttoncolor: White
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "255"
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: speed
+      number: 5
+      channel: "5"
+      value: "100"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "255"
+    flash: false
+  - name: Mini
+    number: 6
+    label: Mini
+    buttoncolor: Pink
+    master: 0
+    actions:
+    - name: Mini
+      number: 1
+      colors:
+      - Green
+      - Red
+      - Blue
+      mode: Chase
+      fade: Soft
+      size: "Off"
+      speed: Music
+      rotate: "Off"
+      rotatespeed: "Off"
+      program: "Off"
+      strobe: "Off"
+    flash: false
+  - name: Reddy
+    number: 7
+    label: Reddy
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Reddy
+      number: 1
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
     flash: false
   use_fixture: vue
 - id: 26
@@ -1758,7 +1798,7 @@ fixtures:
     settings:
     - name: mode
       number: 1
-      channel: "139"
+      channel: "1"
       value: "255"
     flash: false
 - id: 30
@@ -1799,4 +1839,4 @@ fixtures:
   - number: 5
     name: Speed
   - number: 6
-    name: Master
+    name: Master Reverse

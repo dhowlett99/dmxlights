@@ -36,7 +36,7 @@ const debug_mini bool = false
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
 func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig,
-	blackout bool, master int, dmxInterfacePresent bool) {
+	blackout bool, brightness int, master int, dmxInterfacePresent bool) {
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
 
@@ -148,6 +148,10 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Remember that we have stopped this mini sequencer.
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
+		// Disable this mini sequencer with the sound service.
+		// Use the switch number as the unique sequence name.
+		soundConfig.DisableSoundTrigger(switchName)
+
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
@@ -167,7 +171,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 			fmt.Printf("error %d\n", err)
 		}
 
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 
 		return
 	}
@@ -353,7 +357,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 							switchChannels[switchNumber].StopRotate <- true
 						}
 						// And turn the fixture off.
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
 					}
@@ -366,7 +370,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						for _, color := range fixture.Colors {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, master, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						}
 					}
 
