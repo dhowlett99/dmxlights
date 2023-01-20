@@ -34,6 +34,10 @@ type SwitchPanel struct {
 
 func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *ActionPanel) *SwitchPanel {
 
+	if debug {
+		fmt.Printf("NewSwitchPanel\n")
+	}
+
 	sw := SwitchPanel{}
 	sw.SwitchesList = switchesList
 	sw.SwitchOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
@@ -91,6 +95,10 @@ func NewSwitchPanel(switchesAvailable bool, switchesList []itemSelect, ap *Actio
 
 func PopulateSwitches(thisFixture fixture.Fixture) (switchesAvailable bool, actionsAvailable bool,
 	actionsList []fixture.Action, switchesList []itemSelect) {
+
+	if debug {
+		fmt.Printf("PopulateSwitches\n")
+	}
 
 	switchOptions := []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 

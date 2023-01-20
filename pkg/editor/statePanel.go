@@ -46,6 +46,10 @@ const (
 
 func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPanel) *StatePanel {
 
+	if debug {
+		fmt.Printf("NewStatePanel\n")
+	}
+
 	sp := StatePanel{}
 	sp.ButtonColorOptions = []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
 	sp.StateOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
@@ -197,6 +201,11 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 
 // UpdateItem replaces the selected item by id with newItem.
 func updateStateItem(states []fixture.State, id int16, newState fixture.State) []fixture.State {
+
+	if debug {
+		fmt.Printf("updateStateItem\n")
+	}
+
 	newStates := []fixture.State{}
 	for _, state := range states {
 		if state.Number == id {
@@ -211,6 +220,11 @@ func updateStateItem(states []fixture.State, id int16, newState fixture.State) [
 }
 
 func addState(states []fixture.State, id int16) []fixture.State {
+
+	if debug {
+		fmt.Printf("addState\n")
+	}
+
 	newStates := []fixture.State{}
 	newItem := fixture.State{}
 	newItem.Number = id + 1
@@ -232,6 +246,11 @@ func addState(states []fixture.State, id int16) []fixture.State {
 }
 
 func deleteState(stateList []fixture.State, id int16) []fixture.State {
+
+	if debug {
+		fmt.Printf("deleteState\n")
+	}
+
 	newStates := []fixture.State{}
 	if id == 1 {
 		return stateList
@@ -245,6 +264,11 @@ func deleteState(stateList []fixture.State, id int16) []fixture.State {
 }
 
 func stateItemAllreadyExists(number int16, stateList []fixture.State) bool {
+
+	if debug {
+		fmt.Printf("stateItemAllreadyExists\n")
+	}
+
 	// look through the state list for the id's
 	for _, item := range stateList {
 		if item.Number == number {
@@ -255,6 +279,11 @@ func stateItemAllreadyExists(number int16, stateList []fixture.State) bool {
 }
 
 func findLargestStateNumber(items []fixture.State) int16 {
+
+	if debug {
+		fmt.Printf("findLargestStateNumber\n")
+	}
+
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -265,6 +294,11 @@ func findLargestStateNumber(items []fixture.State) int16 {
 }
 
 func populateSettingList(statesList []fixture.State, stateNumber int16) (settingsList []fixture.Setting) {
+
+	if debug {
+		fmt.Printf("populateSettingList\n")
+	}
+
 	for _, state := range statesList {
 		if stateNumber == state.Number {
 			return state.Settings
@@ -274,6 +308,11 @@ func populateSettingList(statesList []fixture.State, stateNumber int16) (setting
 }
 
 func createSettingList(channelNumber int16) (settingsList []fixture.Setting) {
+
+	if debug {
+		fmt.Printf("createSettingList\n")
+	}
+
 	newItem := fixture.Setting{}
 	newItem.Name = "New Setting"
 	newItem.Number = 1

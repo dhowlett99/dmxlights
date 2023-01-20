@@ -61,8 +61,6 @@ type FixturesPanel struct {
 	DescriptionEntryError map[int]bool
 }
 
-const debug bool = false
-
 const RECTANGLE = 0
 const TEXT = 1
 
@@ -276,6 +274,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 		// Create Table
 		func() (o fyne.CanvasObject) {
+
 			return container.NewMax(
 				widget.NewLabel("id"), // ID.
 				widget.NewSelect(fp.TypeOptions, func(value string) {}),   // Type rgb, scanner or switch.
@@ -722,6 +721,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
 
+	if debug {
+		fmt.Printf("checkForDuplicateName\n")
+	}
+
 	var err error
 	var reports []string
 
@@ -742,6 +745,10 @@ func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]stri
 
 func checkForDuplicateLabel(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
 
+	if debug {
+		fmt.Printf("checkForDuplicateLabel\n")
+	}
+
 	var err error
 	var reports []string
 
@@ -761,6 +768,10 @@ func checkForDuplicateLabel(fixtures *fixture.Fixtures, fp FixturesPanel) ([]str
 }
 
 func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
+
+	if debug {
+		fmt.Printf("checkForNoOverlap\n")
+	}
 
 	var err error
 	var reports []string
@@ -816,6 +827,9 @@ func UpdateFixture(fixtures []fixture.Fixture, id int, newItem fixture.Fixture) 
 
 // checkOverlap
 func checkOverlap(aStart int, aEnd int, bStart int, bEnd int) bool {
+	if debug {
+		fmt.Printf("checkOverlap\n")
+	}
 	return (aStart >= bEnd) != (aEnd > bStart)
 }
 
@@ -836,6 +850,10 @@ func checkDMXAddress(value string) error {
 }
 
 func checkTextEntry(value string) error {
+
+	if debug {
+		fmt.Printf("checkTextEntry\n")
+	}
 
 	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \.\_]+$`).MatchString
 

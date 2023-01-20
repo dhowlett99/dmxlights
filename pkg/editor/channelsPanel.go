@@ -35,6 +35,10 @@ type ChannelPanel struct {
 
 func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {
 
+	if debug {
+		fmt.Printf("NewChannelPanel\n")
+	}
+
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurve", "Speed"}
 	cp.ChannelList = channels
@@ -133,6 +137,11 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 }
 
 func createChannelSettingList(channelNumber int16) (settingsList []fixture.Setting) {
+
+	if debug {
+		fmt.Printf("createChannelSettingList\n")
+	}
+
 	newItem := fixture.Setting{}
 	newItem.Name = "New"
 	newItem.Label = "New"
@@ -144,6 +153,11 @@ func createChannelSettingList(channelNumber int16) (settingsList []fixture.Setti
 }
 
 func populateChannelSettingList(channelList []fixture.Channel, channelNumber int16) (settingsList []fixture.Setting) {
+
+	if debug {
+		fmt.Printf("populateChannelSettingList\n")
+	}
+
 	for _, channel := range channelList {
 		if channelNumber == channel.Number {
 			return channel.Settings
@@ -153,6 +167,11 @@ func populateChannelSettingList(channelList []fixture.Channel, channelNumber int
 }
 
 func channelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
+
+	if debug {
+		fmt.Printf("channelItemAllreadyExists\n")
+	}
+
 	// look through the channel list for the id's
 	for _, item := range channelList {
 		if item.Number == number {
@@ -163,6 +182,11 @@ func channelItemAllreadyExists(number int16, channelList []fixture.Channel) bool
 }
 
 func findLargestChannelNumber(items []fixture.Channel) int16 {
+
+	if debug {
+		fmt.Printf("findLargestChannelNumber\n")
+	}
+
 	var number int16
 	for _, item := range items {
 		if item.Number > number {
@@ -173,6 +197,11 @@ func findLargestChannelNumber(items []fixture.Channel) int16 {
 }
 
 func addChannelItem(channels []fixture.Channel, id int16, options []string) []fixture.Channel {
+
+	if debug {
+		fmt.Printf("addChannelItem\n")
+	}
+
 	newChannels := []fixture.Channel{}
 	newItem := fixture.Channel{}
 	newItem.Number = id + 1
@@ -194,6 +223,11 @@ func addChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 }
 
 func deleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
+
+	if debug {
+		fmt.Printf("deleteChannelItem\n")
+	}
+
 	newChannels := []fixture.Channel{}
 	if id == 1 {
 		return channelList
@@ -208,6 +242,11 @@ func deleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channe
 
 // UpdateItem replaces the selected item by id with newItem.
 func updateChannelItem(channels []fixture.Channel, id int16, newChannel fixture.Channel) []fixture.Channel {
+
+	if debug {
+		fmt.Printf("updateChannelItem\n")
+	}
+
 	newChannels := []fixture.Channel{}
 	for _, channel := range channels {
 		if channel.Number == id {

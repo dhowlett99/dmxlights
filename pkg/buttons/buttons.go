@@ -2815,7 +2815,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Clear switch positions to their first positions.
 		if sequence.Type == "switch" {
-			this.SwitchPositions = [9][9]int{}
+			//this.SwitchPositions = [9][9]int{}
 			cmd := common.Command{
 				Action: common.ClearAllSwitchPositions,
 			}

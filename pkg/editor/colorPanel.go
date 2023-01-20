@@ -18,6 +18,7 @@
 package editor
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -47,6 +48,10 @@ type Button struct {
 }
 
 func NewColorPickerPanel(w fyne.Window) *ColorPanel {
+
+	if debug {
+		fmt.Printf("NewColorPickerPanel\n")
+	}
 
 	cp := ColorPanel{}
 	cp.Buttons = make(map[string]Button, 10)
@@ -152,6 +157,10 @@ func NewColorPickerPanel(w fyne.Window) *ColorPanel {
 
 func SetFromCheckState(cp *ColorPanel) {
 
+	if debug {
+		fmt.Printf("SetFromCheckState\n")
+	}
+
 	var colorSelection []string
 
 	// Clear Rectangles
@@ -174,6 +183,11 @@ func SetFromCheckState(cp *ColorPanel) {
 }
 
 func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
+
+	if debug {
+		fmt.Printf("SetRectangleColorsFromString\n")
+	}
+
 	cp.Buttons["Red"].check.Checked = false
 	cp.Buttons["Orange"].check.Checked = false
 	cp.Buttons["Yellow"].check.Checked = false

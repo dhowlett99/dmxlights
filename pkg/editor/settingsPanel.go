@@ -39,6 +39,10 @@ type SettingsPanel struct {
 
 func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool, buttonsOff bool) *SettingsPanel {
 
+	if debug {
+		fmt.Printf("NewSettingsPanel\n")
+	}
+
 	var SETTING_NUMBER int
 	var SETTING_NAME int
 	var SETTING_CHANNEL int
@@ -175,6 +179,11 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 }
 
 func settingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
+
+	if debug {
+		fmt.Printf("settingItemAllreadyExists\n")
+	}
+
 	// look through the settings list for the id's
 	for _, item := range settingsList {
 		if item.Number == number {
@@ -185,6 +194,11 @@ func settingItemAllreadyExists(number int, settingsList []fixture.Setting) bool 
 }
 
 func findLargestsettingsNumber(items []fixture.Setting) int {
+
+	if debug {
+		fmt.Printf("findLargestsettingsNumber\n")
+	}
+
 	var number int
 	for _, item := range items {
 		if item.Number > number {
@@ -195,6 +209,11 @@ func findLargestsettingsNumber(items []fixture.Setting) int {
 }
 
 func addSettingsItem(items []fixture.Setting, id int, options []string) []fixture.Setting {
+
+	if debug {
+		fmt.Printf("addSettingsItem\n")
+	}
+
 	newItems := []fixture.Setting{}
 	newItem := fixture.Setting{}
 	newItem.Number = int(id) + 1
@@ -216,6 +235,11 @@ func addSettingsItem(items []fixture.Setting, id int, options []string) []fixtur
 }
 
 func updateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting) []fixture.Setting {
+
+	if debug {
+		fmt.Printf("updateSettingsItem\n")
+	}
+
 	newItems := []fixture.Setting{}
 	for _, item := range items {
 		if item.Number == id {

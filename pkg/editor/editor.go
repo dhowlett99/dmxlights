@@ -34,7 +34,13 @@ type itemSelect struct {
 	Actions []fixture.Action
 }
 
+const debug bool = false
+
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+
+	if debug {
+		fmt.Printf("NewChannelEditor\n")
+	}
 
 	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {

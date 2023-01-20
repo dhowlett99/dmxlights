@@ -30,6 +30,10 @@ import (
 // Show a list of States.
 func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
+	if debug {
+		fmt.Printf("NewStateEditor\n")
+	}
+
 	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
@@ -193,6 +197,10 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 }
 
 func populateOptions(fixtureName string, name string, fixtures *fixture.Fixtures) []string {
+
+	if debug {
+		fmt.Printf("populateOptions\n")
+	}
 
 	options := []string{}
 	programSettings, err := fixture.GetChannelSettinsByName(fixtureName, name, fixtures)
