@@ -384,6 +384,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			button.container = container.NewMax(button.rectangle, button.button)
 			containers = append(containers, button.container)
 		}
+		button.button.Importance = widget.LowImportance
 		NewButton := Button{}
 		NewButton.button = button.button
 		NewButton.container = button.container

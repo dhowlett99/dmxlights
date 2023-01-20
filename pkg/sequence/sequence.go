@@ -940,7 +940,7 @@ func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequenceNumber {
 			if fixture.NumberChannels > 0 {
-				fmt.Printf("Found Number of Channels def. : %d\n", fixture.NumberChannels)
+				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberChannels)
 				return fixture.NumberChannels
 			}
 			if fixture.Number > numberFixtures {
