@@ -24,6 +24,14 @@ test:
 legacy-build:
 	go build --tags legacy dmxlights.go
 
+clean: 
+	go clean -cache dmxlights.go
+
+dep:
+	rm -rf go.mod go.sum 
+	go mod init
+	go mod tidy
+
 build:
 	go mod tidy
 	go build dmxlights.go
