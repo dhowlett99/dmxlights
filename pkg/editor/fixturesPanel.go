@@ -245,8 +245,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		fp.FixtureList = append(fp.FixtureList, newItem)
 	}
 
-	// Create a new list.
+	// Create a new fixtures list.
 	fp.FixturePanel = widget.NewTable(
+		// Function to find length of this table.
 		func() (int, int) {
 			if fp.UpdateChannels {
 				fp.FixtureList[fp.UpdateThisFixture].Channels = fp.UpdatedChannelsList
@@ -272,7 +273,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			return len(data), len(data[0])
 		},
 
-		// Create Table
+		// Function to create items in this table.
 		func() (o fyne.CanvasObject) {
 
 			return container.NewMax(
@@ -301,7 +302,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				widget.NewButton("Channels", func() {}), // Channel Button
 			)
 		},
-		// Function to update items in this list.
+
+		// Function to update items in this table.
 		func(i widget.TableCellID, o fyne.CanvasObject) {
 
 			// Hide all field types.

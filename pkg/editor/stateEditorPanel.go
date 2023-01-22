@@ -70,7 +70,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
-	st := NewSettingsPanel([]fixture.Setting{}, false, true)
+	st := NewSettingsPanel([]fixture.Setting{}, false)
 	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
 	st.SettingsPanel.Hide()
 

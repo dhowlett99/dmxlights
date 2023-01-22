@@ -28,7 +28,7 @@ import (
 )
 
 type SettingsPanel struct {
-	SettingsPanel     *widget.List
+	SettingsPanel     *widget.Table
 	SettingsList      []fixture.Setting
 	SettingsOptions   []string
 	ChannelOptions    []string
@@ -37,18 +37,20 @@ type SettingsPanel struct {
 	UpdateSettings    bool
 }
 
-func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool, buttonsOff bool) *SettingsPanel {
+const SETTING_NUMBER int = 0
+const SETTING_NAME int = 1
+const SETTING_CHANNEL int = 2
+const SETTING_VALUE int = 3
+const SETTING_DELETE int = 4
+const SETTING_ADD int = 5
+
+func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool) *SettingsPanel {
 
 	if debug {
 		fmt.Printf("NewSettingsPanel\n")
 	}
 
-	var SETTING_NUMBER int
-	var SETTING_NAME int
-	var SETTING_CHANNEL int
-	var SETTING_VALUE int
-	var SETTING_DELETE int
-	var SETTING_ADD int
+	var data = [][]string{}
 
 	st := SettingsPanel{}
 	st.SettingsList = SettingsList
@@ -56,38 +58,20 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 	st.ChannelOptions = []string{"None"}
 
 	// Settingses Selection Panel.
-	st.SettingsPanel = widget.NewList(
-		func() int {
-			return len(st.SettingsList)
+	st.SettingsPanel = widget.NewTable(
+
+		func() (int, int) {
+			height := len(data)
+			width := 6
+			return height, width
 		},
-		// Function to create item.
-		func() fyne.CanvasObject {
+		// Function to create table.
+		func() (o fyne.CanvasObject) {
 
-			if channelFieldDisabled {
+			// Load the fixtures into the array used by the table.
+			data = makeSettingsArray(st.SettingsList)
 
-				SETTING_NUMBER = 0
-				SETTING_NAME = 1
-				SETTING_VALUE = 2
-				SETTING_DELETE = 3
-				SETTING_ADD = 4
-
-				return container.NewGridWithColumns(5,
-					widget.NewLabel("template"),      // Setting Number.
-					widget.NewEntry(),                // Setting Name.
-					widget.NewEntry(),                // Setting Value.
-					widget.NewButton("-", func() {}), // Delete this Setting.
-					widget.NewButton("+", func() {}), // Add a new Setting below.
-				)
-			}
-
-			SETTING_NUMBER = 0
-			SETTING_NAME = 1
-			SETTING_CHANNEL = 2
-			SETTING_VALUE = 3
-			SETTING_DELETE = 4
-			SETTING_ADD = 5
-
-			return container.NewGridWithColumns(5,
+			return container.NewMax(
 				widget.NewLabel("template"), // Setting Number.
 				widget.NewEntry(),           // Setting Name.
 				widget.NewSelect(st.ChannelOptions, func(value string) {}), // Setting Value.// Channel Number.
@@ -97,83 +81,121 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool,
 			)
 		},
 
-		// Function to update item in this list.
-		func(i widget.ListItemID, o fyne.CanvasObject) {
+		// Function to update item in this table.
+		func(i widget.TableCellID, o fyne.CanvasObject) {
+
+			// Hide all field types.
+			hideAllSettingsFields(o)
 
 			// Show the setting a number.
-			o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(fmt.Sprintf("%d", st.SettingsList[i].Number))
-
-			// Show and Edit the Name.
-			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = nil
-			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).SetText(st.SettingsList[i].Name)
-			o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = func(value string) {
-				newSetting := fixture.Setting{}
-				newSetting.Label = st.SettingsList[i].Label
-				newSetting.Name = value
-				newSetting.Number = st.SettingsList[i].Number
-				if !channelFieldDisabled {
-					newSetting.Channel = st.SettingsList[i].Channel
-				}
-				newSetting.Value = st.SettingsList[i].Value
-				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				st.UpdateSettings = true
-				st.UpdateThisChannel = st.CurrentChannel - 1
+			if i.Col == SETTING_NUMBER {
+				showSettingsField(SETTING_NUMBER, o)
+				o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(data[i.Row][i.Col])
 			}
 
-			if !channelFieldDisabled {
-				// Channel value.
+			// Show and Edit the Name.
+			if i.Col == SETTING_NAME {
+				showSettingsField(SETTING_NAME, o)
+				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = nil
+				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = func(value string) {
+					newSetting := fixture.Setting{}
+					newSetting.Label = st.SettingsList[i.Row].Label
+					newSetting.Name = value
+					newSetting.Number = st.SettingsList[i.Row].Number
+					if !channelFieldDisabled {
+						newSetting.Channel = st.SettingsList[i.Row].Channel
+					}
+					newSetting.Value = st.SettingsList[i.Row].Value
+					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+					data = makeSettingsArray(st.SettingsList)
+					st.UpdateSettings = true
+					st.UpdateThisChannel = st.CurrentChannel - 1
+				}
+			}
+
+			// Channel value.
+			if i.Col == SETTING_CHANNEL {
+				showSettingsField(SETTING_CHANNEL, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = channelFieldDisabled
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(st.SettingsList[i].Channel)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(value string) {
 					newSetting := fixture.Setting{}
-					newSetting.Label = st.SettingsList[i].Label
-					newSetting.Name = st.SettingsList[i].Name
-					newSetting.Number = st.SettingsList[i].Number
+					newSetting.Label = st.SettingsList[i.Row].Label
+					newSetting.Name = st.SettingsList[i.Row].Name
+					newSetting.Number = st.SettingsList[i.Row].Number
 					newSetting.Channel = value
-					newSetting.Value = st.SettingsList[i].Value
+					newSetting.Value = st.SettingsList[i.Row].Value
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
 				}
 			}
 
 			// Show and Edit the Setting Value.
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = nil
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).SetText(st.SettingsList[i].Value)
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = func(value string) {
-				newSetting := fixture.Setting{}
-				newSetting.Label = st.SettingsList[i].Label
-				newSetting.Name = st.SettingsList[i].Name
-				newSetting.Number = st.SettingsList[i].Number
-				if !channelFieldDisabled {
-					newSetting.Channel = st.SettingsList[i].Channel
+			if i.Col == SETTING_VALUE {
+				showSettingsField(SETTING_VALUE, o)
+				o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = nil
+				o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).OnChanged = func(value string) {
+					newSetting := fixture.Setting{}
+					newSetting.Label = st.SettingsList[i.Row].Label
+					newSetting.Name = st.SettingsList[i.Row].Name
+					newSetting.Number = st.SettingsList[i.Row].Number
+					if !channelFieldDisabled {
+						newSetting.Channel = st.SettingsList[i.Row].Channel
+					}
+					newSetting.Value = value
+					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
+					data = makeSettingsArray(st.SettingsList)
+					st.UpdateSettings = true
+					st.UpdateThisChannel = st.CurrentChannel - 1
 				}
-				newSetting.Value = value
-				st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
-				st.UpdateSettings = true
-				st.UpdateThisChannel = st.CurrentChannel - 1
 			}
 
 			// Show the Delete Setting Button.
-			o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = buttonsOff
-			o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
-				st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i].Number-1)
-				st.UpdateSettings = true
-				st.UpdateThisChannel = st.CurrentChannel - 1
-				st.SettingsPanel.Refresh()
+			if i.Col == SETTING_DELETE {
+				showSettingsField(SETTING_DELETE, o)
+				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = nil
+				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
+					st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number-1)
+					data = makeSettingsArray(st.SettingsList)
+					st.UpdateSettings = true
+					st.UpdateThisChannel = st.CurrentChannel - 1
+					st.SettingsPanel.Refresh()
+				}
 			}
 
 			// Show the Add Setting Button.
-			o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).Hidden = buttonsOff
-			o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
-				st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i].Number, st.SettingsOptions)
-				st.UpdateSettings = true
-				st.UpdateThisChannel = st.CurrentChannel - 1
-				st.SettingsPanel.Refresh()
+			if i.Col == SETTING_ADD {
+				showSettingsField(SETTING_ADD, o)
+				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = nil
+				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
+					st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number, st.SettingsOptions)
+					data = makeSettingsArray(st.SettingsList)
+					st.UpdateSettings = true
+					st.UpdateThisChannel = st.CurrentChannel - 1
+					st.SettingsPanel.Refresh()
+				}
 			}
 		},
 	)
+
+	// Setup the columns of this table.
+	st.SettingsPanel.SetColumnWidth(0, 40)  // Number
+	st.SettingsPanel.SetColumnWidth(1, 100) // Name
+	if channelFieldDisabled {
+		st.SettingsPanel.SetColumnWidth(2, 0) // Channel
+	} else {
+		st.SettingsPanel.SetColumnWidth(2, 100) // Channel
+	}
+	st.SettingsPanel.SetColumnWidth(3, 50) // Value
+	st.SettingsPanel.SetColumnWidth(4, 20) // Delete
+	st.SettingsPanel.SetColumnWidth(5, 20) // Add
 
 	return &st
 }
@@ -261,4 +283,64 @@ func deleteSettingsItem(settingsList []fixture.Setting, id int) []fixture.Settin
 		}
 	}
 	return newSettings
+}
+
+// makeSettingsArray - Convert the list of settings to an array of strings containing and array of strings with
+// the values from each fixture.
+// This is done once when the settings panel is loaded.
+func makeSettingsArray(settings []fixture.Setting) [][]string {
+
+	if debug {
+		fmt.Printf("makeSettingsArray\n")
+	}
+
+	var data = [][]string{}
+
+	for _, setting := range settings {
+		newSetting := []string{}
+		newSetting = append(newSetting, fmt.Sprintf("%d", setting.Number))
+		newSetting = append(newSetting, setting.Name)
+		newSetting = append(newSetting, setting.Channel)
+		newSetting = append(newSetting, setting.Value)
+		newSetting = append(newSetting, "-")
+		newSetting = append(newSetting, "+")
+		newSetting = append(newSetting, "Channels")
+
+		data = append(data, newSetting)
+	}
+
+	return data
+}
+
+func showSettingsField(field int, o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("showField\n")
+	}
+	// Now show the selected field.
+	switch {
+	case field == SETTING_NUMBER:
+		o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).Hidden = false
+	case field == SETTING_NAME:
+		o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).Hidden = false
+	case field == SETTING_CHANNEL:
+		o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = false
+	case field == SETTING_VALUE:
+		o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).Hidden = false
+	case field == SETTING_DELETE:
+		o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = false
+	case field == SETTING_ADD:
+		o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).Hidden = false
+	}
+}
+
+func hideAllSettingsFields(o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("hideAllSettingsFields\n")
+	}
+	o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).Hidden = true
 }
