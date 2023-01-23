@@ -125,7 +125,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	statesList := thisFixture.States
 
 	// Create States Panel.
-	var StatesPanel *widget.List
+	var StatesPanel *widget.Table
 	sp := NewStatePanel(statesList, ap, st)
 	StatesPanel = sp.StatePanel
 

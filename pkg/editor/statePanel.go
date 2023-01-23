@@ -28,14 +28,14 @@ import (
 )
 
 type StatePanel struct {
-	StatePanel         *widget.List
+	StatePanel         *widget.Table
 	StatesList         []fixture.State
 	ButtonColorOptions []string
 	StateOptions       []string
 }
 
 const (
-	STATE_ID int = iota
+	STATE_NUMBER int = iota
 	STATE_NAME
 	STATE_BUTTONCOLOR
 	STATE_DELETE
@@ -50,15 +50,17 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 		fmt.Printf("NewStatePanel\n")
 	}
 
+	var data = [][]string{}
+
 	sp := StatePanel{}
 	sp.ButtonColorOptions = []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
 	sp.StateOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	sp.StatesList = statesList
 
 	// statees Selection Panel.
-	sp.StatePanel = widget.NewList(
+	sp.StatePanel = widget.NewTable(
 		// Function to find length.
-		func() int {
+		func() (int, int) {
 			if ap.UpdateActions {
 				sp.StatesList[ap.UpdateThisAction].Actions = ap.ActionsList
 				ap.UpdateActions = false
@@ -67,15 +69,22 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 				sp.StatesList[st.UpdateThisChannel].Settings = st.SettingsList
 				st.UpdateSettings = false
 			}
-			return len(sp.StatesList)
+
+			height := len(data)
+			width := 7
+			return height, width
+
 		},
-		// Function to create item.
+		// Function to create table.
 		func() (o fyne.CanvasObject) {
 
-			return container.NewHBox(
+			// Load the fixtures into the array used by the table.
+			data = updateStatesArray(sp.StatesList)
 
-				// State Id.
-				container.NewWithoutLayout(widget.NewLabel("template")),
+			return container.NewMax(
+
+				// State Number.
+				widget.NewLabel("template"),
 
 				// State Name.
 				widget.NewEntry(),
@@ -93,109 +102,148 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 				widget.NewButton("Actions", nil),
 
 				// Settings button.
-				widget.NewButton("Settings", nil),
+				widget.NewButton("Values", nil),
 			)
 		},
-		// Function to update item in this list.
-		func(thisState widget.ListItemID, o fyne.CanvasObject) {
+		// Function to update item in this table.
+		func(thisState widget.TableCellID, o fyne.CanvasObject) {
+
+			// Hide all field types.
+			hideAllStatesFields(o)
 
 			// Show the state Number.
-			o.(*fyne.Container).Objects[STATE_ID].(*fyne.Container).Objects[0].Resize(fyne.Size{Height: 50, Width: 30})
-			o.(*fyne.Container).Objects[STATE_ID].(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", sp.StatesList[thisState].Number))
+			if thisState.Col == STATE_NUMBER {
+				showStatesField(STATE_NUMBER, o)
+				o.(*fyne.Container).Objects[STATE_NUMBER].(*widget.Label).SetText(fmt.Sprintf("%d", sp.StatesList[thisState.Row].Number))
+			}
 
 			// Show the state name.
-			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).SetText(sp.StatesList[thisState].Name)
-			o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).OnChanged = func(value string) {
-				newState := fixture.State{}
-				newState.Name = value
-				newState.Number = sp.StatesList[thisState].Number
-				newState.Master = sp.StatesList[thisState].Master
-				newState.Label = value
-				newState.ButtonColor = sp.StatesList[thisState].ButtonColor
-				newState.Flash = sp.StatesList[thisState].Flash
-				newState.Settings = sp.StatesList[thisState].Settings
-				newState.Actions = sp.StatesList[thisState].Actions
-				sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
+			if thisState.Col == STATE_NAME {
+				showStatesField(STATE_NAME, o)
+				o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).SetText(sp.StatesList[thisState.Row].Name)
+				o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).OnChanged = func(value string) {
+					newState := fixture.State{}
+					newState.Name = value
+					newState.Number = sp.StatesList[thisState.Row].Number
+					newState.Master = sp.StatesList[thisState.Row].Master
+					newState.Label = value
+					newState.ButtonColor = sp.StatesList[thisState.Row].ButtonColor
+					newState.Flash = sp.StatesList[thisState.Row].Flash
+					newState.Settings = sp.StatesList[thisState.Row].Settings
+					newState.Actions = sp.StatesList[thisState.Row].Actions
+					sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState.Row].Number, newState)
+					data = updateStatesArray(sp.StatesList)
+				}
 			}
 
 			// Show the selection box for button color.
-			for _, option := range sp.ButtonColorOptions {
-				if option == sp.StatesList[thisState].ButtonColor {
-					o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).SetSelected(option)
-				}
-			}
-
-			o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).OnChanged = func(value string) {
-				newState := fixture.State{}
-				newState.Name = sp.StatesList[thisState].Name
-				newState.Number = sp.StatesList[thisState].Number
-				newState.Master = sp.StatesList[thisState].Master
-				newState.Label = sp.StatesList[thisState].Label
-				newState.ButtonColor = value
-				newState.Flash = sp.StatesList[thisState].Flash
-				newState.Settings = sp.StatesList[thisState].Settings
-				newState.Actions = sp.StatesList[thisState].Actions
-				sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState].Number, newState)
-			}
-			o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).PlaceHolder = "Select"
-
-			// Channel Delete Button.
-			o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).OnTapped = func() {
-				sp.StatesList = deleteState(sp.StatesList, sp.StatesList[thisState].Number)
-				sp.StatePanel.Refresh()
-			}
-
-			// Channel Add Button.
-			o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).OnTapped = func() {
-				sp.StatesList = addState(sp.StatesList, sp.StatesList[thisState].Number)
-				sp.StatePanel.Refresh()
-			}
-
-			// Actions Button.
-			o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).OnTapped = func() {
-				// Highlight this channel
-				sp.StatePanel.Select(thisState)
-				if sp.StatesList != nil {
-					// Get Existing Actions for this state.
-					index := sp.StatesList[thisState].Number - 1
-					ap.ActionsList = sp.StatesList[index].Actions
-
-					// If the settings are empty create a new set of settings.
-					if len(ap.ActionsList) == 0 {
-						// Create new settings.
-						ap.ActionsList = CreateActionsList(sp.StatesList, thisState)
+			if thisState.Col == STATE_BUTTONCOLOR {
+				showStatesField(STATE_BUTTONCOLOR, o)
+				for _, option := range sp.ButtonColorOptions {
+					if option == sp.StatesList[thisState.Row].ButtonColor {
+						o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).SetSelected(option)
 					}
 				}
-				ap.CurrentState = int(sp.StatesList[thisState].Number - 1)
-				ap.CurrentStateName = sp.StatesList[thisState].Name
-				ap.ActionsPanel.Hidden = false
-				st.SettingsPanel.Hidden = true
-				ap.ActionsPanel.Refresh()
+				o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).OnChanged = func(value string) {
+					newState := fixture.State{}
+					newState.Name = sp.StatesList[thisState.Row].Name
+					newState.Number = sp.StatesList[thisState.Row].Number
+					newState.Master = sp.StatesList[thisState.Row].Master
+					newState.Label = sp.StatesList[thisState.Row].Label
+					newState.ButtonColor = value
+					newState.Flash = sp.StatesList[thisState.Row].Flash
+					newState.Settings = sp.StatesList[thisState.Row].Settings
+					newState.Actions = sp.StatesList[thisState.Row].Actions
+					sp.StatesList = updateStateItem(sp.StatesList, sp.StatesList[thisState.Row].Number, newState)
+					data = updateStatesArray(sp.StatesList)
+				}
+				o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).PlaceHolder = "Select"
+			}
+
+			// State delete button.
+			if thisState.Col == STATE_DELETE {
+				showStatesField(STATE_DELETE, o)
+				o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).OnTapped = func() {
+					sp.StatesList = deleteState(sp.StatesList, sp.StatesList[thisState.Row].Number)
+					data = updateStatesArray(sp.StatesList)
+					sp.StatePanel.Refresh()
+				}
+			}
+
+			// State add button.
+			if thisState.Col == STATE_ADD {
+				showStatesField(STATE_ADD, o)
+				o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).OnTapped = func() {
+					sp.StatesList = addState(sp.StatesList, sp.StatesList[thisState.Row].Number)
+					data = updateStatesArray(sp.StatesList)
+					sp.StatePanel.Refresh()
+				}
+			}
+
+			// Actions button.
+			if thisState.Col == STATE_ACTIONS {
+				showStatesField(STATE_ACTIONS, o)
+				o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).OnTapped = func() {
+					// Highlight this channel
+					sp.StatePanel.Select(thisState)
+					if sp.StatesList != nil {
+						// Get Existing Actions for this state.
+						index := sp.StatesList[thisState.Row].Number - 1
+						data = updateStatesArray(sp.StatesList)
+						ap.ActionsList = sp.StatesList[index].Actions
+
+						// If the settings are empty create a new set of settings.
+						if len(ap.ActionsList) == 0 {
+							// Create new settings.
+							ap.ActionsList = CreateActionsList(sp.StatesList, thisState.Row)
+						}
+					}
+					ap.CurrentState = int(sp.StatesList[thisState.Row].Number - 1)
+					ap.CurrentStateName = sp.StatesList[thisState.Row].Name
+					ap.ActionsPanel.Hidden = false
+					st.SettingsPanel.Hidden = true
+					ap.ActionsPanel.Refresh()
+				}
 			}
 
 			// Settings Button.
-			o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).OnTapped = func() {
-				// Highlight this channel
-				sp.StatePanel.Select(thisState)
-				if sp.StatesList != nil {
-					// Get Existing Settings for channel.
-					st.SettingsList = populateSettingList(sp.StatesList, sp.StatesList[thisState].Number)
-					// If the settings are empty create a new set of settings.
-					if len(st.SettingsList) == 0 {
-						// Create new settings.
-						st.SettingsList = createSettingList(sp.StatesList[thisState].Number)
-						st.CurrentChannel = int(sp.StatesList[thisState].Number)
+			if thisState.Col == STATE_SETTINGS {
+				showStatesField(STATE_SETTINGS, o)
+				o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).OnTapped = func() {
+					// Highlight this channel
+					sp.StatePanel.Select(thisState)
+					if sp.StatesList != nil {
+						// Get Existing Settings for channel.
+						st.SettingsList = populateSettingList(sp.StatesList, sp.StatesList[thisState.Row].Number)
+						data = updateStatesArray(sp.StatesList)
+						// If the settings are empty create a new set of settings.
+						if len(st.SettingsList) == 0 {
+							// Create new settings.
+							st.SettingsList = createSettingList(sp.StatesList[thisState.Row].Number)
+							st.CurrentChannel = int(sp.StatesList[thisState.Row].Number)
 
-					} else {
-						// Edit existing settings.
-						st.CurrentChannel = int(sp.StatesList[thisState].Number)
+						} else {
+							// Edit existing settings.
+							st.CurrentChannel = int(sp.StatesList[thisState.Row].Number)
+						}
+						ap.ActionsPanel.Hidden = true
+						st.SettingsPanel.Hidden = false
+						st.SettingsPanel.Refresh()
 					}
-					ap.ActionsPanel.Hidden = true
-					st.SettingsPanel.Hidden = false
-					st.SettingsPanel.Refresh()
 				}
 			}
-		})
+		},
+	)
+
+	// Setup the columns of this table.
+	sp.StatePanel.SetColumnWidth(0, 40)  // Number
+	sp.StatePanel.SetColumnWidth(1, 80)  // Name
+	sp.StatePanel.SetColumnWidth(2, 100) // Button Color
+	sp.StatePanel.SetColumnWidth(3, 20)  // Delete
+	sp.StatePanel.SetColumnWidth(4, 20)  // Add
+	sp.StatePanel.SetColumnWidth(5, 60)  // Actions
+	sp.StatePanel.SetColumnWidth(6, 60)  // Settings
+
 	return &sp
 }
 
@@ -319,4 +367,67 @@ func createSettingList(channelNumber int16) (settingsList []fixture.Setting) {
 	newItem.Value = "0"
 	settingsList = append(settingsList, newItem)
 	return settingsList
+}
+
+// makeStatesArray - Convert the list of states to an array of strings containing and array of strings with
+// the values from each state.
+// This is done once when the state panel is loaded.
+func updateStatesArray(states []fixture.State) [][]string {
+
+	if debug {
+		fmt.Printf("makeSettingsArray\n")
+	}
+
+	var data = [][]string{}
+
+	for _, state := range states {
+		newState := []string{}
+		newState = append(newState, fmt.Sprintf("%d", state.Number))
+		newState = append(newState, state.Name)
+		newState = append(newState, state.ButtonColor)
+		newState = append(newState, "-")
+		newState = append(newState, "+")
+		newState = append(newState, "Actions")
+		newState = append(newState, "Values")
+		data = append(data, newState)
+	}
+
+	return data
+}
+
+func showStatesField(field int, o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("showField\n")
+	}
+	// Now show the selected field.
+	switch {
+	case field == STATE_NUMBER:
+		o.(*fyne.Container).Objects[STATE_NUMBER].(*widget.Label).Hidden = false
+	case field == STATE_NAME:
+		o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).Hidden = false
+	case field == STATE_BUTTONCOLOR:
+		o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).Hidden = false
+	case field == STATE_DELETE:
+		o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).Hidden = false
+	case field == STATE_ADD:
+		o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).Hidden = false
+	case field == STATE_ACTIONS:
+		o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).Hidden = false
+	case field == STATE_SETTINGS:
+		o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).Hidden = false
+	}
+}
+
+func hideAllStatesFields(o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("hideAllSettingsFields\n")
+	}
+	o.(*fyne.Container).Objects[STATE_NUMBER].(*widget.Label).Hidden = true
+	o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).Hidden = true
+	o.(*fyne.Container).Objects[STATE_DELETE].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[STATE_ADD].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).Hidden = true
+
 }
