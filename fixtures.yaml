@@ -1830,6 +1830,41 @@ fixtures:
   channels:
   - number: 1
     name: Program
+    settings:
+    - name: RGB Mode
+      labe: New
+      number: 1
+      value: 0-24
+    - name: Mode1
+      number: 2
+      value: 25-49
+    - name: Mode2
+      number: 3
+      value: 50-74
+    - name: Mode3
+      number: 4
+      value: 75-99
+    - name: Mode4
+      number: 5
+      value: 100-124
+    - name: Mode5
+      number: 6
+      value: 125-149
+    - name: Mode6
+      number: 7
+      value: 150-174
+    - name: Mode7
+      number: 8
+      value: 175-199
+    - name: Mode8
+      number: 9
+      value: 200-224
+    - name: Mode9
+      number: 10
+      value: 225-249
+    - name: Mode10
+      number: 11
+      value: Sound
   - number: 2
     name: Red1
   - number: 3
