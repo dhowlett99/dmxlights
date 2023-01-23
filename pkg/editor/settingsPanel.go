@@ -193,7 +193,7 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 	} else {
 		st.SettingsPanel.SetColumnWidth(2, 100) // Channel
 	}
-	st.SettingsPanel.SetColumnWidth(3, 50) // Value
+	st.SettingsPanel.SetColumnWidth(3, 80) // Value
 	st.SettingsPanel.SetColumnWidth(4, 20) // Delete
 	st.SettingsPanel.SetColumnWidth(5, 20) // Add
 
