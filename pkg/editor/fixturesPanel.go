@@ -735,6 +735,13 @@ func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]stri
 	for _, fixture := range fixtures.Fixtures {
 		for _, testfixture := range fixtures.Fixtures {
 			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
+				if len(strings.TrimSpace(fixture.Name)) == 0 {
+					fp.NameEntryError[fixture.ID] = true
+					// We have an empty name
+					err = fmt.Errorf("empty name")
+					reports = append(reports, fmt.Sprintf("empty name on fixture ID %d and ID %d with name %s", fixture.ID, testfixture.ID, fixture.Name))
+					return reports, err
+				}
 				if fixture.Name == testfixture.Name {
 					fp.NameEntryError[fixture.ID] = true
 					// We have an duplicate name
@@ -856,7 +863,11 @@ func checkDMXAddress(value string) error {
 func checkTextEntry(value string) error {
 
 	if debug {
-		fmt.Printf("checkTextEntry\n")
+		fmt.Printf("checkTextEntry %s\n", value)
+	}
+
+	if len(strings.TrimSpace(value)) == 0 || len(value) == 0 {
+		return fmt.Errorf("cannot be an empty string")
 	}
 
 	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \.\_]+$`).MatchString
