@@ -28,10 +28,18 @@ import (
 )
 
 type ChannelPanel struct {
-	ChannelPanel   *widget.List
+	ChannelPanel   *widget.Table
 	ChannelList    []fixture.Channel
 	ChannelOptions []string
 }
+
+const (
+	CHANNEL_NUMBER int = iota
+	CHANNEL_NAME
+	CHANNEL_DELETE
+	CHANNEL_ADD
+	CHANNEL_SETTINGS
+)
 
 func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st *SettingsPanel) *ChannelPanel {
 
@@ -39,23 +47,33 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 		fmt.Printf("NewChannelPanel\n")
 	}
 
+	var data = [][]string{}
+
 	cp := ChannelPanel{}
 	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Master Reverse", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurve", "Speed"}
 	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
-	cp.ChannelPanel = widget.NewList(
+	cp.ChannelPanel = widget.NewTable(
+
 		// Function to find length.
-		func() int {
+		func() (int, int) {
 			if st.UpdateSettings {
 				cp.ChannelList[st.UpdateThisChannel].Settings = st.SettingsList
 				st.UpdateSettings = false
 			}
-			return len(cp.ChannelList)
+			height := len(data)
+			width := 5
+			return height, width
 		},
-		// Function to create item.
+
+		// Function to create table.
 		func() (o fyne.CanvasObject) {
-			return container.NewHBox(
+
+			// Load the settings into the array used by the table.
+			data = makeChannelsArray(cp.ChannelList)
+
+			return container.NewMax(
 
 				// Channel Number.
 				widget.NewLabel("template"),
@@ -69,69 +87,99 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				// Channel add button
 				widget.NewButton("+", func() {}),
 
-				// Channel access settings for this channel button.
+				// Settings for this channel button.
 				widget.NewButton("settings", func() {}),
 			)
 		},
-		// Function to update item in this list.
-		func(i widget.ListItemID, o fyne.CanvasObject) {
+
+		// Function to update item in this table.
+		func(i widget.TableCellID, o fyne.CanvasObject) {
+
+			// Hide all field types.
+			hideAllChannelsFields(o)
 
 			// Show the Channel Number.
-			o.(*fyne.Container).Objects[0].(*widget.Label).SetText(fmt.Sprintf("%d", cp.ChannelList[i].Number))
+			if i.Col == CHANNEL_NUMBER {
+				showChannelsField(CHANNEL_NUMBER, o)
+				o.(*fyne.Container).Objects[CHANNEL_NUMBER].(*widget.Label).SetText(fmt.Sprintf("%d", cp.ChannelList[i.Row].Number))
+			}
 
 			// Show the currently selected Channel option.
-			for _, option := range cp.ChannelOptions {
-				if option == cp.ChannelList[i].Name {
-					o.(*fyne.Container).Objects[1].(*widget.Select).SetSelected(option)
+			if i.Col == CHANNEL_NAME {
+				showChannelsField(CHANNEL_NAME, o)
+				for _, option := range cp.ChannelOptions {
+					if option == cp.ChannelList[i.Row].Name {
+						o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).SetSelected(option)
+					}
 				}
-			}
-			// Edit the channel Value.
-			o.(*fyne.Container).Objects[1].(*widget.Select).OnChanged = func(value string) {
-				newChannel := fixture.Channel{}
-				newChannel.Name = value
-				newChannel.Number = cp.ChannelList[i].Number
-				newChannel.Value = cp.ChannelList[i].Value
-				newChannel.Settings = cp.ChannelList[i].Settings
-				newChannel.Comment = cp.ChannelList[i].Comment
-				newChannel.MaxDegrees = cp.ChannelList[i].MaxDegrees
-				newChannel.Offset = cp.ChannelList[i].Offset
-				cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i].Number, newChannel)
+				// Edit the channel Value.
+				o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).OnChanged = func(value string) {
+					newChannel := fixture.Channel{}
+					newChannel.Name = value
+					newChannel.Number = cp.ChannelList[i.Row].Number
+					newChannel.Value = cp.ChannelList[i.Row].Value
+					newChannel.Settings = cp.ChannelList[i.Row].Settings
+					newChannel.Comment = cp.ChannelList[i.Row].Comment
+					newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
+					newChannel.Offset = cp.ChannelList[i.Row].Offset
+					cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
+					data = makeChannelsArray(cp.ChannelList)
+				}
 			}
 
 			// Channel Delete Button.
-			o.(*fyne.Container).Objects[2].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = deleteChannelItem(cp.ChannelList, cp.ChannelList[i].Number)
-				cp.ChannelPanel.Refresh()
+			if i.Col == CHANNEL_DELETE {
+				showChannelsField(CHANNEL_DELETE, o)
+				o.(*fyne.Container).Objects[CHANNEL_DELETE].(*widget.Button).OnTapped = func() {
+					cp.ChannelList = deleteChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number)
+					data = makeChannelsArray(cp.ChannelList)
+					cp.ChannelPanel.Refresh()
+				}
 			}
 
 			// Channel Add Button.
-			o.(*fyne.Container).Objects[3].(*widget.Button).OnTapped = func() {
-				cp.ChannelList = addChannelItem(cp.ChannelList, cp.ChannelList[i].Number, cp.ChannelOptions)
-				cp.ChannelPanel.Refresh()
+			if i.Col == CHANNEL_ADD {
+				showChannelsField(CHANNEL_ADD, o)
+				o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).OnTapped = func() {
+					cp.ChannelList = addChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, cp.ChannelOptions)
+					data = makeChannelsArray(cp.ChannelList)
+					cp.ChannelPanel.Refresh()
+				}
 			}
 
 			// Settings Button.
-			o.(*fyne.Container).Objects[4].(*widget.Button).OnTapped = func() {
-				// Highlight this channel
-				cp.ChannelPanel.Select(i)
-				if cp.ChannelList != nil {
-					// Get Existing Settings for channel.
-					st.SettingsList = populateChannelSettingList(cp.ChannelList, cp.ChannelList[i].Number)
-					// If the settings are empty create a new set of settings.
-					if len(st.SettingsList) == 0 {
-						// Create new settings.
-						st.SettingsList = createChannelSettingList(cp.ChannelList[i].Number)
-						st.CurrentChannel = int(cp.ChannelList[i].Number)
-						st.SettingsPanel.Hidden = false
-						st.SettingsPanel.Refresh()
-					} else {
-						// Edit existing settings.
-						st.CurrentChannel = int(cp.ChannelList[i].Number)
-						st.SettingsPanel.Refresh()
+			if i.Col == CHANNEL_SETTINGS {
+				showChannelsField(CHANNEL_SETTINGS, o)
+				o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).OnTapped = func() {
+					// Highlight this channel
+					cp.ChannelPanel.Select(i)
+					if cp.ChannelList != nil {
+						// Get Existing Settings for channel.
+						st.SettingsList = populateChannelSettingList(cp.ChannelList, cp.ChannelList[i.Row].Number)
+						// If the settings are empty create a new set of settings.
+						if len(st.SettingsList) == 0 {
+							// Create new settings.
+							st.SettingsList = createChannelSettingList(cp.ChannelList[i.Row].Number)
+							st.CurrentChannel = int(cp.ChannelList[i.Row].Number)
+							st.SettingsPanel.Hidden = false
+							st.SettingsPanel.Refresh()
+						} else {
+							// Edit existing settings.
+							st.CurrentChannel = int(cp.ChannelList[i.Row].Number)
+							st.SettingsPanel.Refresh()
+						}
 					}
 				}
 			}
-		})
+		},
+	)
+
+	// Setup the columns of this table.
+	cp.ChannelPanel.SetColumnWidth(0, 40)  // Number
+	cp.ChannelPanel.SetColumnWidth(1, 160) // Name
+	cp.ChannelPanel.SetColumnWidth(2, 20)  // Delete
+	cp.ChannelPanel.SetColumnWidth(3, 20)  // Add
+	cp.ChannelPanel.SetColumnWidth(4, 100) // Settings
 
 	return &cp
 }
@@ -258,4 +306,59 @@ func updateChannelItem(channels []fixture.Channel, id int16, newChannel fixture.
 		}
 	}
 	return newChannels
+}
+
+// makeChannelsArray - Convert the list of channels to an array of strings containing and array of strings with
+// the values from each channel.
+// This is done once when the channels panel is loaded.
+func makeChannelsArray(channels []fixture.Channel) [][]string {
+
+	if debug {
+		fmt.Printf("makeChannelsArray\n")
+	}
+
+	var data = [][]string{}
+
+	for _, channel := range channels {
+		newChannel := []string{}
+		newChannel = append(newChannel, fmt.Sprintf("%d", channel.Number))
+		newChannel = append(newChannel, channel.Name)
+		newChannel = append(newChannel, "-")
+		newChannel = append(newChannel, "+")
+		newChannel = append(newChannel, "Settings")
+
+		data = append(data, newChannel)
+	}
+
+	return data
+}
+
+func showChannelsField(field int, o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("showChannelsField\n")
+	}
+	// Now show the selected field.
+	switch {
+	case field == CHANNEL_NUMBER:
+		o.(*fyne.Container).Objects[CHANNEL_NUMBER].(*widget.Label).Hidden = false
+	case field == CHANNEL_NAME:
+		o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).Hidden = false
+	case field == CHANNEL_DELETE:
+		o.(*fyne.Container).Objects[CHANNEL_DELETE].(*widget.Button).Hidden = false
+	case field == CHANNEL_ADD:
+		o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = false
+	case field == CHANNEL_SETTINGS:
+		o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = false
+	}
+}
+
+func hideAllChannelsFields(o fyne.CanvasObject) {
+	if debug {
+		fmt.Printf("hideAllChannelsFields\n")
+	}
+	o.(*fyne.Container).Objects[CHANNEL_NUMBER].(*widget.Label).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_DELETE].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = true
 }

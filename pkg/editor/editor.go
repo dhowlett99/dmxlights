@@ -27,13 +27,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-type itemSelect struct {
-	Number  int16
-	Label   string
-	Options []string
-	Actions []fixture.Action
-}
-
 const debug bool = false
 
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {

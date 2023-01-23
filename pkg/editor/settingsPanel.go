@@ -37,12 +37,14 @@ type SettingsPanel struct {
 	UpdateSettings    bool
 }
 
-const SETTING_NUMBER int = 0
-const SETTING_NAME int = 1
-const SETTING_CHANNEL int = 2
-const SETTING_VALUE int = 3
-const SETTING_DELETE int = 4
-const SETTING_ADD int = 5
+const (
+	SETTING_NUMBER int = iota
+	SETTING_NAME
+	SETTING_CHANNEL
+	SETTING_VALUE
+	SETTING_DELETE
+	SETTING_ADD
+)
 
 func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool) *SettingsPanel {
 
@@ -60,15 +62,17 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 	// Settingses Selection Panel.
 	st.SettingsPanel = widget.NewTable(
 
+		// Function to find length.
 		func() (int, int) {
 			height := len(data)
 			width := 6
 			return height, width
 		},
+
 		// Function to create table.
 		func() (o fyne.CanvasObject) {
 
-			// Load the fixtures into the array used by the table.
+			// Load the settings into the array used by the table.
 			data = makeSettingsArray(st.SettingsList)
 
 			return container.NewMax(
