@@ -122,7 +122,15 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 			if i.Col == SETTING_CHANNEL {
 				showSettingsField(SETTING_CHANNEL, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(data[i.Row][i.Col])
+				// Update the options to include any thing that might specified in the config file.
+				st.ChannelOptions = addChannelOption(st.ChannelOptions, data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Options = st.ChannelOptions
+				// Match the options to the data in the field and display in anyway.
+				for _, option := range st.ChannelOptions {
+					if option == data[i.Row][i.Col] {
+						o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(option)
+					}
+				}
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = channelFieldDisabled
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(value string) {
 					newSetting := fixture.Setting{}
@@ -202,6 +210,18 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 	st.SettingsPanel.SetColumnWidth(5, 20) // Add
 
 	return &st
+}
+
+func addChannelOption(options []string, newOption string) []string {
+	newOptions := []string{}
+	for _, option := range options {
+		if option != newOption {
+			newOptions = append(newOptions, option)
+		}
+	}
+	// now add the new option.
+	newOptions = append(newOptions, newOption)
+	return newOptions
 }
 
 func settingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
