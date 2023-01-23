@@ -51,15 +51,17 @@ type ActionPanel struct {
 const LABEL = 0
 const SELECT = 1
 
-const ACTIONS_MODE = 0
-const ACTIONS_COLORS = 1
-const ACTIONS_FADE = 2
-const ACTIONS_SIZE = 3
-const ACTIONS_SPEED = 4
-const ACTIONS_ROTATE = 5
-const ACTIONS_ROTATESPEED = 6
-const ACTIONS_PROGRAM = 7
-const ACTIONS_STROBE = 8
+const (
+	ACTIONS_MODE int = iota
+	ACTIONS_COLORS
+	ACTIONS_FADE
+	ACTIONS_SIZE
+	ACTIONS_SPEED
+	ACTIONS_ROTATE
+	ACTIONS_ROTATESPEED
+	ACTIONS_PROGRAM
+	ACTIONS_STROBE
+)
 
 func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 

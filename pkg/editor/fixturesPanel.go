@@ -64,17 +64,19 @@ type FixturesPanel struct {
 const RECTANGLE = 0
 const TEXT = 1
 
-const FIXTURE_ID int = 0
-const FIXTURE_TYPE int = 1
-const FIXTURE_GROUP int = 2
-const FIXTURE_NUMBER int = 3
-const FIXTURE_NAME int = 4
-const FIXTURE_LABEL int = 5
-const FIXTURE_ADDRESS int = 6
-const FIXTURE_DESCRIPTION int = 7
-const FIXTURE_DELETE int = 8
-const FIXTURE_ADD int = 9
-const FIXTURE_CHANNELS int = 10
+const (
+	FIXTURE_ID int = iota
+	FIXTURE_TYPE
+	FIXTURE_GROUP
+	FIXTURE_NUMBER
+	FIXTURE_NAME
+	FIXTURE_LABEL
+	FIXTURE_ADDRESS
+	FIXTURE_DESCRIPTION
+	FIXTURE_DELETE
+	FIXTURE_ADD
+	FIXTURE_CHANNELS
+)
 
 // Convert the list of fixtures to an array of strings containing and array of strings with
 // the values from each fixture.
