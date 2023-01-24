@@ -35,6 +35,9 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		fmt.Printf("NewChannelEditor\n")
 	}
 
+	// Create the save button early so we can pass the pointer to error checks.
+	buttonSave := widget.NewButton("OK", func() {})
+
 	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
@@ -83,7 +86,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	// Create Settings Panel
 	var settingsPanel *widget.Table
 	hideChannelSettings := true
-	st = NewSettingsPanel(settingsList, hideChannelSettings)
+	st = NewSettingsPanel(w, settingsList, hideChannelSettings, buttonSave)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.
@@ -95,8 +98,8 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	scrollableSettingsList := container.NewVScroll(settingsPanel)
 	scrollableSettingsList.SetMinSize(fyne.Size{Height: 400, Width: 250})
 
-	// OK button.
-	buttonSave := widget.NewButton("OK", func() {
+	// Setup OK buttons action.
+	buttonSave.OnTapped = func() {
 
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
@@ -115,7 +118,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		}
 
 		modal.Hide()
-	})
+	}
 
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {

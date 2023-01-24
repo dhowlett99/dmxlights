@@ -34,6 +34,9 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fmt.Printf("NewStateEditor\n")
 	}
 
+	// Create the save button early so we can pass the pointer to error checks.
+	buttonSave := widget.NewButton("OK", func() {})
+
 	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
@@ -70,7 +73,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
-	st := NewSettingsPanel([]fixture.Setting{}, false)
+	st := NewSettingsPanel(w, []fixture.Setting{}, false, buttonSave)
 	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
 	st.SettingsPanel.Hide()
 
@@ -139,8 +142,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	scrollableSettingsList := container.NewScroll(st.SettingsPanel)
 	scrollableSettingsList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 
-	// OK button.
-	buttonSave := widget.NewButton("OK", func() {
+	// Setup OK buttons action.
+	buttonSave.OnTapped = func() {
 
 		// Populate the fixture used by this switch.
 		fp.UseFixture = useInput.Selected
@@ -169,7 +172,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 		// Refresh the fixtures panel incase something has changed.
 		fp.FixturePanel.Refresh()
-	})
+	}
 
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {

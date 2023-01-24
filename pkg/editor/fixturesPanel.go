@@ -407,6 +407,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							buttonSave.Disable()
 
 						} else {
+							fp.NameEntryError[fp.FixtureList[i.Row].ID] = false
 							// And make sure we refresh every row, when we update this field.
 							// So all the red error rectangls will disappear
 							fp.FixturePanel.Refresh()
@@ -453,6 +454,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						// Disable the save button.
 						buttonSave.Disable()
 					} else {
+						fp.LabelEntryError[fp.FixtureList[i.Row].ID] = false
 						// And make sure we refresh every row, when we update this field.
 						// So all the red error rectangls will disappear
 						fp.FixturePanel.Refresh()
@@ -500,6 +502,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							// Disable the save button.
 							buttonSave.Disable()
 						} else {
+							fp.AddressEntryError[fp.FixtureList[i.Row].ID] = false
 							// And make sure we refresh every row, when we update this field.
 							// So all the red error rectangls will disappear
 							fp.FixturePanel.Refresh()
@@ -551,6 +554,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 						// Disable the save button.
 						buttonSave.Disable()
 					} else {
+						fp.DescriptionEntryError[fp.FixtureList[i.Row].ID] = false
 						// And make sure we refresh every row, when we update this field.
 						// So all the red error rectangls will disappear
 						fp.FixturePanel.Refresh()

@@ -19,10 +19,14 @@ package editor
 
 import (
 	"fmt"
+	"image/color"
 	"sort"
+	"strings"
 
 	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
@@ -35,6 +39,8 @@ type SettingsPanel struct {
 	CurrentChannel    int
 	UpdateThisChannel int
 	UpdateSettings    bool
+
+	NameEntryError map[int]bool
 }
 
 const (
@@ -46,7 +52,7 @@ const (
 	SETTING_ADD
 )
 
-func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool) *SettingsPanel {
+func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFieldDisabled bool, buttonSave *widget.Button) *SettingsPanel {
 
 	if debug {
 		fmt.Printf("NewSettingsPanel\n")
@@ -58,6 +64,34 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 	st.SettingsList = SettingsList
 	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	st.ChannelOptions = []string{"None"}
+
+	Red := color.RGBA{}
+	Red.R = uint8(255)
+	Red.G = uint8(0)
+	Red.B = uint8(0)
+	Red.A = 255
+
+	White := color.White
+
+	// Storage for error flags for each fixture.
+	st.NameEntryError = make(map[int]bool, len(st.SettingsList))
+
+	// Create a dialog for error messages.
+	var reports []string
+	popupErrorPanel := &widget.PopUp{}
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		popupErrorPanel.Hide()
+	})
+	popupErrorPanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Title"),
+			widget.NewLabel("Error Message"),
+			widget.NewLabel("Report"),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		w.Canvas(),
+	)
 
 	// Settingses Selection Panel.
 	st.SettingsPanel = widget.NewTable(
@@ -77,7 +111,10 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 
 			return container.NewMax(
 				widget.NewLabel("template"), // Setting Number.
-				widget.NewEntry(),           // Setting Name.
+				container.NewMax(
+					canvas.NewRectangle(color.White),
+					widget.NewEntry(), // Name.
+				),
 				widget.NewSelect(st.ChannelOptions, func(value string) {}), // Setting Value.// Channel Number.
 				widget.NewEntry(),                // Setting Value.
 				widget.NewButton("-", func() {}), // Delete this Setting.
@@ -97,12 +134,17 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 				o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(data[i.Row][i.Col])
 			}
 
-			// Show and Edit the Name.
+			// Show and Edit the Setting Name.
 			if i.Col == SETTING_NAME {
 				showSettingsField(SETTING_NAME, o)
-				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = nil
-				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).SetText(data[i.Row][i.Col])
-				o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).OnChanged = func(value string) {
+				if st.NameEntryError[st.SettingsList[i.Row].Number] {
+					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+				} else {
+					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+				}
+				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
+				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
 					newSetting := fixture.Setting{}
 					newSetting.Label = st.SettingsList[i.Row].Label
 					newSetting.Name = value
@@ -115,6 +157,34 @@ func NewSettingsPanel(SettingsList []fixture.Setting, channelFieldDisabled bool)
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
+
+					// Clear all errors in all rows.
+					for row := 0; row < len(data); row++ {
+						st.NameEntryError[row] = false
+					}
+
+					// Check the text entered.
+					err := checkTextEntry(value)
+					if err != nil {
+						st.NameEntryError[st.SettingsList[i.Row].Number] = true
+						st.SettingsPanel.Refresh()
+						popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Name Entry Error"
+						popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+						popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+						o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+						st.SettingsList[i.Row].Name = data[i.Row][i.Col]
+						popupErrorPanel.Show()
+						// Disable the save button.
+						buttonSave.Disable()
+
+					} else {
+						st.NameEntryError[st.SettingsList[i.Row].Number] = false
+						// And make sure we refresh every row, when we update this field.
+						// So all the red error rectangls will disappear
+						st.SettingsPanel.Refresh()
+						// Enable the save button.
+						buttonSave.Enable()
+					}
 				}
 			}
 
@@ -345,7 +415,8 @@ func showSettingsField(field int, o fyne.CanvasObject) {
 	case field == SETTING_NUMBER:
 		o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).Hidden = false
 	case field == SETTING_NAME:
-		o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
 	case field == SETTING_CHANNEL:
 		o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = false
 	case field == SETTING_VALUE:
@@ -362,7 +433,8 @@ func hideAllSettingsFields(o fyne.CanvasObject) {
 		fmt.Printf("hideAllSettingsFields\n")
 	}
 	o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).Hidden = true
-	o.(*fyne.Container).Objects[SETTING_NAME].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = true
+	o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = true
 	o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = true
 	o.(*fyne.Container).Objects[SETTING_VALUE].(*widget.Entry).Hidden = true
 	o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = true
