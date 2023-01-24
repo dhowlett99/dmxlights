@@ -808,6 +808,11 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 			shutterValue = 255 // Assume no chase so just turn on every scanner.
 
 			if chase {
+				// during a tranisition between different numbers of scanners an error can occur.
+				// so check that we're not out of bounds.
+				if scannerChaseSequenceNumber > len(enabledScannersList) || scannerChaseSequenceNumber < 0 {
+					scannerChaseSequenceNumber = 0
+				}
 				if enabledScannersList[scannerChaseSequenceNumber] == fixture {
 					shutterValue = 255
 				} else {
