@@ -1,3 +1,20 @@
+// Copyright (C) 2022 dhowlett99.
+// This is the dmxlights fixture editor it is attached to a fixture and
+// describes the fixtures properties which is then saved in the fixtures.yaml
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package commands
 
 import (
@@ -6,6 +23,7 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 const debug = false
@@ -186,16 +204,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command to Start Strobe\n", mySequenceNumber)
 		}
-		sequence.StartFlood = true
-		sequence.StopFlood = false
-		sequence.FloodPlayOnce = true
 		sequence.StrobeSpeed = command.Args[STROBE_SPEED].Value.(int)
+		sequence.Strobe = true
+		if sequence.StartFlood {
+			sequence.FloodPlayOnce = true
+		}
+		if sequence.Static {
+			sequence.PlayStaticOnce = true
+		}
 		return sequence
 
 	case common.StopStrobe:
 		if debug {
 			fmt.Printf("%d: Command to Stop Strobe\n", mySequenceNumber)
 		}
+		sequence.Strobe = false
 		sequence.StrobeSpeed = 0
 		sequence.StartFlood = false
 		sequence.StopFlood = true
@@ -208,7 +231,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command to Update Strobe Speed to %d\n", mySequenceNumber, command.Args[STROBE_SPEED].Value)
 		}
 		sequence.StrobeSpeed = command.Args[STROBE_SPEED].Value.(int)
-		sequence.FloodPlayOnce = true
+		if sequence.StartFlood {
+			sequence.FloodPlayOnce = true
+		}
+		if sequence.Static {
+			sequence.PlayStaticOnce = true
+		}
+
 		return sequence
 
 	case common.Normal:
@@ -295,7 +324,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.SaveColors = true
+		sequence.ScannerColorMutex.Lock()
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.ScannerColorMutex.Unlock()
 		return sequence
 
 	case common.ClearSequenceColor:
@@ -375,11 +406,24 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// Clear switch positions for this sequence
 	case common.ClearAllSwitchPositions:
+		if debug {
+			fmt.Printf("%d: Command ClearAllSwitchPositions n", mySequenceNumber)
+		}
 		// Loop through all the switchies.
 		for X := 0; X < len(sequence.Switches); X++ {
 			sequence.Switches[X].CurrentState = 0
 		}
 		sequence.PlaySwitchOnce = true
+		return sequence
+
+	case common.ResetAllSwitchPositions:
+		const FIXTURES_CONFIG = 0
+		if debug {
+			fmt.Printf("%d: Command ResetAllSwitchPositions n", mySequenceNumber)
+		}
+		sequence.Switches = LoadSwitchConfiguration(mySequenceNumber, command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures))
+		sequence.PlaySwitchOnce = true
+		sequence.PlaySingleSwitch = false
 		return sequence
 
 	// Update the named switch position for the current sequence.
@@ -563,23 +607,65 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	if commandSpeed == 12 {
 		Speed = 75
 	}
-	if commandSpeed == 13 {
-		Speed = 50
-	}
-	if commandSpeed == 14 {
-		Speed = 25
-	}
-	if commandSpeed == 15 {
-		Speed = 20
-	}
-	if commandSpeed == 16 {
-		Speed = 15
-	}
-	if commandSpeed == 17 {
-		Speed = 10
-	}
-	if commandSpeed == 18 {
-		Speed = 7
-	}
 	return Speed * time.Millisecond
+}
+
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
+
+	if debug {
+		fmt.Printf("Load switch data\n")
+	}
+
+	// A new group of switches.
+	newSwitchList := []common.Switch{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Group == mySequenceNumber+1 {
+			// find switch data.
+			newSwitch := common.Switch{}
+			newSwitch.Name = fixture.Name
+			newSwitch.Label = fixture.Label
+			newSwitch.Number = fixture.Number
+			newSwitch.Description = fixture.Description
+			newSwitch.UseFixture = fixture.UseFixture
+
+			newSwitch.States = []common.State{}
+			for _, state := range fixture.States {
+				newState := common.State{}
+				newState.Name = state.Name
+				newState.Number = state.Number
+				newState.Label = state.Label
+				newState.ButtonColor = state.ButtonColor
+				newState.Flash = state.Flash
+
+				// Copy values.
+				newState.Values = []common.Value{}
+				for _, setting := range state.Settings {
+					newValue := common.Value{}
+					newValue.Channel = setting.Channel
+					newValue.Setting = setting.Value
+					newState.Values = append(newState.Values, newValue)
+				}
+
+				// Copy actions.
+				newState.Actions = []common.Action{}
+				for _, action := range state.Actions {
+					newAction := common.Action{}
+					newAction.Name = action.Name
+					newAction.Colors = action.Colors
+					newAction.Mode = action.Mode
+					newAction.Fade = action.Fade
+					newAction.Speed = action.Speed
+					newAction.Rotate = action.Rotate
+					newAction.Program = action.Program
+					newState.Actions = append(newState.Actions, newAction)
+				}
+
+				newSwitch.States = append(newSwitch.States, newState)
+			}
+			// Add new switch to the list.
+			newSwitchList = append(newSwitchList, newSwitch)
+		}
+	}
+
+	return newSwitchList
 }

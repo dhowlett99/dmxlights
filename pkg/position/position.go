@@ -1,3 +1,20 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is the dmxlights position calculator, positions are generated from
+// patterns. Positions control size, fade times and shifts.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package position
 
 import (
@@ -176,22 +193,15 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 		}
 	}
 
-	// It appears counters arn't always the same.
-	counter1 := len(fadeColors[0])
-	counter2 := len(fadeColors[1])
-	counter3 := len(fadeColors[2])
-	counter4 := len(fadeColors[3])
-
+	// Setup the counters for the lengths for each fixture.
+	// The number of steps is different for each fixture, depending on how
+	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
-	counter := counter1
-	if counter2 < counter1 {
-		counter = counter2
-	}
-	if counter3 < counter {
-		counter = counter3
-	}
-	if counter4 < counter {
-		counter = counter4
+	counter := len(fadeColors[0])
+	for fixture := 0; fixture < numberFixtures; fixture++ {
+		if len(fadeColors[fixture]) < counter {
+			counter = len(fadeColors[fixture])
+		}
 	}
 
 	if debug {
@@ -230,6 +240,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 
 	positionsOut := make(map[int]common.Position)
 	lampOn := make(map[int]bool)
+	lampOff := make(map[int]bool)
 
 	// Assemble the positions.
 	for step := 0; step < totalNumberOfSteps; step++ {
@@ -263,11 +274,12 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 						newFixture.Tilt = fadeColors[fixture][step].Tilt
 						newFixture.Shutter = fadeColors[fixture][step].Shutter
 						lampOn[fixture] = true
+						lampOff[fixture] = false
 						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 						newPosition.Fixtures[fixture] = newFixture
 					} else {
 						// turn the lamp off, but only if its already on.
-						if lampOn[fixture] || !Optimisation {
+						if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
 							newFixture.Colors = append(newFixture.Colors, common.Color{})
 							newFixture.Gobo = fadeColors[fixture][step].Gobo
 							newFixture.Pan = fadeColors[fixture][step].Pan
@@ -277,6 +289,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 							newPosition.Fixtures[fixture] = newFixture
 						}
+						lampOff[fixture] = true
 					}
 				} else {
 					// We've found a color. turn it on but only if its already off.

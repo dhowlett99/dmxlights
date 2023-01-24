@@ -1,3 +1,20 @@
+// Copyright (C) 2022,2025 dhowlett99.
+// This is the dmxlights graphical user interface.
+// Implemented and depends on fyne.io
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package gui
 
 import (
@@ -19,6 +36,7 @@ import (
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/editor"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
@@ -85,18 +103,7 @@ func (panel *MyPanel) LabelRightHandButtons() {
 
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
 
-	// Shortcut to label a button.
-	if alight.UpdateLabel {
-		panel.UpdateButtonLabel(alight.X, alight.Y, alight.Label)
-		return
-	}
-
-	// Shortcut to label a status bar item.
-	if alight.UpdateStatus {
-		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
-		return
-	}
-
+	// Check for requests outside buttons avaialable.
 	if alight.X == -1 { // Addressing the top row.
 		fmt.Printf("error X is -1\n")
 		return
@@ -111,6 +118,18 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 	}
 	if alight.Y > 8 {
 		fmt.Printf("error Y is > 8 \n")
+		return
+	}
+
+	// Shortcut to label a button.
+	if alight.UpdateLabel {
+		panel.UpdateButtonLabel(alight.X, alight.Y, alight.Label)
+		return
+	}
+
+	// Shortcut to label a status bar item.
+	if alight.UpdateStatus {
+		panel.UpdateStatusBar(alight.Status, alight.Hidden, alight.Which)
 		return
 	}
 
@@ -154,7 +173,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 			for {
 				// Turn on.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OnColor)
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OnColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
@@ -166,7 +185,7 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 				// Turn off.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = convertRGBtoNRGBA(alight.OffColor)
+				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OffColor)
 				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
@@ -178,16 +197,6 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 			}
 		}()
 	}
-}
-
-// Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
-func convertRGBtoNRGBA(alight common.Color) color.NRGBA {
-	NRGBAcolor := color.NRGBA{}
-	NRGBAcolor.R = uint8(alight.R)
-	NRGBAcolor.G = uint8(alight.G)
-	NRGBAcolor.B = uint8(alight.B)
-	NRGBAcolor.A = 255
-	return NRGBAcolor
 }
 
 func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
@@ -319,7 +328,6 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 		var skipPopup bool
 		button.button = widget.NewButton("     ", func() {
-
 			if X == 8 && Y == 5 || X > 7 || Y < 5 {
 				skipPopup = true
 			}
@@ -351,7 +359,16 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
-			button := widget.NewButton("MYDMX", nil) // button widget
+			button := widget.NewButton("MYDMX", func() {
+				modal, err := editor.NewFixturePanel(sequences, myWindow, Y, X, fixturesConfig, commandChannels)
+				if err != nil {
+					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
+					return
+				}
+				modal.Resize(fyne.NewSize(800, 600))
+				modal.Show()
+
+			}) // button widget
 			myLogo := canvas.NewImageFromFile("dmxlights.png")
 			container1 := container.NewMax(
 				button,
@@ -367,6 +384,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			button.container = container.NewMax(button.rectangle, button.button)
 			containers = append(containers, button.container)
 		}
+		button.button.Importance = widget.LowImportance
 		NewButton := Button{}
 		NewButton.button = button.button
 		NewButton.container = button.container

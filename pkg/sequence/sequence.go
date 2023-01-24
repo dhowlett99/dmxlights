@@ -1,3 +1,20 @@
+// Copyright (C) 2022,2023 dhowlett99.
+// This is the dmxlights main sequencer responsible for controlling all
+// of the fixtures in a group.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package sequence
 
 import (
@@ -5,7 +22,6 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
 	"strconv"
 	"strings"
@@ -21,7 +37,6 @@ import (
 
 	"github.com/go-yaml/yaml"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -40,10 +55,11 @@ type SequenceConfig struct {
 
 // LoadSequences loads sequence configuration information.
 // Each sequence has a :-
-//       name: sequence name,  a singe word.
-//       description: free text describing the sequence.
-//       group: assignes to one of the top 4 rows of the launchpad. 1-4
-//       type:  rgb, scanner or switch
+//
+//	name: sequence name,  a singe word.
+//	description: free text describing the sequence.
+//	group: assignes to one of the top 4 rows of the launchpad. 1-4
+//	type:  rgb, scanner or switch
 func LoadSequences() (sequences *SequencesConfig, err error) {
 	filename := "sequences.yaml"
 
@@ -51,7 +67,7 @@ func LoadSequences() (sequences *SequencesConfig, err error) {
 	if err != nil {
 		return nil, errors.New("error: loading sequences.yaml file: " + err.Error())
 	}
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, errors.New("error: reading sequences.yaml file: " + err.Error())
 	}
@@ -102,7 +118,8 @@ func CreateSequence(
 	// Every scanner has a number of gobos in its wheel.
 	availableScannerGobos := make(map[int][]common.StaticColorButton)
 
-	// A map of the fixture colors.
+	// Create a map of the fixture colors.
+	// This will be protected from synchronous access by sequence.ScannerColorMutex
 	scannerColors := make(map[int]int)
 
 	if sequenceType == "scanner" {
@@ -143,7 +160,7 @@ func CreateSequence(
 		Number:                 mySequenceNumber,
 		RGBFade:                common.DefaultRGBFade,
 		MusicTrigger:           false,
-		Run:                    true,
+		Run:                    false,
 		Bounce:                 false,
 		RGBAvailablePatterns:   availableRGBPatterns,
 		ScannerSize:            common.DefaultScannerSize,
@@ -173,6 +190,7 @@ func CreateSequence(
 	// We need to protect the maps from syncronous access.
 	sequence.ScannerStateMutex = &sync.RWMutex{}
 	sequence.DisableOnceMutex = &sync.RWMutex{}
+	sequence.ScannerColorMutex = &sync.RWMutex{}
 
 	if sequence.Type == "rgb" {
 		sequence.GuiFunctionLabels[0] = "Set\nPatten"
@@ -210,68 +228,8 @@ func CreateSequence(
 	}
 
 	if sequenceType == "switch" {
-
-		if debug {
-			fmt.Printf("Load switch data\n")
-		}
-
 		// Load the switch information in from the fixtures.yaml file.
-		// A new group of switches.
-		newSwitchList := []common.Switch{}
-		for _, fixture := range fixturesConfig.Fixtures {
-			if fixture.Group == mySequenceNumber+1 {
-				// find switch data.
-				for _, swiTch := range fixture.Switches {
-					newSwitch := common.Switch{}
-					newSwitch.Name = swiTch.Name
-					newSwitch.Label = swiTch.Label
-					newSwitch.Number = swiTch.Number
-					newSwitch.Description = swiTch.Description
-					newSwitch.Fixture = swiTch.Fixture
-
-					newSwitch.States = []common.State{}
-					for _, state := range swiTch.States {
-						newState := common.State{}
-						newState.Name = state.Name
-						newState.Label = state.Label
-						newState.ButtonColor.R = state.ButtonColor.R
-						newState.ButtonColor.G = state.ButtonColor.G
-						newState.ButtonColor.B = state.ButtonColor.B
-						newState.Flash = state.Flash
-
-						// Copy values.
-						newState.Values = []common.Value{}
-						for _, value := range state.Values {
-							newValue := common.Value{}
-							newValue.Channel = value.Channel
-							newValue.Setting = value.Setting
-							newState.Values = append(newState.Values, newValue)
-						}
-
-						// Copy actions.
-						newState.Actions = []common.Action{}
-						for _, action := range state.Actions {
-							newAction := common.Action{}
-							newAction.Name = action.Name
-							newAction.Colors = action.Colors
-							newAction.Mode = action.Mode
-							newAction.Fade = action.Fade
-							newAction.Speed = action.Speed
-							newAction.Rotate = action.Rotate
-							newAction.Music = action.Music
-							newAction.Program = action.Program
-							newState.Actions = append(newState.Actions, newAction)
-						}
-
-						newSwitch.States = append(newSwitch.States, newState)
-					}
-					// Add new switch to the list.
-					newSwitchList = append(newSwitchList, newSwitch)
-				}
-			}
-		}
-		sequence.Type = sequenceType
-		sequence.Switches = newSwitchList
+		sequence.Switches = commands.LoadSwitchConfiguration(mySequenceNumber, fixturesConfig)
 		sequence.PlaySwitchOnce = true
 	}
 
@@ -281,7 +239,7 @@ func CreateSequence(
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
-	pad *mk3.Launchpad,
+	//pad *mk3.Launchpad,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
@@ -384,6 +342,7 @@ func PlaySequence(sequence common.Sequence,
 				RGBStaticColors: sequence.StaticColors,
 				StartFlood:      sequence.StartFlood,
 				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -404,6 +363,7 @@ func PlaySequence(sequence common.Sequence,
 				StartFlood:     sequence.StartFlood,
 				StopFlood:      sequence.StopFlood,
 				StrobeSpeed:    sequence.StrobeSpeed,
+				Strobe:         sequence.Strobe,
 			}
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
@@ -432,6 +392,7 @@ func PlaySequence(sequence common.Sequence,
 				Hide:            sequence.Hide,
 				Master:          sequence.Master,
 				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
 				Blackout:        sequence.Blackout,
 			}
 
@@ -492,6 +453,8 @@ func PlaySequence(sequence common.Sequence,
 
 						scannerLastColor := 0
 
+						sequence.ScannerColorMutex.Lock()
+						sequence.ScannerStateMutex.Lock()
 						// AvailableFixtures give the real number of configured scanners.
 						for _, fixture := range sequence.ScannersAvailable {
 							// First check that this fixture has some configured colors.
@@ -500,6 +463,7 @@ func PlaySequence(sequence common.Sequence,
 								// Found a scanner with some colors.
 								totalColorForThisFixture := len(colors)
 
+								// Now can mess with the scanner color map.
 								sequence.ScannerColor[fixture.Number-1]++
 								if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
 									if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
@@ -510,6 +474,8 @@ func PlaySequence(sequence common.Sequence,
 								}
 							}
 						}
+						sequence.ScannerStateMutex.Unlock()
+						sequence.ScannerColorMutex.Unlock()
 					}
 				}
 
@@ -637,12 +603,20 @@ func PlaySequence(sequence common.Sequence,
 				disabledOnce := sequence.DisableOnce
 				sequence.DisableOnceMutex.RUnlock()
 
+				sequence.ScannerStateMutex.RLock()
+				scannerColor := sequence.ScannerColor
+				sequence.ScannerStateMutex.RUnlock()
+
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.CurrentSpeed/10, sequence, channels)
+					speed := sequence.CurrentSpeed / 10
+					if sequence.Type == "scanner" {
+						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
+					}
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels)
 					if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}
@@ -650,26 +624,29 @@ func PlaySequence(sequence common.Sequence,
 					for fixtureNumber, fixture := range fixtureStepChannels {
 						if scannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
-								Step:                   step,
-								Rotate:                 sequence.Rotate,
-								StrobeSpeed:            sequence.StrobeSpeed,
-								Master:                 sequence.Master,
-								Blackout:               sequence.Blackout,
-								Hide:                   sequence.Hide,
-								Type:                   sequence.Type,
-								RGBPosition:            sequence.RGBPositions[step],
-								StartFlood:             sequence.StartFlood,
-								StopFlood:              sequence.StopFlood,
-								SequenceNumber:         sequence.Number,
-								ScannerPosition:        sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
-								ScannerSelectedGobo:    sequence.ScannerGobo,
-								ScannerState:           scannerState,
-								ScannerDisableOnce:     disabledOnce,
-								ScannerChase:           sequence.ScannerChase,
-								ScannerColor:           sequence.ScannerColor,
-								ScannerAvailableColors: sequence.ScannerAvailableColors,
-								ScannerOffsetPan:       sequence.ScannerOffsetPan,
-								ScannerOffsetTilt:      sequence.ScannerOffsetTilt,
+								Step:                     step,
+								NumberSteps:              sequence.NumberSteps,
+								Rotate:                   sequence.Rotate,
+								StrobeSpeed:              sequence.StrobeSpeed,
+								Strobe:                   sequence.Strobe,
+								Master:                   sequence.Master,
+								Blackout:                 sequence.Blackout,
+								Hide:                     sequence.Hide,
+								Type:                     sequence.Type,
+								RGBPosition:              sequence.RGBPositions[step],
+								StartFlood:               sequence.StartFlood,
+								StopFlood:                sequence.StopFlood,
+								SequenceNumber:           sequence.Number,
+								ScannerPosition:          sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
+								ScannerSelectedGobo:      sequence.ScannerGobo,
+								ScannerState:             scannerState,
+								ScannerDisableOnce:       disabledOnce,
+								ScannerChase:             sequence.ScannerChase,
+								ScannerColor:             scannerColor,
+								ScannerAvailableColors:   sequence.ScannerAvailableColors,
+								ScannerOffsetPan:         sequence.ScannerOffsetPan,
+								ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
+								ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
 							}
 
 							// Start the fixture group.
@@ -733,7 +710,8 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			// For this state.
 			if stateNumber == switchData.CurrentState {
 				// Use the button color for this state to light the correct color on the launchpad.
-				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: state.ButtonColor.R, Green: state.ButtonColor.G, Blue: state.ButtonColor.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+				color, _ := common.GetRGBColorByName(state.ButtonColor)
+				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 
 				// Label the switch.
 				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
@@ -763,7 +741,8 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 		// For this state.
 		if stateNumber == currentState {
 			// Use the button color for this state to light the correct color on the launchpad.
-			common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: state.ButtonColor.R, Green: state.ButtonColor.G, Blue: state.ButtonColor.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+			color, _ := common.GetRGBColorByName(state.ButtonColor)
+			common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 
 			// Label the switch.
 			common.LabelButton(switchNumber, mySequenceNumber, switchLabel+"\n"+state.Label, guiButtons)
@@ -928,19 +907,21 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 	for _, fixture := range fixtures.Fixtures {
-		for _, channel := range fixture.Channels {
-			if strings.Contains(channel.Name, "Color") {
-				for _, setting := range channel.Settings {
-					newStaticColorButton := common.StaticColorButton{}
-					newStaticColorButton.SelectedColor = setting.Number
-					settingColor, err := common.GetRGBColorByName(setting.Name)
-					if err != nil {
-						fmt.Printf("error: %d\n", err)
-						continue
+		if fixture.Type == "scanner" {
+			for _, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Color") {
+					for _, setting := range channel.Settings {
+						newStaticColorButton := common.StaticColorButton{}
+						newStaticColorButton.SelectedColor = setting.Number
+						settingColor, err := common.GetRGBColorByName(setting.Name)
+						if err != nil {
+							fmt.Printf("error: %s\n", err)
+							continue
+						}
+						newStaticColorButton.Color = settingColor
+						availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
+						scannerColors[fixture.Number-1] = 0
 					}
-					newStaticColorButton.Color = settingColor
-					availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
-					scannerColors[fixture.Number-1] = 0
 				}
 			}
 		}
@@ -959,7 +940,7 @@ func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequenceNumber {
 			if fixture.NumberChannels > 0 {
-				fmt.Printf("Found Number of Channels def. : %d\n", fixture.NumberChannels)
+				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberChannels)
 				return fixture.NumberChannels
 			}
 			if fixture.Number > numberFixtures {
@@ -993,11 +974,12 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 						newGobo.Name = setting.Name
 						newGobo.Label = setting.Label
 						newGobo.Number = setting.Number
-						newGobo.Setting = setting.Setting
+						v, _ := strconv.Atoi(setting.Value)
+						newGobo.Setting = v
 						newGobo.Color = common.Color{R: 255, G: 255, B: 0} // Yellow.
 						gobos[f.Number] = append(gobos[f.Number], newGobo)
 						if debug {
-							fmt.Printf("\tGobo: %s Setting: %d\n", setting.Name, setting.Setting)
+							fmt.Printf("\tGobo: %s Setting: %s\n", setting.Name, setting.Value)
 						}
 					}
 				}

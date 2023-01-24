@@ -1,16 +1,32 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is the dmxlights common functions.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package common
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 	"sync"
 	"time"
-
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
-
+const MaxDMXAddress = 512
+const MaxTextEntryLength = 35
 const DefaultScannerSize = 120
 const MaxScannerSize = 120
 const MaxRGBSize = 120
@@ -71,17 +87,24 @@ type Value struct {
 	Setting string
 }
 
+type Setting struct {
+	Name  string
+	Value int16
+}
+
 type State struct {
 	Name        string
+	Number      int16
 	Label       string
 	Values      []Value
-	ButtonColor Color
+	ButtonColor string
 	Actions     []Action
 	Flash       bool
 }
 
 type Action struct {
 	Name    string
+	Number  int
 	Colors  []string
 	Mode    string
 	Fade    string
@@ -99,6 +122,7 @@ type Switch struct {
 	Description  string
 	States       []State
 	Fixture      string
+	UseFixture   string
 }
 
 type StaticColorButton struct {
@@ -170,6 +194,7 @@ const (
 	UpdateFunctions
 	GetUpdatedSequence
 	ClearAllSwitchPositions
+	ResetAllSwitchPositions
 	UpdateSwitch
 	Inverted
 	UpdateGobo
@@ -232,6 +257,7 @@ type Sequence struct {
 	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                     int                         // Master Brightness
+	Strobe                     bool                        // Strobe is enabled.
 	StrobeSpeed                int                         // Strobe speed.
 	Rotate                     int                         // Rotate speed.
 	RGBShift                   int                         // RGB shift.
@@ -283,6 +309,7 @@ type Sequence struct {
 	ScannerGobo                int                         // The selected gobo.
 	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
 	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
+	ScannerColorMutex          *sync.RWMutex               // Mutex to protect the scanner color maps from syncronous access.
 	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates         []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
@@ -340,10 +367,12 @@ type Step struct {
 
 type FixtureCommand struct {
 	Step           int
+	NumberSteps    int
 	Type           string
 	SequenceNumber int
 
 	// Common commands.
+	Strobe      bool
 	StrobeSpeed int
 	Master      int
 	Blackout    bool
@@ -359,15 +388,16 @@ type FixtureCommand struct {
 	RGBStaticColors []StaticColorButton
 
 	// Scanner Commands.
-	ScannerColor           map[int]int
-	ScannerPosition        Position
-	ScannerState           map[int]ScannerState
-	ScannerDisableOnce     map[int]bool
-	ScannerChase           bool
-	ScannerAvailableColors map[int][]StaticColorButton
-	ScannerSelectedGobo    int
-	ScannerOffsetPan       int
-	ScannerOffsetTilt      int
+	ScannerColor             map[int]int
+	ScannerPosition          Position
+	ScannerState             map[int]ScannerState
+	ScannerDisableOnce       map[int]bool
+	ScannerChase             bool
+	ScannerAvailableColors   map[int][]StaticColorButton
+	ScannerSelectedGobo      int
+	ScannerOffsetPan         int
+	ScannerOffsetTilt        int
+	ScannerNumberCoordinates int
 
 	// Derby Commands
 	Rotate  int
@@ -384,6 +414,7 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
+	ID           string
 	Name         string
 	Label        string
 	Type         string
@@ -670,6 +701,16 @@ func GetColorArrayByNames(names []string) ([]Color, error) {
 	return colors, nil
 }
 
+// Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
+func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
+	NRGBAcolor := color.NRGBA{}
+	NRGBAcolor.R = uint8(alight.R)
+	NRGBAcolor.G = uint8(alight.G)
+	NRGBAcolor.B = uint8(alight.B)
+	NRGBAcolor.A = 255
+	return NRGBAcolor
+}
+
 func GetRGBColorByName(color string) (Color, error) {
 	switch color {
 	case "Red":
@@ -706,7 +747,7 @@ func GetRGBColorByName(color string) (Color, error) {
 		return Color{R: 0, G: 0, B: 0}, nil
 
 	}
-	return Color{}, fmt.Errorf("color not found")
+	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
 }
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
@@ -826,6 +867,14 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	}
 
 	return colors
+}
+
+func MapCopy(scannerColor map[int]int, scannerColorMutex *sync.RWMutex) map[int]int {
+	newMap := make(map[int]int)
+	for key, value := range scannerColor {
+		newMap[key] = value
+	}
+	return newMap
 }
 
 func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
@@ -1022,49 +1071,6 @@ func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButto
 		return
 	}
 	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-}
-
-// ListenAndSendToLaunchPad is the thread that listens for events to send to
-// the launch pad.  It is thread safe and is the only thread talking to the
-// launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan ALight, pad *mk3.Launchpad, LaunchPadConnected bool) {
-	for {
-
-		// Wait for the event.
-		alight := <-eventsForLauchpad
-
-		if LaunchPadConnected {
-			// Wait for a few millisecond so the launchpad and the gui step at the same time
-			time.Sleep(14 * time.Microsecond)
-
-			// We're in standard turn the light on.
-			if !alight.Flash {
-
-				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-				Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-				Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-				Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-
-				// Now light the launchpad button.
-				err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
-				if err != nil {
-					fmt.Printf("error writing to launchpad %e\n" + err.Error())
-				}
-
-				// Now we're been asked go flash this button.
-			} else {
-				// Now light the launchpad button.
-				if debug {
-					fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, GetLaunchPadColorCodeByRGB(alight.OnColor))
-					fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, GetLaunchPadColorCodeByRGB(alight.OffColor))
-				}
-				err := pad.FlashLight(alight.X, alight.Y, int(GetLaunchPadColorCodeByRGB(alight.OnColor)), int(GetLaunchPadColorCodeByRGB(alight.OffColor)))
-				if err != nil {
-					fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
-				}
-			}
-		}
-	}
 }
 
 func LabelButton(X int, Y int, label string, guiButtons chan ALight) {

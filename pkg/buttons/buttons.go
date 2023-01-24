@@ -1,9 +1,26 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is button processor, used by the launchpad and gui interfaces.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package buttons
 
 import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -36,6 +53,7 @@ type CurrentState struct {
 	Strobe                    map[int]bool                 // We are in strobe mode. True if strobing
 	StrobeSpeed               map[int]int                  // Strobe speed. value is speed 0-255, indexed by sequence number.
 	SavePreset                bool                         // Save a preset flag.
+	Config                    bool                         // Flag to indicate we are in fixture config mode.
 	Blackout                  bool                         // Blackout all fixtures.
 	Flood                     bool                         // Flood all fixtures.
 	FunctionSelectMode        []bool                       // Which sequence is in function selection mode.
@@ -74,22 +92,6 @@ type CurrentState struct {
 	DmxInterfacePresent       bool                         // Flag to indicate precence of DMX interface card
 	DmxInterfacePresentConfig *usbdmx.ControllerConfig     // DMX Interface card config.
 	LaunchpadName             string                       // Storage for launchpad config.
-}
-
-// main thread is used to get commands from the lauchpad.
-func ReadLaunchPadButtons(guiButtons chan common.ALight, this *CurrentState, sequences []*common.Sequence,
-	eventsForLaunchpad chan common.ALight, dmxController *ft232.DMXController,
-	fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command,
-	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
-	dmxInterfaceCardPresent bool) {
-
-	buttonChannel := this.Pad.Listen()
-
-	// Main loop reading commands from the Novation Launchpad.
-	for {
-		hit := <-buttonChannel
-		ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
-	}
 }
 
 func ProcessButtons(X int, Y int,
@@ -146,12 +148,12 @@ func ProcessButtons(X int, Y int,
 		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		}
 
 		return
@@ -177,7 +179,7 @@ func ProcessButtons(X int, Y int,
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		return
 	}
 
@@ -690,8 +692,8 @@ func ProcessButtons(X int, Y int,
 
 		if !sequences[this.SelectedSequence].MusicTrigger {
 			this.Speed[this.SelectedSequence]++
-			if this.Speed[this.SelectedSequence] > 18 {
-				this.Speed[this.SelectedSequence] = 18
+			if this.Speed[this.SelectedSequence] > 12 {
+				this.Speed[this.SelectedSequence] = 12
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
@@ -1086,6 +1088,9 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
+
+		// Get an upto date copy of the switch
+		sequences[Y].Switches = commands.LoadSwitchConfiguration(Y, fixturesConfig)
 
 		// We have a valid switch.
 		if X < len(sequences[Y].Switches) {
@@ -2075,12 +2080,12 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 }
 
-func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, strobeSpeed int, dmxInterfacePresent bool) {
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
 	for y := 0; y < len(sequences); y++ {
 		if sequences[y].Type != "switch" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, strobeSpeed, dmxInterfacePresent)
+				fixture.MapFixtures(y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -2091,7 +2096,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, nil, fixturesConfig, true, 0, 0, 0, dmxInterfacePresent)
+				fixture.MapFixtures(sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
@@ -2248,9 +2253,12 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		if debug {
 			fmt.Printf("Lamp %+v\n", lamp)
 		}
+		sequence.ScannerColorMutex.RLock()
 		if fixtureNumber == sequence.ScannerColor[this.SelectedFixture] {
 			lamp.Flash = true
 		}
+		sequence.ScannerColorMutex.RUnlock()
+
 		if lamp.Flash {
 			Black := common.Color{R: 0, G: 0, B: 0}
 			common.FlashLight(fixtureNumber, this.SelectedSequence, lamp.Color, Black, eventsForLaunchpad, guiButtons)
@@ -2341,7 +2349,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0, dmxInterfacePresent)
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// Load the config.
 	// Which forces all sequences to load their config.
@@ -2610,7 +2618,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Get the pad back into sane mode.
 	if this.LaunchPadConnected {
-		this.Pad.Reset()
+		this.Pad.Program()
 	}
 
 	// Turn off the flashing save button.
@@ -2807,7 +2815,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Clear switch positions to their first positions.
 		if sequence.Type == "switch" {
-			this.SwitchPositions = [9][9]int{}
+			//this.SwitchPositions = [9][9]int{}
 			cmd := common.Command{
 				Action: common.ClearAllSwitchPositions,
 			}
@@ -2836,6 +2844,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditStaticColorsMode[this.SelectedSequence] = false
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
+	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 }
 
 func getScannerShiftLabel(shift int) string {

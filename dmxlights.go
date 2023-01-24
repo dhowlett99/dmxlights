@@ -1,3 +1,19 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is the dmxlights main program and calls all others.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package main
 
 import (
@@ -17,12 +33,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
+	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 func main() {
@@ -115,7 +131,7 @@ func main() {
 	// Setup a connection to the Novation Launchpad.
 	// Tested with a Novation Launchpad mini mk3.
 	fmt.Println("Setup Novation Launchpad")
-	this.Pad, err = mk3.Open()
+	this.Pad, err = launchpad.NewLaunchPad()
 	if err != nil {
 		fmt.Printf("launchpad: %v", err)
 		this.LaunchPadConnected = false
@@ -125,7 +141,6 @@ func main() {
 	if this.LaunchPadConnected {
 		defer this.Pad.Close()
 	}
-
 	// Report on connected devices.
 	panel.PopupNotFoundMessage(myWindow,
 		gui.Device{
@@ -170,6 +185,15 @@ func main() {
 		os.Exit(1)
 	}
 
+	// Update the fixture list with the sequence type.
+	for _, sequence := range sequencesConfig.Sequences {
+		for fixtureNumber, fixture := range fixturesConfig.Fixtures {
+			if sequence.Group == fixture.Group {
+				fixturesConfig.Fixtures[fixtureNumber].Type = sequence.Type
+			}
+		}
+	}
+
 	// Create the sequences from config file.
 	// Add Sequence to an array.
 	sequences := []*common.Sequence{}
@@ -181,12 +205,13 @@ func main() {
 		newSequence.Name = sequenceConf.Name
 		newSequence.Description = sequenceConf.Description
 		newSequence.Label = sequenceConf.Label
+		newSequence.Type = sequenceConf.Type
 
 		sequences = append(sequences, &newSequence)
 
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Selected speed for the sequence. Common to all types of sequence.
-		this.Running[sequenceNumber] = true                                        // Set this sequence to be in the running state. Common to all types of sequence.
+		this.Running[sequenceNumber] = false                                       // Set this sequence to be in the not running state. Common to all types of sequence.
 		this.Strobe[sequenceNumber] = false                                        // Set strobe to be off for all sequences.
 		this.StrobeSpeed[sequenceNumber] = 255                                     // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Default RGB shift size.
@@ -289,7 +314,7 @@ func main() {
 
 	// Now create a thread to handle launchpad light button events.
 	go func() {
-		common.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
+		launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 	}()
 
 	// Add buttons to the main panel.
@@ -306,7 +331,7 @@ func main() {
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
-	topStatusBar := fyne.NewContainerWithLayout(
+	topStatusBar := container.New(
 		layout.NewHBoxLayout(),
 		layout.NewSpacer(),
 		upLabel,
@@ -324,7 +349,7 @@ func main() {
 		layout.NewSpacer(),
 		toolbar)
 
-	bottonStatusBar := fyne.NewContainerWithLayout(
+	bottonStatusBar := container.New(
 		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.BeatLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
@@ -332,10 +357,10 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, bottonStatusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[1], 1, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[2], 2, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[3], 3, this.Pad, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[0], 0, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[1], 1, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[2], 2, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[3], 3, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
@@ -345,7 +370,7 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, 0, this.DmxInterfacePresent)
+	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 
 	if this.LaunchPadConnected {
 		// Listen to launchpad buttons.
@@ -360,7 +385,7 @@ func main() {
 			updateChannels []chan common.Sequence,
 			dmxInterfaceCardPresent bool) {
 
-			buttons.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
+			launchpad.ReadLaunchPadButtons(guiButtons, this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, dmxInterfaceCardPresent)
 
 		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 	}

@@ -46,5 +46,44 @@ I use the mk3 version.
 
 "github.com/rakyll/launchpad/mk3”
 
+## Installing on Catalina 
+
+I have found that the version of libusb-1.0.0.dylib used by the FTDI DMX interface card fails to connect when using the version from the 'brew install libusb' 
+Note if running as root the card does connect but this wasn't deemed a suitable fix as 
+starting the app from the dock runs as a used.
+
+
+
+Otool reveals it has an extra '/System/Library/Frameworks/Security.framework/Versions/A/Security' attribute and the file size is different.
+ otool -L libusb-1.0.0.dylib 
+```libusb-1.0.0.dylib:
+	/usr/local/opt/libusb/lib/libusb-1.0.0.dylib (compatibility version 4.0.0, current version 4.0.0)
+	/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)
+	/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)
+	/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 1677.104.0)
+	/System/Library/Frameworks/Security.framework/Versions/A/Security (compatibility version 1.0.0, current version 59306.140.5)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1281.100.1)
+```
+
+### SOLUTION...
+
+I have found the the libusb-1.0.0.dylib from xcode distribution is different and allows the FTDI DMX to connect. From /opt/local/lib/libusb-1.0.0.dylib
+File size is also smaller 111044.
+
+/usr/local/opt/libusb/lib/libusb-1.0.0.dylib
+```
+-r--r--r--   1 derek  admin  141344 30 Nov 22:47 NOT_WORKING-libusb-1.0.0.dylib
+-rwxr-xr-x   1 derek  admin  111044 30 Nov 22:51 libusb-1.0.0.dylib
+```
+
+``` otool -L /Volumes/USEFUL/libusb-1.0.0.dylib 
+/Volumes/USEFUL/libusb-1.0.0.dylib:
+	/opt/local/lib/libusb-1.0.0.dylib (compatibility version 4.0.0, current version 4.0.0)
+	/usr/lib/libobjc.A.dylib (compatibility version 1.0.0, current version 228.0.0)
+	/System/Library/Frameworks/IOKit.framework/Versions/A/IOKit (compatibility version 1.0.0, current version 275.0.0)
+	/System/Library/Frameworks/CoreFoundation.framework/Versions/A/CoreFoundation (compatibility version 150.0.0, current version 1675.129.0)
+	/usr/lib/libSystem.B.dylib (compatibility version 1.0.0, current version 1281.100.1)
+```
+
 
 
