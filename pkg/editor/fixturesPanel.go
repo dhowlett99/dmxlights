@@ -55,7 +55,7 @@ type FixturesPanel struct {
 	NumberOptions []string
 	TypeOptions   []string
 
-	DMXValueEntryError    map[int]bool
+	DMXAddressEntryError  map[int]bool
 	NameEntryError        map[int]bool
 	LabelEntryError       map[int]bool
 	DescriptionEntryError map[int]bool
@@ -154,7 +154,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
 	// Storage for error flags for each fixture.
-	fp.DMXValueEntryError = make(map[int]bool, len(fp.FixtureList))
+	fp.DMXAddressEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.NameEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.LabelEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.DescriptionEntryError = make(map[int]bool, len(fp.FixtureList))
@@ -467,7 +467,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			// Fixture DMX Address.
 			if i.Col == FIXTURE_ADDRESS {
 				showField(FIXTURE_ADDRESS, o)
-				if fp.DMXValueEntryError[fp.FixtureList[i.Row].ID] {
+				if fp.DMXAddressEntryError[fp.FixtureList[i.Row].ID] {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
@@ -484,13 +484,13 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 						// Clear all errors in all rows.
 						for row := 0; row < len(data); row++ {
-							fp.DMXValueEntryError[row] = false
+							fp.DMXAddressEntryError[row] = false
 						}
 
 						// Check DMX Address is valid.
-						err := checkDMXValue(value)
+						err := checkDMXAddress(value)
 						if err != nil {
-							fp.DMXValueEntryError[fp.FixtureList[i.Row].ID] = true
+							fp.DMXAddressEntryError[fp.FixtureList[i.Row].ID] = true
 							fp.FixturePanel.Refresh()
 							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "DMX Entry Error"
 							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
@@ -502,7 +502,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 							// Disable the save button.
 							buttonSave.Disable()
 						} else {
-							fp.DMXValueEntryError[fp.FixtureList[i.Row].ID] = false
+							fp.DMXAddressEntryError[fp.FixtureList[i.Row].ID] = false
 							// And make sure we refresh every row, when we update this field.
 							// So all the red error rectangls will disappear
 							fp.FixturePanel.Refresh()
@@ -795,7 +795,7 @@ func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, 
 		for _, testfixture := range fixtures.Fixtures {
 			if fixture.Type != "switch" && fixture.ID != testfixture.ID {
 				if checkOverlap(int(fixture.Address), int(fixture.Address)+len(fixture.Channels), int(testfixture.Address), int(testfixture.Address)+len(testfixture.Channels)) {
-					fp.DMXValueEntryError[fixture.ID] = true
+					fp.DMXAddressEntryError[fixture.ID] = true
 					// We have an overlapping DMX address.
 					err = fmt.Errorf("overlapping DMX Address")
 					reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, testfixture.Name))
@@ -848,6 +848,25 @@ func checkOverlap(aStart int, aEnd int, bStart int, bEnd int) bool {
 	return (aStart >= bEnd) != (aEnd > bStart)
 }
 
+func checkDMXAddress(value string) error {
+
+	if len(strings.TrimSpace(value)) == 0 || len(value) == 0 {
+		return fmt.Errorf("DMX error, value is empty")
+	}
+
+	address, err := strconv.Atoi(value)
+	if err != nil {
+		return fmt.Errorf("DMX error, must only contain numbers")
+	}
+	if address == 0 {
+		return fmt.Errorf("DMX error, cannot be zero")
+	}
+	if address > common.MaxDMXAddress {
+		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)
+	}
+	return nil
+}
+
 func checkDMXValue(value string) error {
 
 	if len(strings.TrimSpace(value)) == 0 || len(value) == 0 {
@@ -857,6 +876,9 @@ func checkDMXValue(value string) error {
 	address, err := strconv.Atoi(value)
 	if err != nil {
 		return fmt.Errorf("DMX error, must only contain numbers")
+	}
+	if address < 0 {
+		return fmt.Errorf("DMX error, cannot be less than zero")
 	}
 	if address > common.MaxDMXAddress {
 		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)

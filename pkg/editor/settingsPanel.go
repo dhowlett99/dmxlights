@@ -160,11 +160,11 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				}
 				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
-					if value != "" {
+				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(settingName string) {
+					if settingName != "" {
 						newSetting := fixture.Setting{}
-						newSetting.Label = st.SettingsList[i.Row].Label
-						newSetting.Name = value
+						newSetting.Label = settingName // Label same as name.
+						newSetting.Name = settingName
 						newSetting.Number = st.SettingsList[i.Row].Number
 						if !channelFieldDisabled {
 							newSetting.Channel = st.SettingsList[i.Row].Channel
@@ -181,7 +181,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						}
 
 						// Check the text entered.
-						err := checkTextEntry(value)
+						err := checkTextEntry(settingName)
 						if err != nil {
 							st.NameEntryError[st.SettingsList[i.Row].Number] = true
 							st.SettingsPanel.Refresh()
@@ -206,7 +206,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				}
 			}
 
-			// Channel value.
+			// Channel number.
 			if i.Col == SETTING_CHANNEL {
 				showSettingsField(SETTING_CHANNEL, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
@@ -220,12 +220,12 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 					}
 				}
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = channelFieldDisabled
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(value string) {
+				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(settingChannel string) {
 					newSetting := fixture.Setting{}
 					newSetting.Label = st.SettingsList[i.Row].Label
 					newSetting.Name = st.SettingsList[i.Row].Name
 					newSetting.Number = st.SettingsList[i.Row].Number
-					newSetting.Channel = value
+					newSetting.Channel = settingChannel
 					newSetting.Value = st.SettingsList[i.Row].Value
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
@@ -244,8 +244,8 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				}
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
-					if value != "" {
+				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(settingValue string) {
+					if settingValue != "" {
 						newSetting := fixture.Setting{}
 						newSetting.Label = st.SettingsList[i.Row].Label
 						newSetting.Name = st.SettingsList[i.Row].Name
@@ -253,7 +253,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						if !channelFieldDisabled {
 							newSetting.Channel = st.SettingsList[i.Row].Channel
 						}
-						newSetting.Value = value
+						newSetting.Value = settingValue
 						st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 						data = makeSettingsArray(st.SettingsList)
 						st.UpdateSettings = true
@@ -265,7 +265,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						}
 
 						// Check the text entered.
-						err := checkDMXValue(value)
+						err := checkDMXValue(settingValue)
 						if err != nil {
 							st.DMXValueEntryError[st.SettingsList[i.Row].Number] = true
 							st.SettingsPanel.Refresh()
@@ -273,7 +273,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
 							popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
 							o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-							st.SettingsList[i.Row].Name = data[i.Row][i.Col]
+							st.SettingsList[i.Row].Value = data[i.Row][i.Col]
 							popupErrorPanel.Show()
 							// Disable the save button.
 							buttonSave.Disable()
