@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"image/color"
 	"math"
+	"strings"
 	"sync"
 	"time"
 )
@@ -1372,4 +1373,10 @@ func FindSensitivity(soundGain float32) int {
 	}
 
 	return 99
+}
+
+func FormatLabel(label string) string {
+	// replace any spaces with new lines.
+	// new lines are represented by a dot in code beneath us.
+	return strings.Replace(label, " ", ".", -1)
 }

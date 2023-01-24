@@ -2226,7 +2226,8 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		} else {
 			common.LightLamp(common.ALight{X: goboNumber, Y: this.SelectedSequence, Brightness: sequence.Master, Red: gobo.Color.R, Green: gobo.Color.G, Blue: gobo.Color.B}, eventsForLaunchpad, guiButtons)
 		}
-		common.LabelButton(goboNumber, this.SelectedSequence, gobo.Label, guiButtons)
+		goboName := common.FormatLabel(gobo.Name)
+		common.LabelButton(goboNumber, this.SelectedSequence, goboName, guiButtons)
 	}
 }
 
