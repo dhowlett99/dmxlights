@@ -570,7 +570,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_DELETE].(*widget.Button).OnTapped = func() {
-					fp.FixtureList = DeleteFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
+					fp.FixtureList = deleteFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
 					data = updateArray(fp.FixtureList)
 					fp.FixturePanel.Refresh()
 				}
@@ -582,7 +582,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				o.(*fyne.Container).Objects[FIXTURE_ADD].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[FIXTURE_ADD].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_ADD].(*widget.Button).OnTapped = func() {
-					fp.FixtureList = AddFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
+					fp.FixtureList = addFixture(fp.FixtureList, fp.FixtureList[i.Row].ID)
 					data = updateArray(fp.FixtureList)
 					fp.FixturePanel.Refresh()
 				}
@@ -856,13 +856,13 @@ func checkDMXAddress(value string) error {
 
 	address, err := strconv.Atoi(value)
 	if err != nil {
-		return fmt.Errorf("DMX error, must only contain numbers")
+		return fmt.Errorf("DMX Address error, must only contain numbers")
 	}
 	if address == 0 {
-		return fmt.Errorf("DMX error, cannot be zero")
+		return fmt.Errorf("DMX Address error, cannot be zero")
 	}
 	if address > common.MaxDMXAddress {
-		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)
+		return fmt.Errorf("DMX Address error, cannot be greater than %d", common.MaxDMXAddress)
 	}
 	return nil
 }
@@ -870,19 +870,64 @@ func checkDMXAddress(value string) error {
 func checkDMXValue(value string) error {
 
 	if len(strings.TrimSpace(value)) == 0 || len(value) == 0 {
-		return fmt.Errorf("DMX error, value is empty")
+		return fmt.Errorf("DMX Value error, value is empty")
 	}
 
+	// Filter out any characters and special characters.
+	var IsRangeOrNumber = regexp.MustCompile(`^[0-9\-]+$`).MatchString
+	if !IsRangeOrNumber(value) {
+		return fmt.Errorf("DMX Value error, must only numbers, ranges can be specified e.g. 10-20")
+	}
+
+	// No check the numbers in a range.
+	if strings.Contains(value, "-") {
+		// We've found a range of values.
+		// Find the start value
+		numbers := strings.Split(value, "-")
+
+		fmt.Printf("numbers %s\n", numbers)
+
+		// Now apply the range depending on the speed
+		// Check the start of the range.
+		err := checkDMXnumber(numbers[0])
+		if err != nil {
+			return err
+		}
+		// Check the stop of the range.
+		err = checkDMXnumber(numbers[1])
+		if err != nil {
+			return err
+		}
+
+		// Check the range makes sense.
+		if numbers[1] < numbers[0] {
+			return fmt.Errorf("second value in range must be less than first")
+		}
+	}
+
+	return nil
+}
+
+func checkDMXnumber(value string) error {
+
+	if debug {
+		fmt.Printf("checkDMXnumber: checking value %s\n", value)
+	}
+
+	if value == "" {
+		return nil
+	}
 	address, err := strconv.Atoi(value)
 	if err != nil {
-		return fmt.Errorf("DMX error, must only contain numbers")
+		return fmt.Errorf("DMX Number error, must only contain numbers")
 	}
 	if address < 0 {
-		return fmt.Errorf("DMX error, cannot be less than zero")
+		return fmt.Errorf("DMX Number error, cannot be less than zero")
 	}
 	if address > common.MaxDMXAddress {
-		return fmt.Errorf("DMX error, cannot be greater than %d", common.MaxDMXAddress)
+		return fmt.Errorf("DMX Number error, cannot be greater than %d", common.MaxDMXAddress)
 	}
+
 	return nil
 }
 
@@ -897,7 +942,6 @@ func checkTextEntry(value string) error {
 	}
 
 	var IsLetter = regexp.MustCompile(`^[a-zA-Z0-9\ \.\_]+$`).MatchString
-
 	if !IsLetter(value) {
 		return fmt.Errorf("must only contain letters and numbers, underscore and dots are allowed")
 	}
@@ -908,7 +952,7 @@ func checkTextEntry(value string) error {
 	return nil
 }
 
-func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
+func addFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 
 	if debug {
 		fmt.Printf("AddFixture\n")
@@ -917,8 +961,8 @@ func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 	newFixtures := []fixture.Fixture{}
 	newFixture := fixture.Fixture{}
 	newFixture.ID = id + 1
-	if FixtureItemAllreadyExists(newFixture.ID, fixtures) {
-		newFixture.ID = FindLargestFixtureNumber(fixtures) + 1
+	if fixtureItemAllreadyExists(newFixture.ID, fixtures) {
+		newFixture.ID = findLargestFixtureNumber(fixtures) + 1
 	}
 	newFixture.Name = "New"
 	newFixture.Type = "rgb"
@@ -943,7 +987,7 @@ func AddFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 	return newFixtures
 }
 
-func DeleteFixture(fixtureList []fixture.Fixture, id int) []fixture.Fixture {
+func deleteFixture(fixtureList []fixture.Fixture, id int) []fixture.Fixture {
 
 	if debug {
 		fmt.Printf("DeleteFixture\n")
@@ -961,7 +1005,7 @@ func DeleteFixture(fixtureList []fixture.Fixture, id int) []fixture.Fixture {
 	return newFixtures
 }
 
-func FixtureItemAllreadyExists(id int, fixtureList []fixture.Fixture) bool {
+func fixtureItemAllreadyExists(id int, fixtureList []fixture.Fixture) bool {
 
 	if debug {
 		fmt.Printf("FixtureItemAllreadyExists\n")
@@ -976,7 +1020,7 @@ func FixtureItemAllreadyExists(id int, fixtureList []fixture.Fixture) bool {
 	return false
 }
 
-func FindLargestFixtureNumber(fixtures []fixture.Fixture) int {
+func findLargestFixtureNumber(fixtures []fixture.Fixture) int {
 
 	if debug {
 		fmt.Printf("FindLargestFixtureNumber\n")

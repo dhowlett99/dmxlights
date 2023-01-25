@@ -604,7 +604,7 @@ func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXCont
 func MapFixtures(mySequenceNumber int,
 	dmxController *ft232.DMXController,
 	displayFixture int, R int, G int, B int, W int, A int, uv int,
-	Pan int, Tilt int, Shutter int, Rotate int, Music int, Program int,
+	pan int, tilt int, shutter int, rotate int, music int, program int,
 	selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, strobe bool, strobeSpeed int,
 	dmxInterfacePresent bool) {
@@ -625,65 +625,47 @@ func MapFixtures(mySequenceNumber int,
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
 						if channel.Offset != nil {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan+*channel.Offset)), dmxController, dmxInterfacePresent)
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
 						} else {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Pan)), dmxController, dmxInterfacePresent)
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan)), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Tilt") {
 						if channel.Offset != nil {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
+							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
 						}
-						setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, Tilt)), dmxController, dmxInterfacePresent)
+						setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Shutter") {
 						// If we have defined settings for the shutter channel, then use them.
 						if channel.Settings != nil {
 							// Look through any settings configured for Shutter.
 							for _, s := range channel.Settings {
-								if !strobe && s.Name == "On" || s.Name == "Open" {
-									v, _ := strconv.Atoi(s.Value)
-									setChannel(fixture.Address+int16(channelNumber), byte(Shutter+v), dmxController, dmxInterfacePresent)
+								if !strobe && (s.Name == "On" || s.Name == "Open") {
+									v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
+									setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 								if strobe && strings.Contains(s.Name, "Strobe") {
-									// Found some stobe settings.
-									if strings.Contains(s.Value, "-") {
-										// We've found a range of values.
-										// Find the start value// Find the start
-										numbers := strings.Split(s.Value, "-")
-
-										// Now apply the range depending on the speed
-										// First turn the stings into numbers.
-										start, _ := strconv.Atoi(numbers[0])
-										stop, _ := strconv.Atoi(numbers[1])
-
-										// Calculate the value depending on the strobe speed.
-										r := float32(stop) - float32(start)
-										var full float32 = 255
-										value := (r / full) * float32(strobeSpeed)
-
-										// Now apply the speed
-										final := int(value) + start
-										setChannel(fixture.Address+int16(channelNumber), byte(final), dmxController, dmxInterfacePresent)
-									}
+									v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
+									setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 							}
 						} else {
 							// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
-							setChannel(fixture.Address+int16(channelNumber), byte(Shutter), dmxController, dmxInterfacePresent)
+							setChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Rotate") {
-						setChannel(fixture.Address+int16(channelNumber), byte(Rotate), dmxController, dmxInterfacePresent)
+						setChannel(fixture.Address+int16(channelNumber), byte(rotate), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Music") {
-						setChannel(fixture.Address+int16(channelNumber), byte(Music), dmxController, dmxInterfacePresent)
+						setChannel(fixture.Address+int16(channelNumber), byte(music), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Program") {
-						setChannel(fixture.Address+int16(channelNumber), byte(Program), dmxController, dmxInterfacePresent)
+						setChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "ProgramSpeed") {
-						setChannel(fixture.Address+int16(channelNumber), byte(Program), dmxController, dmxInterfacePresent)
+						setChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
@@ -751,6 +733,29 @@ func MapFixtures(mySequenceNumber int,
 			}
 		}
 	}
+}
+
+func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue int) (final int) {
+
+	if strings.Contains(configValue, "-") {
+		// We've found a range of values.
+		// Find the start value
+		numbers := strings.Split(configValue, "-")
+
+		// Now apply the range depending on the speed
+		// First turn the stings into numbers.
+		start, _ := strconv.Atoi(numbers[0])
+		stop, _ := strconv.Atoi(numbers[1])
+
+		// Calculate the value depending on the setting value
+		r := float32(stop) - float32(start)
+		var full float32 = 255
+		value := (r / full) * float32(settingValue)
+
+		// Now apply the speed
+		final = int(value) + start
+	}
+	return final
 }
 
 func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {

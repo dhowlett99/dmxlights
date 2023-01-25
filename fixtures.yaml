@@ -1044,7 +1044,7 @@ fixtures:
     settings:
     - name: Open
       number: 1
-      value: "255"
+      value: 248-255
     - name: Closed
       number: 2
       value: "0"
