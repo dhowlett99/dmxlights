@@ -2611,6 +2611,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		return
 	}
 
+	// Start clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 	} else {
