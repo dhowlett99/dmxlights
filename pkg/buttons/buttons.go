@@ -2618,11 +2618,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
 	}
 
-	// Get the pad back into sane mode.
-	if this.LaunchPadConnected {
-		this.Pad.Program()
-	}
-
 	// Turn off the flashing save button.
 	this.SavePreset = false
 	common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
@@ -2847,6 +2842,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
 	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
+
+	// Get the pad back into sane mode.
+	if this.LaunchPadConnected {
+		this.Pad.Program()
+	}
 }
 
 func getScannerShiftLabel(shift int) string {
@@ -2893,7 +2893,7 @@ func getScannerCoordinatesLabel(shift int) string {
 func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	for sequenceNumber, sequence := range sequences {
 		this.SelectButtonPressed[sequenceNumber] = false
-		this.FunctionSelectMode[sequenceNumber] = true
+		this.FunctionSelectMode[sequenceNumber] = false
 		this.EditSequenceColorsMode[sequenceNumber] = false
 		this.EditStaticColorsMode[sequenceNumber] = false
 		this.EditGoboSelectionMode[sequenceNumber] = false
