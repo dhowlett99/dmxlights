@@ -59,6 +59,88 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	// Now process any command.
 	switch command.Action {
 
+	case common.Reset:
+		if debug {
+			fmt.Printf("%d: Command Reset\n", mySequenceNumber)
+		}
+		// Turn off any static scenes.
+		sequence.PlayStaticOnce = true
+		sequence.PlaySwitchOnce = true
+		sequence.Static = false
+		// Stop the sequence.
+		sequence.Functions[common.Function8_Music_Trigger].State = false
+		sequence.Functions[common.Function6_Static_Gobo].State = false
+		sequence.MusicTrigger = false
+		sequence.Run = false
+		sequence.Static = false
+		sequence.Clear = true
+		// Clear the sequence colors.
+		sequence.UpdateSequenceColor = false
+		sequence.SequenceColors = []common.Color{}
+		sequence.CurrentColors = []common.Color{}
+		// Reset the speed back to the default.
+		sequence.Speed = common.DefaultSpeed
+		sequence.CurrentSpeed = SetSpeed(common.DefaultSpeed)
+		if sequence.Type == "rgb" {
+			// Reset the RGB shift back to the default.
+			sequence.RGBShift = common.DefaultRGBShift
+			// Reset the RGB Size back to the default.
+			sequence.RGBSize = common.DefaultRGBSize
+			// Reset the RGB fade speed back to the default
+			sequence.RGBFade = common.DefaultRGBFade
+			// Stop the flood mode.
+			sequence.StartFlood = true
+			sequence.StopFlood = false
+			//sequence.FloodPlayOnce = true
+			// Stop the strobe mode.
+			sequence.Strobe = false
+			sequence.StrobeSpeed = 0
+			sequence.StartFlood = false
+			sequence.StopFlood = true
+			//sequence.FloodPlayOnce = true
+		}
+		if sequence.Type == "scanner" {
+			// Reset pan and tilt to the center
+			sequence.ScannerOffsetPan = common.ScannerMidPoint
+			sequence.ScannerOffsetTilt = common.ScannerMidPoint
+			// Enable all scanners.
+			sequence.ScannerStateMutex.Lock()
+			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
+				newScannerState := common.ScannerState{}
+				newScannerState.Enabled = true
+				newScannerState.Inverted = false
+				sequence.ScannerState[scanner] = newScannerState
+			}
+			sequence.ScannerStateMutex.Unlock()
+			// Reset the number of coordinates.
+			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
+			// Reset the scanner size back to default. common.DefaultScannerSize
+			sequence.ScannerSize = common.DefaultScannerSize
+			// Reset the scanner pattern back to default.
+			sequence.UpdateSequenceColor = false
+			sequence.RecoverSequenceColors = false
+			sequence.UpdatePattern = true
+			sequence.SelectedPattern = common.DefaultPattern
+			// Clear all the function buttons for this sequence.
+			sequence.Functions[common.Function1_Pattern].State = false
+			sequence.Functions[common.Function2_Auto_Color].State = false
+			sequence.Functions[common.Function3_Auto_Pattern].State = false
+			sequence.Functions[common.Function4_Bounce].State = false
+			sequence.Functions[common.Function5_Color].State = false
+			sequence.Functions[common.Function6_Static_Gobo].State = false
+			sequence.Functions[common.Function7_Invert_Chase].State = false
+			sequence.Functions[common.Function8_Music_Trigger].State = false
+			sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
+		}
+		if sequence.Type == "switch" {
+			// Clear switch positions to their first positions.
+			for X := 0; X < len(sequence.Switches); X++ {
+				sequence.Switches[X].CurrentState = 0
+			}
+			sequence.PlaySwitchOnce = true
+		}
+		return sequence
+
 	case common.Hide:
 		if debug {
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)

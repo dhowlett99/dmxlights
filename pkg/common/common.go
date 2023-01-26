@@ -41,6 +41,7 @@ const DefaultSpeed = 7
 const DefaultRGBShift = 0
 const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
+const ScannerMidPoint = 127
 
 const MaxBrightness = 255
 
@@ -168,6 +169,7 @@ type Command struct {
 // Valid Command Actions.
 const (
 	Actions int = iota
+	Reset
 	UpdateMode
 	UpdateStatic
 	UpdateStaticColor
@@ -1093,7 +1095,7 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 // LightOn Turn on a Light.
 func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
-		fmt.Printf("LightLamp  X:%d  Y:%d\n", Light.X, Light.Y)
+		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", Light.X, Light.Y, Light.Red, Light.Green, Light.Blue, Light.Brightness)
 	}
 	// Send message to Novation Launchpad.
 	event := ALight{

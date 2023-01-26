@@ -21,8 +21,8 @@ package presets
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
+	"os"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
@@ -33,28 +33,34 @@ type Preset struct {
 	Label    string `json:"label"`
 }
 
-func InitPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
+// RefeshPresets is used to refresh the view of presets.
+func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
 			// Set to Preset Yellow.
 			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+			// State true is a preset which has a saved config.
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
+				// Selected preset is set to flashing red.
 				if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Selected {
 					common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
 				} else {
+					// other wise preset is set to red.
 					common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 				}
+			} else {
+				// Unused preset is set to yellow.
+				common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			}
 			common.LabelButton(x, y, presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label, guiButtons)
 		}
 	}
 }
 
+// ClearPresets is used to un-select all presets.
 func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			// Set to Preset Yellow.
-			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			newPreset := presets[fmt.Sprint(x)+","+fmt.Sprint(y)]
 			newPreset.Selected = false
 			presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset
@@ -70,7 +76,7 @@ func SavePresets(presets map[string]Preset) {
 	}
 
 	// Write to file
-	err = ioutil.WriteFile("presets.json", data, 0644)
+	err = os.WriteFile("presets.json", data, 0644)
 	if err != nil {
 		log.Fatalf("error: writing config: %v to file:%s", err, "presets.json")
 	}
@@ -81,7 +87,7 @@ func LoadPresets() map[string]Preset {
 	presets := map[string]Preset{}
 
 	// Read the file.
-	data, err := ioutil.ReadFile("presets.json")
+	data, err := os.ReadFile("presets.json")
 	if err != nil {
 		fmt.Printf("error reading presets: %v from file:%s\n", err, "presets.json")
 		return presets

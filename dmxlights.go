@@ -64,8 +64,8 @@ func main() {
 	this.Strobe = make(map[int]bool, 4)                // Initialise storage for four sequences.
 	this.MasterBrightness = 255                        // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                                 // Fine gain -0.09 -> 0.09
-	this.OffsetPan = 120                               // Start pan from the center
-	this.OffsetTilt = 120                              // Start tilt from the center.
+	this.OffsetPan = common.ScannerMidPoint            // Start pan from the center
+	this.OffsetTilt = common.ScannerMidPoint           // Start tilt from the center.
 	this.Patterns = pattern.MakePatterns()             // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, 4)         // Initialise four select buttons.
 	this.FunctionSelectMode = make([]bool, 4)          // Initialise four function mode states.

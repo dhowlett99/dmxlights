@@ -346,7 +346,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 							return
 						}
 						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, State: true, Selected: true}
-						presets.InitPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+						presets.RefreshPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
 						presets.SavePresets(this.PresetsStore)
 						Red := common.Color{R: 255, G: 0, B: 0}
 						PresetYellow := common.Color{R: 150, G: 150, B: 0}

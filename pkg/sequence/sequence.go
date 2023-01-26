@@ -181,8 +181,8 @@ func CreateSequence(
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
-		ScannerOffsetPan:       120,
-		ScannerOffsetTilt:      120,
+		ScannerOffsetPan:       common.ScannerMidPoint,
+		ScannerOffsetTilt:      common.ScannerMidPoint,
 		GuiFixtureLabels:       fixtureLabels,
 	}
 
@@ -330,7 +330,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Start flood mode.
-		if sequence.StartFlood && sequence.FloodPlayOnce {
+		if sequence.StartFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("sequence %d Start flood mode\n", mySequenceNumber)
 			}
