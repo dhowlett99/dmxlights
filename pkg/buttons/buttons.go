@@ -2441,7 +2441,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 			{Name: "Stop Flood", Value: false},
 		},
 	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
+	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "rgb")
 
 	this.Flood = false
 
@@ -2459,7 +2459,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 		this.SelectButtonPressed[sequenceNumber] = false
 	}
 
-	// Recall our previous config.
+	// Recall our previous config from the temporary file config0.0.json
 	config.AskToLoadConfig(commandChannels, 0, 0)
 
 	// Because the sequences were updated beneath us get an upto date copy of all the sequences.
@@ -2510,7 +2510,7 @@ func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft
 	// Flash the flood button pink to indicate we're in flood.
 	common.FlashLight(8, 3, common.Pink, common.White, eventsForLaunchpad, guiButtons)
 
-	// First save our config
+	// First save our config in the temporary file config0.0.json
 	config.AskToSaveConfig(commandChannels, replyChannels, 0, 0)
 
 	// Stop all sequences, so we start in sync.
@@ -2526,7 +2526,7 @@ func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft
 			{Name: "StartFlood", Value: true},
 		},
 	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
+	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "rgb")
 
 	this.Flood = true
 }
