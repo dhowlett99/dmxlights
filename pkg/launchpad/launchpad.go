@@ -56,12 +56,23 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentSt
 	}
 }
 
+type coordinate struct {
+	X int
+	Y int
+}
+
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
 func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad, LaunchPadConnected bool) {
-	for {
 
+	launchPadMap := make(map[coordinate]common.Color, 81)
+
+	for key := range launchPadMap {
+		launchPadMap[key] = common.Color{R: 0, G: 0, B: 0}
+	}
+
+	for {
 		// Wait for the event.
 		alight := <-eventsForLauchpad
 
@@ -73,19 +84,35 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Lau
 			if !alight.Flash {
 
 				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-				Red := ((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-				Green := ((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55)
-				Blue := ((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55)
+				Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
 
-				// Now light the launchpad button.
-				err := pad.Light(alight.X, alight.Y, int(Red), int(Green), int(Blue))
-				if err != nil {
-					fmt.Printf("error writing to launchpad %e\n" + err.Error())
+				place := coordinate{X: alight.X, Y: alight.Y}
+				storedColor := common.Color{R: launchPadMap[place].R, G: launchPadMap[place].G, B: launchPadMap[place].B}
+
+				// If we have this color already don't write again.
+				newColor := common.Color{R: Red, G: Green, B: Blue}
+
+				if storedColor != newColor {
+					// Now light the launchpad button.
+					if debug {
+						fmt.Printf("X:%d Y:%d Stored Color is %+v  New Color is %+v\n", place.X, place.Y, storedColor, newColor)
+					}
+					err := pad.Light(alight.X, alight.Y, Red, Green, Blue)
+					if err != nil {
+						fmt.Printf("error writing to launchpad %e\n" + err.Error())
+					}
 				}
 
-				// Now we're been asked go flash this button.
+				launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
+					R: Red,
+					G: Green,
+					B: Blue,
+				}
+
 			} else {
-				// Now light the launchpad button.
+				// Now we're been asked go flash this button.
 				if debug {
 					fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadColorCodeByRGB(alight.OnColor))
 					fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadColorCodeByRGB(alight.OffColor))

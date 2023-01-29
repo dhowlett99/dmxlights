@@ -37,8 +37,6 @@ type Preset struct {
 func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			// Set to Preset Yellow.
-			common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 			// State true is a preset which has a saved config.
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
 				// Selected preset is set to flashing red.

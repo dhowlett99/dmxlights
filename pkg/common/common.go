@@ -33,6 +33,7 @@ const MaxScannerSize = 120
 const MaxRGBSize = 120
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.
+const MaxBrightness = 255
 const DefaultPattern = 0
 const DefaultRGBSize = 1
 const DefaultRGBFade = 1
@@ -43,7 +44,7 @@ const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
 const ScannerMidPoint = 127
 
-const MaxBrightness = 255
+var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 
 type ALight struct {
 	X                int

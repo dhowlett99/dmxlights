@@ -64,19 +64,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Reset\n", mySequenceNumber)
 		}
 		// Turn off any static scenes.
-		sequence.PlayStaticOnce = true
-		sequence.PlaySwitchOnce = true
 		sequence.Static = false
+		sequence.PlayStaticOnce = true
 		// Stop the sequence.
 		sequence.Functions[common.Function8_Music_Trigger].State = false
 		sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
-		sequence.Static = false
 		sequence.Clear = true
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = []common.Color{}
+		sequence.SequenceColors = common.DefaultSequenceColors
 		sequence.CurrentColors = []common.Color{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DefaultSpeed
@@ -89,15 +87,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Reset the RGB fade speed back to the default
 			sequence.RGBFade = common.DefaultRGBFade
 			// Stop the flood mode.
-			sequence.StartFlood = true
-			sequence.StopFlood = false
-			//sequence.FloodPlayOnce = true
+			sequence.StartFlood = false
+			sequence.StopFlood = true
+			sequence.FloodPlayOnce = true
 			// Stop the strobe mode.
 			sequence.Strobe = false
 			sequence.StrobeSpeed = 0
-			sequence.StartFlood = false
-			sequence.StopFlood = true
-			//sequence.FloodPlayOnce = true
 		}
 		if sequence.Type == "scanner" {
 			// Reset pan and tilt to the center
