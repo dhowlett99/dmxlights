@@ -53,6 +53,12 @@ const (
 	SETTING_ADD
 )
 
+const (
+	TITLE int = iota
+	MESSAGE
+	REPORT
+)
+
 func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFieldDisabled bool, buttonSave *widget.Button) *SettingsPanel {
 
 	if debug {
@@ -185,9 +191,10 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						if err != nil {
 							st.NameEntryError[st.SettingsList[i.Row].Number] = true
 							st.SettingsPanel.Refresh()
-							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Name Entry Error"
-							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
-							popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+							// Populate error message panel.
+							popupErrorPanel.Content.(*fyne.Container).Objects[TITLE].(*widget.Label).Text = "Name Entry Error"
+							popupErrorPanel.Content.(*fyne.Container).Objects[MESSAGE].(*widget.Label).Text = err.Error()
+							popupErrorPanel.Content.(*fyne.Container).Objects[REPORT].(*widget.Label).Text = strings.Join(reports, "\n")
 							o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 							st.SettingsList[i.Row].Name = data[i.Row][i.Col]
 							popupErrorPanel.Show()

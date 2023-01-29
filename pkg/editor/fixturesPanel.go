@@ -885,8 +885,6 @@ func checkDMXValue(value string) error {
 		// Find the start value
 		numbers := strings.Split(value, "-")
 
-		fmt.Printf("numbers %s\n", numbers)
-
 		// Now apply the range depending on the speed
 		// Check the start of the range.
 		err := checkDMXnumber(numbers[0])
