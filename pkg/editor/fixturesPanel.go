@@ -891,18 +891,25 @@ func checkDMXValue(value string) error {
 		if err != nil {
 			return err
 		}
-		// Check the stop of the range.
-		err = checkDMXnumber(numbers[1])
-		if err != nil {
-			return err
+		// Check the stop value of the range.
+		if numbers[1] != "" {
+			err = checkDMXnumber(numbers[1])
+			if err != nil {
+				return err
+			}
 		}
 
 		// Check the range makes sense.
-		if numbers[1] < numbers[0] {
+		if numbers[1] < numbers[0] && numbers[1] != "" {
 			return fmt.Errorf("second value in range must be less than first")
 		}
+	} else {
+		// Check the single value (no range case).
+		err := checkDMXnumber(value)
+		if err != nil {
+			return err
+		}
 	}
-
 	return nil
 }
 
