@@ -396,7 +396,7 @@ func ProcessButtons(X int, Y int,
 			this.MasterBrightness = 0
 		}
 		cmd := common.Command{
-			Action: common.MaxBrightness,
+			Action: common.MasterBrightness,
 			Args: []common.Arg{
 				{Name: "Master", Value: this.MasterBrightness},
 			},
@@ -422,7 +422,7 @@ func ProcessButtons(X int, Y int,
 			this.MasterBrightness = 255
 		}
 		cmd := common.Command{
-			Action: common.MaxBrightness,
+			Action: common.MasterBrightness,
 			Args: []common.Arg{
 				{Name: "Master", Value: this.MasterBrightness},
 			},

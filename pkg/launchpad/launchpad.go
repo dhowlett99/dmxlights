@@ -84,13 +84,13 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Lau
 			whichLamp := coordinate{X: alight.X, Y: alight.Y}
 			storedColor := common.Color{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
 
+			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+			Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+			Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+			Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+
 			// We're in standard turn the light on.
 			if !alight.Flash {
-
-				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-				Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-				Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-				Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
 
 				// If we have this color already don't write again.
 				newColor := common.Color{R: Red, G: Green, B: Blue}
@@ -106,13 +106,6 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Lau
 					}
 				}
 
-				launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
-					R:     Red,
-					G:     Green,
-					B:     Blue,
-					Flash: false,
-				}
-
 			} else {
 				// Now we're been asked go flash this button.
 				if debug {
@@ -124,12 +117,13 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Lau
 					fmt.Printf("flash: error writing to launchpad %e\n" + err.Error())
 				}
 
-				launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
-					R:     alight.OnColor.R,
-					G:     alight.OnColor.G,
-					B:     alight.OnColor.B,
-					Flash: true,
-				}
+			}
+			// Remember what lamps are light.
+			launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
+				R:     Red,
+				G:     Green,
+				B:     Blue,
+				Flash: true,
 			}
 		}
 	}
