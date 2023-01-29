@@ -66,12 +66,13 @@ type ALight struct {
 }
 
 type Color struct {
-	R  int
-	G  int
-	B  int
-	W  int
-	A  int
-	UV int
+	R     int
+	G     int
+	B     int
+	W     int
+	A     int
+	UV    int
+	Flash bool
 }
 
 // Used in calculating Positions.
@@ -1106,7 +1107,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      false,
+		Flash:      Light.Flash,
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 	}
@@ -1120,7 +1121,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		Red:        Light.Red,
 		Green:      Light.Green,
 		Blue:       Light.Blue,
-		Flash:      false,
+		Flash:      Light.Flash,
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 		Label:      Light.Label,

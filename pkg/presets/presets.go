@@ -44,7 +44,7 @@ func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common
 					common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
 				} else {
 					// other wise preset is set to red.
-					common.LightLamp(common.ALight{X: x, Y: y, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+					common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
 				}
 			} else {
 				// Unused preset is set to yellow.

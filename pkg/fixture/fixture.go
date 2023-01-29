@@ -253,6 +253,23 @@ func FixtureReceiver(
 		// Propogate the strobe speed.
 		sequence.StrobeSpeed = cmd.StrobeSpeed
 
+		if cmd.StartFlood {
+			var lamp common.Color
+			if cmd.RGBStatic {
+				lamp = cmd.RGBStaticColors[myFixtureNumber].Color
+			} else {
+				lamp = common.Color{R: 255, G: 255, B: 255}
+			}
+			MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.R, Green: lamp.G, Blue: lamp.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+			continue
+		}
+		if cmd.StopFlood {
+			MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+			continue
+		}
+
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 			if cmd.Clear {
@@ -260,22 +277,6 @@ func FixtureReceiver(
 				continue
 			}
 
-			if cmd.StartFlood {
-				var lamp common.Color
-				if cmd.RGBStatic {
-					lamp = cmd.RGBStaticColors[myFixtureNumber].Color
-				} else {
-					lamp = common.Color{R: 255, G: 255, B: 255}
-				}
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, lamp.R, lamp.G, lamp.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
-				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.R, Green: lamp.G, Blue: lamp.B, Brightness: 255}, eventsForLauchpad, guiButtons)
-				continue
-			}
-			if cmd.StopFlood {
-				MapFixtures(cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
-				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
-				continue
-			}
 			if cmd.RGBStatic {
 				sequence := common.Sequence{}
 				sequence.Type = cmd.Type

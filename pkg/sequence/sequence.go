@@ -352,7 +352,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Stop flood mode.
-		if sequence.StopFlood && sequence.FloodPlayOnce {
+		if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("sequence %d Stop flood mode\n", mySequenceNumber)
 			}
