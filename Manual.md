@@ -9,26 +9,61 @@ Firstly we use the Novation Launchpad Mini (Mk3) as the control surface and a ch
 Second design goal was to do away with having to have a large fixture library,  with DMX lights you simply add the description of what channels
 do what to a simple text file.
 
+As of versions 2.0 of dmxlights we now support a fixture editior. The editor is started by clicking on the DMX Lights logo in the top right.
+
+## Features
+
+- Four sequence groups.
+- Automatic chases and automatic color, gobo and patten change.
+- Control of speed, pattern shift, size and fade.
+- Selectable chase bounce.
+- Chase color selection.
+- Chases can be inverted.
+- Sound trigger 800Hz, with fine sensitivity adjustment.
+- Master brightness.
+- RGB, scanners, and projectors supported.
+- Configurable switch bank. 
+- Selectable static colors. 
+- Mini sequencer for single fixture control.
+- Indepentent selection of scanner colors and gobos.
+- Direct flood button.
+- Strobe set by selected sequence.
+- Single key blackout.
+- Fixture editor.
+
 ## Instalation
 
 clone the DMX lights repositary
 
 git clone github.com/dhowlett99/dmxlights
 
-set up the modules
+### Set up the modules and build the code with :-
+
 
 ```sh
-export GO111MODULE=on
-go mod init
-go mod tidy
-
-go build dmxlights.go
+make build
 ```
 
 or on a older mac
 ```sh
-go build -tags legacy dmxlights.go
+make legacy-build
 ```
+creates a dmxlights binary.
+```sh
+./dmxlights
+```
+
+### Creating a Mac application.
+
+```sh
+make deploy 
+```
+```sh
+make legacy-deploy
+```
+creates a dmxlights.app which can be double clicked to start or 
+dragged onto the dock.
+
 
 ### Setting up your fixtures
 
