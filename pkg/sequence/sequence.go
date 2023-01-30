@@ -452,19 +452,21 @@ func PlaySequence(sequence common.Sequence,
 
 					if sequence.AutoColor {
 
-						scannerLastColor := 0
-
-						sequence.ScannerColorMutex.Lock()
-						sequence.ScannerStateMutex.Lock()
-						// AvailableFixtures give the real number of configured scanners.
-						for fixtureNumber, fixture := range sequence.ScannersAvailable {
-
+						// Change all the fixtures to the next gobo.
+						for fixtureNumber := range sequence.ScannersAvailable {
 							sequence.ScannerGoboMutex.Lock()
 							sequence.ScannerGobo[fixtureNumber]++
 							if sequence.ScannerGobo[fixtureNumber] > 7 {
 								sequence.ScannerGobo[fixtureNumber] = 0
 							}
 							sequence.ScannerGoboMutex.Unlock()
+						}
+						scannerLastColor := 0
+
+						sequence.ScannerColorMutex.Lock()
+						sequence.ScannerStateMutex.Lock()
+						// AvailableFixtures gives the real number of configured scanners.
+						for _, fixture := range sequence.ScannersAvailable {
 
 							// First check that this fixture has some configured colors.
 							colors, ok := sequence.ScannerAvailableColors[fixture.Number]
