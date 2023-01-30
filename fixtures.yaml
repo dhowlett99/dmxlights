@@ -619,7 +619,7 @@ fixtures:
     - name: Blue Star
       number: 5
       value: "29"
-    - name: MultiColor Coma
+    - name: Multi Color Coma
       number: 6
       value: "36"
     - name: Purple Bub
@@ -676,7 +676,7 @@ fixtures:
     - name: Blue Star
       number: 5
       value: "29"
-    - name: MultiColor Coma
+    - name: Multi Color Coma
       number: 6
       value: "36"
     - name: Purple Bub
@@ -790,7 +790,7 @@ fixtures:
     - name: Blue Star
       number: 5
       value: "29"
-    - name: MultiColor Coma
+    - name: Multi Color Coma
       number: 6
       value: "36"
     - name: Purple Bub
@@ -847,7 +847,7 @@ fixtures:
     - name: Blue Star
       number: 5
       value: "29"
-    - name: MultiColor Coma
+    - name: Multi Color Coma
       number: 6
       value: "36"
     - name: Purple Bub
