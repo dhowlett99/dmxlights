@@ -737,6 +737,10 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
 
+		if this.LaunchPadConnected {
+			this.Pad.Program()
+		}
+
 		return
 	}
 
@@ -759,6 +763,10 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
 
+		if this.LaunchPadConnected {
+			this.Pad.Program()
+		}
+
 		return
 	}
 
@@ -780,6 +788,10 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
+
+		if this.LaunchPadConnected {
+			this.Pad.Program()
+		}
 
 		return
 	}
