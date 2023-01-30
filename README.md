@@ -7,6 +7,8 @@ connecting to the lighting fixtures.
 Novation Launchpad Mini Mk3 - https://novationmusic.com/en/launch/launchpad-mini
 FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface FT232RL 75176 Module_AM - https://www.ebay.co.uk/itm/333947918351
 
+[DMX Lights Manual.](./Manual.md)
+
 # Dependances
 - github.com/rakyll/launchpad/mk2
 - github.com/oliread/usbdmx"
@@ -16,10 +18,6 @@ FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface 
 
 
 # FTDI Integration
-
-
-
-
 
 ## Notes on getting the FTDI interface working.
 
@@ -51,7 +49,6 @@ I use the mk3 version.
 I have found that the version of libusb-1.0.0.dylib used by the FTDI DMX interface card fails to connect when using the version from the 'brew install libusb' 
 Note if running as root the card does connect but this wasn't deemed a suitable fix as 
 starting the app from the dock runs as a used.
-
 
 
 Otool reveals it has an extra '/System/Library/Frameworks/Security.framework/Versions/A/Security' attribute and the file size is different.
