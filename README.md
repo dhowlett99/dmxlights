@@ -12,8 +12,7 @@ Built for Apple Mac (tested on Catalina 10.15.7)
 [DMX Lights Manual.](./Manual.md)
 
 # Dependances
-- github.com/rakyll/launchpad/mk2
-- github.com/oliread/usbdmx"
+- github.com/rakyll/launchpad/mk3
 - github.com/oliread/usbdmx/ft232"
 - github.com/gordonklaus/portaudio
 - fyne.io/fyne/v2
