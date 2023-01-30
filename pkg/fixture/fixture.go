@@ -341,9 +341,15 @@ func FixtureReceiver(
 
 				// If enables activate the physical scanner.
 				sequence.ScannerColorMutex.RLock()
-				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerSelectedGobo, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+				scannerColor := cmd.ScannerColor[myFixtureNumber]
 				sequence.ScannerColorMutex.RUnlock()
+
+				sequence.ScannerGoboMutex.RLock()
+				scannerGobo := cmd.ScannerGobo[myFixtureNumber]
+				sequence.ScannerGoboMutex.RUnlock()
+
+				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
+					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
 					if cmd.ScannerChase {

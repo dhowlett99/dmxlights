@@ -562,10 +562,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.UpdateGobo:
 		const SELECTED_GOBO = 0
+		const FIXTURE_NUMBER = 1
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.Args[SELECTED_GOBO].Value)
 		}
-		sequence.ScannerGobo = command.Args[SELECTED_GOBO].Value.(int)
+		sequence.ScannerGoboMutex.Lock()
+		sequence.ScannerGobo[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_GOBO].Value.(int)
+		sequence.ScannerGoboMutex.Unlock()
 		sequence.Static = false
 		return sequence
 
@@ -575,7 +578,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[AUTO_COLOR].Value)
 		}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
-		sequence.ScannerGobo = 1
 		if !command.Args[AUTO_COLOR].Value.(bool) {
 			sequence.RecoverSequenceColors = true
 		} else {

@@ -42,6 +42,7 @@ type CurrentState struct {
 	ScannerShift              map[int]int                  // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                   map[int]int                  // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
 	ScannerSize               map[int]int                  // current scanner size for all fixtures. Indexed by sequence
+	ScannerColor              int                          // current scanner color.
 	RGBFade                   map[int]int                  // Indexed by sequence.
 	ScannerFade               map[int]int                  // Indexed by sequence.
 	ScannerCoordinates        map[int]int                  // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
@@ -1447,13 +1448,13 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Set Scanner Color X:%d Y:%d\n", X, Y)
 		}
 
-		scannerColor := X
+		this.ScannerColor = X
 
 		// Set the scanner color for this sequence.
 		cmd := common.Command{
 			Action: common.UpdateScannerColor,
 			Args: []common.Arg{
-				{Name: "SelectedColor", Value: scannerColor},
+				{Name: "SelectedColor", Value: this.ScannerColor},
 				{Name: "SelectedFixture", Value: this.SelectedFixture},
 			},
 		}
@@ -1468,7 +1469,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single color DMX message.
-		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, scannerColor, this.DmxInterfacePresent)
+		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.ScannerColor, this.DmxInterfacePresent)
 
 		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -1511,21 +1512,23 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S C A N N E R   G O B O
 	if X >= 0 && X < 8 && Y != -1 &&
+		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		!this.EditFixtureSelectionMode &&
-		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State &&
-		sequences[this.SelectedSequence].Type == "scanner" {
+		sequences[this.SelectedSequence].Type == "scanner" &&
+		sequences[this.SelectedSequence].Functions[common.Function6_Static_Gobo].State {
+
+		if debug {
+			fmt.Printf("Sequence %d Fixture %d Set Gobo %d\n", this.SelectedSequence, this.SelectedFixture, this.SelectedGobo)
+		}
 
 		this.SelectedGobo = X + 1
 
-		if debug {
-			fmt.Printf("Sequence %d Set Gobo %d\n", this.SelectedSequence, this.SelectedGobo)
-		}
-
-		// Add the selected gobo to the sequence.
+		// Set the selected gobo for this sequence.
 		cmd := common.Command{
 			Action: common.UpdateGobo,
 			Args: []common.Arg{
 				{Name: "SelectedGobo", Value: this.SelectedGobo},
+				{Name: "FixtureNumber", Value: this.SelectedFixture},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1534,9 +1537,6 @@ func ProcessButtons(X int, Y int,
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		// Set the colors.
-		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single gobo DMX message.
 		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo, this.DmxInterfacePresent)
@@ -2221,9 +2221,11 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		if gobo.Number > 8 {
 			return // We only have 8 buttons so we can't select from any more.
 		}
-		if gobo.Number == sequence.ScannerGobo {
+		sequence.ScannerColorMutex.RLock()
+		if gobo.Number == sequence.ScannerGobo[this.SelectedFixture] {
 			gobo.Flash = true
 		}
+		sequence.ScannerColorMutex.RUnlock()
 		if debug {
 			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.ScannerGobo, gobo.Flash)
 		}

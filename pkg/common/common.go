@@ -311,10 +311,11 @@ type Sequence struct {
 	SelectedPattern            int                         // The selected pattern.
 	ScannerSize                int                         // The selected scanner size.
 	ScannerShift               int                         // Used for shifting scanners patterns apart.
-	ScannerGobo                int                         // The selected gobo.
+	ScannerGoboMutex           *sync.RWMutex               // Mutex to protect the scanner gobo map from syncronous access.
+	ScannerGobo                map[int]int                 // Eight scanners per sequence, each can have their own gobo.
 	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
 	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
-	ScannerColorMutex          *sync.RWMutex               // Mutex to protect the scanner color maps from syncronous access.
+	ScannerColorMutex          *sync.RWMutex               // Mutex to protect the scanner color map from syncronous access.
 	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates         []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates int                         // index into scanner coordinates.
@@ -399,7 +400,7 @@ type FixtureCommand struct {
 	ScannerDisableOnce       map[int]bool
 	ScannerChase             bool
 	ScannerAvailableColors   map[int][]StaticColorButton
-	ScannerSelectedGobo      int
+	ScannerGobo              map[int]int
 	ScannerOffsetPan         int
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int
