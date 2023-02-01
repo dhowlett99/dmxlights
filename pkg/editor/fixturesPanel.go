@@ -901,7 +901,7 @@ func checkDMXValue(value string) error {
 
 		// Check the range makes sense.
 		if numbers[1] < numbers[0] && numbers[1] != "" {
-			return fmt.Errorf("second value in range must be less than first")
+			return fmt.Errorf("second value in range must be greater than first")
 		}
 	} else {
 		// Check the single value (no range case).

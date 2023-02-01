@@ -1157,7 +1157,7 @@ fixtures:
   description: ACME Deluge
   type: switch
   group: 4
-  address: 0
+  address: 145
   channels: []
   states:
   - name: "Off"
@@ -1166,30 +1166,67 @@ fixtures:
     buttoncolor: Green
     master: 0
     settings:
-    - name: master dimmer
-      number: 0
-      channel: "145"
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      channel: Master
+      value: "0"
+    - name: "Off"
+      labe: "Off"
+      number: 2
+      channel: Rotate
+      value: "0"
+    - name: "Off"
+      labe: "Off"
+      number: 3
+      channel: Color
       value: "0"
     flash: false
-  - name: "On"
+  - name: Orange
     number: 2
-    label: "On"
-    buttoncolor: Red
+    label: Orange
+    buttoncolor: Orange
     master: 0
     settings:
-    - name: master dimmer
-      number: 0
-      channel: "145"
-      value: "255"
-    - name: effect
-      number: 0
-      channel: "146"
-      value: "135"
-    - name: color
-      number: 0
-      channel: "147"
-      value: "135"
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "50"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "0121"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "0"
     flash: false
+  - name: Rotate
+    number: 3
+    label: Rotate
+    buttoncolor: White
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "50"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "128"
+    flash: false
+  use_fixture: deluge
 - id: 25
   name: switch4
   label: SW4.Vue
@@ -1875,3 +1912,76 @@ fixtures:
     name: Speed
   - number: 6
     name: Master Reverse
+- id: 32
+  name: Deluge
+  label: deluge
+  number: 1
+  description: Acme Deluge
+  type: projector
+  group: 105
+  address: 145
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Rotate
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      value: "0"
+    - name: Clockwise Fast to Slow
+      labe: Clockwise Fast to Slow
+      number: 2
+      value: 10-120
+    - name: "Off"
+      labe: "Off"
+      number: 3
+      value: 121-131
+    - name: AntiClockwise Slow to FastNew
+      labe: AntiClockwise Slow to FastNew
+      number: 4
+      value: 187-196
+    - name: "Off"
+      labe: "Off"
+      number: 5
+      value: 246-255
+  - number: 3
+    name: Color
+    settings:
+    - name: White
+      labe: White
+      number: 1
+      value: 0-7
+    - name: Color1
+      labe: Color1
+      number: 2
+      value: 8-32
+    - name: Color2
+      labe: Color2
+      number: 3
+      value: 33-56
+    - name: Color3
+      labe: Color3
+      number: 4
+      value: 57-80
+    - name: Color4
+      labe: Color4
+      number: 5
+      value: 81-104
+    - name: Color5
+      labe: Color5
+      number: 6
+      value: 105-127
+    - name: Clockwise Fast to Slow
+      labe: Clockwise Fast to Slow
+      number: 7
+      value: 128-186
+    - name: "Off"
+      labe: "Off"
+      number: 8
+      value: 187-196
+    - name: Antilockwise  Slow to Fast
+      labe: Antilockwise  Slow to Fast
+      number: 9
+      value: 197-255
