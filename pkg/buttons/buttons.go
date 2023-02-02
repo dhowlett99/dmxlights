@@ -2671,6 +2671,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
+	// Light the correct sequence selector button.
+	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+
 	// Reset the launchpad.
 	if this.LaunchPadConnected {
 		this.Pad.Program()
