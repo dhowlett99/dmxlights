@@ -252,87 +252,84 @@ type Gobo struct {
 
 // Sequence describes sequences.
 type Sequence struct {
-	Name                       string                      // Sequence name.
-	Label                      string                      // Sequence label.
-	Description                string                      // Sequence description.
-	Number                     int                         // Sequence number.
-	Run                        bool                        // True if this sequence is running.
-	Bounce                     bool                        // True if this sequence is bouncing.
-	RGBInvert                  bool                        // True if RGB sequence patten is inverted.
-	Hide                       bool                        // Hide is used to hide sequence buttons when using function keys.
-	Type                       string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
-	Master                     int                         // Master Brightness
-	Strobe                     bool                        // Strobe is enabled.
-	StrobeSpeed                int                         // Strobe speed.
-	Rotate                     int                         // Rotate speed.
-	RGBShift                   int                         // RGB shift.
-	CurrentSpeed               time.Duration               // Sequence speed represented as a duration.
-	Speed                      int                         // Sequence speed represented by a short number.
-	MusicTrigger               bool                        // Is this sequence in music trigger mode.
-	Blackout                   bool                        // Flag to indicate we're in blackout mode.
-	CurrentColors              []Color                     // Storage for the colors in a sequence.
-	SequenceColors             []Color                     // Temporay storage for changing sequence colors.
-	Color                      int                         // Index into current sequnece colors.
-	Steps                      []Step                      // Steps in this sequence.
-	NumberSteps                int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	NumberFixtures             int                         // Number of fixtures for this sequence.
-	RGBPositions               map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
-	ScannerPositions           map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
-	AutoColor                  bool                        // Sequence is going to automatically change the color.
-	AutoPattern                bool                        // Sequence is going to automatically change the pattern.
-	GuiFunctionLabels          [8]string                   // Storage for the function key labels for this sequence.
-	GuiFixtureLabels           []string                    // Storage for the fixture labels. Used for scanner names.
-	Pattern                    Pattern                     // Contains fixtures and steps info.
-	RGBAvailablePatterns       map[int]Pattern             // Available patterns for the RGB fixtures.
-	RGBAvailableColors         []StaticColorButton         // Available colors for the RGB fixtures.
-	RGBColor                   int                         // The selected RGB fixture color.
-	RGBFade                    int                         // RGB Fade time
-	RGBSize                    int                         // RGB Fade size
-	SavedSequenceColors        []Color                     // Used for updating the color in a sequence.
-	RecoverSequenceColors      bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
-	SaveColors                 bool                        // Indicate we should save colors in this sequence. used for above.
-	Mode                       string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
-	StaticColors               []StaticColorButton         // Used in static color editing
-	Clear                      bool                        // Clear all fixtures in this sequence.
-	Static                     bool                        // We're a static sequence.
-	PlayStaticOnce             bool                        // Play a static scene only once.
-	PlaySwitchOnce             bool                        // Play a switch sequence scene only once.
-	PlaySingleSwitch           bool                        // Play a single switch.
-	StartFlood                 bool                        // We're in flood mode.
-	StopFlood                  bool                        // We're not in flood mode.
-	StartStrobe                bool                        // We're in strobe mode.
-	StopStrobe                 bool                        // We're not in strobe mode.
-	FloodPlayOnce              bool                        // Play the flood sceme only once.
-	FloodSelectedSequence      map[int]bool                // A map that remembers who is in flood mode.
-	ScannerAvailableColors     map[int][]StaticColorButton // Available colors for this scanner.
-	ScannerAvailableGobos      map[int][]StaticColorButton // Available gobos for this scanner.
-	ScannerAvailablePatterns   map[int]Pattern             // Available patterns for this scanner.
-	ScannersAvailable          []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
-	SelectedPattern            int                         // The selected pattern.
-	ScannerSize                int                         // The selected scanner size.
-	ScannerShift               int                         // Used for shifting scanners patterns apart.
-	ScannerGoboMutex           *sync.RWMutex               // Mutex to protect the scanner gobo map from syncronous access.
-	ScannerGobo                map[int]int                 // Eight scanners per sequence, each can have their own gobo.
-	ScannerChase               bool                        // Chase the scanner shutters instead of allways being on.
-	ScannerInvert              bool                        // Invert the scanner, i.e scanner in the opposite direction.
-	ScannerColorMutex          *sync.RWMutex               // Mutex to protect the scanner color map from syncronous access.
-	ScannerColor               map[int]int                 // Eight scanners per sequence, each can have their own color.
-	ScannerCoordinates         []int                       // Number of scanner coordinates.
-	ScannerSelectedCoordinates int                         // index into scanner coordinates.
-	ScannerOffsetPan           int                         // Offset for pan values.
-	ScannerOffsetTilt          int                         // Offset for tilt values.
-	ScannerStateMutex          *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
-	ScannerState               map[int]ScannerState        // Map of fixtures which are disabled.
-	DisableOnceMutex           *sync.RWMutex               // Mutex to protect the  disable maps from syncronous access.
-	DisableOnce                map[int]bool                // Map used to play disable only once.
-	UpdateSize                 bool                        // Command to update size.
-	UpdateShift                bool                        // Command to update the shift.
-	UpdatePattern              bool                        // Flag to indicate we're going to change the RGB pattern.
-	UpdateSequenceColor        bool                        // Command to update the sequence colors.
-	Functions                  []Function                  // Storage for the sequence functions.
-	FunctionMode               bool                        // This sequence is in function mode.
-	Switches                   []Switch                    // A switch sequence stores its data in here.
-	CurrentSwitch              int
+	Name                        string                      // Sequence name.
+	Label                       string                      // Sequence label.
+	Description                 string                      // Sequence description.
+	Number                      int                         // Sequence number.
+	Run                         bool                        // True if this sequence is running.
+	Bounce                      bool                        // True if this sequence is bouncing.
+	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
+	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
+	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
+	Master                      int                         // Master Brightness
+	Strobe                      bool                        // Strobe is enabled.
+	StrobeSpeed                 int                         // Strobe speed.
+	Rotate                      int                         // Rotate speed.
+	RGBShift                    int                         // RGB shift.
+	CurrentSpeed                time.Duration               // Sequence speed represented as a duration.
+	Speed                       int                         // Sequence speed represented by a short number.
+	MusicTrigger                bool                        // Is this sequence in music trigger mode.
+	Blackout                    bool                        // Flag to indicate we're in blackout mode.
+	CurrentColors               []Color                     // Storage for the colors in a sequence.
+	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
+	Color                       int                         // Index into current sequnece colors.
+	Steps                       []Step                      // Steps in this sequence.
+	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
+	NumberFixtures              int                         // Number of fixtures for this sequence.
+	RGBPositions                map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
+	ScannerPositions            map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
+	AutoColor                   bool                        // Sequence is going to automatically change the color.
+	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
+	GuiFunctionLabels           [8]string                   // Storage for the function key labels for this sequence.
+	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
+	Pattern                     Pattern                     // Contains fixtures and steps info.
+	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
+	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
+	RGBColor                    int                         // The selected RGB fixture color.
+	RGBFade                     int                         // RGB Fade time
+	RGBSize                     int                         // RGB Fade size
+	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
+	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
+	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
+	Mode                        string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	StaticColors                []StaticColorButton         // Used in static color editing
+	Clear                       bool                        // Clear all fixtures in this sequence.
+	Static                      bool                        // We're a static sequence.
+	PlayStaticOnce              bool                        // Play a static scene only once.
+	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
+	PlaySingleSwitch            bool                        // Play a single switch.
+	StartFlood                  bool                        // We're in flood mode.
+	StopFlood                   bool                        // We're not in flood mode.
+	StartStrobe                 bool                        // We're in strobe mode.
+	StopStrobe                  bool                        // We're not in strobe mode.
+	FloodPlayOnce               bool                        // Play the flood sceme only once.
+	FloodSelectedSequence       map[int]bool                // A map that remembers who is in flood mode.
+	ScannerAvailableColorsMutex *sync.RWMutex               // Mutex to protect the scanner available colors map from syncronous access.
+	ScannerAvailableColors      map[int][]StaticColorButton // Available colors for this scanner.
+	ScannerAvailableGobos       map[int][]StaticColorButton // Available gobos for this scanner.
+	ScannerAvailablePatterns    map[int]Pattern             // Available patterns for this scanner.
+	ScannersAvailable           []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
+	SelectedPattern             int                         // The selected pattern.
+	ScannerSize                 int                         // The selected scanner size.
+	ScannerShift                int                         // Used for shifting scanners patterns apart.
+	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
+	ScannerChase                bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerInvert               bool                        // Invert the scanner, i.e scanner in the opposite direction.
+	ScannerColor                map[int]int                 // Eight scanners per sequence, each can have their own color.
+	ScannerCoordinates          []int                       // Number of scanner coordinates.
+	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
+	ScannerOffsetPan            int                         // Offset for pan values.
+	ScannerOffsetTilt           int                         // Offset for tilt values.
+	ScannerState                map[int]ScannerState        // Map of fixtures which are disabled.
+	DisableOnce                 map[int]bool                // Map used to play disable only once.
+	UpdateSize                  bool                        // Command to update size.
+	UpdateShift                 bool                        // Command to update the shift.
+	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
+	UpdateSequenceColor         bool                        // Command to update the sequence colors.
+	Functions                   []Function                  // Storage for the sequence functions.
+	FunctionMode                bool                        // This sequence is in function mode.
+	Switches                    []Switch                    // A switch sequence stores its data in here.
+	CurrentSwitch               int
 }
 
 type Function struct {
@@ -394,13 +391,13 @@ type FixtureCommand struct {
 	RGBStaticColors []StaticColorButton
 
 	// Scanner Commands.
-	ScannerColor             map[int]int
+	ScannerColor             int
 	ScannerPosition          Position
-	ScannerState             map[int]ScannerState
-	ScannerDisableOnce       map[int]bool
+	ScannerState             ScannerState
+	ScannerDisableOnce       bool
 	ScannerChase             bool
-	ScannerAvailableColors   map[int][]StaticColorButton
-	ScannerGobo              map[int]int
+	ScannerAvailableColors   []StaticColorButton
+	ScannerGobo              int
 	ScannerOffsetPan         int
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int

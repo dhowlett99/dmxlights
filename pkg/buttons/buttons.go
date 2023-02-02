@@ -2156,7 +2156,7 @@ func ShowScannerStatus(selectedSequence int, sequence common.Sequence, this *Cur
 		}
 
 	}
-	time.Sleep(1 * time.Second) // Wait so we can see the changes.
+	time.Sleep(200 * time.Millisecond) // Wait so we can see the changes.
 	common.RevealSequence(selectedSequence, commandChannels)
 }
 
@@ -2233,11 +2233,9 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 		if gobo.Number > 8 {
 			return // We only have 8 buttons so we can't select from any more.
 		}
-		sequence.ScannerColorMutex.RLock()
 		if gobo.Number == sequence.ScannerGobo[this.SelectedFixture] {
 			gobo.Flash = true
 		}
-		sequence.ScannerColorMutex.RUnlock()
 		if debug {
 			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.ScannerGobo, gobo.Flash)
 		}
@@ -2275,11 +2273,9 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		if debug {
 			fmt.Printf("Lamp %+v\n", lamp)
 		}
-		sequence.ScannerColorMutex.RLock()
 		if fixtureNumber == sequence.ScannerColor[this.SelectedFixture] {
 			lamp.Flash = true
 		}
-		sequence.ScannerColorMutex.RUnlock()
 
 		if lamp.Flash {
 			Black := common.Color{R: 0, G: 0, B: 0}

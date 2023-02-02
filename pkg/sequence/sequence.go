@@ -25,7 +25,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
@@ -189,13 +188,6 @@ func CreateSequence(
 		ScannerOffsetTilt:      common.ScannerMidPoint,
 		GuiFixtureLabels:       fixtureLabels,
 	}
-
-	// Since we will be accessing these maps from the sequence thread and the fixture threads
-	// We need to protect the maps from syncronous access.
-	sequence.ScannerStateMutex = &sync.RWMutex{}
-	sequence.DisableOnceMutex = &sync.RWMutex{}
-	sequence.ScannerColorMutex = &sync.RWMutex{}
-	sequence.ScannerGoboMutex = &sync.RWMutex{}
 
 	if sequence.Type == "rgb" {
 		sequence.GuiFunctionLabels[0] = "Set\nPatten"
@@ -454,17 +446,13 @@ func PlaySequence(sequence common.Sequence,
 
 						// Change all the fixtures to the next gobo.
 						for fixtureNumber := range sequence.ScannersAvailable {
-							sequence.ScannerGoboMutex.Lock()
 							sequence.ScannerGobo[fixtureNumber]++
 							if sequence.ScannerGobo[fixtureNumber] > 7 {
 								sequence.ScannerGobo[fixtureNumber] = 0
 							}
-							sequence.ScannerGoboMutex.Unlock()
 						}
 						scannerLastColor := 0
 
-						sequence.ScannerColorMutex.Lock()
-						sequence.ScannerStateMutex.Lock()
 						// AvailableFixtures gives the real number of configured scanners.
 						for _, fixture := range sequence.ScannersAvailable {
 
@@ -485,8 +473,6 @@ func PlaySequence(sequence common.Sequence,
 								}
 							}
 						}
-						sequence.ScannerStateMutex.Unlock()
-						sequence.ScannerColorMutex.Unlock()
 					}
 				}
 
@@ -505,9 +491,7 @@ func PlaySequence(sequence common.Sequence,
 						// Calulate positions for each RGB fixture.
 						optimisation := true
 						// Retrieve the scanner state.
-						sequence.ScannerStateMutex.RLock()
 						scannerState := sequence.ScannerState
-						sequence.ScannerStateMutex.RUnlock()
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
 						positions, num := position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
@@ -545,9 +529,7 @@ func PlaySequence(sequence common.Sequence,
 					// Calulate positions for each RGB fixture.
 					optimisation := true
 					// Retrieve the scanner state.
-					sequence.ScannerStateMutex.RLock()
 					scannerState := sequence.ScannerState
-					sequence.ScannerStateMutex.RUnlock()
 					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
 				}
 
@@ -606,22 +588,6 @@ func PlaySequence(sequence common.Sequence,
 					sequence.CurrentColors = common.HowManyScannerColors(sequence.ScannerPositions[fixture])
 				}
 
-				sequence.ScannerStateMutex.RLock()
-				scannerState := sequence.ScannerState
-				sequence.ScannerStateMutex.RUnlock()
-
-				sequence.DisableOnceMutex.RLock()
-				disabledOnce := sequence.DisableOnce
-				sequence.DisableOnceMutex.RUnlock()
-
-				sequence.ScannerStateMutex.RLock()
-				scannerColor := sequence.ScannerColor
-				sequence.ScannerStateMutex.RUnlock()
-
-				sequence.ScannerGoboMutex.RLock()
-				scannerGobo := sequence.ScannerGobo
-				sequence.ScannerGoboMutex.RUnlock()
-
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < sequence.NumberSteps; step++ {
@@ -637,7 +603,8 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					for fixtureNumber, fixture := range fixtureStepChannels {
-						if scannerState[fixtureNumber].Enabled {
+
+						if sequence.ScannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
 								Step:                     step,
 								NumberSteps:              sequence.NumberSteps,
@@ -653,12 +620,12 @@ func PlaySequence(sequence common.Sequence,
 								StopFlood:                sequence.StopFlood,
 								SequenceNumber:           sequence.Number,
 								ScannerPosition:          sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
-								ScannerGobo:              scannerGobo,
-								ScannerState:             scannerState,
-								ScannerDisableOnce:       disabledOnce,
+								ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
+								ScannerState:             sequence.ScannerState[fixtureNumber],
+								ScannerDisableOnce:       sequence.DisableOnce[fixtureNumber],
 								ScannerChase:             sequence.ScannerChase,
-								ScannerColor:             scannerColor,
-								ScannerAvailableColors:   sequence.ScannerAvailableColors,
+								ScannerColor:             sequence.ScannerColor[fixtureNumber],
+								ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],
 								ScannerOffsetPan:         sequence.ScannerOffsetPan,
 								ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 								ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],

@@ -99,14 +99,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.ScannerOffsetPan = common.ScannerMidPoint
 			sequence.ScannerOffsetTilt = common.ScannerMidPoint
 			// Enable all scanners.
-			sequence.ScannerStateMutex.Lock()
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[scanner] = newScannerState
 			}
-			sequence.ScannerStateMutex.Unlock()
 			// Reset the number of coordinates.
 			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
 			// Reset the scanner size back to default. common.DefaultScannerSize
@@ -401,9 +399,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
 		}
 		sequence.SaveColors = true
-		sequence.ScannerColorMutex.Lock()
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
-		sequence.ScannerColorMutex.Unlock()
 		return sequence
 
 	case common.ClearSequenceColor:
@@ -521,14 +517,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.EnableAllScanners:
 		const SEQUENCE_NUMBER = 0 // Integer
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			sequence.ScannerStateMutex.Lock()
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[command.Args[scanner].Value.(int)] = newScannerState
 			}
-			sequence.ScannerStateMutex.Unlock()
 		}
 
 	// Here we want to disable/enable the selected scanner.
@@ -542,20 +536,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
-				sequence.ScannerStateMutex.Lock()
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
 				newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
 				sequence.ScannerState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
-				sequence.ScannerStateMutex.Unlock()
 			}
 		}
 
 		// When we disable a fixture we send a off command to the shutter to make it go off.
 		// We only want to do this once to avoid flooding the universe with DMX commands.
-		sequence.DisableOnceMutex.Lock()
 		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
-		sequence.DisableOnceMutex.Unlock()
 		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence
@@ -566,9 +556,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Gobo to Number %d\n", mySequenceNumber, command.Args[SELECTED_GOBO].Value)
 		}
-		sequence.ScannerGoboMutex.Lock()
 		sequence.ScannerGobo[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_GOBO].Value.(int)
-		sequence.ScannerGoboMutex.Unlock()
 		sequence.Static = false
 		return sequence
 

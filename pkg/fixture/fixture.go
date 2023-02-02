@@ -302,9 +302,7 @@ func FixtureReceiver(
 					common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				}
 
-				sequence.ScannerColorMutex.RLock()
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
-				sequence.ScannerColorMutex.RUnlock()
 			}
 		}
 
@@ -319,53 +317,34 @@ func FixtureReceiver(
 			// find the fixture
 			fixture := cmd.ScannerPosition.Fixtures[myFixtureNumber]
 
-			sequence.ScannerStateMutex.RLock()
-			enabled := cmd.ScannerState[myFixtureNumber].Enabled
-			sequence.ScannerStateMutex.RUnlock()
-
-			sequence.DisableOnceMutex.RLock()
-			disableOnce := cmd.ScannerDisableOnce[myFixtureNumber]
-			sequence.DisableOnceMutex.RUnlock()
-
 			// If this fixture is disabled then shut the shutter off.
-			if disableOnce && !enabled {
+			if cmd.ScannerDisableOnce && !cmd.ScannerState.Enabled {
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, false, 0, dmxInterfacePresent)
 				// Locking for write.
-				sequence.DisableOnceMutex.Lock()
 				sequence.DisableOnce[myFixtureNumber] = false
-				sequence.DisableOnceMutex.Unlock()
 				continue
 			}
 
-			if enabled {
+			if cmd.ScannerState.Enabled {
 
 				// If enables activate the physical scanner.
-				sequence.ScannerColorMutex.RLock()
-				scannerColor := cmd.ScannerColor[myFixtureNumber]
-				sequence.ScannerColorMutex.RUnlock()
-
-				sequence.ScannerGoboMutex.RLock()
-				scannerGobo := cmd.ScannerGobo[myFixtureNumber]
-				sequence.ScannerGoboMutex.RUnlock()
+				scannerColor := cmd.ScannerColor
 
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
 					if cmd.ScannerChase {
 						// We are chase mode, we want the buttons to be the color selected for this scanner.
 						// Remember that fixtures in the real world start with 1 not 0.
-						realFixture := myFixtureNumber + 1
+						//realFixture := myFixtureNumber + 1
 						// Find the color that has been selected for this fixture.
 						// selected color is an index into the scanner colors selected.
-						sequence.ScannerColorMutex.RLock()
-						selectedColor := cmd.ScannerColor[myFixtureNumber]
-						sequence.ScannerColorMutex.RUnlock()
+						selectedColor := cmd.ScannerColor
 
 						// Do we have a set of available colors for this fixture.
-						_, ok := cmd.ScannerAvailableColors[realFixture]
-						if ok {
-							availableColors := cmd.ScannerAvailableColors[realFixture]
+						if len(cmd.ScannerAvailableColors) != 0 {
+							availableColors := cmd.ScannerAvailableColors
 							red := availableColors[selectedColor].Color.R
 							green := availableColors[selectedColor].Color.G
 							blue := availableColors[selectedColor].Color.B
@@ -833,16 +812,16 @@ func MapSwitchFixture(mySequenceNumber int,
 									if strings.Contains(setting.Name, "reverse") || strings.Contains(setting.Name, "invert") {
 										c, _ := strconv.Atoi(setting.Channel)
 										if debug {
-											fmt.Printf("Master Reverse->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c-1, fixture.Address+int16(c-1), reverse_dmx(howBright))
+											fmt.Printf("Master Reverse->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), reverse_dmx(howBright))
 											fmt.Printf("howBright %d\n", howBright)
 										}
-										setChannel(fixture.Address+int16(c-1), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
+										setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 									} else {
 										c, _ := strconv.Atoi(setting.Channel)
 										if debug {
-											fmt.Printf("Master->setting address %d setting.Channel %d total %d to value %f\n", fixture.Address, c-1, fixture.Address+int16(c-1), v)
+											fmt.Printf("Master->setting address %d setting.Channel %d total %d to value %f\n", fixture.Address, c, fixture.Address+int16(c), v)
 										}
-										setChannel(fixture.Address+int16(c-1), byte(howBright), dmxController, dmxInterfacePresent)
+										setChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
 									}
 
 								} else {
@@ -855,9 +834,9 @@ func MapSwitchFixture(mySequenceNumber int,
 											// If the channel has is a number set it directly.
 											c, _ := strconv.Atoi(setting.Channel)
 											if debug {
-												fmt.Printf("Direct Channel Number ->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c-1, fixture.Address+int16(c-1), v)
+												fmt.Printf("Direct Channel Number ->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c-1), byte(v), dmxController, dmxInterfacePresent)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											// Handle the fact that the channel may be a label as well.
 											fixture, err := findFixtureByName(useFixture, fixtures)
@@ -867,9 +846,9 @@ func MapSwitchFixture(mySequenceNumber int,
 											}
 											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, setting.Channel, fixtures)
 											if debug {
-												fmt.Printf("Label Lookup Channel Number->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c-1, fixture.Address+int16(c-1), v)
+												fmt.Printf("Label Lookup Channel Number->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c-1), byte(v), dmxController, dmxInterfacePresent)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 
 									} else {
@@ -889,9 +868,9 @@ func MapSwitchFixture(mySequenceNumber int,
 										if IsNumericOnly(setting.Channel) {
 											c, _ := strconv.ParseFloat(setting.Channel, 32)
 											if debug {
-												fmt.Printf("Setting Number ->setting address %d setting.Channel %f total %d to value %d\n", fixture.Address, c-1, fixture.Address+int16(c-1), v)
+												fmt.Printf("Setting Number ->setting address %d setting.Channel %f total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c-1), byte(v), dmxController, dmxInterfacePresent)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											fixture, err := findFixtureByName(useFixture, fixtures)
 											if err != nil {
@@ -900,9 +879,9 @@ func MapSwitchFixture(mySequenceNumber int,
 											}
 											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, setting.Channel, fixtures)
 											if debug {
-												fmt.Printf("Setting Label->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c-1, fixture.Address+int16(c-1), v)
+												fmt.Printf("Setting Label->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c-1), byte(v), dmxController, dmxInterfacePresent)
+											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 									}
 								}
@@ -1079,12 +1058,8 @@ func turnOnFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtu
 	if !cmd.Hide {
 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	}
-	// Create a temporary map of fixture colors.
-	sequence.ScannerColorMutex.Lock()
-	cmd.ScannerColor = make(map[int]int)
-	cmd.ScannerColor[myFixtureNumber] = FindColor(myFixtureNumber, mySequenceNumber, "White", fixtures, cmd.ScannerColor)
-	sequence.ScannerColorMutex.Unlock()
-
+	// Find the color number for White.
+	scannerColor := FindColor(myFixtureNumber, mySequenceNumber, "White", fixtures)
 	red := 255
 	green := 255
 	blue := 255
@@ -1101,9 +1076,7 @@ func turnOnFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtu
 	music := 0
 	program := 0
 
-	sequence.ScannerColorMutex.RLock()
-	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, sequence.ScannerColor[myFixtureNumber], fixtures, false, brightness, master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
-	sequence.ScannerColorMutex.RUnlock()
+	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, scannerColor, fixtures, false, brightness, master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
@@ -1128,19 +1101,15 @@ func FindGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fi
 }
 
 // FindColor takes the name of a color channel setting like "White" and returns the color number for this type of scanner.
-func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures, scannerColors map[int]int) int {
+func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures) int {
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for _, channel := range fixture.Channels {
 				if fixture.Number == myFixtureNumber+1 {
 					if strings.Contains(channel.Name, "Color") {
-						for colorNumber := range scannerColors {
-							if colorNumber == myFixtureNumber {
-								for _, setting := range channel.Settings {
-									if setting.Number-1 == scannerColors[myFixtureNumber] {
-										return setting.Number
-									}
-								}
+						for _, setting := range channel.Settings {
+							if setting.Name == color {
+								return setting.Number
 							}
 						}
 					}
