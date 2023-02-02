@@ -171,6 +171,7 @@ type Command struct {
 // Valid Command Actions.
 const (
 	Actions int = iota
+	Clear
 	Reset
 	UpdateMode
 	UpdateStatic

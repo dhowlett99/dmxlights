@@ -2596,6 +2596,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 	}
 
+	// Turn off the strobe light.
+	common.LightLamp(common.ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255, Flash: false}, eventsForLaunchpad, guiButtons)
+
 	// Clear out soundtriggers
 	for _, trigger := range this.SoundTriggers {
 		trigger.State = false
@@ -2661,6 +2664,12 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	// Clear the presets and display them.
 	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+
+	// Turn off all fixtures.
+	cmd = common.Command{
+		Action: common.Clear,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Reset the launchpad.
 	if this.LaunchPadConnected {

@@ -478,7 +478,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
-				if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
 
@@ -598,7 +598,7 @@ func PlaySequence(sequence common.Sequence,
 						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
 					}
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels)
-					if !sequence.Run || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}
 

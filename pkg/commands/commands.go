@@ -79,6 +79,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Reset the speed back to the default.
 		sequence.Speed = common.DefaultSpeed
 		sequence.CurrentSpeed = SetSpeed(common.DefaultSpeed)
+		// Stop the strobe mode.
+		sequence.Strobe = false
+		sequence.StrobeSpeed = 0
+		sequence.StartFlood = false
+		sequence.StopFlood = true
+		sequence.FloodPlayOnce = true
 		if sequence.Type == "rgb" {
 			// Reset the RGB shift back to the default.
 			sequence.RGBShift = common.DefaultRGBShift
@@ -90,9 +96,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StartFlood = false
 			sequence.StopFlood = true
 			sequence.FloodPlayOnce = true
-			// Stop the strobe mode.
-			sequence.Strobe = false
-			sequence.StrobeSpeed = 0
 		}
 		if sequence.Type == "scanner" {
 			// Reset pan and tilt to the center
@@ -132,6 +135,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			}
 			sequence.PlaySwitchOnce = true
 		}
+		return sequence
+
+	case common.Clear:
+		if debug {
+			fmt.Printf("%d: Command Clear\n", mySequenceNumber)
+		}
+		sequence.Clear = true
 		return sequence
 
 	case common.Hide:

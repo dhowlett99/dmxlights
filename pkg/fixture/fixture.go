@@ -269,13 +269,13 @@ func FixtureReceiver(
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 			continue
 		}
+		if cmd.Clear {
+			turnOffFixtures(sequence, cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
+			continue
+		}
 
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
-			if cmd.Clear {
-				turnOffFixtures(sequence, cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
-				continue
-			}
 
 			if cmd.RGBStatic {
 				sequence := common.Sequence{}
@@ -1048,9 +1048,9 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 // turnOffFixtures is used to turn off a fixture when we stop a sequence.
 func turnOffFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxInterfacePresent bool) {
-	if !cmd.Hide {
-		common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
-	}
+	// if !cmd.Hide {
+	// 	common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
+	// }
 	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
