@@ -755,8 +755,8 @@ func GetRGBColorByName(color string) (Color, error) {
 
 func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	switch color {
-	case Color{R: 0, G: 100, B: 255}:
-		return 0x2a // Light Blue
+	case Color{R: 0, G: 196, B: 255}:
+		return 0x25 // Light Blue
 	case Color{R: 255, G: 0, B: 0}:
 		return 0x48 // Red
 	case Color{R: 255, G: 111, B: 0}:
