@@ -33,27 +33,24 @@ import (
 
 const debug_mini bool = false
 
-// newMiniSequencer is a simple sequencer which can be attached to a switch and a fixture to allow simple effects.
-func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, action Action, dmxController *ft232.DMXController, fixturesConfig *Fixtures,
+// newMiniSequencer is a simple sequencer which can be attached to a switch and a single fixture to allow simple effects.
+// The miniSequenceer implements the actions attaced to a switch state.
+// Currently we support 1. Off 2. Control, ability to set programs 3. Static colors 4. Chase. soft, hard and timed or music triggered.
+// Long term objective of actions is to replace the direct value settings.
+func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, action Action,
+	dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels map[int]common.SwitchChannel, soundConfig *sound.SoundConfig,
 	blackout bool, brightness int, master int, dmxInterfacePresent bool) {
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
 
-	// Find the fixture for this switch mini sequence.
-	fixture, err := findFixtureByName(fixtureName, fixturesConfig)
-	if err != nil {
-		fmt.Printf("error %s\n", err.Error())
-		return
-	}
-
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
 	// Find all the specified settings for the program channel
-	programSettings, err := GetChannelSettinsByName(fixtureName, "Program", fixturesConfig)
+	programSettings, err := GetChannelSettinsByName(fixture.Name, "Program", fixturesConfig)
 	if err != nil {
-		fmt.Printf("newMiniSequencer: no program settings found for fixture %s\n", fixtureName)
+		fmt.Printf("newMiniSequencer: no program settings found for fixture %s\n", fixture.Name)
 	}
 
 	cfg := getConfig(action, programSettings)
@@ -77,18 +74,18 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		return
 	}
 
@@ -107,30 +104,30 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannel("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
 		if err != nil {
-			fmt.Printf("fixture %s program channel not found: %s,", fixtureName, err)
+			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Look up the program state required.
 		v, err := findChannelSettingByName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
 		if err != nil {
-			fmt.Printf("fixture %s program state not found: %s,", fixtureName, err)
+			fmt.Printf("fixture %s program state not found: %s,", fixture.Name, err)
 			return
 		}
 
@@ -155,14 +152,14 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -200,7 +197,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Turn off the fixture.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -212,7 +209,7 @@ func newMiniSequencer(fixtureName string, switchNumber int, switchPosition int, 
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixtureName, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
