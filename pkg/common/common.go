@@ -33,7 +33,7 @@ const MaxScannerSize = 120
 const MaxRGBSize = 120
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.
-const MaxBrightness = 255
+const MaxDMXBrightness = 255
 const DefaultPattern = 0
 const DefaultRGBSize = 1
 const DefaultRGBFade = 1
@@ -1227,9 +1227,9 @@ func Reverse(in int) int {
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
 
-	fadeUpValues := GetFadeValues(float64(MaxBrightness), fade, false)
-	fadeOnValues := GetFadeOnValues(MaxBrightness, size)
-	fadeDownValues := GetFadeValues(float64(MaxBrightness), fade, true)
+	fadeUpValues := GetFadeValues(float64(MaxDMXBrightness), fade, false)
+	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, size)
+	fadeDownValues := GetFadeValues(float64(MaxDMXBrightness), fade, true)
 
 	slopeOn = append(slopeOn, fadeUpValues...)
 	slopeOn = append(slopeOn, fadeOnValues...)

@@ -85,6 +85,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StartFlood = false
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
+		// Set Master brightness back to max.
+		sequence.Master = common.MasterBrightness
+
 		if sequence.Type == "rgb" {
 			// Reset the RGB shift back to the default.
 			sequence.RGBShift = common.DefaultRGBShift

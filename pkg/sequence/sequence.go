@@ -173,7 +173,7 @@ func CreateSequence(
 		ScannerShift:           common.DefaultScannerShift,
 		RGBShift:               common.DefaultRGBShift,
 		Blackout:               false,
-		Master:                 common.MaxBrightness,
+		Master:                 common.MaxDMXBrightness,
 		ScannerGobo:            scannerGobos,
 		StartFlood:             false,
 		RGBColor:               1,

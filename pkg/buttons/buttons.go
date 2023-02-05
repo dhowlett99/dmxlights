@@ -222,9 +222,9 @@ func ProcessButtons(X int, Y int,
 			this.SelectedSequence = 0
 			// Indicate if this sequence is running.
 			if this.Running[this.SelectedSequence] {
-				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MaxBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			}
 			this.SelectButtonPressed[this.SelectedSequence] = false
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -419,8 +419,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		this.MasterBrightness = this.MasterBrightness + 10
-		if this.MasterBrightness > 255 {
-			this.MasterBrightness = 255
+		if this.MasterBrightness > common.MaxDMXBrightness {
+			this.MasterBrightness = common.MaxDMXBrightness
 		}
 		cmd := common.Command{
 			Action: common.MasterBrightness,
@@ -444,7 +444,7 @@ func ProcessButtons(X int, Y int,
 		if this.SavePreset { // Turn the save mode off.
 			this.SavePreset = false
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			return
 		}
 		this.SavePreset = true
@@ -472,11 +472,11 @@ func ProcessButtons(X int, Y int,
 			current := this.PresetsStore[location]
 			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label}
 			this.LastPreset = &location
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 
 			// turn off the save button from flashing.
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			presets.SavePresets(this.PresetsStore)
 
@@ -507,9 +507,9 @@ func ProcessButtons(X int, Y int,
 					this.SelectedSequence = 0
 					// Indicate if this sequence is running.
 					if this.Running[this.SelectedSequence] {
-						common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MaxBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 					} else {
-						common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 					}
 					this.SelectButtonPressed[this.SelectedSequence] = false
 					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -833,7 +833,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			// The scanner sequence has stopped, so show the status of the scanners.
 			if sequences[this.SelectedSequence].Type == "scanner" {
@@ -856,7 +856,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			this.Running[this.SelectedSequence] = true
 			return
 		}
@@ -1341,7 +1341,7 @@ func ProcessButtons(X int, Y int,
 				this.StaticButtons[this.SelectedSequence].Color.R = 255
 			}
 
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: this.StaticButtons[this.SelectedSequence].Color.R, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
@@ -1369,7 +1369,7 @@ func ProcessButtons(X int, Y int,
 			if this.StaticButtons[this.SelectedSequence].Color.G < 0 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 255
 			}
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 0, Green: this.StaticButtons[this.SelectedSequence].Color.G, Blue: 0}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
@@ -1397,7 +1397,7 @@ func ProcessButtons(X int, Y int,
 			if this.StaticButtons[this.SelectedSequence].Color.B < 0 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 255
 			}
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 0, Green: 0, Blue: this.StaticButtons[this.SelectedSequence].Color.B}, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
@@ -1789,7 +1789,7 @@ func ProcessButtons(X int, Y int,
 				Action: common.Blackout,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.FlashLight(8, 7, common.Pink, common.White, eventsForLaunchpad, guiButtons)
 		} else {
 			this.Blackout = false
@@ -1797,7 +1797,7 @@ func ProcessButtons(X int, Y int,
 				Action: common.Normal,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 		}
 		return
 	}
@@ -2139,19 +2139,19 @@ func ShowScannerStatus(selectedSequence int, sequence common.Sequence, this *Cur
 
 		// Enabled but not inverted then On and green.
 		if this.ScannerState[scannerNumber][sequence.Number].Enabled && !this.ScannerState[scannerNumber][sequence.Number].Inverted {
-			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MaxBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "On", guiButtons)
 		}
 
 		// Enabled and inverted then Invert and red.
 		if this.ScannerState[scannerNumber][sequence.Number].Enabled && this.ScannerState[scannerNumber][sequence.Number].Inverted {
-			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MaxBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "Invert", guiButtons)
 		}
 
 		// Not enabled and not inverted then off and blue.
 		if !this.ScannerState[scannerNumber][sequence.Number].Enabled && !this.ScannerState[scannerNumber][sequence.Number].Inverted {
-			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MaxBrightness, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: common.MasterBrightness, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "Off", guiButtons)
 		}
 
@@ -2185,7 +2185,7 @@ func ShowRGBColorSelectionButtons(mySequenceNumber int, sequence common.Sequence
 			Black := common.Color{R: 0, G: 0, B: 0}
 			common.FlashLight(myFixtureNumber, mySequenceNumber, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: common.MaxBrightness, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Brightness: common.MasterBrightness, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLaunchpad, guiButtons)
 		}
 	}
 }
@@ -2393,7 +2393,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Turn off the local copy of the this.Flood flag.
 	this.Flood = false
 	// And stop the flood button flashing.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 	// Remember we selected this preset
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)
@@ -2450,7 +2450,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	// Turn the flood button back to white.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 	// Send a message to stop
 	cmd := common.Command{
@@ -2587,13 +2587,13 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 	// Turn off the Running light.
-	common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 	// Turn off the this.Flood
 	if this.Flood {
 		this.Flood = false
 		// Turn the flood button back to white.
-		common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MaxBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 	}
 
 	// Turn off the strobe light.
@@ -2636,6 +2636,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditScannerColorsMode[sequenceNumber] = false                         // Clear scanner color mode.
 		this.EditSequenceColorsMode[sequenceNumber] = false                        // Clear rgb color mode.
 		this.EditStaticColorsMode[sequenceNumber] = false                          // Clear static color mode.
+		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
 
 		if sequence.Type == "scanner" {
 			// Enable all scanners.
@@ -2673,6 +2674,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Light the correct sequence selector button.
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+
+	// Clear the graphics labels.
+	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 	// Reset the launchpad.
 	if this.LaunchPadConnected {
