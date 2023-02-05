@@ -1163,7 +1163,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    buttoncolor: Green
+    buttoncolor: Black
     master: 0
     settings:
     - name: "Off"
@@ -1182,32 +1182,10 @@ fixtures:
       channel: Color
       value: "0"
     flash: false
-  - name: Orange
+  - name: Color1
     number: 2
-    label: Orange
-    buttoncolor: Orange
-    master: 0
-    settings:
-    - name: Master
-      labe: Master
-      number: 1
-      channel: Master
-      value: "50"
-    - name: Rotate
-      labe: Rotate
-      number: 2
-      channel: Rotate
-      value: "0121"
-    - name: Color
-      labe: Color
-      number: 3
-      channel: Color
-      value: "0"
-    flash: false
-  - name: Rotate
-    number: 3
-    label: Rotate
-    buttoncolor: White
+    label: Color1
+    buttoncolor: Green
     master: 0
     settings:
     - name: Master
@@ -1219,12 +1197,56 @@ fixtures:
       labe: Rotate
       number: 2
       channel: Rotate
-      value: "50"
+      value: "12"
     - name: Color
       labe: Color
       number: 3
       channel: Color
-      value: "128"
+      value: "10"
+    flash: false
+  - name: Color2
+    number: 3
+    label: Color2
+    buttoncolor: Cyan
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "12"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "30"
+    flash: false
+  - name: Color3
+    number: 4
+    label: Color3
+    buttoncolor: Purple
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "12"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "75"
     flash: false
   use_fixture: deluge
 - id: 25
