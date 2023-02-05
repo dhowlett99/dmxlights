@@ -242,7 +242,7 @@ func PlaySequence(sequence common.Sequence,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels,
-	SwitchChannels map[int]common.SwitchChannel,
+	switchChannels map[int]common.SwitchChannel,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
@@ -308,7 +308,7 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
 			}
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
 			continue
@@ -319,7 +319,7 @@ func PlaySequence(sequence common.Sequence,
 			if debug {
 				fmt.Printf("sequence %d Play single switch mode\n", mySequenceNumber)
 			}
-			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, SwitchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
+			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
@@ -687,9 +687,16 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
 	}
 	for switchNumber, switchData := range sequence.Switches {
+
+		if debug {
+			fmt.Printf("switchNumber %d state %d\n", switchData.Number, switchData.CurrentState)
+		}
 		for stateNumber, state := range switchData.States {
 
 			// For this state.
+			if debug {
+				fmt.Printf("stateNumber %d state %d\n", stateNumber, switchData.CurrentState)
+			}
 			if stateNumber == switchData.CurrentState {
 				// Use the button color for this state to light the correct color on the launchpad.
 				color, _ := common.GetRGBColorByName(state.ButtonColor)

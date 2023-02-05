@@ -86,7 +86,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
 		// Set Master brightness back to max.
-		sequence.Master = common.MasterBrightness
+		sequence.Master = common.MaxDMXBrightness
 
 		if sequence.Type == "rgb" {
 			// Reset the RGB shift back to the default.
@@ -132,9 +132,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
 		}
 		if sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("Clear switch positions\n")
+			}
 			// Clear switch positions to their first positions.
-			for X := 0; X < len(sequence.Switches); X++ {
-				sequence.Switches[X].CurrentState = 0
+			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
+				sequence.Switches[switchNumber].CurrentState = 0
 			}
 			sequence.PlaySwitchOnce = true
 		}

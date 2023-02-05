@@ -840,6 +840,7 @@ func MapSwitchFixture(mySequenceNumber int,
 									howBright := int((float64(v) / 100) * (float64(brightness) / 2.55))
 									if strings.Contains(setting.Name, "reverse") || strings.Contains(setting.Name, "invert") {
 										c, _ := strconv.Atoi(setting.Channel)
+										c = c - 1 // Channels are relative to the base address so deduct one to make it work.
 										if debug {
 											fmt.Printf("Master Reverse->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), reverse_dmx(howBright))
 											fmt.Printf("howBright %d\n", howBright)
@@ -847,6 +848,7 @@ func MapSwitchFixture(mySequenceNumber int,
 										setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 									} else {
 										c, _ := strconv.Atoi(setting.Channel)
+										c = c - 1 // Channels are relative to the base address so deduct one to make it work.
 										if debug {
 											fmt.Printf("Master->setting address %d setting.Channel %d total %d to value %f\n", fixture.Address, c, fixture.Address+int16(c), v)
 										}
@@ -862,6 +864,7 @@ func MapSwitchFixture(mySequenceNumber int,
 										if IsNumericOnly(setting.Channel) {
 											// If the channel has is a number set it directly.
 											c, _ := strconv.Atoi(setting.Channel)
+											c = c - 1 // Channels are relative to the base address so deduct one to make it work.
 											if debug {
 												fmt.Printf("Direct Channel Number ->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
