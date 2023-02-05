@@ -222,7 +222,7 @@ const (
 	ClearStaticColor
 	SetStaticColorBar
 	Static
-	MasterBrightness
+	Master
 	UpdateNumberCoordinates
 	UpdateOffsetPan
 	UpdateOffsetTilt

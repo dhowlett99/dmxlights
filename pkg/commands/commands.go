@@ -466,7 +466,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	// We are setting the Master brightness in this sequence.
-	case common.MasterBrightness:
+	case common.Master:
 		const MASTER = 0
 		if debug {
 			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, command.Args[MASTER].Value)
