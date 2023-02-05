@@ -49,8 +49,8 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 	// Find all the specified settings for the program channel
 	programSettings, err := GetChannelSettinsByName(fixture.Name, "Program", fixturesConfig)
-	if err != nil {
-		fmt.Printf("newMiniSequencer: no program settings found for fixture %s\n", fixture.Name)
+	if err != nil && debug {
+		fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
 	}
 
 	cfg := getConfig(action, programSettings)

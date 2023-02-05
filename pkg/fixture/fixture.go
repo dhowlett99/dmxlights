@@ -764,25 +764,29 @@ func MapSwitchFixture(mySequenceNumber int,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
-	var useFixture string
+	var useFixtureLabel string
 
 	if debug {
 		fmt.Printf("MapSwitchFixture switchNumber %d, currentState %d\n", switchNumber, currentState)
 	}
 
-	// Step through the fixture config file.
+	// Step through the fixture config file looking for switches.
 	for _, fixture := range fixturesConfig.Fixtures {
 
 		// Looking for the switch that matches the sequence and fixture number.
 		if fixture.Group-1 == mySequenceNumber && fixture.Number-1 == switchNumber {
 
+			if debug {
+				fmt.Printf("Switches useFixture is %s\n", fixture.UseFixture)
+			}
 			// Now we find the fixture used by the switch
 			if fixture.UseFixture != "" {
 				// use this fixture for the sequencer actions
-				useFixture = fixture.UseFixture
+				// BTW UseFixtureLabel is the label for the fixture NOT the name.
+				useFixtureLabel = fixture.UseFixture
 
 				// Find the details of the fixture for this switch.
-				fixture, err := findFixtureByName(useFixture, fixturesConfig)
+				actualFixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 				if err != nil {
 					fmt.Printf("error %s\n", err.Error())
 					return
@@ -790,15 +794,11 @@ func MapSwitchFixture(mySequenceNumber int,
 
 				// If blackout, set master to off.
 				if blackout {
-					masterChannel, err := FindChannel("Master", fixture.ID, mySequenceNumber, fixturesConfig)
-					if err != nil {
-						fmt.Printf("fixture:%s master channel not defined: %s\n", fixture.Name, err)
+					masterChannel, err := FindChannel("Master", actualFixture.ID, mySequenceNumber, fixturesConfig)
+					if err != nil && debug {
+						fmt.Printf("warning! fixture:%s master channel not defined: %s\n", actualFixture.Name, err)
 					}
-					setChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
-				}
-
-				if debug {
-					fmt.Printf("useFixture %s\n", fixture.UseFixture)
+					setChannel(actualFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 				}
 
 				// Look through the switch states for this switch.
@@ -812,7 +812,7 @@ func MapSwitchFixture(mySequenceNumber int,
 							if debug {
 								fmt.Printf("actions are available\n")
 							}
-							newMiniSequencer(fixture, fixture.Number, currentState, action, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent)
+							newMiniSequencer(actualFixture, fixture.Number, currentState, action, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent)
 						}
 
 						// Play any preset DMX values directly to the universe.
@@ -868,7 +868,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											// Handle the fact that the channel may be a label as well.
-											fixture, err := findFixtureByName(useFixture, fixturesConfig)
+											fixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 											if err != nil {
 												fmt.Printf("error %s\n", err.Error())
 												return
@@ -882,7 +882,7 @@ func MapSwitchFixture(mySequenceNumber int,
 
 									} else {
 										// If the setting contains a label, look up the label in the fixture definition.
-										fixture, err := findFixtureByName(useFixture, fixturesConfig)
+										fixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 										if err != nil {
 											fmt.Printf("error %s\n", err.Error())
 											return
@@ -901,7 +901,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											}
 											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
-											fixture, err := findFixtureByName(useFixture, fixturesConfig)
+											fixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 											if err != nil {
 												fmt.Printf("error %s\n", err.Error())
 												return
@@ -940,7 +940,7 @@ func IsNumericOnly(str string) bool {
 func turnOffFixture(fixtureName string, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	fixture, err := findFixtureByName(fixtureName, fixtures)
 	if err != nil {
-		fmt.Printf("error %s\n", err.Error())
+		fmt.Printf("turnOffFixture: fixtureName: %s error %s\n", fixtureName, err.Error())
 		return
 	}
 	blackout := false
@@ -972,19 +972,34 @@ func getSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber in
 	return switchChannels[switchNumber].SequencerRunning
 }
 
-func findFixtureByName(fixtureName string, fixtures *Fixtures) (*Fixture, error) {
+func findFixtureByName(name string, fixtures *Fixtures) (*Fixture, error) {
 	if debug {
-		fmt.Printf("Look for fixture by Name %s\n", fixtureName)
+		fmt.Printf("Look for fixture by Name %s\n", name)
 	}
 	for _, fixture := range fixtures.Fixtures {
-		if strings.Contains(fixture.Label, fixtureName) {
+		if strings.Contains(fixture.Name, name) {
 			if debug {
 				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
 			}
 			return &fixture, nil
 		}
 	}
-	return nil, fmt.Errorf("findFixtureByName: failed to find fixture %s", fixtureName)
+	return nil, fmt.Errorf("findFixtureByName: failed to find fixture %s", name)
+}
+
+func findFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
+	if debug {
+		fmt.Printf("Look for fixture by Label %s\n", label)
+	}
+	for _, fixture := range fixtures.Fixtures {
+		if strings.Contains(fixture.Label, label) {
+			if debug {
+				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+			}
+			return &fixture, nil
+		}
+	}
+	return nil, fmt.Errorf("findFixtureByLabel: failed to find fixture %s", label)
 }
 
 func FindFixtureAddressByName(fixtureName string, fixtures *Fixtures) string {
