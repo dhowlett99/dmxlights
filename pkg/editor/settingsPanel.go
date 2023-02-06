@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"image/color"
-	"sort"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -354,37 +353,7 @@ func addChannelOption(options []string, newOption string) []string {
 	return newOptions
 }
 
-func settingItemAllreadyExists(number int, settingsList []fixture.Setting) bool {
-
-	if debug {
-		fmt.Printf("settingItemAllreadyExists\n")
-	}
-
-	// look through the settings list for the id's
-	for _, item := range settingsList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func findLargestsettingsNumber(items []fixture.Setting) int {
-
-	if debug {
-		fmt.Printf("findLargestsettingsNumber\n")
-	}
-
-	var number int
-	for _, item := range items {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
-}
-
-func addSettingsItem(items []fixture.Setting, id int, options []string) []fixture.Setting {
+func addSettingsItem(items []fixture.Setting, id int, options []string) (outItems []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("addSettingsItem\n")
@@ -393,9 +362,6 @@ func addSettingsItem(items []fixture.Setting, id int, options []string) []fixtur
 	newItems := []fixture.Setting{}
 	newItem := fixture.Setting{}
 	newItem.Number = int(id) + 1
-	if settingItemAllreadyExists(newItem.Number, items) {
-		newItem.Number = findLargestsettingsNumber(items) + 1
-	}
 	newItem.Name = "New"
 
 	for _, item := range items {
@@ -404,10 +370,36 @@ func addSettingsItem(items []fixture.Setting, id int, options []string) []fixtur
 		}
 		newItems = append(newItems, item)
 	}
-	sort.Slice(newItems, func(i, j int) bool {
-		return newItems[i].Number < newItems[j].Number
-	})
-	return newItems
+
+	// Now fix the item numbers
+	for number, indexedItem := range newItems {
+		indexedItem.Number = number + 1
+		outItems = append(outItems, indexedItem)
+	}
+
+	return outItems
+}
+
+func deleteSettingsItem(settingsList []fixture.Setting, id int) (outItems []fixture.Setting) {
+
+	if debug {
+		fmt.Printf("deleteSettingsItem\n")
+	}
+
+	newSettings := []fixture.Setting{}
+	for settingNumber, setting := range settingsList {
+		if settingNumber != id {
+			newSettings = append(newSettings, setting)
+		}
+	}
+
+	// Now fix the item numbers
+	for number, indexedItem := range newSettings {
+		indexedItem.Number = number + 1
+		outItems = append(outItems, indexedItem)
+	}
+
+	return outItems
 }
 
 func updateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting) []fixture.Setting {
@@ -427,16 +419,6 @@ func updateSettingsItem(items []fixture.Setting, id int, newItem fixture.Setting
 		}
 	}
 	return newItems
-}
-
-func deleteSettingsItem(settingsList []fixture.Setting, id int) []fixture.Setting {
-	newSettings := []fixture.Setting{}
-	for settingNumber, setting := range settingsList {
-		if settingNumber != id {
-			newSettings = append(newSettings, setting)
-		}
-	}
-	return newSettings
 }
 
 // makeSettingsArray - Convert the list of settings to an array of strings containing and array of strings with

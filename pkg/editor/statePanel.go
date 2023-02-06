@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"sort"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -267,7 +266,7 @@ func updateStateItem(states []fixture.State, id int16, newState fixture.State) [
 	return newStates
 }
 
-func addState(states []fixture.State, id int16) []fixture.State {
+func addState(states []fixture.State, id int16) (outItems []fixture.State) {
 
 	if debug {
 		fmt.Printf("addState\n")
@@ -276,9 +275,6 @@ func addState(states []fixture.State, id int16) []fixture.State {
 	newStates := []fixture.State{}
 	newItem := fixture.State{}
 	newItem.Number = id + 1
-	if stateItemAllreadyExists(newItem.Number, states) {
-		newItem.Number = findLargestStateNumber(states) + 1
-	}
 	newItem.Name = "New"
 
 	for _, item := range states {
@@ -287,13 +283,17 @@ func addState(states []fixture.State, id int16) []fixture.State {
 		}
 		newStates = append(newStates, item)
 	}
-	sort.Slice(newStates, func(i, j int) bool {
-		return newStates[i].Number < newStates[j].Number
-	})
-	return newStates
+
+	// Now fix the item numbers
+	for number, indexedItem := range newStates {
+		indexedItem.Number = int16(number + 1)
+		outItems = append(outItems, indexedItem)
+	}
+
+	return outItems
 }
 
-func deleteState(stateList []fixture.State, id int16) []fixture.State {
+func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State) {
 
 	if debug {
 		fmt.Printf("deleteState\n")
@@ -308,37 +308,14 @@ func deleteState(stateList []fixture.State, id int16) []fixture.State {
 			newStates = append(newStates, channel)
 		}
 	}
-	return newStates
-}
 
-func stateItemAllreadyExists(number int16, stateList []fixture.State) bool {
-
-	if debug {
-		fmt.Printf("stateItemAllreadyExists\n")
+	// Now fix the item numbers
+	for number, indexedItem := range newStates {
+		indexedItem.Number = int16(number + 1)
+		outItems = append(outItems, indexedItem)
 	}
 
-	// look through the state list for the id's
-	for _, item := range stateList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func findLargestStateNumber(items []fixture.State) int16 {
-
-	if debug {
-		fmt.Printf("findLargestStateNumber\n")
-	}
-
-	var number int16
-	for _, item := range items {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
+	return outItems
 }
 
 func populateSettingList(statesList []fixture.State, stateNumber int16) (settingsList []fixture.Setting) {

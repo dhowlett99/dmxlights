@@ -22,7 +22,6 @@ import (
 	"image/color"
 	"os"
 	"regexp"
-	"sort"
 	"strconv"
 	"strings"
 
@@ -799,6 +798,7 @@ func checkForNoOverlap(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, 
 					// We have an overlapping DMX address.
 					err = fmt.Errorf("overlapping DMX Address")
 					reports = append(reports, fmt.Sprintf("overlapping DMX Address on fixture %s with fixture %s", fixture.Name, testfixture.Name))
+					return reports, err
 				}
 			}
 		}
@@ -957,7 +957,7 @@ func checkTextEntry(value string) error {
 	return nil
 }
 
-func addFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
+func addFixture(fixtures []fixture.Fixture, id int) (outItems []fixture.Fixture) {
 
 	if debug {
 		fmt.Printf("AddFixture\n")
@@ -965,14 +965,11 @@ func addFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 
 	newFixtures := []fixture.Fixture{}
 	newFixture := fixture.Fixture{}
-	newFixture.ID = id + 1
-	if fixtureItemAllreadyExists(newFixture.ID, fixtures) {
-		newFixture.ID = findLargestFixtureNumber(fixtures) + 1
-	}
+	newFixture.ID = id
 	newFixture.Name = "New"
 	newFixture.Type = "rgb"
 
-	// Create a empty channel for this fixture.
+	// Create a empty channel list for this fixture.
 	newChannels := []fixture.Channel{}
 	newChannel := fixture.Channel{
 		Number: 1,
@@ -986,63 +983,47 @@ func addFixture(fixtures []fixture.Fixture, id int) []fixture.Fixture {
 		}
 		newFixtures = append(newFixtures, fixture)
 	}
-	sort.Slice(newFixtures, func(i, j int) bool {
-		return newFixtures[i].ID < newFixtures[j].ID
-	})
-	return newFixtures
+
+	// Now fix the item numbers
+	for number, indexedItem := range newFixtures {
+		indexedItem.ID = number + 1
+		outItems = append(outItems, indexedItem)
+	}
+
+	return outItems
 }
 
-func deleteFixture(fixtureList []fixture.Fixture, id int) []fixture.Fixture {
+func deleteFixture(fixtureList []fixture.Fixture, id int) (outItems []fixture.Fixture) {
 
 	if debug {
 		fmt.Printf("DeleteFixture\n")
 	}
 
 	newFixtures := []fixture.Fixture{}
-	if id == 1 {
-		return fixtureList
-	}
+	// if id == 1 {
+	// 	return fixtureList
+	// }
 	for _, fixture := range fixtureList {
 		if fixture.ID != id {
 			newFixtures = append(newFixtures, fixture)
 		}
 	}
-	return newFixtures
-}
 
-func fixtureItemAllreadyExists(id int, fixtureList []fixture.Fixture) bool {
-
-	if debug {
-		fmt.Printf("FixtureItemAllreadyExists\n")
+	// Now fix the item numbers
+	for number, indexedItem := range newFixtures {
+		indexedItem.ID = number + 1
+		outItems = append(outItems, indexedItem)
 	}
 
-	// look through the fixture list for the id's
-	for _, fixture := range fixtureList {
-		if fixture.ID == id {
-			return true
-		}
-	}
-	return false
-}
-
-func findLargestFixtureNumber(fixtures []fixture.Fixture) int {
-
-	if debug {
-		fmt.Printf("FindLargestFixtureNumber\n")
+	if len(outItems) == 0 {
+		// Create a default Channel
+		newItem := fixture.Fixture{}
+		newItem.Number = 1
+		newItem.Name = "New"
+		outItems = append(outItems, newItem)
 	}
 
-	var number int
-	for _, fixture := range fixtures {
-		if fixture.ID > number {
-			number = fixture.ID
-		}
-	}
-
-	if debug {
-		fmt.Printf("Largest %d\n", number)
-	}
-
-	return number
+	return outItems
 }
 
 func hideAllFields(o fyne.CanvasObject) {

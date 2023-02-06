@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"sort"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -214,37 +213,7 @@ func populateChannelSettingList(channelList []fixture.Channel, channelNumber int
 	return settingsList
 }
 
-func channelItemAllreadyExists(number int16, channelList []fixture.Channel) bool {
-
-	if debug {
-		fmt.Printf("channelItemAllreadyExists\n")
-	}
-
-	// look through the channel list for the id's
-	for _, item := range channelList {
-		if item.Number == number {
-			return true
-		}
-	}
-	return false
-}
-
-func findLargestChannelNumber(items []fixture.Channel) int16 {
-
-	if debug {
-		fmt.Printf("findLargestChannelNumber\n")
-	}
-
-	var number int16
-	for _, item := range items {
-		if item.Number > number {
-			number = item.Number
-		}
-	}
-	return number
-}
-
-func addChannelItem(channels []fixture.Channel, id int16, options []string) []fixture.Channel {
+func addChannelItem(channels []fixture.Channel, id int16, options []string) (outItems []fixture.Channel) {
 
 	if debug {
 		fmt.Printf("addChannelItem\n")
@@ -253,9 +222,6 @@ func addChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 	newChannels := []fixture.Channel{}
 	newItem := fixture.Channel{}
 	newItem.Number = id + 1
-	if channelItemAllreadyExists(newItem.Number, channels) {
-		newItem.Number = findLargestChannelNumber(channels) + 1
-	}
 	newItem.Name = "New"
 
 	for _, item := range channels {
@@ -264,28 +230,44 @@ func addChannelItem(channels []fixture.Channel, id int16, options []string) []fi
 		}
 		newChannels = append(newChannels, item)
 	}
-	sort.Slice(newChannels, func(i, j int) bool {
-		return newChannels[i].Number < newChannels[j].Number
-	})
-	return newChannels
+
+	// Now fix the item numbers
+	for number, indexedItem := range newChannels {
+		indexedItem.Number = int16(number + 1)
+		outItems = append(outItems, indexedItem)
+	}
+
+	return outItems
 }
 
-func deleteChannelItem(channelList []fixture.Channel, id int16) []fixture.Channel {
+func deleteChannelItem(channelList []fixture.Channel, id int16) (outItems []fixture.Channel) {
 
 	if debug {
 		fmt.Printf("deleteChannelItem\n")
 	}
 
 	newChannels := []fixture.Channel{}
-	if id == 1 {
-		return channelList
-	}
 	for _, channel := range channelList {
 		if channel.Number != id {
 			newChannels = append(newChannels, channel)
 		}
 	}
-	return newChannels
+
+	// Now fix the item numbers
+	for number, indexedItem := range newChannels {
+		indexedItem.Number = int16(number + 1)
+		outItems = append(outItems, indexedItem)
+	}
+
+	if len(outItems) == 0 {
+		// Create a default Channel
+		newItem := fixture.Channel{}
+		newItem.Number = 1
+		newItem.Name = "New"
+		outItems = append(outItems, newItem)
+	}
+
+	return outItems
 }
 
 // UpdateItem replaces the selected item by id with newItem.
