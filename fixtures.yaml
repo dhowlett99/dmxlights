@@ -1834,7 +1834,7 @@ fixtures:
   description: Gibraltar Booth
   type: switch
   group: 4
-  address: 0
+  address: 90
   channels: []
   states:
   - name: "Off"
@@ -1842,24 +1842,124 @@ fixtures:
     label: "Off"
     buttoncolor: Green
     master: 0
+    actions:
+    - name: "Off"
+      number: 1
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
     flash: false
-  - name: "On"
+  - name: Red
     number: 2
-    label: "On"
+    label: Red
     buttoncolor: Red
     master: 0
+    actions:
+    - name: "On"
+      number: 1
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
     flash: false
-  - name: Slow
+  - name: Green
     number: 3
-    label: Slow
-    buttoncolor: Red
+    label: Green
+    buttoncolor: Green
     master: 0
+    actions:
+    - name: New
+      number: 1
+      colors:
+      - Green
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors:
+      - Blue
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Fade
+    number: 5
+    label: Fade
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Fade
+      number: 1
+      colors:
+      - Red
+      - Green
+      - Blue
+      mode: Chase
+      fade: Soft
+      size: Medium
+      speed: VeryFast
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 1
+      colors:
+      - Green
+      - Red
+      - Blue
+      mode: Chase
+      fade: Sharp
+      size: "Off"
+      speed: Music
+      rotate: "Off"
+      rotatespeed: ""
+      program: ""
+      strobe: ""
     settings:
     - name: mode
       number: 1
       channel: "1"
       value: "255"
     flash: false
+  use_fixture: megabar
 - id: 30
   name: Oil
   label: Oil1
@@ -1935,6 +2035,42 @@ fixtures:
   - number: 6
     name: Master Reverse
 - id: 32
+  name: ADJ MegaBar
+  label: megabar
+  number: 1
+  description: ADJ MegaBar
+  type: rgb
+  group: 110
+  address: 90
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Macro
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      value: "0"
+  - number: 5
+    name: Strobe
+  - number: 6
+    name: Program
+    settings:
+    - name: New
+      number: 1
+      value: 0-15
+    - name: Strobe
+      labe: Strobe
+      number: 2
+      value: 16-255
+  - number: 7
+    name: Master
+- id: 33
   name: Deluge
   label: deluge
   number: 1

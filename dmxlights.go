@@ -133,7 +133,7 @@ func main() {
 	fmt.Println("Setup Novation Launchpad")
 	this.Pad, err = launchpad.NewLaunchPad()
 	if err != nil {
-		fmt.Printf("launchpad: %v", err)
+		fmt.Printf("launchpad: %v\n", err)
 		this.LaunchPadConnected = false
 		this.LaunchpadName = "Not Found"
 	}
@@ -241,10 +241,11 @@ func main() {
 	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
 	this.SoundTriggers = []*common.Trigger{}
 
-	for triggerNumber := 0; triggerNumber < 10; triggerNumber++ {
+	for triggerNumber := 0; triggerNumber < 12; triggerNumber++ {
 		newChannel := make(chan common.Command)
 		var name string
 		var newTrigger common.Trigger
+		// First three triggers occupied by sequence 1,2 & 3
 		if triggerNumber < 3 {
 			name = fmt.Sprintf("sequence%d", triggerNumber)
 		} else {

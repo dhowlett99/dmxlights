@@ -347,6 +347,8 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
+					// First three triggers occupied by sequence 1,2 & 3
+					// So switch channels use 4 -11
 					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						// Stop.

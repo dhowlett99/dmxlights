@@ -49,7 +49,15 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 	var data = [][]string{}
 
 	cp := ChannelPanel{}
-	cp.ChannelOptions = []string{"Rotate", "Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8", "Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8", "Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8", "White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8", "Master", "Master Reverse", "Dimmer", "Static", "Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe", "Color", "Gobo", "Program", "ProgramSpeed", "Programs", "ColorMacros", "SoundActive", "DimmerCurve", "Speed"}
+	cp.ChannelOptions = []string{"Rotate", "Macro",
+		"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8",
+		"Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8",
+		"Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8",
+		"White1", "White2", "White3", "White4", "White5", "White6", "White7", "White8",
+		"Master", "Master Reverse", "Dimmer", "Static",
+		"Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe",
+		"Color", "Gobo", "Program", "ProgramSpeed", "Programs",
+		"ColorMacros", "SoundActive", "DimmerCurve", "Speed"}
 	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
