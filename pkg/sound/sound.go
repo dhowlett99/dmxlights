@@ -220,8 +220,6 @@ func (soundConfig *SoundConfig) getAvailableInputs() {
 	}
 
 	for _, inputChannel := range soundConfig.inputChannels {
-		fmt.Printf("inputChannel %v\n", *inputChannel)
-
 		for _, device := range inputChannel.Devices {
 			if device.MaxInputChannels > 0 {
 				fmt.Printf("device %s\n", device.Name)
