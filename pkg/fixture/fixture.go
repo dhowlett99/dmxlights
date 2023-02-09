@@ -1098,6 +1098,7 @@ func turnOffFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixt
 	// if !cmd.Hide {
 	// 	common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 	// }
+	common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 	MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 

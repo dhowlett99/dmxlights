@@ -2610,12 +2610,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	// Update status bar.
 	common.UpdateStatusBar("BEAT", "beat", false, guiButtons)
 
-	// Send reset to all sequences.
-	cmd := common.Command{
-		Action: common.Reset,
-	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
-
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {
 		this.SelectedSequence = 0                                                  // Update the status bar for the first sequnce. Because that will be the one selected after a clear.
@@ -2683,6 +2677,12 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 		}
 	}
+
+	// Send reset to all sequences.
+	cmd := common.Command{
+		Action: common.Reset,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Clear the presets and display them.
 	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
