@@ -1163,7 +1163,7 @@ fixtures:
   - name: "Off"
     number: 1
     label: "Off"
-    buttoncolor: Black
+    buttoncolor: Green
     master: 0
     settings:
     - name: "Off"
@@ -1185,7 +1185,7 @@ fixtures:
   - name: Color1
     number: 2
     label: Color1
-    buttoncolor: Green
+    buttoncolor: Orange
     master: 0
     settings:
     - name: Master
@@ -1207,7 +1207,7 @@ fixtures:
   - name: Color2
     number: 3
     label: Color2
-    buttoncolor: Cyan
+    buttoncolor: Yellow
     master: 0
     settings:
     - name: Master
@@ -1229,7 +1229,7 @@ fixtures:
   - name: Color3
     number: 4
     label: Color3
-    buttoncolor: Purple
+    buttoncolor: Pink
     master: 0
     settings:
     - name: Master
