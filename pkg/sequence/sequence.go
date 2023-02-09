@@ -281,7 +281,7 @@ func PlaySequence(sequence common.Sequence,
 		sequence.UpdateShift = false
 
 		// Check for any waiting commands.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 
 		// Clear all fixtures.
 		if sequence.Clear {
@@ -310,7 +310,7 @@ func PlaySequence(sequence common.Sequence,
 			// Show initial state of switches
 			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
 			continue
 		}
 
@@ -322,7 +322,7 @@ func PlaySequence(sequence common.Sequence,
 			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels)
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
 			continue
 		}
 
@@ -477,7 +477,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Check is any commands are waiting.
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels)
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
@@ -597,7 +597,7 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.Type == "scanner" {
 						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
 					}
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels)
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
 					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
 					}

@@ -20,7 +20,6 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -1109,8 +1108,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
 
-		// Get an upto date copy of the switch
-		sequences[Y].Switches = commands.LoadSwitchConfiguration(Y, fixturesConfig)
+		// Get an upto date copy of the switch information by updating our copy of the switch sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// We have a valid switch.
 		if X < len(sequences[Y].Switches) {
@@ -2419,11 +2418,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// If we are loading a switch sequence, update our local copy of the switch settings.
 		if sequences[sequenceNumber].Type == "switch" {
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-			for position := 0; position < 8; position++ {
-				swiTch := sequences[sequenceNumber].Switches[position]
-				this.SwitchPositions[sequenceNumber][position] = swiTch.CurrentState
+
+			// Now set our local representation of switches
+			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
+				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentState
 				if debug {
-					fmt.Printf("restoring switch %+v\n", this.SwitchPositions[sequenceNumber][position])
+					var stateNames []string
+					for _, state := range swiTch.States {
+						stateNames = append(stateNames, state.Name)
+					}
+					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
 				}
 			}
 		}
@@ -2660,6 +2664,24 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			sequences[sequenceNumber].Functions[common.Function8_Music_Trigger].State = false
 		}
 
+		// Reset the sequence switch states back to config from the fixture config in memory.
+		// And ditch any out of date copy from a loaded preset.
+		if sequence.Type == "switch" {
+			// Get an upto date copy of the sequence.
+			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+			// Now set our local representation of switches
+			for swiTchNumber, swiTch := range sequence.Switches {
+				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentState
+				if debug {
+					var stateNames []string
+					for _, state := range swiTch.States {
+						stateNames = append(stateNames, state.Name)
+					}
+					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
+				}
+			}
+		}
 	}
 
 	// Clear the presets and display them.

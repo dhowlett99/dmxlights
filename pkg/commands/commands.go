@@ -30,7 +30,7 @@ const debug = false
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
-func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels) common.Sequence {
+func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels, fixturesConfig *fixture.Fixtures) common.Sequence {
 
 	// Setup channels.
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
@@ -135,6 +135,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			if debug {
 				fmt.Printf("Clear switch positions\n")
 			}
+
+			// read the fixtures config currently in memory.
+			sequence.Switches = LoadSwitchConfiguration(mySequenceNumber, fixturesConfig)
+			sequence.PlaySwitchOnce = true
+
 			// Clear switch positions to their first positions.
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 				sequence.Switches[switchNumber].CurrentState = 0
