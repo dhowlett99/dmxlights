@@ -489,12 +489,10 @@ func PlaySequence(sequence common.Sequence,
 						slopeOn := []int{255}
 						slopeOff := []int{0}
 						// Calulate positions for each RGB fixture.
-						optimisation := true
-						// Retrieve the scanner state.
-						scannerState := sequence.ScannerState
+						sequence.Optimisation = true
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
-						positions, num := position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
+						positions, num := position.CalculatePositions(sequence, slopeOn, slopeOff)
 						sequence.NumberSteps = num
 
 						sequence.ScannerPositions[fixture] = make(map[int]common.Position, 9)
@@ -523,14 +521,31 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
+				// If we are setting the current colors in a rgb sequence.
+				if sequence.AutoColor &&
+					sequence.Type == "rgb" &&
+					sequence.Pattern.Label != "Multi.Color" &&
+					sequence.Pattern.Label != "Color.Chase" {
+
+					// Find a new color.
+					newColor := []common.Color{}
+					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
+					sequence.SequenceColors = newColor
+
+					// Step through the available colors.
+					sequence.RGBColor++
+					if sequence.RGBColor > 7 {
+						sequence.RGBColor = 0
+					}
+					sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+				}
+
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
 					slopeOn, slopeOff := common.CalculateFadeValues(sequence.RGBFade, sequence.RGBSize)
 					// Calulate positions for each RGB fixture.
-					optimisation := true
-					// Retrieve the scanner state.
-					scannerState := sequence.ScannerState
-					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff, optimisation, scannerState)
+					sequence.Optimisation = true
+					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -558,25 +573,6 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				// If we are setting the current colors in a rgb sequence.
-				if sequence.AutoColor &&
-					sequence.Type == "rgb" &&
-					sequence.Pattern.Label != "Multi.Color" &&
-					sequence.Pattern.Label != "Color.Chase" {
-
-					// Find a new color.
-					newColor := []common.Color{}
-					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
-					sequence.SequenceColors = newColor
-
-					// Step through the available colors.
-					sequence.RGBColor++
-					if sequence.RGBColor > 7 {
-						sequence.RGBColor = 0
-					}
-					sequence.RGBPositions = replaceColors(sequence.RGBPositions, sequence.SequenceColors)
-				}
-
 				if sequence.RGBInvert {
 					sequence.SequenceColors = common.HowManyColors(sequence.RGBPositions)
 					sequence.RGBPositions = invertRGBcolorsInPositions(sequence.RGBPositions, sequence.SequenceColors)
@@ -600,6 +596,13 @@ func PlaySequence(sequence common.Sequence,
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
 					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
 						break
+					}
+
+					if debug {
+						fmt.Printf("----> Step %d\n", step)
+						for f := 0; f < len(sequence.RGBPositions[step].Fixtures); f++ {
+							fmt.Printf("\t Fixture %v\n", sequence.RGBPositions[step].Fixtures[f])
+						}
 					}
 
 					for fixtureNumber, fixture := range fixtureStepChannels {
@@ -826,45 +829,6 @@ func invertRGBcolorsInPositions(positions map[int]common.Position, colors []comm
 	}
 
 	return positions
-}
-
-// replaceColors can take a sequence and replace its current pattern colors with the colors specified.
-func replaceColors(positionsMap map[int]common.Position, colors []common.Color) map[int]common.Position {
-
-	var insertColor int
-	numberColors := len(colors)
-
-	replace := make(map[int]common.Position)
-	lengthPositions := len(positionsMap)
-	for currentPosition := 0; currentPosition < lengthPositions; currentPosition++ {
-		position := positionsMap[currentPosition]
-		if insertColor >= numberColors {
-			insertColor = 0
-		}
-		lengthFixtures := len(position.Fixtures)
-		for fixtureNumber := 0; fixtureNumber < lengthFixtures; fixtureNumber++ {
-			fixture := position.Fixtures[fixtureNumber]
-			lengthColors := len(fixture.Colors)
-			for colorNumber := 0; colorNumber < lengthColors; colorNumber++ {
-				color := fixture.Colors[colorNumber]
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
-					continue
-				}
-			}
-		}
-		insertColor++
-		replace[currentPosition] = position
-	}
-
-	if debug {
-		length := len(positionsMap)
-		for step := 0; step < length; step++ {
-			fmt.Printf("%v\n", replace[step])
-		}
-	}
-
-	return replace
 }
 
 func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {

@@ -71,6 +71,7 @@ func TestCalculatePositions(t *testing.T) {
 				slopeOn:  []int{1, 50, 255},
 				slopeOff: []int{1, 50, 255},
 				sequence: common.Sequence{
+					Optimisation: false,
 					Bounce:       false,
 					RGBInvert:    false,
 					RGBShift:     0,
@@ -476,6 +477,7 @@ func TestCalculatePositions(t *testing.T) {
 				slopeOn:  []int{1, 50, 255},
 				slopeOff: []int{1, 50, 255},
 				sequence: common.Sequence{
+					Optimisation: false,
 					Bounce:       false,
 					RGBInvert:    false,
 					RGBShift:     8,
@@ -601,6 +603,7 @@ func TestCalculatePositions(t *testing.T) {
 				slopeOn:  []int{1, 50, 255},
 				slopeOff: []int{255, 50, 1},
 				sequence: common.Sequence{
+					Optimisation: false,
 					Bounce:       false,
 					RGBInvert:    false,
 					RGBShift:     8, // Eight is reversed so creates a shift of 2.
@@ -724,7 +727,7 @@ func TestCalculatePositions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			got, got1 := CalculatePositions(tt.args.sequence, tt.args.slopeOn, tt.args.slopeOff, false, tt.args.sequence.ScannerState)
+			got, got1 := CalculatePositions(tt.args.sequence, tt.args.slopeOn, tt.args.slopeOff)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
 			}

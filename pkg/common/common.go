@@ -330,7 +330,8 @@ type Sequence struct {
 	Functions                   []Function                  // Storage for the sequence functions.
 	FunctionMode                bool                        // This sequence is in function mode.
 	Switches                    []Switch                    // A switch sequence stores its data in here.
-	CurrentSwitch               int
+	CurrentSwitch               int                         // Play this current switch position.
+	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 }
 
 type Function struct {

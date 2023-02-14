@@ -26,7 +26,7 @@ import (
 
 const debug = false
 
-func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int, Optimisation bool, scannerState map[int]common.ScannerState) (map[int]common.Position, int) {
+func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int) (map[int]common.Position, int) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
 	shift := common.Reverse(sequence.RGBShift)
@@ -215,7 +215,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int,
 		}
 	}
 
-	positionsOut := AssemblePositions(fadeColors, counter, numberFixtures, scannerState, sequence.RGBInvert, sequence.ScannerChase, Optimisation)
+	positionsOut := AssemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
 	return positionsOut, len(positionsOut)
 
 }
