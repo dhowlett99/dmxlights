@@ -429,6 +429,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
 					sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
 					sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
+					sequence.Pattern.PattenTrim = sequence.RGBAvailablePatterns[sequence.SelectedPattern].PattenTrim
 					sequence.UpdatePattern = false
 				}
 
@@ -586,7 +587,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0; step < sequence.NumberSteps; step++ {
+				for step := 0 + sequence.Pattern.PattenTrim; step < sequence.NumberSteps-sequence.Pattern.PattenTrim; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
 					speed := sequence.CurrentSpeed / 10

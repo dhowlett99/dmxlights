@@ -148,13 +148,14 @@ type ScannerState struct {
 }
 
 type Pattern struct {
-	Name     string
-	Label    string
-	Number   int
-	Length   int // 8, 4 or 2
-	Size     int
-	Fixtures int // 8 Fixtures
-	Steps    []Step
+	Name       string
+	Label      string
+	Number     int
+	Length     int // 8, 4 or 2
+	Size       int
+	Fixtures   int // 8 Fixtures
+	Steps      []Step
+	PattenTrim int
 }
 
 type Arg struct {
