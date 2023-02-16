@@ -224,7 +224,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		sequence.Steps = sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
-		slopeOn, slopeOff := common.CalculateFadeValues(cfg.Fade, cfg.Size)
+		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(cfg.Fade, cfg.Size)
 		// Calulate positions for each RGB fixture.
 		sequence.Optimisation = false
 		sequence.ScannerState = map[int]common.ScannerState{
@@ -245,7 +245,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			},
 		}
 
-		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff)
+		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence)
 
 		var rotateCounter int
 		var clockwise int

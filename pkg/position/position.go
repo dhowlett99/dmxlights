@@ -26,7 +26,7 @@ import (
 
 const debug = false
 
-func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int) (map[int]common.Position, int) {
+func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
 	shift := common.Reverse(sequence.RGBShift)
@@ -45,13 +45,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						// make space for a colored lamp.
 						if !sequence.RGBInvert {
 							// A faded up and down color.
-							for _, slope := range slopeOn {
+							for _, slope := range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
-							for range slopeOn {
+							for range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -60,7 +60,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
-							for range slopeOff {
+							for range sequence.FadeDownAndUp {
 								if shiftCounter == shift {
 									break
 								}
@@ -71,7 +71,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 							}
 						} else {
 							// A fading to black lamp.
-							for _, slope := range slopeOff {
+							for _, slope := range sequence.FadeDownAndUp {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -101,13 +101,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						// make space for a colored lamp.
 						if !sequence.RGBInvert {
 							// A faded up and down color.
-							for _, slope := range slopeOn {
+							for _, slope := range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
-							for range slopeOn {
+							for range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -116,7 +116,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
-							for range slopeOff {
+							for range sequence.FadeDownAndUp {
 								if shiftCounter == shift {
 									break
 								}
@@ -127,7 +127,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 							}
 						} else {
 							// A fading to black lamp.
-							for _, slope := range slopeOff {
+							for _, slope := range sequence.FadeDownAndUp {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -152,13 +152,13 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						// make space for a colored lamp.
 						if !sequence.RGBInvert {
 							// A faded up and down color.
-							for _, slope := range slopeOn {
+							for _, slope := range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
-							for range slopeOn {
+							for range sequence.FadeUpAndDown {
 								newColor := makeNewColor(fixture, fixtureNumber, color, 255)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -167,7 +167,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 						if !sequence.RGBInvert {
 							shiftCounter = 0
 							// make space for a off lamp.
-							for range slopeOff {
+							for range sequence.FadeDownAndUp {
 								if shiftCounter == shift {
 									break
 								}
@@ -178,7 +178,7 @@ func CalculatePositions(sequence common.Sequence, slopeOn []int, slopeOff []int)
 							}
 						} else {
 							// A fading to black lamp.
-							for _, slope := range slopeOff {
+							for _, slope := range sequence.FadeDownAndUp {
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
@@ -240,7 +240,6 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 
 	positionsOut := make(map[int]common.Position)
 	lampOn := make(map[int]bool)
-	lampOff := make(map[int]bool)
 
 	// Assemble the positions.
 	for step := 0; step < totalNumberOfSteps; step++ {
@@ -274,12 +273,11 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 						newFixture.Tilt = fadeColors[fixture][step].Tilt
 						newFixture.Shutter = fadeColors[fixture][step].Shutter
 						lampOn[fixture] = true
-						lampOff[fixture] = false
 						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 						newPosition.Fixtures[fixture] = newFixture
 					} else {
 						// turn the lamp off, but only if its already on.
-						if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
+						if lampOn[fixture] || !Optimisation {
 							newFixture.Colors = append(newFixture.Colors, common.Color{})
 							newFixture.Gobo = fadeColors[fixture][step].Gobo
 							newFixture.Pan = fadeColors[fixture][step].Pan
@@ -289,7 +287,6 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
 							newPosition.Fixtures[fixture] = newFixture
 						}
-						lampOff[fixture] = true
 					}
 				} else {
 					// We've found a color. turn it on but only if its already off.

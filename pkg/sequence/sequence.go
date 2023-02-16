@@ -486,13 +486,13 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.Type == "scanner" {
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 						// Calculate fade curve values.
-						slopeOn := []int{255}
-						slopeOff := []int{0}
+						sequence.FadeUpAndDown = []int{255}
+						sequence.FadeDownAndUp = []int{0}
 						// Calulate positions for each RGB fixture.
 						sequence.Optimisation = true
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
-						positions, num := position.CalculatePositions(sequence, slopeOn, slopeOff)
+						positions, num := position.CalculatePositions(sequence)
 						sequence.NumberSteps = num
 
 						sequence.ScannerPositions[fixture] = make(map[int]common.Position, 9)
@@ -542,10 +542,10 @@ func PlaySequence(sequence common.Sequence,
 
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
-					slopeOn, slopeOff := common.CalculateFadeValues(sequence.RGBFade, sequence.RGBSize)
+					sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBFade, sequence.RGBSize)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
-					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence, slopeOn, slopeOff)
+					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -599,9 +599,9 @@ func PlaySequence(sequence common.Sequence,
 					}
 
 					if debug {
-						fmt.Printf("----> Step %d\n", step)
+						fmt.Printf("----> Step %d This many Fixtures %d\n", step, len(sequence.RGBPositions[step].Fixtures))
 						for f := 0; f < len(sequence.RGBPositions[step].Fixtures); f++ {
-							fmt.Printf("\t Fixture %v\n", sequence.RGBPositions[step].Fixtures[f])
+							fmt.Printf("\t Fixture:%d  %v\n", f, sequence.RGBPositions[step].Fixtures[f])
 						}
 					}
 

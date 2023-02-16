@@ -287,6 +287,8 @@ type Sequence struct {
 	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
+	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off
+	FadeDownAndUp               []int                       // curve fade off and on again
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.

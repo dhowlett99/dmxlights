@@ -55,8 +55,6 @@ func TestCalculatePositions(t *testing.T) {
 	full := 255
 	type args struct {
 		sequence common.Sequence
-		slopeOn  []int
-		slopeOff []int
 	}
 	tests := []struct {
 		name  string
@@ -67,17 +65,16 @@ func TestCalculatePositions(t *testing.T) {
 		{
 			name: "golden path - common par fixture RGB",
 			args: args{
-
-				slopeOn:  []int{1, 50, 255},
-				slopeOff: []int{1, 50, 255},
 				sequence: common.Sequence{
-					Optimisation: false,
-					Bounce:       false,
-					RGBInvert:    false,
-					RGBShift:     0,
-					RGBSize:      255,
-					RGBFade:      0,
-					ScannerState: allFixturesEnabled,
+					FadeUpAndDown: []int{1, 50, 255},
+					FadeDownAndUp: []int{1, 50, 255},
+					Optimisation:  false,
+					Bounce:        false,
+					RGBInvert:     false,
+					RGBShift:      0,
+					RGBSize:       255,
+					RGBFade:       0,
+					ScannerState:  allFixturesEnabled,
 					Steps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
@@ -474,16 +471,16 @@ func TestCalculatePositions(t *testing.T) {
 		{
 			name: "Shift1 - common par fixture RGB",
 			args: args{
-				slopeOn:  []int{1, 50, 255},
-				slopeOff: []int{1, 50, 255},
 				sequence: common.Sequence{
-					Optimisation: false,
-					Bounce:       false,
-					RGBInvert:    false,
-					RGBShift:     8,
-					RGBSize:      255,
-					RGBFade:      10,
-					ScannerState: allFixturesEnabled,
+					FadeUpAndDown: []int{1, 50, 255},
+					FadeDownAndUp: []int{1, 50, 255},
+					Optimisation:  false,
+					Bounce:        false,
+					RGBInvert:     false,
+					RGBShift:      8,
+					RGBSize:       255,
+					RGBFade:       10,
+					ScannerState:  allFixturesEnabled,
 					Steps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
@@ -600,16 +597,16 @@ func TestCalculatePositions(t *testing.T) {
 		{
 			name: "Shift1 - Not Inverted common par fixture RGB",
 			args: args{
-				slopeOn:  []int{1, 50, 255},
-				slopeOff: []int{255, 50, 1},
 				sequence: common.Sequence{
-					Optimisation: false,
-					Bounce:       false,
-					RGBInvert:    false,
-					RGBShift:     8, // Eight is reversed so creates a shift of 2.
-					RGBSize:      255,
-					RGBFade:      10,
-					ScannerState: allFixturesEnabled,
+					FadeUpAndDown: []int{1, 50, 255},
+					FadeDownAndUp: []int{255, 50, 1},
+					Optimisation:  false,
+					Bounce:        false,
+					RGBInvert:     false,
+					RGBShift:      8, // Eight is reversed so creates a shift of 2.
+					RGBSize:       255,
+					RGBFade:       10,
+					ScannerState:  allFixturesEnabled,
 					Steps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
@@ -727,7 +724,7 @@ func TestCalculatePositions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			got, got1 := CalculatePositions(tt.args.sequence, tt.args.slopeOn, tt.args.slopeOff)
+			got, got1 := CalculatePositions(tt.args.sequence)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
 			}
