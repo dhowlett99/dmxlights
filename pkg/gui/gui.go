@@ -47,7 +47,7 @@ import (
 const ColumnWidth int = 9
 
 type Button struct {
-	button    *widget.Button
+	button    *noHoverButton
 	rectangle *canvas.Rectangle
 	container *fyne.Container
 }
@@ -308,6 +308,28 @@ func (panel *MyPanel) PopupNotFoundMessage(myWindow fyne.Window, dmxInterface De
 
 }
 
+// The latest version of the fyne.io toolkit implemnent a grey color
+// which hovers over buttons when place the mouse over the button.
+// Which stops us seeing the button colors.
+// So we extend the button wiget to have a null MouseIn func.
+type noHoverButton struct {
+	widget.Button
+}
+
+// A null MouseIn func.
+func (nhb *noHoverButton) MouseIn() {
+	return
+}
+
+// A exteneded button functon with no hover affect.
+func newNoHoverButton(label string, tapped func()) *noHoverButton {
+	button := &noHoverButton{}
+	button.ExtendBaseWidget(button)
+	button.OnTapped = tapped
+	button.SetText(label)
+	return button
+}
+
 func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	sequences []*common.Sequence,
 	this *buttons.CurrentState,
@@ -327,7 +349,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		X := columnNumber
 
 		var skipPopup bool
-		button.button = widget.NewButton("     ", func() {
+		button.button = newNoHoverButton("     ", func() {
 			if X == 8 && Y == 5 || X > 7 || Y < 5 {
 				skipPopup = true
 			}
