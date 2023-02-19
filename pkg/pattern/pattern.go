@@ -307,7 +307,7 @@ func MakePatterns() map[int]common.Pattern {
 		Name:       "Pairs",
 		Label:      "Pairs",
 		Number:     3,
-		PattenTrim: 3,
+		PattenTrim: 0,
 		Steps: []common.Step{
 			{
 				Fixtures: []common.Fixture{
@@ -614,6 +614,110 @@ func MakePatterns() map[int]common.Pattern {
 		},
 	}
 
+	vu := common.Pattern{
+		Name:   "VU.Meter",
+		Label:  "VU.Meter",
+		Number: 7,
+		Steps: []common.Step{
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
+			{
+				Fixtures: []common.Fixture{
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+					{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+				},
+			},
+		},
+	}
+
 	Patterns[0] = standard
 	Patterns[1] = flash
 	Patterns[2] = rgbchase
@@ -621,6 +725,7 @@ func MakePatterns() map[int]common.Pattern {
 	Patterns[4] = inward
 	Patterns[5] = colors
 	Patterns[6] = multi
+	Patterns[7] = vu
 	return Patterns
 
 }

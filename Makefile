@@ -25,7 +25,7 @@ legacy-build:
 	go build --tags legacy dmxlights.go
 
 clean: 
-	go clean -cache dmxlights.go
+	go clean -cache
 
 dep:
 	rm -rf go.mod go.sum 
