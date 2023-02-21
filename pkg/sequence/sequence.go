@@ -135,7 +135,7 @@ func CreateSequence(
 	// We can disable a fixture by setting fixture Enabled to false.
 	scannerState := make(map[int]common.ScannerState, 8)
 	// Find the number of fixtures for this sequence.
-	numberFixtures := getNumberOfFixtures(mySequenceNumber, fixturesConfig)
+	numberFixtures := getNumberOfFixtures(mySequenceNumber, fixturesConfig, false)
 	// Initailise the scanner state for all defined fixtures.
 	for x := 0; x < numberFixtures; x++ {
 		newScanner := common.ScannerState{}
@@ -883,24 +883,50 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 	return availableScannerColors, scannerColors
 }
 
-func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
+func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures, allPosibleFixtures bool) int {
 
 	if debug {
-		fmt.Printf("getNumberOfFixtures\n")
+		fmt.Printf("getNumberOfFixturesn for sequence %d\n", sequenceNumber)
 	}
 
 	var numberFixtures int
 
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequenceNumber {
+			// config has use_channels set.
 			if fixture.NumberChannels > 0 {
 				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberChannels)
-				return fixture.NumberChannels
-			}
-			if fixture.Number > numberFixtures {
-				numberFixtures++
+				if allPosibleFixtures {
+					numberFixtures = numberFixtures + fixture.NumberChannels
+				} else {
+					return fixture.NumberChannels
+				}
+
+			} else {
+				// Examine the channels and count number of color channels.
+				// We use Red for the count.
+				var subFixture int
+				if allPosibleFixtures {
+					for _, channel := range fixture.Channels {
+						if strings.Contains(channel.Name, "Red") {
+							// Found a fixture def.
+							subFixture++
+						}
+					}
+				}
+				if subFixture > 1 {
+					numberFixtures = numberFixtures + subFixture
+				} else {
+					if fixture.Number > numberFixtures {
+						numberFixtures++
+					}
+				}
 			}
 		}
+	}
+
+	if debug {
+		fmt.Printf("numberFixtures found %d\n", numberFixtures)
 	}
 	return numberFixtures
 }

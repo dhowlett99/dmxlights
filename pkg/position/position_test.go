@@ -23,6 +23,33 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+var allFixturesEnabled = map[int]common.ScannerState{
+	0: {
+		Enabled: true,
+	},
+	1: {
+		Enabled: true,
+	},
+	2: {
+		Enabled: true,
+	},
+	3: {
+		Enabled: true,
+	},
+	4: {
+		Enabled: true,
+	},
+	5: {
+		Enabled: true,
+	},
+	6: {
+		Enabled: true,
+	},
+	7: {
+		Enabled: true,
+	},
+}
+
 func TestCalculatePositions(t *testing.T) {
 
 	allFixturesEnabled := map[int]common.ScannerState{
@@ -737,33 +764,6 @@ func TestCalculatePositions(t *testing.T) {
 
 func TestCalculatePositions2(t *testing.T) {
 
-	allFixturesEnabled := map[int]common.ScannerState{
-		0: {
-			Enabled: true,
-		},
-		1: {
-			Enabled: true,
-		},
-		2: {
-			Enabled: true,
-		},
-		3: {
-			Enabled: true,
-		},
-		4: {
-			Enabled: true,
-		},
-		5: {
-			Enabled: true,
-		},
-		6: {
-			Enabled: true,
-		},
-		7: {
-			Enabled: true,
-		},
-	}
-
 	full := 255
 	type args struct {
 		sequence common.Sequence
@@ -872,264 +872,615 @@ func TestCalculatePositions2(t *testing.T) {
 	}
 }
 
-// func TestCalculateScannerChasePositionsAllEnabled(t *testing.T) {
+func Test_calculateScannerPositions(t *testing.T) {
 
-// 	allFixturesEnabled := map[int]common.ScannerState{
-// 		0: {
-// 			Enabled: true,
-// 		},
-// 		1: {
-// 			Enabled: true,
-// 		},
-// 		2: {
-// 			Enabled: true,
-// 		},
-// 		3: {
-// 			Enabled: true,
-// 		},
-// 	}
+	full := 255
+	type args struct {
+		sequence common.Sequence
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int]common.Position
+	}{
 
-// 	full := 255
-// 	type args struct {
-// 		sequence common.Sequence
-// 		slopeOn  []int
-// 		slopeOff []int
-// 	}
-// 	tests := []struct {
-// 		name  string
-// 		args  args
-// 		want  map[int]common.Position
-// 		want1 int
-// 	}{
-// 		{
-// 			name: "Scanner Basic Check, All enabled shutter fires in sequence",
-// 			args: args{
-// 				slopeOn:  []int{255},
-// 				slopeOff: []int{0},
-// 				sequence: common.Sequence{
-// 					Type:         "Scanner",
-// 					ScannerChase: true,
-// 					Bounce:       false,
-// 					RGBInvert:    false,
-// 					RGBShift:     0,
-// 					RGBSize:      255,
-// 					RGBFade:      10,
-// 					ScannerState: allFixturesEnabled,
-// 					Steps: []common.Step{
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			want: map[int]common.Position{
-// 				0: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				1: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				2: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				3: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 			},
-// 			want1: 4,
-// 		},
-// 	}
+		{
+			name: "Scanner case, both scanners doing same things.",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				3: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				4: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				5: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				6: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+			},
+		},
+		{
+			name: "Scanner case, both scanners doing different things.",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 200},
+							},
+						},
+					},
+				},
+			},
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Optimisation is turned off for testing.
-// 			got, got1 := CalculatePositions(tt.args.sequence, tt.args.slopeOn, tt.args.slopeOff, false, tt.args.sequence.ScannerState)
-// 			if !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("CalculatePositions() got = %+v, want %+v", got, tt.want)
-// 			}
-// 			if got1 != tt.want1 {
-// 				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
-// 			}
-// 		})
-// 	}
-// }
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 128, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
 
-// func TestCalculateScannerChasePositionsHalfEnabled(t *testing.T) {
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 128, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+			},
+		},
 
-// 	allFixturesEnabled := map[int]common.ScannerState{
-// 		0: {
-// 			Enabled: true,
-// 		},
-// 		1: {
-// 			Enabled: true,
-// 		},
-// 		2: {
-// 			Enabled: false,
-// 		},
-// 		3: {
-// 			Enabled: false,
-// 		},
-// 	}
+		{
+			name: "Scanner case, one set of instruction in a pattern should create one set of positions.",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+							},
+						},
+						{
+							Type: "scanner",
+							Fixtures: []common.Fixture{
+								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
 
-// 	full := 255
-// 	type args struct {
-// 		sequence common.Sequence
-// 		slopeOn  []int
-// 		slopeOff []int
-// 	}
-// 	tests := []struct {
-// 		name  string
-// 		args  args
-// 		want  map[int]common.Position
-// 		want1 int
-// 	}{
-// 		{
-// 			name: "Scanner Basic Check, All enabled shutter fires in sequence",
-// 			args: args{
-// 				slopeOn:  []int{255},
-// 				slopeOff: []int{0},
-// 				sequence: common.Sequence{
-// 					Type:         "Scanner",
-// 					ScannerChase: true,
-// 					Bounce:       false,
-// 					RGBInvert:    false,
-// 					RGBShift:     0,
-// 					RGBSize:      255,
-// 					RGBFade:      10,
-// 					ScannerState: allFixturesEnabled,
-// 					Steps: []common.Step{
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 						{
-// 							Fixtures: []common.Fixture{
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 								{Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 							},
-// 						},
-// 					},
-// 				},
-// 			},
-// 			want: map[int]common.Position{
-// 				0: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				1: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				2: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 				3: {
-// 					Fixtures: map[int]common.Fixture{
-// 						0: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						1: {Shutter: 255, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						2: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
-// 						3: {Shutter: 0, Pan: 128, Tilt: 128, MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
-// 					},
-// 				},
-// 			},
-// 			want1: 4,
-// 		},
-// 	}
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+					},
+				},
+			},
+		},
 
-// 	for _, tt := range tests {
-// 		t.Run(tt.name, func(t *testing.T) {
-// 			// Optimisation is turned off for testing.
-// 			got, got1 := CalculatePositions(tt.args.sequence, tt.args.slopeOn, tt.args.slopeOff, false, tt.args.sequence.ScannerState)
-// 			if !reflect.DeepEqual(got, tt.want) {
-// 				t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
-// 			}
-// 			if got1 != tt.want1 {
-// 				t.Errorf("calculatePositions() got1 = %+v, want %+v", got1, tt.want1)
-// 			}
-// 		})
-// 	}
-// }
+		{
+			name: "Pairs case",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
+
+				0: {
+					Fixtures: map[int]common.Fixture{
+
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+			},
+		},
+
+		{
+			name: "Scanners inverted no bounce",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					ScannerInvert: true,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Pan: 1, Tilt: 1, Gobo: 1, Shutter: 255},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Pan: 2, Tilt: 2, Gobo: 1, Shutter: 255},
+							},
+						},
+					},
+				},
+			},
+
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+					},
+				},
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+					},
+				},
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+					},
+				},
+			},
+		},
+
+		{
+			name: "Scanners inverted with bounce",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        true,
+					ScannerInvert: true,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Pan: 1, Tilt: 1, Gobo: 1, Shutter: 255},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Pan: 2, Tilt: 2, Gobo: 1, Shutter: 255},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
+					},
+				},
+
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
+					},
+				},
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
+					},
+				},
+				3: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
+					},
+				},
+				4: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 255, B: 0}}, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
+					},
+				},
+				5: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
+					},
+				},
+			},
+		},
+		{
+			name: "Multicolored Patten",
+			args: args{
+				sequence: common.Sequence{
+					Bounce:        false,
+					ScannerInvert: false,
+					FadeUpAndDown: []int{255},
+					FadeDownAndUp: []int{0},
+					Optimisation:  false,
+					ScannerState:  allFixturesEnabled,
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
+				// Start of want.
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+
+				3: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				4: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				5: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				6: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				7: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 111, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 255, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {MasterDimmer: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 100, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				// End of Want
+			},
+		},
+
+		// End of test cases.
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, _ := CalculatePositions(tt.args.sequence); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("got = %+v", got)
+				t.Errorf("want =%+v", tt.want)
+			}
+		})
+	}
+}
