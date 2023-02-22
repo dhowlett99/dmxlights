@@ -601,8 +601,8 @@ func PlaySequence(sequence common.Sequence,
 
 					if debug {
 						fmt.Printf("----> Step %d This many Fixtures %d\n", step, len(sequence.RGBPositions[step].Fixtures))
-						for f := 0; f < len(sequence.RGBPositions[step].Fixtures); f++ {
-							fmt.Printf("\t Fixture:%d  %v\n", f, sequence.RGBPositions[step].Fixtures[f])
+						for _, fixture := range sequence.RGBPositions[step].Fixtures {
+							fmt.Printf("\t Fixture: %+v\n", fixture)
 						}
 					}
 
