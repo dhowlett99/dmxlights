@@ -862,7 +862,7 @@ func ProcessButtons(X int, Y int,
 
 	}
 
-	// S T O B E - Strobe.
+	// S T R O B E - Strobe.
 	if X == 8 && Y == 6 {
 
 		// Shutdown any function bars.
@@ -884,11 +884,9 @@ func ProcessButtons(X int, Y int,
 			return
 
 		} else {
-			// Start strobing for all sequences.
+			// Start strobing for this sequence.
 			this.Strobe[this.SelectedSequence] = true
-			for sequence := range sequences {
-				this.StrobeSpeed[sequence] = 255
-			}
+			this.StrobeSpeed[this.SelectedSequence] = 255
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
@@ -2438,14 +2436,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	this.MasterBrightness = sequences[this.SelectedSequence].Master
 
 	// Show the correct running and strobe buttons.
-	this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
-	if this.StrobeSpeed[this.SelectedSequence] > 0 {
-		this.Strobe[this.SelectedSequence] = true
+	if this.Strobe[this.SelectedSequence] {
+		this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 		// Show this sequence running status in the start/stop button.
 		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 		common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
 	} else {
-		this.Strobe[this.SelectedSequence] = false
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
 }

@@ -319,6 +319,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StartFlood = false
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
+		if sequence.Static {
+			sequence.PlayStaticOnce = true
+		}
 		return sequence
 
 	case common.UpdateStrobeSpeed:

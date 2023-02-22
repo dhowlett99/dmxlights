@@ -287,6 +287,7 @@ func FixtureReceiver(
 				sequence.StaticColors = cmd.RGBStaticColors
 				sequence.Static = cmd.RGBStatic
 				sequence.StrobeSpeed = cmd.StrobeSpeed
+				sequence.Strobe = cmd.Strobe
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
@@ -606,7 +607,8 @@ func MapFixtures(mySequenceNumber int,
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == mySequenceNumber {
 			for channelNumber, channel := range fixture.Channels {
-				if fixture.Number == displayFixture+1 {
+				// Match the fixture number unless there are mulitple sub fixtures.
+				if fixture.Number == displayFixture+1 || fixture.NumberChannels > 0 {
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
 						if channel.Offset != nil {
@@ -672,9 +674,14 @@ func MapFixtures(mySequenceNumber int,
 						if blackout {
 							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 						} else {
-							setChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
+							if strobe {
+								setChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
+							} else {
+								setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+							}
 						}
 					}
+					// Master Dimmer.
 					if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
 						if blackout {
 							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
@@ -1045,6 +1052,7 @@ func reverse_dmx(n int) int {
 
 func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxInterfacePresent bool) {
 
+	fmt.Printf("lightStaticFixture seq %d fixture %d \n", sequence.Number, myFixtureNumber)
 	lamp := sequence.StaticColors[myFixtureNumber]
 
 	if sequence.Hide {
@@ -1056,6 +1064,7 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
+	fmt.Printf("strobe %t speed %d\n", sequence.Strobe, sequence.StrobeSpeed)
 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
 
 	// Only play once, we don't want to flood the DMX universe with
