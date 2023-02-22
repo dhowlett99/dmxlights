@@ -82,7 +82,7 @@ type CurrentState struct {
 	StaticButtons             []common.StaticColorButton   // Storage for the color of the static buttons.
 	SelectedGobo              int                          // The selected GOBO.
 	ButtonTimer               *time.Time                   // Button Timer
-	SelectColorBar            int                          // Storage for color bar in static color selection.
+	SelectColorBar            map[int]int                  // Storage for color bar in static color selection. Indexed by sequence.
 	SwitchChannels            map[int]common.SwitchChannel // Used for communicating with mini-sequencers on switches.
 	LaunchPadConnected        bool                         // Flag to indicate presence of Novation Launchpad.
 	DmxInterfacePresent       bool                         // Flag to indicate precence of DMX interface card
@@ -2530,12 +2530,12 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		sequences[this.SelectedSequence].Type != "scanner" {
 
 		// Back to the begining of the rotation.
-		if this.SelectColorBar > common.MaxColorBar {
-			this.SelectColorBar = 0
+		if this.SelectColorBar[this.SelectedSequence] > common.MaxColorBar {
+			this.SelectColorBar[this.SelectedSequence] = 0
 		}
 
 		// First press resets the colors to the default color bar.
-		if this.SelectColorBar == 0 {
+		if this.SelectColorBar[this.SelectedSequence] == 0 {
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.ClearStaticColor,
@@ -2544,20 +2544,20 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// Rotate around solid colors.
-		if this.SelectColorBar > 0 {
+		if this.SelectColorBar[this.SelectedSequence] > 0 {
 
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.SetStaticColorBar,
 				Args: []common.Arg{
-					{Name: "Selection", Value: this.SelectColorBar},
+					{Name: "Selection", Value: this.SelectColorBar[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
 		// Now increment the color bar.
-		this.SelectColorBar++
+		this.SelectColorBar[this.SelectedSequence]++
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)

@@ -1052,7 +1052,10 @@ func reverse_dmx(n int) int {
 
 func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxInterfacePresent bool) {
 
-	fmt.Printf("lightStaticFixture seq %d fixture %d \n", sequence.Number, myFixtureNumber)
+	if debug {
+		fmt.Printf("lightStaticFixture seq %d fixture %d \n", sequence.Number, myFixtureNumber)
+	}
+
 	lamp := sequence.StaticColors[myFixtureNumber]
 
 	if sequence.Hide {
@@ -1064,7 +1067,9 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}
-	fmt.Printf("strobe %t speed %d\n", sequence.Strobe, sequence.StrobeSpeed)
+	if debug {
+		fmt.Printf("strobe %t speed %d\n", sequence.Strobe, sequence.StrobeSpeed)
+	}
 	MapFixtures(sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
 
 	// Only play once, we don't want to flood the DMX universe with

@@ -84,6 +84,7 @@ func main() {
 	this.RGBFade = make(map[int]int, 4)                // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, 4)            // Initialise storage for four sequences.
 	this.StrobeSpeed = make(map[int]int, 4)            // Initialise storage for four sequences.
+	this.SelectColorBar = make(map[int]int, 4)         // Initialise storage for four sequences.
 	this.ScannerCoordinates = make(map[int]int, 4)     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
 	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
 	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
