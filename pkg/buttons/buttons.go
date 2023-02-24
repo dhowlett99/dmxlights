@@ -26,9 +26,9 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/dhowlett99/pad"
 	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
@@ -70,7 +70,7 @@ type CurrentState struct {
 	FollowingAction           string                       // String to find next function, used in selecting a fixture.
 	OffsetPan                 int                          // Offset for Pan.
 	OffsetTilt                int                          // Offset for Tilt.
-	Pad                       *mk3.Launchpad               // Pointer to the Novation Launchpad object.
+	Pad                       *pad.Pad                     // Pointer to the Novation Launchpad object.
 	PresetsStore              map[string]presets.Preset    // Storage for the Presets.
 	LastPreset                *string                      // Last preset used.
 	SoundTriggers             []*common.Trigger            // Pointer to the Sound Triggers.
