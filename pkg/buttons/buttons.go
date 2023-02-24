@@ -335,7 +335,12 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// F L O O D
-	if X == 8 && Y == 3 && !this.SavePreset {
+	if X == 8 && Y == 3 {
+
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -884,6 +889,11 @@ func ProcessButtons(X int, Y int,
 
 	// S T R O B E - Strobe.
 	if X == 8 && Y == 6 {
+
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -1799,6 +1809,11 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("BLACKOUT\n")
 		}
+
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		if !this.Blackout {
 			this.Blackout = true
