@@ -4,7 +4,7 @@ go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.3.1
-	github.com/dhowlett99/pad v0.0.0-20230223211747-ea9b260809af
+	github.com/dhowlett99/pad v0.0.0-20230223232808-5d63d62ed62e
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gordonklaus/portaudio v0.0.0-20221027163845-7c3b689db3cc
 	github.com/oliread/usbdmx v0.0.0-20200510141510-3b43952fa44b
