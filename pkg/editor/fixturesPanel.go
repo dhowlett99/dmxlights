@@ -214,10 +214,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	header.SetColumnWidth(1, 100) // Type
 	header.SetColumnWidth(2, 60)  // Sequence Number
 	header.SetColumnWidth(3, 60)  // Fixture Number
-	header.SetColumnWidth(4, 100) // Name
-	header.SetColumnWidth(5, 100) // Label
+	header.SetColumnWidth(4, 80)  // Name
+	header.SetColumnWidth(5, 80)  // Label
 	header.SetColumnWidth(6, 50)  // DMX Address
-	header.SetColumnWidth(7, 150) // Description
+	header.SetColumnWidth(7, 140) // Description
 	header.SetColumnWidth(8, 20)  // Delete Button
 	header.SetColumnWidth(9, 20)  // Add Button
 	header.SetColumnWidth(10, 40) // Channels Button
@@ -619,10 +619,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp.FixturePanel.SetColumnWidth(1, 100) // Type
 	fp.FixturePanel.SetColumnWidth(2, 60)  // Sequence Number
 	fp.FixturePanel.SetColumnWidth(3, 60)  // Fixture Number
-	fp.FixturePanel.SetColumnWidth(4, 100) // Name
-	fp.FixturePanel.SetColumnWidth(5, 100) // Label
+	fp.FixturePanel.SetColumnWidth(4, 80)  // Name
+	fp.FixturePanel.SetColumnWidth(5, 80)  // Label
 	fp.FixturePanel.SetColumnWidth(6, 50)  // DMX Address
-	fp.FixturePanel.SetColumnWidth(7, 150) // Description
+	fp.FixturePanel.SetColumnWidth(7, 140) // Description
 	fp.FixturePanel.SetColumnWidth(8, 20)  // Delete Button
 	fp.FixturePanel.SetColumnWidth(9, 20)  // Add Button
 	fp.FixturePanel.SetColumnWidth(10, 40) // Channels Button
