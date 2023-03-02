@@ -22,7 +22,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/pad"
+	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/oliread/usbdmx/ft232"
 )
 

@@ -12,7 +12,6 @@ Built for Apple Mac (tested on Catalina 10.15.7)
 [DMX Lights Manual.](./Manual.md)
 
 # Dependances
-- github.com/dhowlett99/pad
 - github.com/scgolang/midi
 - github.com/oliread/usbdmx/ft232"
 - github.com/gordonklaus/portaudio
@@ -42,7 +41,6 @@ $ sudo kextunload -b com.apple.driver.AppleUSBFTDI
 ```
 ##  Launch Pad Integration
 
-github.com/dhowlett99/pad
 github.com/scgolang/midi
 
 ## Installing on Catalina 
