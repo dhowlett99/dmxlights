@@ -1,13 +1,13 @@
 module github.com/dhowlett99/dmxlights
 
-go 1.19
+go 1.20
 
 require (
 	fyne.io/fyne/v2 v2.3.1
+	github.com/dhowlett99/pad v0.0.0-20230223232808-5d63d62ed62e
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gordonklaus/portaudio v0.0.0-20221027163845-7c3b689db3cc
 	github.com/oliread/usbdmx v0.0.0-20200510141510-3b43952fa44b
-	github.com/rakyll/launchpad v0.1.0
 )
 
 require (
@@ -28,8 +28,9 @@ require (
 	github.com/google/gousb v1.1.2 // indirect
 	github.com/gopherjs/gopherjs v1.17.2 // indirect
 	github.com/jsummers/gobmp v0.0.0-20151104160322-e2ba15ffa76e // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/rakyll/portmidi v0.0.0-20191102002215-74e95e8bc9b1 // indirect
+	github.com/scgolang/midi v0.5.0 // indirect
 	github.com/srwiley/oksvg v0.0.0-20220731023508-a61f04f16b76 // indirect
 	github.com/srwiley/rasterx v0.0.0-20210519020934-456a8d69b780 // indirect
 	github.com/stretchr/testify v1.8.0 // indirect

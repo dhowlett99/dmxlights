@@ -1,6 +1,5 @@
 // Copyright (C) 2022,2025 dhowlett99.
 // This is the dmxlights launchpad interface.
-// Implemented by and depends on github.com/rakyll/launchpad/mk3
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -23,17 +22,17 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/pad"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
 
-func NewLaunchPad() (*mk3.Launchpad, error) {
+func NewLaunchPad() (*pad.Pad, error) {
 
 	// Setup a connection to the Novation Launchpad.
-	// Tested with a Novation Launchpad mini mk3.
-	pad, err := mk3.Open()
+	// Tested with a Novation Launchpad mini pad.
+	pad, err := pad.Open()
 	if err != nil {
 		return nil, fmt.Errorf("%v", err)
 	}
@@ -47,7 +46,12 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentSt
 	replyChannels []chan common.Sequence, updateChannels []chan common.Sequence,
 	dmxInterfaceCardPresent bool) {
 
-	buttonChannel := this.Pad.Listen()
+	// Create a channel to listen for buttons being pressed.
+	// Send the button pressed hit to the button channel.
+	buttonChannel := make(chan pad.Hit)
+	go func() {
+		this.Pad.Listen(buttonChannel)
+	}()
 
 	// Main loop reading commands from the Novation Launchpad.
 	for {
@@ -64,7 +68,7 @@ type coordinate struct {
 // ListenAndSendToLaunchPad is the thread that listens for events to send to
 // the launch pad.  It is thread safe and is the only thread talking to the
 // launch pad. A channel is used to queue the events to be sent.
-func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *mk3.Launchpad, LaunchPadConnected bool) {
+func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadConnected bool) {
 
 	launchPadMap := make(map[coordinate]common.Color, 81)
 

@@ -26,14 +26,16 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/dhowlett99/pad"
 	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
-	"github.com/rakyll/launchpad/mk3"
 )
 
 const debug = false
 
 type CurrentState struct {
+	Crash1                    bool                         // Flags to detect launchpad crash.
+	Crash2                    bool                         // Flags to detect launchpad crash.
 	SelectedSequence          int                          // The currently selected sequence.
 	LastSelectedSequence      int                          // Store fof the last selected squence.
 	Speed                     map[int]int                  // Local copy of sequence speed. Indexed by sequence.
@@ -70,7 +72,7 @@ type CurrentState struct {
 	FollowingAction           string                       // String to find next function, used in selecting a fixture.
 	OffsetPan                 int                          // Offset for Pan.
 	OffsetTilt                int                          // Offset for Tilt.
-	Pad                       *mk3.Launchpad               // Pointer to the Novation Launchpad object.
+	Pad                       *pad.Pad                     // Pointer to the Novation Launchpad object.
 	PresetsStore              map[string]presets.Preset    // Storage for the Presets.
 	LastPreset                *string                      // Last preset used.
 	SoundTriggers             []*common.Trigger            // Pointer to the Sound Triggers.
@@ -104,6 +106,36 @@ func ProcessButtons(X int, Y int,
 
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
+	}
+
+	// The Novation Launchpad is not designed for the number of MIDI
+	// Events we send when all the sequences are chasing at top
+	// Speed, so we look out for the crys for help when the Launchpad
+	// Crashes. When we see the following three events we reset the pad.
+	// As this happens so quickly the user should be unware that a crash
+	// has taken place.
+	if X == -1 && Y == 8 {
+		this.Crash1 = true
+		return
+	}
+	if X == 1 && Y == 8 && this.Crash1 {
+		this.Crash2 = true
+		return
+	}
+	// Crash 2 message has appeared and this isn't a pad program ack.
+	if X != 0 && Y == 8 && this.Crash2 {
+		// Start a supervisor thread which will reset the launchpad every 1/2 second.
+		time.Sleep(200 * time.Millisecond)
+		if this.LaunchPadConnected {
+			this.Pad.Program()
+		}
+		InitButtons(this, eventsForLaunchpad, guiButtons)
+		sequence.ShowSwitches(3, sequences[3], eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig, this.DmxInterfacePresent)
+		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+		this.Crash1 = false
+		this.Crash2 = false
+		fmt.Printf("RESET PAD\n")
+		return
 	}
 
 	// F L A S H   O N   B U T T O N S - Briefly light (flash) the fixtures based on color pattern.
@@ -303,7 +335,12 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// F L O O D
-	if X == 8 && Y == 3 && !this.SavePreset {
+	if X == 8 && Y == 3 {
+
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -736,10 +773,6 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
 
-		if this.LaunchPadConnected {
-			this.Pad.Program()
-		}
-
 		return
 	}
 
@@ -762,10 +795,6 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
 
-		if this.LaunchPadConnected {
-			this.Pad.Program()
-		}
-
 		return
 	}
 
@@ -787,10 +816,6 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
-
-		if this.LaunchPadConnected {
-			this.Pad.Program()
-		}
 
 		return
 	}
@@ -864,6 +889,11 @@ func ProcessButtons(X int, Y int,
 
 	// S T R O B E - Strobe.
 	if X == 8 && Y == 6 {
+
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -1780,6 +1810,11 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("BLACKOUT\n")
 		}
 
+		// Turn off the flashing save button
+		this.SavePreset = false
+		this.SavePreset = false
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
 		if !this.Blackout {
 			this.Blackout = true
 			cmd := common.Command{
@@ -2335,6 +2370,13 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	if this.LaunchPadConnected {
 		this.Pad.Light(8, -1, 0, 0, 255)
 	}
+
+	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
+	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
 
 	// Light up any existing presets.
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)

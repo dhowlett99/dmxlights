@@ -27,6 +27,12 @@ legacy-build:
 clean: 
 	go clean -cache
 
+init:
+	rm -rf go.mod
+	rm -rf go.sum
+	go mod init
+	go mod tidy
+
 dep:
 	rm -rf go.mod go.sum 
 	go mod init

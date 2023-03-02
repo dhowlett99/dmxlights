@@ -89,6 +89,7 @@ func main() {
 	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
 	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
 	this.LaunchpadName = "Novation Launchpad Mk3 Mini" // Name of launchpad.
+
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
 	for switchChannel := 0; switchChannel < 10; switchChannel++ {
@@ -121,7 +122,7 @@ func main() {
 	}
 
 	// Save the presets on exit.
-	c := make(chan os.Signal)
+	c := make(chan os.Signal, 1)
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
@@ -139,9 +140,11 @@ func main() {
 		this.LaunchpadName = "Not Found"
 	}
 
+	// If launchpad found, defer the close.
 	if this.LaunchPadConnected {
 		defer this.Pad.Close()
 	}
+
 	// Report on connected devices.
 	panel.PopupNotFoundMessage(myWindow,
 		gui.Device{
@@ -333,6 +336,7 @@ func main() {
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
+	// Create top status bar.
 	topStatusBar := container.New(
 		layout.NewHBoxLayout(),
 		layout.NewSpacer(),
@@ -351,6 +355,7 @@ func main() {
 		layout.NewSpacer(),
 		toolbar)
 
+	// Create bottom status bar.
 	bottonStatusBar := container.New(
 		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.BeatLabel)
 
@@ -374,8 +379,8 @@ func main() {
 	// Clear the pad. Strobe is set to 0.
 	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 
+	// If present create a thread to listen to launchpad button events.
 	if this.LaunchPadConnected {
-		// Listen to launchpad buttons.
 		go func(guiButtons chan common.ALight,
 			this *buttons.CurrentState,
 			sequences []*common.Sequence,
@@ -391,13 +396,6 @@ func main() {
 
 		}(guiButtons, &this, sequences, eventsForLaunchpad, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 	}
-
-	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
