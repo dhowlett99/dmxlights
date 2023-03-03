@@ -18,10 +18,8 @@
 package gui
 
 import (
-	"bufio"
 	"fmt"
 	"image/color"
-	"io/ioutil"
 	"log"
 	"os"
 	"strings"
@@ -242,14 +240,8 @@ func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {
 }
 
 func (panel *MyPanel) ConvertButtonImageToIcon(filename string) []byte {
-	iconFile, err := os.Open(filename)
-	if err != nil {
-		log.Fatal(err)
-	}
 
-	r := bufio.NewReader(iconFile)
-
-	iconImage, err := ioutil.ReadAll(r)
+	iconImage, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -317,9 +309,7 @@ type noHoverButton struct {
 }
 
 // A null MouseIn func.
-func (nhb *noHoverButton) MouseIn() {
-	return
-}
+func (nhb *noHoverButton) MouseIn() {}
 
 // A exteneded button functon with no hover affect.
 func newNoHoverButton(label string, tapped func()) *noHoverButton {
