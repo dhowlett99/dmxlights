@@ -4,6 +4,9 @@ A DJ lighting package
 A DMX lighting controller that uses a Novation Launchpad as a control surface and a cheap FTDI interface for 
 connecting to the lighting fixtures.
 
+![Main Screen](mainScreen.png)
+
+
 Novation Launchpad Mini Mk3 - https://novationmusic.com/en/launch/launchpad-mini
 FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface FT232RL 75176 Module_AM.
 
