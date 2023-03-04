@@ -701,6 +701,94 @@ fixtures:
       number: 3
       value: "255"
 - id: 17
+  name: ADJ Dekker2
+  label: dekker2
+  number: 1
+  description: American DJ Dekker LED Derby
+  type: rgb
+  group: 101
+  address: 330
+  channels:
+  - number: 1
+    name: Rotate
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: Rotate Clockwise Slow
+      number: 2
+      value: "1"
+    - name: Rotate Clockwise Fast
+      number: 3
+      value: "127"
+    - name: Rotate Anti Clockwise Fast
+      number: 4
+      value: "128"
+    - name: Rotate Anti Clockwise Slow
+      number: 5
+      value: "255"
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White1
+  - number: 6
+    name: Master
+  - number: 7
+    name: Program
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: 4 Color Loop Change
+      number: 2
+      value: "1"
+    - name: 9 Color Fade Change
+      number: 3
+      value: "27"
+    - name: 4 Color Loop Change
+      number: 4
+      value: "52"
+    - name: 9 Color Fade Change
+      number: 5
+      value: "77"
+    - name: Strobe 1 Dim - Bright
+      number: 6
+      value: "102"
+    - name: Strobe 2 Bright - Dim
+      number: 7
+      value: "127"
+    - name: Strobe 3 Dim - Bright - Dim
+      number: 8
+      value: "152"
+    - name: Strobe 4 W/O Dim Effect
+      number: 9
+      value: "177"
+    - name: Strobe 5 with 9 Color
+      number: 10
+      value: "202"
+    - name: Strobe 6 with Gradual Dim
+      number: 11
+      value: "227"
+    - name: All Programs will Cycle
+      number: 12
+      value: "255"
+  - number: 8
+    name: ProgramSpeed
+    settings:
+    - name: Slow
+      number: 1
+      value: "1"
+    - name: Fast
+      number: 2
+      value: "254"
+    - name: Sound Active
+      number: 3
+      value: "255"
+- id: 18
   name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -757,7 +845,7 @@ fixtures:
       value: "57"
   - number: 5
     name: Master
-- id: 18
+- id: 19
   name: Scanner 2
   label: ADJ.Com.Scan2
   number: 2
@@ -814,7 +902,7 @@ fixtures:
       value: "57"
   - number: 5
     name: Master
-- id: 19
+- id: 20
   name: Scanner 3
   label: ADJ.Com.Scan3
   number: 3
@@ -871,7 +959,7 @@ fixtures:
       value: "57"
   - number: 5
     name: Master
-- id: 20
+- id: 21
   name: Scanner 4
   label: ADJ.Com.Scan4
   number: 4
@@ -928,7 +1016,7 @@ fixtures:
       value: "57"
   - number: 5
     name: Master
-- id: 21
+- id: 22
   name: Scanner 5
   label: ADJ.Com.Scan5
   number: 5
@@ -985,7 +1073,7 @@ fixtures:
       value: "57"
   - number: 5
     name: Master
-- id: 22
+- id: 23
   name: Scanner 6
   label: ADJ.Inno.Spot1
   number: 6
@@ -1090,7 +1178,7 @@ fixtures:
     - name: DefaultCurve
       number: 1
       value: "255"
-- id: 23
+- id: 24
   name: Scanner 7
   label: ADJ.Inno.Spot2
   number: 7
@@ -1195,7 +1283,7 @@ fixtures:
     - name: Default Curve
       number: 1
       value: "255"
-- id: 24
+- id: 25
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1242,7 +1330,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: Oil1
-- id: 25
+- id: 26
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1274,7 +1362,7 @@ fixtures:
       channel: "57"
       value: "255"
     flash: false
-- id: 26
+- id: 27
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1373,7 +1461,7 @@ fixtures:
       value: "75"
     flash: false
   use_fixture: deluge
-- id: 27
+- id: 28
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1579,7 +1667,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: vue
-- id: 28
+- id: 29
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -1757,7 +1845,7 @@ fixtures:
       value: "0"
     flash: false
   use_fixture: par38
-- id: 29
+- id: 30
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -1929,14 +2017,14 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker1
-- id: 30
+- id: 31
   name: switch7
   label: SW7.DERBY
   number: 7
   description: ADJ DEKKER 2
   type: switch
   group: 4
-  address: 0
+  address: 330
   channels: []
   states:
   - name: "Off"
@@ -1944,14 +2032,164 @@ fixtures:
     label: "Off"
     buttoncolor: Green
     master: 0
+    actions:
+    - name: "Off"
+      number: 0
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: Rotate
+      number: 1
+      channel: Rotate
+      value: "off"
+    - name: Red1
+      number: 2
+      channel: Red1
+      value: "0"
+    - name: Green1
+      number: 3
+      channel: Green1
+      value: "0"
+    - name: Blue1
+      number: 4
+      channel: Blue1
+      value: "0"
+    - name: White1
+      number: 5
+      channel: White1
+      value: "0"
+    - name: Master
+      number: 6
+      channel: Master
+      value: "0"
+    - name: Program
+      number: 7
+      channel: Program
+      value: "0"
+    - name: ProgramSpeed
+      number: 8
+      channel: ProgramSpeed
+      value: "0"
     flash: false
-  - name: "On"
+  - name: Red
     number: 2
-    label: "On"
+    label: Red
     buttoncolor: Red
     master: 0
+    actions:
+    - name: Red
+      number: 0
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
     flash: false
-- id: 31
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: Green
+      number: 0
+      colors:
+      - Green
+      mode: Static
+      fade: "Off"
+      size: ""
+      speed: "Off"
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 0
+      colors:
+      - Blue
+      mode: Static
+      fade: "Off"
+      size: ""
+      speed: "Off"
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Soft
+    number: 5
+    label: Soft
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Soft
+      number: 0
+      colors:
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      mode: Chase
+      fade: Soft
+      size: Short
+      speed: Fast
+      rotate: Anti Clockwise
+      rotatespeed: Slow
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 0
+      colors:
+      - Yellow
+      - White
+      - Pink
+      - Black
+      - Red
+      - Orange
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      mode: Chase
+      fade: Soft
+      size: "Off"
+      speed: Music
+      rotate: Auto
+      rotatespeed: Fast
+      program: ""
+      strobe: ""
+    flash: false
+  use_fixture: dekker2
+- id: 32
   name: switch8
   label: SW8.Booth
   number: 8
@@ -2084,7 +2322,7 @@ fixtures:
       value: "255"
     flash: false
   use_fixture: megabar
-- id: 32
+- id: 33
   name: Oil
   label: Oil1
   number: 1
@@ -2102,7 +2340,7 @@ fixtures:
     - name: "On"
       number: 2
       value: "255"
-- id: 33
+- id: 34
   name: Vue1.1
   label: vue
   number: 1
@@ -2158,7 +2396,7 @@ fixtures:
     name: Speed
   - number: 6
     name: Master Reverse
-- id: 34
+- id: 35
   name: ADJ MegaBar
   label: megabar
   number: 1
@@ -2194,7 +2432,7 @@ fixtures:
       value: 16-255
   - number: 7
     name: Master
-- id: 35
+- id: 36
   name: Deluge
   label: deluge
   number: 1
