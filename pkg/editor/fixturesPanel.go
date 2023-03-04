@@ -320,7 +320,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			if i.Col == FIXTURE_TYPE {
 				showField(FIXTURE_TYPE, o)
 				o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).OnChanged = nil
-				o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).SetSelected(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).Selected = data[i.Row][i.Col]
+				o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).Refresh()
 				o.(*fyne.Container).Objects[FIXTURE_TYPE].(*widget.Select).OnChanged = func(value string) {
 					if data[i.Row][FIXTURE_ID] == fmt.Sprintf("%d", fp.FixtureList[i.Row].ID) {
 						newFixture := makeNewFixture(data, i, FIXTURE_TYPE, value, fp.FixtureList)
@@ -965,9 +966,13 @@ func addFixture(fixtures []fixture.Fixture, id int) (outItems []fixture.Fixture)
 
 	newFixtures := []fixture.Fixture{}
 	newFixture := fixture.Fixture{}
-	newFixture.ID = id
-	newFixture.Name = "New"
-	newFixture.Type = "rgb"
+	newFixture.ID = id + 1
+	newFixture.Group = 1
+	newFixture.Number = 1
+	newFixture.Name = fmt.Sprintf("Fixture %d", newFixture.ID)
+	newFixture.Label = fmt.Sprintf("Label %d", newFixture.ID)
+	newFixture.Description = fmt.Sprintf("Desc %d", newFixture.ID)
+	newFixture.Type = "(Select One)"
 
 	// Create a empty channel list for this fixture.
 	newChannels := []fixture.Channel{}
@@ -977,11 +982,25 @@ func addFixture(fixtures []fixture.Fixture, id int) (outItems []fixture.Fixture)
 	newChannels = append(newChannels, newChannel)
 	newFixture.Channels = newChannels
 
-	for _, fixture := range fixtures {
-		if fixture.ID == id {
+	var added bool // Only add once.
+
+	for no, fixture := range fixtures {
+		// Add at the start of an empty list.
+		if len(fixtures) == 0 && !added {
 			newFixtures = append(newFixtures, newFixture)
+			added = true
+		}
+		// Insert at this position.
+		if fixture.ID == id+1 && !added {
+			newFixtures = append(newFixtures, newFixture)
+			added = true
 		}
 		newFixtures = append(newFixtures, fixture)
+		// Append an item at the very end.
+		if no == len(fixtures)-1 && !added {
+			newFixtures = append(newFixtures, newFixture)
+			added = true
+		}
 	}
 
 	// Now fix the item numbers
@@ -1016,11 +1035,26 @@ func deleteFixture(fixtureList []fixture.Fixture, id int) (outItems []fixture.Fi
 	}
 
 	if len(outItems) == 0 {
-		// Create a default Channel
-		newItem := fixture.Fixture{}
-		newItem.Number = 1
-		newItem.Name = "New"
-		outItems = append(outItems, newItem)
+		// Create a default fixture with one default channel.
+		newFixture := fixture.Fixture{}
+		newFixture.ID = 1
+		newFixture.Group = 1
+		newFixture.Number = 1
+		newFixture.Name = fmt.Sprintf("Fixture %d", newFixture.ID)
+		newFixture.Label = fmt.Sprintf("Label %d", newFixture.ID)
+		newFixture.Description = fmt.Sprintf("Desc %d", newFixture.ID)
+		newFixture.Type = "(Select One)"
+
+		emptyValue := int16(0)
+		newChannel := fixture.Channel{
+			Number:  0,
+			Name:    "New",
+			Value:   &emptyValue,
+			Comment: "New",
+			//Settings
+		}
+		newFixture.Channels = append(newFixture.Channels, newChannel)
+		outItems = append(outItems, newFixture)
 	}
 
 	return outItems

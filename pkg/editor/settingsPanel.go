@@ -302,11 +302,18 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
-					st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number-1)
+					if len(st.SettingsList) != 0 {
+						st.SettingsList = deleteSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number-1)
+					}
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
-					st.SettingsPanel.Refresh()
+
+					if len(st.SettingsList) == 0 {
+						st.SettingsPanel.Hide()
+					} else {
+						st.SettingsPanel.Refresh()
+					}
 				}
 			}
 
@@ -316,7 +323,11 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
-					st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number, st.SettingsOptions)
+					if len(st.SettingsList) != 0 {
+						st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number, st.SettingsOptions)
+					} else {
+						st.SettingsList = addSettingsItem(st.SettingsList, 0, st.SettingsOptions)
+					}
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
@@ -353,7 +364,7 @@ func addChannelOption(options []string, newOption string) []string {
 	return newOptions
 }
 
-func addSettingsItem(items []fixture.Setting, id int, options []string) (outItems []fixture.Setting) {
+func addSettingsItem(items []fixture.Setting, number int, options []string) (outItems []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("addSettingsItem\n")
@@ -361,14 +372,37 @@ func addSettingsItem(items []fixture.Setting, id int, options []string) (outItem
 
 	newItems := []fixture.Setting{}
 	newItem := fixture.Setting{}
-	newItem.Number = int(id) + 1
+	newItem.Number = int(number) + 1
 	newItem.Name = "New"
+	newItem.Label = "New"
+	newItem.Channel = "(Select one)"
+	newItem.Value = "0"
 
-	for _, item := range items {
-		if item.Number == id {
+	var added bool // Only add once.
+
+	if number == 0 {
+		items = append(items, newItem)
+	}
+
+	for no, item := range items {
+		// Add at the start of an empty list.
+		if len(items) == 0 && !added {
 			newItems = append(newItems, newItem)
+			added = true
+		}
+		// Insert at this position.
+		if item.Number == number+1 && !added {
+			fmt.Printf("Insert at this position %+v\n", newItem)
+			newItems = append(newItems, newItem)
+			added = true
 		}
 		newItems = append(newItems, item)
+		// Append an item at the very end.
+		if no == len(items)-1 && !added {
+			fmt.Printf("Append an item at the very end. \n")
+			newItems = append(newItems, newItem)
+			added = true
+		}
 	}
 
 	// Now fix the item numbers

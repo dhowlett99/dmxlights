@@ -66,6 +66,9 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 		// Function to find length.
 		func() (int, int) {
 			if st.UpdateSettings {
+				if st.UpdateThisChannel < 0 {
+					st.UpdateThisChannel = 0
+				}
 				cp.ChannelList[st.UpdateThisChannel].Settings = st.SettingsList
 				st.UpdateSettings = false
 			}
@@ -114,11 +117,9 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			// Show the currently selected Channel option.
 			if i.Col == CHANNEL_NAME {
 				showChannelsField(CHANNEL_NAME, o)
-				for _, option := range cp.ChannelOptions {
-					if option == cp.ChannelList[i.Row].Name {
-						o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).SetSelected(option)
-					}
-				}
+				o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).OnChanged = nil
+				o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).Selected = cp.ChannelList[i.Row].Name
+				o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).Refresh()
 				// Edit the channel Value.
 				o.(*fyne.Container).Objects[CHANNEL_NAME].(*widget.Select).OnChanged = func(value string) {
 					newChannel := fixture.Channel{}
@@ -221,7 +222,7 @@ func populateChannelSettingList(channelList []fixture.Channel, channelNumber int
 	return settingsList
 }
 
-func addChannelItem(channels []fixture.Channel, id int16, options []string) (outItems []fixture.Channel) {
+func addChannelItem(channels []fixture.Channel, number int16, options []string) (outItems []fixture.Channel) {
 
 	if debug {
 		fmt.Printf("addChannelItem\n")
@@ -229,14 +230,30 @@ func addChannelItem(channels []fixture.Channel, id int16, options []string) (out
 
 	newChannels := []fixture.Channel{}
 	newItem := fixture.Channel{}
-	newItem.Number = id + 1
-	newItem.Name = "New"
+	newItem.Number = number + 1
+	newItem.Name = "(Select one)"
+	emptyValue := int16(0)
+	newItem.Value = &emptyValue
 
-	for _, item := range channels {
-		if item.Number == id {
+	var added bool // Only add once.
+
+	for no, item := range channels {
+		// Add at the start of an empty list.
+		if len(channels) == 0 && !added {
 			newChannels = append(newChannels, newItem)
+			added = true
+		}
+		// Insert at this position.
+		if item.Number == number+1 && !added {
+			newChannels = append(newChannels, newItem)
+			added = true
 		}
 		newChannels = append(newChannels, item)
+		// Append an item at the very end.
+		if no == len(channels)-1 && !added {
+			newChannels = append(newChannels, newItem)
+			added = true
+		}
 	}
 
 	// Now fix the item numbers
@@ -271,7 +288,7 @@ func deleteChannelItem(channelList []fixture.Channel, id int16) (outItems []fixt
 		// Create a default Channel
 		newItem := fixture.Channel{}
 		newItem.Number = 1
-		newItem.Name = "New"
+		newItem.Name = "(Select one)"
 		outItems = append(outItems, newItem)
 	}
 
