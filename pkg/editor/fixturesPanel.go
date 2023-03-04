@@ -513,9 +513,12 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 				}
 
 				// Switch addresses are the address of the fixture being used.
-				// So this comes from the state panel's usefixture field.
+				// So this comes from the state panel's use fixture field.
+				// So if your a switch you can't change the DMX address here.
 				if data[i.Row][FIXTURE_TYPE] == "switch" {
 					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Disable()
+				} else {
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).Enable()
 				}
 			}
 
