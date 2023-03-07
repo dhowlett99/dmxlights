@@ -746,8 +746,10 @@ func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue
 
 		// Now apply the speed
 		final = int(value) + start
+		return final
+	} else {
+		return settingValue
 	}
-	return final
 }
 
 func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
