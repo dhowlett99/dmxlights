@@ -212,8 +212,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 	header.SetColumnWidth(0, 40)  // Id
 	header.SetColumnWidth(1, 100) // Type
-	header.SetColumnWidth(2, 60)  // Sequence Number
-	header.SetColumnWidth(3, 60)  // Fixture Number
+	header.SetColumnWidth(2, 61)  // Sequence Number
+	header.SetColumnWidth(3, 59)  // Fixture Number
 	header.SetColumnWidth(4, 80)  // Name
 	header.SetColumnWidth(5, 80)  // Label
 	header.SetColumnWidth(6, 50)  // DMX Address
@@ -621,8 +621,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 
 	fp.FixturePanel.SetColumnWidth(0, 40)  // Id
 	fp.FixturePanel.SetColumnWidth(1, 100) // Type
-	fp.FixturePanel.SetColumnWidth(2, 60)  // Sequence Number
-	fp.FixturePanel.SetColumnWidth(3, 60)  // Fixture Number
+	fp.FixturePanel.SetColumnWidth(2, 61)  // Sequence Number
+	fp.FixturePanel.SetColumnWidth(3, 59)  // Fixture Number
 	fp.FixturePanel.SetColumnWidth(4, 80)  // Name
 	fp.FixturePanel.SetColumnWidth(5, 80)  // Label
 	fp.FixturePanel.SetColumnWidth(6, 50)  // DMX Address

@@ -751,10 +751,10 @@ func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue
 }
 
 func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	if dmxDebug {
+		fmt.Printf("DMX Debug    Channel %d Value %d\n", index, data)
+	}
 	if dmxInterfacePresent {
-		if dmxDebug {
-			fmt.Printf("DMX Debug    Channel %d Value %d\n", index, data)
-		}
 		dmxController.SetChannel(index, data)
 	}
 }
