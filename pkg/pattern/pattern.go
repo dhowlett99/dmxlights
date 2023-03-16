@@ -735,6 +735,37 @@ type scanner struct {
 	values []int
 }
 
+// GenerateStandardChasePatterm
+func GenerateStandardChasePatterm(numberSteps int) common.Pattern {
+
+	var pattern common.Pattern
+
+	pattern.Name = "std.Scanner.Chase"
+	pattern.Label = "std.Scanner.Chase"
+	pattern.Steps = []common.Step{}
+
+	for step := 0; step < numberSteps; step++ {
+		newStep := common.Step{}
+		newStep.Fixtures = []common.Fixture{}
+		for fixture := 0; fixture < numberSteps; fixture++ {
+			newFixture := common.Fixture{}
+			newFixture.MasterDimmer = 255
+			newFixture.Shutter = 0
+			newFixture.Colors = []common.Color{{R: 0, G: 0, B: 0}}
+			if step == fixture {
+				newFixture.Shutter = full
+				newFixture.Colors = []common.Color{{R: 255, G: 255, B: 255}}
+			}
+			newStep.Fixtures = append(newStep.Fixtures, newFixture)
+		}
+
+		pattern.Steps = append(pattern.Steps, newStep)
+	}
+
+	return pattern
+
+}
+
 // GeneratePattern takes an array of Coordinates and turns them into a pattern
 // which is the starting point for all sequence steps.
 func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState map[int]common.ScannerState) common.Pattern {
@@ -835,7 +866,7 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 	// If all the scanners are enabled it's a straight forward task to switch them on in order.
 	// But if some are disabled, then we need to sequence only the enabled scanners.
 	// So first we make a list of the enabled scanners and place them in an array for easy access.
-	numberEnabledScanners := getNumberEnabledScanners(scannerState, NumberFixtures)
+	numberEnabledScanners := GetNumberEnabledScanners(scannerState, NumberFixtures)
 	enabledScannersList := makeEnabledScannerList(scannerState, NumberCoordinates, numberEnabledScanners, NumberFixtures)
 
 	// Now create the steps in the pattern.
@@ -867,7 +898,6 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 			}
 
 			newFixture := common.Fixture{
-				Type:         "scanner",
 				MasterDimmer: full,
 				// Apply a color to represent each position in the pattern.
 				Colors: []common.Color{
@@ -884,7 +914,6 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		scannerChaseSequenceNumber++
 
 		newStep := common.Step{
-			Type:     "scanner",
 			Fixtures: fixtures,
 		}
 		steps = append(steps, newStep)
@@ -899,13 +928,16 @@ type Coordinate struct {
 	Pan  int
 }
 
-func getNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOfFixtures int) int {
+func GetNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOfFixtures int) int {
 
 	var getNumberEnabledScanners int
 	for fixture := 0; fixture < numberOfFixtures; fixture++ {
 		if scannerState[fixture].Enabled {
 			getNumberEnabledScanners++
 		}
+	}
+	if debug {
+		fmt.Printf("getNumberEnabledScanners %d\n", getNumberEnabledScanners)
 	}
 	return getNumberEnabledScanners
 }
@@ -922,6 +954,10 @@ func makeEnabledScannerList(scannerState map[int]common.ScannerState, NumberCoor
 				enabledScannerList = append(enabledScannerList, fixture)
 			}
 		}
+	}
+
+	if debug {
+		fmt.Printf("makeEnabledScannerList %d\n", enabledScannerList)
 	}
 	return enabledScannerList
 }

@@ -1031,6 +1031,17 @@ fixtures:
       number: 1
       value: "255"
 - id: 22
+  name: Scanner 8
+  label: ADJ.Inno.Spot3
+  number: 8
+  description: American DJ Inno Pocket Spot
+  type: scanner
+  group: 3
+  address: 455
+  channels:
+  - number: 1
+    name: Red7
+- id: 23
   name: ADJ QA PAR 38
   label: par38
   number: 1
@@ -1107,7 +1118,7 @@ fixtures:
       number: 5
       value: "48"
   use_channels: 8
-- id: 23
+- id: 24
   name: ADJ Dekker1
   label: dekker1
   number: 1
@@ -1195,7 +1206,7 @@ fixtures:
     - name: Sound Active
       number: 3
       value: "255"
-- id: 24
+- id: 25
   name: ADJ Dekker2
   label: dekker2
   number: 1
@@ -1283,7 +1294,7 @@ fixtures:
     - name: Sound Active
       number: 3
       value: "255"
-- id: 25
+- id: 26
   name: Oil
   label: Oil1
   number: 1
@@ -1301,7 +1312,7 @@ fixtures:
     - name: "On"
       number: 2
       value: "255"
-- id: 26
+- id: 27
   name: Vue1.1
   label: vue
   number: 1
@@ -1357,7 +1368,7 @@ fixtures:
     name: Speed
   - number: 6
     name: Master Reverse
-- id: 27
+- id: 28
   name: ADJ MegaBar
   label: megabar
   number: 1
@@ -1393,7 +1404,7 @@ fixtures:
       value: 16-255
   - number: 7
     name: Master
-- id: 28
+- id: 29
   name: Deluge
   label: deluge
   number: 1
@@ -1466,7 +1477,7 @@ fixtures:
       labe: Antilockwise  Slow to Fast
       number: 9
       value: 197-255
-- id: 29
+- id: 30
   name: 'Flames '
   label: flames
   number: 1
@@ -1486,7 +1497,7 @@ fixtures:
       labe: "On"
       number: 2
       value: "255"
-- id: 30
+- id: 31
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1533,7 +1544,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: Oil1
-- id: 31
+- id: 32
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1568,7 +1579,7 @@ fixtures:
       value: "On"
     flash: false
   use_fixture: flames
-- id: 32
+- id: 33
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1667,7 +1678,7 @@ fixtures:
       value: "75"
     flash: false
   use_fixture: deluge
-- id: 33
+- id: 34
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1873,7 +1884,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: vue
-- id: 34
+- id: 35
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -2051,7 +2062,7 @@ fixtures:
       value: "0"
     flash: false
   use_fixture: par38
-- id: 35
+- id: 36
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -2223,7 +2234,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker1
-- id: 36
+- id: 37
   name: switch7
   label: SW7.DERBY
   number: 7
@@ -2395,7 +2406,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker2
-- id: 37
+- id: 38
   name: switch8
   label: SW8.Booth
   number: 8

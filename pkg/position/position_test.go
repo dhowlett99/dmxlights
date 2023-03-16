@@ -102,7 +102,7 @@ func TestCalculatePositions(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       0,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -508,7 +508,7 @@ func TestCalculatePositions(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       10,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -634,7 +634,7 @@ func TestCalculatePositions(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       10,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -787,7 +787,7 @@ func TestCalculatePositions2(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       1,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -893,54 +893,54 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 100, Tilt: 150},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}, Gobo: 36, Shutter: 255, Pan: 150, Tilt: 100},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
+								{MasterDimmer: full, Colors: []common.Color{{R: 100, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 200, Tilt: 50},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 190, B: 255}}, Gobo: 36, Shutter: 255, Pan: 255, Tilt: 0},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+								{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
+								{MasterDimmer: full, Colors: []common.Color{{R: 145, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 0},
 							},
 						},
 					},
@@ -1000,19 +1000,19 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 255},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 200},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 128, Tilt: 200},
 							},
 						},
 					},
@@ -1045,17 +1045,17 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
+								{MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}, Gobo: 36, Shutter: 255, Pan: 0, Tilt: 255},
 							},
 						},
 						{
-							Type: "scanner",
+
 							Fixtures: []common.Fixture{
-								{Type: "scanner", MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
+								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Gobo: 36, Shutter: 255, Pan: 50, Tilt: 200},
 							},
 						},
 					},
@@ -1085,7 +1085,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -1153,7 +1153,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
@@ -1202,7 +1202,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
@@ -1265,7 +1265,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					Steps: []common.Step{
+					RGBSteps: []common.Step{
 						{
 							Fixtures: []common.Fixture{
 								{MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -1480,6 +1480,199 @@ func Test_calculateScannerPositions(t *testing.T) {
 			if got, _ := CalculatePositions(tt.args.sequence); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestAddScannerPositions(t *testing.T) {
+
+	positions := make(map[int]common.Position)
+
+	// First position.
+	newPosition1 := common.Position{}
+	newPosition1.Fixtures = make(map[int]common.Fixture)
+
+	// Fixture 1.
+	newFixture1 := common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 1, B: 0}},
+	}
+	newPosition1.Fixtures[0] = newFixture1
+
+	// Fixture 2.
+	newFixture2 := common.Fixture{
+
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 50, B: 0}},
+	}
+	newPosition1.Fixtures[1] = newFixture2
+
+	// Fixture 3.
+	newFixture3 := common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 255, B: 0}},
+	}
+	newPosition1.Fixtures[2] = newFixture3
+
+	// Add first position.
+	positions[0] = newPosition1
+
+	newPosition2 := common.Position{}
+	newPosition2.Fixtures = make(map[int]common.Fixture)
+
+	newFixture1 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 1, B: 0}},
+	}
+	newPosition2.Fixtures[0] = newFixture1
+
+	newFixture2 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 50, B: 0}},
+	}
+	newPosition2.Fixtures[1] = newFixture2
+
+	newFixture3 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 255, B: 0}},
+	}
+	newPosition2.Fixtures[2] = newFixture3
+
+	// Add Second position.
+	positions[1] = newPosition2
+
+	newPosition3 := common.Position{}
+	newPosition3.Fixtures = make(map[int]common.Fixture)
+
+	newFixture1 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 1, B: 0}},
+	}
+	newPosition3.Fixtures[0] = newFixture1
+
+	newFixture2 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 50, B: 0}},
+	}
+	newPosition3.Fixtures[1] = newFixture2
+
+	newFixture3 = common.Fixture{
+		Shutter: 255,
+		Colors:  []common.Color{{R: 0, G: 255, B: 0}},
+	}
+	newPosition3.Fixtures[2] = newFixture3
+
+	// Add third position.
+	positions[2] = newPosition3
+
+	type args struct {
+		scannerPattern common.Pattern
+		positionsIn    map[int]common.Position
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int]common.Position
+	}{
+		{
+			name: "add 12 scanner positions to a 10 point curver",
+			args: args{
+				positionsIn: positions,
+				scannerPattern: common.Pattern{
+					Name:  "test",
+					Label: "test",
+					Steps: []common.Step{
+						{
+							Fixtures: []common.Fixture{
+								{
+									Name: "scanner1",
+									Pan:  1,
+									Tilt: 1,
+								},
+								{
+									Name: "scanner2",
+									Pan:  1,
+									Tilt: 1,
+								},
+								{
+									Name: "scanner3",
+									Pan:  1,
+									Tilt: 1,
+								},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{
+									Name: "scanner1",
+									Pan:  2,
+									Tilt: 2,
+								},
+								{
+									Name: "scanner2",
+									Pan:  2,
+									Tilt: 2,
+								},
+								{
+									Name: "scanner3",
+									Pan:  2,
+									Tilt: 2,
+								},
+							},
+						},
+						{
+							Fixtures: []common.Fixture{
+								{
+									Name: "scanner1",
+									Pan:  3,
+									Tilt: 3,
+								},
+								{
+									Name: "scanner2",
+									Pan:  3,
+									Tilt: 3,
+								},
+								{
+									Name: "scanner3",
+									Pan:  3,
+									Tilt: 3,
+								},
+							},
+						},
+					},
+				},
+			},
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 1, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 50, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 1, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 50, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 1, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 3, Tilt: 3, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 50, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 3, Tilt: 3, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {MasterDimmer: 0, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}}, Pan: 3, Tilt: 3, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := AddScannerPositions(tt.args.scannerPattern, tt.args.positionsIn); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("AddScannerPositions() = got \n%+v", got)
+				t.Errorf("AddScannerPositions() = want \n%+v", tt.want)
 			}
 		})
 	}

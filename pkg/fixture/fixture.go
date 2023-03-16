@@ -331,8 +331,15 @@ func FixtureReceiver(
 				// If enables activate the physical scanner.
 				scannerColor := cmd.ScannerColor
 
+				// In the case of a scanner, they usually have a shutter and a master dimmer to control the brightness
+				// of the lamp. Problem is we can't use the shutter for the control of the overall brightness and the
+				// master for the master dimmmer like we do with RGB fixture. The shutter noramlly is more of a switch
+				// eg. Open , Closed , Strobe etc. If I want to slow fade through a set of scanners I need to use the
+				// brightness for control. Which means I need to combine the master and the control brightness
+				// at this stage.
+				scannerBrightness := int(math.Round((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55)))
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
 					if cmd.ScannerChase {

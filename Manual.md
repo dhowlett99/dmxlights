@@ -291,3 +291,7 @@ Function 8 Music Trigger.
 
 Pressing function 8 will disable the speed of the sequence completely and the chase will step in time to the music. Music sensitivity is auto detected on the volume of the sound. But you can effect a fine tunning by pressing Sens- or Sens+ to increase or decrease the reaction to the music being played. Sens- and Sens+ apply to all sequences using the music trigger.
 
+
+Fade Slopes
+
+![Slopes](slopes.png)

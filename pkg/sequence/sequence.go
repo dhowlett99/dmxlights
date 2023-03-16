@@ -172,6 +172,7 @@ func CreateSequence(
 		Speed:                  common.DefaultSpeed,
 		ScannerShift:           common.DefaultScannerShift,
 		RGBShift:               common.DefaultRGBShift,
+		RGBCoordinates:         common.DefaultRGBCoordinates,
 		Blackout:               false,
 		Master:                 common.MaxDMXBrightness,
 		ScannerGobo:            scannerGobos,
@@ -398,7 +399,6 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// This is the inner loop where the sequence runs.
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
 			for sequence.Run && !sequence.Static {
@@ -425,10 +425,11 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
-					sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
-					sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
-					sequence.Pattern.PattenTrim = sequence.RGBAvailablePatterns[sequence.SelectedPattern].PattenTrim
+					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+					sequence.RGBSteps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+					sequence.RGBPattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
+					sequence.RGBPattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
+					sequence.RGBPattern.PattenTrim = sequence.RGBAvailablePatterns[sequence.SelectedPattern].PattenTrim
 					sequence.UpdatePattern = false
 				}
 
@@ -439,8 +440,17 @@ func PlaySequence(sequence common.Sequence,
 					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
 					sequence.UpdatePattern = false
 
-					sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
-					sequence.Steps = sequence.Pattern.Steps
+					// Set the chase RGB steps used to chase the shutter.
+					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+					pattern := pattern.GenerateStandardChasePatterm(sequence.EnabledNumberFixtures)
+					sequence.RGBSteps = pattern.Steps
+					sequence.RGBPattern.Name = pattern.Name
+					sequence.RGBPattern.Label = pattern.Label
+					sequence.RGBPattern.PattenTrim = pattern.PattenTrim
+
+					// Set the scanner steps used to move through PAN and TILT values.
+					sequence.ScannerPattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
+					sequence.ScannerSteps = sequence.ScannerPattern.Steps
 
 					if sequence.AutoColor {
 
@@ -484,12 +494,20 @@ func PlaySequence(sequence common.Sequence,
 
 				// Calculate positions for each scanner based on the steps in the pattern.
 				if sequence.Type == "scanner" {
+					if debug {
+						fmt.Printf("Scanner Steps\n")
+						for stepNumber, step := range sequence.ScannerPattern.Steps {
+							fmt.Printf("Scanner Steps %+v\n", stepNumber)
+							for _, fixture := range step.Fixtures {
+								fmt.Printf("Fixture %+v\n", fixture)
+							}
+						}
+					}
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						// Calculate fade curve values.
-						sequence.FadeUpAndDown = []int{255}
-						sequence.FadeDownAndUp = []int{0}
+						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
+						sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
 						// Calulate positions for each RGB fixture.
-						sequence.Optimisation = true
+						sequence.Optimisation = false
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
 						positions, num := position.CalculatePositions(sequence)
@@ -508,11 +526,11 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
-							sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+							sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
-						sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+						sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
 							sequence.SavedSequenceColors = common.HowManyColors(sequence.RGBPositions)
@@ -524,8 +542,8 @@ func PlaySequence(sequence common.Sequence,
 				// If we are setting the current colors in a rgb sequence.
 				if sequence.AutoColor &&
 					sequence.Type == "rgb" &&
-					sequence.Pattern.Label != "Multi.Color" &&
-					sequence.Pattern.Label != "Color.Chase" {
+					sequence.RGBPattern.Label != "Multi.Color" &&
+					sequence.RGBPattern.Label != "Color.Chase" {
 
 					// Find a new color.
 					newColor := []common.Color{}
@@ -537,12 +555,12 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.RGBColor > 7 {
 						sequence.RGBColor = 0
 					}
-					sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
+					sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
 				}
 
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
-					sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBFade, sequence.RGBSize)
+					sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence)
@@ -552,7 +570,7 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.AutoPattern && sequence.Type == "rgb" {
 					for patternNumber, pattern := range sequence.RGBAvailablePatterns {
 						if pattern.Number == sequence.SelectedPattern {
-							sequence.Pattern.Number = patternNumber
+							sequence.RGBPattern.Number = patternNumber
 							if debug {
 								fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
 							}
@@ -584,9 +602,10 @@ func PlaySequence(sequence common.Sequence,
 					sequence.CurrentColors = common.HowManyScannerColors(sequence.ScannerPositions[fixture])
 				}
 
+				// This is the inner loop where the sequence runs.
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0 + sequence.Pattern.PattenTrim; step < sequence.NumberSteps-sequence.Pattern.PattenTrim; step++ {
+				for step := 0 + sequence.RGBPattern.PattenTrim; step < sequence.NumberSteps-sequence.RGBPattern.PattenTrim; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
 					speed := sequence.CurrentSpeed / 10
@@ -605,7 +624,7 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 
-					for fixtureNumber, fixture := range fixtureStepChannels {
+					for fixtureNumber := 0; fixtureNumber < sequence.EnabledNumberFixtures; fixtureNumber++ {
 
 						if sequence.ScannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
@@ -635,7 +654,7 @@ func PlaySequence(sequence common.Sequence,
 							}
 
 							// Start the fixture group.
-							fixture <- command
+							fixtureStepChannels[fixtureNumber] <- command
 						}
 					}
 				}

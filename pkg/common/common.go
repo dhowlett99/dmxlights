@@ -43,6 +43,7 @@ const DefaultRGBShift = 0
 const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
 const ScannerMidPoint = 127
+const DefaultRGBCoordinates = 10
 
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 
@@ -77,13 +78,14 @@ type Color struct {
 
 // Used in calculating Positions.
 type FixtureBuffer struct {
-	Color         Color
-	MasterDimmer  int
-	Gobo          int
-	Pan           int
-	Tilt          int
-	Shutter       int
-	ScannerNumber int
+	Color        Color
+	MasterDimmer int
+	Brightness   int
+	Gobo         int
+	Pan          int
+	Tilt         int
+	Shutter      int
+	//ScannerNumber int
 }
 
 type Value struct {
@@ -275,16 +277,18 @@ type Sequence struct {
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
-	Steps                       []Step                      // Steps in this sequence.
+	RGBSteps                    []Step                      // RGB or Shutter steps in this  sequence.
+	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	NumberFixtures              int                         // Number of fixtures for this sequence.
+	NumberFixtures              int                         // Total Number of fixtures for this sequence.
+	EnabledNumberFixtures       int                         // Enabled Number of fixtures for this sequence.
 	RGBPositions                map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
 	ScannerPositions            map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
 	AutoColor                   bool                        // Sequence is going to automatically change the color.
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels           [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
-	Pattern                     Pattern                     // Contains fixtures and steps info.
+	RGBPattern                  Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
@@ -314,6 +318,7 @@ type Sequence struct {
 	ScannerAvailablePatterns    map[int]Pattern             // Available patterns for this scanner.
 	ScannersAvailable           []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
 	SelectedPattern             int                         // The selected pattern.
+	ScannerPattern              Pattern                     // Contains scanner Pan & Tilt steps info.
 	ScannerSize                 int                         // The selected scanner size.
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
@@ -335,6 +340,7 @@ type Sequence struct {
 	Switches                    []Switch                    // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
+	RGBCoordinates              int                         // Number of coordinates in RGB fade.
 }
 
 type Function struct {
@@ -370,7 +376,6 @@ type Hit struct {
 
 type Step struct {
 	Fixtures []Fixture
-	Type     string
 }
 
 type FixtureCommand struct {
@@ -425,8 +430,8 @@ type Fixture struct {
 	ID           string
 	Name         string
 	Label        string
-	Type         string
 	MasterDimmer int
+	Brightness   int
 	ScannerColor Color
 	Colors       []Color
 	Pan          int
@@ -1229,11 +1234,11 @@ func Reverse(in int) int {
 }
 
 // CalculateFadeValues - calculate fade curve values.
-func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
+func CalculateFadeValues(noCoordianates int, fade int, size int) (slopeOn []int, slopeOff []int) {
 
-	fadeUpValues := GetFadeValues(float64(MaxDMXBrightness), fade, false)
+	fadeUpValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, false)
 	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, size)
-	fadeDownValues := GetFadeValues(float64(MaxDMXBrightness), fade, true)
+	fadeDownValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, true)
 
 	slopeOn = append(slopeOn, fadeUpValues...)
 	slopeOn = append(slopeOn, fadeOnValues...)
@@ -1245,81 +1250,56 @@ func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
 	return slopeOn, slopeOff
 }
 
-func GetFadeValues(size float64, fade int, reverse bool) []int {
+func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {
 
-	out := []int{}
-	outPadded := []int{}
-	size = size / 2
-
-	var numberCoordinates float64
-
-	if fade == 1 {
-		numberCoordinates = 20
-	}
-	if fade == 2 {
-		numberCoordinates = 25
-	}
-	if fade == 3 {
-		numberCoordinates = 30
-	}
-	if fade == 4 {
-		numberCoordinates = 35
-	}
-	if fade == 5 {
-		numberCoordinates = 40
-	}
-	if fade == 6 {
-		numberCoordinates = 45
-	}
-	if fade == 7 {
-		numberCoordinates = 50
-	}
-	if fade == 8 {
-		numberCoordinates = 55
-	}
-	if fade == 9 {
-		numberCoordinates = 60
-	}
-	if fade == 10 {
-		numberCoordinates = 65
-	}
-
-	var theta float64
 	var x float64
-	if reverse {
-		for x = 0; x <= 180; x += numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
+	var counter float64
+	var slope float64
+
+	coordinates := float64(noCoordinates)
+
+	switch fade {
+	case 10:
+		slope = 30
+	case 9:
+		slope = 15
+	case 8:
+		slope = 10
+	case 7:
+		slope = 7
+	case 6:
+		slope = 5
+	case 5:
+		slope = 4
+	case 4:
+		slope = 3
+	case 3:
+		slope = 2
+	case 2:
+		slope = 1.5
+	case 1:
+		slope = 1
+	default:
+		slope = 0
+	}
+
+	if !reverse {
+		for counter = 0; counter <= coordinates-1; counter++ {
+			x = (counter / 2) / (coordinates - 1)
+			y := math.Pow(math.Sin(x*math.Pi), slope)
+			dmx := int(size * y)
+			out = append(out, dmx)
 		}
 	} else {
-		for x = 180; x >= 0; x -= numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
+		for counter = coordinates - 1; counter >= 0; counter-- {
+			x = (counter / 2) / (coordinates - 1)
+			y := math.Pow(math.Sin(x*math.Pi), slope)
+			dmx := int(size * y)
+			out = append(out, dmx)
 		}
 	}
 
-	if reverse {
-		for value := 10; value > 0; value-- {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[len(out)-value])
-			}
-		}
-
-	} else {
-		for value := 0; value < 10; value++ {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[value])
-			}
-		}
-	}
-
-	return outPadded
+	return out
 }
 
 func GetFadeOnValues(size int, fade int) []int {
