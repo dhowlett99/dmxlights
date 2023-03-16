@@ -399,6 +399,12 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
+		if sequence.Type == "scanner" {
+			// Get available scanner patterns.
+			sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+			sequence.UpdatePattern = false
+		}
+
 		// Sequence in Normal Running Mode.
 		if sequence.Mode == "Sequence" {
 			for sequence.Run && !sequence.Static {
@@ -435,10 +441,6 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup scanner patterns.
 				if sequence.Type == "scanner" {
-
-					// Get available scanner patterns.
-					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
-					sequence.UpdatePattern = false
 
 					// Set the chase RGB steps used to chase the shutter.
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
