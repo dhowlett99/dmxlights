@@ -512,7 +512,6 @@ func PlaySequence(sequence common.Sequence,
 						var positions map[int]common.Position
 						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
 						if sequence.ScannerChase {
-							fmt.Printf("-------> sequence.RGBFade %d\n", sequence.RGBFade)
 							sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
 							// Calulate positions for each RGB fixture.
 							sequence.Optimisation = false
