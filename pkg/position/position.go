@@ -221,18 +221,66 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 		}
 	}
 
-	positionsOut := AssemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
+	positionsOut := assemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
 
 	// Add scanner Positions
 	if sequence.Type == "scanner" {
-		positionsOut = AddScannerPositions(sequence.ScannerPattern, positionsOut)
+		positionsOut = overlayScannerPositions(sequence.ScannerPattern, positionsOut)
 	}
 
 	return positionsOut, len(positionsOut)
 
 }
 
-func AddScannerPositions(scannerPattern common.Pattern, positionsIn map[int]common.Position) map[int]common.Position {
+func CalculateScannerPositions(sequence common.Sequence) (map[int]common.Position, int) {
+
+	positionsOut := make(map[int]common.Position)
+
+	// Step through the steps in the pattern
+	for stepNumber, step := range sequence.ScannerSteps {
+
+		// Create a new position for each step.
+		newPosition := common.Position{}
+		// Add some space for the fixtures.
+		newPosition.Fixtures = make(map[int]common.Fixture)
+
+		// All fixtures have the same rotation for now.
+		for fixtureNumber := range step.Fixtures {
+
+			newFixture := common.Fixture{}
+			newFixture.ID = step.Fixtures[fixtureNumber].ID
+			newFixture.Name = step.Fixtures[fixtureNumber].Name
+			newFixture.Label = step.Fixtures[fixtureNumber].Label
+			newFixture.MasterDimmer = step.Fixtures[fixtureNumber].MasterDimmer
+			newFixture.Brightness = step.Fixtures[fixtureNumber].Brightness
+			newFixture.ScannerColor = step.Fixtures[fixtureNumber].ScannerColor
+
+			newFixture.Colors = step.Fixtures[fixtureNumber].Colors
+			newFixture.Shutter = step.Fixtures[fixtureNumber].Shutter
+
+			newFixture.Rotate = step.Fixtures[fixtureNumber].Rotate
+			newFixture.Music = step.Fixtures[fixtureNumber].Music
+			newFixture.Gobo = step.Fixtures[fixtureNumber].Gobo
+			newFixture.Program = step.Fixtures[fixtureNumber].Program
+
+			newFixture.Pan = step.Fixtures[fixtureNumber].Pan
+			newFixture.Tilt = step.Fixtures[fixtureNumber].Tilt
+
+			newPosition.Fixtures[fixtureNumber] = newFixture
+
+		}
+
+		// Only add a position if there are some enabled scanners in the fixture list.
+		if len(newPosition.Fixtures) != 0 {
+			positionsOut[stepNumber] = newPosition
+		}
+
+	}
+
+	return positionsOut, len(positionsOut)
+}
+
+func overlayScannerPositions(scannerPattern common.Pattern, positionsIn map[int]common.Position) map[int]common.Position {
 
 	positionsOut := make(map[int]common.Position)
 
@@ -307,7 +355,7 @@ func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color,
 	return newColor
 }
 
-func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
+func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
 
 	positionsOut := make(map[int]common.Position)
 	lampOn := make(map[int]bool)

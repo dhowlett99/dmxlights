@@ -423,7 +423,7 @@ type Position struct {
 	Fixtures map[int]Fixture
 }
 
-// A fixture can have any or some of the
+// A common fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {

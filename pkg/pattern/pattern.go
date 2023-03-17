@@ -859,15 +859,6 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 	pattern := common.Pattern{}
 	// And then the array for the steps.
 	steps := []common.Step{}
-	var shutterValue int
-	var scannerChaseSequenceNumber int
-
-	// Should we turn on the shutter at this position?
-	// If all the scanners are enabled it's a straight forward task to switch them on in order.
-	// But if some are disabled, then we need to sequence only the enabled scanners.
-	// So first we make a list of the enabled scanners and place them in an array for easy access.
-	numberEnabledScanners := GetNumberEnabledScanners(scannerState, NumberFixtures)
-	enabledScannersList := makeEnabledScannerList(scannerState, NumberCoordinates, numberEnabledScanners, NumberFixtures)
 
 	// Now create the steps in the pattern.
 	// Now using the actual number of scanners.
@@ -876,29 +867,13 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 		// Make space for the fixtures.
 		fixtures := []common.Fixture{}
 
-		if scannerChaseSequenceNumber >= len(enabledScannersList) {
-			scannerChaseSequenceNumber = 0
-		}
-
 		// Now add the fixtures.
 		for fixture := 0; fixture < NumberFixtures; fixture++ {
-			shutterValue = 255 // Assume no chase so just turn on every scanner.
-
-			if chase {
-				// during a tranisition between different numbers of scanners an error can occur.
-				// so check that we're not out of bounds.
-				if scannerChaseSequenceNumber > len(enabledScannersList) || scannerChaseSequenceNumber < 0 {
-					scannerChaseSequenceNumber = 0
-				}
-				if enabledScannersList[scannerChaseSequenceNumber] == fixture {
-					shutterValue = 255
-				} else {
-					shutterValue = 0
-				}
-			}
 
 			newFixture := common.Fixture{
 				MasterDimmer: full,
+				Brightness:   full,
+				Shutter:      full,
 				// Apply a color to represent each position in the pattern.
 				Colors: []common.Color{
 					common.GetColorButtonsArray(scanners[fixture].values[stepNumber]),
@@ -906,12 +881,11 @@ func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShif
 				Pan:          Coordinates[scanners[fixture].values[stepNumber]].Pan,
 				Tilt:         Coordinates[scanners[fixture].values[stepNumber]].Tilt,
 				ScannerColor: common.Color{R: 255, G: 255, B: 255}, // White
-				Shutter:      shutterValue,
-				Gobo:         0, // First gobo is usually open, TODO find this out in the config.
+				Gobo:         0,                                    // First gobo is usually open,
+				// TODO find correct gobo and shutter values from the config.
 			}
 			fixtures = append(fixtures, newFixture)
 		}
-		scannerChaseSequenceNumber++
 
 		newStep := common.Step{
 			Fixtures: fixtures,

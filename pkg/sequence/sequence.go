@@ -506,14 +506,19 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+						var positions map[int]common.Position
 						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
-						sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
-						// Calulate positions for each RGB fixture.
-						sequence.Optimisation = false
-						// Pass through the inverted / reverse flag.
-						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
-						positions, num := position.CalculatePositions(sequence)
-						sequence.NumberSteps = num
+						if sequence.ScannerChase {
+							sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
+							// Calulate positions for each RGB fixture.
+							sequence.Optimisation = false
+							// Pass through the inverted / reverse flag.
+							sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
+							positions, sequence.NumberSteps = position.CalculatePositions(sequence)
+						} else {
+							// We're not chasing so just add the scanner positions,
+							positions, sequence.NumberSteps = position.CalculateScannerPositions(sequence)
+						}
 
 						sequence.ScannerPositions[fixture] = make(map[int]common.Position, 9)
 						for positionNumber, position := range positions {
