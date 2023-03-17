@@ -441,6 +441,9 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup scanner patterns.
 				if sequence.Type == "scanner" {
+					// Get available scanner patterns.
+					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+					sequence.UpdatePattern = false
 
 					// Set the chase RGB steps used to chase the shutter.
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
@@ -509,6 +512,7 @@ func PlaySequence(sequence common.Sequence,
 						var positions map[int]common.Position
 						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
 						if sequence.ScannerChase {
+							fmt.Printf("-------> sequence.RGBFade %d\n", sequence.RGBFade)
 							sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
 							// Calulate positions for each RGB fixture.
 							sequence.Optimisation = false

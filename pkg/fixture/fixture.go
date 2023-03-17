@@ -359,9 +359,17 @@ func FixtureReceiver(
 							common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: red, Green: green, Blue: blue, Brightness: fixture.Shutter}, eventsForLauchpad, guiButtons)
 							common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 						} else {
-							// No color selected or available, use white.
-							common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 255, Green: 255, Blue: 255, Brightness: fixture.Shutter}, eventsForLauchpad, guiButtons)
-							common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+							// If the pattern has colors use them.
+							if len(fixture.Colors) != 0 {
+								for _, color := range fixture.Colors {
+									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+								}
+							} else {
+								// No color selected or available, use white.
+								common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 222, Green: 255, Blue: 255, Brightness: fixture.Shutter}, eventsForLauchpad, guiButtons)
+								common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+							}
 						}
 					} else {
 						// Only fire every quarter turn of the scanner coordinates to save on launchpad mini traffic.
