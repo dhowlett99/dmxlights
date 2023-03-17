@@ -942,7 +942,7 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].ScannerChase {{
+		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].ScannerChase {
 			// Send Update RGB Size.
 			this.RGBSize[this.SelectedSequence]--
 			if this.RGBSize[this.SelectedSequence] < 1 {
@@ -989,7 +989,7 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].ScannerChase { {
+		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].ScannerChase {
 			// Send Update RGB Size.
 			this.RGBSize[this.SelectedSequence]++
 			if this.RGBSize[this.SelectedSequence] > common.MaxRGBSize {
