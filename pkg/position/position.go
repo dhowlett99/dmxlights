@@ -230,23 +230,23 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	// Add scanner positions. Chase mode means we overlay the scanner pan and tilt on top of the RGB fade values.
 	if sequence.ScannerChase {
-		positionsOut = overlayScannerPositions(sequence.ScannerPattern, positionsOut)
+		positionsOut = overlayScannerPositions(sequence.ScannerSteps, positionsOut)
 	}
 
 	return positionsOut, len(positionsOut)
 
 }
 
-func overlayScannerPositions(scannerPattern common.Pattern, positionsIn map[int]common.Position) map[int]common.Position {
+func overlayScannerPositions(steps []common.Step, positionsIn map[int]common.Position) map[int]common.Position {
 
 	if debug {
-		fmt.Printf("overlayScannerPositions\n")
+		fmt.Printf("overlayScannerPositions has %d steps\n", len(steps))
 	}
 
 	positionsOut := make(map[int]common.Position)
 
 	numberPositions := len(positionsIn)
-	numberScannerSteps := len(scannerPattern.Steps)
+	numberScannerSteps := len(steps)
 
 	var scannerPosition int = 0
 
@@ -272,17 +272,14 @@ func overlayScannerPositions(scannerPattern common.Pattern, positionsIn map[int]
 			newFixture.MasterDimmer = positionsIn[step].Fixtures[fixtureNumber].MasterDimmer
 			newFixture.Brightness = positionsIn[step].Fixtures[fixtureNumber].Brightness
 			newFixture.ScannerColor = positionsIn[step].Fixtures[fixtureNumber].ScannerColor
-
 			newFixture.Colors = positionsIn[step].Fixtures[fixtureNumber].Colors
 			newFixture.Shutter = positionsIn[step].Fixtures[fixtureNumber].Shutter
-
 			newFixture.Rotate = positionsIn[step].Fixtures[fixtureNumber].Rotate
 			newFixture.Music = positionsIn[step].Fixtures[fixtureNumber].Music
 			newFixture.Gobo = positionsIn[step].Fixtures[fixtureNumber].Gobo
 			newFixture.Program = positionsIn[step].Fixtures[fixtureNumber].Program
-
-			newFixture.Pan = scannerPattern.Steps[scannerPosition].Fixtures[fixtureNumber].Pan
-			newFixture.Tilt = scannerPattern.Steps[scannerPosition].Fixtures[fixtureNumber].Tilt
+			newFixture.Pan = steps[scannerPosition].Fixtures[fixtureNumber].Pan
+			newFixture.Tilt = steps[scannerPosition].Fixtures[fixtureNumber].Tilt
 
 			newPosition.Fixtures[fixtureNumber] = newFixture
 
@@ -295,7 +292,6 @@ func overlayScannerPositions(scannerPattern common.Pattern, positionsIn map[int]
 		if len(newPosition.Fixtures) != 0 {
 			positionsOut[step] = newPosition
 		}
-
 	}
 
 	return positionsOut

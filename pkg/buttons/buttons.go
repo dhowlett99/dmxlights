@@ -80,7 +80,7 @@ type CurrentState struct {
 	SequenceChannels          common.Channels              // Channles used to communicate with the sequence.
 	Patterns                  map[int]common.Pattern       // A indexed map of the available patterns for this sequence.
 	ScannerPattern            int                          // The selected scanner pattern Number. Used as the index for above.
-	RGBPattern                int                          // The selected RGB pattern Number. Used as the index for above.
+	Pattern                   int                          // The selected RGB pattern Number. Used as the index for above.
 	StaticButtons             []common.StaticColorButton   // Storage for the color of the static buttons.
 	SelectedGobo              int                          // The selected GOBO.
 	ButtonTimer               *time.Time                   // Button Timer
@@ -155,25 +155,25 @@ func ProcessButtons(X int, Y int,
 		}
 		colorPattern := 5
 		flashSequence := common.Sequence{
-			RGBPattern: common.Pattern{
+			Pattern: common.Pattern{
 				Name:  "colors",
 				Steps: this.Patterns[colorPattern].Steps, // Use the color pattern for flashing.
 			},
 		}
 
-		red := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].R
-		green := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].G
-		blue := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].B
-		white := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].W
-		amber := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].A
-		uv := flashSequence.RGBPattern.Steps[X].Fixtures[X].Colors[0].UV
-		pan := flashSequence.RGBPattern.Steps[X].Fixtures[X].Pan
-		tilt := flashSequence.RGBPattern.Steps[X].Fixtures[X].Tilt
-		shutter := flashSequence.RGBPattern.Steps[X].Fixtures[X].Shutter
-		rotate := flashSequence.RGBPattern.Steps[X].Fixtures[X].Rotate
-		music := flashSequence.RGBPattern.Steps[X].Fixtures[X].Music
-		gobo := flashSequence.RGBPattern.Steps[X].Fixtures[X].Gobo
-		program := flashSequence.RGBPattern.Steps[X].Fixtures[X].Program
+		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
+		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
+		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
+		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
+		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
+		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
+		pan := flashSequence.Pattern.Steps[X].Fixtures[X].Pan
+		tilt := flashSequence.Pattern.Steps[X].Fixtures[X].Tilt
+		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
+		rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
+		music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
+		gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
+		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
 		fixture.MapFixtures(Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)

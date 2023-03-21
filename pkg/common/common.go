@@ -289,7 +289,7 @@ type Sequence struct {
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
 	GuiFunctionLabels           [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
-	RGBPattern                  Pattern                     // Contains fixtures and RGB steps info.
+	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
@@ -319,7 +319,6 @@ type Sequence struct {
 	ScannerAvailablePatterns    map[int]Pattern             // Available patterns for this scanner.
 	ScannersAvailable           []StaticColorButton         // Holds a set of red buttons, one for every available fixture.
 	SelectedPattern             int                         // The selected pattern.
-	ScannerPattern              Pattern                     // Contains scanner Pan & Tilt steps info.
 	ScannerSize                 int                         // The selected scanner size.
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
