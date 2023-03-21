@@ -447,7 +447,7 @@ func PlaySequence(sequence common.Sequence,
 
 					// Set the chase RGB steps used to chase the shutter.
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-					pattern := pattern.GenerateStandardChasePatterm(sequence.EnabledNumberFixtures)
+					pattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
 					sequence.RGBSteps = pattern.Steps
 					sequence.RGBPattern.Name = pattern.Name
 					sequence.RGBPattern.Label = pattern.Label
@@ -634,7 +634,7 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 
-					for fixtureNumber := 0; fixtureNumber < sequence.EnabledNumberFixtures; fixtureNumber++ {
+					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 
 						if sequence.ScannerState[fixtureNumber].Enabled {
 							command := common.FixtureCommand{
@@ -1005,43 +1005,43 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 	scannerPattens := make(map[int]common.Pattern)
 
 	// Scanner circle pattern 0
-	coordinates := []pattern.Coordinate{{Pan: 127, Tilt: 127}}
-	stopPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
-	stopPatten.Name = "stop"
-	stopPatten.Number = 0
-	stopPatten.Label = "Stop"
-	scannerPattens[0] = stopPatten
-
-	coordinates = pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetPan), float64(sequence.ScannerOffsetTilt))
+	coordinates := pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetPan), float64(sequence.ScannerOffsetTilt))
 	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
 	circlePatten.Name = "circle"
-	circlePatten.Number = 1
+	circlePatten.Number = 0
 	circlePatten.Label = "Circle"
-	scannerPattens[1] = circlePatten
+	scannerPattens[0] = circlePatten
 
 	// Scanner left right pattern 1
 	coordinates = pattern.ScanGeneratorLeftRight(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
 	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
 	leftRightPatten.Name = "leftright"
-	leftRightPatten.Number = 2
+	leftRightPatten.Number = 1
 	leftRightPatten.Label = "Left.Right"
-	scannerPattens[2] = leftRightPatten
+	scannerPattens[1] = leftRightPatten
 
 	// // Scanner up down pattern 2
 	coordinates = pattern.ScanGeneratorUpDown(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
 	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
 	upDownPatten.Name = "updown"
-	upDownPatten.Number = 3
+	upDownPatten.Number = 2
 	upDownPatten.Label = "Up.Down"
-	scannerPattens[3] = upDownPatten
+	scannerPattens[2] = upDownPatten
 
 	// // Scanner zig zag pattern 3
 	coordinates = pattern.ScanGenerateSineWave(float64(sequence.ScannerSize), 5000, float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
 	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
 	zigZagPatten.Name = "zigzag"
-	zigZagPatten.Number = 4
+	zigZagPatten.Number = 3
 	zigZagPatten.Label = "Zig.Zag"
-	scannerPattens[4] = zigZagPatten
+	scannerPattens[3] = zigZagPatten
+
+	coordinates = []pattern.Coordinate{{Pan: 127, Tilt: 127}}
+	stopPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	stopPatten.Name = "stop"
+	stopPatten.Number = 4
+	stopPatten.Label = "Stop"
+	scannerPattens[4] = stopPatten
 
 	return scannerPattens
 

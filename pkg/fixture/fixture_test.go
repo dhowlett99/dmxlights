@@ -17,8 +17,6 @@
 package fixture
 
 import (
-	"fmt"
-	"os"
 	"testing"
 )
 
@@ -77,18 +75,85 @@ func Test_calculateMaxDMX(t *testing.T) {
 
 func Test_lookUpChannelNumberByNameInFixtureDefinition(t *testing.T) {
 
+	value := int16(100)
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := LoadFixtures("../../fixtures.yaml")
-	if err != nil {
-		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
-		os.Exit(1)
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Name:  "fixture1",
+				Group: 1,
+				Channels: []Channel{
+					{
+						Name:  "Red",
+						Value: &value,
+					},
+					{
+						Name:  "Green",
+						Value: &value,
+					},
+					{
+						Name:  "Blue",
+						Value: &value,
+					},
+					{
+						Name:  "White",
+						Value: &value,
+					},
+					{
+						Name:  "Uv",
+						Value: &value,
+					},
+					{
+						Name:  "Master",
+						Value: &value,
+					},
+				},
+			},
+
+			{
+				Name:  "fixture2",
+				Group: 2,
+				Channels: []Channel{
+					{
+						Name:  "White0",
+						Value: &value,
+					},
+					{
+						Name:  "White1",
+						Value: &value,
+					},
+					{
+						Name:  "White2",
+						Value: &value,
+					},
+					{
+						Name:  "White3",
+						Value: &value,
+					},
+					{
+						Name:  "White4",
+						Value: &value,
+					},
+				},
+			},
+
+			{
+				Name:  "fixture3",
+				Group: 3,
+				Channels: []Channel{
+					{
+						Name:  "ProgramSpeed",
+						Value: &value,
+					},
+				},
+			},
+		},
 	}
 
 	type args struct {
-		group        int
-		switchNumber int
-		channelName  string
-		fixtures     *Fixtures
+		group       int
+		channelName string
+		fixtures    *Fixtures
 	}
 	tests := []struct {
 		name    string
@@ -97,42 +162,39 @@ func Test_lookUpChannelNumberByNameInFixtureDefinition(t *testing.T) {
 		wantErr bool
 	}{
 		{
-			name: "simple test",
+			name: "simple test 1",
 			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "Master",
-				fixtures:     fixturesConfig,
+				group:       1,
+				channelName: "Master",
+				fixtures:    fixturesConfig,
 			},
 			want:    5,
 			wantErr: false,
 		},
 		{
-			name: "simple test",
+			name: "simple test 2",
 			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "White1",
-				fixtures:     fixturesConfig,
+				group:       2,
+				channelName: "White4",
+				fixtures:    fixturesConfig,
 			},
 			want:    4,
 			wantErr: false,
 		},
 		{
-			name: "simple test",
+			name: "simple test 3",
 			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "ProgramSpeed",
-				fixtures:     fixturesConfig,
+				group:       3,
+				channelName: "ProgramSpeed",
+				fixtures:    fixturesConfig,
 			},
-			want:    7,
+			want:    0,
 			wantErr: false,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := lookUpChannelNumberByNameInFixtureDefinition(tt.args.group, tt.args.switchNumber, tt.args.channelName, tt.args.fixtures)
+			got, err := lookUpChannelNumberByNameInFixtureDefinition(tt.args.group, tt.args.channelName, tt.args.fixtures)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("lookUpChannelNumberByNameInFixtureDefinition() error = %v, wantErr %v", err, tt.wantErr)
 				return

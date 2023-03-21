@@ -85,7 +85,7 @@ type FixtureBuffer struct {
 	Pan          int
 	Tilt         int
 	Shutter      int
-	//ScannerNumber int
+	Enabled      bool
 }
 
 type Value struct {
@@ -330,6 +330,7 @@ type Sequence struct {
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
 	ScannerState                map[int]ScannerState        // Map of fixtures which are disabled.
+	DisableOnceMutex            *sync.RWMutex               // Lock to protect DisableOnce.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
@@ -375,7 +376,7 @@ type Hit struct {
 }
 
 type Step struct {
-	Fixtures []Fixture
+	Fixtures map[int]Fixture
 }
 
 type FixtureCommand struct {
@@ -441,6 +442,7 @@ type Fixture struct {
 	Music        int
 	Gobo         int
 	Program      int
+	Enabled      bool
 }
 
 type ButtonPresets struct {

@@ -322,11 +322,13 @@ func FixtureReceiver(
 			if cmd.ScannerDisableOnce && !cmd.ScannerState.Enabled {
 				MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, false, 0, dmxInterfacePresent)
 				// Locking for write.
+				sequence.DisableOnceMutex.Lock()
 				sequence.DisableOnce[myFixtureNumber] = false
+				sequence.DisableOnceMutex.Unlock()
 				continue
 			}
 
-			if cmd.ScannerState.Enabled {
+			if fixture.Enabled {
 
 				// If enables activate the physical scanner.
 				scannerColor := cmd.ScannerColor
@@ -545,7 +547,7 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 	return 0, fmt.Errorf("channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
 }
 
-func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, channelName string, fixtures *Fixtures) (int, error) {
+func lookUpChannelNumberByNameInFixtureDefinition(group int, channelName string, fixtures *Fixtures) (int, error) {
 
 	if debug {
 		fmt.Printf("lookUpChannelNumberByName for %s\n", channelName)
@@ -559,7 +561,6 @@ func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, c
 				fmt.Printf("fixture.group %d group %d\n", fixture.Group, group)
 				fmt.Printf("channels %+v\n", fixture.Channels)
 			}
-			//if fixture.Number == switchNumber {
 			fixtureName = fixture.Name
 			for channelNumber, channel := range fixture.Channels {
 				if debug {
@@ -576,9 +577,9 @@ func lookUpChannelNumberByNameInFixtureDefinition(group int, switchNumber int, c
 	}
 
 	if debug {
-		fmt.Printf("channel not found in fixture :%s", fixtureName)
+		fmt.Printf("channel %s not found in fixture :%s", channelName, fixtureName)
 	}
-	return 0, fmt.Errorf("channel not found in fixture :%s", fixtureName)
+	return 0, fmt.Errorf("channel %s not found in fixture :%s", channelName, fixtureName)
 }
 
 func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController,
@@ -900,7 +901,7 @@ func MapSwitchFixture(mySequenceNumber int,
 												fmt.Printf("error %s\n", err.Error())
 												return
 											}
-											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, setting.Channel, fixturesConfig)
+											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, setting.Channel, fixturesConfig)
 											if debug {
 												fmt.Printf("Label Lookup Channel Number->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
@@ -933,7 +934,7 @@ func MapSwitchFixture(mySequenceNumber int,
 												fmt.Printf("error %s\n", err.Error())
 												return
 											}
-											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, switchNumber, setting.Channel, fixturesConfig)
+											c, _ := lookUpChannelNumberByNameInFixtureDefinition(fixture.Group, setting.Channel, fixturesConfig)
 											if debug {
 												fmt.Printf("Setting Label->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}

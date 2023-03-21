@@ -2166,7 +2166,7 @@ func ShowScannerStatus(selectedSequence int, sequence common.Sequence, this *Cur
 	for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
 
 		if debug {
-			fmt.Printf("Enabled %t Inverted %t\n", this.ScannerState[scannerNumber][sequence.Number].Enabled, this.ScannerState[scannerNumber][sequence.Number].Inverted)
+			fmt.Printf("Scanner %d Enabled %t Inverted %t\n", scannerNumber, this.ScannerState[scannerNumber][sequence.Number].Enabled, this.ScannerState[scannerNumber][sequence.Number].Inverted)
 		}
 
 		// Enabled but not inverted then On and green.

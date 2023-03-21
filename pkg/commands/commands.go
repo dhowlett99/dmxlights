@@ -556,7 +556,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const FIXTURE_STATE = 2    // Boolean
 		const FIXTURE_INVERTED = 3 // Boolean
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
@@ -569,7 +569,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		// When we disable a fixture we send a off command to the shutter to make it go off.
 		// We only want to do this once to avoid flooding the universe with DMX commands.
+		sequence.DisableOnceMutex.Lock()
 		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
+		sequence.DisableOnceMutex.Unlock()
 		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence

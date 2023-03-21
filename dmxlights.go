@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 	"syscall"
 	"time"
 
@@ -207,6 +208,7 @@ func main() {
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name
+		newSequence.DisableOnceMutex = &sync.RWMutex{}
 		newSequence.Description = sequenceConf.Description
 		newSequence.Label = sequenceConf.Label
 		newSequence.Type = sequenceConf.Type
