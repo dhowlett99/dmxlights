@@ -278,7 +278,7 @@ type Sequence struct {
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
-	RGBSteps                    []Step                      // RGB or Shutter steps in this  sequence.
+	Steps                       []Step                      // RGB or Shutter steps in this  sequence.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures              int                         // Total Number of fixtures for this sequence.

@@ -432,7 +432,7 @@ func PlaySequence(sequence common.Sequence,
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-					sequence.RGBSteps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
 					sequence.RGBPattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
 					sequence.RGBPattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
 					sequence.RGBPattern.PattenTrim = sequence.RGBAvailablePatterns[sequence.SelectedPattern].PattenTrim
@@ -448,7 +448,7 @@ func PlaySequence(sequence common.Sequence,
 					// Set the chase RGB steps used to chase the shutter.
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
 					pattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
-					sequence.RGBSteps = pattern.Steps
+					sequence.Steps = pattern.Steps
 					sequence.RGBPattern.Name = pattern.Name
 					sequence.RGBPattern.Label = pattern.Label
 					sequence.RGBPattern.PattenTrim = pattern.PattenTrim
@@ -513,16 +513,23 @@ func PlaySequence(sequence common.Sequence,
 						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
 						if sequence.ScannerChase {
 							sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
-							// Calulate positions for each RGB fixture.
+							// Turn off optimasation because we need all the scanners to move.
 							sequence.Optimisation = false
-							// Pass through the inverted / reverse flag.
-							sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
-							positions, sequence.NumberSteps = position.CalculatePositions(sequence)
 						} else {
 							// We're not chasing so just add the scanner positions,
-							positions, sequence.NumberSteps = position.CalculateScannerPositions(sequence)
+							// We won't need curve values.
+							sequence.FadeUpAndDown = []int{255}
+							sequence.FadeDownAndUp = []int{0}
+							// Turn on optimasation.
+							sequence.Optimisation = true
 						}
 
+						// Pass through the inverted / reverse flag.
+						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted
+						// Calulate positions for each RGB fixture.
+						positions, sequence.NumberSteps = position.CalculatePositions(sequence)
+
+						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
 						sequence.ScannerPositions[fixture] = make(map[int]common.Position, 9)
 						for positionNumber, position := range positions {
 							sequence.ScannerPositions[fixture][positionNumber] = position
@@ -536,11 +543,11 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
-							sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
+							sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
-						sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
+						sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
 							sequence.SavedSequenceColors = common.HowManyColors(sequence.RGBPositions)
@@ -565,7 +572,7 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.RGBColor > 7 {
 						sequence.RGBColor = 0
 					}
-					sequence.RGBSteps = replaceRGBcolorsInSteps(sequence.RGBSteps, sequence.SequenceColors)
+					sequence.Steps = replaceRGBcolorsInSteps(sequence.Steps, sequence.SequenceColors)
 				}
 
 				if sequence.Type == "rgb" {

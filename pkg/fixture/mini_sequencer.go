@@ -222,7 +222,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			RGBCoordinates: common.DefaultRGBCoordinates,
 		}
 		sequence.RGBPattern = pattern.MakeSingleFixtureChase(cfg.Colors)
-		sequence.RGBSteps = sequence.RGBPattern.Steps
+		sequence.Steps = sequence.RGBPattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
 		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)

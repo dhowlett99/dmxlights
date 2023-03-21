@@ -29,7 +29,7 @@ const debug = false
 func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int) {
 
 	if debug {
-		fmt.Printf("CalculatePositions Number Steps %d\n", len(sequence.RGBSteps))
+		fmt.Printf("CalculatePositions Number Steps %d\n", len(sequence.Steps))
 	}
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
@@ -41,7 +41,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	if !sequence.ScannerInvert {
 		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.RGBSteps {
+		for _, step := range sequence.Steps {
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
@@ -96,8 +96,8 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 	if sequence.Bounce || sequence.ScannerInvert {
 		// Generate the positions in reverse.
 		// Reverse the steps.
-		for stepNumber := len(sequence.RGBSteps); stepNumber > 0; stepNumber-- {
-			step := sequence.RGBSteps[stepNumber-1]
+		for stepNumber := len(sequence.Steps); stepNumber > 0; stepNumber-- {
+			step := sequence.Steps[stepNumber-1]
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
@@ -153,7 +153,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	if sequence.Bounce && sequence.ScannerInvert {
 		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.RGBSteps {
+		for _, step := range sequence.Steps {
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
@@ -228,76 +228,13 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	positionsOut := assemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
 
-	// Add scanner Positions
-	if sequence.Type == "scanner" {
+	// Add scanner positions. Chase mode means we overlay the scanner pan and tilt on top of the RGB fade values.
+	if sequence.ScannerChase {
 		positionsOut = overlayScannerPositions(sequence.ScannerPattern, positionsOut)
 	}
 
 	return positionsOut, len(positionsOut)
 
-}
-
-func CalculateScannerPositions(sequence common.Sequence) (map[int]common.Position, int) {
-
-	if debug {
-		fmt.Printf("CalculateScannerPositions\n")
-	}
-
-	positionsOut := make(map[int]common.Position)
-
-	// Step through the steps in the pattern
-	for stepNumber, step := range sequence.ScannerSteps {
-
-		// Create a new position for each step.
-		newPosition := common.Position{}
-		// Add some space for the fixtures.
-		newPosition.Fixtures = make(map[int]common.Fixture)
-
-		// All fixtures have the same rotation for now.
-		for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
-
-			newFixture := common.Fixture{}
-			newFixture.Enabled = step.Fixtures[fixtureNumber].Enabled
-			newFixture.ID = step.Fixtures[fixtureNumber].ID
-			newFixture.Name = step.Fixtures[fixtureNumber].Name
-			newFixture.Label = step.Fixtures[fixtureNumber].Label
-			newFixture.MasterDimmer = step.Fixtures[fixtureNumber].MasterDimmer
-			newFixture.Brightness = step.Fixtures[fixtureNumber].Brightness
-			newFixture.ScannerColor = step.Fixtures[fixtureNumber].ScannerColor
-
-			newFixture.Colors = step.Fixtures[fixtureNumber].Colors
-			newFixture.Shutter = step.Fixtures[fixtureNumber].Shutter
-
-			newFixture.Rotate = step.Fixtures[fixtureNumber].Rotate
-			newFixture.Music = step.Fixtures[fixtureNumber].Music
-			newFixture.Gobo = step.Fixtures[fixtureNumber].Gobo
-			newFixture.Program = step.Fixtures[fixtureNumber].Program
-
-			newFixture.Pan = step.Fixtures[fixtureNumber].Pan
-			newFixture.Tilt = step.Fixtures[fixtureNumber].Tilt
-
-			newPosition.Fixtures[fixtureNumber] = newFixture
-
-		}
-
-		// Only add a position if there are some enabled scanners in the fixture list.
-		if len(newPosition.Fixtures) > 0 {
-			positionsOut[stepNumber] = newPosition
-		}
-
-		if debug {
-			for positionNumber := 0; positionNumber < len(positionsOut); positionNumber++ {
-				position := positionsOut[positionNumber]
-				fmt.Printf("Position %d\n", positionNumber)
-				for fixture := 0; fixture < len(position.Fixtures); fixture++ {
-					fmt.Printf("\tFixture %d Enabled %t Values %+v Pan %d Tilt %d\n", fixture, position.Fixtures[fixture].Enabled, position.Fixtures[fixture].Colors, position.Fixtures[fixture].Pan, position.Fixtures[fixture].Tilt)
-				}
-			}
-		}
-
-	}
-
-	return positionsOut, len(positionsOut)
 }
 
 func overlayScannerPositions(scannerPattern common.Pattern, positionsIn map[int]common.Position) map[int]common.Position {
@@ -372,6 +309,9 @@ func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color,
 
 	newColor := common.FixtureBuffer{}
 	newColor.Color = common.Color{}
+	newColor.Gobo = fixture.Gobo
+	newColor.Pan = fixture.Pan
+	newColor.Tilt = fixture.Tilt
 	newColor.Shutter = fixture.Shutter
 	newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(insertValue) / 2.55)))
 	newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(insertValue) / 2.55)))

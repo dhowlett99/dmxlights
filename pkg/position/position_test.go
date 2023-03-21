@@ -103,7 +103,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBFade:       0,
 					ScannerState:  allFixturesEnabled,
 					ScannerChase:  false,
-					RGBSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -506,7 +506,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					RGBSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -726,7 +726,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       10,
 					ScannerState:  allFixturesEnabled,
-					RGBSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -853,7 +853,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBFade:       10,
 					ScannerInvert: false,
 					ScannerState:  allFixturesEnabled,
-					RGBSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
@@ -1006,7 +1006,7 @@ func TestCalculatePositions2(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       1,
 					ScannerState:  allFixturesEnabled,
-					RGBSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -1111,8 +1111,9 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown: []int{255},
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
+					ScannerChase:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					Steps: []common.Step{
 						{
 
 							Fixtures: map[int]common.Fixture{
@@ -1219,7 +1220,8 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					ScannerChase:  false,
+					Steps: []common.Step{
 						{
 
 							Fixtures: map[int]common.Fixture{
@@ -1264,7 +1266,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					Steps: []common.Step{
 						{
 
 							Fixtures: map[int]common.Fixture{
@@ -1304,7 +1306,8 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					ScannerChase:  false,
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -1372,7 +1375,8 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					ScannerChase:  false,
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
@@ -1421,7 +1425,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerSteps: []common.Step{
+					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
 								0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}, Pan: 0, Tilt: 0, Gobo: 1, Shutter: 255},
@@ -1480,7 +1484,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := CalculateScannerPositions(tt.args.sequence); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := CalculatePositions(tt.args.sequence); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
 			}
@@ -1676,92 +1680,6 @@ func TestAddScannerPositions(t *testing.T) {
 			if got := overlayScannerPositions(tt.args.scannerPattern, tt.args.positionsIn); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AddScannerPositions() = got \n%+v", got)
 				t.Errorf("AddScannerPositions() = want \n%+v", tt.want)
-			}
-		})
-	}
-}
-
-func TestCalculateScannerPositions(t *testing.T) {
-	type args struct {
-		sequence common.Sequence
-	}
-	tests := []struct {
-		name       string
-		args       args
-		want       map[int]common.Position
-		wantLength int
-	}{
-		{
-			name: "simple case",
-			args: args{
-				sequence: common.Sequence{
-					ScannerSteps: []common.Step{
-						{
-							Fixtures: map[int]common.Fixture{
-								0: {
-									Pan:          1,
-									Tilt:         1,
-									Shutter:      255,
-									MasterDimmer: 255,
-									Brightness:   255,
-								},
-							},
-						},
-						{
-							Fixtures: map[int]common.Fixture{
-								0: {
-									Pan:          2,
-									Tilt:         2,
-									Shutter:      255,
-									MasterDimmer: 255,
-									Brightness:   255,
-								},
-							},
-						},
-						{
-							Fixtures: map[int]common.Fixture{
-								0: {
-									Pan:          3,
-									Tilt:         3,
-									Shutter:      255,
-									MasterDimmer: 255,
-									Brightness:   255,
-								},
-							},
-						},
-					},
-				},
-			},
-			want: map[int]common.Position{
-				0: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: 255, Brightness: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-					},
-				},
-
-				1: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: 255, Brightness: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-					},
-				},
-
-				2: {
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: 255, Brightness: 255, ScannerColor: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 3, Tilt: 3, Shutter: 255, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-					},
-				},
-			},
-			wantLength: 3,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			got, got1 := CalculateScannerPositions(tt.args.sequence)
-			if !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CalculateScannerPositions() got = %+v, want %+v", got, tt.want)
-			}
-			if got1 != tt.wantLength {
-				t.Errorf("CalculateScannerPositions() got1 = %+v, want %+v", got1, tt.wantLength)
 			}
 		})
 	}
