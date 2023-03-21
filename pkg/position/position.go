@@ -208,6 +208,17 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 	// The number of steps is different for each fixture, depending on how
 	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
+	if debug {
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[0]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[1]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[2]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[3]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[4]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[5]))
+		fmt.Printf("FadeColors 0=%d", len(fadeColors[6]))
+		fmt.Printf("FadeColors 0=%d\n", len(fadeColors[7]))
+	}
+
 	counter := 200
 	for fixture := 0; fixture < numberFixtures; fixture++ {
 		if len(fadeColors[fixture]) != 0 && len(fadeColors[fixture]) < counter {
@@ -226,7 +237,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 		}
 	}
 
-	positionsOut := assemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
+	positionsOut := assemblePositions(fadeColors, counter, sequence.EnabledNumberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
 
 	// Add scanner positions. Chase mode means we overlay the scanner pan and tilt on top of the RGB fade values.
 	if sequence.ScannerChase {
