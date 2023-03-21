@@ -300,6 +300,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command to Start Strobe\n", mySequenceNumber)
 		}
+		// Remember the state of the Music trigger flag.
+		sequence.LastMusicTrigger = sequence.MusicTrigger
 		sequence.StrobeSpeed = command.Args[STROBE_SPEED].Value.(int)
 		sequence.Strobe = true
 		if sequence.StartFlood {
@@ -322,6 +324,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if sequence.Static {
 			sequence.PlayStaticOnce = true
 		}
+		// Restore the state of the music trigger flag.
+		sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
+		sequence.MusicTrigger = sequence.LastMusicTrigger
 		return sequence
 
 	case common.UpdateStrobeSpeed:

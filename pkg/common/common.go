@@ -273,6 +273,7 @@ type Sequence struct {
 	CurrentSpeed                time.Duration               // Sequence speed represented as a duration.
 	Speed                       int                         // Sequence speed represented by a short number.
 	MusicTrigger                bool                        // Is this sequence in music trigger mode.
+	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
