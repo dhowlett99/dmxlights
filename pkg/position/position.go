@@ -335,7 +335,7 @@ func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color,
 	return newColor
 }
 
-func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
+func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, enabledNumberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
 
 	if debug {
 		fmt.Printf("assemblePositions\n")
@@ -359,34 +359,68 @@ func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixture := 0; fixture < numberFixtures; fixture++ {
+		for fixture := 0; fixture < enabledNumberFixtures; fixture++ {
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
-			newColor.R = fadeColors[fixture][step].Color.R
-			newColor.G = fadeColors[fixture][step].Color.G
-			newColor.B = fadeColors[fixture][step].Color.B
-			newColor.W = fadeColors[fixture][step].Color.W
 
-			// Optimisation is applied in this step. We only play out off's to the universe if the lamp is already on.
-			// And in the case of inverted playout only colors if the lamp is already on.
-			if !RGBInvert {
-				// We've found a color.
-				if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 || fadeColors[fixture][step].Color.W > 0 {
-					newFixture.Colors = append(newFixture.Colors, newColor)
-					newFixture.Enabled = fadeColors[fixture][step].Enabled
-					newFixture.Gobo = fadeColors[fixture][step].Gobo
-					newFixture.Pan = fadeColors[fixture][step].Pan
-					newFixture.Tilt = fadeColors[fixture][step].Tilt
-					newFixture.Shutter = fadeColors[fixture][step].Shutter
-					lampOn[fixture] = true
-					lampOff[fixture] = false
-					newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-					newFixture.Brightness = fadeColors[fixture][step].Brightness
-					newPosition.Fixtures[fixture] = newFixture
+			lenghtOfSteps := len(fadeColors[fixture])
+			if step < lenghtOfSteps {
+
+				newColor.R = fadeColors[fixture][step].Color.R
+				newColor.G = fadeColors[fixture][step].Color.G
+				newColor.B = fadeColors[fixture][step].Color.B
+				newColor.W = fadeColors[fixture][step].Color.W
+
+				// Optimisation is applied in this step. We only play out off's to the universe if the lamp is already on.
+				// And in the case of inverted playout only colors if the lamp is already on.
+				if !RGBInvert {
+					// We've found a color.
+					if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 || fadeColors[fixture][step].Color.W > 0 {
+						newFixture.Colors = append(newFixture.Colors, newColor)
+						newFixture.Enabled = fadeColors[fixture][step].Enabled
+						newFixture.Gobo = fadeColors[fixture][step].Gobo
+						newFixture.Pan = fadeColors[fixture][step].Pan
+						newFixture.Tilt = fadeColors[fixture][step].Tilt
+						newFixture.Shutter = fadeColors[fixture][step].Shutter
+						lampOn[fixture] = true
+						lampOff[fixture] = false
+						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
+						newFixture.Brightness = fadeColors[fixture][step].Brightness
+						newPosition.Fixtures[fixture] = newFixture
+					} else {
+						// turn the lamp off, but only if its already on.
+						if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
+							newFixture.Colors = append(newFixture.Colors, common.Color{})
+							newFixture.Enabled = fadeColors[fixture][step].Enabled
+							newFixture.Gobo = fadeColors[fixture][step].Gobo
+							newFixture.Pan = fadeColors[fixture][step].Pan
+							newFixture.Tilt = fadeColors[fixture][step].Tilt
+							newFixture.Shutter = fadeColors[fixture][step].Shutter
+							lampOn[fixture] = false
+							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
+							newFixture.Brightness = fadeColors[fixture][step].Brightness
+							newPosition.Fixtures[fixture] = newFixture
+						}
+						lampOff[fixture] = true
+					}
 				} else {
-					// turn the lamp off, but only if its already on.
-					if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
+					// We've found a color. turn it on but only if its already off.
+					if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 || fadeColors[fixture][step].Color.W > 0 {
+						if !lampOn[fixture] || !Optimisation {
+							newFixture.Colors = append(newFixture.Colors, newColor)
+							newFixture.Enabled = fadeColors[fixture][step].Enabled
+							newFixture.Gobo = fadeColors[fixture][step].Gobo
+							newFixture.Pan = fadeColors[fixture][step].Pan
+							newFixture.Tilt = fadeColors[fixture][step].Tilt
+							newFixture.Shutter = fadeColors[fixture][step].Shutter
+							lampOn[fixture] = true
+							newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
+							newFixture.Brightness = fadeColors[fixture][step].Brightness
+							newPosition.Fixtures[fixture] = newFixture
+						}
+					} else {
+						// turn the lamp off
 						newFixture.Colors = append(newFixture.Colors, common.Color{})
 						newFixture.Enabled = fadeColors[fixture][step].Enabled
 						newFixture.Gobo = fadeColors[fixture][step].Gobo
@@ -398,35 +432,6 @@ func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 						newFixture.Brightness = fadeColors[fixture][step].Brightness
 						newPosition.Fixtures[fixture] = newFixture
 					}
-					lampOff[fixture] = true
-				}
-			} else {
-				// We've found a color. turn it on but only if its already off.
-				if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 || fadeColors[fixture][step].Color.W > 0 {
-					if !lampOn[fixture] || !Optimisation {
-						newFixture.Colors = append(newFixture.Colors, newColor)
-						newFixture.Enabled = fadeColors[fixture][step].Enabled
-						newFixture.Gobo = fadeColors[fixture][step].Gobo
-						newFixture.Pan = fadeColors[fixture][step].Pan
-						newFixture.Tilt = fadeColors[fixture][step].Tilt
-						newFixture.Shutter = fadeColors[fixture][step].Shutter
-						lampOn[fixture] = true
-						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-						newFixture.Brightness = fadeColors[fixture][step].Brightness
-						newPosition.Fixtures[fixture] = newFixture
-					}
-				} else {
-					// turn the lamp off
-					newFixture.Colors = append(newFixture.Colors, common.Color{})
-					newFixture.Enabled = fadeColors[fixture][step].Enabled
-					newFixture.Gobo = fadeColors[fixture][step].Gobo
-					newFixture.Pan = fadeColors[fixture][step].Pan
-					newFixture.Tilt = fadeColors[fixture][step].Tilt
-					newFixture.Shutter = fadeColors[fixture][step].Shutter
-					lampOn[fixture] = false
-					newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-					newFixture.Brightness = fadeColors[fixture][step].Brightness
-					newPosition.Fixtures[fixture] = newFixture
 				}
 			}
 		}
