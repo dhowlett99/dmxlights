@@ -1677,7 +1677,7 @@ func TestAddScannerPositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := overlayScannerPositions(tt.args.scannerPattern, tt.args.positionsIn); !reflect.DeepEqual(got, tt.want) {
+			if got := overlayScannerPositions(tt.args.scannerPattern.Steps, tt.args.positionsIn); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AddScannerPositions() = got \n%+v", got)
 				t.Errorf("AddScannerPositions() = want \n%+v", tt.want)
 			}
