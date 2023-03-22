@@ -359,7 +359,7 @@ func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixture := 0; fixture < enabledNumberFixtures; fixture++ {
+		for fixture := 0; fixture <= enabledNumberFixtures; fixture++ {
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
