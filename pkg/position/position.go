@@ -273,7 +273,6 @@ func overlayScannerPositions(steps []common.Step, positionsIn map[int]common.Pos
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
 		// All fixtures have the same rotation for now.
-
 		for fixtureNumber := 0; fixtureNumber < len(positionsIn[step].Fixtures); fixtureNumber++ {
 			newFixture := common.Fixture{}
 			newFixture.Enabled = positionsIn[step].Fixtures[fixtureNumber].Enabled

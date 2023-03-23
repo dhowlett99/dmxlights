@@ -642,36 +642,36 @@ func PlaySequence(sequence common.Sequence,
 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 
-						if sequence.ScannerState[fixtureNumber].Enabled {
-							command := common.FixtureCommand{
-								Step:                     step,
-								NumberSteps:              sequence.NumberSteps,
-								Rotate:                   sequence.Rotate,
-								StrobeSpeed:              sequence.StrobeSpeed,
-								Strobe:                   sequence.Strobe,
-								Master:                   sequence.Master,
-								Blackout:                 sequence.Blackout,
-								Hide:                     sequence.Hide,
-								Type:                     sequence.Type,
-								RGBPosition:              sequence.RGBPositions[step],
-								StartFlood:               sequence.StartFlood,
-								StopFlood:                sequence.StopFlood,
-								SequenceNumber:           sequence.Number,
-								ScannerPosition:          sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
-								ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
-								ScannerState:             sequence.ScannerState[fixtureNumber],
-								ScannerDisableOnce:       sequence.DisableOnce[fixtureNumber],
-								ScannerChase:             sequence.ScannerChase,
-								ScannerColor:             sequence.ScannerColor[fixtureNumber],
-								ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],
-								ScannerOffsetPan:         sequence.ScannerOffsetPan,
-								ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
-								ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
-							}
-
-							// Start the fixture group.
-							fixtureStepChannels[fixtureNumber] <- command
+						// Even if the fixture is disabled we still need to send this message to the fixture.
+						// beacuse the fixture is the one who is responsible for turning it off.
+						command := common.FixtureCommand{
+							Step:                     step,
+							NumberSteps:              sequence.NumberSteps,
+							Rotate:                   sequence.Rotate,
+							StrobeSpeed:              sequence.StrobeSpeed,
+							Strobe:                   sequence.Strobe,
+							Master:                   sequence.Master,
+							Blackout:                 sequence.Blackout,
+							Hide:                     sequence.Hide,
+							Type:                     sequence.Type,
+							RGBPosition:              sequence.RGBPositions[step],
+							StartFlood:               sequence.StartFlood,
+							StopFlood:                sequence.StopFlood,
+							SequenceNumber:           sequence.Number,
+							ScannerPosition:          sequence.ScannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
+							ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
+							ScannerState:             sequence.ScannerState[fixtureNumber],
+							ScannerDisableOnce:       sequence.DisableOnce[fixtureNumber],
+							ScannerChase:             sequence.ScannerChase,
+							ScannerColor:             sequence.ScannerColor[fixtureNumber],
+							ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],
+							ScannerOffsetPan:         sequence.ScannerOffsetPan,
+							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
+							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
 						}
+
+						// Start the fixture group.
+						fixtureStepChannels[fixtureNumber] <- command
 					}
 				}
 			}

@@ -44,6 +44,11 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
 
+	fixture, err := findFixtureByName(fixture.Name, fixturesConfig)
+	if err != nil {
+		fmt.Printf("turnOffFixture: fixtureName: %s error %s\n", fixture.Name, err.Error())
+		return
+	}
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
@@ -74,18 +79,18 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		return
 	}
 
@@ -104,18 +109,18 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannel("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
@@ -152,14 +157,14 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -197,7 +202,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Turn off the fixture.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -209,7 +214,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 

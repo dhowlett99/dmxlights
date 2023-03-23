@@ -205,3 +205,106 @@ func Test_lookUpChannelNumberByNameInFixtureDefinition(t *testing.T) {
 		})
 	}
 }
+
+func TestFindGobo(t *testing.T) {
+
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Name:   "fixture1",
+				Group:  1,
+				Number: 1,
+				Channels: []Channel{
+					{
+						Name: "Red",
+					},
+					{
+						Name: "Green",
+					},
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+						},
+					},
+				},
+			},
+			{
+				Name:   "fixture2",
+				Group:  2,
+				Number: 2,
+				Channels: []Channel{
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+							{
+								Name:   "White Circle",
+								Number: 2,
+							},
+						},
+					},
+					{
+						Name: "Shutter",
+					},
+				},
+			},
+			{
+				Name:   "fixture3",
+				Group:  3,
+				Number: 3,
+				Channels: []Channel{
+					{
+						Name: "ProgramSpeed",
+					},
+				},
+			},
+		},
+	}
+
+	type args struct {
+		myFixtureNumber  int
+		mySequenceNumber int
+		selectedGobo     string
+		fixtures         *Fixtures
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "find White gobo",
+			args: args{
+				myFixtureNumber:  1,
+				mySequenceNumber: 1,
+				selectedGobo:     "White",
+				fixtures:         fixturesConfig,
+			},
+			want: 2,
+		},
+		{
+			name: "find Yellow gobo",
+			args: args{
+				myFixtureNumber:  0,
+				mySequenceNumber: 0,
+				selectedGobo:     "Yellow",
+				fixtures:         fixturesConfig,
+			},
+			want: 1,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := FindGobo(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
+				t.Errorf("FindGobo() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
