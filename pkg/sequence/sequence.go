@@ -445,17 +445,9 @@ func PlaySequence(sequence common.Sequence,
 					sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
 					sequence.UpdatePattern = false
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-					if sequence.ScannerChase {
-						// Set the chase RGB steps used to chase the shutter.
-						sequence.Pattern = pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
-						sequence.Steps = sequence.Pattern.Steps
-						// AND Set the extra scanner steps value to overlay PAN and TILT values.
-						sequence.ScannerSteps = sequence.ScannerAvailablePatterns[sequence.SelectedPattern].Steps
-					} else {
-						// Set the scanner steps used to send out pan and tilt values.
-						sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
-						sequence.Steps = sequence.Pattern.Steps
-					}
+					// Set the scanner steps used to send out pan and tilt values.
+					sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
+					sequence.Steps = sequence.Pattern.Steps
 
 					if sequence.AutoColor {
 						// Change all the fixtures to the next gobo.
@@ -509,19 +501,11 @@ func PlaySequence(sequence common.Sequence,
 					}
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 						var positions map[int]common.Position
-						// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
-						if sequence.ScannerChase {
-							sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
-							// Turn off optimasation because we need all the scanners to move.
-							sequence.Optimisation = false
-						} else {
-							// We're not chasing so just add the scanner positions,
-							// We won't need curve values.
-							sequence.FadeUpAndDown = []int{255}
-							sequence.FadeDownAndUp = []int{0}
-							// Turn on optimasation.
-							sequence.Optimisation = true
-						}
+						// We're playing out the scanner positions, so we won't need curve values.
+						sequence.FadeUpAndDown = []int{255}
+						sequence.FadeDownAndUp = []int{0}
+						// Turn on optimasation.
+						sequence.Optimisation = true
 
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.ScannerState[fixture].Inverted

@@ -90,6 +90,8 @@ type CurrentState struct {
 	DmxInterfacePresent       bool                         // Flag to indicate precence of DMX interface card
 	DmxInterfacePresentConfig *usbdmx.ControllerConfig     // DMX Interface card config.
 	LaunchpadName             string                       // Storage for launchpad config.
+	Chaser                    common.Sequence              // Sequence for chaser.
+	ChaserCommandChannerls    common.Channels              // Control channels for chaser.
 }
 
 func ProcessButtons(X int, Y int,
@@ -1715,6 +1717,7 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(4, cmd, commandChannels)
 
 		// Light the correct function key.
 		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)

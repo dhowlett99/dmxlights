@@ -230,6 +230,7 @@ const (
 	UpdateOffsetPan
 	UpdateOffsetTilt
 	EnableAllScanners
+	UpdateScannerChase
 )
 
 // A full step cycle is 39 ticks ie 39 values.
@@ -272,6 +273,7 @@ type Sequence struct {
 	RGBShift                    int                         // RGB shift.
 	CurrentSpeed                time.Duration               // Sequence speed represented as a duration.
 	Speed                       int                         // Sequence speed represented by a short number.
+	ChaserSpeed                 time.Duration               // Chaser Speed represented as a duration.
 	MusicTrigger                bool                        // Is this sequence in music trigger mode.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
@@ -342,6 +344,7 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
+	ChaseControlChannel         chan FixtureCommand         // Chase control channel used for scanner chases.
 }
 
 type Function struct {
@@ -412,6 +415,7 @@ type FixtureCommand struct {
 	ScannerOffsetPan         int
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int
+	ScannerShutterPositions  map[int]Position
 
 	// Derby Commands
 	Rotate  int
@@ -487,10 +491,13 @@ func SendCommandToSequence(selectedSequence int, command Command, commandChannel
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
+
 	commandChannels[0] <- command
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+	fmt.Printf("----> send command to Seq 5\n")
+	commandChannels[4] <- command
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
@@ -827,6 +834,8 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 	// Map scanner chase mode. Uses same function key as above.
 	if sequence.Type == "scanner" {
 		sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
+		fmt.Printf("--->I AM setting Scanner Chase for you to %t\n", sequence.ScannerChase)
+
 	}
 
 	// Map music trigger function.

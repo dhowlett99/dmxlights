@@ -42,6 +42,10 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
+const NumberOfSequences = 5
+const NumberOfSwitches = 8
+const NumberOfChasers = 1
+
 func main() {
 
 	fmt.Println("DMX Lighting")
@@ -59,37 +63,37 @@ func main() {
 	// Setup the current state.
 	this := buttons.CurrentState{}
 
-	this.Blackout = false                              // Blackout starts in off.
-	this.Flood = false                                 // Flood starts in off.
-	this.Running = make(map[int]bool, 4)               // Initialise storage for four sequences.
-	this.Strobe = make(map[int]bool, 4)                // Initialise storage for four sequences.
-	this.MasterBrightness = 255                        // Affects all DMX fixtures and launchpad lamps.
-	this.SoundGain = 0                                 // Fine gain -0.09 -> 0.09
-	this.OffsetPan = common.ScannerMidPoint            // Start pan from the center
-	this.OffsetTilt = common.ScannerMidPoint           // Start tilt from the center.
-	this.Patterns = pattern.MakePatterns()             // Build the default set of Patterns.
-	this.SelectButtonPressed = make([]bool, 4)         // Initialise four select buttons.
-	this.FunctionSelectMode = make([]bool, 4)          // Initialise four function mode states.
-	this.EditSequenceColorsMode = make([]bool, 4)      // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = make([]bool, 4)       // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = make([]bool, 4)       // Remember when we are in selecting gobo mode.
-	this.EditStaticColorsMode = make([]bool, 4)        // Remember when we are in editing static colors mode.
-	this.EditPatternMode = make([]bool, 4)             // Remember when we are in editing pattern mode.
-	this.StaticButtons = makeStaticButtonsStorage()    // Make storgage for color editing button results.
-	this.PresetsStore = presets.LoadPresets()          // Load the presets from their json files.
-	this.Speed = make(map[int]int, 4)                  // Initialise storage for four sequences.
-	this.RGBSize = make(map[int]int, 4)                // Initialise storage for four sequences.
-	this.ScannerSize = make(map[int]int, 4)            // Initialise storage for four sequences.
-	this.RGBShift = make(map[int]int, 4)               // Initialise storage for four sequences.
-	this.ScannerShift = make(map[int]int, 4)           // Initialise storage for four sequences.
-	this.RGBFade = make(map[int]int, 4)                // Initialise storage for four sequences.
-	this.ScannerFade = make(map[int]int, 4)            // Initialise storage for four sequences.
-	this.StrobeSpeed = make(map[int]int, 4)            // Initialise storage for four sequences.
-	this.SelectColorBar = make(map[int]int, 4)         // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, 4)     // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
-	this.LaunchPadConnected = true                     // Assume launchpad is present, until tested.
-	this.DmxInterfacePresent = true                    // Assume DMX interface card is present, until tested.
-	this.LaunchpadName = "Novation Launchpad Mk3 Mini" // Name of launchpad.
+	this.Blackout = false                                          // Blackout starts in off.
+	this.Flood = false                                             // Flood starts in off.
+	this.Running = make(map[int]bool, NumberOfSequences)           // Initialise storage for four sequences.
+	this.Strobe = make(map[int]bool, NumberOfSequences)            // Initialise storage for four sequences.
+	this.MasterBrightness = 255                                    // Affects all DMX fixtures and launchpad lamps.
+	this.SoundGain = 0                                             // Fine gain -0.09 -> 0.09
+	this.OffsetPan = common.ScannerMidPoint                        // Start pan from the center
+	this.OffsetTilt = common.ScannerMidPoint                       // Start tilt from the center.
+	this.Patterns = pattern.MakePatterns()                         // Build the default set of Patterns.
+	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
+	this.FunctionSelectMode = make([]bool, NumberOfSequences)      // Initialise four function mode states.
+	this.EditSequenceColorsMode = make([]bool, NumberOfSequences)  // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = make([]bool, NumberOfSequences)   // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = make([]bool, NumberOfSequences)   // Remember when we are in selecting gobo mode.
+	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
+	this.EditPatternMode = make([]bool, NumberOfSequences)         // Remember when we are in editing pattern mode.
+	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
+	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
+	this.Speed = make(map[int]int, NumberOfSequences)              // Initialise storage for four sequences.
+	this.RGBSize = make(map[int]int, NumberOfSequences)            // Initialise storage for four sequences.
+	this.ScannerSize = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
+	this.RGBShift = make(map[int]int, NumberOfSequences)           // Initialise storage for four sequences.
+	this.ScannerShift = make(map[int]int, NumberOfSequences)       // Initialise storage for four sequences.
+	this.RGBFade = make(map[int]int, NumberOfSequences)            // Initialise storage for four sequences.
+	this.ScannerFade = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
+	this.StrobeSpeed = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
+	this.SelectColorBar = make(map[int]int, NumberOfSequences)     // Initialise storage for four sequences.
+	this.ScannerCoordinates = make(map[int]int, NumberOfSequences) // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
+	this.LaunchPadConnected = true                                 // Assume launchpad is present, until tested.
+	this.DmxInterfacePresent = true                                // Assume DMX interface card is present, until tested.
+	this.LaunchpadName = "Novation Launchpad Mk3 Mini"             // Name of launchpad.
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
@@ -234,8 +238,8 @@ func main() {
 	replyChannels := []chan common.Sequence{}
 	updateChannels := []chan common.Sequence{}
 
-	// Make four default channels for commands.
-	for sequenceNumber := 0; sequenceNumber < 4; sequenceNumber++ {
+	// Make four default channels & one for the scanner chaser for commands.
+	for sequenceNumber := 0; sequenceNumber < NumberOfSequences; sequenceNumber++ {
 		commandChannel := make(chan common.Command)
 		commandChannels = append(commandChannels, commandChannel)
 		replyChannel := make(chan common.Sequence)
@@ -244,15 +248,19 @@ func main() {
 		updateChannels = append(updateChannels, updateChannel)
 	}
 
+	// Create a mini sequencer used to chase the lamps on scanners. Call it sequence 5
+	this.Chaser = sequence.NewChaser(5, dmxController, fixturesConfig, this.SequenceChannels, this.SoundConfig, this.DmxInterfacePresent)
+
 	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
 	this.SoundTriggers = []*common.Trigger{}
 
-	for triggerNumber := 0; triggerNumber < 12; triggerNumber++ {
+	NumberOfMusicTriggers := NumberOfSequences + NumberOfSwitches + NumberOfChasers
+	for triggerNumber := 0; triggerNumber <= NumberOfMusicTriggers; triggerNumber++ {
 		newChannel := make(chan common.Command)
 		var name string
 		var newTrigger common.Trigger
-		// First three triggers occupied by sequence 1,2 & 3
-		if triggerNumber < 3 {
+		// First four triggers occupied by sequence 1,2,3, 4
+		if triggerNumber < 4 {
 			name = fmt.Sprintf("sequence%d", triggerNumber)
 		} else {
 			name = fmt.Sprintf("switch%d", triggerNumber-3)
@@ -370,6 +378,7 @@ func main() {
 	go sequence.PlaySequence(*sequences[1], 1, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 	go sequence.PlaySequence(*sequences[2], 2, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 	go sequence.PlaySequence(*sequences[3], 3, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.StartChaser(this.Chaser, 4, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

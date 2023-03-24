@@ -411,7 +411,7 @@ func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXCon
 					for _, setting := range channel.Settings {
 						if setting.Number-1 == scannerColor {
 							v, _ := strconv.ParseFloat(setting.Value, 32)
-							setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -470,10 +470,10 @@ func findChannelSettingByLabel(group int, switchNumber int, channelName string, 
 	return 0, fmt.Errorf("label setting \"%s\" not found i channel \"%s\" fixture :%s", label, channelName, fixtureName)
 }
 
-func findChannelSettingByName(group int, switchNumber int, channelName string, settingName string, fixtures *Fixtures) (int, error) {
+func findChannelSettingByChannelNameAndSettingName(group int, switchNumber int, channelName string, settingName string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByName for %s\n", channelName)
+		fmt.Printf("findChannelSettingByChannelNameAndSettingName for %s\n", channelName)
 	}
 
 	var fixtureName string
@@ -602,7 +602,7 @@ func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXCont
 					for _, setting := range channel.Settings {
 						if setting.Number == selectedGobo {
 							v, _ := strconv.Atoi(setting.Value)
-							setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 						}
 					}
 				}
@@ -638,16 +638,16 @@ func MapFixtures(mySequenceNumber int,
 					// Scanner channels
 					if strings.Contains(channel.Name, "Pan") {
 						if channel.Offset != nil {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
 						} else {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan)), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan)), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Tilt") {
 						if channel.Offset != nil {
-							setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
 						}
-						setChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Shutter") {
 						// If we have defined settings for the shutter channel, then use them.
@@ -656,35 +656,35 @@ func MapFixtures(mySequenceNumber int,
 							for _, s := range channel.Settings {
 								if !strobe && (s.Name == "On" || s.Name == "Open") {
 									v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
-									setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 								if strobe && strings.Contains(s.Name, "Strobe") {
 									v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
-									setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 							}
 						} else {
 							// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
-							setChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
 						}
 					}
 					if strings.Contains(channel.Name, "Rotate") {
-						setChannel(fixture.Address+int16(channelNumber), byte(rotate), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(rotate), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Music") {
-						setChannel(fixture.Address+int16(channelNumber), byte(music), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(music), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Program") {
-						setChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "ProgramSpeed") {
-						setChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 					}
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
 							if setting.Number == selectedGobo {
 								v, _ := strconv.Atoi(setting.Value)
-								setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
@@ -692,61 +692,61 @@ func MapFixtures(mySequenceNumber int,
 						for _, setting := range channel.Settings {
 							if setting.Number-1 == scannerColor {
 								v, _ := strconv.Atoi(setting.Value)
-								setChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
 					if strings.Contains(channel.Name, "Strobe") {
 						if blackout {
-							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 						} else {
 							if strobe {
-								setChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
 							} else {
-								setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
-					// Master Dimmer.
-					if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-						if blackout {
-							setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-						} else {
-							if strings.Contains(channel.Name, "reverse") ||
-								strings.Contains(channel.Name, "Reverse") ||
-								strings.Contains(channel.Name, "invert") ||
-								strings.Contains(channel.Name, "Invert") {
-								setChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
-							} else {
-								setChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
-							}
-						}
-					}
+					// // Master Dimmer.
+					// if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+					// 	if blackout {
+					// 		setChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+					// 	} else {
+					// 		if strings.Contains(channel.Name, "reverse") ||
+					// 			strings.Contains(channel.Name, "Reverse") ||
+					// 			strings.Contains(channel.Name, "invert") ||
+					// 			strings.Contains(channel.Name, "Invert") {
+					// 			setChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+					// 		} else {
+					// 			setChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+					// 		}
+					// 	}
+					// }
 				}
 				// Static value.
 				if strings.Contains(channel.Name, "Static") {
 					if channel.Value != nil {
-						setChannel(fixture.Address+int16(channelNumber), byte(*channel.Value), dmxController, dmxInterfacePresent)
+						SetChannel(fixture.Address+int16(channelNumber), byte(*channel.Value), dmxController, dmxInterfacePresent)
 					}
 				}
 				// Fixture channels.
 				if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "White"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(White)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(White)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "Amber"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(Amber)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(Amber)), dmxController, dmxInterfacePresent)
 				}
 				if strings.Contains(channel.Name, "UV"+strconv.Itoa(displayFixture+1)) {
-					setChannel(fixture.Address+int16(channelNumber), byte(int(UV)), dmxController, dmxInterfacePresent)
+					SetChannel(fixture.Address+int16(channelNumber), byte(int(UV)), dmxController, dmxInterfacePresent)
 				}
 			}
 		}
@@ -779,7 +779,7 @@ func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue
 	}
 }
 
-func setChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	if dmxDebug {
 		fmt.Printf("DMX Debug    Channel %d Value %d\n", index, data)
 	}
@@ -830,11 +830,11 @@ func MapSwitchFixture(mySequenceNumber int,
 
 				// If blackout, set master to off.
 				if blackout {
-					masterChannel, err := FindChannel("Master", actualFixture.ID, mySequenceNumber, fixturesConfig)
+					masterChannel, err := FindChannelNumberByName("Master", actualFixture.ID, mySequenceNumber, fixturesConfig)
 					if err != nil && debug {
 						fmt.Printf("warning! fixture:%s master channel not defined: %s\n", actualFixture.Name, err)
 					}
-					setChannel(actualFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
+					SetChannel(actualFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 				}
 
 				// Look through the switch states for this switch.
@@ -865,7 +865,7 @@ func MapSwitchFixture(mySequenceNumber int,
 								}
 								// We have a blackout request, so set this
 								v, _ := strconv.ParseFloat(setting.Value, 32)
-								setChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(v), byte(0), dmxController, dmxInterfacePresent)
 							} else {
 
 								// Not Blackout.
@@ -881,14 +881,14 @@ func MapSwitchFixture(mySequenceNumber int,
 											fmt.Printf("Master Reverse->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), reverse_dmx(howBright))
 											fmt.Printf("howBright %d\n", howBright)
 										}
-										setChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
+										SetChannel(fixture.Address+int16(c), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 									} else {
 										c, _ := strconv.Atoi(setting.Channel)
 										c = c - 1 // Channels are relative to the base address so deduct one to make it work.
 										if debug {
 											fmt.Printf("Master->setting address %d setting.Channel %d total %d to value %f\n", fixture.Address, c, fixture.Address+int16(c), v)
 										}
-										setChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
+										SetChannel(fixture.Address+int16(c), byte(howBright), dmxController, dmxInterfacePresent)
 									}
 
 								} else {
@@ -904,7 +904,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											if debug {
 												fmt.Printf("Direct Channel Number ->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+											SetChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											// Handle the fact that the channel may be a label as well.
 											fixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
@@ -916,7 +916,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											if debug {
 												fmt.Printf("Label Lookup Channel Number->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+											SetChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 
 									} else {
@@ -938,7 +938,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											if debug {
 												fmt.Printf("Setting Number ->setting address %d setting.Channel %f total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+											SetChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										} else {
 											fixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 											if err != nil {
@@ -949,7 +949,7 @@ func MapSwitchFixture(mySequenceNumber int,
 											if debug {
 												fmt.Printf("Setting Label->setting address %d setting.Channel %d total %d to value %d\n", fixture.Address, c, fixture.Address+int16(c), v)
 											}
-											setChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
+											SetChannel(fixture.Address+int16(c), byte(v), dmxController, dmxInterfacePresent)
 										}
 									}
 								}
@@ -996,7 +996,27 @@ func getSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber in
 	return switchChannels[switchNumber].SequencerRunning
 }
 
+func FindFixtureAddressByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures *Fixtures) (int16, error) {
+	if debug {
+		fmt.Printf("findFixtureAddressByGroupAndNumber seq %d fixture %d\n", sequenceNumber, fixtureNumber)
+	}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == sequenceNumber+1 {
+			if fixture.Number == fixtureNumber+1 {
+				if debug {
+					fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+				}
+				return fixture.Address, nil
+			}
+		}
+	}
+	return 0, fmt.Errorf("findFixtureByName: failed to find address for sequence %d fixture %d", sequenceNumber, fixtureNumber)
+}
+
 func findFixtureByName(name string, fixtures *Fixtures) (*Fixture, error) {
+	if name == "" {
+		return nil, fmt.Errorf("findFixtureByName: fixture name is empty")
+	}
 	if debug {
 		fmt.Printf("Look for fixture by Name %s\n", name)
 	}
@@ -1190,13 +1210,13 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 	return 0
 }
 
-// FindChannel - takes a channel name and returns the channel number of the fixture.
+// FindChannelNumberByName - takes a channel name and returns the channel number of the fixture.
 // Returns an error if not found.
-func FindChannel(channelName string, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) (int, error) {
+func FindChannelNumberByName(channelName string, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) (int, error) {
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == mySequenceNumber {
-			for channelNumber, channel := range fixture.Channels {
-				if fixture.Number == myFixtureNumber+1 {
+		if fixture.Group == mySequenceNumber+1 {
+			if fixture.Number == myFixtureNumber+1 {
+				for channelNumber, channel := range fixture.Channels {
 					if strings.Contains(channel.Name, channelName) {
 						return channelNumber, nil
 					}

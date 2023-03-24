@@ -123,21 +123,21 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
-		programChannel, err := FindChannel("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
+		programChannel, err := FindChannelNumberByName("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
 		if err != nil {
 			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Look up the program state required.
-		v, err := findChannelSettingByName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
+		v, err := findChannelSettingByChannelNameAndSettingName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
 		if err != nil {
 			fmt.Printf("fixture %s program state not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Now play that DMX value on the program channel of this fixture.
-		setChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
+		SetChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
 
 		return
 	}
@@ -272,11 +272,11 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 			if cfg.Rotatable {
 
-				rotateChannel, err := FindChannel("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				rotateChannel, err := FindChannelNumberByName("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
 				if err != nil {
 					fmt.Printf("rotator: %s,", err)
 				}
-				masterChannel, err := FindChannel("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				masterChannel, err := FindChannelNumberByName("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
@@ -290,15 +290,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 						select {
 						case <-switchChannels[switchNumber].StopRotate:
 							time.Sleep(1 * time.Millisecond)
-							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							return
 						case <-switchChannels[switchNumber].KeepRotateAlive:
 							time.Sleep(1 * time.Millisecond)
 							continue
 						case <-time.After(1500 * time.Millisecond):
-							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							time.Sleep(250 * time.Millisecond)
-							setChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 						}
 					}
 				}(switchNumber, switchChannels)

@@ -26,7 +26,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = false
+const debug = true
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -637,6 +637,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
 		}
 		sequence.ScannerOffsetTilt = command.Args[OFFSET_TILT].Value.(int)
+		return sequence
+
+	case common.UpdateScannerChase:
+		const SCANNER_CHASE = 0
+		if debug {
+			fmt.Printf("%d: Command Update ScannerChase to %t \n", mySequenceNumber, command.Args[SCANNER_CHASE].Value)
+		}
+		sequence.ScannerChase = command.Args[SCANNER_CHASE].Value.(bool)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.
