@@ -491,13 +491,10 @@ func SendCommandToSequence(selectedSequence int, command Command, commandChannel
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
-
 	commandChannels[0] <- command
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
-	fmt.Printf("----> send command to Seq 5\n")
-	commandChannels[4] <- command
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
@@ -804,23 +801,23 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map the auto color change setting.
-	sequence.AutoColor = sequence.Functions[Function2_Auto_Color].State
+	sequence.AutoColor = functions[Function2_Auto_Color].State
 
 	// Map the auto pattern change setting.
-	sequence.AutoPattern = sequence.Functions[Function3_Auto_Pattern].State
+	sequence.AutoPattern = functions[Function3_Auto_Pattern].State
 
 	// Map bounce function to sequence bounce setting.
-	sequence.Bounce = sequence.Functions[Function4_Bounce].State
+	sequence.Bounce = functions[Function4_Bounce].State
 
 	// Map color selection function.
-	if sequence.Functions[Function5_Color].State {
+	if functions[Function5_Color].State {
 		sequence.PlayStaticOnce = true
 	}
 
 	// Map static function.
 	if sequence.Type != "scanner" {
-		sequence.Static = sequence.Functions[Function6_Static_Gobo].State
-		if sequence.Functions[Function6_Static_Gobo].State {
+		sequence.Static = functions[Function6_Static_Gobo].State
+		if functions[Function6_Static_Gobo].State {
 			sequence.PlayStaticOnce = true
 			sequence.Hide = true
 		}
@@ -828,19 +825,17 @@ func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
 	// Map RGB invert function.
 	if sequence.Type == "rgb" {
-		sequence.RGBInvert = sequence.Functions[Function7_Invert_Chase].State
+		sequence.RGBInvert = functions[Function7_Invert_Chase].State
 	}
 
 	// Map scanner chase mode. Uses same function key as above.
 	if sequence.Type == "scanner" {
-		sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
-		fmt.Printf("--->I AM setting Scanner Chase for you to %t\n", sequence.ScannerChase)
-
+		sequence.ScannerChase = functions[Function7_Invert_Chase].State
 	}
 
 	// Map music trigger function.
-	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
-	if sequence.Functions[Function8_Music_Trigger].State {
+	sequence.MusicTrigger = functions[Function8_Music_Trigger].State
+	if functions[Function8_Music_Trigger].State {
 		sequence.Run = true
 	}
 

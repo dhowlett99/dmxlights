@@ -233,6 +233,10 @@ func main() {
 		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
 	}
 
+	// Create a mini sequencer used to chase the lamps on scanners. Call it sequence 5
+	this.Chaser = sequence.NewChaser(5, dmxController, fixturesConfig, this.SequenceChannels, this.SoundConfig, this.DmxInterfacePresent)
+	sequences = append(sequences, &this.Chaser)
+
 	// Create all the channels I need.
 	commandChannels := []chan common.Command{}
 	replyChannels := []chan common.Sequence{}
@@ -247,9 +251,6 @@ func main() {
 		updateChannel := make(chan common.Sequence)
 		updateChannels = append(updateChannels, updateChannel)
 	}
-
-	// Create a mini sequencer used to chase the lamps on scanners. Call it sequence 5
-	this.Chaser = sequence.NewChaser(5, dmxController, fixturesConfig, this.SequenceChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
 	this.SoundTriggers = []*common.Trigger{}

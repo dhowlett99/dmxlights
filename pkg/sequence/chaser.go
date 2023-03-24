@@ -122,12 +122,8 @@ func StartChaser(sequence common.Sequence,
 		for {
 
 			// Check for any waiting commands.
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
-
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Hour, sequence, channels, fixturesConfig)
 			if sequence.ScannerChase {
-
-				fmt.Printf("---> SEQ 5 sequence.ScannerChase %t\n", sequence.ScannerChase)
-
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < len(shutterPositions); step++ {
@@ -156,11 +152,14 @@ func StartChaser(sequence common.Sequence,
 							fmt.Printf("StartChaser: error %s\n", err.Error())
 							return
 						}
-						//fmt.Printf("Fixture %s Set Master Address %d to Value %d\n", myfixture.Name, fixtureAddress+int16(masterChannel), myfixture.Brightness)
+						//fmt.Printf("Fixture %d Set Master Address %d to Value %d\n", fixtureNumber, fixtureAddress+int16(masterChannel), myfixture.Brightness)
 						fixture.SetChannel(fixtureAddress+int16(masterChannel), byte(myfixture.Brightness), dmxController, dmxInterfacePresent)
 					}
 					// Check for any waiting commands.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.ChaserSpeed, sequence, channels, fixturesConfig)
+					if !sequence.ScannerChase {
+						break
+					}
 				}
 			}
 		}
