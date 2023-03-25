@@ -342,7 +342,6 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
-	ChaseControlChannel         chan FixtureCommand         // Chase control channel used for scanner chases.
 }
 
 type Function struct {
@@ -493,6 +492,7 @@ func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+	commandChannels[4] <- command
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
