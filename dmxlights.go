@@ -238,8 +238,7 @@ func main() {
 	updateChannels := []chan common.Sequence{}
 
 	// Make four default channels & one for the scanner chaser for commands.
-	for sequenceNumber := 0; sequenceNumber < NumberOfSequences; sequenceNumber++ {
-		fmt.Printf("Make a set of channels for seq %d\n", sequenceNumber)
+	for range sequences {
 		commandChannel := make(chan common.Command)
 		commandChannels = append(commandChannels, commandChannel)
 		replyChannel := make(chan common.Sequence)

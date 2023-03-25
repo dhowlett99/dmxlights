@@ -91,7 +91,6 @@ type CurrentState struct {
 	DmxInterfacePresentConfig *usbdmx.ControllerConfig     // DMX Interface card config.
 	LaunchpadName             string                       // Storage for launchpad config.
 	Chaser                    common.Sequence              // Sequence for chaser.
-	ChaserCommandChannerls    common.Channels              // Control channels for chaser.
 }
 
 func ProcessButtons(X int, Y int,
@@ -667,42 +666,53 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if this.Strobe[this.SelectedSequence] {
-			this.StrobeSpeed[this.SelectedSequence] -= 10
-			if this.StrobeSpeed[this.SelectedSequence] < 0 {
-				this.StrobeSpeed[this.SelectedSequence] = 0
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		// Decrease Strobe Speed.
+		if this.Strobe[targetSequence] {
+			this.StrobeSpeed[targetSequence] -= 10
+			if this.StrobeSpeed[targetSequence] < 0 {
+				this.StrobeSpeed[targetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[targetSequence]), "speed", false, guiButtons)
 			return
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
 
-		if !sequences[this.SelectedSequence].MusicTrigger {
-			this.Speed[this.SelectedSequence]--
-			if this.Speed[this.SelectedSequence] < 0 {
-				this.Speed[this.SelectedSequence] = 1
+		// Decrease Speed.
+		if !sequences[targetSequence].MusicTrigger {
+			this.Speed[targetSequence]--
+			if this.Speed[targetSequence] < 0 {
+				this.Speed[targetSequence] = 1
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
+					{Name: "Speed", Value: this.Speed[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[targetSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -714,44 +724,53 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Speed \n")
 		}
 
-		if this.Strobe[this.SelectedSequence] {
-			this.StrobeSpeed[this.SelectedSequence] += 10
-			if this.StrobeSpeed[this.SelectedSequence] > 255 {
-				this.StrobeSpeed[this.SelectedSequence] = 255
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if this.Strobe[targetSequence] {
+			this.StrobeSpeed[targetSequence] += 10
+			if this.StrobeSpeed[targetSequence] > 255 {
+				this.StrobeSpeed[targetSequence] = 255
 			}
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[targetSequence]), "speed", false, guiButtons)
 			return
 		}
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
 
-		if !sequences[this.SelectedSequence].MusicTrigger {
-			this.Speed[this.SelectedSequence]++
-			if this.Speed[this.SelectedSequence] > 12 {
-				this.Speed[this.SelectedSequence] = 12
+		if !sequences[targetSequence].MusicTrigger {
+			this.Speed[targetSequence]++
+			if this.Speed[targetSequence] > 12 {
+				this.Speed[targetSequence] = 12
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
+					{Name: "Speed", Value: this.Speed[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[targetSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -1717,6 +1736,31 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Update the function keys in the shutter chaser.
+		if sequences[this.SelectedSequence].Type == "scanner" {
+			cmd = common.Command{
+				Action: common.UpdateFunctions,
+				Args: []common.Arg{
+					{Name: "Functions", Value: sequences[4].Functions},
+				},
+			}
+			common.SendCommandToSequence(4, cmd, commandChannels)
+
+			if sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+				// Start the shutter chaser.
+				cmd = common.Command{
+					Action: common.Start,
+				}
+				common.SendCommandToSequence(4, cmd, commandChannels)
+			} else {
+				// Stop the shutter chaser.
+				cmd = common.Command{
+					Action: common.Stop,
+				}
+				common.SendCommandToSequence(4, cmd, commandChannels)
+			}
+		}
 
 		// Light the correct function key.
 		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)

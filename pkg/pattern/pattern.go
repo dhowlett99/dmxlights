@@ -778,10 +778,12 @@ func GenerateStandardChasePatterm(numberSteps int, scannerState map[int]common.S
 		}
 	}
 
-	for _, step := range pattern.Steps {
-		fmt.Printf("Fixtures \n")
-		for fixture := 0; fixture < len(step.Fixtures); fixture++ {
-			fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
+	if debug {
+		for _, step := range pattern.Steps {
+			fmt.Printf("Fixtures \n")
+			for fixture := 0; fixture < len(step.Fixtures); fixture++ {
+				fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
+			}
 		}
 	}
 

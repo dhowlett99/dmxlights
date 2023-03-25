@@ -1107,6 +1107,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanner case, both scanners doing same things.",
 			args: args{
 				sequence: common.Sequence{
+					Type:          "scanner",
 					Bounce:        false,
 					FadeUpAndDown: []int{255},
 					FadeDownAndUp: []int{0},

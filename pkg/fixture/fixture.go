@@ -309,7 +309,7 @@ func FixtureReceiver(
 					// TODO Integrate cmd.master with fixture.Brightness.
 					// TODO find the scanner sequence number from the config.
 					scannerFixturesSequenceNumber := 2 // Scanner sequence.
-					fmt.Printf("myFixtureNumber %d fixture.Brightness %d\n", myFixtureNumber, fixture.Brightness)
+					//fmt.Printf("myFixtureNumber %d fixture.Brightness %d\n", myFixtureNumber, fixture.Brightness)
 					MapFixtures(true, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {
 					MapFixtures(false, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
@@ -718,21 +718,21 @@ func MapFixtures(chaser bool, mySequenceNumber int,
 								}
 							}
 						}
-						// // Master Dimmer.
-						// if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-						// 	if blackout {
-						// 		SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-						// 	} else {
-						// 		if strings.Contains(channel.Name, "reverse") ||
-						// 			strings.Contains(channel.Name, "Reverse") ||
-						// 			strings.Contains(channel.Name, "invert") ||
-						// 			strings.Contains(channel.Name, "Invert") {
-						// 			SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
-						// 		} else {
-						// 			SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
-						// 		}
-						// 	}
-						// }
+						// Master Dimmer.
+						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+							if blackout {
+								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+							} else {
+								if strings.Contains(channel.Name, "reverse") ||
+									strings.Contains(channel.Name, "Reverse") ||
+									strings.Contains(channel.Name, "invert") ||
+									strings.Contains(channel.Name, "Invert") {
+									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+								} else {
+									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+								}
+							}
+						}
 					} else {
 						// Master Dimmer.
 						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {

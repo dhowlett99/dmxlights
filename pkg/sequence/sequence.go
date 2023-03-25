@@ -433,7 +433,6 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.Type == "rgb" {
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
-						fmt.Printf("I am a chaser so GenerateStandardChasePatterm \n")
 
 						// TODO find the scanner sequence number from the config.
 						scannerSequenceNumber := 2
@@ -452,19 +451,12 @@ func PlaySequence(sequence common.Sequence,
 							newScanner.Inverted = false
 							sequence.ScannerState[x] = newScanner
 						}
-
-						fmt.Printf("sequence.NumberFixtures %d\n", sequence.NumberFixtures)
-						fmt.Printf("sequence.ScannerState %v\n", sequence.ScannerState)
 						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-
 						scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
 						sequence.Steps = scannerChasePattern.Steps
 						sequence.Pattern.Name = scannerChasePattern.Name
 						sequence.Pattern.Label = scannerChasePattern.Label
 						sequence.UpdatePattern = false
-						fmt.Printf("sequence.EnabledNumberFixtures %d\n", sequence.EnabledNumberFixtures)
-
-						fmt.Printf("Seq:%d Chaser Number of Steps %d\n", mySequenceNumber, len(sequence.Steps))
 					} else {
 						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
 						sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps

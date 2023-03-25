@@ -26,15 +26,13 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = true
+const debug = false
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
 func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duration, sequence common.Sequence, channels common.Channels, fixturesConfig *fixture.Fixtures) common.Sequence {
 
 	// Setup channels.
-
-	fmt.Printf("LISTEN ON COMMAND CHANNEL %d\n", mySequenceNumber)
 	commandChannel := channels.CommmandChannels[mySequenceNumber]
 	replyChannel := channels.ReplyChannels[mySequenceNumber]
 	updateChannel := channels.UpdateChannels[mySequenceNumber]
