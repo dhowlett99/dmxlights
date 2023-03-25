@@ -409,7 +409,7 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.Mode == "Sequence" {
 			for sequence.Run && !sequence.Static {
 				if debug {
-					fmt.Printf("sequence %d Running mode\n", mySequenceNumber)
+					fmt.Printf("sequence %d type %s label %s Running mode\n", mySequenceNumber, sequence.Type, sequence.Label)
 				}
 				// Map music trigger function.
 				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
@@ -431,12 +431,47 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-					sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
-					sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
-					sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
-					sequence.Pattern.PattenTrim = sequence.RGBAvailablePatterns[sequence.SelectedPattern].PattenTrim
-					sequence.UpdatePattern = false
+					if sequence.Label == "chaser" {
+						// Set the chase RGB steps used to chase the shutter.
+						fmt.Printf("I am a chaser so GenerateStandardChasePatterm \n")
+
+						// TODO find the scanner sequence number from the config.
+						scannerSequenceNumber := 2
+						sequence.NumberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig, false)
+
+						sequence.ScannerChase = true
+
+						// Since this chaser sequence had no actual fixtures of its own
+						// Scanner state was never created by createSequence.
+						sequence.ScannerState = make(map[int]common.ScannerState, 8)
+
+						// Initailise the scanner state for all defined fixtures.
+						for x := 0; x < sequence.NumberFixtures; x++ {
+							newScanner := common.ScannerState{}
+							newScanner.Enabled = true
+							newScanner.Inverted = false
+							sequence.ScannerState[x] = newScanner
+						}
+
+						fmt.Printf("sequence.NumberFixtures %d\n", sequence.NumberFixtures)
+						fmt.Printf("sequence.ScannerState %v\n", sequence.ScannerState)
+						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+
+						scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
+						sequence.Steps = scannerChasePattern.Steps
+						sequence.Pattern.Name = scannerChasePattern.Name
+						sequence.Pattern.Label = scannerChasePattern.Label
+						sequence.UpdatePattern = false
+						fmt.Printf("sequence.EnabledNumberFixtures %d\n", sequence.EnabledNumberFixtures)
+
+						fmt.Printf("Seq:%d Chaser Number of Steps %d\n", mySequenceNumber, len(sequence.Steps))
+					} else {
+						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+						sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+						sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
+						sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
+						sequence.UpdatePattern = false
+					}
 				}
 
 				// Setup scanner patterns.
@@ -605,7 +640,7 @@ func PlaySequence(sequence common.Sequence,
 				// This is the inner loop where the sequence runs.
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0 + sequence.Pattern.PattenTrim; step < sequence.NumberSteps-sequence.Pattern.PattenTrim; step++ {
+				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
 					speed := sequence.CurrentSpeed / 10

@@ -150,14 +150,13 @@ type ScannerState struct {
 }
 
 type Pattern struct {
-	Name       string
-	Label      string
-	Number     int
-	Length     int // 8, 4 or 2
-	Size       int
-	Fixtures   int // 8 Fixtures
-	Steps      []Step
-	PattenTrim int
+	Name     string
+	Label    string
+	Number   int
+	Length   int // 8, 4 or 2
+	Size     int
+	Fixtures int // 8 Fixtures
+	Steps    []Step
 }
 
 type Arg struct {
@@ -487,7 +486,17 @@ const (
 )
 
 func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
-	commandChannels[selectedSequence] <- command
+
+	fmt.Printf("lenght of command channels. %d\n", len(commandChannels))
+	if selectedSequence == 2 {
+		fmt.Printf("Send Command to Sequence %d\n", selectedSequence)
+		commandChannels[selectedSequence] <- command
+		fmt.Printf("Send Command to Sequence %d\n", 4)
+		commandChannels[4] <- command
+	} else {
+		fmt.Printf("Send Command to Sequence %d\n", selectedSequence)
+		commandChannels[selectedSequence] <- command
+	}
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
@@ -495,6 +504,7 @@ func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+	commandChannels[4] <- command
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {

@@ -44,7 +44,6 @@ import (
 
 const NumberOfSequences = 5
 const NumberOfSwitches = 8
-const NumberOfChasers = 1
 
 func main() {
 
@@ -233,10 +232,6 @@ func main() {
 		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
 	}
 
-	// Create a mini sequencer used to chase the lamps on scanners. Call it sequence 5
-	this.Chaser = sequence.NewChaser(5, dmxController, fixturesConfig, this.SequenceChannels, this.SoundConfig, this.DmxInterfacePresent)
-	sequences = append(sequences, &this.Chaser)
-
 	// Create all the channels I need.
 	commandChannels := []chan common.Command{}
 	replyChannels := []chan common.Sequence{}
@@ -244,6 +239,7 @@ func main() {
 
 	// Make four default channels & one for the scanner chaser for commands.
 	for sequenceNumber := 0; sequenceNumber < NumberOfSequences; sequenceNumber++ {
+		fmt.Printf("Make a set of channels for seq %d\n", sequenceNumber)
 		commandChannel := make(chan common.Command)
 		commandChannels = append(commandChannels, commandChannel)
 		replyChannel := make(chan common.Sequence)
@@ -255,17 +251,27 @@ func main() {
 	// SoundTriggers is a an array of switches and channels which control which sequence gets a music trigger.
 	this.SoundTriggers = []*common.Trigger{}
 
-	NumberOfMusicTriggers := NumberOfSequences + NumberOfSwitches + NumberOfChasers
+	NumberOfMusicTriggers := NumberOfSequences + NumberOfSwitches
+
+	// Setting trigger names.
+	// TODO re-visit this and make the allocation of trigger numbers less confusing.
 	for triggerNumber := 0; triggerNumber <= NumberOfMusicTriggers; triggerNumber++ {
 		newChannel := make(chan common.Command)
 		var name string
 		var newTrigger common.Trigger
-		// First four triggers occupied by sequence 0=FOH, 1=Uplighter,2=Scanners,3=switch 4=shutter chaser,
-		if triggerNumber < 4 {
+		// First three triggers occupied by sequence 0=FOH, 1=Uplighter,2=Scanners, 3-10 switched 11=shutter chase
+		if triggerNumber < 3 {
 			name = fmt.Sprintf("sequence%d", triggerNumber)
-		} else {
+		}
+		// 3-10 , eight switches
+		if triggerNumber > 3 && triggerNumber < 11 {
 			name = fmt.Sprintf("switch%d", triggerNumber-3)
 		}
+		// sequence 4 = shutter chaser,
+		if triggerNumber == 11 {
+			name = fmt.Sprintf("sequence%d", 3)
+		}
+
 		newTrigger = common.Trigger{
 			Name:    name,
 			State:   false,
@@ -379,7 +385,7 @@ func main() {
 	go sequence.PlaySequence(*sequences[1], 1, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 	go sequence.PlaySequence(*sequences[2], 2, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 	go sequence.PlaySequence(*sequences[3], 3, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.StartChaser(this.Chaser, 4, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[4], 4, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

@@ -305,10 +305,9 @@ func MakePatterns() map[int]common.Pattern {
 	}
 
 	pairs := common.Pattern{
-		Name:       "Pairs",
-		Label:      "Pairs",
-		Number:     3,
-		PattenTrim: 0,
+		Name:   "Pairs",
+		Label:  "Pairs",
+		Number: 3,
 		Steps: []common.Step{
 			{
 				Fixtures: map[int]common.Fixture{
@@ -779,12 +778,12 @@ func GenerateStandardChasePatterm(numberSteps int, scannerState map[int]common.S
 		}
 	}
 
-	// for _, step := range pattern.Steps {
-	// 	fmt.Printf("Fixtures \n")
-	// 	for fixture := 0; fixture < len(step.Fixtures); fixture++ {
-	// 		fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
-	// 	}
-	// }
+	for _, step := range pattern.Steps {
+		fmt.Printf("Fixtures \n")
+		for fixture := 0; fixture < len(step.Fixtures); fixture++ {
+			fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
+		}
+	}
 
 	return pattern
 
@@ -941,33 +940,33 @@ func GetNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOf
 	return getNumberEnabledScanners
 }
 
-// func makeEnabledScannerList(scannerState map[int]common.ScannerState, NumberCoordinates int, numberEnabledScanners, numberScanners int) []int {
+func makeEnabledScannerList(scannerState map[int]common.ScannerState, NumberCoordinates int, numberEnabledScanners, numberScanners int) []int {
 
-// 	enabledScannerList := []int{}
+	enabledScannerList := []int{}
 
-// 	size := findStepSize(NumberCoordinates, numberEnabledScanners)
+	size := findStepSize(NumberCoordinates, numberEnabledScanners)
 
-// 	for fixture := 0; fixture < numberScanners; fixture++ {
-// 		if scannerState[fixture].Enabled {
-// 			for s := 0; s < size; s++ {
-// 				enabledScannerList = append(enabledScannerList, fixture)
-// 			}
-// 		}
-// 	}
+	for fixture := 0; fixture < numberScanners; fixture++ {
+		if scannerState[fixture].Enabled {
+			for s := 0; s < size; s++ {
+				enabledScannerList = append(enabledScannerList, fixture)
+			}
+		}
+	}
 
-// 	if debug {
-// 		fmt.Printf("makeEnabledScannerList %d\n", enabledScannerList)
-// 	}
-// 	return enabledScannerList
-// }
+	if debug {
+		fmt.Printf("makeEnabledScannerList %d\n", enabledScannerList)
+	}
+	return enabledScannerList
+}
 
-// func findStepSize(NumberCoordinates int, numberEnabledScanners int) int {
+func findStepSize(NumberCoordinates int, numberEnabledScanners int) int {
 
-// 	actualNumberCoodinates := float64(NumberCoordinates)
-// 	acutalnumberEnabledScanners := float64(numberEnabledScanners)
+	actualNumberCoodinates := float64(NumberCoordinates)
+	acutalnumberEnabledScanners := float64(numberEnabledScanners)
 
-// 	return int(math.Round(actualNumberCoodinates / acutalnumberEnabledScanners))
-// }
+	return int(math.Round(actualNumberCoodinates / acutalnumberEnabledScanners))
+}
 
 func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float64) (out []Coordinate) {
 	var theta float64
