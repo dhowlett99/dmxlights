@@ -36,16 +36,17 @@ func NewChaser(mySequenceNumber int, dmxController *ft232.DMXController, fixture
 
 	// Start of chase.
 	sequence := common.Sequence{}
+	sequence.Run = false
 	sequence.Type = "scanner"
 	sequence.ChaserSpeed = 100 * time.Millisecond
-	sequence.ScannerChase = false
+	sequence.ScannerChase = true
 	sequence.NumberFixtures = 8
 	sequence.RGBCoordinates = 20
 	sequence.RGBFade = 1
 	sequence.RGBSize = 1
 	sequence.RGBShift = 1
 	sequence.EnabledNumberFixtures = 3
-	sequence.Optimisation = false
+	sequence.Optimisation = true
 	sequence.ScannerInvert = false
 	sequence.Bounce = false
 	sequence.RGBInvert = false
@@ -62,8 +63,6 @@ func NewChaser(mySequenceNumber int, dmxController *ft232.DMXController, fixture
 		sequence.Functions = append(sequence.Functions, newFunction)
 	}
 
-	//sequence.Functions[common.Function7_Invert_Chase].State = false
-
 	sequence.ScannerState = map[int]common.ScannerState{
 		0: {
 			Enabled: true,
@@ -75,25 +74,33 @@ func NewChaser(mySequenceNumber int, dmxController *ft232.DMXController, fixture
 			Enabled: true,
 		},
 		3: {
-			Enabled: true,
+			Enabled: false,
 		},
 		4: {
-			Enabled: true,
+			Enabled: false,
 		},
 		5: {
-			Enabled: true,
+			Enabled: false,
 		},
 		6: {
-			Enabled: true,
+			Enabled: false,
 		},
 		7: {
-			Enabled: true,
+			Enabled: false,
 		},
 	}
 
 	// Set the chase RGB steps used to chase the shutter.
 	scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
 	sequence.Steps = scannerChasePattern.Steps
+
+	for positionNumber := 0; positionNumber < len(sequence.Steps); positionNumber++ {
+		position := sequence.Steps[positionNumber]
+		fmt.Printf("Step %d\n", positionNumber)
+		for fixture := 0; fixture < len(position.Fixtures); fixture++ {
+			fmt.Printf("\tFixture %d Enabled %t Brightness %+v\n", fixture, position.Fixtures[fixture].Enabled, position.Fixtures[fixture].Brightness)
+		}
+	}
 
 	// Calculate fade curve values. The number of Shutter (RGB) steps has to match the number of scanner steps.
 	sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
@@ -119,46 +126,63 @@ func StartChaser(sequence common.Sequence,
 		// Calulate positions for each Scanner Shutter.
 		shutterPositions, _ := position.CalculatePositions(sequence)
 
+		for positionNumber := 0; positionNumber < len(shutterPositions); positionNumber++ {
+			position := shutterPositions[positionNumber]
+			fmt.Printf("Position %d\n", positionNumber)
+			for fixture := 0; fixture < len(position.Fixtures); fixture++ {
+				fmt.Printf("\tFixture %d Enabled %t Brightness %+v\n", fixture, position.Fixtures[fixture].Enabled, position.Fixtures[fixture].Brightness)
+			}
+		}
+		// Check for any waiting commands
+
 		for {
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Second, sequence, channels, fixturesConfig)
 
-			// Check for any waiting commands.
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Hour, sequence, channels, fixturesConfig)
-			if sequence.ScannerChase {
-				// Run through the steps in the sequence.
-				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0; step < len(shutterPositions); step++ {
+			fmt.Printf("---> Chaser run flag %t\n", sequence.Run)
 
-					// Play out fixture to DMX channels.
-					position := shutterPositions[step]
+			if sequence.Run {
+				for {
 
-					fixtures := position.Fixtures
-
-					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-
-						myfixture := fixtures[fixtureNumber]
-
-						scannerFixturesSequenceNumber := 2 // Scanner sequence.
-
-						masterChannel, err := fixture.FindChannelNumberByName("Master", fixtureNumber, scannerFixturesSequenceNumber, fixturesConfig)
-						if err != nil {
-							fmt.Printf("StartChaser master: %s,", err)
-							return
-						}
-
-						// Find the fixtures details.
-
-						fixtureAddress, err := fixture.FindFixtureAddressByGroupAndNumber(scannerFixturesSequenceNumber, fixtureNumber, fixturesConfig)
-						if err != nil {
-							fmt.Printf("StartChaser: error %s\n", err.Error())
-							return
-						}
-						//fmt.Printf("Fixture %d Set Master Address %d to Value %d\n", fixtureNumber, fixtureAddress+int16(masterChannel), myfixture.Brightness)
-						fixture.SetChannel(fixtureAddress+int16(masterChannel), byte(myfixture.Brightness), dmxController, dmxInterfacePresent)
-					}
 					// Check for any waiting commands.
-					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.ChaserSpeed, sequence, channels, fixturesConfig)
-					if !sequence.ScannerChase {
+					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
+					if !sequence.Run {
 						break
+					}
+
+					// Run through the steps in the sequence.
+					// Remember every step contains infomation for all the fixtures in this group.
+					for step := 0; step < len(shutterPositions); step++ {
+
+						// Play out fixture to DMX channels.
+						position := shutterPositions[step]
+
+						fixtures := position.Fixtures
+
+						for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
+
+							myfixture := fixtures[fixtureNumber]
+							//fmt.Printf("---> fixture %d brightness %d\n", fixtureNumber, myfixture.Brightness)
+
+							scannerFixturesSequenceNumber := 2 // Scanner sequence.
+
+							// Find the fixtures details.
+							masterChannel, err := fixture.FindChannelNumberByName("Master", fixtureNumber, scannerFixturesSequenceNumber, fixturesConfig)
+							if err != nil {
+								fmt.Printf("StartChaser master: %s,", err)
+								return
+							}
+							fixtureAddress, err := fixture.FindFixtureAddressByGroupAndNumber(scannerFixturesSequenceNumber, fixtureNumber, fixturesConfig)
+							if err != nil {
+								fmt.Printf("StartChaser: error %s\n", err.Error())
+								return
+							}
+							//fmt.Printf("Fixture %d Set Master Address %d to Value %d\n", fixtureNumber, fixtureAddress+int16(masterChannel), myfixture.Brightness)
+							fixture.SetChannel(fixtureAddress+int16(masterChannel), byte(myfixture.Brightness), dmxController, dmxInterfacePresent)
+						}
+						sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, sequence.ChaserSpeed, sequence, channels, fixturesConfig)
+						if !sequence.Run {
+							break
+						}
 					}
 				}
 			}

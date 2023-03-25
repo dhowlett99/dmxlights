@@ -260,7 +260,7 @@ func main() {
 		newChannel := make(chan common.Command)
 		var name string
 		var newTrigger common.Trigger
-		// First four triggers occupied by sequence 1,2,3, 4
+		// First four triggers occupied by sequence 0=FOH, 1=Uplighter,2=Scanners,3=switch 4=shutter chaser,
 		if triggerNumber < 4 {
 			name = fmt.Sprintf("sequence%d", triggerNumber)
 		} else {

@@ -1719,15 +1719,23 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If we're a scanner send a message to the shutter chaser as well.
-		if sequences[this.SelectedFixture].Type == "scanner" {
-			cmd = common.Command{
-				Action: common.UpdateFunctions,
-				Args: []common.Arg{
-					{Name: "Functions", Value: sequences[this.SelectedSequence].Functions},
-				},
-			}
-			common.SendCommandToSequence(4, cmd, commandChannels)
+		fmt.Printf("---> type is %s\n", sequences[this.SelectedFixture].Type)
+		//if sequences[this.SelectedFixture].Type == "scanner" {
+		cmd = common.Command{
+			Action: common.UpdateFunctions,
+			Args: []common.Arg{
+				{Name: "Functions", Value: sequences[this.SelectedSequence].Functions},
+			},
 		}
+		common.SendCommandToSequence(4, cmd, commandChannels)
+
+		// Start the chaser.
+		//if sequences[this.SelectedFixture].Functions[common.Function7_Invert_Chase].State {
+		cmd = common.Command{
+			Action: common.Start,
+		}
+		common.SendCommandToSequence(4, cmd, commandChannels)
+		//}
 
 		// Light the correct function key.
 		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
