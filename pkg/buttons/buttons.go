@@ -573,39 +573,48 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
-			this.RGBShift[this.SelectedSequence] = this.RGBShift[this.SelectedSequence] - 1
-			if this.RGBShift[this.SelectedSequence] < 0 {
-				this.RGBShift[this.SelectedSequence] = 0
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
+			this.RGBShift[targetSequence] = this.RGBShift[targetSequence] - 1
+			if this.RGBShift[targetSequence] < 0 {
+				this.RGBShift[targetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
-					{Name: "RGBShift", Value: this.RGBShift[this.SelectedSequence]},
+					{Name: "RGBShift", Value: this.RGBShift[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[targetSequence]), "shift", false, guiButtons)
 			return
 		}
 
-		if sequences[this.SelectedSequence].Type == "scanner" {
-			this.ScannerShift[this.SelectedSequence] = this.ScannerShift[this.SelectedSequence] - 1
-			if this.ScannerShift[this.SelectedSequence] < 0 {
-				this.ScannerShift[this.SelectedSequence] = 0
+		if sequences[targetSequence].Type == "scanner" {
+			this.ScannerShift[targetSequence] = this.ScannerShift[targetSequence] - 1
+			if this.ScannerShift[targetSequence] < 0 {
+				this.ScannerShift[targetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
-					{Name: "ScannerShift", Value: this.ScannerShift[this.SelectedSequence]},
+					{Name: "ScannerShift", Value: this.ScannerShift[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
+			label := getScannerShiftLabel(this.ScannerShift[targetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
@@ -620,39 +629,48 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
-			this.RGBShift[this.SelectedSequence] = this.RGBShift[this.SelectedSequence] + 1
-			if this.RGBShift[this.SelectedSequence] > 50 {
-				this.RGBShift[this.SelectedSequence] = 50
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
+			this.RGBShift[targetSequence] = this.RGBShift[targetSequence] + 1
+			if this.RGBShift[targetSequence] > 50 {
+				this.RGBShift[targetSequence] = 50
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
-					{Name: "Shift", Value: this.RGBShift[this.SelectedSequence]},
+					{Name: "Shift", Value: this.RGBShift[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[targetSequence]), "shift", false, guiButtons)
 			return
 		}
 
-		if sequences[this.SelectedSequence].Type == "scanner" {
-			this.ScannerShift[this.SelectedSequence] = this.ScannerShift[this.SelectedSequence] + 1
-			if this.ScannerShift[this.SelectedSequence] > 3 {
-				this.ScannerShift[this.SelectedSequence] = 3
+		if sequences[targetSequence].Type == "scanner" {
+			this.ScannerShift[targetSequence] = this.ScannerShift[targetSequence] + 1
+			if this.ScannerShift[targetSequence] > 3 {
+				this.ScannerShift[targetSequence] = 3
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
-					{Name: "ScannerShift", Value: this.ScannerShift[this.SelectedSequence]},
+					{Name: "ScannerShift", Value: this.ScannerShift[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])
+			label := getScannerShiftLabel(this.ScannerShift[targetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
 			return
 		}
