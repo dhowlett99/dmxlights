@@ -1213,7 +1213,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaseer to turn on this scanner.
+			// Tell the sequence chaser to turn on this scanner.
 			cmd = common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
@@ -1241,7 +1241,7 @@ func ProcessButtons(X int, Y int,
 			this.ScannerState[X][Y].Enabled = true
 			this.ScannerState[X][Y].Inverted = false
 
-			// Tell the sequence to turn off this scanner.
+			// Tell the sequence to turn on this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
@@ -1259,7 +1259,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SequenceNumber", Value: 4},
 					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: false},
+					{Name: "FixtureState", Value: true},
 					{Name: "FixtureInverted", Value: false},
 				},
 			}
@@ -1281,7 +1281,7 @@ func ProcessButtons(X int, Y int,
 			this.ScannerState[X][Y].Enabled = true
 			this.ScannerState[X][Y].Inverted = true
 
-			// Tell the sequence to turn on this scanner.
+			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
@@ -1293,14 +1293,14 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaseer to turn on this scanner.
+			// Tell the sequence chaseer to invert this scanner.
 			cmd = common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
 					{Name: "SequenceNumber", Value: 4},
 					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: false},
-					{Name: "FixtureInverted", Value: false},
+					{Name: "FixtureState", Value: true},
+					{Name: "FixtureInverted", Value: true},
 				},
 			}
 			common.SendCommandToSequence(4, cmd, commandChannels)
