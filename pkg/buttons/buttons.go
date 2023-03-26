@@ -177,12 +177,12 @@ func ProcessButtons(X int, Y int,
 		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			fixture.MapFixtures(false, false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		}
 
 		return
@@ -207,7 +207,7 @@ func ProcessButtons(X int, Y int,
 		X = X - 100
 
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		return
 	}
 
@@ -1218,6 +1218,18 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
+			// Tell the sequence chaseer to turn on this scanner.
+			cmd = common.Command{
+				Action: common.ToggleFixtureState,
+				Args: []common.Arg{
+					{Name: "SequenceNumber", Value: 4},
+					{Name: "FixtureNumber", Value: X},
+					{Name: "FixtureState", Value: false},
+					{Name: "FixtureInverted", Value: false},
+				},
+			}
+			common.SendCommandToSequence(4, cmd, commandChannels)
+
 			// Show the status.
 			ShowScannerStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -1246,6 +1258,18 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
+			// Tell the sequence chaseer to turn on this scanner.
+			cmd = common.Command{
+				Action: common.ToggleFixtureState,
+				Args: []common.Arg{
+					{Name: "SequenceNumber", Value: 4},
+					{Name: "FixtureNumber", Value: X},
+					{Name: "FixtureState", Value: false},
+					{Name: "FixtureInverted", Value: false},
+				},
+			}
+			common.SendCommandToSequence(4, cmd, commandChannels)
+
 			// Show the status.
 			ShowScannerStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -1273,6 +1297,18 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
+
+			// Tell the sequence chaseer to turn on this scanner.
+			cmd = common.Command{
+				Action: common.ToggleFixtureState,
+				Args: []common.Arg{
+					{Name: "SequenceNumber", Value: 4},
+					{Name: "FixtureNumber", Value: X},
+					{Name: "FixtureState", Value: false},
+					{Name: "FixtureInverted", Value: false},
+				},
+			}
+			common.SendCommandToSequence(4, cmd, commandChannels)
 
 			// Show the status.
 			ShowScannerStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
@@ -1739,13 +1775,13 @@ func ProcessButtons(X int, Y int,
 
 		// Update the function keys in the shutter chaser.
 		if sequences[this.SelectedSequence].Type == "scanner" {
-			cmd = common.Command{
-				Action: common.UpdateFunctions,
-				Args: []common.Arg{
-					{Name: "Functions", Value: sequences[4].Functions},
-				},
-			}
-			common.SendCommandToSequence(4, cmd, commandChannels)
+			// cmd = common.Command{
+			// 	Action: common.UpdateFunctions,
+			// 	Args: []common.Arg{
+			// 		{Name: "Functions", Value: sequences[4].Functions},
+			// 	},
+			// }
+			// common.SendCommandToSequence(4, cmd, commandChannels)
 
 			if sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
 				// Start the shutter chaser.
@@ -2182,7 +2218,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		if sequences[y].Type != "switch" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(false, y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
+				fixture.MapFixtures(false, false, y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -2193,7 +2229,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(false, sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
+				fixture.MapFixtures(false, false, sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}

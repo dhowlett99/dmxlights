@@ -207,7 +207,7 @@ func main() {
 	sequences := []*common.Sequence{}
 	for sequenceNumber, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
-		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceNumber, this.Patterns, fixturesConfig, this.SequenceChannels)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceConf.Label, sequenceNumber, this.Patterns, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name

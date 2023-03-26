@@ -83,6 +83,7 @@ func LoadSequences() (sequences *SequencesConfig, err error) {
 // Assigns default values for all types of sequence.
 func CreateSequence(
 	sequenceType string,
+	sequenceLabel string,
 	mySequenceNumber int,
 	availablePatterns map[int]common.Pattern,
 	fixturesConfig *fixture.Fixtures,
@@ -134,8 +135,16 @@ func CreateSequence(
 	// A map of the state of fixtures in the sequence.
 	// We can disable a fixture by setting fixture Enabled to false.
 	scannerState := make(map[int]common.ScannerState, 8)
+	var numberFixtures int
 	// Find the number of fixtures for this sequence.
-	numberFixtures := getNumberOfFixtures(mySequenceNumber, fixturesConfig, false)
+	if sequenceLabel == "chaser" {
+		// TODO find the scanner sequence number from the config.
+		scannerSequenceNumber := 2
+		numberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig, false)
+	} else {
+		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig, false)
+	}
+
 	// Initailise the scanner state for all defined fixtures.
 	for x := 0; x < numberFixtures; x++ {
 		newScanner := common.ScannerState{}
@@ -433,24 +442,7 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.Type == "rgb" {
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
-
-						// TODO find the scanner sequence number from the config.
-						scannerSequenceNumber := 2
-						sequence.NumberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig, false)
-
 						sequence.ScannerChase = true
-
-						// Since this chaser sequence had no actual fixtures of its own
-						// Scanner state was never created by createSequence.
-						sequence.ScannerState = make(map[int]common.ScannerState, 8)
-
-						// Initailise the scanner state for all defined fixtures.
-						for x := 0; x < sequence.NumberFixtures; x++ {
-							newScanner := common.ScannerState{}
-							newScanner.Enabled = true
-							newScanner.Inverted = false
-							sequence.ScannerState[x] = newScanner
-						}
 						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
 						scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
 						sequence.Steps = scannerChasePattern.Steps
@@ -679,6 +671,7 @@ func PlaySequence(sequence common.Sequence,
 							ScannerOffsetPan:         sequence.ScannerOffsetPan,
 							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
+							ScannerHasShutterChase:   sequence.Functions[common.Function7_Invert_Chase].State,
 						}
 
 						// Start the fixture group.
