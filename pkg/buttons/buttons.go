@@ -976,40 +976,49 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
 			// Send Update RGB Size.
-			this.RGBSize[this.SelectedSequence]--
-			if this.RGBSize[this.SelectedSequence] < 1 {
-				this.RGBSize[this.SelectedSequence] = 1
+			this.RGBSize[targetSequence]--
+			if this.RGBSize[targetSequence] < 1 {
+				this.RGBSize[targetSequence] = 1
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
-					{Name: "RGBSize", Value: this.RGBSize[this.SelectedSequence]},
+					{Name: "RGBSize", Value: this.RGBSize[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[targetSequence]), "size", false, guiButtons)
 			return
 		}
 
-		if sequences[this.SelectedSequence].Type == "scanner" {
+		if sequences[targetSequence].Type == "scanner" {
 			// Send Update Scanner Size.
-			this.ScannerSize[this.SelectedSequence] = this.ScannerSize[this.SelectedSequence] - 10
-			if this.ScannerSize[this.SelectedSequence] < 0 {
-				this.ScannerSize[this.SelectedSequence] = 0
+			this.ScannerSize[targetSequence] = this.ScannerSize[targetSequence] - 10
+			if this.ScannerSize[targetSequence] < 0 {
+				this.ScannerSize[targetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize[this.SelectedSequence]},
+					{Name: "ScannerSize", Value: this.ScannerSize[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[targetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
@@ -1023,40 +1032,49 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
 			// Send Update RGB Size.
-			this.RGBSize[this.SelectedSequence]++
-			if this.RGBSize[this.SelectedSequence] > common.MaxRGBSize {
-				this.RGBSize[this.SelectedSequence] = common.MaxRGBSize
+			this.RGBSize[targetSequence]++
+			if this.RGBSize[targetSequence] > common.MaxRGBSize {
+				this.RGBSize[targetSequence] = common.MaxRGBSize
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
-					{Name: "RGBSize", Value: this.RGBSize[this.SelectedSequence]},
+					{Name: "RGBSize", Value: this.RGBSize[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[targetSequence]), "size", false, guiButtons)
 			return
 		}
 
-		if sequences[this.SelectedSequence].Type == "scanner" {
+		if sequences[targetSequence].Type == "scanner" {
 			// Send Update Scanner Size.
-			this.ScannerSize[this.SelectedSequence] = this.ScannerSize[this.SelectedSequence] + 10
-			if this.ScannerSize[this.SelectedSequence] > common.MaxScannerSize {
-				this.ScannerSize[this.SelectedSequence] = common.MaxScannerSize
+			this.ScannerSize[targetSequence] = this.ScannerSize[targetSequence] + 10
+			if this.ScannerSize[targetSequence] > common.MaxScannerSize {
+				this.ScannerSize[targetSequence] = common.MaxScannerSize
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize[this.SelectedSequence]},
+					{Name: "ScannerSize", Value: this.ScannerSize[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.SelectedSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[targetSequence]), "size", false, guiButtons)
 
 			return
 		}
