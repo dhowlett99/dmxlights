@@ -91,6 +91,7 @@ type CurrentState struct {
 	DmxInterfacePresentConfig *usbdmx.ControllerConfig     // DMX Interface card config.
 	LaunchpadName             string                       // Storage for launchpad config.
 	Chaser                    common.Sequence              // Sequence for chaser.
+	ChaserRunning             bool                         // Chaser is running.
 }
 
 func ProcessButtons(X int, Y int,
@@ -879,12 +880,6 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
-
-			// The scanner sequence has stopped, so show the status of the scanners.
-			if sequences[this.SelectedSequence].Type == "scanner" {
-				// Show the status.
-				ShowScannerStatus(this.SelectedSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
-			}
 
 			this.Running[this.SelectedSequence] = false
 			return
@@ -1747,9 +1742,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
 		}
 
-		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
 		for _, functions := range sequences[this.SelectedSequence].Functions {
 			if Y == functions.SequenceNumber {
 				if !sequences[this.SelectedSequence].Functions[X].State {
@@ -1773,6 +1765,9 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// Get an upto date copy of the sequence.
+		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
 		// Update the function keys in the shutter chaser.
 		if sequences[this.SelectedSequence].Type == "scanner" {
 			// cmd = common.Command{
@@ -1785,12 +1780,14 @@ func ProcessButtons(X int, Y int,
 
 			if sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
 				// Start the shutter chaser.
+				this.ChaserRunning = true
 				cmd = common.Command{
 					Action: common.Start,
 				}
 				common.SendCommandToSequence(4, cmd, commandChannels)
 			} else {
 				// Stop the shutter chaser.
+				this.ChaserRunning = false
 				cmd = common.Command{
 					Action: common.Stop,
 				}
@@ -1799,7 +1796,8 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Light the correct function key.
-		common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		//common.ShowFunctionButtons(*sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		// Now some functions mean that we go into another menu ( set of buttons )
 		// This is true for :-
@@ -1998,7 +1996,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Light the strobe button.
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
-	//Light the start stop button.
+	// Light the start stop button.
 	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 	// First time into function mode we head back to normal mode.
@@ -2058,16 +2056,16 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("Reveal Sequence\n")
 		}
 		common.RevealSequence(this.SelectedSequence, commandChannels)
+
+		// If the chase is running, reveal it.
+		if this.ChaserRunning {
+			common.RevealSequence(4, commandChannels)
+		}
+
 		// Turn off the function mode flag.
 		this.FunctionSelectMode[this.SelectedSequence] = false
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = true
-
-		// Reveal the scanner State
-		if sequences[this.SelectedSequence].Type == "scanner" {
-			// Show the status.
-			ShowScannerStatus(this.SelectedSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
-		}
 
 		return
 	}
@@ -2095,6 +2093,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 			// And reveal the sequence.
 			common.RevealSequence(this.SelectedSequence, commandChannels)
+
+			// If the chase is running, reveal it.
+			if this.ChaserRunning {
+				common.RevealSequence(4, commandChannels)
+			}
 
 			// Editing pattern is over for this sequence.
 			this.EditPatternMode[this.SelectedSequence] = false
@@ -2128,6 +2131,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 		// And reveal the sequence on the launchpad keys
 		common.RevealSequence(this.SelectedSequence, commandChannels)
+
+		// If the chaser is running, reveal it.
+		if this.ChaserRunning {
+			common.RevealSequence(4, commandChannels)
+		}
+
 		// Turn off the function mode flag.
 		this.FunctionSelectMode[this.SelectedSequence] = false
 		// Now forget we pressed twice and start again.
@@ -2157,6 +2166,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// And hide the sequence so we can only see the function buttons.
 		common.HideSequence(this.SelectedSequence, commandChannels)
+
+		// If the chase is running, hide it.
+		common.HideSequence(4, commandChannels)
 
 		// Turn off any static sequence so we can see the functions.
 		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")

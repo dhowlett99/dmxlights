@@ -941,6 +941,10 @@ func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALigh
 
 func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
+	if debug {
+		fmt.Printf("ShowFunctionButtons sequence %d\n", selectedSequence)
+	}
+
 	// Loop through the available functions for this sequence
 	for index, function := range sequence.Functions {
 		if debug {
