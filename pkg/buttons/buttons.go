@@ -725,6 +725,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Speed \n")
 		}
 
+		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
@@ -750,8 +752,6 @@ func ProcessButtons(X int, Y int,
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[targetSequence]), "speed", false, guiButtons)
 			return
 		}
-
-		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// Get an upto date copy of the sequence.
 		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
@@ -1053,41 +1053,50 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
-			this.RGBFade[this.SelectedSequence]--
-			if this.RGBFade[this.SelectedSequence] < 1 {
-				this.RGBFade[this.SelectedSequence] = 1
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
+			this.RGBFade[targetSequence]--
+			if this.RGBFade[targetSequence] < 1 {
+				this.RGBFade[targetSequence] = 1
 			}
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "RGBFadeSpeed", Value: this.RGBFade[this.SelectedSequence]},
+					{Name: "RGBFadeSpeed", Value: this.RGBFade[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[targetSequence]), "fade", false, guiButtons)
 
 			return
 		}
 
 		// Update Coordinates.
-		if sequences[this.SelectedSequence].Type == "scanner" {
+		if sequences[targetSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCoordinates[this.SelectedSequence]--
-			if this.ScannerCoordinates[this.SelectedSequence] < 0 {
-				this.ScannerCoordinates[this.SelectedSequence] = 0
+			this.ScannerCoordinates[targetSequence]--
+			if this.ScannerCoordinates[targetSequence] < 0 {
+				this.ScannerCoordinates[targetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.SelectedSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[targetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
@@ -1103,40 +1112,49 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		if sequences[this.SelectedSequence].Type == "rgb" || sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
-			this.RGBFade[this.SelectedSequence]++
-			if this.RGBFade[this.SelectedSequence] > common.MaxRGBFade {
-				this.RGBFade[this.SelectedSequence] = common.MaxRGBFade
+		// If we're a scanner and we're in shutter chase mode.
+		var targetSequence int
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			sequences[this.SelectedSequence].Functions[common.Function7_Invert_Chase].State {
+			targetSequence = 4
+		} else {
+			targetSequence = this.SelectedSequence
+		}
+
+		if sequences[targetSequence].Type == "rgb" || sequences[targetSequence].Functions[common.Function7_Invert_Chase].State {
+			this.RGBFade[targetSequence]++
+			if this.RGBFade[targetSequence] > common.MaxRGBFade {
+				this.RGBFade[targetSequence] = common.MaxRGBFade
 			}
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.RGBFade[this.SelectedSequence]},
+					{Name: "FadeSpeed", Value: this.RGBFade[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[targetSequence]), "fade", false, guiButtons)
 			return
 		}
 
 		// Update Coordinates.
-		if sequences[this.SelectedSequence].Type == "scanner" {
+		if sequences[targetSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCoordinates[this.SelectedSequence]++
-			if this.ScannerCoordinates[this.SelectedSequence] > 4 {
-				this.ScannerCoordinates[this.SelectedSequence] = 4
+			this.ScannerCoordinates[targetSequence]++
+			if this.ScannerCoordinates[targetSequence] > 4 {
+				this.ScannerCoordinates[targetSequence] = 4
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.SelectedSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[targetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.SelectedSequence])
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[targetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
