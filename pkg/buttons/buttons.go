@@ -31,7 +31,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug = false
+const debug = true
 
 type CurrentState struct {
 	Crash1                    bool                         // Flags to detect launchpad crash.
@@ -125,11 +125,13 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 	if X == 1 && Y == 8 && this.Crash1 {
+		fmt.Printf("CRASH 1\n")
 		this.Crash2 = true
 		return
 	}
 	// Crash 2 message has appeared and this isn't a pad program ack.
 	if X != 0 && Y == 8 && this.Crash2 {
+		fmt.Printf("CRASH 2\n")
 		// Start a supervisor thread which will reset the launchpad every 1/2 second.
 		time.Sleep(200 * time.Millisecond)
 		if this.LaunchPadConnected {
@@ -220,6 +222,10 @@ func ProcessButtons(X int, Y int,
 	if X >= 100 && X < 108 &&
 		(Y > 3 && Y < 7) {
 
+		if debug {
+			fmt.Printf("Preset Pressed X:%d Y:%d\n", X, Y)
+		}
+
 		// Remove the button off offset.
 		X = X - 100
 
@@ -272,6 +278,11 @@ func ProcessButtons(X int, Y int,
 
 	// C L E A R  - clear all from the GUI.
 	if X == 0 && Y == -1 && gui {
+
+		if debug {
+			fmt.Printf("GUI Clear Pressed X:%d Y:%d\n", X, Y)
+		}
+
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
@@ -279,6 +290,10 @@ func ProcessButtons(X int, Y int,
 	// C L E A R  - Start the timer, waiting for a long press to clear all.
 	// Because a short press in scanner mode shifts the scanners up.
 	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
+
+		if debug {
+			fmt.Printf("Clear Pressed Start Timer X:%d Y:%d\n", X, Y)
+		}
 		// Start a timer for this button.
 		here := time.Now()
 		this.ButtonTimer = &here
@@ -287,12 +302,20 @@ func ProcessButtons(X int, Y int,
 
 	//  C L E A R - clear all if we're not in the scanner mode.
 	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type != "scanner" {
+		if debug {
+			fmt.Printf("Clear All If We're Not in Scanner Mode X:%d Y:%d\n", X, Y)
+		}
 		clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
 
 	// C L E A R  - We have a long press.
 	if X == 100 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
+
+		if debug {
+			fmt.Printf("Clear Pressed Long Press X:%d Y:%d\n", X, Y)
+		}
+
 		// Remove the off button offset.
 		X = X - 100
 		// Stop the timer for this preset.
@@ -344,6 +367,10 @@ func ProcessButtons(X int, Y int,
 	// F L O O D
 	if X == 8 && Y == 3 {
 
+		if debug {
+			fmt.Printf("Start FLood X:%d Y:%d\n", X, Y)
+		}
+
 		// Turn off the flashing save button
 		this.SavePreset = false
 		this.SavePreset = false
@@ -387,6 +414,7 @@ func ProcessButtons(X int, Y int,
 
 	// Sound sensitity up.
 	if X == 4 && Y == -1 {
+
 		if debug {
 			fmt.Printf("Sound Up %f\n", this.SoundGain)
 		}
@@ -408,6 +436,7 @@ func ProcessButtons(X int, Y int,
 
 	// Sound sensitity down.
 	if X == 5 && Y == -1 {
+
 		if debug {
 			fmt.Printf("Sound Down%f\n", this.SoundGain)
 		}
@@ -481,6 +510,7 @@ func ProcessButtons(X int, Y int,
 
 	// Save mode.
 	if X == 8 && Y == 4 {
+
 		if debug {
 			fmt.Printf("Save Mode\n")
 		}
@@ -936,6 +966,10 @@ func ProcessButtons(X int, Y int,
 	// S T R O B E - Strobe.
 	if X == 8 && Y == 6 {
 
+		if debug {
+			fmt.Printf("Strobe X:%d Y:%d\n", X, Y)
+		}
+
 		// Turn off the flashing save button
 		this.SavePreset = false
 		this.SavePreset = false
@@ -1341,6 +1375,7 @@ func ProcessButtons(X int, Y int,
 
 		// Invert scanner if we're enabled but not inverted.
 		if this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
+
 			if debug {
 				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
 			}
@@ -1382,6 +1417,7 @@ func ProcessButtons(X int, Y int,
 
 	// DOWN ARROW
 	if X == 1 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+
 		if debug {
 			fmt.Printf("DOWN ARROW\n")
 		}
@@ -1410,6 +1446,7 @@ func ProcessButtons(X int, Y int,
 
 	// LEFT ARROW
 	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+
 		if debug {
 			fmt.Printf("LEFT ARROW\n")
 		}
@@ -1438,6 +1475,7 @@ func ProcessButtons(X int, Y int,
 
 	// RIGHT ARROW
 	if X == 3 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+
 		if debug {
 			fmt.Printf("RIGHT ARROW\n")
 		}
@@ -1500,6 +1538,7 @@ func ProcessButtons(X int, Y int,
 	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
+
 			if debug {
 				fmt.Printf("Choose Static Green X:%d Y:%d\n", X, Y)
 			}
@@ -1528,6 +1567,7 @@ func ProcessButtons(X int, Y int,
 	if X == 3 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
+
 			if debug {
 				fmt.Printf("Choose Static Blue X:%d Y:%d\n", X, Y)
 			}
@@ -1717,6 +1757,10 @@ func ProcessButtons(X int, Y int,
 		!this.FunctionSelectMode[this.SelectedSequence] && // Not in function Mode
 		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On
 
+		if debug {
+			fmt.Printf("Update Static for X %d\n", X)
+		}
+
 		// For this button increment the color.
 		sequences[this.SelectedSequence].StaticColors[X].X = X
 		sequences[this.SelectedSequence].StaticColors[X].Y = Y
@@ -1797,11 +1841,16 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	fmt.Printf("FunctionSelectMode: got %t want true\n", this.FunctionSelectMode[this.SelectedSequence])
-	fmt.Printf("EditPatternMode: got %t want false\n", this.EditPatternMode[this.SelectedSequence])
-	fmt.Printf("EditStaticColorsMode: got %t want false\n", this.EditStaticColorsMode[this.SelectedSequence])
-	fmt.Printf("EditGoboSelectionMode: got %t want false\n", this.EditGoboSelectionMode[this.SelectedSequence])
-	fmt.Printf("Function5_Color: got %t want false\n", this.Functions[this.SelectedSequence][common.Function5_Color].State)
+	fmt.Printf("X\t\t%d\n", X)
+	fmt.Printf("Y\t\t%d\n", Y)
+	fmt.Printf("SelectedSequence\t\t%d\n", this.SelectedSequence)
+	fmt.Printf("Seq type \t\t%s\n", sequences[this.SelectedFixture].Type)
+	fmt.Printf("EditFixtureSelectionMode\t%t \n", this.EditFixtureSelectionMode)
+	fmt.Printf("FunctionSelectMode:\t\t%t \n", this.FunctionSelectMode[this.SelectedSequence])
+	fmt.Printf("EditPatternMode:\t\t%t\n", this.EditPatternMode[this.SelectedSequence])
+	fmt.Printf("EditStaticColorsMode:\t\t%t\n", this.EditStaticColorsMode[this.SelectedSequence])
+	fmt.Printf("EditGoboSelectionMode:\t\t%t\n", this.EditGoboSelectionMode[this.SelectedSequence])
+	fmt.Printf("Function5_Color: \t\t%t\n", this.Functions[this.SelectedSequence][common.Function5_Color].State)
 	fmt.Printf("--------------\n")
 
 	// F U N C T I O N  K E Y S
@@ -1978,7 +2027,7 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditStaticColorsMode[this.SelectedSequence] = true   // Turn on edit static color mode.
-			// this.FunctionSelectMode[this.SelectedSequence] = false    // Turn off functions.
+			this.FunctionSelectMode[this.SelectedSequence] = false    // Turn off functions.
 
 			// Go straight to static color selection mode, don't wait for a another select press.
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
