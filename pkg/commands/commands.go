@@ -67,8 +67,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Static = false
 		sequence.PlayStaticOnce = true
 		// Stop the sequence.
-		sequence.Functions[common.Function8_Music_Trigger].State = false
-		sequence.Functions[common.Function6_Static_Gobo].State = false
+		//this.Functions[common.Function8_Music_Trigger].State = false
+		//	this.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Clear = true
@@ -121,15 +121,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.UpdatePattern = true
 			sequence.SelectedPattern = common.DefaultPattern
 			// Clear all the function buttons for this sequence.
-			sequence.Functions[common.Function1_Pattern].State = false
-			sequence.Functions[common.Function2_Auto_Color].State = false
-			sequence.Functions[common.Function3_Auto_Pattern].State = false
-			sequence.Functions[common.Function4_Bounce].State = false
-			sequence.Functions[common.Function5_Color].State = false
-			sequence.Functions[common.Function6_Static_Gobo].State = false
-			sequence.Functions[common.Function7_Invert_Chase].State = false
-			sequence.Functions[common.Function8_Music_Trigger].State = false
-			sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
+			// this.Functions[common.Function1_Pattern].State = false
+			// this.Functions[common.Function2_Auto_Color].State = false
+			// sequence.Functions[common.Function3_Auto_Pattern].State = false
+			// sequence.Functions[common.Function4_Bounce].State = false
+			// sequence.Functions[common.Function5_Color].State = false
+			// sequence.Functions[common.Function6_Static_Gobo].State = false
+			// sequence.Functions[common.Function7_Invert_Chase].State = false
+			// sequence.Functions[common.Function8_Music_Trigger].State = false
+			// sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
 		}
 		if sequence.Type == "switch" {
 			if debug {
@@ -253,8 +253,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		sequence.Functions[common.Function8_Music_Trigger].State = false
-		sequence.Functions[common.Function6_Static_Gobo].State = false
+		//sequence.Functions[common.Function8_Music_Trigger].State = false
+		//sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Static = false
@@ -325,7 +325,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.PlayStaticOnce = true
 		}
 		// Restore the state of the music trigger flag.
-		sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
+		//sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
 		sequence.MusicTrigger = sequence.LastMusicTrigger
 		return sequence
 
@@ -353,17 +353,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Blackout = false
 		return sequence
 
-	case common.UpdateFunctions:
-		const FUNCTIONS = 0
+	case common.UpdateBounce:
+		const STATE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Functions\n", mySequenceNumber)
-			for _, function := range command.Args[FUNCTIONS].Value.([]common.Function) {
-				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
-			}
+			fmt.Printf("%d: Command Update Bounce to %t\n", mySequenceNumber, command.Args[STATE].Value)
 		}
-		// Setup the actions based on the state of the function keys.
-		sequence = common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
-
+		sequence.Bounce = command.Args[STATE].Value.(bool)
 		return sequence
 
 	case common.UpdateStatic:
@@ -374,6 +369,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
+		return sequence
 
 	case common.UpdateMode:
 		const MODE = 0
@@ -645,6 +641,26 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update ScannerChase to %t \n", mySequenceNumber, command.Args[SCANNER_CHASE].Value)
 		}
 		sequence.ScannerChase = command.Args[SCANNER_CHASE].Value.(bool)
+		return sequence
+
+	case common.UpdateMusicTrigger:
+		const STATE = 0
+		if debug {
+			fmt.Printf("%d: Command Update Music Trigger to %t \n", mySequenceNumber, command.Args[STATE].Value)
+		}
+		sequence.MusicTrigger = command.Args[STATE].Value.(bool)
+		sequence.Run = true
+		sequence.Mode = "Sequence"
+		sequence.UpdatePattern = true
+		sequence.Static = false
+		return sequence
+
+	case common.UpdateScannerHasShutterChase:
+		const STATE = 0
+		if debug {
+			fmt.Printf("%d: Command Update ScannerHasShutterChase to %t \n", mySequenceNumber, command.Args[STATE].Value)
+		}
+		sequence.ScannerHasShutterChase = command.Args[STATE].Value.(bool)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.

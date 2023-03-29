@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"os"
 	"os/signal"
+	"strconv"
 	"sync"
 	"syscall"
 	"time"
@@ -93,6 +94,7 @@ func main() {
 	this.LaunchPadConnected = true                                 // Assume launchpad is present, until tested.
 	this.DmxInterfacePresent = true                                // Assume DMX interface card is present, until tested.
 	this.LaunchpadName = "Novation Launchpad Mk3 Mini"             // Name of launchpad.
+	this.Functions = make(map[int][]common.Function)               // Array holding functions for each sequence.
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
@@ -230,6 +232,59 @@ func main() {
 		this.RGBFade[sequenceNumber] = common.DefaultRGBFade                       // Set the default fade time for RGB fixtures.
 		this.ScannerFade[sequenceNumber] = common.DefaultScannerFade               // Set the default fade time for scanners.
 		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
+
+		if newSequence.Label == "chaser" {
+			this.ChaserSequenceNumber = sequenceNumber
+		}
+
+		if newSequence.Type == "scanner" {
+			this.ScannerSequenceNumber = sequenceNumber
+		}
+		// Setup Functions Labels.
+		if newSequence.Type == "rgb" {
+			this.FunctionLabels[0] = "RGB\nPatten"
+			this.FunctionLabels[1] = "RGB\nAuto\nColor"
+			this.FunctionLabels[2] = "RGB\nAuto\nPatten"
+			this.FunctionLabels[3] = "RGB\nBounce"
+			this.FunctionLabels[4] = "RGB\nChase\nColor"
+			this.FunctionLabels[5] = "RGB\nStatic\nColor"
+			this.FunctionLabels[6] = "RGB\nInvert"
+			this.FunctionLabels[7] = "RGB\nMusic"
+		}
+
+		if newSequence.Type == "scanner" && newSequence.Label != "chaser" {
+			this.FunctionLabels[0] = "Scan\nPatten"
+			this.FunctionLabels[1] = "Scan\nAuto\nColor"
+			this.FunctionLabels[2] = "Scan\nAuto\nPatten"
+			this.FunctionLabels[3] = "Scan\nBounce"
+			this.FunctionLabels[4] = "Scan\nColor"
+			this.FunctionLabels[5] = "Scan\nGobo"
+			this.FunctionLabels[6] = "Chase"
+			this.FunctionLabels[7] = "Scan\nMusic"
+		}
+
+		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
+			this.FunctionLabels[0] = "Chase\nPatten"
+			this.FunctionLabels[1] = "Chase\nAuto\nColor"
+			this.FunctionLabels[2] = "Chase\nAuto\nPatten"
+			this.FunctionLabels[3] = "Chase\nBounce"
+			this.FunctionLabels[4] = "Chase\nColor"
+			this.FunctionLabels[5] = "Chase\nGobo"
+			this.FunctionLabels[6] = "Chase"
+			this.FunctionLabels[7] = "Chase\nMusic"
+		}
+
+		// Make functions for each of the sequences.
+		for function := 0; function < 8; function++ {
+			newFunction := common.Function{
+				Name:           strconv.Itoa(function),
+				SequenceNumber: sequenceNumber,
+				Number:         function,
+				State:          false,
+				Label:          this.FunctionLabels[function],
+			}
+			this.Functions[sequenceNumber] = append(this.Functions[sequenceNumber], newFunction)
+		}
 	}
 
 	// Create all the channels I need.

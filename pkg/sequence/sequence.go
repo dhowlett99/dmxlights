@@ -199,40 +199,7 @@ func CreateSequence(
 		GuiFixtureLabels:       fixtureLabels,
 	}
 
-	if sequence.Type == "rgb" {
-		sequence.GuiFunctionLabels[0] = "Set\nPatten"
-		sequence.GuiFunctionLabels[1] = "Auto\nColor"
-		sequence.GuiFunctionLabels[2] = "Auto\nPatten"
-		sequence.GuiFunctionLabels[3] = "Bounce"
-		sequence.GuiFunctionLabels[4] = "Chase\nColor"
-		sequence.GuiFunctionLabels[5] = "Static\nColor"
-		sequence.GuiFunctionLabels[6] = "Invert"
-		sequence.GuiFunctionLabels[7] = "Music"
-	}
-
-	if sequence.Type == "scanner" {
-		sequence.GuiFunctionLabels[0] = "Set\nPatten"
-		sequence.GuiFunctionLabels[1] = "Auto\nColor"
-		sequence.GuiFunctionLabels[2] = "Auto\nPatten"
-		sequence.GuiFunctionLabels[3] = "Bounce"
-		sequence.GuiFunctionLabels[4] = "Color"
-		sequence.GuiFunctionLabels[5] = "Gobo"
-		sequence.GuiFunctionLabels[6] = "Chase"
-		sequence.GuiFunctionLabels[7] = "Music"
-	}
-
 	sequence.ScannerPositions = make(map[int]map[int]common.Position, sequence.NumberFixtures)
-	// Make functions for each of the sequences.
-	for function := 0; function < 8; function++ {
-		newFunction := common.Function{
-			Name:           strconv.Itoa(function),
-			SequenceNumber: mySequenceNumber,
-			Number:         function,
-			State:          false,
-			Label:          sequence.GuiFunctionLabels[function],
-		}
-		sequence.Functions = append(sequence.Functions, newFunction)
-	}
 
 	if sequenceType == "switch" {
 		// Load the switch information in from the fixtures.yaml file.
@@ -381,12 +348,12 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
-			if debug {
-				fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
-			}
+			//if debug {
+			fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
+			//}
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
-			sequence.Functions[common.Function8_Music_Trigger].State = false
+			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
@@ -420,8 +387,6 @@ func PlaySequence(sequence common.Sequence,
 				if debug {
 					fmt.Printf("sequence %d type %s label %s Running mode\n", mySequenceNumber, sequence.Type, sequence.Label)
 				}
-				// Map music trigger function.
-				sequence.MusicTrigger = sequence.Functions[common.Function8_Music_Trigger].State
 
 				// If the music trigger is being used then the timer is disabled.
 				for triggerNumber, trigger := range channels.SoundTriggers {
@@ -671,7 +636,7 @@ func PlaySequence(sequence common.Sequence,
 							ScannerOffsetPan:         sequence.ScannerOffsetPan,
 							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
-							ScannerHasShutterChase:   sequence.Functions[common.Function7_Invert_Chase].State,
+							ScannerHasShutterChase:   sequence.ScannerHasShutterChase,
 						}
 
 						// Start the fixture group.

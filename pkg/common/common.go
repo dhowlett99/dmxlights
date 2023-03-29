@@ -177,6 +177,7 @@ const (
 	Reset
 	UpdateMode
 	UpdateStatic
+	UpdateBounce
 	UpdateStaticColor
 	UpdateSequenceColor
 	PlayStaticOnce
@@ -230,6 +231,8 @@ const (
 	UpdateOffsetTilt
 	EnableAllScanners
 	UpdateScannerChase
+	UpdateMusicTrigger
+	UpdateScannerHasShutterChase
 )
 
 // A full step cycle is 39 ticks ie 39 values.
@@ -287,7 +290,6 @@ type Sequence struct {
 	ScannerPositions            map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
 	AutoColor                   bool                        // Sequence is going to automatically change the color.
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
-	GuiFunctionLabels           [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
@@ -336,12 +338,12 @@ type Sequence struct {
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor         bool                        // Command to update the sequence colors.
-	Functions                   []Function                  // Storage for the sequence functions.
 	FunctionMode                bool                        // This sequence is in function mode.
 	Switches                    []Switch                    // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
+	ScannerHasShutterChase      bool                        //Flag to indicate Scanner is in Shutter chase mode
 }
 
 type Function struct {
@@ -510,23 +512,6 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 			commandChannels[index] <- command
 		}
 	}
-}
-
-func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
-
-	// The target set of buttons.
-	ClearSelectedRowOfButtons(selectedSequence, eventsForLauchpad, guiButtons)
-
-	// Get an upto date copy of the sequence.
-	cmd := Command{
-		Action: ReadConfig,
-	}
-	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
-
-	replyChannel := channels.ReplyChannels[selectedSequence]
-	sequence := <-replyChannel
-
-	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
 
 func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
@@ -797,51 +782,51 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	return code
 }
 
-func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
+// func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
 
-	// Map the auto color change setting.
-	sequence.AutoColor = functions[Function2_Auto_Color].State
+// 	// Map the auto color change setting.
+// 	sequence.AutoColor = functions[Function2_Auto_Color].State
 
-	// Map the auto pattern change setting.
-	sequence.AutoPattern = functions[Function3_Auto_Pattern].State
+// 	// Map the auto pattern change setting.
+// 	sequence.AutoPattern = functions[Function3_Auto_Pattern].State
 
-	// Map bounce function to sequence bounce setting.
-	sequence.Bounce = functions[Function4_Bounce].State
+// 	// Map bounce function to sequence bounce setting.
+// 	sequence.Bounce = functions[Function4_Bounce].State
 
-	// Map color selection function.
-	if functions[Function5_Color].State {
-		sequence.PlayStaticOnce = true
-	}
+// 	// Map color selection function.
+// 	if functions[Function5_Color].State {
+// 		sequence.PlayStaticOnce = true
+// 	}
 
-	// Map static function.
-	if sequence.Type != "scanner" {
-		sequence.Static = functions[Function6_Static_Gobo].State
-		if functions[Function6_Static_Gobo].State {
-			sequence.PlayStaticOnce = true
-			sequence.Hide = true
-		}
-	}
+// 	// Map static function.
+// 	if sequence.Type != "scanner" {
+// 		sequence.Static = functions[Function6_Static_Gobo].State
+// 		if functions[Function6_Static_Gobo].State {
+// 			sequence.PlayStaticOnce = true
+// 			sequence.Hide = true
+// 		}
+// 	}
 
-	// Map RGB invert function.
-	if sequence.Type == "rgb" {
-		sequence.RGBInvert = functions[Function7_Invert_Chase].State
-	}
+// 	// Map RGB invert function.
+// 	if sequence.Type == "rgb" {
+// 		sequence.RGBInvert = functions[Function7_Invert_Chase].State
+// 	}
 
-	// Map scanner chase mode. Uses same function key as above.
-	if sequence.Type == "scanner" {
-		sequence.ScannerChase = functions[Function7_Invert_Chase].State
-	}
+// 	// Map scanner chase mode. Uses same function key as above.
+// 	if sequence.Type == "scanner" {
+// 		sequence.ScannerChase = functions[Function7_Invert_Chase].State
+// 	}
 
-	// Map music trigger function.
-	sequence.MusicTrigger = functions[Function8_Music_Trigger].State
-	if functions[Function8_Music_Trigger].State {
-		sequence.Run = true
-	}
+// 	// Map music trigger function.
+// 	sequence.MusicTrigger = functions[Function8_Music_Trigger].State
+// 	if functions[Function8_Music_Trigger].State {
+// 		sequence.Run = true
+// 	}
 
-	sequence.Functions = functions
+// 	this.Functions = functions
 
-	return sequence
-}
+// 	return sequence
+// }
 
 func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 
@@ -936,27 +921,6 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALight) {
 	for x := 0; x < 8; x++ {
 		LabelButton(x, selectedSequence, "", guiButtons)
-	}
-}
-
-func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
-	if debug {
-		fmt.Printf("ShowFunctionButtons sequence %d\n", selectedSequence)
-	}
-
-	// Loop through the available functions for this sequence
-	for index, function := range sequence.Functions {
-		if debug {
-			fmt.Printf("ShowFunctionButtons: function %+v\n", function)
-		}
-
-		if function.State {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-		} else {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-		}
-		LabelButton(index, selectedSequence, function.Label, guiButtons)
 	}
 }
 
