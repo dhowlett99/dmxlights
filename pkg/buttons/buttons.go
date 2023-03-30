@@ -2021,7 +2021,8 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Function 7 - Toggle the shutter chaser mode.
-		if !this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State && X == common.Function7_Invert_Chase {
+		if X == common.Function7_Invert_Chase && !this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			sequences[this.SelectedSequence].Type == "scanner" {
 
 			// Tell the scannern & chaser sequences that the scanner shutter chase is on.
 			cmd := common.Command{
@@ -2048,7 +2049,8 @@ func ProcessButtons(X int, Y int,
 
 			return
 		}
-		if this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State && X == common.Function7_Invert_Chase {
+		if X == common.Function7_Invert_Chase && this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			sequences[this.SelectedSequence].Type == "scanner" {
 
 			// Tell the scanner & chase sequence that the scanner shutter chase is off.
 			cmd := common.Command{
