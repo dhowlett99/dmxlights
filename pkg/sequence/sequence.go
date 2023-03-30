@@ -207,6 +207,12 @@ func CreateSequence(
 		sequence.PlaySwitchOnce = true
 	}
 
+	if sequenceType == "scanner" {
+		// Get available scanner patterns.
+		sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+		sequence.UpdatePattern = false
+	}
+
 	return sequence
 }
 
@@ -410,12 +416,6 @@ func PlaySequence(sequence common.Sequence,
 			sequence.PlayStaticOnce = false
 			sequence.Static = false
 			continue
-		}
-
-		if sequence.Type == "scanner" {
-			// Get available scanner patterns.
-			sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
-			sequence.UpdatePattern = false
 		}
 
 		// Sequence in Normal Running Mode.
@@ -1014,6 +1014,10 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 // All scanner patterns have the same number of steps defined by NumberCoordinates.
 func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern {
 
+	if debug {
+		fmt.Printf("getAvailableScannerPattens\n")
+	}
+
 	scannerPattens := make(map[int]common.Pattern)
 
 	// Scanner circle pattern 0
@@ -1054,6 +1058,12 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 	stopPatten.Number = 4
 	stopPatten.Label = "Stop"
 	scannerPattens[4] = stopPatten
+
+	if debug {
+		for _, pattern := range scannerPattens {
+			fmt.Printf("Made a pattern called %s\n", pattern.Name)
+		}
+	}
 
 	return scannerPattens
 
