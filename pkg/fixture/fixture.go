@@ -291,6 +291,10 @@ func FixtureReceiver(
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
+			if cmd.RGBStatic {
+				turnOffFixture(myFixtureNumber, mySequenceNumber, fixtures, dmxController, dmxInterfacePresent)
+				continue
+			}
 			// Play out fixture to DMX channels.
 			fixture := cmd.RGBPosition.Fixtures[myFixtureNumber]
 			for _, color := range fixture.Colors {

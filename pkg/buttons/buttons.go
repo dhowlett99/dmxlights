@@ -844,10 +844,10 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("--->HandleSelect 2\n")
 		fmt.Printf("Static Funct %t\n", this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-		cmd := common.Command{
-			Action: common.PlayStaticOnce,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		// cmd := common.Command{
+		// 	Action: common.PlayStaticOnce,
+		// }
+		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
@@ -867,10 +867,10 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("--->HandleSelect 3\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		cmd := common.Command{
-			Action: common.PlayStaticOnce,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		// cmd := common.Command{
+		// 	Action: common.PlayStaticOnce,
+		// }
+		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
@@ -890,10 +890,10 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("--->HandleSelect 4\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		cmd := common.Command{
-			Action: common.PlayStaticOnce,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		// cmd := common.Command{
+		// 	Action: common.PlayStaticOnce,
+		// }
+		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
@@ -1968,17 +1968,6 @@ func ProcessButtons(X int, Y int,
 			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-
-		// if this.Functions[targetSequence][common.Function4_Bounce].State {
-		// 	// Swicth on any static colors.
-		// 	cmd := common.Command{
-		// 		Action: common.UpdateStatic,
-		// 		Args: []common.Arg{
-		// 			{Name: "Static", Value: true},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(targetSequence, cmd, commandChannels)
-		// }
 
 		// Map Function 5 RGB - Go straight into RGB color edit mode, don't wait for a another select press.
 		if X == common.Function5_Color && sequences[targetSequence].Type == "rgb" {

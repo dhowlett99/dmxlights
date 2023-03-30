@@ -351,6 +351,8 @@ func PlaySequence(sequence common.Sequence,
 			//if debug {
 			fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
 			//}
+
+			sequence.Static = true
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
@@ -371,7 +373,41 @@ func PlaySequence(sequence common.Sequence,
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sequence.Static = false
 			sequence.PlayStaticOnce = false
+			continue
+		}
+
+		// Turn Static Mode Off
+		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
+			//if debug {
+			fmt.Printf("sequence %d Static Off mode\n", mySequenceNumber)
+			//}
+
+			sequence.Static = false
+
+			// Turn off any music trigger for this sequence.
+			sequence.MusicTrigger = false
+			// this.Functions[common.Function8_Music_Trigger].State = false
+			channels.SoundTriggers[mySequenceNumber].State = false
+
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Type:            sequence.Type,
+				SequenceNumber:  sequence.Number,
+				RGBStatic:       !sequence.Static,
+				RGBStaticColors: sequence.StaticColors,
+				Hide:            sequence.Hide,
+				Master:          sequence.Master,
+				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
+				Blackout:        sequence.Blackout,
+			}
+
+			// Now tell all the fixtures what they need to do.
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sequence.PlayStaticOnce = false
+			sequence.Static = false
 			continue
 		}
 
