@@ -965,6 +965,7 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
+					{Name: "STROBE_STATE", Value: false},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
@@ -983,6 +984,7 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
+					{Name: "STROBE_STATE", Value: true},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
