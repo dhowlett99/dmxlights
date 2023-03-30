@@ -31,7 +31,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-const debug = true
+const debug = false
 
 type CurrentState struct {
 	Crash1                    bool                         // Flags to detect launchpad crash.
@@ -2010,6 +2010,11 @@ func ProcessButtons(X int, Y int,
 		// Function 6 RGB - edit static color if we are a RGB sequence.
 		if !this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && X == common.Function6_Static_Gobo {
 
+			// Starting a static sequence will turn off a running chaser, so turn off the start lamp
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			//  and remember that this sequence is off.
+			this.Running[this.SelectedSequence] = false
+
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 
 			fmt.Printf("Start Static Mode\n")
@@ -2059,7 +2064,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			// this.SelectButtonPressed[this.SelectedSequence] = true
-
+			common.RevealSequence(this.SelectedSequence, commandChannels)
 			// Light the correct function key.
 			return
 		}
@@ -2309,6 +2314,30 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 			// Show the colors
 			ShowRGBColorSelectionButtons(this.MasterBrightness, this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			return
+		}
+
+		// We're in RGB Static Color Mode.
+		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && sequences[this.SelectedSequence].Type == "rgb" {
+			if debug {
+				fmt.Printf("Show RGB Static Colors\n")
+			}
+			this.EditStaticColorsMode[this.SelectedSequence] = true
+
+			// Tell the sequence about the new color and where we are in the
+			// color cycle.
+			cmd := common.Command{
+				Action: common.UpdateStaticColor,
+				Args: []common.Arg{
+					{Name: "Static", Value: true},
+					{Name: "StaticLamp", Value: this.LastStaticColorButtonX},
+					{Name: "StaticLampFlash", Value: true},
+					{Name: "SelectedColor", Value: sequences[this.SelectedSequence].StaticColors[this.LastStaticColorButtonX].SelectedColor},
+					{Name: "StaticColor", Value: sequences[this.SelectedSequence].StaticColors[this.LastStaticColorButtonX].Color},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
 			return
 		}
 
@@ -3175,8 +3204,6 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 }
 
 func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
-
-	debug := true
 
 	if debug {
 		fmt.Printf("ShowFunctionButtons sequence %d\n", selectedSequence)

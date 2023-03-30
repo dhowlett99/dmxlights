@@ -393,15 +393,16 @@ func PlaySequence(sequence common.Sequence,
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Type:            sequence.Type,
-				SequenceNumber:  sequence.Number,
-				RGBStatic:       !sequence.Static,
-				RGBStaticColors: sequence.StaticColors,
-				Hide:            sequence.Hide,
-				Master:          sequence.Master,
-				StrobeSpeed:     sequence.StrobeSpeed,
-				Strobe:          sequence.Strobe,
-				Blackout:        sequence.Blackout,
+				Type:              sequence.Type,
+				SequenceNumber:    sequence.Number,
+				RGBStatic:         sequence.Static,
+				RGBPlayStaticOnce: sequence.PlayStaticOnce,
+				RGBStaticColors:   sequence.StaticColors,
+				Hide:              sequence.Hide,
+				Master:            sequence.Master,
+				StrobeSpeed:       sequence.StrobeSpeed,
+				Strobe:            sequence.Strobe,
+				Blackout:          sequence.Blackout,
 			}
 
 			// Now tell all the fixtures what they need to do.

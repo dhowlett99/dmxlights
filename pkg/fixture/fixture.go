@@ -291,8 +291,9 @@ func FixtureReceiver(
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
-			if cmd.RGBStatic {
+			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce {
 				turnOffFixture(myFixtureNumber, mySequenceNumber, fixtures, dmxController, dmxInterfacePresent)
+				common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				continue
 			}
 			// Play out fixture to DMX channels.

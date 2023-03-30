@@ -399,9 +399,10 @@ type FixtureCommand struct {
 	StopFlood  bool
 
 	// RGB commands.
-	RGBPosition     Position
-	RGBStatic       bool
-	RGBStaticColors []StaticColorButton
+	RGBPosition       Position
+	RGBStatic         bool
+	RGBStaticColors   []StaticColorButton
+	RGBPlayStaticOnce bool
 
 	// Scanner Commands.
 	ScannerColor             int

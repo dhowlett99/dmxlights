@@ -369,6 +369,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
+		sequence.Run = false
 		return sequence
 
 	case common.UpdateMode:
