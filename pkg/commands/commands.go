@@ -249,6 +249,26 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = true
 		return sequence
 
+	case common.StartChase:
+		if debug {
+			fmt.Printf("%d: Command StartChase\n", mySequenceNumber)
+		}
+		sequence.ScannerChaser = true
+		sequence.Mode = "Sequence"
+		sequence.Static = false
+		sequence.Run = true
+		return sequence
+
+	case common.StopChase:
+		if debug {
+			fmt.Printf("%d: Command Stop Chase\n", mySequenceNumber)
+		}
+		sequence.ScannerChaser = false
+		sequence.Mode = "Sequence"
+		sequence.Static = false
+		sequence.Run = false
+		return sequence
+
 	case common.Stop:
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
@@ -642,7 +662,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update ScannerChase to %t \n", mySequenceNumber, command.Args[SCANNER_CHASE].Value)
 		}
-		sequence.ScannerChase = command.Args[SCANNER_CHASE].Value.(bool)
+		sequence.ScannerChaser = command.Args[SCANNER_CHASE].Value.(bool)
 		return sequence
 
 	case common.UpdateMusicTrigger:
@@ -662,7 +682,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update ScannerHasShutterChase to %t \n", mySequenceNumber, command.Args[STATE].Value)
 		}
-		sequence.ScannerHasShutterChase = command.Args[STATE].Value.(bool)
+		sequence.ScannerChaser = command.Args[STATE].Value.(bool)
 		return sequence
 
 	// If we are being asekd to load a config, use the new sequence.

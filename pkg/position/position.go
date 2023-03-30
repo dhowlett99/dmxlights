@@ -53,13 +53,13 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 							// A faded up and down color.
 							for _, slope := range sequence.FadeUpAndDown {
 								//fmt.Printf("--CALC--> Fixture %d Enabled %t\n", fixtureNumber, sequence.ScannerState[fixtureNumber].Enabled)
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range sequence.FadeUpAndDown {
-								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -72,14 +72,14 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 									break
 								}
 								// A black lamp.
-								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range sequence.FadeDownAndUp {
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -111,13 +111,13 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range sequence.FadeUpAndDown {
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range sequence.FadeUpAndDown {
-								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -130,14 +130,14 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 									break
 								}
 								// A black lamp.
-								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range sequence.FadeDownAndUp {
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -164,13 +164,13 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range sequence.FadeUpAndDown {
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						} else {
 							// A solid on color.
 							for range sequence.FadeUpAndDown {
-								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -183,14 +183,14 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 									break
 								}
 								// A black lamp.
-								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, 0, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 								shiftCounter++
 							}
 						} else {
 							// A fading to black lamp.
 							for _, slope := range sequence.FadeDownAndUp {
-								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChase)
+								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}
 						}
@@ -237,7 +237,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 		}
 	}
 
-	positionsOut := assemblePositions(fadeColors, counter, sequence.EnabledNumberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChase, sequence.Optimisation)
+	positionsOut := assemblePositions(fadeColors, counter, sequence.EnabledNumberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChaser, sequence.Optimisation)
 
 	return positionsOut, len(positionsOut)
 

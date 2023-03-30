@@ -102,7 +102,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBSize:       255,
 					RGBFade:       0,
 					ScannerState:  allFixturesEnabled,
-					ScannerChase:  false,
+					ScannerChaser: false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -1112,7 +1112,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown: []int{255},
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
-					ScannerChase:  false,
+					ScannerChaser: false,
 					ScannerState:  allFixturesEnabled,
 					Steps: []common.Step{
 						{
@@ -1221,7 +1221,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerChase:  false,
+					ScannerChaser: false,
 					Steps: []common.Step{
 						{
 
@@ -1307,7 +1307,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerChase:  false,
+					ScannerChaser: false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -1376,7 +1376,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp: []int{0},
 					Optimisation:  false,
 					ScannerState:  allFixturesEnabled,
-					ScannerChase:  false,
+					ScannerChaser: false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{

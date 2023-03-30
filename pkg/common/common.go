@@ -185,7 +185,9 @@ const (
 	UnHide
 	Hide
 	Start
+	StartChase
 	Stop
+	StopChase
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
@@ -324,7 +326,7 @@ type Sequence struct {
 	ScannerSize                 int                         // The selected scanner size.
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
-	ScannerChase                bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerChaser               bool                        // Chase the scanner shutters instead of allways being on.
 	ScannerInvert               bool                        // Invert the scanner, i.e scanner in the opposite direction.
 	ScannerColor                map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates          []int                       // Number of scanner coordinates.
@@ -343,7 +345,7 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
-	ScannerHasShutterChase      bool                        //Flag to indicate Scanner is in Shutter chase mode
+	//ScannerHasShutterChase      bool                        // Flag to indicate Scanner is in Shutter chase mode
 }
 
 type Function struct {
@@ -409,7 +411,7 @@ type FixtureCommand struct {
 	ScannerPosition          Position
 	ScannerState             ScannerState
 	ScannerDisableOnce       bool
-	ScannerChase             bool
+	ScannerChaser            bool
 	ScannerAvailableColors   []StaticColorButton
 	ScannerGobo              int
 	ScannerOffsetPan         int

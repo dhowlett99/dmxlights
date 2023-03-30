@@ -360,7 +360,7 @@ func PlaySequence(sequence common.Sequence,
 
 			sequence.Static = true
 			// Turn off any music trigger for this sequence.
-			sequence.MusicTrigger = false
+			//sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
@@ -393,7 +393,7 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Static = false
 
 			// Turn off any music trigger for this sequence.
-			sequence.MusicTrigger = false
+			//sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
@@ -444,7 +444,7 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.Type == "rgb" {
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
-						sequence.ScannerChase = true
+						sequence.ScannerChaser = true
 						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
 						scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
 						sequence.Steps = scannerChasePattern.Steps
@@ -667,13 +667,13 @@ func PlaySequence(sequence common.Sequence,
 							ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
 							ScannerState:             sequence.ScannerState[fixtureNumber],
 							ScannerDisableOnce:       sequence.DisableOnce[fixtureNumber],
-							ScannerChase:             sequence.ScannerChase,
+							ScannerChaser:            sequence.ScannerChaser,
 							ScannerColor:             sequence.ScannerColor[fixtureNumber],
 							ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],
 							ScannerOffsetPan:         sequence.ScannerOffsetPan,
 							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
-							ScannerHasShutterChase:   sequence.ScannerHasShutterChase,
+							//ScannerHasShutterChase:   sequence.ScannerHasShutterChase,
 						}
 
 						// Start the fixture group.
@@ -1022,7 +1022,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// Scanner circle pattern 0
 	coordinates := pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetPan), float64(sequence.ScannerOffsetTilt))
-	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.ScannerState)
 	circlePatten.Name = "circle"
 	circlePatten.Number = 0
 	circlePatten.Label = "Circle"
@@ -1030,7 +1030,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// Scanner left right pattern 1
 	coordinates = pattern.ScanGeneratorLeftRight(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.ScannerState)
 	leftRightPatten.Name = "leftright"
 	leftRightPatten.Number = 1
 	leftRightPatten.Label = "Left.Right"
@@ -1038,7 +1038,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// // Scanner up down pattern 2
 	coordinates = pattern.ScanGeneratorUpDown(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.ScannerState)
 	upDownPatten.Name = "updown"
 	upDownPatten.Number = 2
 	upDownPatten.Label = "Up.Down"
@@ -1046,14 +1046,14 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 
 	// // Scanner zig zag pattern 3
 	coordinates = pattern.ScanGenerateSineWave(float64(sequence.ScannerSize), 5000, float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]))
-	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.ScannerState)
 	zigZagPatten.Name = "zigzag"
 	zigZagPatten.Number = 3
 	zigZagPatten.Label = "Zig.Zag"
 	scannerPattens[3] = zigZagPatten
 
 	coordinates = []pattern.Coordinate{{Pan: 127, Tilt: 127}}
-	stopPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChase, sequence.ScannerState)
+	stopPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.ScannerState)
 	stopPatten.Name = "stop"
 	stopPatten.Number = 4
 	stopPatten.Label = "Stop"

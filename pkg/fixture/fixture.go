@@ -313,12 +313,12 @@ func FixtureReceiver(
 					}
 					// Fixture brightness is sent as master in this case.
 					// TODO Integrate cmd.master with fixture.Brightness.
-					MapFixtures(true, cmd.ScannerHasShutterChase, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {
 					if !cmd.Hide {
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 					}
-					MapFixtures(false, cmd.ScannerHasShutterChase, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					MapFixtures(false, cmd.ScannerChaser, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				}
 			}
 		}
@@ -363,11 +363,11 @@ func FixtureReceiver(
 				// brightness for control. Which means I need to combine the master and the control brightness
 				// at this stage.
 				scannerBrightness := int(math.Round((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55)))
-				MapFixtures(false, cmd.ScannerHasShutterChase, mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
+				MapFixtures(false, cmd.ScannerChaser, mySequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
 					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
-					if cmd.ScannerChase {
+					if cmd.ScannerChaser {
 						// We are chase mode, we want the buttons to be the color selected for this scanner.
 						// Remember that fixtures in the real world start with 1 not 0.
 						//realFixture := myFixtureNumber + 1

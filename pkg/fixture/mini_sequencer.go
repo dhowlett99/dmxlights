@@ -222,7 +222,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			ScannerInvert:  false,
 			RGBInvert:      false,
 			Bounce:         false,
-			ScannerChase:   false,
+			ScannerChaser:  false,
 			RGBShift:       1,
 			RGBCoordinates: common.DefaultRGBCoordinates,
 		}

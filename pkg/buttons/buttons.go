@@ -93,7 +93,7 @@ type CurrentState struct {
 	DmxInterfacePresentConfig *usbdmx.ControllerConfig     // DMX Interface card config.
 	LaunchpadName             string                       // Storage for launchpad config.
 	Chaser                    common.Sequence              // Sequence for chaser.
-	ChaserRunning             bool                         // Chaser is running.
+	ScannerChaser             bool                         // Chaser is running.
 	ChaserSequenceNumber      int                          // Chaser sequence number, setup at start.
 	ScannerSequenceNumber     int                          // Scanner sequence number, setup at start.
 }
@@ -2022,53 +2022,61 @@ func ProcessButtons(X int, Y int,
 		// Function 7 - Toggle the shutter chaser mode.
 		if X == common.Function7_Invert_Chase && !this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
 			sequences[this.SelectedSequence].Type == "scanner" {
+
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
+			this.ScannerChaser = true
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
 			// Tell the scannern & chaser sequences that the scanner shutter chase is on.
 			cmd := common.Command{
 				Action: common.UpdateScannerHasShutterChase,
 				Args: []common.Arg{
-					{Name: "ScannerHasShutterChase", Value: true},
+					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 				},
 			}
 			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
 			cmd = common.Command{
-				Action: common.Start,
-				Args: []common.Arg{
-					{Name: "Start Chase", Value: true},
-				},
+				Action: common.StartChase,
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
-			this.ChaserRunning = true
+
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
 		}
 		if X == common.Function7_Invert_Chase && this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
 			sequences[this.SelectedSequence].Type == "scanner" {
+
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+			this.ScannerChaser = false
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
 			// Tell the scanner & chase sequence that the scanner shutter chase is off.
 			cmd := common.Command{
 				Action: common.UpdateScannerHasShutterChase,
 				Args: []common.Arg{
-					{Name: "ScannerHasShutterChase", Value: false},
+					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 				},
 			}
 			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
 			cmd = common.Command{
-				Action: common.Stop,
-				Args: []common.Arg{
-					{Name: "Stop Chase", Value: false},
-				},
+				Action: common.StopChase,
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-			this.ChaserRunning = false
+
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
 		}
 
-		// Function 8 - Send start music trigger
-		if X == common.Function8_Music_Trigger && !this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+		// Function 8 - Send start music trigger for scanner movements.
+		if X == common.Function8_Music_Trigger && !this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State && !this.ScannerChaser {
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
 			// Starting a music trigger with start the sequence, so turn on the start lamp
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
@@ -2086,8 +2094,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			return
 		}
-
-		if X == common.Function8_Music_Trigger && this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+		if X == common.Function8_Music_Trigger && this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State && !this.ScannerChaser {
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -2101,6 +2108,41 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			return
 		}
+
+		// Function 8 - Send start music trigger for shutter chaser.
+		if X == common.Function8_Music_Trigger && !this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State && this.ScannerChaser {
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
+			// Starting a music trigger with start the sequence, so turn on the start lamp
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			//  and remember that this sequence is on.
+			this.Running[this.ChaserSequenceNumber] = true
+			ShowFunctionButtons(this, this.ChaserSequenceNumber, eventsForLaunchpad, guiButtons)
+			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			// Start the music trigger for the target sequence.
+			cmd := common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			return
+		}
+		if X == common.Function8_Music_Trigger && this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State && this.ScannerChaser {
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
+			ShowFunctionButtons(this, this.ChaserSequenceNumber, eventsForLaunchpad, guiButtons)
+			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			// Stop the music trigger for the target sequence.
+			cmd := common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			return
+		}
+
 		return
 	}
 
@@ -2163,7 +2205,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			state := this.Functions[this.SelectedSequence][functionNumber].State
 			fmt.Printf("HANDLE: function %d state %t\n", functionNumber, state)
 		}
-		fmt.Printf("HANDLE: this.ChaserRunning %t \n", this.ChaserRunning)
+		fmt.Printf("HANDLE: this.ChaserRunning %t \n", this.ScannerChaser)
 		fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t \n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.FunctionSelectMode[%d] = %t \n", this.SelectedSequence, this.FunctionSelectMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.SelectedSequence, this.EditSequenceColorsMode[this.SelectedSequence])
@@ -2305,7 +2347,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		// If the chase is running, reveal it.
-		if this.ChaserRunning {
+		if this.ScannerChaser {
 			if debug {
 				fmt.Printf("%d: Reveal Sequence\n", this.ChaserSequenceNumber)
 			}
@@ -2345,7 +2387,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
 			// If the chase is running, reveal it.
-			if this.ChaserRunning {
+			if this.ScannerChaser {
 				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 			}
 
@@ -2385,7 +2427,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		// If the chaser is running, reveal it.
-		if this.ChaserRunning {
+		if this.ScannerChaser {
 			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
@@ -2789,7 +2831,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	this.LastPreset = &last
 
 	// Get an upto date copy of all of the sequences.
-	for sequenceNumber := range sequences {
+	for sequenceNumber, sequence := range sequences {
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
 		// restore the speed, shift, size, fade, coordinates label data.
@@ -2801,9 +2843,23 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
 		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
+		this.ScannerChaser = sequences[sequenceNumber].ScannerChaser
 
-		// switch off any color editing.
-		//this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+		// Restore the functions states from the sequence.
+		if sequence.Type == "rgb" {
+			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
+			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
+			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].RGBInvert
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+		}
+		if sequence.Type == "scanner" {
+			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
+			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
+			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
 		if sequences[sequenceNumber].Type == "switch" {
