@@ -964,6 +964,9 @@ func ProcessButtons(X int, Y int,
 			// Stop strobing this sequence.
 			cmd := common.Command{
 				Action: common.Strobe,
+				Args: []common.Arg{
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
