@@ -28,7 +28,7 @@ import (
 const debug = false
 const MaxDMXAddress = 512
 const MaxTextEntryLength = 35
-const DefaultScannerSize = 120
+const DefaultScannerSize = 60
 const MaxScannerSize = 120
 const MaxRGBSize = 120
 const MaxRGBFade = 10

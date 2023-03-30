@@ -253,14 +253,14 @@ func main() {
 		}
 
 		if newSequence.Type == "scanner" && newSequence.Label != "chaser" {
-			this.FunctionLabels[0] = "Scan\nPatten"
-			this.FunctionLabels[1] = "Scan\nAuto\nColor"
-			this.FunctionLabels[2] = "Scan\nAuto\nPatten"
-			this.FunctionLabels[3] = "Scan\nBounce"
-			this.FunctionLabels[4] = "Scan\nColor"
-			this.FunctionLabels[5] = "Scan\nGobo"
+			this.FunctionLabels[0] = "Scanner\nPatten"
+			this.FunctionLabels[1] = "Scanner\nAuto\nColor"
+			this.FunctionLabels[2] = "Scanner\nAuto\nPatten"
+			this.FunctionLabels[3] = "Scanner\nBounce"
+			this.FunctionLabels[4] = "Scanner\nColor"
+			this.FunctionLabels[5] = "Scanner\nGobo"
 			this.FunctionLabels[6] = "Chase"
-			this.FunctionLabels[7] = "Scan\nMusic"
+			this.FunctionLabels[7] = "Scanner\nMusic"
 		}
 
 		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
