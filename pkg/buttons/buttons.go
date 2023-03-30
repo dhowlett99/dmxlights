@@ -1832,132 +1832,122 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
 		}
 
-		// Which sequence are we addressing.
-		// var targetSequence int
-		// if this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-		// 	// If we're in shutter chase mode.
-		// 	targetSequence = this.ChaserSequenceNumber // target  the chaser
-		// } else {
-		targetSequence := this.SelectedSequence
-		fmt.Printf("Target Sequene is %d\n", targetSequence)
-		//}
-
 		// Map Function 1 - Go straight into pattern select mode, don't wait for a another select press.
 		if X == common.Function1_Pattern {
 			this.EditPatternMode[this.SelectedSequence] = true
-			this.Functions[targetSequence][common.Function1_Pattern].State = true
-			common.ClearSelectedRowOfButtons(targetSequence, eventsForLaunchpad, guiButtons)
+			this.Functions[this.SelectedSequence][common.Function1_Pattern].State = true
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = false
-			ShowPatternSelectionButtons(targetSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}
 
 		// Function 2 Set Auto Color - Toggle the auto color feature.
-		if !this.Functions[targetSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
-			this.Functions[targetSequence][common.Function2_Auto_Color].State = true
+		if !this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = true
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
 					{Name: "Bounce", Value: true},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-		if this.Functions[targetSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
-			this.Functions[targetSequence][common.Function2_Auto_Color].State = false
+		if this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = false
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
 					{Name: "Off", Value: false},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
 
 		// Function 3 Set Auto Pattern - Toggle Auto Pattern.
-		if !this.Functions[targetSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
-			this.Functions[targetSequence][common.Function3_Auto_Pattern].State = true
+		if !this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = true
 			cmd := common.Command{
 				Action: common.UpdateAutoPattern,
 				Args: []common.Arg{
 					{Name: "Bounce", Value: true},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-		if this.Functions[targetSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
-			this.Functions[targetSequence][common.Function3_Auto_Pattern].State = false
+		if this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = false
 			cmd := common.Command{
 				Action: common.UpdateAutoPattern,
 				Args: []common.Arg{
 					{Name: "Off", Value: false},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
 
 		// Function 4 Bounce - Toggle bounce feature.
-		if !this.Functions[targetSequence][common.Function4_Bounce].State && X == common.Function4_Bounce {
-			this.Functions[targetSequence][common.Function4_Bounce].State = true
+		if !this.Functions[this.SelectedSequence][common.Function4_Bounce].State && X == common.Function4_Bounce {
+			this.Functions[this.SelectedSequence][common.Function4_Bounce].State = true
 			cmd := common.Command{
 				Action: common.UpdateBounce,
 				Args: []common.Arg{
 					{Name: "Bounce", Value: true},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-		if this.Functions[targetSequence][common.Function4_Bounce].State && X == common.Function4_Bounce {
-			this.Functions[targetSequence][common.Function4_Bounce].State = false
+		if this.Functions[this.SelectedSequence][common.Function4_Bounce].State && X == common.Function4_Bounce {
+			this.Functions[this.SelectedSequence][common.Function4_Bounce].State = false
 			cmd := common.Command{
 				Action: common.UpdateBounce,
 				Args: []common.Arg{
 					{Name: "Off", Value: false},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Light the correct function key.
-			ShowFunctionButtons(this, targetSequence, eventsForLaunchpad, guiButtons)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
 
 		// Map Function 5 RGB - Go straight into RGB color edit mode, don't wait for a another select press.
-		if X == common.Function5_Color && sequences[targetSequence].Type == "rgb" {
-			this.EditSequenceColorsMode[targetSequence] = true
-			this.Functions[targetSequence][common.Function5_Color].State = true
+		if X == common.Function5_Color && sequences[this.SelectedSequence].Type == "rgb" {
+			this.EditSequenceColorsMode[this.SelectedSequence] = true
+			this.Functions[this.SelectedSequence][common.Function5_Color].State = true
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(targetSequence, eventsForLaunchpad, guiButtons)
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			// Set the colors.
-			sequences[targetSequence].CurrentColors = sequences[targetSequence].SequenceColors
+			sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 			// Show the colors
-			ShowRGBColorSelectionButtons(this.MasterBrightness, targetSequence, *sequences[targetSequence], eventsForLaunchpad, guiButtons)
+			ShowRGBColorSelectionButtons(this.MasterBrightness, this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}
 
 		// Map Function 5 Scanner - Go straight into scanner color edit mode via select fixture, don't wait for a another select press.
-		if X == common.Function5_Color && sequences[targetSequence].Type == "scanner" {
-			this.EditSequenceColorsMode[targetSequence] = true
+		if X == common.Function5_Color && sequences[this.SelectedSequence].Type == "scanner" {
+			this.EditSequenceColorsMode[this.SelectedSequence] = true
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-			common.ClearSelectedRowOfButtons(targetSequence, eventsForLaunchpad, guiButtons)
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = true
-			sequences[targetSequence].StaticColors[X].FirstPress = false
+			sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
 			this.FollowingAction = "ShowScannerColorSelectionButtons"
-			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[targetSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
+			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 			return
 		}
 
@@ -1981,10 +1971,7 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			//  and remember that this sequence is off.
 			this.Running[this.SelectedSequence] = false
-
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
-
-			fmt.Printf("Start Static Mode\n")
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditStaticColorsMode[this.SelectedSequence] = true   // Turn on edit static color mode.
@@ -2002,15 +1989,12 @@ func ProcessButtons(X int, Y int,
 					{Name: "Static", Value: true},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
-
-			// this.SelectButtonPressed[this.SelectedSequence] = false
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			return
 		}
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && X == common.Function6_Static_Gobo {
 
-			fmt.Printf("Stop Static Mode\n")
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditStaticColorsMode[this.SelectedSequence] = false  // Turn off edit static color mode.
@@ -2032,14 +2016,13 @@ func ProcessButtons(X int, Y int,
 
 			// this.SelectButtonPressed[this.SelectedSequence] = true
 			common.RevealSequence(this.SelectedSequence, commandChannels)
-			// Light the correct function key.
+
 			return
 		}
 
 		// Function 7 - Toggle the shutter chaser mode.
 		if !this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State && X == common.Function7_Invert_Chase {
 
-			fmt.Printf("Start Chaser \n")
 			// Tell the scannern & chaser sequences that the scanner shutter chase is on.
 			cmd := common.Command{
 				Action: common.UpdateScannerHasShutterChase,
@@ -2066,8 +2049,6 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 		if this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State && X == common.Function7_Invert_Chase {
-
-			fmt.Printf("Stop Chaser \n")
 
 			// Tell the scanner & chase sequence that the scanner shutter chase is off.
 			cmd := common.Command{
