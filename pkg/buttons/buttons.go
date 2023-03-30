@@ -2552,17 +2552,17 @@ func ShowScannerStatus(selectedSequence int, sequence common.Sequence, this *Cur
 // For the given sequence show the available sequence colors on the relevant buttons.
 func ShowRGBColorSelectionButtons(master int, mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
-	//if debug {
-	fmt.Printf("Show Color Selection Buttons\n")
-	//}
+	if debug {
+		fmt.Printf("Show Color Selection Buttons\n")
+	}
 	// Check if we need to flash this button.
 	for myFixtureNumber, lamp := range sequence.RGBAvailableColors {
 
 		for index, availableColor := range sequence.RGBAvailableColors {
 			for _, sequenceColor := range sequence.CurrentColors {
-				//if debug {
-				fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
-				//}
+				if debug {
+					fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+				}
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
 						lamp.Flash = true
