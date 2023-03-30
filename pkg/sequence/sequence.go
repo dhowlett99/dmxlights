@@ -348,9 +348,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
-			//if debug {
-			fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
-			//}
+			if debug {
+				fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
+			}
 
 			sequence.Static = true
 			// Turn off any music trigger for this sequence.
@@ -380,9 +380,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Turn Static Mode Off
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
-			//if debug {
-			fmt.Printf("sequence %d Static Off mode\n", mySequenceNumber)
-			//}
+			if debug {
+				fmt.Printf("sequence %d Static Off mode\n", mySequenceNumber)
+			}
 
 			sequence.Static = false
 

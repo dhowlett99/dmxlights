@@ -2421,22 +2421,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Handle 4 - Function Bar On!\n", this.SelectedSequence)
 		}
 
-		// Unset the function key.
-		//this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 		// If static is on turn it off.
-		fmt.Printf("---> Function6_Static_Gobo %t\n", this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State)
-		//if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
 		if this.EditStaticColorsMode[this.SelectedFixture] && sequences[this.SelectedSequence].Type != "scanner" {
 			if debug {
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
 			common.SetMode(this.SelectedSequence, commandChannels, "Static")
-			//this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditStaticColorsMode[this.SelectedFixture] = false
 		}
-
-		// Unset the edit static color mode.
-		//this.EditStaticColorsMode[this.SelectedSequence] = false
 
 		// Set function mode.
 		this.FunctionSelectMode[this.SelectedSequence] = true
@@ -2697,9 +2689,9 @@ func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence
 // For the given sequence show the available patterns on the relevant buttons.
 func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
-	//if debug {
-	fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
-	//}
+	if debug {
+		fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
+	}
 
 	LightBlue := common.Color{R: 0, G: 100, B: 255}
 	White := common.Color{R: 255, G: 255, B: 255}
