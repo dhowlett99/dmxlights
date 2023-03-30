@@ -125,13 +125,11 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 	if X == 1 && Y == 8 && this.Crash1 {
-		fmt.Printf("CRASH 1\n")
 		this.Crash2 = true
 		return
 	}
 	// Crash 2 message has appeared and this isn't a pad program ack.
 	if X != 0 && Y == 8 && this.Crash2 {
-		fmt.Printf("CRASH 2\n")
 		// Start a supervisor thread which will reset the launchpad every 1/2 second.
 		time.Sleep(200 * time.Millisecond)
 		if this.LaunchPadConnected {
@@ -142,7 +140,6 @@ func ProcessButtons(X int, Y int,
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		this.Crash1 = false
 		this.Crash2 = false
-		fmt.Printf("RESET PAD\n")
 		return
 	}
 
@@ -270,7 +267,6 @@ func ProcessButtons(X int, Y int,
 				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			}
 			this.SelectButtonPressed[this.SelectedSequence] = false
-			fmt.Printf("--->HandleSelect 10\n")
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		}
 		return
@@ -378,7 +374,6 @@ func ProcessButtons(X int, Y int,
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
-		fmt.Printf("--->HandleSelect 11\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		if !this.Flood { // We're not already in flood so lets ask the sequence to flood.
@@ -586,7 +581,6 @@ func ProcessButtons(X int, Y int,
 						common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 					}
 					this.SelectButtonPressed[this.SelectedSequence] = false
-					fmt.Printf("--->HandleSelect 1\n")
 					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
@@ -841,13 +835,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		fmt.Printf("--->HandleSelect 2\n")
-		fmt.Printf("Static Funct %t\n", this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-		// cmd := common.Command{
-		// 	Action: common.PlayStaticOnce,
-		// }
-		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
@@ -864,13 +852,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		fmt.Printf("--->HandleSelect 3\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		// cmd := common.Command{
-		// 	Action: common.PlayStaticOnce,
-		// }
-		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
@@ -887,7 +869,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		fmt.Printf("--->HandleSelect 4\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		// cmd := common.Command{
@@ -910,7 +891,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
 		}
 
-		fmt.Printf("--->HandleSelect 5\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		cmd := common.Command{
@@ -977,7 +957,6 @@ func ProcessButtons(X int, Y int,
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
-		fmt.Printf("--->HandleSelect 6\n")
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		// If strobing, stop it
@@ -1841,18 +1820,6 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	fmt.Printf("X\t\t%d\n", X)
-	fmt.Printf("Y\t\t%d\n", Y)
-	fmt.Printf("SelectedSequence\t\t%d\n", this.SelectedSequence)
-	fmt.Printf("Seq type \t\t%s\n", sequences[this.SelectedFixture].Type)
-	fmt.Printf("EditFixtureSelectionMode\t%t \n", this.EditFixtureSelectionMode)
-	fmt.Printf("FunctionSelectMode:\t\t%t \n", this.FunctionSelectMode[this.SelectedSequence])
-	fmt.Printf("EditPatternMode:\t\t%t\n", this.EditPatternMode[this.SelectedSequence])
-	fmt.Printf("EditStaticColorsMode:\t\t%t\n", this.EditStaticColorsMode[this.SelectedSequence])
-	fmt.Printf("EditGoboSelectionMode:\t\t%t\n", this.EditGoboSelectionMode[this.SelectedSequence])
-	fmt.Printf("Function5_Color: \t\t%t\n", this.Functions[this.SelectedSequence][common.Function5_Color].State)
-	fmt.Printf("--------------\n")
-
 	// F U N C T I O N  K E Y S
 	if X >= 0 && X < 8 &&
 		this.FunctionSelectMode[this.SelectedSequence] &&
@@ -2094,7 +2061,6 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
 			this.ChaserRunning = true
 
-			fmt.Printf("--->HandleSelect 7\n")
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 			return
@@ -2124,7 +2090,6 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
 			this.ChaserRunning = false
 
-			fmt.Printf("--->HandleSelect 8\n")
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 			return
@@ -2209,8 +2174,6 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 // HandleSelect - Runs when you press a select button to select a sequence.
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
-
-	debug := true
 
 	if debug {
 		for functionNumber := 0; functionNumber < 8; functionNumber++ {
@@ -3139,7 +3102,6 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
 
 	// Clear the graphics labels.
-	fmt.Printf("--->HandleSelect 9\n")
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 	// Reset the launchpad.
