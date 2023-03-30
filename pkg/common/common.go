@@ -907,12 +907,18 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 
 // For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	if mySequenceNumber == 4 {
+		return
+	}
 	for myFixtureNumber := range sequence.RGBAvailableColors {
 		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
 }
 
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	if selectedSequence == 4 {
+		return
+	}
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
@@ -920,6 +926,9 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 }
 
 func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALight) {
+	if selectedSequence == 4 {
+		return
+	}
 	for x := 0; x < 8; x++ {
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}

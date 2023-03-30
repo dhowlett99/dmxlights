@@ -2498,7 +2498,7 @@ func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentStat
 
 func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
 	for y := 0; y < len(sequences); y++ {
-		if sequences[y].Type != "switch" {
+		if sequences[y].Type != "switch" && sequences[y].Label != "chaser" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 				fixture.MapFixtures(false, false, y, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
@@ -2510,7 +2510,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
 	for x := 0; x < 8; x++ {
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
-			if sequences[sequenceNumber].Type == "rgb" {
+			if sequences[sequenceNumber].Type == "rgb" && sequences[sequenceNumber].Label != "chaser" {
 				common.LightLamp(common.ALight{X: x, Y: sequenceNumber, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 				fixture.MapFixtures(false, false, sequenceNumber, dmxController, x, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)

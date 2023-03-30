@@ -256,7 +256,7 @@ func FixtureReceiver(
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 
-			if cmd.StartFlood {
+			if cmd.StartFlood && sequence.Label != "chaser" {
 				var lamp common.Color
 				if cmd.RGBStatic {
 					lamp = cmd.RGBStaticColors[myFixtureNumber].Color
@@ -267,17 +267,17 @@ func FixtureReceiver(
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.R, Green: lamp.G, Blue: lamp.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 				continue
 			}
-			if cmd.StopFlood {
+			if cmd.StopFlood && sequence.Label != "chaser" {
 				MapFixtures(false, false, cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
-			if cmd.Clear {
+			if cmd.Clear && sequence.Label != "chaser" {
 				turnOffFixtures(sequence, cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				continue
 			}
 
-			if cmd.RGBStatic {
+			if cmd.RGBStatic && sequence.Label != "chaser" {
 				sequence := common.Sequence{}
 				sequence.Type = cmd.Type
 				sequence.Number = cmd.SequenceNumber
@@ -291,7 +291,7 @@ func FixtureReceiver(
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
-			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce {
+			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce && sequence.Label != "chaser" {
 				turnOffFixture(myFixtureNumber, mySequenceNumber, fixtures, dmxController, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				continue
