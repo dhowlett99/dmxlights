@@ -52,7 +52,6 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 						if !sequence.RGBInvert {
 							// A faded up and down color.
 							for _, slope := range sequence.FadeUpAndDown {
-								//fmt.Printf("--CALC--> Fixture %d Enabled %t\n", fixtureNumber, sequence.ScannerState[fixtureNumber].Enabled)
 								newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 							}

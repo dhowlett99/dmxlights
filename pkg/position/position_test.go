@@ -93,16 +93,17 @@ func TestCalculateRGBPositions(t *testing.T) {
 			name: "golden path - common par fixture RGB",
 			args: args{
 				sequence: common.Sequence{
-					FadeUpAndDown: []int{1, 50, 255},
-					FadeDownAndUp: []int{1, 50, 255},
-					Optimisation:  false,
-					Bounce:        false,
-					RGBInvert:     false,
-					RGBShift:      0,
-					RGBSize:       255,
-					RGBFade:       0,
-					ScannerState:  allFixturesEnabled,
-					ScannerChaser: false,
+					FadeUpAndDown:         []int{1, 50, 255},
+					FadeDownAndUp:         []int{1, 50, 255},
+					Optimisation:          false,
+					Bounce:                false,
+					RGBInvert:             false,
+					RGBShift:              0,
+					RGBSize:               255,
+					RGBFade:               0,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 8,
+					ScannerChaser:         false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -500,12 +501,13 @@ func TestCalculateRGBPositions(t *testing.T) {
 			name: "Multicolored Patten",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        false,
-					ScannerInvert: false,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
+					Bounce:                false,
+					ScannerInvert:         false,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 8,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -717,15 +719,16 @@ func TestCalculateRGBPositions(t *testing.T) {
 			name: "Shift1 - common par fixture RGB",
 			args: args{
 				sequence: common.Sequence{
-					FadeUpAndDown: []int{1, 50, 255},
-					FadeDownAndUp: []int{1, 50, 255},
-					Optimisation:  false,
-					Bounce:        false,
-					RGBInvert:     false,
-					RGBShift:      8,
-					RGBSize:       255,
-					RGBFade:       10,
-					ScannerState:  allFixturesEnabled,
+					FadeUpAndDown:         []int{1, 50, 255},
+					FadeDownAndUp:         []int{1, 50, 255},
+					Optimisation:          false,
+					Bounce:                false,
+					RGBInvert:             false,
+					RGBShift:              8,
+					RGBSize:               255,
+					RGBFade:               10,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 4,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -843,16 +846,17 @@ func TestCalculateRGBPositions(t *testing.T) {
 			name: "Shift1 - Not Inverted common par fixture RGB",
 			args: args{
 				sequence: common.Sequence{
-					FadeUpAndDown: []int{1, 50, 255},
-					FadeDownAndUp: []int{255, 50, 1},
-					Optimisation:  false,
-					Bounce:        false,
-					RGBInvert:     false,
-					RGBShift:      8, // Eight is reversed so creates a shift of 2.
-					RGBSize:       255,
-					RGBFade:       10,
-					ScannerInvert: false,
-					ScannerState:  allFixturesEnabled,
+					FadeUpAndDown:         []int{1, 50, 255},
+					FadeDownAndUp:         []int{255, 50, 1},
+					Optimisation:          false,
+					Bounce:                false,
+					RGBInvert:             false,
+					RGBShift:              8, // Eight is reversed so creates a shift of 2.
+					RGBSize:               255,
+					RGBFade:               10,
+					ScannerInvert:         false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 4,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -997,15 +1001,16 @@ func TestCalculatePositions2(t *testing.T) {
 			name: "pairs patten test - common par fixture RGB",
 			args: args{
 				sequence: common.Sequence{
-					FadeUpAndDown: []int{1, 50, 255, 255, 50, 1},
-					FadeDownAndUp: []int{255, 50, 1, 1, 50, 255},
-					Optimisation:  false,
-					Bounce:        false,
-					RGBInvert:     false,
-					RGBShift:      10,
-					RGBSize:       255,
-					RGBFade:       1,
-					ScannerState:  allFixturesEnabled,
+					FadeUpAndDown:         []int{1, 50, 255, 255, 50, 1},
+					FadeDownAndUp:         []int{255, 50, 1, 1, 50, 255},
+					Optimisation:          false,
+					Bounce:                false,
+					RGBInvert:             false,
+					RGBShift:              10,
+					RGBSize:               255,
+					RGBFade:               1,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 2,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -1107,13 +1112,14 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanner case, both scanners doing same things.",
 			args: args{
 				sequence: common.Sequence{
-					Type:          "scanner",
-					Bounce:        false,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerChaser: false,
-					ScannerState:  allFixturesEnabled,
+					Type:                  "scanner",
+					Bounce:                false,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerChaser:         false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 2,
 					Steps: []common.Step{
 						{
 
@@ -1216,12 +1222,13 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanner case, both scanners doing different things.",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        false,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
-					ScannerChaser: false,
+					Bounce:                false,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 2,
+					ScannerChaser:         false,
 					Steps: []common.Step{
 						{
 
@@ -1262,11 +1269,12 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanner case, one set of instruction in a pattern should create one set of positions.",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        false,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
+					Bounce:                false,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 1,
 					Steps: []common.Step{
 						{
 
@@ -1302,12 +1310,13 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Pairs case",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        false,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
-					ScannerChaser: false,
+					Bounce:                false,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 8,
+					ScannerChaser:         false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -1370,13 +1379,14 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanners inverted no bounce",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        false,
-					ScannerInvert: true,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
-					ScannerChaser: false,
+					Bounce:                false,
+					ScannerInvert:         true,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 1,
+					ScannerChaser:         false,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
@@ -1420,12 +1430,13 @@ func Test_calculateScannerPositions(t *testing.T) {
 			name: "Scanners inverted with bounce",
 			args: args{
 				sequence: common.Sequence{
-					Bounce:        true,
-					ScannerInvert: true,
-					FadeUpAndDown: []int{255},
-					FadeDownAndUp: []int{0},
-					Optimisation:  false,
-					ScannerState:  allFixturesEnabled,
+					Bounce:                true,
+					ScannerInvert:         true,
+					FadeUpAndDown:         []int{255},
+					FadeDownAndUp:         []int{0},
+					Optimisation:          false,
+					ScannerState:          allFixturesEnabled,
+					EnabledNumberFixtures: 1,
 					Steps: []common.Step{
 						{
 							Fixtures: map[int]common.Fixture{
