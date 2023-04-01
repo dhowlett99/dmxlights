@@ -2046,17 +2046,20 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 7 - Toggle the shutter chaser mode.
-		if X == common.Function7_Invert_Chase && !this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+		// Function 7 - Toggle the shutter chaser mode. 1st Press starts the chaser.
+		if X == common.Function7_Invert_Chase &&
+			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
 			this.ScannerChaser = true
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true   // Chaser
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = false // Music Trigger
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-			// Tell the scannern & chaser sequences that the scanner shutter chase is on.
+			// Tell the scannern & chaser sequences that the scanner shutter chase flag is on.
 			cmd := common.Command{
 				Action: common.UpdateScannerHasShutterChase,
 				Args: []common.Arg{
@@ -2066,6 +2069,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+			// Tell the chaser to stop.
 			cmd = common.Command{
 				Action: common.StartChase,
 			}
@@ -2074,25 +2078,67 @@ func ProcessButtons(X int, Y int,
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
 		}
-		if X == common.Function7_Invert_Chase && this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+
+		// Function 7 - Toggle the shutter chaser mode. 2nd Press starts the music trigger for the chaser.
+		if X == common.Function7_Invert_Chase &&
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-			this.ScannerChaser = false
+			this.ScannerChaser = true
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = true
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-			// Tell the scanner & chase sequence that the scanner shutter chase is off.
+			// Tell the chaser sequences that the music trigger is on.
+			cmd := common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+			return
+		}
+
+		// Function 7 - Toggle the shutter chaser mode. 3rd Press stops the chaser and music trigger.
+		if X == common.Function7_Invert_Chase &&
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
+			sequences[this.SelectedSequence].Type == "scanner" {
+
+			this.ScannerChaser = false
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = false
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
+			// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
+			this.Running[this.ChaserSequenceNumber] = false
 			cmd := common.Command{
 				Action: common.UpdateScannerHasShutterChase,
 				Args: []common.Arg{
 					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 				},
 			}
-			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+			// Stop the music trigger for the chaser sequence.
+			cmd = common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			// Stop the chaser.
 			cmd = common.Command{
 				Action: common.StopChase,
 			}
@@ -2149,158 +2195,6 @@ func ProcessButtons(X int, Y int,
 
 			return
 		}
-
-		// // Function 8 MUSIC TRIGGER Scanner Mode - 1st Press Send start music trigger for scanner movements, light the lamp purple
-		// if X == common.Function8_Music_Trigger && sequences[this.SelectedSequence].Type == "scanner" &&
-		// 	!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State &&
-		// 	!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
-
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = false
-
-		// 	// Stop the music trigger for the chaser sequence.
-		// 	this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-		// 	cmd := common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: false},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-		// 	// Start the music trigger for the scanner sequence.
-		// 	// Starting a music trigger will start the sequence, so turn on the start lamp
-		// 	common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-		// 	//  and remember that this sequence is on.
-		// 	this.Running[this.SelectedSequence] = true
-		// 	cmd = common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: true},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// 	ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		// 	common.LabelButton(X, this.SelectedSequence, "Move\nMusic\nTrigger", guiButtons)
-		// 	time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
-		// 	return
-		// }
-
-		// // Function 8 MUSIC TRIGGER - Second Press Scanner Mode - Send enable music trigger to shutter chase lights the lamp orange.
-		// if X == common.Function8_Music_Trigger && sequences[this.SelectedSequence].Type == "scanner" &&
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State &&
-		// 	!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
-
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = true
-
-		// 	// Stop the music trigger for the scanner sequence.
-		// 	// Stopping a music trigger will stop the sequence, so turn off the start lamp
-		// 	common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-		// 	//  and remember that this sequence is off.
-		// 	this.Running[this.SelectedSequence] = false
-		// 	cmd := common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: false},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// 	// Start the music trigger for the chaser sequence.
-		// 	this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
-		// 	cmd = common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: true},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-		// 	ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		// 	common.LabelButton(X, this.SelectedSequence, "Shutter\nMusic\nTrigger", guiButtons)
-		// 	time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
-		// 	return
-		// }
-
-		// // Function 8 MUSIC TRIGGER Scanner Mode - 3rd Press send start music trigger to both scanner and shutter chaser. lights the lamp yellow.
-		// if X == common.Function8_Music_Trigger && sequences[this.SelectedSequence].Type == "scanner" &&
-		// 	!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State &&
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
-
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = true
-
-		// 	// Start the music trigger for the scanner sequence.
-		// 	// Starting a music trigger with start the sequence, so turn on the start lamp
-		// 	common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-		// 	//  and remember that this sequence is on.
-		// 	this.Running[this.ChaserSequenceNumber] = true
-		// 	this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
-		// 	cmd := common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: true},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// 	// Start the music trigger for the scanner sequence.
-		// 	this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
-		// 	cmd = common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: true},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-		// 	ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		// 	common.LabelButton(X, this.SelectedSequence, "Move &\nShutter\nMusic", guiButtons)
-		// 	time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
-		// 	return
-		// }
-		// // Function 8 MUSIC TRIGGER Scanner Mode - Fourth press turns off both scanner and shutter chaser music trigger. button goes back to cyan.
-		// if X == common.Function8_Music_Trigger && sequences[this.SelectedSequence].Type == "scanner" &&
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State &&
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
-
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
-		// 	this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = false
-
-		// 	// Stop the music trigger for the scanner sequence.
-		// 	// Stopping a music trigger will stop the sequence, so turn off the start lamp
-		// 	common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-		// 	//  and remember that this sequence is off.
-		// 	this.Running[this.SelectedSequence] = false
-		// 	cmd := common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: false},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		// 	// Stop the music trigger for the scanner sequence.
-		// 	this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-		// 	cmd = common.Command{
-		// 		Action: common.UpdateMusicTrigger,
-		// 		Args: []common.Arg{
-		// 			{Name: "MusicTriger", Value: false},
-		// 		},
-		// 	}
-		// 	common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-		// 	ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		// 	common.LabelButton(X, this.SelectedSequence, "Music\nTrigger\nOff", guiButtons)
-		// 	time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
-		// 	return
-		// }
 
 		return
 	}
