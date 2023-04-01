@@ -132,6 +132,7 @@ func main() {
 	signal.Notify(c, os.Interrupt, syscall.SIGTERM)
 	go func() {
 		<-c
+		fmt.Println("Saving Presets")
 		presets.SavePresets(this.PresetsStore)
 		os.Exit(1)
 	}()
@@ -475,6 +476,9 @@ func main() {
 	myWindow.SetContent(content)
 
 	myWindow.ShowAndRun()
+
+	fmt.Println("Saving Presets")
+	presets.SavePresets(this.PresetsStore)
 
 }
 
