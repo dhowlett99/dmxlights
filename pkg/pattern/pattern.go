@@ -735,8 +735,10 @@ type scanner struct {
 	values []int
 }
 
-// GenerateStandardChasePatterm
-func GenerateStandardChasePatterm(numberSteps int, scannerState map[int]common.ScannerState) common.Pattern {
+// ApplyScannerState - Apply the state of the scanners to the pattern, fixture disabling work by disabling the
+// steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
+// catch steps that have more than one fixture alight in any one step.
+func ApplyScannerState(generatedSteps []common.Step, scannerState map[int]common.ScannerState) common.Pattern {
 
 	var pattern common.Pattern
 
@@ -744,30 +746,34 @@ func GenerateStandardChasePatterm(numberSteps int, scannerState map[int]common.S
 	pattern.Label = "std.Scanner.Chase"
 	pattern.Steps = []common.Step{}
 
-	for step := 0; step < numberSteps; step++ {
+	for _, step := range generatedSteps {
 
-		newStep := common.Step{}
+		newStep := step
 		newStep.Fixtures = make(map[int]common.Fixture)
 		hasColors := make(map[int]bool)
-		for fixture := 0; fixture < numberSteps; fixture++ {
+		for fixtureNumber, fixture := range step.Fixtures {
 			newFixture := common.Fixture{}
-			newFixture.Enabled = scannerState[fixture].Enabled
+			newFixture.Enabled = scannerState[fixtureNumber].Enabled
 			newFixture.MasterDimmer = 255
-			newFixture.Shutter = 0
-			newFixture.Colors = []common.Color{{R: 0, G: 0, B: 0}}
-			hasColors[fixture] = false
-			if step == fixture {
-				newFixture.Shutter = full
-				newFixture.Colors = []common.Color{{R: 255, G: 255, B: 255}}
-				hasColors[fixture] = true
+			newFixture.Shutter = fixture.Shutter
+			newFixture.Colors = fixture.Colors
+			for _, color := range newFixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					newFixture.Colors = []common.Color{{R: 255, G: 255, B: 255}}
+					hasColors[fixtureNumber] = true
+				} else {
+					hasColors[fixtureNumber] = false
+				}
 			}
-			newStep.Fixtures[fixture] = newFixture
+			newStep.Fixtures[fixtureNumber] = newFixture
 		}
 
-		// fmt.Printf("Fixtures \n")
-		// for fixture := 0; fixture < len(newStep.Fixtures); fixture++ {
-		// 	fmt.Printf("Fixture %d Enabled %t Colors %+v\n", fixture, newStep.Fixtures[fixture].Enabled, newStep.Fixtures[fixture].Colors)
-		// }
+		if debug {
+			fmt.Printf("Fixtures \n")
+			for fixture := 0; fixture < len(newStep.Fixtures); fixture++ {
+				fmt.Printf("Fixture %d Enabled %t Colors %+v\n", fixture, newStep.Fixtures[fixture].Enabled, newStep.Fixtures[fixture].Colors)
+			}
+		}
 
 		for fixtureNumber, fixture := range newStep.Fixtures {
 			// Don't add steps with no enabled fixtures.

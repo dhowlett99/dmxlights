@@ -442,22 +442,24 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
+
+					var scannerChasePattern common.Pattern
+					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
-						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-						scannerChasePattern := pattern.GenerateStandardChasePatterm(sequence.NumberFixtures, sequence.ScannerState)
-						sequence.Steps = scannerChasePattern.Steps
-						sequence.Pattern.Name = scannerChasePattern.Name
-						sequence.Pattern.Label = scannerChasePattern.Label
-						sequence.UpdatePattern = false
+						pattenSteps := sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+						scannerChasePattern = pattern.ApplyScannerState(pattenSteps, sequence.ScannerState)
 					} else {
-						sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
-						sequence.Steps = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
-						sequence.Pattern.Name = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Name
-						sequence.Pattern.Label = sequence.RGBAvailablePatterns[sequence.SelectedPattern].Label
-						sequence.UpdatePattern = false
+						scannerChasePattern = sequence.RGBAvailablePatterns[sequence.SelectedPattern]
 					}
+
+					sequence.Steps = scannerChasePattern.Steps
+					sequence.Pattern.Name = scannerChasePattern.Name
+					sequence.Pattern.Label = scannerChasePattern.Label
+					sequence.UpdatePattern = false
+
 				}
 
 				// Setup scanner patterns.

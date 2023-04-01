@@ -298,27 +298,29 @@ func FixtureReceiver(
 			}
 			// Play out fixture to DMX channels.
 			fixture := cmd.RGBPosition.Fixtures[myFixtureNumber]
-			for _, color := range fixture.Colors {
-				red := color.R
-				green := color.G
-				blue := color.B
-				white := color.W
+			if fixture.Enabled {
+				for _, color := range fixture.Colors {
+					red := color.R
+					green := color.G
+					blue := color.B
+					white := color.W
 
-				// If we're a shutter chaser flavoured RGB sequence, then disable everything except the brightness.
-				if sequence.Label == "chaser" {
-					// TODO find the scanner sequence number from the config.
-					scannerFixturesSequenceNumber := 2 // Scanner sequence.
-					if !cmd.Hide {
-						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+					// If we're a shutter chaser flavoured RGB sequence, then disable everything except the brightness.
+					if sequence.Label == "chaser" {
+						// TODO find the scanner sequence number from the config.
+						scannerFixturesSequenceNumber := 2 // Scanner sequence.
+						if !cmd.Hide {
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+						}
+						// Fixture brightness is sent as master in this case.
+						// TODO Integrate cmd.master with fixture.Brightness.
+						MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					} else {
+						if !cmd.Hide {
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+						}
+						MapFixtures(false, cmd.ScannerChaser, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 					}
-					// Fixture brightness is sent as master in this case.
-					// TODO Integrate cmd.master with fixture.Brightness.
-					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
-				} else {
-					if !cmd.Hide {
-						common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-					}
-					MapFixtures(false, cmd.ScannerChaser, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, 0, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				}
 			}
 		}
@@ -367,7 +369,7 @@ func FixtureReceiver(
 					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
 				if !cmd.Hide {
-					if cmd.ScannerChaser {
+					if cmd.ScannerChaser && sequence.Label == "chaser" {
 						// We are chase mode, we want the buttons to be the color selected for this scanner.
 						// Remember that fixtures in the real world start with 1 not 0.
 						//realFixture := myFixtureNumber + 1
@@ -398,13 +400,15 @@ func FixtureReceiver(
 						}
 					} else {
 						// Only fire every quarter turn of the scanner coordinates to save on launchpad mini traffic.
-						howOftern := cmd.NumberSteps / 4
-						if howOftern != 0 {
-							if cmd.Step%howOftern == 0 {
-								// We're not in chase mode so use the color generated in the pattern generator.common.
-								for _, color := range fixture.Colors {
-									common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
-									common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+						if !cmd.ScannerChaser {
+							howOftern := cmd.NumberSteps / 4
+							if howOftern != 0 {
+								if cmd.Step%howOftern == 0 {
+									// We're not in chase mode so use the color generated in the pattern generator.common.
+									for _, color := range fixture.Colors {
+										common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
+										common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+									}
 								}
 							}
 						}
