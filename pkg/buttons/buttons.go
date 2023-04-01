@@ -1935,7 +1935,11 @@ func ProcessButtons(X int, Y int,
 					{Name: "Bounce", Value: true},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			if !this.ScannerChaser {
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			} else {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			}
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
@@ -1947,7 +1951,11 @@ func ProcessButtons(X int, Y int,
 					{Name: "Off", Value: false},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			if !this.ScannerChaser {
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			} else {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			}
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
