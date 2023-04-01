@@ -1804,23 +1804,46 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Set Pattern to %d\n", X)
 		}
 
-		// Tell the sequence to change the pattern.
-		cmd := common.Command{
-			Action: common.UpdatePattern,
-			Args: []common.Arg{
-				{Name: "SelectPattern", Value: X},
-			},
+		if !this.ScannerChaser {
+
+			// Tell the sequence to change the pattern.
+			cmd := common.Command{
+				Action: common.UpdatePattern,
+				Args: []common.Arg{
+					{Name: "SelectPattern", Value: X},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			this.FunctionSelectMode[this.SelectedSequence] = false
+
+			// Get an upto date copy of the sequence.
+			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
+			this.EditFixtureSelectionMode = false
+			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+		} else {
+			// Tell the sequence to change the pattern.
+			cmd := common.Command{
+				Action: common.UpdatePattern,
+				Args: []common.Arg{
+					{Name: "SelectPattern", Value: X},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			this.FunctionSelectMode[this.SelectedSequence] = false
+
+			// Get an upto date copy of the sequence.
+			sequences[this.ChaserSequenceNumber] = common.RefreshSequence(this.ChaserSequenceNumber, commandChannels, updateChannels)
+
+			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
+			this.EditFixtureSelectionMode = false
+			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		this.FunctionSelectMode[this.SelectedSequence] = false
-
-		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
-		this.EditFixtureSelectionMode = false
-		ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 		return
 	}
@@ -1843,7 +1866,11 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function1_Pattern].State = true
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = false
-			ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			if !this.ScannerChaser {
+				ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			} else {
+				ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+			}
 			return
 		}
 
@@ -2424,7 +2451,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			this.EditPatternMode[this.SelectedSequence] = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
-			ShowPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}
 
@@ -2851,11 +2878,15 @@ func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence
 }
 
 // For the given sequence show the available patterns on the relevant buttons.
-func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+// mySequenceDisplayNumber is the sequence whos buttons you want the pattern selection to show on.
+// master is the master brightness for the same buttons.
+// targetSequence - is the squence you are updating the pattern, this could be different in the case
+// of scanner shutter chaser sequence which doesn't have it's own buttons.
+func ShowPatternSelectionButtons(mySequenceDisplayNumber int, master int, targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("Sequence Name %s Type %s  Label %s\n", sequence.Name, sequence.Type, sequence.Label)
-		for _, pattern := range sequence.ScannerAvailablePatterns {
+		fmt.Printf("Sequence Name %s Type %s  Label %s\n", targetSequence.Name, targetSequence.Type, targetSequence.Label)
+		for _, pattern := range targetSequence.ScannerAvailablePatterns {
 			fmt.Printf("Found a pattern called %s\n", pattern.Name)
 		}
 	}
@@ -2863,29 +2894,29 @@ func ShowPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence,
 	LightBlue := common.Color{R: 0, G: 100, B: 255}
 	White := common.Color{R: 255, G: 255, B: 255}
 
-	if sequence.Type == "rgb" {
-		for _, pattern := range sequence.RGBAvailablePatterns {
+	if targetSequence.Type == "rgb" {
+		for _, pattern := range targetSequence.RGBAvailablePatterns {
 			if debug {
 				fmt.Printf("pattern is %s\n", pattern.Name)
 			}
-			if pattern.Number == sequence.SelectedPattern {
-				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+			if pattern.Number == targetSequence.SelectedPattern {
+				common.FlashLight(pattern.Number, mySequenceDisplayNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceDisplayNumber, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(pattern.Number, mySequenceNumber, pattern.Label, guiButtons)
+			common.LabelButton(pattern.Number, mySequenceDisplayNumber, pattern.Label, guiButtons)
 		}
 		return
 	}
 
-	if sequence.Type == "scanner" {
-		for _, pattern := range sequence.ScannerAvailablePatterns {
-			if pattern.Number == sequence.SelectedPattern {
-				common.FlashLight(pattern.Number, mySequenceNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+	if targetSequence.Type == "scanner" {
+		for _, pattern := range targetSequence.ScannerAvailablePatterns {
+			if pattern.Number == targetSequence.SelectedPattern {
+				common.FlashLight(pattern.Number, mySequenceDisplayNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceNumber, Red: 0, Green: 100, Blue: 255, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceDisplayNumber, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(pattern.Number, mySequenceNumber, pattern.Label, guiButtons)
+			common.LabelButton(pattern.Number, mySequenceDisplayNumber, pattern.Label, guiButtons)
 		}
 		return
 	}
