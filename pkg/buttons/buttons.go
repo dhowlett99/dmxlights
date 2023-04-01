@@ -2083,6 +2083,19 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+			// Update the buttons: speed
+			common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
+			common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
+
+			common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+			common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+
+			common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+			common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+
+			common.LabelButton(6, 7, "Chase\nFase\nSoft", guiButtons)
+			common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
+
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
 		}
@@ -2108,6 +2121,18 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			common.LabelButton(0, 7, "", guiButtons)
+			common.LabelButton(1, 7, "", guiButtons)
+
+			common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+			common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+
+			common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+			common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+
+			common.LabelButton(6, 7, "Chase\nFase\nSoft", guiButtons)
+			common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
 
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
@@ -2151,6 +2176,19 @@ func ProcessButtons(X int, Y int,
 				Action: common.StopChase,
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			// Update the buttons: speed
+			common.LabelButton(0, 7, "Speed\nDown", guiButtons)
+			common.LabelButton(1, 7, "Speed\nUp", guiButtons)
+
+			common.LabelButton(2, 7, "Shift\nDown", guiButtons)
+			common.LabelButton(3, 7, "Shift\nUp", guiButtons)
+
+			common.LabelButton(4, 7, "Size\nDown", guiButtons)
+			common.LabelButton(5, 7, "Size\nUp", guiButtons)
+
+			common.LabelButton(6, 7, "Fase\nSoft", guiButtons)
+			common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
 
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
