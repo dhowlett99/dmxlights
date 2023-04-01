@@ -443,21 +443,21 @@ func PlaySequence(sequence common.Sequence,
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
 
-					var scannerChasePattern common.Pattern
+					var chasePattern common.Pattern
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
 
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
 						pattenSteps := sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
-						scannerChasePattern = pattern.ApplyScannerState(pattenSteps, sequence.ScannerState)
+						chasePattern = pattern.ApplyScannerState(pattenSteps, sequence.ScannerState)
 					} else {
-						scannerChasePattern = sequence.RGBAvailablePatterns[sequence.SelectedPattern]
+						chasePattern = sequence.RGBAvailablePatterns[sequence.SelectedPattern]
 					}
 
-					sequence.Steps = scannerChasePattern.Steps
-					sequence.Pattern.Name = scannerChasePattern.Name
-					sequence.Pattern.Label = scannerChasePattern.Label
+					sequence.Steps = chasePattern.Steps
+					sequence.Pattern.Name = chasePattern.Name
+					sequence.Pattern.Label = chasePattern.Label
 					sequence.UpdatePattern = false
 
 				}
@@ -675,7 +675,6 @@ func PlaySequence(sequence common.Sequence,
 							ScannerOffsetPan:         sequence.ScannerOffsetPan,
 							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
-							//ScannerHasShutterChase:   sequence.ScannerHasShutterChase,
 						}
 
 						// Start the fixture group.

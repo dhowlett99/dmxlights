@@ -3401,5 +3401,9 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
 		common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+		if this.ScannerChaser {
+			common.LabelButton(common.Function1_Pattern, this.SelectedSequence, "Chase\nPattern", guiButtons)
+			common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chase\nBounce", guiButtons)
+		}
 	}
 }
