@@ -2161,10 +2161,12 @@ func ProcessButtons(X int, Y int,
 			!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
 
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
-			// Starting a music trigger with start the sequence, so turn on the start lamp
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-			//  and remember that this sequence is on.
+
+			// Starting a music trigger will start the sequence, so turn on the start lamp
+			// and remember that this sequence is on.
 			this.Running[this.SelectedSequence] = true
+			common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+
 			// Start the music trigger for the target sequence.
 			cmd := common.Command{
 				Action: common.UpdateMusicTrigger,
@@ -2186,8 +2188,11 @@ func ProcessButtons(X int, Y int,
 
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
-			time.Sleep(100 * time.Millisecond) // But give the launchpad time to light the function key purple.
+			this.Running[this.SelectedSequence] = false
+			common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 			// Stop the music trigger for the target sequence.
 			cmd := common.Command{
