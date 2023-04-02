@@ -938,6 +938,13 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			this.Running[this.SelectedSequence] = true
+
+			// Clear the pattern function keys
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+			// Reveal the now running sequence
+			common.RevealSequence(this.SelectedSequence, commandChannels)
+
 			return
 		}
 
