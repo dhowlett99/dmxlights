@@ -2077,7 +2077,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-			// Tell the chaser to stop.
+			// Tell the chaser to start.
 			cmd = common.Command{
 				Action: common.StartChase,
 			}
@@ -2952,7 +2952,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
 		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
-		this.ScannerChaser = sequences[sequenceNumber].ScannerChaser
 
 		// Restore the functions states from the sequence.
 		if sequence.Type == "rgb" {
@@ -2967,10 +2966,15 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
-			if sequences[sequenceNumber].ScannerChaser {
-				this.Functions[sequenceNumber][common.Function8_Music_Trigger].State2 = sequences[sequenceNumber].MusicTrigger
-			} else {
-				this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+		}
+
+		// Chaser Sequencer.
+		if sequence.Type == "rgb" && sequence.Label == "chaser" {
+			this.ScannerChaser = sequences[this.ScannerSequenceNumber].ScannerChaser
+			this.Functions[this.ScannerSequenceNumber][common.Function7_Invert_Chase].State2 = sequences[this.ChaserSequenceNumber].MusicTrigger
+			if sequences[this.ChaserSequenceNumber].MusicTrigger {
+				this.SoundTriggers[this.ChaserSequenceNumber].State = true
 			}
 		}
 
@@ -3333,17 +3337,26 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 
 		if function.State && !function.State2 { // Purple
 			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-		}
-		if !function.State && function.State2 { // Orange
-			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
+			if this.ScannerChaser && index == common.Function7_Invert_Chase {
+				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nRunning", guiButtons)
+			}
 		}
 		if function.State && function.State2 { // Yellow
 			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+			if this.ScannerChaser && index == common.Function7_Invert_Chase {
+				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chase\nTo\nMusic", guiButtons)
+			}
 		}
 		if !function.State && !function.State2 { // Cyan
 			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			if this.ScannerChaser && index == common.Function7_Invert_Chase {
+				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nOff", guiButtons)
+			}
 		}
-		common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+		if !this.ScannerChaser {
+			common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+		}
+
 		if this.ScannerChaser {
 			common.LabelButton(common.Function1_Pattern, this.SelectedSequence, "Chase\nPattern", guiButtons)
 			common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chase\nBounce", guiButtons)

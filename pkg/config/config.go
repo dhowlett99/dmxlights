@@ -20,7 +20,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -30,13 +29,20 @@ import (
 
 func SaveConfig(config []common.Sequence, filename string) {
 
+	// Don't store the steps as they are created by each sequencer.
+	sequences := []common.Sequence{}
+	for _, sequence := range config {
+		sequence.Steps = nil
+		sequences = append(sequences, sequence)
+	}
+
 	// Marshall the config into a json object.
-	data, err := json.MarshalIndent(config, "", " ")
+	data, err := json.MarshalIndent(sequences, "", " ")
 	if err != nil {
 		log.Fatalf("error: marshalling config: %v", err)
 	}
 	// Write to file
-	err = ioutil.WriteFile(filename, data, 0644)
+	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
 		log.Fatalf("error: writing config: %v to file:%s", err, filename)
 	}
@@ -47,7 +53,7 @@ func LoadConfig(filename string) []common.Sequence {
 	config := []common.Sequence{}
 
 	// Read the file.
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("error: reading config: %v from file:%s", err, filename)
 	}

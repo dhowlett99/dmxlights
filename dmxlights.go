@@ -260,19 +260,8 @@ func main() {
 			this.FunctionLabels[3] = "Scanner\nBounce"
 			this.FunctionLabels[4] = "Scanner\nColor"
 			this.FunctionLabels[5] = "Scanner\nGobo"
-			this.FunctionLabels[6] = "Chase"
+			this.FunctionLabels[6] = "Chaser\nOff"
 			this.FunctionLabels[7] = "Scanner\nMusic"
-		}
-
-		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
-			this.FunctionLabels[0] = "Chase\nPatten"
-			this.FunctionLabels[1] = "Chase\nAuto\nColor"
-			this.FunctionLabels[2] = "Chase\nAuto\nPatten"
-			this.FunctionLabels[3] = "Chase\nBounce"
-			this.FunctionLabels[4] = "Chase\nColor"
-			this.FunctionLabels[5] = "Chase\nGobo"
-			this.FunctionLabels[6] = "Chase"
-			this.FunctionLabels[7] = "Chase\nMusic"
 		}
 
 		// Make functions for each of the sequences.
