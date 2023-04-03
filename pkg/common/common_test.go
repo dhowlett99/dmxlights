@@ -277,3 +277,43 @@ func TestFindSensitivity(t *testing.T) {
 		})
 	}
 }
+
+func TestReverseDmx(t *testing.T) {
+	type args struct {
+		n int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "Reverse 255",
+			args: args{
+				n: 255,
+			},
+			want: 0,
+		},
+		{
+			name: "Reverse 50",
+			args: args{
+				n: 50,
+			},
+			want: 205,
+		},
+		{
+			name: "Reverse 0",
+			args: args{
+				n: 0,
+			},
+			want: 255,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ReverseDmx(tt.args.n); got != tt.want {
+				t.Errorf("ReverseDmx() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

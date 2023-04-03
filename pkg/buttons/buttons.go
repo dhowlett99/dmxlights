@@ -1946,7 +1946,7 @@ func ProcessButtons(X int, Y int,
 			stopCmd := common.Command{
 				Action: common.UpdateBounce,
 				Args: []common.Arg{
-					{Name: "Bounce", Value: true},
+					{Name: "Bounce", Value: false},
 				},
 			}
 
