@@ -1891,9 +1891,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
 		}
 
-		fmt.Printf("State %t\n", this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State)
-		fmt.Printf("State2 %t\n", this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2)
-
 		// Map Function 1 - Go straight into pattern select mode, don't wait for a another select press.
 		if X == common.Function1_Pattern {
 			this.EditPatternMode[this.SelectedSequence] = true
