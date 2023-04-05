@@ -2105,15 +2105,13 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 7 - Toggle the shutter chaser mode. 1st Press starts the chaser.
+		// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 		if X == common.Function7_Invert_Chase &&
 			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
 			this.ScannerChaser = true
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true   // Chaser
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = false // Music Trigger
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true // Chaser
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -2151,53 +2149,13 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 7 - Toggle the shutter chaser mode. 2nd Press starts the music trigger for the chaser.
+		// Function 7 - Toggle the shutter chaser mode. Stop the chaser.
 		if X == common.Function7_Invert_Chase &&
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
-			sequences[this.SelectedSequence].Type == "scanner" {
-
-			this.ScannerChaser = true
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = true
-
-			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
-			// Tell the chaser sequences that the music trigger is on.
-			cmd := common.Command{
-				Action: common.UpdateMusicTrigger,
-				Args: []common.Arg{
-					{Name: "MusicTriger", Value: true},
-				},
-			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-			common.LabelButton(0, 7, "", guiButtons)
-			common.LabelButton(1, 7, "", guiButtons)
-
-			common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
-			common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
-
-			common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
-			common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
-
-			common.LabelButton(6, 7, "Chase\nFase\nSoft", guiButtons)
-			common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
-
-			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-			return
-		}
-
-		// Function 7 - Toggle the shutter chaser mode. 3rd Press stops the chaser and music trigger.
-		if X == common.Function7_Invert_Chase &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
 			this.ScannerChaser = false
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = false
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -2211,15 +2169,6 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
-
-			// Stop the music trigger for the chaser sequence.
-			cmd = common.Command{
-				Action: common.UpdateMusicTrigger,
-				Args: []common.Arg{
-					{Name: "MusicTriger", Value: false},
-				},
-			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 			// Stop the chaser.
@@ -2245,11 +2194,15 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 8 MUSIC TRIGGER  - Send start music trigger for sequences.
+		// Function 8 MUSIC TRIGGER  - Send start music trigger for scanner & rgb sequences.
 		if X == common.Function8_Music_Trigger &&
+			!this.ScannerChaser &&
 			!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
 
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 			// Starting a music trigger will start the sequence, so turn on the start lamp
 			// and remember that this sequence is on.
@@ -2265,23 +2218,45 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-
+			// We want to exit from functioms immediately so we call handle.
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 			return
 		}
 
-		// Function 8 MUSIC TRIGGER  - Send stop music trigger for sequences.
+		// Function 8 MUSIC TRIGGER  - Send start music trigger for chaser sequences.
 		if X == common.Function8_Music_Trigger &&
+			this.ScannerChaser &&
+			!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
+
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = true
+			this.ScannerChaser = true
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
+			// Tell the chaser sequences that the music trigger is on.
+			cmd := common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: this.ScannerChaser},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			// We want to exit from functioms immediately so we call handle.
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+			return
+		}
+
+		// Function 8 MUSIC TRIGGER  - Send stop music trigger for scanner and rgb sequences.
+		if X == common.Function8_Music_Trigger &&
+
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
 
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
 			this.Running[this.SelectedSequence] = false
 			common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
-
-			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
-			time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 			// Stop the music trigger for the target sequence.
 			cmd := common.Command{
@@ -2294,11 +2269,44 @@ func ProcessButtons(X int, Y int,
 
 			// We want to exit from functioms immediately so we call handle.
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
 			return
 		}
 
-		return
+		// Function 8 MUSIC TRIGGER  - Send stop music trigger chaser sequences.
+		if X == common.Function8_Music_Trigger &&
+			this.ScannerChaser &&
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 {
+
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State2 = false
+			this.ScannerChaser = false
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
+			// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
+			this.Running[this.ChaserSequenceNumber] = this.ScannerChaser
+			cmd := common.Command{
+				Action: common.UpdateScannerHasShutterChase,
+				Args: []common.Arg{
+					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			// Stop the music trigger for the chaser sequence.
+			cmd = common.Command{
+				Action: common.UpdateMusicTrigger,
+				Args: []common.Arg{
+					{Name: "MusicTriger", Value: this.ScannerChaser},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+			// We want to exit from functioms immediately so we call handle.
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+			return
+		}
 	}
 
 	// B L A C K O U T   B U T T O N.
@@ -3464,7 +3472,41 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 				}
 			}
 
-		//case common.Function8_Music_Trigger:
+		case common.Function8_Music_Trigger:
+
+			if !function.State && !function.State2 { // Cyan
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				if this.ScannerChaser {
+					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOff", guiButtons)
+				} else {
+					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+				}
+			}
+
+			if function.State && !function.State2 {
+				if this.ScannerChaser { // Cyan
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOn", guiButtons)
+				} else { // Purple
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+				}
+			}
+
+			if !function.State && function.State2 {
+				if this.ScannerChaser { // Purple
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOn", guiButtons)
+				} else { // Cyan
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+				}
+			}
+
+			if function.State && function.State2 { // Yellow
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+				common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "All\nMusic", guiButtons)
+			}
 
 		default:
 
