@@ -1905,8 +1905,11 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 2 Set Auto Color - Toggle the auto color feature.
-		if !this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
+		// Function 2 Set Auto Color - Toggle the auto color feature in scanner and rgb sequences.
+		if X == common.Function2_Auto_Color &&
+			!this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State &&
+			!this.ScannerChaser {
+
 			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = true
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
@@ -1918,7 +1921,10 @@ func ProcessButtons(X int, Y int,
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-		if this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State && X == common.Function2_Auto_Color {
+		if X == common.Function2_Auto_Color &&
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State &&
+			!this.ScannerChaser {
+
 			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = false
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
@@ -1927,6 +1933,38 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+
+		// Function 2 Set Auto Color - Toggle the auto color feature in chaser sequences.
+		if X == common.Function2_Auto_Color &&
+			!this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State2 &&
+			this.ScannerChaser {
+
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State2 = true
+			cmd := common.Command{
+				Action: common.UpdateAutoColor,
+				Args: []common.Arg{
+					{Name: "AutoColor,", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+		if X == common.Function2_Auto_Color &&
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State2 &&
+			this.ScannerChaser {
+
+			this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State2 = false
+			cmd := common.Command{
+				Action: common.UpdateAutoColor,
+				Args: []common.Arg{
+					{Name: "AutoColor,", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
@@ -3492,7 +3530,42 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 
 		//case common.Function1_Pattern:
 
-		//case common.Function2_Auto_Color:
+		case common.Function2_Auto_Color:
+
+			if !function.State && !function.State2 { // Cyan
+				if !this.ScannerChaser { // Cyan
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Cyan
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if function.State && !function.State2 {
+				if !this.ScannerChaser { // Purple
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOn", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Cyan
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if !function.State && function.State2 {
+				if !this.ScannerChaser { // Cyan
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Purple
+					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOn", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if function.State && function.State2 { // Orange
+				common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Auto\nAutoColor\nBoth", guiButtons)
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
+			}
 
 		case common.Function3_Auto_Pattern:
 

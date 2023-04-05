@@ -562,6 +562,20 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
+				if sequence.Label == "chaser" {
+					// Change all the fixtures to the next gobo.
+					for fixtureNumber := range sequence.ScannersAvailable {
+						sequence.ScannerGobo[fixtureNumber]++
+						if sequence.ScannerGobo[fixtureNumber] > 7 {
+							sequence.ScannerGobo[fixtureNumber] = 0
+						}
+					}
+				}
+
+				if mySequenceNumber == 4 {
+					fmt.Printf("sequence.ScannerGobo %+v\n", sequence.ScannerGobo)
+				}
+
 				// If we are setting the current colors in a rgb sequence.
 				if sequence.AutoColor &&
 					sequence.Type == "rgb" &&
