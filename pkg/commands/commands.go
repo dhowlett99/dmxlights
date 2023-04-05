@@ -67,8 +67,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Static = false
 		sequence.PlayStaticOnce = true
 		// Stop the sequence.
-		//this.Functions[common.Function8_Music_Trigger].State = false
-		//	this.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Clear = true
@@ -110,27 +108,28 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[scanner] = newScannerState
+				sequence.ScannerGobo[scanner] = 0 // Reset Selected Gobo
 			}
 			// Reset the number of coordinates.
 			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
-			// Reset the scanner size back to default. common.DefaultScannerSize
+			// Reset the scanner size and shift back to defaults.
 			sequence.ScannerSize = common.DefaultScannerSize
+			sequence.ScannerShift = common.DefaultScannerShift
 			// Reset the scanner pattern back to default.
 			sequence.UpdateSequenceColor = false
 			sequence.RecoverSequenceColors = false
 			sequence.UpdatePattern = true
 			sequence.SelectedPattern = common.DefaultPattern
-			// Clear all the function buttons for this sequence.
-			// this.Functions[common.Function1_Pattern].State = false
-			// this.Functions[common.Function2_Auto_Color].State = false
-			// sequence.Functions[common.Function3_Auto_Pattern].State = false
-			// sequence.Functions[common.Function4_Bounce].State = false
-			// sequence.Functions[common.Function5_Color].State = false
-			// sequence.Functions[common.Function6_Static_Gobo].State = false
-			// sequence.Functions[common.Function7_Invert_Chase].State = false
-			// sequence.Functions[common.Function8_Music_Trigger].State = false
-			// sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
 		}
+		// Clear all the function buttons for this sequence.
+		sequence.SelectedPattern = common.DefaultPattern
+		sequence.AutoColor = false
+		sequence.AutoPattern = false
+		sequence.Bounce = false
+		sequence.ScannerChaser = false
+		sequence.RGBInvert = false
+		sequence.MusicTrigger = false
+
 		if sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("Clear switch positions\n")

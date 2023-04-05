@@ -1907,28 +1907,69 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 3 Set Auto Pattern - Toggle Auto Pattern.
-		if !this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
+		// Function 3 Set Auto Pattern - Toggle Auto Pattern for scanner and rgb sequences.
+		if X == common.Function3_Auto_Pattern &&
+			!this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State &&
+			!this.ScannerChaser {
+
 			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = true
+
 			cmd := common.Command{
 				Action: common.UpdateAutoPattern,
 				Args: []common.Arg{
-					{Name: "Bounce", Value: true},
+					{Name: "AutoPattern", Value: true},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
-		if this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State && X == common.Function3_Auto_Pattern {
+		if X == common.Function3_Auto_Pattern &&
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State &&
+			!this.ScannerChaser {
+
 			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = false
 			cmd := common.Command{
 				Action: common.UpdateAutoPattern,
 				Args: []common.Arg{
-					{Name: "Off", Value: false},
+					{Name: "AutoPattern", Value: false},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+
+		// Function 3 Set Auto Pattern - Toggle Auto Pattern for chaser sequences
+		if X == common.Function3_Auto_Pattern &&
+			!this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 &&
+			this.ScannerChaser {
+
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 = true
+
+			cmd := common.Command{
+				Action: common.UpdateAutoPattern,
+				Args: []common.Arg{
+					{Name: "AutoPattern", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+		if X == common.Function3_Auto_Pattern &&
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 &&
+			this.ScannerChaser {
+
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 = true
+
+			cmd := common.Command{
+				Action: common.UpdateAutoPattern,
+				Args: []common.Arg{
+					{Name: "AutoPattern", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			return
 		}
@@ -3255,6 +3296,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditSequenceColorsMode[sequenceNumber] = false                        // Clear rgb color mode.
 		this.EditStaticColorsMode[sequenceNumber] = false                          // Clear static color mode.
 		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
+		this.ScannerChaser = false                                                 // Clear the scanner chase mode.
 
 		if sequence.Type == "scanner" {
 			// Enable all scanners.
@@ -3264,29 +3306,31 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			// Tell the scanner buttons what to show.
 			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
-
-			// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
-			this.ScannerChaser = false
-			this.Running[this.ChaserSequenceNumber] = this.ScannerChaser
-			cmd := common.Command{
-				Action: common.UpdateScannerHasShutterChase,
-				Args: []common.Arg{
-					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
-				},
-			}
-			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 		}
 
 		// Clear all the function buttons for this sequence.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
 			this.Functions[sequenceNumber][common.Function1_Pattern].State = false
+			this.Functions[sequenceNumber][common.Function1_Pattern].State2 = false
+
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = false
+			this.Functions[sequenceNumber][common.Function2_Auto_Color].State2 = false
+
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = false
+			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State2 = false
+
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = false
+			this.Functions[sequenceNumber][common.Function4_Bounce].State2 = false
+
 			this.Functions[sequenceNumber][common.Function5_Color].State = false
+			this.Functions[sequenceNumber][common.Function5_Color].State2 = false
+
 			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = false
+			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State2 = false
+
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = false
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State2 = false
+
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = false
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State2 = false
 		}
@@ -3414,7 +3458,42 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 
 		//case common.Function2_Auto_Color:
 
-		//case common.Function3_Auto_Pattern:
+		case common.Function3_Auto_Pattern:
+
+			if !function.State && !function.State2 { // Cyan
+				if !this.ScannerChaser { // Cyan
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Cyan
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if function.State && !function.State2 {
+				if !this.ScannerChaser { // Purple
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOn", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Cyan
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if !function.State && function.State2 {
+				if !this.ScannerChaser { // Cyan
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOff", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { // Purple
+					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOn", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+
+			if function.State && function.State2 { // Orange
+				common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Auto\nPattern\nBoth", guiButtons)
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
+			}
 
 		case common.Function4_Bounce:
 
