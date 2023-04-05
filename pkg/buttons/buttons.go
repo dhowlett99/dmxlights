@@ -2067,6 +2067,44 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
+		// Function 7 - Turn on the RGB Invert mode.
+		if X == common.Function7_Invert_Chase &&
+			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			sequences[this.SelectedSequence].Type == "rgb" {
+
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
+
+			cmd := common.Command{
+				Action: common.UpdateRGBInvert,
+				Args: []common.Arg{
+					{Name: "RGBInvert", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+
+		// Function 7 - Turn off the RGB Invert mode.
+		if X == common.Function7_Invert_Chase &&
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			sequences[this.SelectedSequence].Type == "rgb" {
+
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+
+			cmd := common.Command{
+				Action: common.UpdateRGBInvert,
+				Args: []common.Arg{
+					{Name: "RGBInvert", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			return
+		}
+
 		// Function 7 - Toggle the shutter chaser mode. 1st Press starts the chaser.
 		if X == common.Function7_Invert_Chase &&
 			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
@@ -3402,18 +3440,28 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 		case common.Function7_Invert_Chase:
 
 			if !function.State && !function.State2 { // Cyan
-				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nOff", guiButtons)
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				if this.ScannerChaser {
+					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nOff", guiButtons)
+				} else {
+					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+				}
 			}
 
 			if function.State && !function.State2 { // Purple
-				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nRunning", guiButtons)
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				if this.ScannerChaser {
+					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nRunning", guiButtons)
+				} else {
+					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
+				}
 			}
 
 			if function.State && function.State2 { // Yellow
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-				common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chase\nTo\nMusic", guiButtons)
+				if this.ScannerChaser {
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chase\nTo\nMusic", guiButtons)
+				}
 			}
 
 		//case common.Function8_Music_Trigger:

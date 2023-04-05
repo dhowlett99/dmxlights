@@ -220,6 +220,7 @@ const (
 	ToggleFixtureState
 	FixtureState
 	UpdateRGBShift
+	UpdateRGBInvert
 	UpdateScannerShift
 	UpdateScannerColor
 	UpdateStrobeSpeed
