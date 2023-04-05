@@ -572,10 +572,6 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				if mySequenceNumber == 4 {
-					fmt.Printf("sequence.ScannerGobo %+v\n", sequence.ScannerGobo)
-				}
-
 				// If we are setting the current colors in a rgb sequence.
 				if sequence.AutoColor &&
 					sequence.Type == "rgb" &&
