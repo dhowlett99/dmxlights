@@ -1649,6 +1649,18 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
+		// If configured set scanner color in chaser.
+		if this.ScannerChaser {
+			cmd := common.Command{
+				Action: common.UpdateScannerColor,
+				Args: []common.Arg{
+					{Name: "SelectedColor", Value: this.ScannerColor},
+					{Name: "SelectedFixture", Value: this.SelectedFixture},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		}
+
 		this.EditScannerColorsMode[this.SelectedSequence] = true
 
 		// Get an upto date copy of the sequence.
@@ -1721,6 +1733,18 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// If configured set scanner color in chaser.
+		if this.ScannerChaser {
+			cmd := common.Command{
+				Action: common.UpdateGobo,
+				Args: []common.Arg{
+					{Name: "SelectedGobo", Value: this.SelectedGobo},
+					{Name: "FixtureNumber", Value: this.SelectedFixture},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		}
 
 		this.EditGoboSelectionMode[this.SelectedSequence] = true
 
@@ -1867,6 +1891,9 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
 		}
 
+		fmt.Printf("State %t\n", this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State)
+		fmt.Printf("State2 %t\n", this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2)
+
 		// Map Function 1 - Go straight into pattern select mode, don't wait for a another select press.
 		if X == common.Function1_Pattern {
 			this.EditPatternMode[this.SelectedSequence] = true
@@ -1961,7 +1988,7 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 &&
 			this.ScannerChaser {
 
-			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 = true
+			this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State2 = false
 
 			cmd := common.Command{
 				Action: common.UpdateAutoPattern,
@@ -2031,14 +2058,20 @@ func ProcessButtons(X int, Y int,
 		// Map Function 5 Scanner Color Selection - Go straight into scanner color edit mode via select fixture, don't wait for a another select press.
 		if X == common.Function5_Color && !this.Functions[this.SelectedSequence][common.Function5_Color].State &&
 			sequences[this.SelectedSequence].Type == "scanner" {
+
 			this.Functions[this.SelectedSequence][common.Function5_Color].State = true
 			this.EditSequenceColorsMode[this.SelectedSequence] = true
+
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+			// Select a fixture.
 			this.EditFixtureSelectionMode = true
 			this.FunctionSelectMode[this.SelectedSequence] = true
 			sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
+
 			this.FollowingAction = "ShowScannerColorSelectionButtons"
 			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 			return
@@ -2047,15 +2080,21 @@ func ProcessButtons(X int, Y int,
 		// Map Function 6 Scanner GOBO Selection - Go to select gobo mode if we are in scanner sequence.
 		if X == common.Function6_Static_Gobo && !this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
 			sequences[this.SelectedSequence].Type == "scanner" {
+
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 			this.EditStaticColorsMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditGoboSelectionMode[this.SelectedSequence] = true
+
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
+
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+			// Select a fixture.
 			this.EditFixtureSelectionMode = true
 			this.FunctionSelectMode[this.SelectedSequence] = true
 			sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
+
 			this.FollowingAction = "ShowGoboSelectionButtons"
 			this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 			return
@@ -3532,9 +3571,78 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
 			}
 
-		//case common.Function5_Color:
+		case common.Function5_Color:
 
-		//case common.Function6_Static_Gobo:
+			if !function.State && !function.State2 { // Cyan
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				if !this.ScannerChaser {
+					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
+				} else {
+					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
+				}
+			}
+			if function.State && !function.State2 {
+				if !this.ScannerChaser { // Purple
+					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				} else { //Cyan
+					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+			if !function.State && function.State2 {
+				if !this.ScannerChaser { //Cyan
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
+				} else { // Purple
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
+				}
+			}
+			if function.State && function.State2 { // Purple
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				if !this.ScannerChaser {
+					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
+				} else {
+					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
+				}
+			}
+
+		case common.Function6_Static_Gobo:
+			if !function.State && !function.State2 { // Cyan
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				if !this.ScannerChaser {
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
+				} else {
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
+				}
+			}
+			if function.State && !function.State2 {
+				if !this.ScannerChaser { // Purple
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
+				} else { //Cyan
+					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nGobo", guiButtons)
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+				}
+			}
+			if !function.State && function.State2 {
+				if !this.ScannerChaser { //Cyan
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
+				} else { // Purple
+					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
+				}
+			}
+			if function.State && function.State2 { // Purple
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+				if !this.ScannerChaser {
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
+				} else {
+					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
+				}
+			}
 
 		case common.Function7_Invert_Chase:
 

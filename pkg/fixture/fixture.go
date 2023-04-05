@@ -710,19 +710,23 @@ func MapFixtures(chaser bool, hadShutterChase bool, mySequenceNumber int,
 						if strings.Contains(channel.Name, "ProgramSpeed") {
 							SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 						}
-						if strings.Contains(channel.Name, "Gobo") {
-							for _, setting := range channel.Settings {
-								if setting.Number == selectedGobo {
-									v, _ := strconv.Atoi(setting.Value)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+						if !hadShutterChase {
+							if strings.Contains(channel.Name, "Gobo") {
+								for _, setting := range channel.Settings {
+									if setting.Number == selectedGobo {
+										v, _ := strconv.Atoi(setting.Value)
+										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									}
 								}
 							}
 						}
-						if strings.Contains(channel.Name, "Color") {
-							for _, setting := range channel.Settings {
-								if setting.Number-1 == scannerColor {
-									v, _ := strconv.Atoi(setting.Value)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+						if !hadShutterChase {
+							if strings.Contains(channel.Name, "Color") {
+								for _, setting := range channel.Settings {
+									if setting.Number-1 == scannerColor {
+										v, _ := strconv.Atoi(setting.Value)
+										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									}
 								}
 							}
 						}
@@ -754,7 +758,7 @@ func MapFixtures(chaser bool, hadShutterChase bool, mySequenceNumber int,
 								}
 							}
 						}
-					} else {
+					} else { // We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
 						// Master Dimmer.
 						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
 							if blackout {
@@ -767,6 +771,24 @@ func MapFixtures(chaser bool, hadShutterChase bool, mySequenceNumber int,
 									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
 								} else {
 									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+								}
+							}
+						}
+						// Scanner Color
+						if strings.Contains(channel.Name, "Color") {
+							for _, setting := range channel.Settings {
+								if setting.Number-1 == scannerColor {
+									v, _ := strconv.Atoi(setting.Value)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								}
+							}
+						}
+						// Scanner Gobo
+						if strings.Contains(channel.Name, "Gobo") {
+							for _, setting := range channel.Settings {
+								if setting.Number == selectedGobo {
+									v, _ := strconv.Atoi(setting.Value)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 							}
 						}
