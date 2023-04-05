@@ -3264,6 +3264,18 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			// Tell the scanner buttons what to show.
 			ShowScannerStatus(sequenceNumber, *sequences[sequenceNumber], this, eventsForLaunchpad, guiButtons, commandChannels)
+
+			// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
+			this.ScannerChaser = false
+			this.Running[this.ChaserSequenceNumber] = this.ScannerChaser
+			cmd := common.Command{
+				Action: common.UpdateScannerHasShutterChase,
+				Args: []common.Arg{
+					{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
+				},
+			}
+			common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 		}
 
 		// Clear all the function buttons for this sequence.
