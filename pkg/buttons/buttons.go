@@ -834,7 +834,7 @@ func ProcessButtons(X int, Y int,
 		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
-			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
+			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -852,7 +852,7 @@ func ProcessButtons(X int, Y int,
 		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
-			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
+			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -870,16 +870,10 @@ func ProcessButtons(X int, Y int,
 		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
-			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
+			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		// cmd := common.Command{
-		// 	Action: common.PlayStaticOnce,
-		// }
-		// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
 		this.EditSequenceColorsMode[this.SelectedSequence] = false
 		this.EditGoboSelectionMode[this.SelectedSequence] = false
 
@@ -2145,14 +2139,15 @@ func ProcessButtons(X int, Y int,
 			return
 		}
 
-		// Function 6 RGB - edit static color if we are a RGB sequence.
-		if !this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && X == common.Function6_Static_Gobo {
+		// Function 6 RGB - Turn on edit static color mode.
+		if X == common.Function6_Static_Gobo &&
+			!this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
+			sequences[this.SelectedSequence].Type == "rgb" {
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 			// Starting a static sequence will turn off a running chaser, so turn off the start lamp
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			//  and remember that this sequence is off.
 			this.Running[this.SelectedSequence] = false
-			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
-			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditStaticColorsMode[this.SelectedSequence] = true   // Turn on edit static color mode.
 			this.FunctionSelectMode[this.SelectedSequence] = false    // Turn off functions.
@@ -2170,7 +2165,11 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			return
 		}
-		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && X == common.Function6_Static_Gobo {
+
+		// Function 6 RGB - Turn off edit static color mode.
+		if X == common.Function6_Static_Gobo &&
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
+			sequences[this.SelectedSequence].Type == "rgb" {
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
 			this.EditStaticColorsMode[this.SelectedSequence] = false  // Turn off edit static color mode.
@@ -2187,7 +2186,6 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			// this.SelectButtonPressed[this.SelectedSequence] = true
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 			return
 		}
@@ -2745,7 +2743,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
 			common.SetMode(this.SelectedSequence, commandChannels, "Static")
-			this.EditStaticColorsMode[this.SelectedFixture] = false
+			this.EditStaticColorsMode[this.SelectedSequence] = false
 		}
 
 		// Set function mode.
