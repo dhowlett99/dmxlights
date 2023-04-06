@@ -40,6 +40,8 @@ const DefaultRGBFade = 1
 const DefaultScannerFade = 10
 const DefaultSpeed = 7
 const DefaultRGBShift = 0
+const DefaultScannerColor = 1
+const DefaultScannerGobo = 1
 const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
 const ScannerMidPoint = 127
@@ -279,6 +281,7 @@ type Sequence struct {
 	CurrentSpeed                time.Duration               // Sequence speed represented as a duration.
 	Speed                       int                         // Sequence speed represented by a short number.
 	MusicTrigger                bool                        // Is this sequence in music trigger mode.
+	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
@@ -786,52 +789,6 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 
 	return code
 }
-
-// func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
-
-// 	// Map the auto color change setting.
-// 	sequence.AutoColor = functions[Function2_Auto_Color].State
-
-// 	// Map the auto pattern change setting.
-// 	sequence.AutoPattern = functions[Function3_Auto_Pattern].State
-
-// 	// Map bounce function to sequence bounce setting.
-// 	sequence.Bounce = functions[Function4_Bounce].State
-
-// 	// Map color selection function.
-// 	if functions[Function5_Color].State {
-// 		sequence.PlayStaticOnce = true
-// 	}
-
-// 	// Map static function.
-// 	if sequence.Type != "scanner" {
-// 		sequence.Static = functions[Function6_Static_Gobo].State
-// 		if functions[Function6_Static_Gobo].State {
-// 			sequence.PlayStaticOnce = true
-// 			sequence.Hide = true
-// 		}
-// 	}
-
-// 	// Map RGB invert function.
-// 	if sequence.Type == "rgb" {
-// 		sequence.RGBInvert = functions[Function7_Invert_Chase].State
-// 	}
-
-// 	// Map scanner chase mode. Uses same function key as above.
-// 	if sequence.Type == "scanner" {
-// 		sequence.ScannerChase = functions[Function7_Invert_Chase].State
-// 	}
-
-// 	// Map music trigger function.
-// 	sequence.MusicTrigger = functions[Function8_Music_Trigger].State
-// 	if functions[Function8_Music_Trigger].State {
-// 		sequence.Run = true
-// 	}
-
-// 	this.Functions = functions
-
-// 	return sequence
-// }
 
 func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 

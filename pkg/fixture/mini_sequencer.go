@@ -20,6 +20,7 @@ package fixture
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"time"
@@ -73,8 +74,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug_mini {
+			fmt.Printf("Sound trigger %s disabled\n", switchName)
+		}
 
 		// Stop any running chases.
 		select {
@@ -103,8 +111,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disabled\n", switchName)
+		}
 
 		// Stop any running chases.
 		select {
@@ -151,8 +166,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disable\n", switchName)
+		}
 
 		// Stop any running chases.
 		select {
@@ -196,8 +218,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, true, blackout, master)
 
 		// DeRegister this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disable\n", switchName)
+		}
 
 		// Turn off the fixture.
 		select {
@@ -207,8 +236,17 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		}
 
 		// Register this mini sequencer with the sound service.
+		// Use the switch name as the unique sequence name.
 		if cfg.MusicTrigger {
-			soundConfig.EnableSoundTrigger(switchName)
+			//fmt.Printf("EnableSoundTrigger(switchName) %s\n", switchName)
+			err := soundConfig.EnableSoundTrigger(switchName)
+			if err != nil {
+				fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
+				os.Exit(1)
+			}
+			if debug_mini {
+				fmt.Printf("Sound trigger %s enabled\n", switchName)
+			}
 		}
 
 		// Stop any left over sequence left over for this switch.
@@ -353,9 +391,9 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					// First three triggers occupied by sequence 1,2 & 3
-					// So switch channels use 4 -11
-					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
+					// First four triggers are occupied by sequence 1-FOH,2-Upluighters,3-Scanners,4-Switches,5-ShutterChaser
+					// So switch channels use 5 -12
+					case <-soundConfig.SoundTriggers[switchNumber+4].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						// Stop.
 						if cfg.Rotatable {

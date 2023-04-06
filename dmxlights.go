@@ -43,6 +43,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
+const debug = false
 const NumberOfSequences = 5
 const NumberOfSwitches = 8
 
@@ -260,7 +261,7 @@ func main() {
 			this.FunctionLabels[3] = "Scanner\nBounce"
 			this.FunctionLabels[4] = "Scanner\nColor"
 			this.FunctionLabels[5] = "Scanner\nGobo"
-			this.FunctionLabels[6] = "Chaser\nOff"
+			this.FunctionLabels[6] = "Chaser"
 			this.FunctionLabels[7] = "Scanner\nMusic"
 		}
 
@@ -298,22 +299,29 @@ func main() {
 	NumberOfMusicTriggers := NumberOfSequences + NumberOfSwitches
 
 	// Setting trigger names.
-	// TODO re-visit this and make the allocation of trigger numbers less confusing.
-	for triggerNumber := 0; triggerNumber <= NumberOfMusicTriggers; triggerNumber++ {
+	for triggerNumber := 0; triggerNumber < NumberOfMusicTriggers; triggerNumber++ {
 		newChannel := make(chan common.Command)
 		var name string
 		var newTrigger common.Trigger
 		// First three triggers occupied by sequence 0=FOH, 1=Uplighter,2=Scanners, 3-10 switched 11=shutter chase
-		if triggerNumber < 3 {
-			name = fmt.Sprintf("sequence%d", triggerNumber)
+		if triggerNumber == 0 {
+			name = fmt.Sprintf("sequence%d", triggerNumber) // FOH
 		}
-		// 3-10 , eight switches
-		if triggerNumber > 3 && triggerNumber < 11 {
-			name = fmt.Sprintf("switch%d", triggerNumber-3)
+		if triggerNumber == 1 {
+			name = fmt.Sprintf("sequence%d", triggerNumber) // Uplighters
 		}
-		// sequence 4 = shutter chaser,
-		if triggerNumber == 11 {
-			name = fmt.Sprintf("sequence%d", 3)
+		if triggerNumber == 2 {
+			name = fmt.Sprintf("sequence%d", triggerNumber) // Scanners
+		}
+		if triggerNumber == 3 {
+			name = fmt.Sprintf("sequence%d", triggerNumber) // Switches
+		}
+		if triggerNumber == 4 {
+			name = fmt.Sprintf("sequence%d", triggerNumber) // Shutter Chaser
+		}
+		// 5-12, eight switches
+		if triggerNumber > 4 {
+			name = fmt.Sprintf("switch%d", triggerNumber-4)
 		}
 
 		newTrigger = common.Trigger{
@@ -324,6 +332,12 @@ func main() {
 		}
 
 		this.SoundTriggers = append(this.SoundTriggers, &newTrigger)
+	}
+
+	if debug {
+		for triggerNumber, trigger := range this.SoundTriggers {
+			fmt.Printf("%d: trigger %s installed, enabled %t\n", triggerNumber, trigger.Name, trigger.State)
+		}
 	}
 
 	// Now add them all to a handy channels struct.

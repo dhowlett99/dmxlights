@@ -102,13 +102,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Reset pan and tilt to the center
 			sequence.ScannerOffsetPan = common.ScannerMidPoint
 			sequence.ScannerOffsetTilt = common.ScannerMidPoint
-			// Enable all scanners.
+			// Enable all scanners and reset colors and gobo's.
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[scanner] = newScannerState
-				sequence.ScannerGobo[scanner] = 0 // Reset Selected Gobo
+				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
 			}
 			// Reset the number of coordinates.
 			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
@@ -618,15 +619,33 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.UpdateAutoColor:
 		const AUTO_COLOR = 0
+		const SELECTED_TYPE = 1
 		if debug {
-			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[AUTO_COLOR].Value)
+			fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
 		}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
-		if !command.Args[AUTO_COLOR].Value.(bool) {
+		selectedType := command.Args[SELECTED_TYPE].Value.(string)
+
+		// If we switch auto color off and we are a rgb rembember what colors are in our sequence.
+		if !sequence.AutoColor && selectedType == "rgb" {
+			// If RecoverSequenceColors is true then we recover the colors from the SavedSequenceColors.
 			sequence.RecoverSequenceColors = true
-		} else {
+		}
+		// If we switch auto color on and we are a rgb rembember what colors are in our sequence.
+		if sequence.AutoColor && selectedType == "rgb" {
+			// setting RecoverSequenceColors to false forces the sequence to save the currented
+			// seleced colors to the SavedSequenceColors
 			sequence.RecoverSequenceColors = false
 		}
+
+		// If switch auto color off and we are a scanner then reset the gobo and color back to the defaults.
+		if !sequence.AutoColor && selectedType == "scanner" {
+			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
+				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
+			}
+		}
+
 		return sequence
 
 	case common.UpdateAutoPattern:
@@ -689,6 +708,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.UpdatePattern = true
 		sequence.Static = false
+		sequence.ChangeMusicTrigger = true
 		return sequence
 
 	case common.UpdateScannerHasShutterChase:
@@ -699,7 +719,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerChaser = command.Args[STATE].Value.(bool)
 		return sequence
 
-	// If we are being asekd to load a config, use the new sequence.
+	// If we are being asked to load a config, use the new sequence.
 	case common.LoadConfig:
 		const X = 0
 		const Y = 1

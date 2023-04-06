@@ -187,24 +187,29 @@ func (soundConfig *SoundConfig) GetDeviceName() string {
 }
 
 // EnableSoundTrigger  - Register the Trigger.
-func (soundConfig *SoundConfig) EnableSoundTrigger(name string) {
+func (soundConfig *SoundConfig) EnableSoundTrigger(name string) error {
 	// Step through the existing sound triggers and find the one we want to enable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
+			//fmt.Printf("Enable trigger number %d name %s\n", triggerNumber, trigger.Name)
 			soundConfig.SoundTriggers[triggerNumber].State = true
+			return nil
 		}
 	}
+	return fmt.Errorf("sound trigger %s not found", name)
 }
 
 // DisableSoundTrigger  - Disable the Trigger.
-func (soundConfig *SoundConfig) DisableSoundTrigger(name string) {
+func (soundConfig *SoundConfig) DisableSoundTrigger(name string) error {
 
 	// Step through the existing sound triggers and find the one we want to disable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
 			soundConfig.SoundTriggers[triggerNumber].State = false
+			return nil
 		}
 	}
+	return fmt.Errorf("sound trigger %s not found", name)
 }
 
 func (soundConfig *SoundConfig) getAvailableInputs() {
