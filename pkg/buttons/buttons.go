@@ -37,6 +37,7 @@ type CurrentState struct {
 	Crash1                    bool                         // Flags to detect launchpad crash.
 	Crash2                    bool                         // Flags to detect launchpad crash.
 	SelectedSequence          int                          // The currently selected sequence.
+	SelectedType              string                       // The currently selected sequenece type.
 	LastSelectedSequence      int                          // Store fof the last selected squence.
 	Speed                     map[int]int                  // Local copy of sequence speed. Indexed by sequence.
 	RGBShift                  map[int]int                  // Current rgb fixture shift. Indexed by sequence.
@@ -607,8 +608,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -663,8 +664,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -719,8 +720,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -779,8 +780,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -830,6 +831,7 @@ func ProcessButtons(X int, Y int,
 	if X == 8 && Y == 0 {
 
 		this.SelectedSequence = 0
+		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
@@ -847,6 +849,7 @@ func ProcessButtons(X int, Y int,
 	if X == 8 && Y == 1 {
 
 		this.SelectedSequence = 1
+		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
@@ -864,6 +867,7 @@ func ProcessButtons(X int, Y int,
 	if X == 8 && Y == 2 {
 
 		this.SelectedSequence = 2
+		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
 			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
@@ -1017,8 +1021,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -1073,13 +1077,15 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
 
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
+		if sequences[targetSequence].Type == "rgb" ||
+			this.Functions[targetSequence][common.Function7_Invert_Chase].State {
+
 			// Send Update RGB Size.
 			this.RGBSize[targetSequence]++
 			if this.RGBSize[targetSequence] > common.MaxRGBSize {
@@ -1130,8 +1136,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -1189,8 +1195,8 @@ func ProcessButtons(X int, Y int,
 		// If we're a scanner and we're in shutter chase mode.
 		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State {
-			targetSequence = 4
+			this.ScannerChaser {
+			targetSequence = this.ChaserSequenceNumber
 		} else {
 			targetSequence = this.SelectedSequence
 		}
@@ -1386,7 +1392,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaseer to invert this scanner.
+			// Tell the sequence chaser to invert this scanner.
 			cmd = common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
@@ -1650,7 +1656,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser {
+		if this.ScannerChaser && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateScannerColor,
 				Args: []common.Arg{
@@ -1735,7 +1741,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser {
+		if this.ScannerChaser && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateGobo,
 				Args: []common.Arg{
@@ -1835,27 +1841,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Set Pattern to %d\n", X)
 		}
 
-		if !this.ScannerChaser {
-
-			// Tell the sequence to change the pattern.
-			cmd := common.Command{
-				Action: common.UpdatePattern,
-				Args: []common.Arg{
-					{Name: "SelectPattern", Value: X},
-				},
-			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-			this.FunctionSelectMode[this.SelectedSequence] = false
-
-			// Get an upto date copy of the sequence.
-			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
-			this.EditFixtureSelectionMode = false
-			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-
-		} else {
+		if this.ScannerChaser && this.SelectedType == "scanner" {
 			// Tell the sequence to change the pattern.
 			cmd := common.Command{
 				Action: common.UpdatePattern,
@@ -1873,6 +1859,25 @@ func ProcessButtons(X int, Y int,
 			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 			this.EditFixtureSelectionMode = false
 			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+
+		} else {
+			// Tell the sequence to change the pattern.
+			cmd := common.Command{
+				Action: common.UpdatePattern,
+				Args: []common.Arg{
+					{Name: "SelectPattern", Value: X},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			this.FunctionSelectMode[this.SelectedSequence] = false
+
+			// Get an upto date copy of the sequence.
+			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+
+			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
+			this.EditFixtureSelectionMode = false
+			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 		}
 
@@ -1914,7 +1919,8 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
-					{Name: "Bounce", Value: true},
+					{Name: "AutoColor", Value: true},
+					{Name: "Type", Value: this.SelectedType},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1929,7 +1935,8 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
-					{Name: "Off", Value: false},
+					{Name: "AutoColor", Value: false},
+					{Name: "Type", Value: this.SelectedType},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -1946,7 +1953,8 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
-					{Name: "AutoColor,", Value: true},
+					{Name: "AutoColor", Value: true},
+					{Name: "Type", Value: this.SelectedType},
 				},
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
@@ -1961,7 +1969,8 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.UpdateAutoColor,
 				Args: []common.Arg{
-					{Name: "AutoColor,", Value: false},
+					{Name: "AutoColor", Value: false},
+					{Name: "Type", Value: this.SelectedType},
 				},
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
@@ -2053,16 +2062,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 
-			if !this.ScannerChaser {
-				// Scanner Sequence.
-				if this.Functions[this.SelectedSequence][common.Function4_Bounce].State {
-					this.Functions[this.SelectedSequence][common.Function4_Bounce].State = false
-					common.SendCommandToSequence(this.ScannerSequenceNumber, stopCmd, commandChannels)
-				} else {
-					this.Functions[this.SelectedSequence][common.Function4_Bounce].State = true
-					common.SendCommandToSequence(this.ScannerSequenceNumber, startCmd, commandChannels)
-				}
-			} else {
+			if this.ScannerChaser && this.SelectedType == "scanner" {
 				// Chaser Sequence.
 				if this.Functions[this.SelectedSequence][common.Function4_Bounce].State2 {
 					this.Functions[this.SelectedSequence][common.Function4_Bounce].State2 = false
@@ -2070,6 +2070,16 @@ func ProcessButtons(X int, Y int,
 				} else {
 					this.Functions[this.SelectedSequence][common.Function4_Bounce].State2 = true
 					common.SendCommandToSequence(this.ChaserSequenceNumber, startCmd, commandChannels)
+				}
+
+			} else {
+				// Scanner Sequence.
+				if this.Functions[this.SelectedSequence][common.Function4_Bounce].State {
+					this.Functions[this.SelectedSequence][common.Function4_Bounce].State = false
+					common.SendCommandToSequence(this.SelectedSequence, stopCmd, commandChannels)
+				} else {
+					this.Functions[this.SelectedSequence][common.Function4_Bounce].State = true
+					common.SendCommandToSequence(this.SelectedSequence, startCmd, commandChannels)
 				}
 			}
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -2222,11 +2232,11 @@ func ProcessButtons(X int, Y int,
 
 		// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 		if X == common.Function7_Invert_Chase &&
-			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
 			this.ScannerChaser = true
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true // Chaser
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = true // Chaser
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -2266,11 +2276,11 @@ func ProcessButtons(X int, Y int,
 
 		// Function 7 - Toggle the shutter chaser mode. Stop the chaser.
 		if X == common.Function7_Invert_Chase &&
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 
 			this.ScannerChaser = false
-			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2 = false
 
 			ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -2626,7 +2636,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		// If the chase is running, reveal it.
-		if this.ScannerChaser {
+		if this.ScannerChaser && this.SelectedType == "scanner" {
 			if debug {
 				fmt.Printf("%d: Reveal Sequence\n", this.ChaserSequenceNumber)
 			}
@@ -2666,7 +2676,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
 			// If the chase is running, reveal it.
-			if this.ScannerChaser {
+			if this.ScannerChaser && this.SelectedType == "scanner" {
 				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 			}
 
@@ -2706,7 +2716,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		// If the chaser is running, reveal it.
-		if this.ScannerChaser {
+		if this.ScannerChaser && this.SelectedType == "scanner" {
 			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
@@ -2745,8 +2755,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.HideSequence(this.SelectedSequence, commandChannels)
 
 		// If the chase is running, hide it.
-		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
-
+		if this.ScannerChaser && this.SelectedType == "scanner" {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		}
 		// Turn off any static sequence so we can see the functions.
 		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
 
@@ -3132,6 +3143,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = sequences[sequenceNumber].Static
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].RGBInvert
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
 		}
@@ -3525,276 +3537,42 @@ func ShowFunctionButtons(this *CurrentState, selectedSequence int, eventsForLauc
 			fmt.Printf("ShowFunctionButtons: function %s state %t state2 %t\n", function.Name, function.State, function.State2)
 		}
 
-		// Additional custom labels.
-		switch index {
+		if !function.State && !function.State2 { // Both off so Cyan.
+			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+		}
 
-		//case common.Function1_Pattern:
-
-		case common.Function2_Auto_Color:
-
-			if !function.State && !function.State2 { // Cyan
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && !function.State2 {
-				if !this.ScannerChaser { // Purple
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if !function.State && function.State2 {
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Scanner\nAutoColor\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Purple
-					common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && function.State2 { // Orange
-				common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Auto\nAutoColor\nBoth", guiButtons)
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
-			}
-
-		case common.Function3_Auto_Pattern:
-
-			if !function.State && !function.State2 { // Cyan
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && !function.State2 {
-				if !this.ScannerChaser { // Purple
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if !function.State && function.State2 {
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Scanner\nAutoPatt\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Purple
-					common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAutoPatt\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && function.State2 { // Orange
-				common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Auto\nPattern\nBoth", guiButtons)
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
-			}
-
-		case common.Function4_Bounce:
-
-			if !function.State && !function.State2 { // Cyan
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Scanner\nBounce\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chaser\nBounce\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && !function.State2 {
-				if !this.ScannerChaser { // Purple
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Scanner\nBounce\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Cyan
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chaser\nBounce\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if !function.State && function.State2 {
-				if !this.ScannerChaser { // Cyan
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Scanner\nBounce\nOff", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { // Purple
-					common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chaser\nBounce\nOn", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-
-			if function.State && function.State2 { // Orange
-				common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Bounce\nBoth", guiButtons)
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 111, Blue: 0}, eventsForLauchpad, guiButtons)
-			}
-
-		case common.Function5_Color:
-
-			if !function.State && !function.State2 { // Cyan
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				if !this.ScannerChaser {
-					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
-				} else {
-					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
-				}
-			}
-			if function.State && !function.State2 {
-				if !this.ScannerChaser { // Purple
-					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				} else { //Cyan
-					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-			if !function.State && function.State2 {
-				if !this.ScannerChaser { //Cyan
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
-				} else { // Purple
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
-				}
-			}
-			if function.State && function.State2 { // Purple
+		if function.State && !function.State2 { // Scanner or rgb on and chaser off.
+			if !this.ScannerChaser { // Purple
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				if !this.ScannerChaser {
-					common.LabelButton(common.Function5_Color, selectedSequence, "Scanner\nColor", guiButtons)
-				} else {
-					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
-				}
-			}
-
-		case common.Function6_Static_Gobo:
-			if !function.State && !function.State2 { // Cyan
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				if !this.ScannerChaser {
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
-				} else {
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
-				}
-			}
-			if function.State && !function.State2 {
-				if !this.ScannerChaser { // Purple
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
-				} else { //Cyan
-					common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nGobo", guiButtons)
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				}
-			}
-			if !function.State && function.State2 {
-				if !this.ScannerChaser { //Cyan
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
-				} else { // Purple
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
-				}
-			}
-			if function.State && function.State2 { // Purple
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				if !this.ScannerChaser {
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Scanner\nGobo", guiButtons)
-				} else {
-					common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
-				}
-			}
-
-		case common.Function7_Invert_Chase:
-
-			if !function.State && !function.State2 { // Cyan
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				if this.ScannerChaser {
-					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nOff", guiButtons)
-				} else {
-					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-				}
-			}
-
-			if function.State && !function.State2 { // Purple
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-				if this.ScannerChaser {
-					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser\nRunning", guiButtons)
-				} else {
-					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-				}
-			}
-
-			if function.State && function.State2 { // Yellow
-				if this.ScannerChaser {
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chase\nTo\nMusic", guiButtons)
-				}
-			}
-
-		case common.Function8_Music_Trigger:
-
-			if !function.State && !function.State2 { // Cyan
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-				if this.ScannerChaser {
-					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOff", guiButtons)
-				} else {
-					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-				}
-			}
-
-			if function.State && !function.State2 {
-				if this.ScannerChaser { // Cyan
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOn", guiButtons)
-				} else { // Purple
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-				}
-			}
-
-			if !function.State && function.State2 {
-				if this.ScannerChaser { // Purple
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nOn", guiButtons)
-				} else { // Cyan
-					common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-					common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-				}
-			}
-
-			if function.State && function.State2 { // Yellow
-				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
-				common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "All\nMusic", guiButtons)
-			}
-
-		default:
-
-			if !function.State { // Cyan
+			} else { // Cyan
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 			}
+		}
 
-			if function.State { // Purple
+		if !function.State && function.State2 { // Scanner or rgb off and chaser on.
+			if !this.ScannerChaser { // Cyan
+				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			} else { // Purple
 				common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 			}
+		}
 
-			if !this.ScannerChaser {
-				common.LabelButton(index, selectedSequence, function.Label, guiButtons)
-			}
+		if function.State && function.State2 { // Both scanner or rgb and chaser both on.
+			common.LightLamp(common.ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+		}
 
-			if this.ScannerChaser {
-				common.LabelButton(common.Function1_Pattern, this.SelectedSequence, "Chase\nPattern", guiButtons)
-			}
+		common.LabelButton(index, selectedSequence, function.Label, guiButtons)
 
+		if this.ScannerChaser && this.SelectedType == "scanner" {
+			common.LabelButton(common.Function1_Pattern, this.SelectedSequence, "Chase\nPattern", guiButtons)
+			common.LabelButton(common.Function2_Auto_Color, this.SelectedSequence, "Chaser\nAutoColor", guiButtons)
+			common.LabelButton(common.Function3_Auto_Pattern, this.SelectedSequence, "Chaser\nAuto\nPattern", guiButtons)
+			common.LabelButton(common.Function4_Bounce, this.SelectedSequence, "Chaser\nBounce", guiButtons)
+			common.LabelButton(common.Function5_Color, selectedSequence, "Chaser\nColor", guiButtons)
+			common.LabelButton(common.Function6_Static_Gobo, selectedSequence, "Chaser\nGobo", guiButtons)
+			common.LabelButton(common.Function7_Invert_Chase, this.SelectedSequence, "Chaser", guiButtons)
+			common.LabelButton(common.Function8_Music_Trigger, this.SelectedSequence, "Chaser\nMusic\nTrigger", guiButtons)
 		}
 	}
+
 }

@@ -360,7 +360,7 @@ func PlaySequence(sequence common.Sequence,
 
 			sequence.Static = true
 			// Turn off any music trigger for this sequence.
-			//sequence.MusicTrigger = false
+			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
@@ -379,7 +379,6 @@ func PlaySequence(sequence common.Sequence,
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-			sequence.Static = false
 			sequence.PlayStaticOnce = false
 			continue
 		}
@@ -393,7 +392,7 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Static = false
 
 			// Turn off any music trigger for this sequence.
-			//sequence.MusicTrigger = false
+			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
@@ -426,18 +425,28 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// If the music trigger is being used then the timer is disabled.
-				for triggerNumber, trigger := range channels.SoundTriggers {
-					if sequence.MusicTrigger {
-						sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-						if triggerNumber == mySequenceNumber {
-							trigger.State = true
-						}
-					} else {
-						if triggerNumber == mySequenceNumber {
-							trigger.State = false
-						}
-						sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
+				if sequence.MusicTrigger {
+					sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+					err := soundConfig.EnableSoundTrigger(sequence.Name)
+					if err != nil {
+						fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
+						os.Exit(1)
 					}
+					if debug {
+						fmt.Printf("Sound trigger %s enabled \n", sequence.Name)
+					}
+					sequence.ChangeMusicTrigger = false
+				} else {
+					err := soundConfig.DisableSoundTrigger(sequence.Name)
+					if err != nil {
+						fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+						os.Exit(1)
+					}
+					if debug {
+						fmt.Printf("Sound trigger %s disabled\n", sequence.Name)
+					}
+					sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
+					sequence.ChangeMusicTrigger = false
 				}
 
 				// Setup rgb patterns.
@@ -563,11 +572,13 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				if sequence.Label == "chaser" {
-					// Change all the fixtures to the next gobo.
-					for fixtureNumber := range sequence.ScannersAvailable {
-						sequence.ScannerGobo[fixtureNumber]++
-						if sequence.ScannerGobo[fixtureNumber] > 7 {
-							sequence.ScannerGobo[fixtureNumber] = 0
+					if sequence.AutoColor {
+						// Change all the fixtures to the next gobo.
+						for fixtureNumber := range sequence.ScannersAvailable {
+							sequence.ScannerGobo[fixtureNumber]++
+							if sequence.ScannerGobo[fixtureNumber] > 8 {
+								sequence.ScannerGobo[fixtureNumber] = 1
+							}
 						}
 					}
 				}
