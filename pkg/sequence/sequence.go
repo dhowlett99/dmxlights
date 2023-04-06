@@ -390,10 +390,6 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			sequence.Static = false
-
-			// Turn off any music trigger for this sequence.
-			sequence.MusicTrigger = false
-			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
