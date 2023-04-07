@@ -298,7 +298,6 @@ type Sequence struct {
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
-	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off

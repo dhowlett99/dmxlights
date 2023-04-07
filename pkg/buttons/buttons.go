@@ -97,6 +97,7 @@ type CurrentState struct {
 	ScannerChaser             bool                         // Chaser is running.
 	ChaserSequenceNumber      int                          // Chaser sequence number, setup at start.
 	ScannerSequenceNumber     int                          // Scanner sequence number, setup at start.
+	RGBAvailablePatterns      map[int]common.Pattern       // Available RGB Patterns.
 }
 
 func ProcessButtons(X int, Y int,
@@ -1852,7 +1853,7 @@ func ProcessButtons(X int, Y int,
 
 			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 			this.EditFixtureSelectionMode = false
-			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
 
 		} else {
 			// Tell the sequence to change the pattern.
@@ -1871,7 +1872,7 @@ func ProcessButtons(X int, Y int,
 
 			// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 			this.EditFixtureSelectionMode = false
-			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 		}
 
@@ -1897,9 +1898,9 @@ func ProcessButtons(X int, Y int,
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.EditFixtureSelectionMode = false
 			if !this.ScannerChaser {
-				ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+				ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			} else {
-				ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+				ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
 			}
 			return
 		}
@@ -2485,7 +2486,6 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 // HandleSelect - Runs when you press a select button to select a sequence.
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
-
 	if debug {
 		for functionNumber := 0; functionNumber < 8; functionNumber++ {
 			state := this.Functions[this.SelectedSequence][functionNumber].State
@@ -2499,6 +2499,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.SelectedSequence, this.EditGoboSelectionMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
 		fmt.Printf("HANDLE: Function6_Static_Gobo[%d] = %t\n", this.SelectedSequence, this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State)
+		fmt.Printf("HANDLE: Function7_Invert_Chase[%d] = %t\n", this.SelectedSequence, this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State2)
 	}
 
 	// Update the status bar
@@ -2576,7 +2577,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			this.EditPatternMode[this.SelectedSequence] = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
-			ShowPatternSelectionButtons(this.SelectedSequence, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			return
 		}
 
@@ -3008,7 +3009,7 @@ func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence
 // master is the master brightness for the same buttons.
 // targetSequence - is the squence you are updating the pattern, this could be different in the case
 // of scanner shutter chaser sequence which doesn't have it's own buttons.
-func ShowPatternSelectionButtons(mySequenceDisplayNumber int, master int, targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", targetSequence.Name, targetSequence.Type, targetSequence.Label)
@@ -3021,16 +3022,16 @@ func ShowPatternSelectionButtons(mySequenceDisplayNumber int, master int, target
 	White := common.Color{R: 255, G: 255, B: 255}
 
 	if targetSequence.Type == "rgb" {
-		for _, pattern := range targetSequence.RGBAvailablePatterns {
+		for _, pattern := range this.RGBAvailablePatterns {
 			if debug {
 				fmt.Printf("pattern is %s\n", pattern.Name)
 			}
 			if pattern.Number == targetSequence.SelectedPattern {
-				common.FlashLight(pattern.Number, mySequenceDisplayNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+				common.FlashLight(pattern.Number, this.SelectedSequence, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceDisplayNumber, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: this.SelectedSequence, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(pattern.Number, mySequenceDisplayNumber, pattern.Label, guiButtons)
+			common.LabelButton(pattern.Number, this.SelectedSequence, pattern.Label, guiButtons)
 		}
 		return
 	}
@@ -3038,11 +3039,11 @@ func ShowPatternSelectionButtons(mySequenceDisplayNumber int, master int, target
 	if targetSequence.Type == "scanner" {
 		for _, pattern := range targetSequence.ScannerAvailablePatterns {
 			if pattern.Number == targetSequence.SelectedPattern {
-				common.FlashLight(pattern.Number, mySequenceDisplayNumber, White, LightBlue, eventsForLaunchpad, guiButtons)
+				common.FlashLight(pattern.Number, this.SelectedSequence, White, LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: pattern.Number, Y: mySequenceDisplayNumber, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: pattern.Number, Y: this.SelectedSequence, Red: 0, Green: 100, Blue: 255, Brightness: master}, eventsForLaunchpad, guiButtons)
 			}
-			common.LabelButton(pattern.Number, mySequenceDisplayNumber, pattern.Label, guiButtons)
+			common.LabelButton(pattern.Number, this.SelectedSequence, pattern.Label, guiButtons)
 		}
 		return
 	}
@@ -3149,17 +3150,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
-			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State2 = sequences[sequenceNumber].ScannerChaser
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
-		}
-
-		// Chaser Sequencer.
-		if sequence.Type == "rgb" && sequence.Label == "chaser" {
-			this.ScannerChaser = sequences[this.ScannerSequenceNumber].ScannerChaser
-			this.Functions[this.ScannerSequenceNumber][common.Function7_Invert_Chase].State2 = sequences[this.ChaserSequenceNumber].MusicTrigger
-			if sequences[this.ChaserSequenceNumber].MusicTrigger {
-				this.SoundTriggers[this.ChaserSequenceNumber].State = true
-			}
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State2 = sequences[this.ChaserSequenceNumber].MusicTrigger
+			this.ScannerChaser = sequences[sequenceNumber].ScannerChaser
 		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.

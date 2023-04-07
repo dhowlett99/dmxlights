@@ -211,7 +211,7 @@ func main() {
 	sequences := []*common.Sequence{}
 	for sequenceNumber, sequenceConf := range sequencesConfig.Sequences {
 		fmt.Printf("Found sequence  name: %s, label:%s desc: %s, type: %s\n", sequenceConf.Name, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
-		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceConf.Label, sequenceNumber, this.Patterns, fixturesConfig, this.SequenceChannels)
+		newSequence := sequence.CreateSequence(sequenceConf.Type, sequenceConf.Label, sequenceNumber, fixturesConfig, this.SequenceChannels)
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name
@@ -439,11 +439,11 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, bottonStatusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[1], 1, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[2], 2, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[3], 3, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[4], 4, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[0], 0, this.Patterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[1], 1, this.Patterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[2], 2, this.Patterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[3], 3, this.Patterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[4], 4, this.Patterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

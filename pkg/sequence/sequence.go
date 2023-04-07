@@ -85,7 +85,6 @@ func CreateSequence(
 	sequenceType string,
 	sequenceLabel string,
 	mySequenceNumber int,
-	availablePatterns map[int]common.Pattern,
 	fixturesConfig *fixture.Fixtures,
 	channels common.Channels) common.Sequence {
 
@@ -174,7 +173,6 @@ func CreateSequence(
 		MusicTrigger:           false,
 		Run:                    false,
 		Bounce:                 false,
-		RGBAvailablePatterns:   availablePatterns,
 		ScannerSize:            common.DefaultScannerSize,
 		SequenceColors:         common.DefaultSequenceColors,
 		RGBSize:                common.DefaultRGBSize,
@@ -219,6 +217,7 @@ func CreateSequence(
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
+	availablePatterns map[int]common.Pattern,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
@@ -454,10 +453,10 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
-						pattenSteps := sequence.RGBAvailablePatterns[sequence.SelectedPattern].Steps
+						pattenSteps := availablePatterns[sequence.SelectedPattern].Steps
 						chasePattern = pattern.ApplyScannerState(pattenSteps, sequence.ScannerState)
 					} else {
-						chasePattern = sequence.RGBAvailablePatterns[sequence.SelectedPattern]
+						chasePattern = availablePatterns[sequence.SelectedPattern]
 					}
 
 					sequence.Steps = chasePattern.Steps
@@ -608,7 +607,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// If we are setting the pattern automatically for rgb fixtures.
 				if sequence.AutoPattern && sequence.Type == "rgb" {
-					for patternNumber, pattern := range sequence.RGBAvailablePatterns {
+					for patternNumber, pattern := range availablePatterns {
 						if pattern.Number == sequence.SelectedPattern {
 							sequence.Pattern.Number = patternNumber
 							if debug {
@@ -618,7 +617,7 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 					sequence.SelectedPattern++
-					if sequence.SelectedPattern > len(sequence.RGBAvailablePatterns) {
+					if sequence.SelectedPattern > len(availablePatterns) {
 						sequence.SelectedPattern = 0
 					}
 				}

@@ -26,7 +26,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = false
+const debug = true
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -729,7 +729,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		x := command.Args[X].Value.(int)
 		y := command.Args[Y].Value.(int)
 		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", x, y))
-		//seq := common.Sequence{}
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
