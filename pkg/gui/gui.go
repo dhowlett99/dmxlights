@@ -103,19 +103,19 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 
 	// Check for requests outside buttons avaialable.
 	if alight.X == -1 { // Addressing the top row.
-		fmt.Printf("error X is -1\n")
+		fmt.Printf("UpdateButtonColor: error X is -1\n")
 		return
 	}
 	if alight.Y == -1 { // Addressing the top row.
-		fmt.Printf("error Y is -1\n")
+		fmt.Printf("UpdateButtonColor: error Y is -1\n")
 		return
 	}
 	if alight.X > 8 {
-		fmt.Printf("error X is > 8 \n")
+		fmt.Printf("UpdateButtonColor: error X is > 8 \n")
 		return
 	}
 	if alight.Y > 8 {
-		fmt.Printf("error Y is > 8 \n")
+		fmt.Printf("UpdateButtonColor: error Y is > 8 \n")
 		return
 	}
 

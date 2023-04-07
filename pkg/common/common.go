@@ -107,6 +107,7 @@ type State struct {
 	Values      []Value
 	ButtonColor string
 	Actions     []Action
+	Settings    []Setting
 	Flash       bool
 }
 
@@ -128,7 +129,7 @@ type Switch struct {
 	Label        string
 	CurrentState int
 	Description  string
-	States       []State
+	States       map[int]State
 	Fixture      string
 	UseFixture   string
 }
@@ -341,11 +342,10 @@ type Sequence struct {
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor         bool                        // Command to update the sequence colors.
 	FunctionMode                bool                        // This sequence is in function mode.
-	Switches                    []Switch                    // A switch sequence stores its data in here.
+	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
-	//ScannerHasShutterChase      bool                        // Flag to indicate Scanner is in Shutter chase mode
 }
 
 type Function struct {

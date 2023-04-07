@@ -749,29 +749,24 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
 	}
-	for switchNumber, switchData := range sequence.Switches {
+	for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
+
+		switchData := sequence.Switches[switchNumber]
 
 		if debug {
 			fmt.Printf("switchNumber %d state %d\n", switchData.Number, switchData.CurrentState)
 		}
-		for stateNumber, state := range switchData.States {
 
-			// For this state.
-			if debug {
-				fmt.Printf("stateNumber %d state %d\n", stateNumber, switchData.CurrentState)
-			}
-			if stateNumber == switchData.CurrentState {
-				// Use the button color for this state to light the correct color on the launchpad.
-				color, _ := common.GetRGBColorByName(state.ButtonColor)
-				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+		state := switchData.States[switchData.CurrentState]
 
-				// Label the switch.
-				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
+		color, _ := common.GetRGBColorByName(state.ButtonColor)
+		common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
 
-				// Now play all the values for this state.
-				fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
-			}
-		}
+		// Label the switch.
+		common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
+
+		// Now play all the values for this state.
+		fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
 	}
 }
 

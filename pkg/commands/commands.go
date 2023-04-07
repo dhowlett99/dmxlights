@@ -142,7 +142,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 			// Clear switch positions to their first positions.
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
-				sequence.Switches[switchNumber].CurrentState = 0
+				newSwitch := common.Switch{}
+				newSwitch.CurrentState = 0
+				newSwitch.Description = sequence.Switches[switchNumber].Description
+				newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+				newSwitch.Label = sequence.Switches[switchNumber].Label
+				newSwitch.Name = sequence.Switches[switchNumber].Name
+				newSwitch.Number = sequence.Switches[switchNumber].Number
+				newSwitch.States = sequence.Switches[switchNumber].States
+				newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+				sequence.Switches[switchNumber] = newSwitch
 			}
 			sequence.PlaySwitchOnce = true
 		}
@@ -537,9 +546,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command ClearAllSwitchPositions n", mySequenceNumber)
 		}
-		// Loop through all the switchies.
-		for X := 0; X < len(sequence.Switches); X++ {
-			sequence.Switches[X].CurrentState = 0
+		// Loop through all the switchies. and reset their current state back to 0.
+		for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
+			newSwitch := common.Switch{}
+			newSwitch.CurrentState = 0
+			newSwitch.Description = sequence.Switches[switchNumber].Description
+			newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+			newSwitch.Label = sequence.Switches[switchNumber].Label
+			newSwitch.Name = sequence.Switches[switchNumber].Name
+			newSwitch.Number = sequence.Switches[switchNumber].Number
+			newSwitch.States = sequence.Switches[switchNumber].States
+			newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+			sequence.Switches[switchNumber] = newSwitch
 		}
 		sequence.PlaySwitchOnce = true
 		return sequence
@@ -561,7 +579,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
 		}
-		sequence.Switches[command.Args[SWITCH_NUMBER].Value.(int)].CurrentState = command.Args[SWITCH_POSITION].Value.(int)
+
+		// Loop through all the switchies. and reset their current state back to 0.
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+
+		newSwitch := common.Switch{}
+		newSwitch.CurrentState = switchPosition
+		newSwitch.Description = sequence.Switches[switchNumber].Description
+		newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+		newSwitch.Label = sequence.Switches[switchNumber].Label
+		newSwitch.Name = sequence.Switches[switchNumber].Name
+		newSwitch.Number = sequence.Switches[switchNumber].Number
+		newSwitch.States = sequence.Switches[switchNumber].States
+		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+		sequence.Switches[switchNumber] = newSwitch
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = true
@@ -787,14 +819,17 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	return Speed * time.Millisecond
 }
 
-func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) map[int]common.Switch {
 
 	if debug {
 		fmt.Printf("Load switch data\n")
 	}
 
 	// A new group of switches.
-	newSwitchList := []common.Switch{}
+	newSwitchList := make(map[int]common.Switch)
+
+	switchNumber := 0
+
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Group == mySequenceNumber+1 {
 			// find switch data.
@@ -805,8 +840,8 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 			newSwitch.Description = fixture.Description
 			newSwitch.UseFixture = fixture.UseFixture
 
-			newSwitch.States = []common.State{}
-			for _, state := range fixture.States {
+			newSwitch.States = make(map[int]common.State)
+			for stateNumber, state := range fixture.States {
 				newState := common.State{}
 				newState.Name = state.Name
 				newState.Number = state.Number
@@ -837,10 +872,11 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 					newState.Actions = append(newState.Actions, newAction)
 				}
 
-				newSwitch.States = append(newSwitch.States, newState)
+				newSwitch.States[stateNumber] = newState
 			}
 			// Add new switch to the list.
-			newSwitchList = append(newSwitchList, newSwitch)
+			newSwitchList[switchNumber] = newSwitch
+			switchNumber++
 		}
 	}
 
