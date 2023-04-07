@@ -81,7 +81,7 @@ type CurrentState struct {
 	SoundTriggers             []*common.Trigger            // Pointer to the Sound Triggers.
 	SoundConfig               *sound.SoundConfig           // Pointer to the sound config struct.
 	SequenceChannels          common.Channels              // Channles used to communicate with the sequence.
-	Patterns                  map[int]common.Pattern       // A indexed map of the available patterns for this sequence.
+	RGBPatterns               map[int]common.Pattern       // Available RGB Patterns.
 	ScannerPattern            int                          // The selected scanner pattern Number. Used as the index for above.
 	Pattern                   int                          // The selected RGB pattern Number. Used as the index for above.
 	StaticButtons             []common.StaticColorButton   // Storage for the color of the static buttons.
@@ -97,7 +97,6 @@ type CurrentState struct {
 	ScannerChaser             bool                         // Chaser is running.
 	ChaserSequenceNumber      int                          // Chaser sequence number, setup at start.
 	ScannerSequenceNumber     int                          // Scanner sequence number, setup at start.
-	RGBAvailablePatterns      map[int]common.Pattern       // Available RGB Patterns.
 }
 
 func ProcessButtons(X int, Y int,
@@ -164,7 +163,7 @@ func ProcessButtons(X int, Y int,
 		flashSequence := common.Sequence{
 			Pattern: common.Pattern{
 				Name:  "colors",
-				Steps: this.Patterns[colorPattern].Steps, // Use the color pattern for flashing.
+				Steps: this.RGBPatterns[colorPattern].Steps, // Use the color pattern for flashing.
 			},
 		}
 
@@ -3013,7 +3012,7 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 
 	if debug {
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", targetSequence.Name, targetSequence.Type, targetSequence.Label)
-		for _, pattern := range targetSequence.ScannerAvailablePatterns {
+		for _, pattern := range this.RGBPatterns {
 			fmt.Printf("Found a pattern called %s\n", pattern.Name)
 		}
 	}
@@ -3022,7 +3021,7 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 	White := common.Color{R: 255, G: 255, B: 255}
 
 	if targetSequence.Type == "rgb" {
-		for _, pattern := range this.RGBAvailablePatterns {
+		for _, pattern := range this.RGBPatterns {
 			if debug {
 				fmt.Printf("pattern is %s\n", pattern.Name)
 			}
