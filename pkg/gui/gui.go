@@ -56,7 +56,7 @@ type MyPanel struct {
 	ShiftLabel       *widget.Label
 	SizeLabel        *widget.Label
 	FadeLabel        *widget.Label
-	BeatLabel        *widget.Button
+	VersionLabel     *widget.Button
 	TiltLabel        *widget.Label
 	RedLabel         *widget.Label
 	GreenLabel       *widget.Label
@@ -216,8 +216,8 @@ func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {
 	if which == "fade" {
 		panel.FadeLabel.SetText(label)
 	}
-	if which == "beat" {
-		panel.BeatLabel.Hidden = hide
+	if which == "version" {
+		panel.VersionLabel.Hidden = hide
 	}
 	if which == "tilt" {
 		panel.TiltLabel.SetText(label)
@@ -412,10 +412,10 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, config, launchPadName)
+			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, eventsForLaunchPad, config, launchPadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -424,7 +424,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 }
 
 func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
 	selectedInput := soundConfig.GetDeviceName()
 
@@ -466,7 +466,7 @@ func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	button := widget.NewButton("OK", func() {
 		modal.Hide()
 		soundConfig.StopSoundConfig()
-		soundConfig.StartSoundConfig(selectedInput, guiButtons)
+		soundConfig.StartSoundConfig(selectedInput, guiButtons, eventsForLaunchPad)
 	})
 
 	// Layout of settings panel.

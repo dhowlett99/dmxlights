@@ -351,18 +351,18 @@ func main() {
 	this.ButtonTimer = &time.Time{}
 
 	// Create a sound trigger object and give it the sequences so it can access their configs.
-	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons)
+	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons, eventsForLaunchpad)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, dmxInterfaceConfig, this.LaunchpadName)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
 	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultRGBShift))
 	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
 	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultRGBFade))
-	panel.BeatLabel = widget.NewButton("BEAT", func() {})
-	panel.BeatLabel.Hidden = true
+	panel.VersionLabel = widget.NewButton("Version 2.0", func() {})
+	panel.VersionLabel.Hidden = false
 
 	// Create objects for top status bar.
 	upLabel := widget.NewLabel("       ")
@@ -432,7 +432,7 @@ func main() {
 
 	// Create bottom status bar.
 	bottonStatusBar := container.New(
-		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.BeatLabel)
+		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
 	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)

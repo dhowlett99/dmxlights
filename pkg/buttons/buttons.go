@@ -3353,7 +3353,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		trigger.State = false
 	}
 	// Update status bar.
-	common.UpdateStatusBar("BEAT", "beat", false, guiButtons)
+	common.UpdateStatusBar("Version 2.0", "version", false, guiButtons)
 
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {

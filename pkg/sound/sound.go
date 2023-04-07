@@ -43,7 +43,7 @@ type SoundConfig struct {
 	stopChannel     chan bool
 }
 
-func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight) *SoundConfig {
+func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight, eventsForLaunchpad chan common.ALight) *SoundConfig {
 
 	soundConfig := SoundConfig{}
 	soundConfig.stopChannel = make(chan bool)
@@ -52,13 +52,13 @@ func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight) *S
 	soundConfig.SoundTriggers = channels.SoundTriggers
 
 	soundConfig.getAvailableInputs()
-	soundConfig.StartSoundConfig("Built-in Microphone", guiButtons)
+	soundConfig.StartSoundConfig("Built-in Microphone", guiButtons, eventsForLaunchpad)
 
 	return &soundConfig
 
 }
 
-func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons chan common.ALight) {
+func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons chan common.ALight, eventsForLaunchpad chan common.ALight) {
 
 	fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
 
@@ -162,7 +162,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
 							// Update status bar.
-							common.UpdateStatusBar("BEAT", "beat", false, guiButtons)
+							common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
@@ -175,7 +175,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
-					common.UpdateStatusBar("XXXX", "beat", true, guiButtons)
+					common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 0, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 				}
 			}
 		}
