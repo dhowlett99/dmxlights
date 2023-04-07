@@ -287,13 +287,10 @@ type Sequence struct {
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
-	Steps                       []Step                      // RGB or Shutter steps in this  sequence.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures              int                         // Total Number of fixtures for this sequence.
 	EnabledNumberFixtures       int                         // Enabled Number of fixtures for this sequence.
-	RGBPositions                map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
-	ScannerPositions            map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
 	AutoColor                   bool                        // Sequence is going to automatically change the color.
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.

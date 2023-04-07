@@ -29,15 +29,8 @@ import (
 
 func SaveConfig(config []common.Sequence, filename string) {
 
-	// Don't store the steps as they are created by each sequencer.
-	sequences := []common.Sequence{}
-	for _, sequence := range config {
-		sequence.Steps = nil
-		sequences = append(sequences, sequence)
-	}
-
 	// Marshall the config into a json object.
-	data, err := json.MarshalIndent(sequences, "", " ")
+	data, err := json.MarshalIndent(config, "", " ")
 	if err != nil {
 		log.Fatalf("error: marshalling config: %v", err)
 	}

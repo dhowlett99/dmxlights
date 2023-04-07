@@ -265,7 +265,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			RGBCoordinates: common.DefaultRGBCoordinates,
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
-		sequence.Steps = sequence.Pattern.Steps
+		steps := sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
 		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
@@ -289,7 +289,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			},
 		}
 
-		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence)
+		RGBPositions, _ := position.CalculatePositions(steps, sequence)
 
 		var rotateCounter int
 		var clockwise int
@@ -406,7 +406,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 					}
 
 					// Play out fixture to DMX channels.
-					position := sequence.RGBPositions[step]
+					position := RGBPositions[step]
 
 					fixtures := position.Fixtures
 

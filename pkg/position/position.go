@@ -26,10 +26,10 @@ import (
 
 const debug = false
 
-func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int) {
+func CalculatePositions(steps []common.Step, sequence common.Sequence) (map[int]common.Position, int) {
 
 	if debug {
-		fmt.Printf("CalculatePositions Number Steps %d\n", len(sequence.Steps))
+		fmt.Printf("CalculatePositions Number Steps %d\n", len(steps))
 	}
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
@@ -41,7 +41,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	if !sequence.ScannerInvert {
 		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.Steps {
+		for _, step := range steps {
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
@@ -95,8 +95,8 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 	if sequence.Bounce || sequence.ScannerInvert {
 		// Generate the positions in reverse.
 		// Reverse the steps.
-		for stepNumber := len(sequence.Steps); stepNumber > 0; stepNumber-- {
-			step := sequence.Steps[stepNumber-1]
+		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
+			step := steps[stepNumber-1]
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
@@ -152,7 +152,7 @@ func CalculatePositions(sequence common.Sequence) (map[int]common.Position, int)
 
 	if sequence.Bounce && sequence.ScannerInvert {
 		// First loop make a space in the slope values for each fixture.
-		for _, step := range sequence.Steps {
+		for _, step := range steps {
 			numberFixturesInThisStep = 0
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
