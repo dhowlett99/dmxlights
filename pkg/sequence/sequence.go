@@ -249,14 +249,14 @@ func PlaySequence(sequence common.Sequence,
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -291,7 +291,7 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
 			}
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
+			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, fixtureStepChannels, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
 			continue
@@ -744,11 +744,12 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
 	switchChannels map[int]common.SwitchChannel, SoundTriggers []*common.Trigger,
-	soundConfig *sound.SoundConfig, dmxInterfacePresent bool) {
+	soundConfig *sound.SoundConfig, fixtureStepChannels []chan common.FixtureCommand, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
 	}
+
 	for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 
 		switchData := sequence.Switches[switchNumber]
@@ -765,8 +766,17 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 		// Label the switch.
 		common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
 
-		// Now play all the values for this state.
-		fixture.MapSwitchFixture(switchData, state, mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
+		// Now send a message to the fixture to play all the values for this state.
+		command := common.FixtureCommand{
+
+			SetSwitch:          true,
+			SwitchData:         switchData,
+			State:              state,
+			CurrentSwitchState: switchData.CurrentState,
+		}
+
+		// Start the fixture group.
+		fixtureStepChannels[switchNumber] <- command
 	}
 }
 

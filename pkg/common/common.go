@@ -434,6 +434,12 @@ type FixtureCommand struct {
 	Rotate  int
 	Music   int
 	Program int
+
+	// Switch Commands
+	SetSwitch          bool
+	SwitchData         Switch
+	State              State
+	CurrentSwitchState int
 }
 
 type Position struct {

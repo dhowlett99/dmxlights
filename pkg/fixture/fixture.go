@@ -240,6 +240,9 @@ func FixtureReceiver(
 	fixtureStepChannel chan common.FixtureCommand,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
+	switchChannels map[int]common.SwitchChannel,
+	soundTriggers []*common.Trigger,
+	soundConfig *sound.SoundConfig,
 	dmxController *ft232.DMXController,
 	fixtures *Fixtures,
 	dmxInterfacePresent bool) {
@@ -252,6 +255,12 @@ func FixtureReceiver(
 
 		// Propogate the strobe speed.
 		sequence.StrobeSpeed = cmd.StrobeSpeed
+
+		if cmd.SetSwitch && sequence.Type == "switch" {
+			switchNumber := myFixtureNumber
+			MapSwitchFixture(cmd.SwitchData, cmd.State, mySequenceNumber, dmxController, switchNumber, cmd.CurrentSwitchState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent)
+			continue
+		}
 
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
@@ -296,6 +305,9 @@ func FixtureReceiver(
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				continue
 			}
+
+			// Now play all the values for this state.
+
 			// Play out fixture to DMX channels.
 			fixture := cmd.RGBPosition.Fixtures[myFixtureNumber]
 			if fixture.Enabled {

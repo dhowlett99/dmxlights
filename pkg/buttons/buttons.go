@@ -138,7 +138,14 @@ func ProcessButtons(X int, Y int,
 			this.Pad.Program()
 		}
 		InitButtons(this, eventsForLaunchpad, guiButtons)
-		sequence.ShowSwitches(this.SwitchSequenceNumber, sequences[this.SwitchSequenceNumber], eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig, this.DmxInterfacePresent)
+
+		// Show the static and switch settings.
+		cmd := common.Command{
+			Action: common.UnHide,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+
+		// Show the presets again.
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		this.Crash1 = false
 		this.Crash2 = false
