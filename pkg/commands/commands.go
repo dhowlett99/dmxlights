@@ -835,17 +835,31 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 			// find switch data.
 			newSwitch := common.Switch{}
 			newSwitch.Name = fixture.Name
+			newSwitch.ID = fixture.ID
+			newSwitch.Address = fixture.Address
 			newSwitch.Label = fixture.Label
 			newSwitch.Number = fixture.Number
 			newSwitch.Description = fixture.Description
 			newSwitch.UseFixture = fixture.UseFixture
 
+			// A switch has a number of states.
 			newSwitch.States = make(map[int]common.State)
 			for stateNumber, state := range fixture.States {
 				newState := common.State{}
 				newState.Name = state.Name
 				newState.Number = state.Number
 				newState.Label = state.Label
+
+				// Copy settings.
+				for _, setting := range state.Settings {
+					newSetting := common.Setting{}
+					newSetting.Name = setting.Name
+					newSetting.Label = setting.Label
+					newSetting.Number = setting.Number
+					newSetting.Channel = setting.Channel
+					newSetting.FixtureValue = setting.Value
+					newState.Settings = append(newState.Settings, newSetting)
+				}
 				newState.ButtonColor = state.ButtonColor
 				newState.Flash = state.Flash
 

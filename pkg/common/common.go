@@ -96,8 +96,12 @@ type Value struct {
 }
 
 type Setting struct {
-	Name  string
-	Value int16
+	Name         string
+	Label        string
+	Number       int
+	Channel      string
+	Value        int16
+	FixtureValue string
 }
 
 type State struct {
@@ -112,19 +116,24 @@ type State struct {
 }
 
 type Action struct {
-	Name    string
-	Number  int
-	Colors  []string
-	Mode    string
-	Fade    string
-	Speed   string
-	Rotate  string
-	Music   string
-	Program string
+	Name        string
+	Number      int
+	Colors      []string
+	Mode        string
+	Fade        string
+	Size        string
+	Speed       string
+	Rotate      string
+	RotateSpeed string
+	Music       string
+	Program     string
+	Strobe      string
 }
 
 type Switch struct {
+	ID           int
 	Name         string
+	Address      int16
 	Number       int
 	Label        string
 	CurrentState int

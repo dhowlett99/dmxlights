@@ -212,6 +212,20 @@ func (soundConfig *SoundConfig) DisableSoundTrigger(name string) error {
 	return fmt.Errorf("sound trigger %s not found", name)
 }
 
+// GetSoundTriggerState  - What state is this trigger in ?
+func (soundConfig *SoundConfig) GetSoundTriggerState(name string) bool {
+
+	// Step through the existing sound triggers and find the one we want to find the status of.
+	for triggerNumber, trigger := range soundConfig.SoundTriggers {
+		if trigger.Name == name {
+			if soundConfig.SoundTriggers[triggerNumber].State {
+				return soundConfig.SoundTriggers[triggerNumber].State
+			}
+		}
+	}
+	return false
+}
+
 func (soundConfig *SoundConfig) getAvailableInputs() {
 	// Fire up the audio subsystem just to find the number of audio inputs.
 	err := portaudio.Initialize()

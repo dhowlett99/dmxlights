@@ -22,7 +22,6 @@ import (
 	"fmt"
 	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -45,16 +44,11 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 	switchName := fmt.Sprintf("switch%d", switchNumber)
 
-	fixture, err := findFixtureByName(fixture.Name, fixturesConfig)
-	if err != nil {
-		fmt.Printf("turnOffFixture: fixtureName: %s error %s\n", fixture.Name, err.Error())
-		return
-	}
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
 	// Find all the specified settings for the program channel
-	programSettings, err := GetChannelSettinsByName(fixture.Name, "Program", fixturesConfig)
+	programSettings, err := GetChannelSettinsByName(fixture, "Program", fixturesConfig)
 	if err != nil && debug {
 		fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
 	}
@@ -74,31 +68,35 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch name as the unique sequence name.
-		err := soundConfig.DisableSoundTrigger(switchName)
-		if err != nil {
-			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
-			os.Exit(1)
-		}
-		if debug_mini {
-			fmt.Printf("Sound trigger %s disabled\n", switchName)
+		if soundConfig.GetSoundTriggerState(switchName) {
+			// Use the switch name as the unique sequence name.
+			err := soundConfig.DisableSoundTrigger(switchName)
+			if err != nil {
+				fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+				os.Exit(1)
+			}
+			if debug_mini {
+				fmt.Printf("Sound trigger %s disabled\n", switchName)
+			}
 		}
 
-		// Stop any running chases.
-		select {
-		case switchChannels[switchNumber].Stop <- true:
+		if getSwitchState(switchChannels, switchNumber) {
+			// Stop any running chases.
+			select {
+			case switchChannels[switchNumber].Stop <- true:
+				turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			case <-time.After(100 * time.Millisecond):
+			}
+
+			// Stop any rotates.
+			select {
+			case switchChannels[switchNumber].StopRotate <- true:
+				turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			case <-time.After(100 * time.Millisecond):
+			}
+
 			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
-		case <-time.After(100 * time.Millisecond):
 		}
-
-		// Stop any rotates.
-		select {
-		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
-		case <-time.After(100 * time.Millisecond):
-		}
-
-		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		return
 	}
 
@@ -138,14 +136,14 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
-		programChannel, err := FindChannelNumberByName("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
+		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
 			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Look up the program state required.
-		v, err := findChannelSettingByChannelNameAndSettingName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
+		v, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
 		if err != nil {
 			fmt.Printf("fixture %s program state not found: %s,", fixture.Name, err)
 			return
@@ -238,7 +236,6 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		// Register this mini sequencer with the sound service.
 		// Use the switch name as the unique sequence name.
 		if cfg.MusicTrigger {
-			//fmt.Printf("EnableSoundTrigger(switchName) %s\n", switchName)
 			err := soundConfig.EnableSoundTrigger(switchName)
 			if err != nil {
 				fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
@@ -266,6 +263,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 		steps := sequence.Pattern.Steps
+		sequence.NumberSteps = len(steps)
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
 		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
@@ -310,11 +308,11 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 			if cfg.Rotatable {
 
-				rotateChannel, err := FindChannelNumberByName("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				rotateChannel, err := FindChannelNumberByName(fixture, "Rotate")
 				if err != nil {
 					fmt.Printf("rotator: %s,", err)
 				}
-				masterChannel, err := FindChannelNumberByName("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				masterChannel, err := FindChannelNumberByName(fixture, "Master")
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
@@ -546,54 +544,45 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	return config
 }
 
-func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
-		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixtureName)
+		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixture.Name)
 	}
 
 	settingNames := []common.Setting{}
 
-	// Find the fixture by name.
-	for _, fixture := range fixtures.Fixtures {
+	// Find the channel by name.
+	for _, channel := range fixture.Channels {
 		if debug_mini {
-			fmt.Printf("GetChannelSettinsByName: matching on fixture %s with name %s\n", fixture.Label, fixtureName)
+			fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
 		}
-		if strings.Contains(fixture.Label, fixtureName) {
-
-			// Find the channel by name.
-			for _, channel := range fixture.Channels {
+		if channel.Name == name {
+			if debug_mini {
+				fmt.Printf("Found a Program Channel\n")
+			}
+			// If the program has a hard coded value return that as a default.
+			if channel.Value != nil {
 				if debug_mini {
-					fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
+					fmt.Printf("Found a Default Program Value of %d\n", *channel.Value)
 				}
-				if channel.Name == name {
-					if debug_mini {
-						fmt.Printf("Found a Program Channel\n")
-					}
-					// If the program has a hard coded value return that as a default.
-					if channel.Value != nil {
-						if debug_mini {
-							fmt.Printf("Found a Default Program Value of %d\n", *channel.Value)
-						}
-						value := common.Setting{
-							Name:  "Default",
-							Value: *channel.Value,
-						}
-						settingNames = append(settingNames, value)
-						return settingNames, nil
-					}
-					// Otherwise find the settings available for this channel.
-					for _, setting := range channel.Settings {
-						if debug_mini {
-							fmt.Printf("Looking through Settings %s\n", setting.Name)
-						}
-						v, _ := strconv.Atoi(setting.Value)
-						value := common.Setting{
-							Name:  setting.Name,
-							Value: int16(v),
-						}
-						settingNames = append(settingNames, value)
-					}
+				value := common.Setting{
+					Name:  "Default",
+					Value: *channel.Value,
 				}
+				settingNames = append(settingNames, value)
+				return settingNames, nil
+			}
+			// Otherwise find the settings available for this channel.
+			for _, setting := range channel.Settings {
+				if debug_mini {
+					fmt.Printf("Looking through Settings %s\n", setting.Name)
+				}
+				v, _ := strconv.Atoi(setting.Value)
+				value := common.Setting{
+					Name:  setting.Name,
+					Value: int16(v),
+				}
+				settingNames = append(settingNames, value)
 			}
 		}
 	}
@@ -605,6 +594,6 @@ func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures
 		return settingNames, nil
 	}
 
-	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixtureName)
+	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixture.Name)
 
 }

@@ -766,7 +766,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 		common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
 
 		// Now play all the values for this state.
-		fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
+		fixture.MapSwitchFixture(switchData, state, mySequenceNumber, dmxController, switchNumber, switchData.CurrentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
 	}
 }
 
@@ -779,6 +779,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 		fmt.Printf("ShowSingleSwitch for sequence %d\n", mySequenceNumber)
 	}
 
+	switchData := sequence.Switches[currentSwitch]
 	currentState := sequence.Switches[currentSwitch].CurrentState
 	switchNumber := sequence.Switches[currentSwitch].Number - 1
 	switchLabel := sequence.Switches[currentSwitch].Label
@@ -795,7 +796,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 			common.LabelButton(switchNumber, mySequenceNumber, switchLabel+"\n"+state.Label, guiButtons)
 
 			// Now play all the values for this state.
-			fixture.MapSwitchFixture(mySequenceNumber, dmxController, switchNumber, currentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
+			fixture.MapSwitchFixture(switchData, state, mySequenceNumber, dmxController, switchNumber, currentState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent)
 		}
 	}
 }

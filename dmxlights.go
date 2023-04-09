@@ -235,6 +235,10 @@ func main() {
 		this.ScannerFade[sequenceNumber] = common.DefaultScannerFade               // Set the default fade time for scanners.
 		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
 
+		if newSequence.Label == "switch" {
+			this.SwitchSequenceNumber = sequenceNumber
+		}
+
 		if newSequence.Label == "chaser" {
 			this.ChaserSequenceNumber = sequenceNumber
 		}

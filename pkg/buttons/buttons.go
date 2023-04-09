@@ -95,6 +95,7 @@ type CurrentState struct {
 	LaunchpadName             string                       // Storage for launchpad config.
 	Chaser                    common.Sequence              // Sequence for chaser.
 	ScannerChaser             bool                         // Chaser is running.
+	SwitchSequenceNumber      int                          // Switch sequence number, setup at start.
 	ChaserSequenceNumber      int                          // Chaser sequence number, setup at start.
 	ScannerSequenceNumber     int                          // Scanner sequence number, setup at start.
 }
@@ -137,7 +138,7 @@ func ProcessButtons(X int, Y int,
 			this.Pad.Program()
 		}
 		InitButtons(this, eventsForLaunchpad, guiButtons)
-		sequence.ShowSwitches(3, sequences[3], eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig, this.DmxInterfacePresent)
+		sequence.ShowSwitches(this.SwitchSequenceNumber, sequences[this.SwitchSequenceNumber], eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SwitchChannels, this.SoundTriggers, this.SoundConfig, this.DmxInterfacePresent)
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		this.Crash1 = false
 		this.Crash2 = false

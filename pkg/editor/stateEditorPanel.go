@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -103,7 +104,12 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		}
 
 		// Based on a new use fixure - Try again to populate the program and rotate options as available for this states action.
-		ap.ActionProgramOptions = populateOptions(value, "Program", fixtures)
+		fixture, err := findFixtureByLabel(value, fixtures)
+		if err != nil {
+			fmt.Printf("findFixtureByName: fixtureName: %s error %s\n", fixture.Name, err.Error())
+			return
+		}
+		ap.ActionProgramOptions = populateOptions(fixture, "Program", fixtures)
 
 		// Based on a new use fixure - Try again to populate the channel names in the settings panel.
 		st.ChannelOptions = populateChannelNames(useFixture.Channels)
@@ -199,14 +205,14 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 }
 
-func populateOptions(fixtureName string, name string, fixtures *fixture.Fixtures) []string {
+func populateOptions(thisFixture *fixture.Fixture, name string, fixtures *fixture.Fixtures) []string {
 
 	if debug {
 		fmt.Printf("populateOptions\n")
 	}
 
 	options := []string{}
-	programSettings, err := fixture.GetChannelSettinsByName(fixtureName, name, fixtures)
+	programSettings, err := fixture.GetChannelSettinsByName(thisFixture, name, fixtures)
 	if err == nil {
 		for _, setting := range programSettings {
 			options = append(options, setting.Name)
@@ -235,4 +241,26 @@ func populateChannelNames(channels []fixture.Channel) []string {
 	}
 
 	return options
+}
+
+func findFixtureByLabel(label string, fixtures *fixture.Fixtures) (*fixture.Fixture, error) {
+
+	debug := true
+	if debug {
+		fmt.Printf("Look for fixture by Label %s\n", label)
+	}
+
+	if label == "" {
+		return nil, fmt.Errorf("findFixtureByName: fixture name is empty")
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if strings.Contains(fixture.Label, label) {
+			if debug {
+				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+			}
+			return &fixture, nil
+		}
+	}
+	return nil, fmt.Errorf("findFixtureByLabel: failed to find fixture by label %s", label)
 }
