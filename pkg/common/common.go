@@ -131,16 +131,19 @@ type Action struct {
 }
 
 type Switch struct {
-	ID           int
-	Name         string
-	Address      int16
-	Number       int
-	Label        string
-	CurrentState int
-	Description  string
-	States       map[int]State
-	Fixture      string
-	UseFixture   string
+	ID                   int
+	Name                 string
+	Address              int16
+	Number               int
+	Label                string
+	CurrentPosition      int
+	Description          string
+	States               map[int]State
+	Fixture              string
+	UseFixture           string
+	MiniSequencerRunning bool
+	Blackout             bool
+	Master               int
 }
 
 type StaticColorButton struct {
@@ -375,13 +378,9 @@ type Channels struct {
 }
 
 type SwitchChannel struct {
-	Stop             chan bool
-	StopRotate       chan bool
-	KeepRotateAlive  chan bool
-	SequencerRunning bool
-	Blackout         bool
-	Master           int
-	SwitchPosition   int
+	Stop            chan bool
+	StopRotate      chan bool
+	KeepRotateAlive chan bool
 }
 
 type Hit struct {

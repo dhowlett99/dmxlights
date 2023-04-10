@@ -28,23 +28,40 @@ import (
 )
 
 type Preset struct {
-	State    bool   `json:"state"`
-	Selected bool   `json:"-"`
-	Label    string `json:"label"`
+	State       bool   `json:"state"`
+	Selected    bool   `json:"-"`
+	Label       string `json:"label"`
+	ButtonColor string `json:"buttoncolor"`
 }
 
 // RefeshPresets is used to refresh the view of presets.
 func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
-			// State true is a preset which has a saved config.
+			// State true is a preset which is being used and has a saved config.
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
-				// Selected preset is set to flashing red.
+				// Selected preset is set to it's flashing color.
 				if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Selected {
-					common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+					// Selected.
+					if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor == "" {
+						// There's no color defined so flash red & yellow.
+						common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+					} else {
+						// There is a color in the presets datatbase so set the color
+						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
+						common.FlashLight(x, y, color, common.PresetYellow, eventsForLauchpad, guiButtons)
+					}
 				} else {
-					// other wise preset is set to red.
-					common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: 255, Green: 0, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+					// Not Selected and there's no button color defined so just light the lamp red.
+					if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor == "" {
+						color := common.Red
+						common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+
+					} else {
+						// We're not selected and there is a button color specified so set that color.
+						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
+						common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+					}
 				}
 			} else {
 				// Unused preset is set to yellow.

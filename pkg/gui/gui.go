@@ -28,7 +28,6 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
-	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -332,6 +331,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	updateChannels []chan common.Sequence,
 	dmxInterfacePresent bool) *fyne.Container {
 
+	var popup *widget.PopUp
+
 	containers := []*fyne.Container{}
 	for columnNumber := 0; columnNumber < ColumnWidth; columnNumber++ {
 		button := Button{}
@@ -345,25 +346,59 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			}
 			if this.SavePreset {
 				if !skipPopup {
-					items := []*widget.FormItem{}
-					// Keep existing text.
-					name := widget.NewEntry()
+
+					// Popup name
+					title := widget.NewLabel("Save Presets")
+
+					// Preset name.
+					presetInput := widget.NewEntry()
+					presetInput.Text = "Preset1"
+					presetLabel := widget.NewLabel("Preset Name")
+					preset := container.NewAdaptiveGrid(3, presetLabel, presetInput, layout.NewSpacer())
+
 					if this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].Label != "" {
-						name.SetText(this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].Label)
+						presetInput.SetText(this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].Label)
 					}
-					item := widget.NewFormItem("Name", name)
-					items = append(items, item)
-					popup := dialog.NewForm("Enter Preset", "Ok", "Cancel", items, func(bool) {
-						if name.Text == "" { // We clicked cancel so give up labelling.
+
+					// Button color.
+					buttonColorSelect := widget.NewSelect([]string{"White", "Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "Pink", "Black"}, func(value string) {})
+					buttonColorSelect.Selected = this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].ButtonColor
+
+					buttonColorLabel := widget.NewLabel("Button Color")
+					buttonColor := container.NewAdaptiveGrid(3, buttonColorLabel, buttonColorSelect, layout.NewSpacer())
+
+					// Save button.
+					buttonSave := widget.NewButton("OK", func() {})
+
+					// Cancel button.
+					buttonCancel := widget.NewButton("Cancel", func() {
+						popup.Hide()
+					})
+
+					decideContents := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
+					decide := container.NewAdaptiveGrid(3, layout.NewSpacer(), layout.NewSpacer(), decideContents)
+
+					form := container.NewVBox(title, preset, buttonColor, decide)
+
+					// Layout of settings panel.
+					popup = widget.NewModalPopUp(
+						form,
+						myWindow.Canvas(),
+					)
+
+					// Setup OK buttons action.
+					buttonSave.OnTapped = func() {
+						popup.Hide()
+						if presetInput.Text == "" { // We clicked cancel so give up labelling.
 							return
 						}
-						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: name.Text, State: true, Selected: true}
-						presets.RefreshPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: presetInput.Text, State: true, Selected: true, ButtonColor: buttonColorSelect.Selected}
 						presets.SavePresets(this.PresetsStore)
-						Red := common.Color{R: 255, G: 0, B: 0}
-						PresetYellow := common.Color{R: 150, G: 150, B: 0}
-						common.FlashLight(X, Y-1, Red, PresetYellow, eventsForLauchpad, guiButtons)
-					}, myWindow)
+						presets.RefreshPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+						//Red := common.Color{R: 255, G: 0, B: 0}
+						//PresetYellow := common.Color{R: 150, G: 150, B: 0}
+						//common.FlashLight(X, Y-1, Red, PresetYellow, eventsForLauchpad, guiButtons)
+					}
 					popup.Show()
 				}
 			}

@@ -240,7 +240,7 @@ func FixtureReceiver(
 	fixtureStepChannel chan common.FixtureCommand,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
-	switchChannels map[int]common.SwitchChannel,
+	switchChannels []common.SwitchChannel,
 	soundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
 	dmxController *ft232.DMXController,
@@ -257,8 +257,7 @@ func FixtureReceiver(
 		sequence.StrobeSpeed = cmd.StrobeSpeed
 
 		if cmd.SetSwitch && sequence.Type == "switch" {
-			switchNumber := myFixtureNumber
-			MapSwitchFixture(cmd.SwitchData, cmd.State, mySequenceNumber, dmxController, switchNumber, cmd.CurrentSwitchState, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent)
+			MapSwitchFixture(cmd.SwitchData, cmd.State, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 			continue
 		}
 
@@ -821,20 +820,20 @@ func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxI
 // The switch is idendifed by the sequence and switch number.
 func MapSwitchFixture(swiTch common.Switch,
 	state common.State,
-	mySequenceNumber int,
 	dmxController *ft232.DMXController,
-	switchNumber int, currentState int,
 	fixturesConfig *Fixtures, blackout bool,
 	brightness int, master int,
-	switchChannels map[int]common.SwitchChannel,
+	switchChannels []common.SwitchChannel,
 	SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
-	dmxInterfacePresent bool) {
+	dmxInterfacePresent bool,
+	eventsForLauchpad chan common.ALight,
+	guiButtons chan common.ALight) {
 
 	var useFixtureLabel string
 
 	if debug {
-		fmt.Printf("MapSwitchFixture switchNumber %d, currentState %d\n", switchNumber, currentState)
+		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d\n", swiTch.Number, swiTch.CurrentPosition)
 	}
 
 	// We start by having the switch and its current state passed in.
@@ -893,7 +892,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.RotateSpeed = action.RotateSpeed
 			newAction.Program = action.Program
 			newAction.Strobe = action.Strobe
-			newMiniSequencer(thisFixture, swiTch.Number, currentState, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent)
+			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 		}
 
 		// Now play any preset DMX values directly to the universe.
@@ -974,27 +973,6 @@ func IsNumericOnly(str string) bool {
 		}
 	}
 	return true
-}
-
-func setSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber int, switchPosition int, state bool, blackout bool, master int) {
-
-	currentSwitchState := switchChannels[switchNumber]
-	newSwitchState := common.SwitchChannel{
-		Stop:             currentSwitchState.Stop,
-		StopRotate:       currentSwitchState.StopRotate,
-		KeepRotateAlive:  currentSwitchState.KeepRotateAlive,
-		SequencerRunning: state,
-		Blackout:         blackout,
-		Master:           master,
-		SwitchPosition:   switchPosition,
-	}
-	switchChannels[switchNumber] = newSwitchState
-
-}
-
-// getSwitchState reports on if this switch is running a mini sequence.
-func getSwitchState(switchChannels map[int]common.SwitchChannel, switchNumber int) bool {
-	return switchChannels[switchNumber].SequencerRunning
 }
 
 func FindFixtureAddressByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures *Fixtures) (int16, error) {

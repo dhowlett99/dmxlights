@@ -143,7 +143,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Clear switch positions to their first positions.
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 				newSwitch := common.Switch{}
-				newSwitch.CurrentState = 0
+				newSwitch.CurrentPosition = 0
 				newSwitch.Description = sequence.Switches[switchNumber].Description
 				newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
 				newSwitch.Label = sequence.Switches[switchNumber].Label
@@ -549,7 +549,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Loop through all the switchies. and reset their current state back to 0.
 		for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 			newSwitch := common.Switch{}
-			newSwitch.CurrentState = 0
+			newSwitch.CurrentPosition = 0
 			newSwitch.Description = sequence.Switches[switchNumber].Description
 			newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
 			newSwitch.Label = sequence.Switches[switchNumber].Label
@@ -585,7 +585,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
 
 		newSwitch := common.Switch{}
-		newSwitch.CurrentState = switchPosition
+		newSwitch.CurrentPosition = switchPosition
 		newSwitch.Description = sequence.Switches[switchNumber].Description
 		newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
 		newSwitch.Label = sequence.Switches[switchNumber].Label

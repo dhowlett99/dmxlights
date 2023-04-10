@@ -98,16 +98,14 @@ func main() {
 	this.Functions = make(map[int][]common.Function)               // Array holding functions for each sequence.
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
-	this.SwitchChannels = make(map[int]common.SwitchChannel, 10)
+	this.SwitchChannels = []common.SwitchChannel{}
 	for switchChannel := 0; switchChannel < 10; switchChannel++ {
 		newSwitch := common.SwitchChannel{}
 		newSwitch.Stop = make(chan bool)
 		newSwitch.KeepRotateAlive = make(chan bool)
 		newSwitch.StopRotate = make(chan bool)
-		newSwitch.SequencerRunning = false
-		this.SwitchChannels[switchChannel] = newSwitch
+		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
-
 	// Initialize eight fixture states for the four sequences.
 	this.ScannerState = make([][]common.ScannerState, 9)
 	for x := 0; x < 9; x++ {
