@@ -17,8 +17,6 @@
 package fixture
 
 import (
-	"fmt"
-	"os"
 	"testing"
 )
 
@@ -75,70 +73,104 @@ func Test_calculateMaxDMX(t *testing.T) {
 	}
 }
 
-func Test_lookUpChannelNumberByNameInFixtureDefinition(t *testing.T) {
+func TestFindGobo(t *testing.T) {
 
-	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := LoadFixtures("../../fixtures.yaml")
-	if err != nil {
-		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
-		os.Exit(1)
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Name:   "fixture1",
+				Group:  1,
+				Number: 1,
+				Channels: []Channel{
+					{
+						Name: "Red",
+					},
+					{
+						Name: "Green",
+					},
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+						},
+					},
+				},
+			},
+			{
+				Name:   "fixture2",
+				Group:  2,
+				Number: 2,
+				Channels: []Channel{
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+							{
+								Name:   "White Circle",
+								Number: 2,
+							},
+						},
+					},
+					{
+						Name: "Shutter",
+					},
+				},
+			},
+			{
+				Name:   "fixture3",
+				Group:  3,
+				Number: 3,
+				Channels: []Channel{
+					{
+						Name: "ProgramSpeed",
+					},
+				},
+			},
+		},
 	}
 
 	type args struct {
-		group        int
-		switchNumber int
-		channelName  string
-		fixtures     *Fixtures
+		myFixtureNumber  int
+		mySequenceNumber int
+		selectedGobo     string
+		fixtures         *Fixtures
 	}
 	tests := []struct {
-		name    string
-		args    args
-		want    int
-		wantErr bool
+		name string
+		args args
+		want int
 	}{
 		{
-			name: "simple test",
+			name: "find White gobo",
 			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "Master",
-				fixtures:     fixturesConfig,
+				myFixtureNumber:  1,
+				mySequenceNumber: 1,
+				selectedGobo:     "White",
+				fixtures:         fixturesConfig,
 			},
-			want:    5,
-			wantErr: false,
+			want: 2,
 		},
 		{
-			name: "simple test",
+			name: "find Yellow gobo",
 			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "White1",
-				fixtures:     fixturesConfig,
+				myFixtureNumber:  0,
+				mySequenceNumber: 0,
+				selectedGobo:     "Yellow",
+				fixtures:         fixturesConfig,
 			},
-			want:    4,
-			wantErr: false,
-		},
-		{
-			name: "simple test",
-			args: args{
-				group:        100,
-				switchNumber: 1,
-				channelName:  "ProgramSpeed",
-				fixtures:     fixturesConfig,
-			},
-			want:    7,
-			wantErr: false,
+			want: 1,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, err := lookUpChannelNumberByNameInFixtureDefinition(tt.args.group, tt.args.switchNumber, tt.args.channelName, tt.args.fixtures)
-			if (err != nil) != tt.wantErr {
-				t.Errorf("lookUpChannelNumberByNameInFixtureDefinition() error = %v, wantErr %v", err, tt.wantErr)
-				return
-			}
-			if got != tt.want {
-				t.Errorf("lookUpChannelNumberByNameInFixtureDefinition() = %v, want %v", got, tt.want)
+			if got := FindGobo(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
+				t.Errorf("FindGobo() = %v, want %v", got, tt.want)
 			}
 		})
 	}

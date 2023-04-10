@@ -20,7 +20,6 @@ package config
 import (
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"os"
 	"time"
@@ -36,7 +35,7 @@ func SaveConfig(config []common.Sequence, filename string) {
 		log.Fatalf("error: marshalling config: %v", err)
 	}
 	// Write to file
-	err = ioutil.WriteFile(filename, data, 0644)
+	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
 		log.Fatalf("error: writing config: %v to file:%s", err, filename)
 	}
@@ -47,7 +46,7 @@ func LoadConfig(filename string) []common.Sequence {
 	config := []common.Sequence{}
 
 	// Read the file.
-	data, err := ioutil.ReadFile(filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		log.Fatalf("error: reading config: %v from file:%s", err, filename)
 	}

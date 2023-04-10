@@ -28,7 +28,7 @@ import (
 const debug = false
 const MaxDMXAddress = 512
 const MaxTextEntryLength = 35
-const DefaultScannerSize = 120
+const DefaultScannerSize = 60
 const MaxScannerSize = 120
 const MaxRGBSize = 120
 const MaxRGBFade = 10
@@ -40,9 +40,12 @@ const DefaultRGBFade = 1
 const DefaultScannerFade = 10
 const DefaultSpeed = 7
 const DefaultRGBShift = 0
+const DefaultScannerColor = 1
+const DefaultScannerGobo = 1
 const DefaultScannerShift = 0
 const DefaultScannerCoordinates = 0
 const ScannerMidPoint = 127
+const DefaultRGBCoordinates = 10
 
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 
@@ -77,13 +80,14 @@ type Color struct {
 
 // Used in calculating Positions.
 type FixtureBuffer struct {
-	Color         Color
-	MasterDimmer  int
-	Gobo          int
-	Pan           int
-	Tilt          int
-	Shutter       int
-	ScannerNumber int
+	Color        Color
+	MasterDimmer int
+	Brightness   int
+	Gobo         int
+	Pan          int
+	Tilt         int
+	Shutter      int
+	Enabled      bool
 }
 
 type Value struct {
@@ -92,8 +96,12 @@ type Value struct {
 }
 
 type Setting struct {
-	Name  string
-	Value int16
+	Name         string
+	Label        string
+	Number       int
+	Channel      string
+	Value        int16
+	FixtureValue string
 }
 
 type State struct {
@@ -103,28 +111,34 @@ type State struct {
 	Values      []Value
 	ButtonColor string
 	Actions     []Action
+	Settings    []Setting
 	Flash       bool
 }
 
 type Action struct {
-	Name    string
-	Number  int
-	Colors  []string
-	Mode    string
-	Fade    string
-	Speed   string
-	Rotate  string
-	Music   string
-	Program string
+	Name        string
+	Number      int
+	Colors      []string
+	Mode        string
+	Fade        string
+	Size        string
+	Speed       string
+	Rotate      string
+	RotateSpeed string
+	Music       string
+	Program     string
+	Strobe      string
 }
 
 type Switch struct {
+	ID           int
 	Name         string
+	Address      int16
 	Number       int
 	Label        string
 	CurrentState int
 	Description  string
-	States       []State
+	States       map[int]State
 	Fixture      string
 	UseFixture   string
 }
@@ -148,14 +162,13 @@ type ScannerState struct {
 }
 
 type Pattern struct {
-	Name       string
-	Label      string
-	Number     int
-	Length     int // 8, 4 or 2
-	Size       int
-	Fixtures   int // 8 Fixtures
-	Steps      []Step
-	PattenTrim int
+	Name     string
+	Label    string
+	Number   int
+	Length   int // 8, 4 or 2
+	Size     int
+	Fixtures int // 8 Fixtures
+	Steps    []Step
 }
 
 type Arg struct {
@@ -176,6 +189,7 @@ const (
 	Reset
 	UpdateMode
 	UpdateStatic
+	UpdateBounce
 	UpdateStaticColor
 	UpdateSequenceColor
 	PlayStaticOnce
@@ -183,7 +197,9 @@ const (
 	UnHide
 	Hide
 	Start
+	StartChase
 	Stop
+	StopChase
 	ReadConfig
 	LoadConfig
 	UpdateSpeed
@@ -216,6 +232,7 @@ const (
 	ToggleFixtureState
 	FixtureState
 	UpdateRGBShift
+	UpdateRGBInvert
 	UpdateScannerShift
 	UpdateScannerColor
 	UpdateStrobeSpeed
@@ -228,6 +245,9 @@ const (
 	UpdateOffsetPan
 	UpdateOffsetTilt
 	EnableAllScanners
+	UpdateScannerChase
+	UpdateMusicTrigger
+	UpdateScannerHasShutterChase
 )
 
 // A full step cycle is 39 ticks ie 39 values.
@@ -271,21 +291,20 @@ type Sequence struct {
 	CurrentSpeed                time.Duration               // Sequence speed represented as a duration.
 	Speed                       int                         // Sequence speed represented by a short number.
 	MusicTrigger                bool                        // Is this sequence in music trigger mode.
+	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
+	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
-	Steps                       []Step                      // Steps in this sequence.
+	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
-	NumberFixtures              int                         // Number of fixtures for this sequence.
-	RGBPositions                map[int]Position            // One set of Fixture positions for RGB devices. index is position number.
-	ScannerPositions            map[int]map[int]Position    // Scanner Fixture positions decides where a fixture is in a give set of sequence steps. First index is fixure, second index is positions.
+	NumberFixtures              int                         // Total Number of fixtures for this sequence.
+	EnabledNumberFixtures       int                         // Enabled Number of fixtures for this sequence.
 	AutoColor                   bool                        // Sequence is going to automatically change the color.
 	AutoPattern                 bool                        // Sequence is going to automatically change the pattern.
-	GuiFunctionLabels           [8]string                   // Storage for the function key labels for this sequence.
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
-	Pattern                     Pattern                     // Contains fixtures and steps info.
-	RGBAvailablePatterns        map[int]Pattern             // Available patterns for the RGB fixtures.
+	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off
@@ -317,7 +336,7 @@ type Sequence struct {
 	ScannerSize                 int                         // The selected scanner size.
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
-	ScannerChase                bool                        // Chase the scanner shutters instead of allways being on.
+	ScannerChaser               bool                        // Chase the scanner shutters instead of allways being on.
 	ScannerInvert               bool                        // Invert the scanner, i.e scanner in the opposite direction.
 	ScannerColor                map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates          []int                       // Number of scanner coordinates.
@@ -325,16 +344,17 @@ type Sequence struct {
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
 	ScannerState                map[int]ScannerState        // Map of fixtures which are disabled.
+	DisableOnceMutex            *sync.RWMutex               // Lock to protect DisableOnce.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor         bool                        // Command to update the sequence colors.
-	Functions                   []Function                  // Storage for the sequence functions.
 	FunctionMode                bool                        // This sequence is in function mode.
-	Switches                    []Switch                    // A switch sequence stores its data in here.
+	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
+	RGBCoordinates              int                         // Number of coordinates in RGB fade.
 }
 
 type Function struct {
@@ -342,6 +362,7 @@ type Function struct {
 	SequenceNumber int
 	Number         int
 	State          bool
+	State2         bool
 	Flash          bool
 	Label          string
 }
@@ -369,8 +390,7 @@ type Hit struct {
 }
 
 type Step struct {
-	Fixtures []Fixture
-	Type     string
+	Fixtures map[int]Fixture
 }
 
 type FixtureCommand struct {
@@ -391,26 +411,35 @@ type FixtureCommand struct {
 	StopFlood  bool
 
 	// RGB commands.
-	RGBPosition     Position
-	RGBStatic       bool
-	RGBStaticColors []StaticColorButton
+	RGBPosition       Position
+	RGBStatic         bool
+	RGBStaticColors   []StaticColorButton
+	RGBPlayStaticOnce bool
 
 	// Scanner Commands.
 	ScannerColor             int
 	ScannerPosition          Position
 	ScannerState             ScannerState
 	ScannerDisableOnce       bool
-	ScannerChase             bool
+	ScannerChaser            bool
 	ScannerAvailableColors   []StaticColorButton
 	ScannerGobo              int
 	ScannerOffsetPan         int
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int
+	ScannerShutterPositions  map[int]Position
+	ScannerHasShutterChase   bool
 
 	// Derby Commands
 	Rotate  int
 	Music   int
 	Program int
+
+	// Switch Commands
+	SetSwitch          bool
+	SwitchData         Switch
+	State              State
+	CurrentSwitchState int
 }
 
 type Position struct {
@@ -418,15 +447,15 @@ type Position struct {
 	Fixtures map[int]Fixture
 }
 
-// A fixture can have any or some of the
+// A common fixture can have any or some of the
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
 	ID           string
 	Name         string
 	Label        string
-	Type         string
 	MasterDimmer int
+	Brightness   int
 	ScannerColor Color
 	Colors       []Color
 	Pan          int
@@ -436,6 +465,7 @@ type Fixture struct {
 	Music        int
 	Gobo         int
 	Program      int
+	Enabled      bool
 }
 
 type ButtonPresets struct {
@@ -484,6 +514,7 @@ func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[1] <- command
 	commandChannels[2] <- command
 	commandChannels[3] <- command
+	commandChannels[4] <- command
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
@@ -500,23 +531,6 @@ func SendCommandToAllSequenceExcept(selectedSequence int, command Command, comma
 			commandChannels[index] <- command
 		}
 	}
-}
-
-func MakeFunctionButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight, channels Channels) {
-
-	// The target set of buttons.
-	ClearSelectedRowOfButtons(selectedSequence, eventsForLauchpad, guiButtons)
-
-	// Get an upto date copy of the sequence.
-	cmd := Command{
-		Action: ReadConfig,
-	}
-	SendCommandToSequence(selectedSequence, cmd, channels.CommmandChannels)
-
-	replyChannel := channels.ReplyChannels[selectedSequence]
-	sequence := <-replyChannel
-
-	ShowFunctionButtons(sequence, selectedSequence, eventsForLauchpad, guiButtons)
 }
 
 func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
@@ -787,52 +801,6 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	return code
 }
 
-func SetFunctionKeyActions(functions []Function, sequence Sequence) Sequence {
-
-	// Map the auto color change setting.
-	sequence.AutoColor = sequence.Functions[Function2_Auto_Color].State
-
-	// Map the auto pattern change setting.
-	sequence.AutoPattern = sequence.Functions[Function3_Auto_Pattern].State
-
-	// Map bounce function to sequence bounce setting.
-	sequence.Bounce = sequence.Functions[Function4_Bounce].State
-
-	// Map color selection function.
-	if sequence.Functions[Function5_Color].State {
-		sequence.PlayStaticOnce = true
-	}
-
-	// Map static function.
-	if sequence.Type != "scanner" {
-		sequence.Static = sequence.Functions[Function6_Static_Gobo].State
-		if sequence.Functions[Function6_Static_Gobo].State {
-			sequence.PlayStaticOnce = true
-			sequence.Hide = true
-		}
-	}
-
-	// Map RGB invert function.
-	if sequence.Type == "rgb" {
-		sequence.RGBInvert = sequence.Functions[Function7_Invert_Chase].State
-	}
-
-	// Map scanner chase mode. Uses same function key as above.
-	if sequence.Type == "scanner" {
-		sequence.ScannerChase = sequence.Functions[Function7_Invert_Chase].State
-	}
-
-	// Map music trigger function.
-	sequence.MusicTrigger = sequence.Functions[Function8_Music_Trigger].State
-	if sequence.Functions[Function8_Music_Trigger].State {
-		sequence.Run = true
-	}
-
-	sequence.Functions = functions
-
-	return sequence
-}
-
 func HowManyColors(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
@@ -911,12 +879,18 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 
 // For the given sequence hide the available sequence colors..
 func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	if mySequenceNumber == 4 {
+		return
+	}
 	for myFixtureNumber := range sequence.RGBAvailableColors {
 		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 	}
 }
 
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	if selectedSequence == 4 {
+		return
+	}
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
@@ -924,25 +898,11 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 }
 
 func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALight) {
+	if selectedSequence == 4 {
+		return
+	}
 	for x := 0; x < 8; x++ {
 		LabelButton(x, selectedSequence, "", guiButtons)
-	}
-}
-
-func ShowFunctionButtons(sequence Sequence, selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
-	// Loop through the available functions for this sequence
-	for index, function := range sequence.Functions {
-		if debug {
-			fmt.Printf("ShowFunctionButtons: function %+v\n", function)
-		}
-
-		if function.State {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-		} else {
-			LightLamp(ALight{X: index, Y: selectedSequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-		}
-		LabelButton(index, selectedSequence, function.Label, guiButtons)
 	}
 }
 
@@ -1229,11 +1189,11 @@ func Reverse(in int) int {
 }
 
 // CalculateFadeValues - calculate fade curve values.
-func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
+func CalculateFadeValues(noCoordianates int, fade int, size int) (slopeOn []int, slopeOff []int) {
 
-	fadeUpValues := GetFadeValues(float64(MaxDMXBrightness), fade, false)
+	fadeUpValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, false)
 	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, size)
-	fadeDownValues := GetFadeValues(float64(MaxDMXBrightness), fade, true)
+	fadeDownValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, true)
 
 	slopeOn = append(slopeOn, fadeUpValues...)
 	slopeOn = append(slopeOn, fadeOnValues...)
@@ -1245,81 +1205,56 @@ func CalculateFadeValues(fade int, size int) (slopeOn []int, slopeOff []int) {
 	return slopeOn, slopeOff
 }
 
-func GetFadeValues(size float64, fade int, reverse bool) []int {
+func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {
 
-	out := []int{}
-	outPadded := []int{}
-	size = size / 2
-
-	var numberCoordinates float64
-
-	if fade == 1 {
-		numberCoordinates = 20
-	}
-	if fade == 2 {
-		numberCoordinates = 25
-	}
-	if fade == 3 {
-		numberCoordinates = 30
-	}
-	if fade == 4 {
-		numberCoordinates = 35
-	}
-	if fade == 5 {
-		numberCoordinates = 40
-	}
-	if fade == 6 {
-		numberCoordinates = 45
-	}
-	if fade == 7 {
-		numberCoordinates = 50
-	}
-	if fade == 8 {
-		numberCoordinates = 55
-	}
-	if fade == 9 {
-		numberCoordinates = 60
-	}
-	if fade == 10 {
-		numberCoordinates = 65
-	}
-
-	var theta float64
 	var x float64
-	if reverse {
-		for x = 0; x <= 180; x += numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
+	var counter float64
+	var slope float64
+
+	coordinates := float64(noCoordinates)
+
+	switch fade {
+	case 10:
+		slope = 30
+	case 9:
+		slope = 15
+	case 8:
+		slope = 10
+	case 7:
+		slope = 7
+	case 6:
+		slope = 5
+	case 5:
+		slope = 4
+	case 4:
+		slope = 3
+	case 3:
+		slope = 2
+	case 2:
+		slope = 1.5
+	case 1:
+		slope = 1
+	default:
+		slope = 0
+	}
+
+	if !reverse {
+		for counter = 0; counter <= coordinates-1; counter++ {
+			x = (counter / 2) / (coordinates - 1)
+			y := math.Pow(math.Sin(x*math.Pi), slope)
+			dmx := int(size * y)
+			out = append(out, dmx)
 		}
 	} else {
-		for x = 180; x >= 0; x -= numberCoordinates {
-			theta = (x - 90) * math.Pi / 180
-			x := int(-size*math.Sin(theta) + size)
-			out = append(out, x)
+		for counter = coordinates - 1; counter >= 0; counter-- {
+			x = (counter / 2) / (coordinates - 1)
+			y := math.Pow(math.Sin(x*math.Pi), slope)
+			dmx := int(size * y)
+			out = append(out, dmx)
 		}
 	}
 
-	if reverse {
-		for value := 10; value > 0; value-- {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[len(out)-value])
-			}
-		}
-
-	} else {
-		for value := 0; value < 10; value++ {
-			if value >= len(out) {
-				outPadded = append(outPadded, 255)
-			} else {
-				outPadded = append(outPadded, out[value])
-			}
-		}
-	}
-
-	return outPadded
+	return out
 }
 
 func GetFadeOnValues(size int, fade int) []int {

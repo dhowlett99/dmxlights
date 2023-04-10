@@ -822,319 +822,175 @@ fixtures:
     name: Master
 - id: 20
   name: Scanner 6
-  label: ADJ.Inno.Spot1
+  label: ADJ.Com.Scan6
   number: 6
-  description: American DJ Inno Pocket Spot
+  description: American DJ Comscan LED
   type: scanner
   group: 3
   address: 425
   channels:
   - number: 1
     name: Pan
-    maxdegrees: 540
   - number: 2
-    name: FinePan
-  - number: 3
     name: Tilt
-    maxdegrees: 230
-  - number: 4
-    name: FineTilt
-  - number: 5
-    name: Color
-    settings:
-    - name: White
-      number: 1
-      value: "0"
-    - name: Red
-      number: 2
-      value: "8"
-    - name: Orange
-      number: 3
-      value: "15"
-    - name: Yellow
-      number: 4
-      value: "22"
-    - name: Green
-      number: 5
-      value: "29"
-    - name: Blue
-      number: 6
-      value: "36"
-    - name: Light Blue
-      number: 7
-      value: "43"
-    - name: Pink
-      number: 8
-      value: "50"
-  - number: 6
-    name: Gobo
-    settings:
-    - name: Open
-      number: 1
-      value: "0"
-    - name: Gobo 1
-      number: 2
-      value: "8"
-    - name: Gobo 2
-      number: 3
-      value: "16"
-    - name: Gobo 3
-      number: 4
-      value: "24"
-    - name: Gobo 4
-      number: 5
-      value: "32"
-    - name: Gobo 5
-      number: 6
-      value: "40"
-    - name: Gobo 6
-      number: 7
-      value: "48"
-    - name: Gobo 7
-      number: 8
-      value: "56"
-  - number: 7
+  - number: 3
     name: Shutter
     settings:
     - name: Open
-      number: 0
+      number: 1
       value: "255"
     - name: Closed
-      number: 0
+      number: 2
       value: "0"
     - name: Strobe
-      number: 0
+      number: 3
       value: 16-131
-  - number: 8
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
     name: Master
-  - number: 9
-    name: Speed
-    settings:
-    - name: Fast
-      number: 1
-      value: "255"
-  - number: 10
-    name: SoundActive
-    settings:
-    - name: "Off"
-      number: 1
-      value: "1"
-  - number: 11
-    name: DimmerCurve
-    settings:
-    - name: DefaultCurve
-      number: 1
-      value: "255"
 - id: 21
   name: Scanner 7
-  label: ADJ.Inno.Spot2
+  label: ADJ.Com.Scan7
   number: 7
-  description: American DJ Inno Pocket Spot
+  description: American DJ Comscan LED
   type: scanner
   group: 3
-  address: 440
+  address: 430
   channels:
   - number: 1
     name: Pan
-    maxdegrees: 540
   - number: 2
-    name: FinePan
-  - number: 3
     name: Tilt
-    maxdegrees: 230
-  - number: 4
-    name: FineTilt
-  - number: 5
-    name: Color
-    settings:
-    - name: White
-      number: 1
-      value: "0"
-    - name: Red
-      number: 2
-      value: "8"
-    - name: Orange
-      number: 3
-      value: "15"
-    - name: Yellow
-      number: 4
-      value: "22"
-    - name: Green
-      number: 5
-      value: "29"
-    - name: Blue
-      number: 6
-      value: "36"
-    - name: Light Blue
-      number: 7
-      value: "43"
-    - name: Pink
-      number: 8
-      value: "50"
-  - number: 6
-    name: Gobo
-    settings:
-    - name: Open
-      number: 1
-      value: "0"
-    - name: Gobo 1
-      number: 2
-      value: "8"
-    - name: Gobo 2
-      number: 3
-      value: "16"
-    - name: Gobo 3
-      number: 4
-      value: "24"
-    - name: Gobo 4
-      number: 5
-      value: "32"
-    - name: Gobo 5
-      number: 6
-      value: "40"
-    - name: Gobo 6
-      number: 7
-      value: "48"
-    - name: Gobo 7
-      number: 8
-      value: "56"
-  - number: 7
+  - number: 3
     name: Shutter
     settings:
     - name: Open
       number: 1
-      value: 248-255
+      value: "255"
     - name: Closed
       number: 2
       value: "0"
     - name: Strobe
       number: 3
       value: 16-131
-  - number: 8
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
     name: Master
-  - number: 9
-    name: Speed
-    settings:
-    - name: Fast
-      number: 1
-      value: "255"
-  - number: 10
-    name: SoundActive
-    settings:
-    - name: "Off"
-      number: 1
-      value: "1"
-  - number: 11
-    name: DimmerCurves
-    settings:
-    - name: Default Curve
-      number: 1
-      value: "255"
 - id: 22
   name: Scanner 8
-  label: ADJ.Inno.Spot3
+  label: ADJ.Com.Scan8
   number: 8
-  description: American DJ Inno Pocket Spot
+  description: American DJ Comscan LED
   type: scanner
   group: 3
-  address: 455
+  address: 435
   channels:
   - number: 1
     name: Pan
-    maxdegrees: 540
   - number: 2
-    name: FinePan
-  - number: 3
     name: Tilt
-    maxdegrees: 230
-  - number: 4
-    name: FineTilt
-  - number: 5
-    name: Color
-    settings:
-    - name: White
-      number: 1
-      value: "0"
-    - name: Red
-      number: 2
-      value: "8"
-    - name: Orange
-      number: 3
-      value: "15"
-    - name: Yellow
-      number: 4
-      value: "22"
-    - name: Green
-      number: 5
-      value: "29"
-    - name: Blue
-      number: 6
-      value: "36"
-    - name: Light Blue
-      number: 7
-      value: "43"
-    - name: Pink
-      number: 8
-      value: "50"
-  - number: 6
-    name: Gobo
-    settings:
-    - name: Open
-      number: 1
-      value: "0"
-    - name: Gobo 1
-      number: 2
-      value: "8"
-    - name: Gobo 2
-      number: 3
-      value: "16"
-    - name: Gobo 3
-      number: 4
-      value: "24"
-    - name: Gobo 4
-      number: 5
-      value: "32"
-    - name: Gobo 5
-      number: 6
-      value: "40"
-    - name: Gobo 6
-      number: 7
-      value: "48"
-    - name: Gobo 7
-      number: 8
-      value: "56"
-  - number: 7
+  - number: 3
     name: Shutter
     settings:
     - name: Open
       number: 1
-      value: 248-255
+      value: "255"
     - name: Closed
       number: 2
       value: "0"
     - name: Strobe
       number: 3
       value: 16-131
-  - number: 8
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
     name: Master
-  - number: 9
-    name: Speed
-    settings:
-    - name: Fast
-      number: 1
-      value: "255"
-  - number: 10
-    name: SoundActive
-    settings:
-    - name: "Off"
-      number: 1
-      value: "1"
-  - number: 11
-    name: DimmerCurves
-    settings:
-    - name: Default Curve
-      number: 1
-      value: "255"
 - id: 23
   name: ADJ QA PAR 38
   label: par38
@@ -2620,7 +2476,7 @@ fixtures:
       - Blue
       mode: Chase
       fade: Sharp
-      size: "Off"
+      size: Long
       speed: Music
       rotate: "Off"
       rotatespeed: ""

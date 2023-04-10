@@ -20,8 +20,8 @@ package fixture
 
 import (
 	"fmt"
+	"os"
 	"strconv"
-	"strings"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -48,7 +48,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 	myFixtureNumber := fixture.Number - 1
 
 	// Find all the specified settings for the program channel
-	programSettings, err := GetChannelSettinsByName(fixture.Name, "Program", fixturesConfig)
+	programSettings, err := GetChannelSettinsByName(fixture, "Program", fixturesConfig)
 	if err != nil && debug {
 		fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
 	}
@@ -68,24 +68,35 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
-
-		// Stop any running chases.
-		select {
-		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
-		case <-time.After(100 * time.Millisecond):
+		if soundConfig.GetSoundTriggerState(switchName) {
+			// Use the switch name as the unique sequence name.
+			err := soundConfig.DisableSoundTrigger(switchName)
+			if err != nil {
+				fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+				os.Exit(1)
+			}
+			if debug_mini {
+				fmt.Printf("Sound trigger %s disabled\n", switchName)
+			}
 		}
 
-		// Stop any rotates.
-		select {
-		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
-		case <-time.After(100 * time.Millisecond):
-		}
+		if getSwitchState(switchChannels, switchNumber) {
+			// Stop any running chases.
+			select {
+			case switchChannels[switchNumber].Stop <- true:
+				turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			case <-time.After(100 * time.Millisecond):
+			}
 
-		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			// Stop any rotates.
+			select {
+			case switchChannels[switchNumber].StopRotate <- true:
+				turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			case <-time.After(100 * time.Millisecond):
+			}
+
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+		}
 		return
 	}
 
@@ -98,41 +109,48 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disabled\n", switchName)
+		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
-		programChannel, err := FindChannel("Program", myFixtureNumber, mySequenceNumber, fixturesConfig)
+		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
 			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Look up the program state required.
-		v, err := findChannelSettingByName(fixture.Group, fixture.Number, "Program", action.Program, fixturesConfig)
+		v, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
 		if err != nil {
 			fmt.Printf("fixture %s program state not found: %s,", fixture.Name, err)
 			return
 		}
 
 		// Now play that DMX value on the program channel of this fixture.
-		setChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
+		SetChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
 
 		return
 	}
@@ -146,20 +164,27 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disable\n", switchName)
+		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[switchNumber].StopRotate <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -168,7 +193,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			fmt.Printf("error %d\n", err)
 		}
 
-		MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+		MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 
 		return
 	}
@@ -191,40 +216,56 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		setSwitchState(switchChannels, switchNumber, switchPosition, true, blackout, master)
 
 		// DeRegister this mini sequencer with the sound service.
-		// Use the switch number as the unique sequence name.
-		soundConfig.DisableSoundTrigger(switchName)
+		// Use the switch name as the unique sequence name.
+		err := soundConfig.DisableSoundTrigger(switchName)
+		if err != nil {
+			fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+			os.Exit(1)
+		}
+		if debug {
+			fmt.Printf("Sound trigger %s disable\n", switchName)
+		}
 
 		// Turn off the fixture.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Register this mini sequencer with the sound service.
+		// Use the switch name as the unique sequence name.
 		if cfg.MusicTrigger {
-			soundConfig.EnableSoundTrigger(switchName)
+			err := soundConfig.EnableSoundTrigger(switchName)
+			if err != nil {
+				fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
+				os.Exit(1)
+			}
+			if debug_mini {
+				fmt.Printf("Sound trigger %s enabled\n", switchName)
+			}
 		}
 
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[switchNumber].Stop <- true:
-			turnOffFixture(fixture.Name, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		sequence := common.Sequence{
-			ScannerInvert: false,
-			RGBInvert:     false,
-			Bounce:        false,
-			ScannerChase:  false,
-			RGBShift:      1,
+			ScannerInvert:  false,
+			RGBInvert:      false,
+			Bounce:         false,
+			ScannerChaser:  false,
+			RGBShift:       1,
+			RGBCoordinates: common.DefaultRGBCoordinates,
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
-		sequence.Steps = sequence.Pattern.Steps
+		steps := sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
-		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(cfg.Fade, cfg.Size)
+		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
 		// Calulate positions for each RGB fixture.
 		sequence.Optimisation = false
 		sequence.ScannerState = map[int]common.ScannerState{
@@ -245,7 +286,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			},
 		}
 
-		sequence.RGBPositions, sequence.NumberSteps = position.CalculatePositions(sequence)
+		RGBPositions, numberSteps := position.CalculatePositions(steps, sequence)
 
 		var rotateCounter int
 		var clockwise int
@@ -266,11 +307,11 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 			if cfg.Rotatable {
 
-				rotateChannel, err := FindChannel("Rotate", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				rotateChannel, err := FindChannelNumberByName(fixture, "Rotate")
 				if err != nil {
 					fmt.Printf("rotator: %s,", err)
 				}
-				masterChannel, err := FindChannel("Master", myFixtureNumber, mySequenceNumber, fixturesConfig)
+				masterChannel, err := FindChannelNumberByName(fixture, "Master")
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
@@ -284,15 +325,15 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 						select {
 						case <-switchChannels[switchNumber].StopRotate:
 							time.Sleep(1 * time.Millisecond)
-							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							return
 						case <-switchChannels[switchNumber].KeepRotateAlive:
 							time.Sleep(1 * time.Millisecond)
 							continue
 						case <-time.After(1500 * time.Millisecond):
-							setChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 							time.Sleep(250 * time.Millisecond)
-							setChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 						}
 					}
 				}(switchNumber, switchChannels)
@@ -305,7 +346,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0; step < sequence.NumberSteps; step++ {
+				for step := 0; step < numberSteps; step++ {
 
 					blackout = switchChannels[switchNumber].Blackout
 					master = switchChannels[switchNumber].Master
@@ -347,29 +388,29 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					// First three triggers occupied by sequence 1,2 & 3
-					// So switch channels use 4 -11
-					case <-soundConfig.SoundTriggers[switchNumber+3].Channel:
+					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
+					// So switch channels use 5 -12
+					case <-soundConfig.SoundTriggers[switchNumber+4].Channel:
 					case <-switchChannels[switchNumber].Stop:
 						// Stop.
 						if cfg.Rotatable {
 							switchChannels[switchNumber].StopRotate <- true
 						}
 						// And turn the fixture off.
-						MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
 					}
 
 					// Play out fixture to DMX channels.
-					position := sequence.RGBPositions[step]
+					position := RGBPositions[step]
 
 					fixtures := position.Fixtures
 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						for _, color := range fixture.Colors {
-							MapFixtures(mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+							MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						}
 					}
 
@@ -502,54 +543,45 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	return config
 }
 
-func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
-		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixtureName)
+		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixture.Name)
 	}
 
 	settingNames := []common.Setting{}
 
-	// Find the fixture by name.
-	for _, fixture := range fixtures.Fixtures {
+	// Find the channel by name.
+	for _, channel := range fixture.Channels {
 		if debug_mini {
-			fmt.Printf("GetChannelSettinsByName: matching on fixture %s with name %s\n", fixture.Label, fixtureName)
+			fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
 		}
-		if strings.Contains(fixture.Label, fixtureName) {
-
-			// Find the channel by name.
-			for _, channel := range fixture.Channels {
+		if channel.Name == name {
+			if debug_mini {
+				fmt.Printf("Found a Program Channel\n")
+			}
+			// If the program has a hard coded value return that as a default.
+			if channel.Value != nil {
 				if debug_mini {
-					fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
+					fmt.Printf("Found a Default Program Value of %d\n", *channel.Value)
 				}
-				if channel.Name == name {
-					if debug_mini {
-						fmt.Printf("Found a Program Channel\n")
-					}
-					// If the program has a hard coded value return that as a default.
-					if channel.Value != nil {
-						if debug_mini {
-							fmt.Printf("Found a Default Program Value of %d\n", *channel.Value)
-						}
-						value := common.Setting{
-							Name:  "Default",
-							Value: *channel.Value,
-						}
-						settingNames = append(settingNames, value)
-						return settingNames, nil
-					}
-					// Otherwise find the settings available for this channel.
-					for _, setting := range channel.Settings {
-						if debug_mini {
-							fmt.Printf("Looking through Settings %s\n", setting.Name)
-						}
-						v, _ := strconv.Atoi(setting.Value)
-						value := common.Setting{
-							Name:  setting.Name,
-							Value: int16(v),
-						}
-						settingNames = append(settingNames, value)
-					}
+				value := common.Setting{
+					Name:  "Default",
+					Value: *channel.Value,
 				}
+				settingNames = append(settingNames, value)
+				return settingNames, nil
+			}
+			// Otherwise find the settings available for this channel.
+			for _, setting := range channel.Settings {
+				if debug_mini {
+					fmt.Printf("Looking through Settings %s\n", setting.Name)
+				}
+				v, _ := strconv.Atoi(setting.Value)
+				value := common.Setting{
+					Name:  setting.Name,
+					Value: int16(v),
+				}
+				settingNames = append(settingNames, value)
 			}
 		}
 	}
@@ -561,6 +593,6 @@ func GetChannelSettinsByName(fixtureName string, name string, fixtures *Fixtures
 		return settingNames, nil
 	}
 
-	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixtureName)
+	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixture.Name)
 
 }

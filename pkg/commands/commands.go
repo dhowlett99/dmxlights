@@ -67,8 +67,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Static = false
 		sequence.PlayStaticOnce = true
 		// Stop the sequence.
-		sequence.Functions[common.Function8_Music_Trigger].State = false
-		sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Clear = true
@@ -104,33 +102,35 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Reset pan and tilt to the center
 			sequence.ScannerOffsetPan = common.ScannerMidPoint
 			sequence.ScannerOffsetTilt = common.ScannerMidPoint
-			// Enable all scanners.
+			// Enable all scanners and reset colors and gobo's.
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.ScannerState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.ScannerState[scanner] = newScannerState
+				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
 			}
 			// Reset the number of coordinates.
 			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
-			// Reset the scanner size back to default. common.DefaultScannerSize
+			// Reset the scanner size and shift back to defaults.
 			sequence.ScannerSize = common.DefaultScannerSize
+			sequence.ScannerShift = common.DefaultScannerShift
 			// Reset the scanner pattern back to default.
 			sequence.UpdateSequenceColor = false
 			sequence.RecoverSequenceColors = false
 			sequence.UpdatePattern = true
 			sequence.SelectedPattern = common.DefaultPattern
-			// Clear all the function buttons for this sequence.
-			sequence.Functions[common.Function1_Pattern].State = false
-			sequence.Functions[common.Function2_Auto_Color].State = false
-			sequence.Functions[common.Function3_Auto_Pattern].State = false
-			sequence.Functions[common.Function4_Bounce].State = false
-			sequence.Functions[common.Function5_Color].State = false
-			sequence.Functions[common.Function6_Static_Gobo].State = false
-			sequence.Functions[common.Function7_Invert_Chase].State = false
-			sequence.Functions[common.Function8_Music_Trigger].State = false
-			sequence = common.SetFunctionKeyActions(sequence.Functions, sequence)
 		}
+		// Clear all the function buttons for this sequence.
+		sequence.SelectedPattern = common.DefaultPattern
+		sequence.AutoColor = false
+		sequence.AutoPattern = false
+		sequence.Bounce = false
+		sequence.ScannerChaser = false
+		sequence.RGBInvert = false
+		sequence.MusicTrigger = false
+
 		if sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("Clear switch positions\n")
@@ -142,7 +142,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 			// Clear switch positions to their first positions.
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
-				sequence.Switches[switchNumber].CurrentState = 0
+				newSwitch := common.Switch{}
+				newSwitch.CurrentState = 0
+				newSwitch.Description = sequence.Switches[switchNumber].Description
+				newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+				newSwitch.Label = sequence.Switches[switchNumber].Label
+				newSwitch.Name = sequence.Switches[switchNumber].Name
+				newSwitch.Number = sequence.Switches[switchNumber].Number
+				newSwitch.States = sequence.Switches[switchNumber].States
+				newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+				sequence.Switches[switchNumber] = newSwitch
 			}
 			sequence.PlaySwitchOnce = true
 		}
@@ -199,6 +208,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.RGBShift = command.Args[SHIFT].Value.(int)
 		return sequence
 
+	case common.UpdateRGBInvert:
+		const INVERT = 0
+		if debug {
+			fmt.Printf("%d: Command Update RGB Invert to %d\n", mySequenceNumber, command.Args[INVERT].Value)
+		}
+		sequence.RGBInvert = command.Args[INVERT].Value.(bool)
+		return sequence
+
 	case common.UpdateScannerShift:
 		const SHIFT = 0
 		if debug {
@@ -249,12 +266,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = true
 		return sequence
 
+	case common.StartChase:
+		if debug {
+			fmt.Printf("%d: Command StartChase\n", mySequenceNumber)
+		}
+		sequence.ScannerChaser = true
+		sequence.Mode = "Sequence"
+		sequence.Static = false
+		sequence.Run = true
+		return sequence
+
+	case common.StopChase:
+		if debug {
+			fmt.Printf("%d: Command Stop Chase\n", mySequenceNumber)
+		}
+		sequence.ScannerChaser = false
+		sequence.Mode = "Sequence"
+		sequence.Static = false
+		sequence.Run = false
+		return sequence
+
 	case common.Stop:
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		sequence.Functions[common.Function8_Music_Trigger].State = false
-		sequence.Functions[common.Function6_Static_Gobo].State = false
+		//sequence.Functions[common.Function8_Music_Trigger].State = false
+		//sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Static = false
@@ -296,12 +333,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.Strobe:
-		const STROBE_SPEED = 0
+		const STROBE_STATE = 0
+		const STROBE_SPEED = 1
 		if debug {
 			fmt.Printf("%d: Command to Start Strobe\n", mySequenceNumber)
 		}
+		// Remember the state of the Music trigger flag.
+		sequence.LastMusicTrigger = sequence.MusicTrigger
 		sequence.StrobeSpeed = command.Args[STROBE_SPEED].Value.(int)
-		sequence.Strobe = true
+		sequence.Strobe = command.Args[STROBE_STATE].Value.(bool)
 		if sequence.StartFlood {
 			sequence.FloodPlayOnce = true
 		}
@@ -322,6 +362,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if sequence.Static {
 			sequence.PlayStaticOnce = true
 		}
+		// Restore the state of the music trigger flag.
+		//sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
+		sequence.MusicTrigger = sequence.LastMusicTrigger
 		return sequence
 
 	case common.UpdateStrobeSpeed:
@@ -348,17 +391,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Blackout = false
 		return sequence
 
-	case common.UpdateFunctions:
-		const FUNCTIONS = 0
+	case common.UpdateBounce:
+		const STATE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Functions\n", mySequenceNumber)
-			for _, function := range command.Args[FUNCTIONS].Value.([]common.Function) {
-				fmt.Printf(" Function:%d: Name:%s State:%t\n", function.Number, function.Name, function.State)
-			}
+			fmt.Printf("%d: Command Update Bounce to %t\n", mySequenceNumber, command.Args[STATE].Value)
 		}
-		// Setup the actions based on the state of the function keys.
-		sequence = common.SetFunctionKeyActions(command.Args[FUNCTIONS].Value.([]common.Function), sequence)
-
+		sequence.Bounce = command.Args[STATE].Value.(bool)
 		return sequence
 
 	case common.UpdateStatic:
@@ -369,6 +407,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
+		sequence.Run = false
+		return sequence
 
 	case common.UpdateMode:
 		const MODE = 0
@@ -506,9 +546,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command ClearAllSwitchPositions n", mySequenceNumber)
 		}
-		// Loop through all the switchies.
-		for X := 0; X < len(sequence.Switches); X++ {
-			sequence.Switches[X].CurrentState = 0
+		// Loop through all the switchies. and reset their current state back to 0.
+		for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
+			newSwitch := common.Switch{}
+			newSwitch.CurrentState = 0
+			newSwitch.Description = sequence.Switches[switchNumber].Description
+			newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+			newSwitch.Label = sequence.Switches[switchNumber].Label
+			newSwitch.Name = sequence.Switches[switchNumber].Name
+			newSwitch.Number = sequence.Switches[switchNumber].Number
+			newSwitch.States = sequence.Switches[switchNumber].States
+			newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+			sequence.Switches[switchNumber] = newSwitch
 		}
 		sequence.PlaySwitchOnce = true
 		return sequence
@@ -530,7 +579,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
 		}
-		sequence.Switches[command.Args[SWITCH_NUMBER].Value.(int)].CurrentState = command.Args[SWITCH_POSITION].Value.(int)
+
+		// Loop through all the switchies. and reset their current state back to 0.
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+
+		newSwitch := common.Switch{}
+		newSwitch.CurrentState = switchPosition
+		newSwitch.Description = sequence.Switches[switchNumber].Description
+		newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
+		newSwitch.Label = sequence.Switches[switchNumber].Label
+		newSwitch.Name = sequence.Switches[switchNumber].Name
+		newSwitch.Number = sequence.Switches[switchNumber].Number
+		newSwitch.States = sequence.Switches[switchNumber].States
+		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+		sequence.Switches[switchNumber] = newSwitch
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = true
@@ -556,7 +619,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const FIXTURE_STATE = 2    // Boolean
 		const FIXTURE_INVERTED = 3 // Boolean
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
@@ -569,7 +632,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		// When we disable a fixture we send a off command to the shutter to make it go off.
 		// We only want to do this once to avoid flooding the universe with DMX commands.
+		sequence.DisableOnceMutex.Lock()
 		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
+		sequence.DisableOnceMutex.Unlock()
 		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence
@@ -586,15 +651,33 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.UpdateAutoColor:
 		const AUTO_COLOR = 0
+		const SELECTED_TYPE = 1
 		if debug {
-			fmt.Printf("%d: Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[AUTO_COLOR].Value)
+			fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
 		}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
-		if !command.Args[AUTO_COLOR].Value.(bool) {
+		selectedType := command.Args[SELECTED_TYPE].Value.(string)
+
+		// If we switch auto color off and we are a rgb rembember what colors are in our sequence.
+		if !sequence.AutoColor && selectedType == "rgb" {
+			// If RecoverSequenceColors is true then we recover the colors from the SavedSequenceColors.
 			sequence.RecoverSequenceColors = true
-		} else {
+		}
+		// If we switch auto color on and we are a rgb rembember what colors are in our sequence.
+		if sequence.AutoColor && selectedType == "rgb" {
+			// setting RecoverSequenceColors to false forces the sequence to save the currented
+			// seleced colors to the SavedSequenceColors
 			sequence.RecoverSequenceColors = false
 		}
+
+		// If switch auto color off and we are a scanner then reset the gobo and color back to the defaults.
+		if !sequence.AutoColor && selectedType == "scanner" {
+			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
+				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
+			}
+		}
+
 		return sequence
 
 	case common.UpdateAutoPattern:
@@ -632,7 +715,43 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerOffsetTilt = command.Args[OFFSET_TILT].Value.(int)
 		return sequence
 
-	// If we are being asekd to load a config, use the new sequence.
+	case common.UpdateScannerChase:
+		const SCANNER_CHASE = 0
+		if debug {
+			fmt.Printf("%d: Command Update ScannerChase to %t \n", mySequenceNumber, command.Args[SCANNER_CHASE].Value)
+		}
+		sequence.ScannerChaser = command.Args[SCANNER_CHASE].Value.(bool)
+		return sequence
+
+	case common.UpdateMusicTrigger:
+		const STATE = 0
+		if debug {
+			fmt.Printf("%d: Command Update Music Trigger to %t \n", mySequenceNumber, command.Args[STATE].Value)
+		}
+		sequence.MusicTrigger = command.Args[STATE].Value.(bool)
+		sequence.Run = command.Args[STATE].Value.(bool)
+		sequence.Mode = "Sequence"
+		sequence.ScannerChaser = false
+		if sequence.Label == "chaser" && sequence.Run {
+			sequence.ScannerChaser = true
+		}
+		if sequence.Type == "scanner" && sequence.Label != "chaser" && sequence.Run {
+			sequence.ScannerChaser = false
+		}
+		sequence.UpdatePattern = true
+		sequence.Static = false
+		sequence.ChangeMusicTrigger = true
+		return sequence
+
+	case common.UpdateScannerHasShutterChase:
+		const STATE = 0
+		if debug {
+			fmt.Printf("%d: Command Update ScannerHasShutterChase to %t \n", mySequenceNumber, command.Args[STATE].Value)
+		}
+		sequence.ScannerChaser = command.Args[STATE].Value.(bool)
+		return sequence
+
+	// If we are being asked to load a config, use the new sequence.
 	case common.LoadConfig:
 		const X = 0
 		const Y = 1
@@ -642,7 +761,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		x := command.Args[X].Value.(int)
 		y := command.Args[Y].Value.(int)
 		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", x, y))
-		//seq := common.Sequence{}
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
@@ -701,30 +819,47 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 	return Speed * time.Millisecond
 }
 
-func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) map[int]common.Switch {
 
 	if debug {
 		fmt.Printf("Load switch data\n")
 	}
 
 	// A new group of switches.
-	newSwitchList := []common.Switch{}
+	newSwitchList := make(map[int]common.Switch)
+
+	switchNumber := 0
+
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Group == mySequenceNumber+1 {
 			// find switch data.
 			newSwitch := common.Switch{}
 			newSwitch.Name = fixture.Name
+			newSwitch.ID = fixture.ID
+			newSwitch.Address = fixture.Address
 			newSwitch.Label = fixture.Label
 			newSwitch.Number = fixture.Number
 			newSwitch.Description = fixture.Description
 			newSwitch.UseFixture = fixture.UseFixture
 
-			newSwitch.States = []common.State{}
-			for _, state := range fixture.States {
+			// A switch has a number of states.
+			newSwitch.States = make(map[int]common.State)
+			for stateNumber, state := range fixture.States {
 				newState := common.State{}
 				newState.Name = state.Name
 				newState.Number = state.Number
 				newState.Label = state.Label
+
+				// Copy settings.
+				for _, setting := range state.Settings {
+					newSetting := common.Setting{}
+					newSetting.Name = setting.Name
+					newSetting.Label = setting.Label
+					newSetting.Number = setting.Number
+					newSetting.Channel = setting.Channel
+					newSetting.FixtureValue = setting.Value
+					newState.Settings = append(newState.Settings, newSetting)
+				}
 				newState.ButtonColor = state.ButtonColor
 				newState.Flash = state.Flash
 
@@ -751,10 +886,11 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 					newState.Actions = append(newState.Actions, newAction)
 				}
 
-				newSwitch.States = append(newSwitch.States, newState)
+				newSwitch.States[stateNumber] = newState
 			}
 			// Add new switch to the list.
-			newSwitchList = append(newSwitchList, newSwitch)
+			newSwitchList[switchNumber] = newSwitch
+			switchNumber++
 		}
 	}
 
