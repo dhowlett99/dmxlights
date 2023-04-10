@@ -263,7 +263,6 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 		steps := sequence.Pattern.Steps
-		sequence.NumberSteps = len(steps)
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
 		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
@@ -287,7 +286,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 			},
 		}
 
-		RGBPositions, _ := position.CalculatePositions(steps, sequence)
+		RGBPositions, numberSteps := position.CalculatePositions(steps, sequence)
 
 		var rotateCounter int
 		var clockwise int
@@ -347,7 +346,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
-				for step := 0; step < sequence.NumberSteps; step++ {
+				for step := 0; step < numberSteps; step++ {
 
 					blackout = switchChannels[switchNumber].Blackout
 					master = switchChannels[switchNumber].Master
@@ -389,7 +388,7 @@ func newMiniSequencer(fixture *Fixture, switchNumber int, switchPosition int, ac
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
 					select {
-					// First four triggers are occupied by sequence 1-FOH,2-Upluighters,3-Scanners,4-Switches,5-ShutterChaser
+					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case <-soundConfig.SoundTriggers[switchNumber+4].Channel:
 					case <-switchChannels[switchNumber].Stop:

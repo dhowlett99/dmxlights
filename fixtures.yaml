@@ -1037,7 +1037,7 @@ fixtures:
   description: American DJ Inno Pocket Spot
   type: scanner
   group: 3
-  address: 440
+  address: 455
   channels:
   - number: 1
     name: Pan
