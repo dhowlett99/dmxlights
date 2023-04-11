@@ -361,7 +361,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					}
 
 					// Button color.
-					buttonColorSelect := widget.NewSelect([]string{"White", "Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "Pink", "Black"}, func(value string) {})
+					buttonColorSelect := widget.NewSelect([]string{"White", "Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "Black"}, func(value string) {})
 					buttonColorSelect.Selected = this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)].ButtonColor
 
 					buttonColorLabel := widget.NewLabel("Button Color")

@@ -550,8 +550,6 @@ func ProcessButtons(X int, Y int,
 			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
 			this.LastPreset = &location
 
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 
 			// turn off the save button from flashing.
@@ -562,12 +560,12 @@ func ProcessButtons(X int, Y int,
 			// clear any selected preset.
 			for location, preset := range this.PresetsStore {
 				if preset.State && preset.Selected {
-					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label}
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: "Red"}
 				}
 			}
 
 			// Select this location and flash its button.
-			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label}
+			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 			if gui {
