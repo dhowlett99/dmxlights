@@ -895,6 +895,15 @@ func MapSwitchFixture(swiTch common.Switch,
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 		}
 
+		// If there are no actions, turn off any previos mini sequencers for this switch.
+		if len(state.Actions) == 0 {
+			newAction := Action{}
+			newAction.Name = "Off"
+			newAction.Number = 1
+			newAction.Mode = "Off"
+			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+		}
+
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
 		for _, setting := range state.Settings {
