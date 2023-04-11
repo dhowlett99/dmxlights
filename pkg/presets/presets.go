@@ -115,3 +115,69 @@ func LoadPresets() map[string]Preset {
 
 	return presets
 }
+
+func GetPresetNumber(X int, Y int) string {
+
+	switch Y {
+	case 5:
+		switch X {
+		case 0:
+			return "Preset1"
+		case 1:
+			return "Preset2"
+		case 2:
+			return "Preset3"
+		case 3:
+			return "Preset4"
+		case 4:
+			return "Preset5"
+		case 5:
+			return "Preset6"
+		case 6:
+			return "Preset7"
+		case 7:
+			return "Preset8"
+		}
+
+	case 6:
+		switch X {
+		case 0:
+			return "Preset9"
+		case 1:
+			return "Preset10"
+		case 2:
+			return "Preset11"
+		case 3:
+			return "Preset12"
+		case 4:
+			return "Preset13"
+		case 5:
+			return "Preset14"
+		case 6:
+			return "Preset15"
+		case 7:
+			return "Preset16"
+		}
+
+	case 7:
+		switch X {
+		case 0:
+			return "Preset17"
+		case 1:
+			return "Preset18"
+		case 2:
+			return "Preset19"
+		case 3:
+			return "Preset20"
+		case 4:
+			return "Preset21"
+		case 5:
+			return "Preset22"
+		case 6:
+			return "Preset23"
+		case 7:
+			return "Preset24"
+		}
+	}
+	return ""
+}

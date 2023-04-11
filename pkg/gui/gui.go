@@ -352,7 +352,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 					// Preset name.
 					presetInput := widget.NewEntry()
-					presetInput.Text = "Preset1"
+					presetInput.Text = presets.GetPresetNumber(X, Y)
 					presetLabel := widget.NewLabel("Preset Name")
 					preset := container.NewAdaptiveGrid(3, presetLabel, presetInput, layout.NewSpacer())
 
@@ -395,9 +395,6 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: presetInput.Text, State: true, Selected: true, ButtonColor: buttonColorSelect.Selected}
 						presets.SavePresets(this.PresetsStore)
 						presets.RefreshPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
-						//Red := common.Color{R: 255, G: 0, B: 0}
-						//PresetYellow := common.Color{R: 150, G: 150, B: 0}
-						//common.FlashLight(X, Y-1, Red, PresetYellow, eventsForLauchpad, guiButtons)
 					}
 					popup.Show()
 				}
