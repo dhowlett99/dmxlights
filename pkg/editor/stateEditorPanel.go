@@ -245,7 +245,6 @@ func populateChannelNames(channels []fixture.Channel) []string {
 
 func findFixtureByLabel(label string, fixtures *fixture.Fixtures) (*fixture.Fixture, error) {
 
-	debug := true
 	if debug {
 		fmt.Printf("Look for fixture by Label %s\n", label)
 	}

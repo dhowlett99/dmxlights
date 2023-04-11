@@ -119,6 +119,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 			// Show the state name.
 			if thisState.Col == STATE_NAME {
 				showStatesField(STATE_NAME, o)
+				o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).SetText(sp.StatesList[thisState.Row].Name)
 				o.(*fyne.Container).Objects[STATE_NAME].(*widget.Entry).OnChanged = func(value string) {
 					newState := fixture.State{}
@@ -138,6 +139,8 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 			// Show the selection box for button color.
 			if thisState.Col == STATE_BUTTONCOLOR {
 				showStatesField(STATE_BUTTONCOLOR, o)
+
+				o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).OnChanged = nil
 				for _, option := range sp.ButtonColorOptions {
 					if option == sp.StatesList[thisState.Row].ButtonColor {
 						o.(*fyne.Container).Objects[STATE_BUTTONCOLOR].(*widget.Select).SetSelected(option)
