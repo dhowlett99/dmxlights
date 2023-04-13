@@ -2709,6 +2709,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Turn on status mode
 		this.SelectMode[this.SelectedSequence] = STATUS
 
+		// If the chase is running, hide it.
+		if this.ScannerChaser && this.SelectedType == "scanner" {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		}
+
 		// Remove the function pads.
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 

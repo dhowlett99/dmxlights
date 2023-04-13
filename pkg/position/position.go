@@ -236,7 +236,7 @@ func CalculatePositions(steps []common.Step, sequence common.Sequence) (map[int]
 		}
 	}
 
-	positionsOut := assemblePositions(fadeColors, counter, sequence.EnabledNumberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChaser, sequence.Optimisation)
+	positionsOut := assemblePositions(fadeColors, counter, numberFixtures, sequence.ScannerState, sequence.RGBInvert, sequence.ScannerChaser, sequence.Optimisation)
 
 	return positionsOut, len(positionsOut)
 
@@ -269,7 +269,7 @@ func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color,
 	return newColor
 }
 
-func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, enabledNumberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
+func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfSteps int, numberFixtures int, scannerState map[int]common.ScannerState, RGBInvert bool, chase bool, Optimisation bool) map[int]common.Position {
 
 	if debug {
 		fmt.Printf("assemblePositions\n")
@@ -293,7 +293,7 @@ func assemblePositions(fadeColors map[int][]common.FixtureBuffer, totalNumberOfS
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixture := 0; fixture <= enabledNumberFixtures; fixture++ {
+		for fixture := 0; fixture <= numberFixtures; fixture++ {
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
