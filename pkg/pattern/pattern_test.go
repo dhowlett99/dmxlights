@@ -1425,7 +1425,7 @@ func TestApplyScannerState(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := ApplyScannerState(tt.args.steps, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+			if got := ApplyFixtureState(tt.args.steps, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
 				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
 			}

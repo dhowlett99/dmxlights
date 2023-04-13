@@ -74,7 +74,7 @@ func main() {
 	this.OffsetTilt = common.ScannerMidPoint                       // Start tilt from the center.
 	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
-	this.FunctionSelectMode = make([]bool, NumberOfSequences)      // Initialise four function mode states.
+	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
 	this.EditSequenceColorsMode = make([]bool, NumberOfSequences)  // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = make([]bool, NumberOfSequences)   // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = make([]bool, NumberOfSequences)   // Remember when we are in selecting gobo mode.

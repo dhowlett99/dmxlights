@@ -735,10 +735,11 @@ type scanner struct {
 	values []int
 }
 
-// ApplyScannerState - Apply the state of the scanners to the pattern, fixture disabling work by disabling the
+// ApplyFixtureState - Apply the state of the fixtures to the pattern, fixture disabling works by disabling the
 // steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
-func ApplyScannerState(generatedSteps []common.Step, scannerState map[int]common.ScannerState) common.Pattern {
+// So make sure you also turn off the fixture in the fixture receiver.
+func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common.ScannerState) common.Pattern {
 
 	var pattern common.Pattern
 
@@ -759,7 +760,7 @@ func ApplyScannerState(generatedSteps []common.Step, scannerState map[int]common
 			newFixture.Colors = fixture.Colors
 			for _, color := range newFixture.Colors {
 				if color.R > 0 || color.G > 0 || color.B > 0 {
-					newFixture.Colors = []common.Color{{R: 255, G: 255, B: 255}}
+					//newFixture.Colors = []common.Color{{R: 255, G: 255, B: 255}}
 					hasColors[fixtureNumber] = true
 				} else {
 					hasColors[fixtureNumber] = false

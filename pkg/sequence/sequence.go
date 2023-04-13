@@ -448,24 +448,19 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-
-					var chasePattern common.Pattern
+					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern].Steps, sequence.ScannerState)
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.ScannerState, sequence.NumberFixtures)
+					steps = RGBPattern.Steps
+					sequence.Pattern.Name = RGBPattern.Name
+					sequence.Pattern.Label = RGBPattern.Label
+					sequence.UpdatePattern = false
 
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
-						pattenSteps := availablePatterns[sequence.SelectedPattern].Steps
-						chasePattern = pattern.ApplyScannerState(pattenSteps, sequence.ScannerState)
-					} else {
-						chasePattern = availablePatterns[sequence.SelectedPattern]
+						// Chaser start with a standard chase pattern in white.
+						steps = replaceRGBcolorsInSteps(steps, []common.Color{{R: 255, G: 255, B: 255}})
 					}
-
-					steps = chasePattern.Steps
-					sequence.Pattern.Name = chasePattern.Name
-					sequence.Pattern.Label = chasePattern.Label
-					sequence.UpdatePattern = false
-
 				}
 
 				// Setup scanner patterns.
