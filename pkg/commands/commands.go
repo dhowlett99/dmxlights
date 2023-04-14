@@ -104,10 +104,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.ScannerOffsetTilt = common.ScannerMidPoint
 			// Enable all scanners and reset colors and gobo's.
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
-				newScannerState := common.ScannerState{}
+				newScannerState := common.FixtureState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
-				sequence.ScannerState[scanner] = newScannerState
+				sequence.FixtureState[scanner] = newScannerState
 				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
 				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
 			}
@@ -601,17 +601,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Type = "switch"
 		return sequence
 
-	case common.EnableAllScanners:
-		const SEQUENCE_NUMBER = 0 // Integer
-		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
-				newScannerState := common.ScannerState{}
-				newScannerState.Enabled = true
-				newScannerState.Inverted = false
-				sequence.ScannerState[command.Args[scanner].Value.(int)] = newScannerState
-			}
-		}
-
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
 		const SEQUENCE_NUMBER = 0  // Integer
@@ -623,10 +612,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
 			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
-				newScannerState := common.ScannerState{}
+				newScannerState := common.FixtureState{}
 				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
 				newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
-				sequence.ScannerState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
+				sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 			}
 		}
 

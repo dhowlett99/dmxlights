@@ -321,7 +321,7 @@ func FixtureReceiver(
 						// TODO find the scanner sequence number from the config.
 						scannerFixturesSequenceNumber := 2 // Scanner sequence.
 						if !cmd.Hide {
-							if cmd.ScannerState.Inverted {
+							if cmd.FixtureState.Inverted {
 								common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: common.ReverseDmx(fixture.Brightness)}, eventsForLauchpad, guiButtons)
 							} else {
 								common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
@@ -329,7 +329,7 @@ func FixtureReceiver(
 						}
 						// Fixture brightness is sent as master in this case.
 						// TODO Integrate cmd.master with fixture.Brightness.
-						if cmd.ScannerState.Inverted {
+						if cmd.FixtureState.Inverted {
 							MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, common.ReverseDmx(fixture.Brightness), cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 						} else {
 							MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, sequence.ScannerColor[myFixtureNumber], fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
@@ -364,7 +364,7 @@ func FixtureReceiver(
 			fixture := cmd.ScannerPosition.Fixtures[myFixtureNumber]
 
 			// If this fixture is disabled then shut the shutter off.
-			if cmd.ScannerDisableOnce && !cmd.ScannerState.Enabled {
+			if cmd.ScannerDisableOnce && !cmd.FixtureState.Enabled {
 				turnOffFixture(myFixtureNumber, mySequenceNumber, fixtures, dmxController, dmxInterfacePresent)
 				// Locking for write.
 				sequence.DisableOnceMutex.Lock()

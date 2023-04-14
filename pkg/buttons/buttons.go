@@ -75,7 +75,7 @@ type CurrentState struct {
 	LastStaticColorButtonX    int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY    int                        // Which Static Color button did we change last.
 	SoundGain                 float32                    // Fine gain -0.09 -> 0.09
-	ScannerState              [][]common.ScannerState    // Which fixture is enabled: bool and inverted: bool on which sequence.
+	FixtureState              [][]common.FixtureState    // Which fixture is enabled: bool and inverted: bool on which sequence.
 	SelectedFixture           int                        // Which fixture is selected when changing scanner color or gobo.
 	FollowingAction           string                     // String to find next function, used in selecting a fixture.
 	OffsetPan                 int                        // Offset for Pan.
@@ -1293,17 +1293,17 @@ func ProcessButtons(X int, Y int,
 
 		if debug {
 			fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)
-			fmt.Printf("Fixture State Enabled %t  Inverted %t\n", this.ScannerState[X][Y].Enabled, this.ScannerState[X][Y].Inverted)
+			fmt.Printf("Fixture State Enabled %t  Inverted %t\n", this.FixtureState[X][Y].Enabled, this.FixtureState[X][Y].Inverted)
 		}
 
-		// Disable scanner if we're already enabled and inverted.
-		if this.ScannerState[X][Y].Enabled && this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
+		// Disable fixture if we're already enabled and inverted.
+		if this.FixtureState[X][Y].Enabled && this.FixtureState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 			if debug {
-				fmt.Printf("Disable Scanner Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Disable fixture Number %d State on Sequence %d to false\n", X, Y)
 			}
 
-			this.ScannerState[X][Y].Enabled = false
-			this.ScannerState[X][Y].Inverted = false
+			this.FixtureState[X][Y].Enabled = false
+			this.FixtureState[X][Y].Inverted = false
 
 			// Tell the sequence to turn on this scanner.
 			cmd := common.Command{
@@ -1317,17 +1317,19 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaser to turn on this scanner.
-			cmd = common.Command{
-				Action: common.ToggleFixtureState,
-				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: 4},
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: false},
-					{Name: "FixtureInverted", Value: false},
-				},
+			if this.ScannerChaser && this.SelectedType == "scanner" {
+				// Tell the sequence chaser to turn on this scanner.
+				cmd = common.Command{
+					Action: common.ToggleFixtureState,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: 4},
+						{Name: "FixtureNumber", Value: X},
+						{Name: "FixtureState", Value: false},
+						{Name: "FixtureInverted", Value: false},
+					},
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 			// Show the status.
 			ShowFixtureStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
@@ -1336,14 +1338,14 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Enable scanner if not enabled and not inverted.
-		if !this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
+		if !this.FixtureState[X][Y].Enabled && !this.FixtureState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 
 			if debug {
-				fmt.Printf("Enable Scanner Number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].NumberFixtures)
+				fmt.Printf("Enable fixture number %d State on Sequence %d to true [Scanners:%d]\n", X, Y, sequences[Y].NumberFixtures)
 			}
 
-			this.ScannerState[X][Y].Enabled = true
-			this.ScannerState[X][Y].Inverted = false
+			this.FixtureState[X][Y].Enabled = true
+			this.FixtureState[X][Y].Inverted = false
 
 			// Tell the sequence to turn on this scanner.
 			cmd := common.Command{
@@ -1357,17 +1359,19 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaseer to turn on this scanner.
-			cmd = common.Command{
-				Action: common.ToggleFixtureState,
-				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: 4},
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: true},
-					{Name: "FixtureInverted", Value: false},
-				},
+			if this.ScannerChaser && this.SelectedType == "scanner" {
+				// Tell the sequence chaseer to turn on this scanner.
+				cmd = common.Command{
+					Action: common.ToggleFixtureState,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: 4},
+						{Name: "FixtureNumber", Value: X},
+						{Name: "FixtureState", Value: true},
+						{Name: "FixtureInverted", Value: false},
+					},
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 			// Show the status.
 			ShowFixtureStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
@@ -1377,14 +1381,14 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Invert scanner if we're enabled but not inverted.
-		if this.ScannerState[X][Y].Enabled && !this.ScannerState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
+		if this.FixtureState[X][Y].Enabled && !this.FixtureState[X][Y].Inverted && X < sequences[Y].NumberFixtures {
 
 			if debug {
 				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
 			}
 
-			this.ScannerState[X][Y].Enabled = true
-			this.ScannerState[X][Y].Inverted = true
+			this.FixtureState[X][Y].Enabled = true
+			this.FixtureState[X][Y].Inverted = true
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
@@ -1398,17 +1402,19 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			// Tell the sequence chaser to invert this scanner.
-			cmd = common.Command{
-				Action: common.ToggleFixtureState,
-				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: 4},
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: true},
-					{Name: "FixtureInverted", Value: true},
-				},
+			if this.ScannerChaser && this.SelectedType == "scanner" {
+				// Tell the sequence chaser to invert this scanner.
+				cmd = common.Command{
+					Action: common.ToggleFixtureState,
+					Args: []common.Arg{
+						{Name: "SequenceNumber", Value: 4},
+						{Name: "FixtureNumber", Value: X},
+						{Name: "FixtureState", Value: true},
+						{Name: "FixtureInverted", Value: true},
+					},
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 			// Show the status.
 			ShowFixtureStatus(Y, *sequences[Y], this, eventsForLaunchpad, guiButtons, commandChannels)
@@ -2526,6 +2532,30 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("===============================================\n")
 	}
 
+	//        +-------------------+
+	//        |       NORMAL      |
+	//        +-------------------+
+	//                 |
+	//                 V
+	//        +-------------------+
+	//        |     FUNCTION      |
+	//        +-------------------+
+	//            |            | If Chaser Enabled
+	//            V            V
+	//            |       +-------------------+
+	//            |       |  CHASER FUNCTIONS |
+	//            |       +-------------------+
+	//            |				|
+	//            V				V
+	//         +-------------------+
+	//         |       STATUS      |
+	//         +-------------------+
+	//                  |
+	//                  V
+	//         +-------------------+
+	//         |       NORMAL      |
+	//         +-------------------+
+
 	// Update the status bar
 	if this.Strobe[this.SelectedSequence] {
 		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
@@ -2598,6 +2628,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// But remember we have pressed this select button once.
 		this.SelectMode[this.SelectedSequence] = NORMAL
 		this.SelectButtonPressed[this.SelectedSequence] = true
+
+		// Turn off any previous function or status bars.
+		for sequenceNumber := range sequences {
+			if this.SelectMode[sequenceNumber] == FUNCTION ||
+				this.SelectMode[sequenceNumber] == STATUS {
+				common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+				// And reveal all the other sequence that isn't us.
+				if sequenceNumber != this.SelectedSequence {
+					common.RevealSequence(sequenceNumber, commandChannels)
+					// And turn off the function selected.
+					this.SelectMode[sequenceNumber] = NORMAL
+				}
+			}
+		}
 
 		if this.Functions[this.SelectedSequence][common.Function1_Pattern].State {
 			// Reset the pattern function key.
@@ -2908,23 +2952,23 @@ func ShowFixtureStatus(selectedSequence int, sequence common.Sequence, this *Cur
 	for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
 
 		if debug {
-			fmt.Printf("Scanner %d Enabled %t Inverted %t\n", scannerNumber, this.ScannerState[scannerNumber][sequence.Number].Enabled, this.ScannerState[scannerNumber][sequence.Number].Inverted)
+			fmt.Printf("Scanner %d Enabled %t Inverted %t\n", scannerNumber, this.FixtureState[scannerNumber][sequence.Number].Enabled, this.FixtureState[scannerNumber][sequence.Number].Inverted)
 		}
 
 		// Enabled but not inverted then On and green.
-		if this.ScannerState[scannerNumber][sequence.Number].Enabled && !this.ScannerState[scannerNumber][sequence.Number].Inverted {
+		if this.FixtureState[scannerNumber][sequence.Number].Enabled && !this.FixtureState[scannerNumber][sequence.Number].Inverted {
 			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "On", guiButtons)
 		}
 
 		// Enabled and inverted then Invert and red.
-		if this.ScannerState[scannerNumber][sequence.Number].Enabled && this.ScannerState[scannerNumber][sequence.Number].Inverted {
+		if this.FixtureState[scannerNumber][sequence.Number].Enabled && this.FixtureState[scannerNumber][sequence.Number].Inverted {
 			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: this.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "Invert", guiButtons)
 		}
 
 		// Not enabled and not inverted then off and blue.
-		if !this.ScannerState[scannerNumber][sequence.Number].Enabled && !this.ScannerState[scannerNumber][sequence.Number].Inverted {
+		if !this.FixtureState[scannerNumber][sequence.Number].Enabled && !this.FixtureState[scannerNumber][sequence.Number].Inverted {
 			common.LightLamp(common.ALight{X: scannerNumber, Y: sequence.Number, Brightness: this.MasterBrightness, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(scannerNumber, sequence.Number, "Off", guiButtons)
 		}
@@ -3441,12 +3485,10 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
 		this.ScannerChaser = false                                                 // Clear the scanner chase mode.
 
-		if sequence.Type == "scanner" {
-			// Enable all scanners.
-			for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
-				this.ScannerState[scannerNumber][sequence.Number].Enabled = true
-				this.ScannerState[scannerNumber][sequence.Number].Inverted = false
-			}
+		// Enable all fixtures.
+		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+			this.FixtureState[fixtureNumber][sequence.Number].Enabled = true
+			this.FixtureState[fixtureNumber][sequence.Number].Inverted = false
 		}
 
 		// Clear all the function buttons for this sequence.

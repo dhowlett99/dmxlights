@@ -739,7 +739,7 @@ type scanner struct {
 // steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
 // So make sure you also turn off the fixture in the fixture receiver.
-func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common.ScannerState) common.Pattern {
+func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common.FixtureState) common.Pattern {
 
 	var pattern common.Pattern
 
@@ -800,7 +800,7 @@ func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common
 
 // GeneratePattern takes an array of Coordinates and turns them into a pattern
 // which is the starting point for all sequence steps.
-func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState map[int]common.ScannerState) common.Pattern {
+func GeneratePattern(Coordinates []Coordinate, NumberFixtures int, requestedShift int, chase bool, scannerState map[int]common.FixtureState) common.Pattern {
 
 	NumberCoordinates := len(Coordinates)
 
@@ -935,7 +935,7 @@ type Coordinate struct {
 	Pan  int
 }
 
-func GetNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOfFixtures int) int {
+func GetNumberEnabledScanners(scannerState map[int]common.FixtureState, numberOfFixtures int) int {
 
 	var getNumberEnabledScanners int
 	for fixture := 0; fixture < numberOfFixtures; fixture++ {
@@ -949,7 +949,7 @@ func GetNumberEnabledScanners(scannerState map[int]common.ScannerState, numberOf
 	return getNumberEnabledScanners
 }
 
-func makeEnabledScannerList(scannerState map[int]common.ScannerState, NumberCoordinates int, numberEnabledScanners, numberScanners int) []int {
+func makeEnabledScannerList(scannerState map[int]common.FixtureState, NumberCoordinates int, numberEnabledScanners, numberScanners int) []int {
 
 	enabledScannerList := []int{}
 
