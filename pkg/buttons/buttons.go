@@ -2500,6 +2500,8 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
+	debug := true
+
 	if debug {
 		fmt.Printf("HANDLE: this.Type = %s \n", this.SelectedType)
 		for functionNumber := 0; functionNumber < 8; functionNumber++ {
@@ -2525,6 +2527,30 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.SelectedSequence, this.EditPatternMode[this.SelectedSequence])
 		fmt.Printf("===============================================\n")
 	}
+
+	//        +-------------------+
+	//        |       NORMAL      |
+	//        +-------------------+
+	//                 |
+	//                 V
+	//        +-------------------+
+	//        |     FUNCTION      |
+	//        +-------------------+
+	//            |            | If Chaser Enabled
+	//            V            V
+	//            |       +-------------------+
+	//            |       |  CHASER FUNCTIONS |
+	//            |       +-------------------+
+	//            |				|
+	//            V				V
+	//         +-------------------+
+	//         |       STATUS      |
+	//         +-------------------+
+	//                  |
+	//                  V
+	//         +-------------------+
+	//         |       NORMAL      |
+	//         +-------------------+
 
 	// Update the status bar
 	if this.Strobe[this.SelectedSequence] {
