@@ -363,7 +363,6 @@ type Function struct {
 	SequenceNumber int
 	Number         int
 	State          bool
-	State2         bool
 	Flash          bool
 	Label          string
 }
