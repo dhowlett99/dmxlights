@@ -23,7 +23,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-var allFixturesEnabled = map[int]common.ScannerState{
+var allFixturesEnabled = map[int]common.FixtureState{
 	0: {
 		Enabled: true,
 	},
@@ -52,7 +52,7 @@ var allFixturesEnabled = map[int]common.ScannerState{
 
 func TestCalculateRGBPositions(t *testing.T) {
 
-	allFixturesEnabled := map[int]common.ScannerState{
+	allFixturesEnabled := map[int]common.FixtureState{
 		0: {
 			Enabled: true,
 		},
@@ -102,7 +102,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBShift:              0,
 					RGBSize:               255,
 					RGBFade:               0,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
 					ScannerChaser:         false,
 				},
@@ -508,7 +508,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
 				},
 			},
@@ -730,7 +730,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBShift:              8,
 					RGBSize:               255,
 					RGBFade:               10,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
 				},
 			},
@@ -859,7 +859,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					RGBSize:               255,
 					RGBFade:               10,
 					ScannerInvert:         false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
 				},
 			},
@@ -1015,7 +1015,7 @@ func TestCalculatePositions2(t *testing.T) {
 					RGBShift:              10,
 					RGBSize:               255,
 					RGBFade:               1,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
 				},
 			},
@@ -1125,7 +1125,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
 					ScannerChaser:         false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
 				},
 			},
@@ -1234,7 +1234,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
 					ScannerChaser:         false,
 				},
@@ -1281,7 +1281,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
 				},
 			},
@@ -1323,7 +1323,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
 					ScannerChaser:         false,
 				},
@@ -1394,7 +1394,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
 					ScannerChaser:         false,
 				},
@@ -1445,7 +1445,7 @@ func Test_calculateScannerPositions(t *testing.T) {
 					FadeUpAndDown:         []int{255},
 					FadeDownAndUp:         []int{0},
 					Optimisation:          false,
-					ScannerState:          allFixturesEnabled,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
 				},
 			},

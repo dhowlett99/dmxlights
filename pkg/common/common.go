@@ -159,7 +159,7 @@ type StaticColorButton struct {
 	FirstPress    bool
 }
 
-type ScannerState struct {
+type FixtureState struct {
 	Enabled  bool
 	Inverted bool
 }
@@ -233,7 +233,6 @@ const (
 	UpdateAutoPattern
 	AutoPattern
 	ToggleFixtureState
-	FixtureState
 	UpdateRGBShift
 	UpdateRGBInvert
 	UpdateScannerShift
@@ -247,7 +246,6 @@ const (
 	UpdateNumberCoordinates
 	UpdateOffsetPan
 	UpdateOffsetTilt
-	EnableAllScanners
 	UpdateScannerChase
 	UpdateMusicTrigger
 	UpdateScannerHasShutterChase
@@ -346,7 +344,7 @@ type Sequence struct {
 	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
-	ScannerState                map[int]ScannerState        // Map of fixtures which are disabled.
+	FixtureState                map[int]FixtureState        // Map of fixtures which are disabled.
 	DisableOnceMutex            *sync.RWMutex               // Lock to protect DisableOnce.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
@@ -397,6 +395,7 @@ type FixtureCommand struct {
 	NumberSteps    int
 	Type           string
 	SequenceNumber int
+	FixtureState   FixtureState
 
 	// Common commands.
 	Strobe      bool
@@ -418,7 +417,6 @@ type FixtureCommand struct {
 	// Scanner Commands.
 	ScannerColor             int
 	ScannerPosition          Position
-	ScannerState             ScannerState
 	ScannerDisableOnce       bool
 	ScannerChaser            bool
 	ScannerAvailableColors   []StaticColorButton

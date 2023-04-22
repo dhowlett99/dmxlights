@@ -95,7 +95,7 @@ func Test_circleGenerator(t *testing.T) {
 
 func Test_generatePattern(t *testing.T) {
 
-	allFixturesEnabled := map[int]common.ScannerState{
+	allFixturesEnabled := map[int]common.FixtureState{
 		0: {
 			Enabled: true,
 		},
@@ -127,7 +127,7 @@ func Test_generatePattern(t *testing.T) {
 		fixtures     int
 		shift        int
 		chase        bool
-		scannerState map[int]common.ScannerState
+		scannerState map[int]common.FixtureState
 		Coordinates  []Coordinate
 		want         common.Pattern
 	}{
@@ -912,7 +912,7 @@ func TestScanGenerateSineWave(t *testing.T) {
 
 func Test_getEnabledScanner(t *testing.T) {
 	type args struct {
-		scannerState          map[int]common.ScannerState
+		scannerState          map[int]common.FixtureState
 		numberCoordinates     int
 		numberEnabledScanners int
 	}
@@ -924,7 +924,7 @@ func Test_getEnabledScanner(t *testing.T) {
 		{
 			name: "test 8 scanners 3 disabled",
 			args: args{
-				scannerState: map[int]common.ScannerState{
+				scannerState: map[int]common.FixtureState{
 					0: {Enabled: false, Inverted: false},
 					1: {Enabled: false, Inverted: false},
 					2: {Enabled: false, Inverted: false},
@@ -956,7 +956,7 @@ func Test_getEnabledScanner(t *testing.T) {
 func TestApplyScannerState(t *testing.T) {
 	type args struct {
 		steps        []common.Step
-		scannerState map[int]common.ScannerState
+		scannerState map[int]common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -1064,7 +1064,7 @@ func TestApplyScannerState(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.ScannerState{
+				scannerState: map[int]common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -1295,7 +1295,7 @@ func TestApplyScannerState(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.ScannerState{
+				scannerState: map[int]common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -1394,7 +1394,7 @@ func TestApplyScannerState(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.ScannerState{
+				scannerState: map[int]common.FixtureState{
 					0: {
 						Enabled: true,
 					},
@@ -1523,7 +1523,7 @@ func TestApplyScannerState(t *testing.T) {
 						},
 					},
 				},
-				scannerState: map[int]common.ScannerState{
+				scannerState: map[int]common.FixtureState{
 					0: {
 						Enabled: false, // Disabled.
 					},
