@@ -261,6 +261,11 @@ func FixtureReceiver(
 			continue
 		}
 
+		if cmd.Clear {
+			turnOffFixtures(sequence, cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
+			continue
+		}
+
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 
@@ -278,10 +283,6 @@ func FixtureReceiver(
 			if cmd.StopFlood && sequence.Label != "chaser" {
 				MapFixtures(false, false, cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, sequence.Blackout, sequence.Master, sequence.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
-				continue
-			}
-			if cmd.Clear && sequence.Label != "chaser" {
-				turnOffFixtures(sequence, cmd, myFixtureNumber, mySequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				continue
 			}
 
@@ -1119,9 +1120,10 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 // turnOffFixtures is used to turn off a fixture when we stop a sequence.
 func turnOffFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxInterfacePresent bool) {
-	// if !cmd.Hide {
-	// 	common.LightLamp(common.ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
-	// }
+
+	//if debug {
+	fmt.Printf("Sequence %d: Fixture %d turnOffFixtures\n", sequence.Number, myFixtureNumber)
+	//}
 	common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
 	MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }

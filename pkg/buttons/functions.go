@@ -8,30 +8,81 @@ import (
 )
 
 func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	debug := true
+
+	var displaySequence int
+	var targetSequence int
+
+	if this.SelectMode[this.SelectedSequence] == CHASER {
+		targetSequence = this.ChaserSequenceNumber
+		displaySequence = this.SelectedSequence
+	} else {
+		targetSequence = this.SelectedSequence
+		displaySequence = this.SelectedSequence
+	}
+
 	if debug {
 		fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
 	}
 
+	if debug {
+		fmt.Printf("FUNCS: this.Type = %s \n", this.SelectedType)
+		for functionNumber := 0; functionNumber < 8; functionNumber++ {
+			state := this.Functions[displaySequence][functionNumber].State
+			fmt.Printf("FUNCS: function %d state %t\n", functionNumber, state)
+		}
+		fmt.Printf("FUNCS: this.ChaserRunning %t \n", this.ScannerChaser)
+
+		fmt.Printf("================== WHAT SELECT MODE =================\n")
+		fmt.Printf("FUNCS: this.SelectButtonPressed[%d] = %t \n", displaySequence, this.SelectButtonPressed[displaySequence])
+		if this.SelectMode[displaySequence] == NORMAL {
+			fmt.Printf("FUNCS: this.SelectMode[%d] = NORMAL \n", displaySequence)
+		}
+		if this.SelectMode[displaySequence] == FUNCTION {
+			fmt.Printf("FUNCS: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
+		}
+		if this.SelectMode[displaySequence] == CHASER {
+			fmt.Printf("FUNCS: this.SelectMode[%d] = CHASER \n", this.SelectedSequence)
+		}
+		if this.SelectMode[displaySequence] == STATUS {
+			fmt.Printf("FUNCS: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
+		}
+
+		fmt.Printf("================== WHAT EDIT MODES =================\n")
+		fmt.Printf("FUNCS: this.EditSequenceColorsMode[%d] = %t \n", displaySequence, this.EditSequenceColorsMode[displaySequence])
+		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", displaySequence, this.EditStaticColorsMode[displaySequence])
+		fmt.Printf("FUNCS: this.EditGoboSelectionMode[%d] = %t \n", displaySequence, this.EditGoboSelectionMode[displaySequence])
+		fmt.Printf("FUNCS: this.EditPatternMode[%d] = %t \n", displaySequence, this.EditPatternMode[displaySequence])
+		fmt.Printf("===============================================\n")
+	}
+
 	// Map Function 1 - Go straight into pattern select mode, don't wait for a another select press.
 	if X == common.Function1_Pattern {
-		this.EditPatternMode[this.SelectedSequence] = true
-		this.Functions[this.SelectedSequence][common.Function1_Pattern].State = true
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		this.EditFixtureSelectionMode = false
-		if !this.ScannerChaser {
-			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-		} else {
-			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.ChaserSequenceNumber], eventsForLaunchpad, guiButtons)
+
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function1_Pattern \n", displaySequence, this.SelectMode[displaySequence])
 		}
+
+		this.EditPatternMode[displaySequence] = true
+		this.Functions[displaySequence][common.Function1_Pattern].State = true
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
+		this.EditFixtureSelectionMode = false
+
+		ShowPatternSelectionButtons(this, sequences[targetSequence].Master, *sequences[targetSequence], displaySequence, eventsForLaunchpad, guiButtons)
+
 		return
 	}
 
 	// Function 2 Set Auto Color - Toggle the auto color feature.
-	if X == common.Function2_Auto_Color &&
-		!this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State &&
-		!this.ScannerChaser {
+	if X == common.Function2_Auto_Color && !this.Functions[targetSequence][common.Function2_Auto_Color].State {
 
-		this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function2_Auto_Color On\n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function2_Auto_Color].State = true
+
 		cmd := common.Command{
 			Action: common.UpdateAutoColor,
 			Args: []common.Arg{
@@ -39,15 +90,19 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Type", Value: this.SelectedType},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
-	if X == common.Function2_Auto_Color &&
-		this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State &&
-		!this.ScannerChaser {
+	if X == common.Function2_Auto_Color && this.Functions[targetSequence][common.Function2_Auto_Color].State {
 
-		this.Functions[this.SelectedSequence][common.Function2_Auto_Color].State = false
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function2_Auto_Color Off\n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function2_Auto_Color].State = false
+
 		cmd := common.Command{
 			Action: common.UpdateAutoColor,
 			Args: []common.Arg{
@@ -55,16 +110,20 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Type", Value: this.SelectedType},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 3 Set Auto Pattern - Toggle Auto Pattern.
-	if X == common.Function3_Auto_Pattern &&
-		!this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State {
+	if X == common.Function3_Auto_Pattern && !this.Functions[targetSequence][common.Function3_Auto_Pattern].State {
 
-		this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function3_Auto_Pattern On\n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function3_Auto_Pattern].State = true
 
 		cmd := common.Command{
 			Action: common.UpdateAutoPattern,
@@ -72,29 +131,39 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "AutoPattern", Value: true},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
-	if X == common.Function3_Auto_Pattern &&
-		this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State {
+	if X == common.Function3_Auto_Pattern && this.Functions[targetSequence][common.Function3_Auto_Pattern].State {
 
-		this.Functions[this.SelectedSequence][common.Function3_Auto_Pattern].State = false
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function3_Auto_Pattern Off\n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function3_Auto_Pattern].State = false
+
 		cmd := common.Command{
 			Action: common.UpdateAutoPattern,
 			Args: []common.Arg{
 				{Name: "AutoPattern", Value: false},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 4 Bounce - Toggle bounce feature.
-	if X == common.Function4_Bounce && !this.Functions[this.SelectedSequence][common.Function4_Bounce].State {
+	if X == common.Function4_Bounce && !this.Functions[targetSequence][common.Function4_Bounce].State {
 
-		this.Functions[this.SelectedSequence][common.Function4_Bounce].State = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function4_Bounce On \n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function4_Bounce].State = true
 
 		cmd := common.Command{
 			Action: common.UpdateBounce,
@@ -102,14 +171,18 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Bounce", Value: true},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
-	if X == common.Function4_Bounce && this.Functions[this.SelectedSequence][common.Function4_Bounce].State {
+	if X == common.Function4_Bounce && this.Functions[targetSequence][common.Function4_Bounce].State {
 
-		this.Functions[this.SelectedSequence][common.Function4_Bounce].State = false
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function4_Bounce Off \n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function4_Bounce].State = false
 
 		cmd := common.Command{
 			Action: common.UpdateBounce,
@@ -117,64 +190,85 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Bounce", Value: false},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Map Function 5 RGB - Go straight into RGB color edit mode, don't wait for a another select press.
-	if X == common.Function5_Color && !this.Functions[this.SelectedSequence][common.Function5_Color].State &&
-		sequences[this.SelectedSequence].Type == "rgb" {
-		this.EditSequenceColorsMode[this.SelectedSequence] = true
-		this.Functions[this.SelectedSequence][common.Function5_Color].State = true
+	if X == common.Function5_Color && !this.Functions[targetSequence][common.Function5_Color].State &&
+		sequences[targetSequence].Type == "rgb" {
+
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.EditSequenceColorsMode[targetSequence] = true
+		this.Functions[targetSequence][common.Function5_Color].State = true
+
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
+
 		// Set the colors.
-		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
+		sequences[targetSequence].CurrentColors = sequences[targetSequence].SequenceColors
+
 		// Show the colors
-		ShowRGBColorSelectionButtons(this.MasterBrightness, this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+		ShowRGBColorSelectionButtons(this.MasterBrightness, targetSequence, *sequences[targetSequence], displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Map Function 5 Scanner Color Selection - Go straight into scanner color edit mode via select fixture, don't wait for a another select press.
-	if X == common.Function5_Color && !this.Functions[this.SelectedSequence][common.Function5_Color].State &&
-		sequences[this.SelectedSequence].Type == "scanner" {
+	if X == common.Function5_Color && !this.Functions[targetSequence][common.Function5_Color].State &&
+		sequences[targetSequence].Type == "scanner" {
 
-		this.Functions[this.SelectedSequence][common.Function5_Color].State = true
-		this.EditSequenceColorsMode[this.SelectedSequence] = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function5_Color Scanner Color Selection Mode \n", targetSequence, this.SelectMode[targetSequence])
+		}
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		this.Functions[targetSequence][common.Function5_Color].State = true
+		this.EditSequenceColorsMode[targetSequence] = true
+
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
 
 		// Select a fixture.
 		this.EditFixtureSelectionMode = true
-		this.SelectMode[this.SelectedSequence] = FUNCTION
-		sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
+		this.SelectMode[targetSequence] = FUNCTION
+		sequences[targetSequence].StaticColors[X].FirstPress = false
 
 		this.FollowingAction = "ShowScannerColorSelectionButtons"
-		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
+		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[targetSequence], displaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 		return
 	}
 
 	// Function 6 RGB - Turn on edit static color mode.
 	if X == common.Function6_Static_Gobo &&
-		!this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		sequences[this.SelectedSequence].Type == "rgb" {
-		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
+		!this.Functions[targetSequence][common.Function6_Static_Gobo].State &&
+		sequences[targetSequence].Type == "rgb" {
+
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Static Color Mode On\n", targetSequence, this.SelectMode[targetSequence])
+		}
+
+		this.Functions[targetSequence][common.Function6_Static_Gobo].State = true
 		// Starting a static sequence will turn off a running chaser, so turn off the start lamp
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.ALight{X: X, Y: displaySequence, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
-		this.Running[this.SelectedSequence] = false
-		this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.SelectedSequence] = true   // Turn on edit static color mode.
-		this.SelectMode[this.SelectedSequence] = NORMAL           // Turn off functions.
+		this.Running[targetSequence] = false
+
+		this.EditGoboSelectionMode[targetSequence] = false // Turn off the other option for this function key.
+		this.EditStaticColorsMode[targetSequence] = true   // Turn on edit static color mode.
+		this.SelectMode[targetSequence] = NORMAL           // Turn off functions.
+
 		// Go straight to static color selection mode, don't wait for a another select press.
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
+
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+		common.ClearLabelsSelectedRowOfButtons(displaySequence, guiButtons)
+
 		// Switch on any static colors.
 		cmd := common.Command{
 			Action: common.UpdateStatic,
@@ -182,28 +276,30 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Static", Value: true},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 		return
 	}
 	// Function 6 RGB - Turn off edit static color mode.
 	if X == common.Function6_Static_Gobo &&
-		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		sequences[this.SelectedSequence].Type == "rgb" {
+		this.Functions[targetSequence][common.Function6_Static_Gobo].State &&
+		sequences[targetSequence].Type == "rgb" {
 
 		if debug {
-			fmt.Printf("Function 6 RGB - Turn off edit static color mode.\n")
-
+			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Static Color Mode Off\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+		this.Functions[targetSequence][common.Function6_Static_Gobo].State = false
 
-		this.EditGoboSelectionMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.SelectedSequence] = false  // Turn off edit static color mode.
-		this.SelectMode[this.SelectedSequence] = NORMAL           // Turn off function selection mode.
+		this.EditGoboSelectionMode[targetSequence] = false // Turn off the other option for this function key.
+		this.EditStaticColorsMode[targetSequence] = false  // Turn off edit static color mode.
+		this.SelectMode[targetSequence] = NORMAL           // Turn off function selection mode.
+
 		// Go straight to static color selection mode, don't wait for a another select press.
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
+
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+		common.ClearLabelsSelectedRowOfButtons(displaySequence, guiButtons)
+
 		// Switch off static colors.
 		cmd := common.Command{
 			Action: common.UpdateStatic,
@@ -211,40 +307,49 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "Static", Value: false},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		common.RevealSequence(this.SelectedSequence, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+		common.RevealSequence(targetSequence, commandChannels)
 		return
 	}
 
 	// Map Function 6 Scanner GOBO Selection - Go to select gobo mode if we are in scanner sequence.
-	if X == common.Function6_Static_Gobo && !this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		sequences[this.SelectedSequence].Type == "scanner" {
+	if X == common.Function6_Static_Gobo && !this.Functions[displaySequence][common.Function6_Static_Gobo].State &&
+		sequences[displaySequence].Type == "scanner" {
 
-		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = true
-		this.EditStaticColorsMode[this.SelectedSequence] = false // Turn off the other option for this function key.
-		this.EditGoboSelectionMode[this.SelectedSequence] = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Scanner Gobo Selection Mode\n", displaySequence, this.SelectMode[displaySequence])
+		}
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		this.Functions[displaySequence][common.Function6_Static_Gobo].State = true
+		this.EditStaticColorsMode[displaySequence] = false // Turn off the other option for this function key.
+		this.EditGoboSelectionMode[displaySequence] = true
+
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
 
 		// Select a fixture.
 		this.EditFixtureSelectionMode = true
-		this.SelectMode[this.SelectedSequence] = FUNCTION
-		sequences[this.SelectedSequence].StaticColors[X].FirstPress = false
+		this.SelectMode[displaySequence] = FUNCTION
+		sequences[displaySequence].StaticColors[X].FirstPress = false
 
 		this.FollowingAction = "ShowGoboSelectionButtons"
-		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, this.FollowingAction, guiButtons)
+		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[displaySequence], displaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 		return
 	}
 
 	// Function 7 - Turn on the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
-		!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-		sequences[this.SelectedSequence].Type == "rgb" {
+		!this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
+		sequences[displaySequence].Type == "rgb" &&
+		sequences[displaySequence].Label != "chaser" {
 
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode On\n", displaySequence, this.SelectMode[displaySequence])
+		}
+
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State = true
 
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
@@ -252,18 +357,23 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "RGBInvert", Value: true},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 7 - Turn off the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-		sequences[this.SelectedSequence].Type == "rgb" {
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
+		sequences[displaySequence].Type == "rgb" &&
+		sequences[displaySequence].Label != "chaser" {
 
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+		}
+
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State = false
 
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
@@ -271,21 +381,25 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "RGBInvert", Value: false},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 	if X == common.Function7_Invert_Chase &&
-		!this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-		sequences[this.SelectedSequence].Type == "scanner" {
+		!this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
+		sequences[displaySequence].Type == "scanner" {
+
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode On\n", displaySequence, this.SelectMode[displaySequence])
+		}
 
 		this.ScannerChaser = true
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = true // Chaser
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State = true // Chaser
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell the scannern & chaser sequences that the scanner shutter chase flag is on.
@@ -323,13 +437,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 7 - Toggle the shutter chaser mode. Stop the chaser.
 	if X == common.Function7_Invert_Chase &&
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State &&
-		sequences[this.SelectedSequence].Type == "scanner" {
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
+		sequences[displaySequence].Type == "scanner" {
+
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+		}
 
 		this.ScannerChaser = false
-		this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+		this.Functions[displaySequence][common.Function7_Invert_Chase].State = false
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
@@ -340,7 +458,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Stop the chaser.
@@ -368,18 +486,22 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send start music trigger for scanner & rgb sequences.
 	if X == common.Function8_Music_Trigger &&
-		!this.ScannerChaser &&
-		!this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+		this.SelectMode[displaySequence] != CHASER &&
+		!this.Functions[displaySequence][common.Function8_Music_Trigger].State {
 
-		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = true
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode On\n", displaySequence, this.SelectMode[displaySequence])
+		}
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		this.Functions[displaySequence][common.Function8_Music_Trigger].State = true
+
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Starting a music trigger will start the sequence, so turn on the start lamp
 		// and remember that this sequence is on.
-		this.Running[this.SelectedSequence] = true
-		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+		this.Running[displaySequence] = true
+		common.ShowRunningStatus(displaySequence, this.Running, eventsForLaunchpad, guiButtons)
 
 		// Start the music trigger for the target sequence.
 		cmd := common.Command{
@@ -388,7 +510,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "MusicTriger", Value: true},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 
 		// We want to exit from functioms immediately so we call handle.
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -397,13 +519,16 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send stop music trigger for scanner and rgb sequences.
 	if X == common.Function8_Music_Trigger &&
+		this.Functions[displaySequence][common.Function8_Music_Trigger].State {
 
-		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+		}
 
-		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
+		this.Functions[displaySequence][common.Function8_Music_Trigger].State = false
 
-		this.Running[this.SelectedSequence] = false
-		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+		this.Running[displaySequence] = false
+		common.ShowRunningStatus(displaySequence, this.Running, eventsForLaunchpad, guiButtons)
 
 		// Stop the music trigger for the target sequence.
 		cmd := common.Command{
@@ -412,7 +537,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "MusicTriger", Value: false},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 
 		// We want to exit from functioms immediately so we call handle.
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -421,13 +546,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send stop music trigger chaser sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.ScannerChaser &&
-		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+		this.SelectMode[displaySequence] != CHASER &&
+		this.Functions[displaySequence][common.Function8_Music_Trigger].State {
 
-		this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
+		if debug {
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Shutter Chaser Music Trigger Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+		}
+
+		this.Functions[displaySequence][common.Function8_Music_Trigger].State = false
 		this.ScannerChaser = false
 
-		ShowFunctionButtons(this, this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
@@ -438,7 +567,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Stop the music trigger for the chaser sequence.
