@@ -9,8 +9,6 @@ import (
 
 func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
-
 	var displaySequence int
 	var targetSequence int
 
@@ -50,7 +48,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
-		fmt.Printf("FUNCS: this.EditSequenceColorsMode[%d] = %t \n", displaySequence, this.EditSequenceColorsMode[displaySequence])
+		fmt.Printf("FUNCS: this.EditSequenceColorsMode[%d] = %t \n", displaySequence, this.EditSequenceColorsMode)
 		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", displaySequence, this.EditStaticColorsMode[displaySequence])
 		fmt.Printf("FUNCS: this.EditGoboSelectionMode[%d] = %t \n", displaySequence, this.EditGoboSelectionMode[displaySequence])
 		fmt.Printf("FUNCS: this.EditPatternMode[%d] = %t \n", displaySequence, this.EditPatternMode[displaySequence])
@@ -204,7 +202,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.EditSequenceColorsMode[targetSequence] = true
+		this.EditSequenceColorsMode = true
 		this.Functions[targetSequence][common.Function5_Color].State = true
 
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -227,7 +225,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		this.Functions[targetSequence][common.Function5_Color].State = true
-		this.EditSequenceColorsMode[targetSequence] = true
+		this.EditSequenceColorsMode = true
 
 		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
@@ -254,6 +252,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		this.Functions[targetSequence][common.Function6_Static_Gobo].State = true
+
 		// Starting a static sequence will turn off a running chaser, so turn off the start lamp
 		common.LightLamp(common.ALight{X: X, Y: displaySequence, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
@@ -313,43 +312,43 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 	}
 
 	// Map Function 6 Scanner GOBO Selection - Go to select gobo mode if we are in scanner sequence.
-	if X == common.Function6_Static_Gobo && !this.Functions[displaySequence][common.Function6_Static_Gobo].State &&
-		sequences[displaySequence].Type == "scanner" {
+	if X == common.Function6_Static_Gobo && !this.Functions[targetSequence][common.Function6_Static_Gobo].State &&
+		sequences[targetSequence].Type == "scanner" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Scanner Gobo Selection Mode\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Scanner Gobo Selection Mode\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function6_Static_Gobo].State = true
-		this.EditStaticColorsMode[displaySequence] = false // Turn off the other option for this function key.
-		this.EditGoboSelectionMode[displaySequence] = true
+		this.Functions[targetSequence][common.Function6_Static_Gobo].State = true
+		this.EditStaticColorsMode[targetSequence] = false // Turn off the other option for this function key.
+		this.EditGoboSelectionMode[targetSequence] = true
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
 
 		// Select a fixture.
 		this.EditFixtureSelectionMode = true
-		this.SelectMode[displaySequence] = FUNCTION
-		sequences[displaySequence].StaticColors[X].FirstPress = false
+		this.SelectMode[targetSequence] = FUNCTION
+		sequences[targetSequence].StaticColors[X].FirstPress = false
 
 		this.FollowingAction = "ShowGoboSelectionButtons"
-		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[displaySequence], displaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
+		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[targetSequence], displaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
 		return
 	}
 
 	// Function 7 - Turn on the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
-		!this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
-		sequences[displaySequence].Type == "rgb" &&
-		sequences[displaySequence].Label != "chaser" {
+		!this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
+		sequences[targetSequence].Type == "rgb" &&
+		sequences[targetSequence].Label != "chaser" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode On\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode On\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State = true
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State = true
 
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
@@ -357,23 +356,23 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "RGBInvert", Value: true},
 			},
 		}
-		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 7 - Turn off the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
-		sequences[displaySequence].Type == "rgb" &&
-		sequences[displaySequence].Label != "chaser" {
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
+		sequences[targetSequence].Type == "rgb" &&
+		sequences[targetSequence].Label != "chaser" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode Off\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State = false
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State = false
 
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
@@ -381,25 +380,25 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "RGBInvert", Value: false},
 			},
 		}
-		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 	if X == common.Function7_Invert_Chase &&
-		!this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
-		sequences[displaySequence].Type == "scanner" {
+		!this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
+		sequences[targetSequence].Type == "scanner" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode On\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode On\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
 		this.ScannerChaser = true
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State = true // Chaser
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State = true // Chaser
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell the scannern & chaser sequences that the scanner shutter chase flag is on.
@@ -437,17 +436,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 7 - Toggle the shutter chaser mode. Stop the chaser.
 	if X == common.Function7_Invert_Chase &&
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State &&
-		sequences[displaySequence].Type == "scanner" {
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
+		sequences[targetSequence].Type == "scanner" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode Off\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
 		this.ScannerChaser = false
-		this.Functions[displaySequence][common.Function7_Invert_Chase].State = false
+		this.Functions[targetSequence][common.Function7_Invert_Chase].State = false
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
@@ -458,7 +457,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
 			},
 		}
-		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Stop the chaser.
@@ -486,22 +485,22 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send start music trigger for scanner & rgb sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.SelectMode[displaySequence] != CHASER &&
-		!this.Functions[displaySequence][common.Function8_Music_Trigger].State {
+		this.SelectMode[targetSequence] != CHASER &&
+		!this.Functions[targetSequence][common.Function8_Music_Trigger].State {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode On\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode On\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function8_Music_Trigger].State = true
+		this.Functions[targetSequence][common.Function8_Music_Trigger].State = true
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Starting a music trigger will start the sequence, so turn on the start lamp
 		// and remember that this sequence is on.
 		this.Running[displaySequence] = true
-		common.ShowRunningStatus(displaySequence, this.Running, eventsForLaunchpad, guiButtons)
+		common.ShowRunningStatus(targetSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 		// Start the music trigger for the target sequence.
 		cmd := common.Command{
@@ -510,7 +509,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "MusicTriger", Value: true},
 			},
 		}
-		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 		// We want to exit from functioms immediately so we call handle.
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -519,16 +518,16 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send stop music trigger for scanner and rgb sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.Functions[displaySequence][common.Function8_Music_Trigger].State {
+		this.Functions[targetSequence][common.Function8_Music_Trigger].State {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode Off\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function8_Music_Trigger].State = false
+		this.Functions[targetSequence][common.Function8_Music_Trigger].State = false
 
-		this.Running[displaySequence] = false
-		common.ShowRunningStatus(displaySequence, this.Running, eventsForLaunchpad, guiButtons)
+		this.Running[targetSequence] = false
+		common.ShowRunningStatus(targetSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 		// Stop the music trigger for the target sequence.
 		cmd := common.Command{
@@ -537,7 +536,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 				{Name: "MusicTriger", Value: false},
 			},
 		}
-		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 		// We want to exit from functioms immediately so we call handle.
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -546,17 +545,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send stop music trigger chaser sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.SelectMode[displaySequence] != CHASER &&
-		this.Functions[displaySequence][common.Function8_Music_Trigger].State {
+		this.SelectMode[targetSequence] != CHASER &&
+		this.Functions[targetSequence][common.Function8_Music_Trigger].State {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Shutter Chaser Music Trigger Mode Off\n", displaySequence, this.SelectMode[displaySequence])
+			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Shutter Chaser Music Trigger Mode Off\n", targetSequence, this.SelectMode[targetSequence])
 		}
 
-		this.Functions[displaySequence][common.Function8_Music_Trigger].State = false
+		this.Functions[targetSequence][common.Function8_Music_Trigger].State = false
 		this.ScannerChaser = false
 
-		ShowFunctionButtons(this, displaySequence, displaySequence, eventsForLaunchpad, guiButtons)
+		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
@@ -568,7 +567,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(displaySequence, cmd, commandChannels)
-		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
 
 		// Stop the music trigger for the chaser sequence.
 		cmd = common.Command{

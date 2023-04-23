@@ -139,7 +139,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditGoboSelectionMode[sequenceNumber] = false                         // Clear edit gobo mode.
 		this.EditPatternMode[sequenceNumber] = false                               // Clear edit pattern mode.
 		this.EditScannerColorsMode[sequenceNumber] = false                         // Clear scanner color mode.
-		this.EditSequenceColorsMode[sequenceNumber] = false                        // Clear rgb color mode.
+		this.EditSequenceColorsMode = false                                        // Clear rgb color mode.
 		this.EditStaticColorsMode[sequenceNumber] = false                          // Clear static color mode.
 		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
 		this.ScannerChaser = false                                                 // Clear the scanner chase mode.

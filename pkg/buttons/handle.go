@@ -35,8 +35,6 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
-
 	var targetSequence int
 	var displaySequence int
 
@@ -72,7 +70,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
-		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", targetSequence, this.EditSequenceColorsMode[targetSequence])
+		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", targetSequence, this.EditSequenceColorsMode)
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", targetSequence, this.EditStaticColorsMode[targetSequence])
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", targetSequence, this.EditGoboSelectionMode[targetSequence])
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", targetSequence, this.EditPatternMode[targetSequence])
@@ -189,7 +187,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		if this.SelectMode[this.SelectedSequence] == NORMAL &&
-			this.Functions[this.SelectedSequence][common.Function5_Color].State && this.EditSequenceColorsMode[this.SelectedSequence] {
+			this.Functions[this.SelectedSequence][common.Function5_Color].State && this.EditSequenceColorsMode {
 			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		}
 
@@ -266,7 +264,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 3rd Press Status Mode and not a scanner - we display the fixture status enable/invert/disable buttons.
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode &&
 		!this.EditStaticColorsMode[this.SelectedSequence] &&
 		this.SelectedType != "scanner" {
 
@@ -294,7 +292,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 3rd Press Status Mode and we are scanner - we display the shutter chaser function buttons.
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode &&
 		!this.EditStaticColorsMode[this.SelectedSequence] &&
 		this.SelectedType == "scanner" {
 
@@ -324,7 +322,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 4th Press Normal Mode - we head back to normal mode.
 	if this.SelectMode[this.SelectedSequence] == STATUS &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode &&
 		!this.EditStaticColorsMode[this.SelectedSequence] &&
 		this.SelectedType != "scanner" {
 
@@ -421,7 +419,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 4th Press Normal Mode and we are a scanner- we head back to normal mode.
 	if this.SelectMode[this.SelectedSequence] == CHASER &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode[this.SelectedSequence] &&
+		!this.EditSequenceColorsMode &&
 		!this.EditStaticColorsMode[this.SelectedSequence] &&
 		this.SelectedType == "scanner" {
 
@@ -535,9 +533,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = NORMAL
 
 		// Turn off the edit sequence colors button.
-		if this.EditSequenceColorsMode[this.SelectedSequence] {
-			this.EditSequenceColorsMode[this.SelectedSequence] = false
-			this.Functions[this.SelectedSequence][common.Function5_Color].State = false
+		if this.EditSequenceColorsMode {
+			this.EditSequenceColorsMode = false
+			this.Functions[targetSequence][common.Function5_Color].State = false
 		}
 
 		// Now forget we pressed twice and start again.
