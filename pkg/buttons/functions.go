@@ -32,6 +32,8 @@ func ShowFunctionButtons(this *CurrentState, targetSequence int, displaySequence
 
 func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
+	debug := true
+
 	var displaySequence int
 	var targetSequence int
 
@@ -364,8 +366,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 	// Function 7 - Turn on the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
 		!this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
-		sequences[targetSequence].Type == "rgb" &&
-		sequences[targetSequence].Label != "chaser" {
+		sequences[targetSequence].Type == "rgb" {
 
 		if debug {
 			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode On\n", targetSequence, this.SelectMode[targetSequence])
@@ -388,8 +389,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 	// Function 7 - Turn off the RGB Invert mode.
 	if X == common.Function7_Invert_Chase &&
 		this.Functions[targetSequence][common.Function7_Invert_Chase].State &&
-		sequences[targetSequence].Type == "rgb" &&
-		sequences[targetSequence].Label != "chaser" {
+		sequences[targetSequence].Type == "rgb" {
 
 		if debug {
 			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase RGB Invert Mode Off\n", targetSequence, this.SelectMode[targetSequence])
