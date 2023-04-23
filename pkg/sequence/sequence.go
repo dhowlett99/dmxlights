@@ -144,7 +144,7 @@ func CreateSequence(
 		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig, false)
 	}
 
-	// Initailise the scanner state for all defined fixtures.
+	// Enable all the defined fixtures.
 	for x := 0; x < numberFixtures; x++ {
 		newScanner := common.FixtureState{}
 		newScanner.Enabled = true

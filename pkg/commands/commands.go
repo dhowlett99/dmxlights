@@ -603,20 +603,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
-		const SEQUENCE_NUMBER = 0  // Integer
-		const FIXTURE_NUMBER = 1   // Integer
-		const FIXTURE_STATE = 2    // Boolean
-		const FIXTURE_INVERTED = 3 // Boolean
+		const FIXTURE_NUMBER = 0   // Integer
+		const FIXTURE_STATE = 1    // Boolean
+		const FIXTURE_INVERTED = 2 // Boolean
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t on sequence %d \n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_INVERTED].Value, command.Args[SEQUENCE_NUMBER].Value)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_INVERTED].Value)
 		}
-		if command.Args[SEQUENCE_NUMBER].Value == mySequenceNumber {
-			if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
-				newScannerState := common.FixtureState{}
-				newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
-				newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
-				sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
-			}
+
+		if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
+			newScannerState := common.FixtureState{}
+			newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
+			newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
+			sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 		}
 
 		// When we disable a fixture we send a off command to the shutter to make it go off.

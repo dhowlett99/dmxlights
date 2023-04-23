@@ -747,6 +747,12 @@ func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common
 	pattern.Label = "std.Scanner.Chase"
 	pattern.Steps = []common.Step{}
 
+	if debug {
+		for fixture := 0; fixture < len(scannerState); fixture++ {
+			fmt.Printf("ApplyFixtureState: Fixture:%d State %t\n", fixture, scannerState[fixture].Enabled)
+		}
+	}
+
 	for _, step := range generatedSteps {
 
 		newStep := step

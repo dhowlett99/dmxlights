@@ -216,20 +216,6 @@ func GetFixureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) 
 	return Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
 }
 
-// EditFixture - allows you to change the fixture details for the selected fixture.
-// Returns a complete list of fixtures.
-// Returns an error.
-func EditFixture(groupNumber int, fixtureNumber int, newFixture Fixture, fixtures *Fixtures) (*Fixtures, error) {
-	// scan the fixtures structure for the selected fixture.
-	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group == groupNumber && fixture.Number == fixtureNumber {
-			fixture = newFixture
-			return fixtures, nil
-		}
-	}
-	return fixtures, fmt.Errorf("error: fixture not found")
-}
-
 // FixtureReceivers are created by the sequence and are used to receive step instructions.
 // Each FixtureReceiver knows which step they belong too and when triggered they start a fade up
 // and fade down events which get sent to the launchpad lamps and the DMX fixtures.

@@ -1310,7 +1310,6 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: Y},
 					{Name: "FixtureNumber", Value: X},
 					{Name: "FixtureState", Value: false},
 					{Name: "FixtureInverted", Value: false},
@@ -1318,17 +1317,8 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			if this.ScannerChaser && this.SelectedType == "scanner" {
-				// Tell the sequence chaser to turn on this scanner.
-				cmd = common.Command{
-					Action: common.ToggleFixtureState,
-					Args: []common.Arg{
-						{Name: "SequenceNumber", Value: 4},
-						{Name: "FixtureNumber", Value: X},
-						{Name: "FixtureState", Value: false},
-						{Name: "FixtureInverted", Value: false},
-					},
-				}
+			// If we're a scanner also tell the sequence shutter chaser to turn off this fixture.
+			if this.SelectedType == "scanner" {
 				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
 
@@ -1348,11 +1338,10 @@ func ProcessButtons(X int, Y int,
 			this.FixtureState[X][Y].Enabled = true
 			this.FixtureState[X][Y].Inverted = false
 
-			// Tell the sequence to turn on this scanner.
+			// Tell the sequence to turn on this fixture.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: Y},
 					{Name: "FixtureNumber", Value: X},
 					{Name: "FixtureState", Value: true},
 					{Name: "FixtureInverted", Value: false},
@@ -1360,17 +1349,8 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			if this.ScannerChaser && this.SelectedType == "scanner" {
-				// Tell the sequence chaseer to turn on this scanner.
-				cmd = common.Command{
-					Action: common.ToggleFixtureState,
-					Args: []common.Arg{
-						{Name: "SequenceNumber", Value: 4},
-						{Name: "FixtureNumber", Value: X},
-						{Name: "FixtureState", Value: true},
-						{Name: "FixtureInverted", Value: false},
-					},
-				}
+			// If we're a scanner also tell the sequence shutter chaser to turn on this fixture.
+			if this.SelectedType == "scanner" {
 				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
 
@@ -1395,7 +1375,6 @@ func ProcessButtons(X int, Y int,
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "SequenceNumber", Value: Y},
 					{Name: "FixtureNumber", Value: X},
 					{Name: "FixtureState", Value: true},
 					{Name: "FixtureInverted", Value: true},
@@ -1403,17 +1382,8 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(Y, cmd, commandChannels)
 
-			if this.ScannerChaser && this.SelectedType == "scanner" {
-				// Tell the sequence chaser to invert this scanner.
-				cmd = common.Command{
-					Action: common.ToggleFixtureState,
-					Args: []common.Arg{
-						{Name: "SequenceNumber", Value: 4},
-						{Name: "FixtureNumber", Value: X},
-						{Name: "FixtureState", Value: true},
-						{Name: "FixtureInverted", Value: true},
-					},
-				}
+			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
+			if this.SelectedType == "scanner" {
 				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 			}
 
