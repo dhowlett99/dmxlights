@@ -2421,23 +2421,3 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		}
 	}
 }
-
-func ShowFunctionButtons(this *CurrentState, targetSequence int, displaySequence int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
-
-	if debug {
-		fmt.Printf("ShowFunctionButtons sequence target %d display %d\n", targetSequence, displaySequence)
-	}
-	// Loop through the available functions for this sequence
-	for index, function := range this.Functions[targetSequence] {
-		if debug {
-			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
-		}
-		if !function.State { // Cyan
-			common.LightLamp(common.ALight{X: index, Y: displaySequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-		}
-		if function.State { // Purple
-			common.LightLamp(common.ALight{X: index, Y: displaySequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-		}
-		common.LabelButton(index, displaySequence, function.Label, guiButtons)
-	}
-}
