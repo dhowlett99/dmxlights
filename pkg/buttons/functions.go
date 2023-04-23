@@ -32,8 +32,6 @@ func ShowFunctionButtons(this *CurrentState, targetSequence int, displaySequence
 
 func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
-
 	var displaySequence int
 	var targetSequence int
 
