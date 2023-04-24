@@ -1106,12 +1106,14 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 
 // turnOffFixtures is used to turn off a fixture when we stop a sequence.
 func turnOffFixtures(sequence common.Sequence, cmd common.FixtureCommand, myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, dmxInterfacePresent bool) {
-
-	if debug {
-		fmt.Printf("Sequence %d: Fixture %d turnOffFixtures\n", sequence.Number, myFixtureNumber)
+	// Only turn off real sequences.
+	if sequence.Number < 3 {
+		if debug {
+			fmt.Printf("Sequence %d: Fixture %d turnOffFixtures\n", sequence.Number, myFixtureNumber)
+		}
+		common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
+		MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 	}
-	common.LabelButton(myFixtureNumber, sequence.Number, "", guiButtons)
-	MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
 // FindShutter takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
