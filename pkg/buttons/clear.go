@@ -136,11 +136,11 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditFixtureSelectionMode = false                                      // Clear fixture selecetd mode.
 		this.SelectMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
 		this.SelectButtonPressed[sequenceNumber] = false                           // Clear buttoned selecetd mode.
-		this.EditGoboSelectionMode[sequenceNumber] = false                         // Clear edit gobo mode.
-		this.EditPatternMode[sequenceNumber] = false                               // Clear edit pattern mode.
-		this.EditScannerColorsMode[sequenceNumber] = false                         // Clear scanner color mode.
+		this.EditGoboSelectionMode = false                                         // Clear edit gobo mode.
+		this.EditPatternMode = false                                               // Clear edit pattern mode.
+		this.EditScannerColorsMode = false                                         // Clear scanner color mode.
 		this.EditSequenceColorsMode = false                                        // Clear rgb color mode.
-		this.EditStaticColorsMode[sequenceNumber] = false                          // Clear static color mode.
+		this.EditStaticColorsMode = false                                          // Clear static color mode.
 		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
 		this.ScannerChaser = false                                                 // Clear the scanner chase mode.
 

@@ -35,6 +35,8 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
+	debug := false
+
 	var targetSequence int
 	var displaySequence int
 
@@ -71,9 +73,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", targetSequence, this.EditSequenceColorsMode)
-		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", targetSequence, this.EditStaticColorsMode[targetSequence])
-		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", targetSequence, this.EditGoboSelectionMode[targetSequence])
-		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", targetSequence, this.EditPatternMode[targetSequence])
+		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", targetSequence, this.EditStaticColorsMode)
+		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", targetSequence, this.EditGoboSelectionMode)
+		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", targetSequence, this.EditPatternMode)
 		fmt.Printf("===============================================\n")
 	}
 
@@ -134,7 +136,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// But remember we have pressed this select button once.
 	if this.SelectMode[displaySequence] == NORMAL &&
 		!this.SelectButtonPressed[displaySequence] &&
-		!this.EditStaticColorsMode[targetSequence] {
+		!this.EditStaticColorsMode {
 
 		if debug {
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
@@ -180,7 +182,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 
 			// Editing pattern is over for this sequence.
-			this.EditPatternMode[this.SelectedSequence] = false
+			this.EditPatternMode = false
 
 			// Clear buttons and remove any labels.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -206,7 +208,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 2nd Press same select button go into Function Mode for this sequence.
 	if this.SelectMode[this.SelectedSequence] == NORMAL && sequences[this.SelectedSequence].Type != "switch" || // Don't alow functions in switch mode.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Function select mode is off
-			this.EditStaticColorsMode[this.SelectedSequence] && // AND static colol mode, the case when we leave static colors edit mode.
+			this.EditStaticColorsMode && // AND static colol mode, the case when we leave static colors edit mode.
 			this.SelectButtonPressed[this.SelectedSequence] {
 
 		if debug {
@@ -217,12 +219,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = FUNCTION
 
 		// If static, show static colors.
-		if this.EditStaticColorsMode[this.SelectedSequence] && sequences[this.SelectedSequence].Type != "scanner" {
+		if this.EditStaticColorsMode && sequences[this.SelectedSequence].Type != "scanner" {
 			if debug {
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
 			common.SetMode(this.SelectedSequence, commandChannels, "Static")
-			this.EditStaticColorsMode[this.SelectedSequence] = false
+			this.EditStaticColorsMode = false
 		}
 
 		// And hide the sequence so we can only see the function buttons.
@@ -265,7 +267,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode &&
 		this.SelectedType != "scanner" {
 
 		if debug {
@@ -293,7 +295,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {
@@ -323,7 +325,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == STATUS &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode[this.SelectedSequence] {
+		!this.EditStaticColorsMode {
 
 		if debug {
 			fmt.Printf("%d: Handle Step 5 - Normal Mode From Non Scanner, Function Bar off\n", this.SelectedSequence)
@@ -340,7 +342,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("Show Pattern Selection Buttons\n")
 			}
-			this.EditPatternMode[this.SelectedSequence] = true
+			this.EditPatternMode = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
 			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], displaySequence, eventsForLaunchpad, guiButtons)
 			return
@@ -363,7 +365,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("Show RGB Static Colors\n")
 			}
-			this.EditStaticColorsMode[this.SelectedSequence] = true
+			this.EditStaticColorsMode = true
 
 			// Tell the sequence about the new color and where we are in the
 			// color cycle.
@@ -385,12 +387,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// We're in Scanner Gobo Selection Mode.
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && sequences[this.SelectedSequence].Type == "scanner" {
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
-			this.EditGoboSelectionMode[this.SelectedSequence] = false
+			this.EditGoboSelectionMode = false
 		}
 
 		// Allow us to exit the pattern select mode without setting a pattern.
-		if this.EditPatternMode[this.SelectedSequence] {
-			this.EditPatternMode[this.SelectedSequence] = false
+		if this.EditPatternMode {
+			this.EditPatternMode = false
 		}
 
 		// Else reveal the sequence on the launchpad keys
@@ -419,7 +421,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == CHASER &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode[this.SelectedSequence] &&
+		!this.EditStaticColorsMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {

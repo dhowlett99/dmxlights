@@ -67,10 +67,10 @@ type CurrentState struct {
 	SelectButtonPressed       []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions           [9][9]int                  // Sorage for switch positions.
 	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in sequence colors editing mode.
-	EditScannerColorsMode     []bool                     // This flag is true when the sequence is in select scanner colors editing mode.
-	EditGoboSelectionMode     []bool                     // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditPatternMode           []bool                     // This flag is true when the sequence is in pattern editing mode.
+	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
+	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
+	EditStaticColorsMode      bool                       // This flag is true when the sequence is in static colors editing mode.
+	EditPatternMode           bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode  bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness          int                        // Affects all DMX fixtures and launchpad lamps.
 	LastStaticColorButtonX    int                        // Which Static Color button did we change last.
@@ -853,7 +853,7 @@ func ProcessButtons(X int, Y int,
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.EditSequenceColorsMode = false
-		this.EditGoboSelectionMode[this.SelectedSequence] = false
+		this.EditGoboSelectionMode = false
 
 		return
 	}
@@ -871,7 +871,7 @@ func ProcessButtons(X int, Y int,
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.EditSequenceColorsMode = false
-		this.EditGoboSelectionMode[this.SelectedSequence] = false
+		this.EditGoboSelectionMode = false
 
 		return
 	}
@@ -888,7 +888,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		this.EditSequenceColorsMode = false
-		this.EditGoboSelectionMode[this.SelectedSequence] = false
+		this.EditGoboSelectionMode = false
 
 		return
 	}
@@ -910,7 +910,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode = false
-		this.EditGoboSelectionMode[this.SelectedSequence] = false
+		this.EditGoboSelectionMode = false
 
 		return
 	}
@@ -1576,6 +1576,7 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 && Y != -1 &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		!this.EditFixtureSelectionMode &&
+		!this.EditScannerColorsMode &&
 		this.EditSequenceColorsMode {
 
 		if debug {
@@ -1651,7 +1652,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 		}
 
-		this.EditScannerColorsMode[this.SelectedSequence] = true
+		this.EditScannerColorsMode = true
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
@@ -1736,7 +1737,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 		}
 
-		this.EditGoboSelectionMode[this.SelectedSequence] = true
+		this.EditGoboSelectionMode = true
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
@@ -1758,9 +1759,8 @@ func ProcessButtons(X int, Y int,
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		sequences[this.SelectedSequence].Type != "scanner" && // Not a scanner sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On
+		this.EditStaticColorsMode { // Static Function On
 
 		if debug {
 			fmt.Printf("Update Static for X %d\n", X)
@@ -1819,7 +1819,7 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   P A T T E N
 	if X >= 0 && X < 8 && Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		this.EditPatternMode[this.SelectedSequence] {
+		this.EditPatternMode {
 
 		var targetSequence int
 		var displaySequence int
@@ -2005,10 +2005,10 @@ func ShowRGBColorSelectionButtons(master int, targetSequenceNumber int, targetSe
 
 		for index, availableColor := range targetSequence.RGBAvailableColors {
 			for _, sequenceColor := range targetSequence.CurrentColors {
-				if debug {
-					fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
-				}
 				if availableColor.Color == sequenceColor {
+					if debug {
+						fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+					}
 					if myFixtureNumber == index {
 						lamp.Flash = true
 					}
@@ -2413,9 +2413,9 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
 		this.EditSequenceColorsMode = false
-		this.EditStaticColorsMode[sequenceNumber] = false
-		this.EditGoboSelectionMode[sequenceNumber] = false
-		this.EditPatternMode[sequenceNumber] = false
+		this.EditStaticColorsMode = false
+		this.EditGoboSelectionMode = false
+		this.EditPatternMode = false
 		for function := range this.Functions {
 			this.Functions[sequenceNumber][function].State = false
 		}

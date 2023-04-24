@@ -272,9 +272,13 @@ func FixtureReceiver(
 				continue
 			}
 
-			if cmd.RGBStatic && sequence.Label != "chaser" {
+			if cmd.RGBStatic {
 				sequence := common.Sequence{}
 				sequence.Type = cmd.Type
+
+				if cmd.SequenceNumber == 4 {
+					cmd.SequenceNumber = 2
+				}
 				sequence.Number = cmd.SequenceNumber
 				sequence.Master = cmd.Master
 				sequence.Blackout = cmd.Blackout
@@ -283,6 +287,7 @@ func FixtureReceiver(
 				sequence.Static = cmd.RGBStatic
 				sequence.StrobeSpeed = cmd.StrobeSpeed
 				sequence.Strobe = cmd.Strobe
+
 				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
 				continue
 			}
