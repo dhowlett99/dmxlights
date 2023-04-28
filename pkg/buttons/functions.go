@@ -291,7 +291,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-		common.ClearLabelsSelectedRowOfButtons(displaySequence, guiButtons)
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
 
 		// Switch on any static colors.
 		cmd := common.Command{
@@ -323,7 +323,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		ShowFunctionButtons(this, targetSequence, displaySequence, eventsForLaunchpad, guiButtons)
 
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
-		common.ClearLabelsSelectedRowOfButtons(displaySequence, guiButtons)
+		common.ClearSelectedRowOfButtons(displaySequence, eventsForLaunchpad, guiButtons)
 
 		// Switch off static colors.
 		cmd := common.Command{
