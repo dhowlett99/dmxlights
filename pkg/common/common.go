@@ -501,8 +501,8 @@ const (
 	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
-func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
-	commandChannels[selectedSequence] <- command
+func SendCommandToSequence(targetSequence int, command Command, commandChannels []chan Command) {
+	commandChannels[targetSequence] <- command
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
@@ -521,36 +521,36 @@ func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, comm
 	}
 }
 
-func SendCommandToAllSequenceExcept(selectedSequence int, command Command, commandChannels []chan Command) {
+func SendCommandToAllSequenceExcept(targetSequence int, command Command, commandChannels []chan Command) {
 	for index := range commandChannels {
-		if index != selectedSequence {
+		if index != targetSequence {
 			commandChannels[index] <- command
 		}
 	}
 }
 
-func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
+func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
 	cmd := Command{
 		Action: UpdateMode,
 		Args: []Arg{
 			{Name: "Mode", Value: mode},
 		},
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
-func RevealSequence(selectedSequence int, commandChannels []chan Command) {
+func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: UnHide,
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
-func HideSequence(selectedSequence int, commandChannels []chan Command) {
+func HideSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: Hide,
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and

@@ -35,7 +35,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := false
+	debug := true
 
 	var targetSequence int
 	var displaySequence int
@@ -135,9 +135,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Simply select the selected sequence.
 	// But remember we have pressed this select button once.
 	if this.SelectMode[displaySequence] == NORMAL &&
-		!this.SelectButtonPressed[displaySequence] &&
-		!this.EditStaticColorsMode {
-
+		!this.SelectButtonPressed[displaySequence] {
 		if debug {
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
@@ -219,12 +217,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = FUNCTION
 
 		// If static, show static colors.
-		if this.EditStaticColorsMode && sequences[this.SelectedSequence].Type != "scanner" {
+		if this.EditStaticColorsMode {
 			if debug {
 				fmt.Printf("Show Static Color Selection Buttons\n")
 			}
-			common.SetMode(this.SelectedSequence, commandChannels, "Static")
-			this.EditStaticColorsMode = false
+			common.SetMode(targetSequence, commandChannels, "Static")
+			//this.EditStaticColorsMode = false
 		}
 
 		// And hide the sequence so we can only see the function buttons.
@@ -267,7 +265,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode &&
 		this.SelectedType != "scanner" {
 
 		if debug {
@@ -295,7 +292,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {
@@ -324,8 +320,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 4th Press Normal Mode - we head back to normal mode.
 	if this.SelectMode[this.SelectedSequence] == STATUS &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode {
+		!this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("%d: Handle Step 5 - Normal Mode From Non Scanner, Function Bar off\n", this.SelectedSequence)
@@ -361,25 +356,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// We're in RGB Static Color Mode.
-		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && sequences[this.SelectedSequence].Type == "rgb" {
+		if this.EditStaticColorsMode {
 			if debug {
 				fmt.Printf("Show RGB Static Colors\n")
 			}
-			this.EditStaticColorsMode = true
-
-			// Tell the sequence about the new color and where we are in the
-			// color cycle.
-			cmd := common.Command{
-				Action: common.UpdateStaticColor,
-				Args: []common.Arg{
-					{Name: "Static", Value: true},
-					{Name: "StaticLamp", Value: this.LastStaticColorButtonX},
-					{Name: "StaticLampFlash", Value: true},
-					{Name: "SelectedColor", Value: sequences[this.SelectedSequence].StaticColors[this.LastStaticColorButtonX].SelectedColor},
-					{Name: "StaticColor", Value: sequences[this.SelectedSequence].StaticColors[this.LastStaticColorButtonX].Color},
-				},
+			if this.SelectedType == "rgb" {
+				common.SetMode(this.SelectedSequence, commandChannels, "Static")
+				//this.EditStaticColorsMode = false
+				common.RevealSequence(this.SelectedSequence, commandChannels)
+			} else {
+				common.SetMode(this.ChaserSequenceNumber, commandChannels, "Static")
+				//this.EditStaticColorsMode = false
+				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			return
 		}
@@ -421,7 +410,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == CHASER &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
-		!this.EditStaticColorsMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {

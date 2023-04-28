@@ -282,7 +282,7 @@ func FixtureReceiver(
 				sequence.Number = cmd.SequenceNumber
 				sequence.Master = cmd.Master
 				sequence.Blackout = cmd.Blackout
-				sequence.Hide = cmd.Hide
+				sequence.Hide = false
 				sequence.StaticColors = cmd.RGBStaticColors
 				sequence.Static = cmd.RGBStatic
 				sequence.StrobeSpeed = cmd.StrobeSpeed
@@ -1060,7 +1060,8 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 
 	lamp := sequence.StaticColors[myFixtureNumber]
 
-	if sequence.Hide {
+	// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
+	if !sequence.Hide {
 		if lamp.Flash {
 			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
 			Black := common.Color{R: 0, G: 0, B: 0}
