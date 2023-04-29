@@ -324,6 +324,7 @@ type Sequence struct {
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
+	LastStatic                  bool                        // Last value of static before flood.
 	StartStrobe                 bool                        // We're in strobe mode.
 	StopStrobe                  bool                        // We're not in strobe mode.
 	FloodPlayOnce               bool                        // Play the flood sceme only once.

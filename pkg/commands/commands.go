@@ -318,6 +318,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command to Start Flood\n", mySequenceNumber)
 		}
+		sequence.LastStatic = sequence.Static
+		sequence.Static = false
 		sequence.StartFlood = true
 		sequence.StopFlood = false
 		sequence.FloodPlayOnce = true
@@ -327,6 +329,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command to Stop Flood\n", mySequenceNumber)
 		}
+		sequence.Static = sequence.LastStatic
 		sequence.StartFlood = false
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
