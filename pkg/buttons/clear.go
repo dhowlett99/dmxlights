@@ -37,15 +37,10 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.TargetSequence] {
+	if this.EditStaticColorsMode[this.EditWhichSequenceStatic] {
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
-			this.TargetSequence = this.ChaserSequenceNumber
-			this.DisplaySequence = this.SelectedSequence
-		} else {
-			this.TargetSequence = this.SelectedSequence
-			this.DisplaySequence = this.SelectedSequence
-		}
+		this.TargetSequence = this.EditWhichSequenceStatic
+		this.DisplaySequence = this.SelectedSequence
 
 		// Back to the begining of the rotation.
 		if this.SelectColorBar[this.TargetSequence] > common.MaxColorBar {
