@@ -298,6 +298,10 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		common.RevealSequence(this.TargetSequence, commandChannels)
+
+		// Remember which sequence we are editing
+		this.EditWhichSequenceStatic = this.TargetSequence
+
 		return
 	}
 	// Function 6 RGB - Turn off edit static color mode.

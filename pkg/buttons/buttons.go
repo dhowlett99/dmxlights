@@ -73,6 +73,7 @@ type CurrentState struct {
 	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
+	EditWhichSequenceStatic   int                        // Which sequence is currently be edited
 	EditPatternMode           bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode  bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness          int                        // Affects all DMX fixtures and launchpad lamps.
@@ -1746,19 +1747,14 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		this.EditStaticColorsMode[this.TargetSequence] { // Static Function On
+		this.EditStaticColorsMode[this.EditWhichSequenceStatic] { // Static Function On in any sequence
 
 		if debug {
 			fmt.Printf("Update Static for X %d\n", X)
 		}
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
-			this.TargetSequence = this.ChaserSequenceNumber
-			this.DisplaySequence = this.SelectedSequence
-		} else {
-			this.TargetSequence = this.SelectedSequence
-			this.DisplaySequence = this.SelectedSequence
-		}
+		this.TargetSequence = this.EditWhichSequenceStatic
+		this.DisplaySequence = this.SelectedSequence
 
 		// For this button increment the color.
 		sequences[this.TargetSequence].StaticColors[X].X = X
