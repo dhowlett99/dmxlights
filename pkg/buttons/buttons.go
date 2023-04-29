@@ -174,6 +174,8 @@ func ProcessButtons(X int, Y int,
 		//sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
+		this.SelectedType = sequences[Y].Type
+
 		if debug {
 			fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
 		}
@@ -199,14 +201,20 @@ func ProcessButtons(X int, Y int,
 		gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
 		program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
 
-		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		if this.SelectedType == "rgb" {
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: red, Green: green, Blue: blue}, eventsForLaunchpad, guiButtons)
+			fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		}
+		if this.SelectedType == "scanner" {
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		}
 
 		if gui {
 			time.Sleep(200 * time.Millisecond)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			brightness := 0
 			master := 0
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		}
 
