@@ -31,56 +31,63 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// Flash the correct color buttons
-		ShowRGBColorSelectionButtons(this.MasterBrightness, this.SelectedSequence, *sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		return
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		sequences[this.SelectedSequence].Type != "scanner" {
+	if this.EditStaticColorsMode[this.TargetSequence] {
+
+		if this.SelectMode[this.SelectedSequence] == CHASER {
+			this.TargetSequence = this.ChaserSequenceNumber
+			this.DisplaySequence = this.SelectedSequence
+		} else {
+			this.TargetSequence = this.SelectedSequence
+			this.DisplaySequence = this.SelectedSequence
+		}
 
 		// Back to the begining of the rotation.
-		if this.SelectColorBar[this.SelectedSequence] > common.MaxColorBar {
-			this.SelectColorBar[this.SelectedSequence] = 0
+		if this.SelectColorBar[this.TargetSequence] > common.MaxColorBar {
+			this.SelectColorBar[this.TargetSequence] = 0
 		}
 
 		// First press resets the colors to the default color bar.
-		if this.SelectColorBar[this.SelectedSequence] == 0 {
+		if this.SelectColorBar[this.TargetSequence] == 0 {
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.ClearStaticColor,
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Rotate around solid colors.
-		if this.SelectColorBar[this.SelectedSequence] > 0 {
+		if this.SelectColorBar[this.TargetSequence] > 0 {
 
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.SetStaticColorBar,
 				Args: []common.Arg{
-					{Name: "Selection", Value: this.SelectColorBar[this.SelectedSequence]},
+					{Name: "Selection", Value: this.SelectColorBar[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Now increment the color bar.
-		this.SelectColorBar[this.SelectedSequence]++
+		this.SelectColorBar[this.TargetSequence]++
 
 		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// Clear the pressed flag for all the fixtures.
 		for x := 0; x < 8; x++ {
-			sequences[this.SelectedSequence].StaticColors[x].FirstPress = false
+			sequences[this.TargetSequence].StaticColors[x].FirstPress = false
 		}
 
 		// Flash the correct color buttons
-		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
-		this.SelectMode[this.SelectedSequence] = NORMAL
+		common.ClearLabelsSelectedRowOfButtons(this.DisplaySequence, guiButtons)
+		this.SelectMode[this.SelectedSequence] = this.LastMode[this.SelectedSequence]
 		// The sequence will automatically display the static colors now!
 
 		return
@@ -140,7 +147,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditPatternMode = false                                               // Clear edit pattern mode.
 		this.EditScannerColorsMode = false                                         // Clear scanner color mode.
 		this.EditSequenceColorsMode = false                                        // Clear rgb color mode.
-		this.EditStaticColorsMode = false                                          // Clear static color mode.
+		this.EditStaticColorsMode[this.TargetSequence] = false                     // Clear static color mode.
 		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
 		this.ScannerChaser = false                                                 // Clear the scanner chase mode.
 

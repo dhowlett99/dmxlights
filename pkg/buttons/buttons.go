@@ -43,6 +43,8 @@ type CurrentState struct {
 	Crash1                    bool                       // Flags to detect launchpad crash.
 	Crash2                    bool                       // Flags to detect launchpad crash.
 	SelectedSequence          int                        // The currently selected sequence.
+	TargetSequence            int                        // The current target sequence.
+	DisplaySequence           int                        // The current display sequence.
 	SelectedType              string                     // The currently selected sequenece type.
 	LastSelectedSequence      int                        // Store fof the last selected squence.
 	Speed                     map[int]int                // Local copy of sequence speed. Indexed by sequence.
@@ -62,6 +64,7 @@ type CurrentState struct {
 	Blackout                  bool                       // Blackout all fixtures.
 	Flood                     bool                       // Flood all fixtures.
 	SelectMode                []int                      // What mode each sequence is in : normal mode, function mode, status selection mode.
+	LastMode                  []int                      //Last mode sequence was in : normal mode, function mode, status selection mode.
 	Functions                 map[int][]common.Function  // Map indexed sequence of functions
 	FunctionLabels            [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed       []bool                     // Which sequence has its Select button pressed.
@@ -69,7 +72,7 @@ type CurrentState struct {
 	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in sequence colors editing mode.
 	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode      bool                       // This flag is true when the sequence is in static colors editing mode.
+	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
 	EditPatternMode           bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode  bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness          int                        // Affects all DMX fixtures and launchpad lamps.
@@ -619,47 +622,46 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
-			this.RGBShift[targetSequence] = this.RGBShift[targetSequence] - 1
-			if this.RGBShift[targetSequence] < 0 {
-				this.RGBShift[targetSequence] = 0
+		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
+			if this.RGBShift[this.TargetSequence] < 0 {
+				this.RGBShift[this.TargetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
-					{Name: "RGBShift", Value: this.RGBShift[targetSequence]},
+					{Name: "RGBShift", Value: this.RGBShift[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[targetSequence]), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 			return
 		}
 
-		if sequences[targetSequence].Type == "scanner" {
-			this.ScannerShift[targetSequence] = this.ScannerShift[targetSequence] - 1
-			if this.ScannerShift[targetSequence] < 0 {
-				this.ScannerShift[targetSequence] = 0
+		if sequences[this.TargetSequence].Type == "scanner" {
+			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
+			if this.ScannerShift[this.TargetSequence] < 0 {
+				this.ScannerShift[this.TargetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
-					{Name: "ScannerShift", Value: this.ScannerShift[targetSequence]},
+					{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[targetSequence])
+			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
@@ -675,47 +677,45 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
-
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
-			this.RGBShift[targetSequence] = this.RGBShift[targetSequence] + 1
-			if this.RGBShift[targetSequence] > 50 {
-				this.RGBShift[targetSequence] = 50
+		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
+			if this.RGBShift[this.TargetSequence] > 50 {
+				this.RGBShift[this.TargetSequence] = 50
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
-					{Name: "Shift", Value: this.RGBShift[targetSequence]},
+					{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[targetSequence]), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 			return
 		}
 
-		if sequences[targetSequence].Type == "scanner" {
-			this.ScannerShift[targetSequence] = this.ScannerShift[targetSequence] + 1
-			if this.ScannerShift[targetSequence] > 3 {
-				this.ScannerShift[targetSequence] = 3
+		if sequences[this.TargetSequence].Type == "scanner" {
+			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] + 1
+			if this.ScannerShift[this.TargetSequence] > 3 {
+				this.ScannerShift[this.TargetSequence] = 3
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
-					{Name: "ScannerShift", Value: this.ScannerShift[targetSequence]},
+					{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[targetSequence])
+			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
 			return
 		}
@@ -731,52 +731,50 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
-
 		// Decrease Strobe Speed.
-		if this.Strobe[targetSequence] {
-			this.StrobeSpeed[targetSequence] -= 10
-			if this.StrobeSpeed[targetSequence] < 0 {
-				this.StrobeSpeed[targetSequence] = 0
+		if this.Strobe[this.TargetSequence] {
+			this.StrobeSpeed[this.TargetSequence] -= 10
+			if this.StrobeSpeed[this.TargetSequence] < 0 {
+				this.StrobeSpeed[this.TargetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[targetSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[targetSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
 			return
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// Decrease Speed.
-		if !sequences[targetSequence].MusicTrigger {
-			this.Speed[targetSequence]--
-			if this.Speed[targetSequence] < 0 {
-				this.Speed[targetSequence] = 1
+		if !sequences[this.TargetSequence].MusicTrigger {
+			this.Speed[this.TargetSequence]--
+			if this.Speed[this.TargetSequence] < 0 {
+				this.Speed[this.TargetSequence] = 1
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[targetSequence]},
+					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[targetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -791,50 +789,49 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
 
-		if this.Strobe[targetSequence] {
-			this.StrobeSpeed[targetSequence] += 10
-			if this.StrobeSpeed[targetSequence] > 255 {
-				this.StrobeSpeed[targetSequence] = 255
+		if this.Strobe[this.TargetSequence] {
+			this.StrobeSpeed[this.TargetSequence] += 10
+			if this.StrobeSpeed[this.TargetSequence] > 255 {
+				this.StrobeSpeed[this.TargetSequence] = 255
 			}
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[targetSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[targetSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
 			return
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		if !sequences[targetSequence].MusicTrigger {
-			this.Speed[targetSequence]++
-			if this.Speed[targetSequence] > 12 {
-				this.Speed[targetSequence] = 12
+		if !sequences[this.TargetSequence].MusicTrigger {
+			this.Speed[this.TargetSequence]++
+			if this.Speed[this.TargetSequence] > 12 {
+				this.Speed[this.TargetSequence] = 12
 			}
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[targetSequence]},
+					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[targetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
 
 		return
 	}
@@ -1026,48 +1023,47 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			// Send Update RGB Size.
-			this.RGBSize[targetSequence]--
-			if this.RGBSize[targetSequence] < 1 {
-				this.RGBSize[targetSequence] = 1
+			this.RGBSize[this.TargetSequence]--
+			if this.RGBSize[this.TargetSequence] < 1 {
+				this.RGBSize[this.TargetSequence] = 1
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
-					{Name: "RGBSize", Value: this.RGBSize[targetSequence]},
+					{Name: "RGBSize", Value: this.RGBSize[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[targetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 
-		if sequences[targetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" {
 			// Send Update Scanner Size.
-			this.ScannerSize[targetSequence] = this.ScannerSize[targetSequence] - 10
-			if this.ScannerSize[targetSequence] < 0 {
-				this.ScannerSize[targetSequence] = 0
+			this.ScannerSize[this.TargetSequence] = this.ScannerSize[this.TargetSequence] - 10
+			if this.ScannerSize[this.TargetSequence] < 0 {
+				this.ScannerSize[this.TargetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize[targetSequence]},
+					{Name: "ScannerSize", Value: this.ScannerSize[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[targetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
@@ -1082,50 +1078,48 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
-
-		if sequences[targetSequence].Type == "rgb" ||
-			this.Functions[targetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" ||
+			this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 
 			// Send Update RGB Size.
-			this.RGBSize[targetSequence]++
-			if this.RGBSize[targetSequence] > common.MaxRGBSize {
-				this.RGBSize[targetSequence] = common.MaxRGBSize
+			this.RGBSize[this.TargetSequence]++
+			if this.RGBSize[this.TargetSequence] > common.MaxRGBSize {
+				this.RGBSize[this.TargetSequence] = common.MaxRGBSize
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
-					{Name: "RGBSize", Value: this.RGBSize[targetSequence]},
+					{Name: "RGBSize", Value: this.RGBSize[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[targetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 
-		if sequences[targetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" {
 			// Send Update Scanner Size.
-			this.ScannerSize[targetSequence] = this.ScannerSize[targetSequence] + 10
-			if this.ScannerSize[targetSequence] > common.MaxScannerSize {
-				this.ScannerSize[targetSequence] = common.MaxScannerSize
+			this.ScannerSize[this.TargetSequence] = this.ScannerSize[this.TargetSequence] + 10
+			if this.ScannerSize[this.TargetSequence] > common.MaxScannerSize {
+				this.ScannerSize[this.TargetSequence] = common.MaxScannerSize
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
-					{Name: "ScannerSize", Value: this.ScannerSize[targetSequence]},
+					{Name: "ScannerSize", Value: this.ScannerSize[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[targetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 
 			return
 		}
@@ -1141,49 +1135,47 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
-
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
-			this.RGBFade[targetSequence]--
-			if this.RGBFade[targetSequence] < 1 {
-				this.RGBFade[targetSequence] = 1
+		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+			this.RGBFade[this.TargetSequence]--
+			if this.RGBFade[this.TargetSequence] < 1 {
+				this.RGBFade[this.TargetSequence] = 1
 			}
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "RGBFadeSpeed", Value: this.RGBFade[targetSequence]},
+					{Name: "RGBFadeSpeed", Value: this.RGBFade[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[targetSequence]), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
 
 			return
 		}
 
 		// Update Coordinates.
-		if sequences[targetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCoordinates[targetSequence]--
-			if this.ScannerCoordinates[targetSequence] < 0 {
-				this.ScannerCoordinates[targetSequence] = 0
+			this.ScannerCoordinates[this.TargetSequence]--
+			if this.ScannerCoordinates[this.TargetSequence] < 0 {
+				this.ScannerCoordinates[this.TargetSequence] = 0
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[targetSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[targetSequence])
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
@@ -1200,48 +1192,46 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		var targetSequence int
 		if sequences[this.SelectedSequence].Type == "scanner" &&
 			this.ScannerChaser {
-			targetSequence = this.ChaserSequenceNumber
+			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
-			targetSequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
 		}
-
-		if sequences[targetSequence].Type == "rgb" || this.Functions[targetSequence][common.Function7_Invert_Chase].State {
-			this.RGBFade[targetSequence]++
-			if this.RGBFade[targetSequence] > common.MaxRGBFade {
-				this.RGBFade[targetSequence] = common.MaxRGBFade
+		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+			this.RGBFade[this.TargetSequence]++
+			if this.RGBFade[this.TargetSequence] > common.MaxRGBFade {
+				this.RGBFade[this.TargetSequence] = common.MaxRGBFade
 			}
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
-					{Name: "FadeSpeed", Value: this.RGBFade[targetSequence]},
+					{Name: "FadeSpeed", Value: this.RGBFade[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[targetSequence]), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
 			return
 		}
 
 		// Update Coordinates.
-		if sequences[targetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" {
 			// Fade also send more or less coordinates for the scanner patterns.
-			this.ScannerCoordinates[targetSequence]++
-			if this.ScannerCoordinates[targetSequence] > 4 {
-				this.ScannerCoordinates[targetSequence] = 4
+			this.ScannerCoordinates[this.TargetSequence]++
+			if this.ScannerCoordinates[this.TargetSequence] > 4 {
+				this.ScannerCoordinates[this.TargetSequence] = 4
 			}
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
-					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[targetSequence]},
+					{Name: "NumberCoordinates", Value: this.ScannerCoordinates[this.TargetSequence]},
 				},
 			}
-			common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[targetSequence])
+			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
 			return
 		}
@@ -1485,7 +1475,7 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S T A T I C   C O L O R
 	// Red
-	if X == 1 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
+	if X == 1 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1515,7 +1505,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Green
-	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
+	if X == 2 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1544,7 +1534,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Blue
-	if X == 3 && Y == -1 && sequences[this.SelectedSequence].Type != "scanner" {
+	if X == 3 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1583,17 +1573,13 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
 		}
 
-		var targetSequence int
-		var displaySequence int
-
 		if this.SelectMode[this.SelectedSequence] == CHASER {
-			targetSequence = this.ChaserSequenceNumber
-			displaySequence = this.SelectedSequence
+			this.TargetSequence = this.ChaserSequenceNumber
+			this.DisplaySequence = this.SelectedSequence
 		} else {
-			targetSequence = this.SelectedSequence
-			displaySequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
+			this.DisplaySequence = this.SelectedSequence
 		}
-
 		// Add the selected color to the sequence.
 		cmd := common.Command{
 			Action: common.UpdateSequenceColor,
@@ -1601,18 +1587,18 @@ func ProcessButtons(X int, Y int,
 				{Name: "SelectedColor", Value: X},
 			},
 		}
-		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		this.EditSequenceColorsMode = true
 
 		// Get an upto date copy of the sequence.
-		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// Set the colors.
-		sequences[targetSequence].CurrentColors = sequences[targetSequence].SequenceColors
+		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// We call ShowRGBColorSelectionButtons here so the selections will flash as you press them.
-		ShowRGBColorSelectionButtons(this.MasterBrightness, targetSequence, *sequences[targetSequence], displaySequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		return
 	}
@@ -1760,36 +1746,44 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		this.EditStaticColorsMode { // Static Function On
+		this.EditStaticColorsMode[this.TargetSequence] { // Static Function On
 
 		if debug {
 			fmt.Printf("Update Static for X %d\n", X)
 		}
 
+		if this.SelectMode[this.SelectedSequence] == CHASER {
+			this.TargetSequence = this.ChaserSequenceNumber
+			this.DisplaySequence = this.SelectedSequence
+		} else {
+			this.TargetSequence = this.SelectedSequence
+			this.DisplaySequence = this.SelectedSequence
+		}
+
 		// For this button increment the color.
-		sequences[this.SelectedSequence].StaticColors[X].X = X
-		sequences[this.SelectedSequence].StaticColors[X].Y = Y
-		if sequences[this.SelectedSequence].StaticColors[X].FirstPress {
-			sequences[this.SelectedSequence].StaticColors[X].SelectedColor++
+		sequences[this.TargetSequence].StaticColors[X].X = X
+		sequences[this.TargetSequence].StaticColors[X].Y = Y
+		if sequences[this.TargetSequence].StaticColors[X].FirstPress {
+			sequences[this.TargetSequence].StaticColors[X].SelectedColor++
 		}
-		if sequences[this.SelectedSequence].StaticColors[X].SelectedColor > 10 {
-			sequences[this.SelectedSequence].StaticColors[X].SelectedColor = 0
+		if sequences[this.TargetSequence].StaticColors[X].SelectedColor > 10 {
+			sequences[this.TargetSequence].StaticColors[X].SelectedColor = 0
 		}
-		sequences[this.SelectedSequence].StaticColors[X].Color = common.GetColorButtonsArray(sequences[this.SelectedSequence].StaticColors[X].SelectedColor)
+		sequences[this.TargetSequence].StaticColors[X].Color = common.GetColorButtonsArray(sequences[this.TargetSequence].StaticColors[X].SelectedColor)
 		if debug {
-			fmt.Printf("Selected X:%d Y:%d Static Color is %d\n", X, Y, sequences[this.SelectedSequence].StaticColors[X].SelectedColor)
+			fmt.Printf("Selected X:%d Y:%d Static Color is %d\n", X, Y, sequences[this.TargetSequence].StaticColors[X].SelectedColor)
 		}
 
 		// Store the color data to allow for editing of static colors.
-		this.StaticButtons[this.SelectedSequence].X = X
-		this.StaticButtons[this.SelectedSequence].Y = Y
-		this.StaticButtons[this.SelectedSequence].Color = sequences[this.SelectedSequence].StaticColors[X].Color
-		this.StaticButtons[this.SelectedSequence].SelectedColor = sequences[this.SelectedSequence].StaticColors[X].SelectedColor
+		this.StaticButtons[this.TargetSequence].X = X
+		this.StaticButtons[this.TargetSequence].Y = Y
+		this.StaticButtons[this.TargetSequence].Color = sequences[this.TargetSequence].StaticColors[X].Color
+		this.StaticButtons[this.TargetSequence].SelectedColor = sequences[this.TargetSequence].StaticColors[X].SelectedColor
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Red %02d", sequences[this.SelectedSequence].StaticColors[X].Color.R), "red", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Green %02d", sequences[this.SelectedSequence].StaticColors[X].Color.G), "green", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", sequences[this.SelectedSequence].StaticColors[X].Color.B), "blue", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Red %02d", sequences[this.TargetSequence].StaticColors[X].Color.R), "red", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Green %02d", sequences[this.TargetSequence].StaticColors[X].Color.G), "green", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", sequences[this.TargetSequence].StaticColors[X].Color.B), "blue", false, guiButtons)
 
 		// Tell the sequence about the new color and where we are in the
 		// color cycle.
@@ -1799,19 +1793,19 @@ func ProcessButtons(X int, Y int,
 				{Name: "Static", Value: true},
 				{Name: "StaticLamp", Value: X},
 				{Name: "StaticLampFlash", Value: true},
-				{Name: "SelectedColor", Value: sequences[this.SelectedSequence].StaticColors[X].SelectedColor},
-				{Name: "StaticColor", Value: sequences[this.SelectedSequence].StaticColors[X].Color},
+				{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[X].SelectedColor},
+				{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[X].Color},
 			},
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		this.LastStaticColorButtonX = X
 		this.LastStaticColorButtonY = Y
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
-			sequences[this.SelectedSequence].StaticColors[x].FirstPress = false
+			sequences[this.TargetSequence].StaticColors[x].FirstPress = false
 		}
-		sequences[this.SelectedSequence].StaticColors[X].FirstPress = true
+		sequences[this.TargetSequence].StaticColors[X].FirstPress = true
 
 		return
 	}
@@ -1821,15 +1815,12 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode {
 
-		var targetSequence int
-		var displaySequence int
-
 		if this.SelectMode[this.SelectedSequence] == CHASER {
-			targetSequence = this.ChaserSequenceNumber
-			displaySequence = this.SelectedSequence
+			this.TargetSequence = this.ChaserSequenceNumber
+			this.DisplaySequence = this.SelectedSequence
 		} else {
-			targetSequence = this.SelectedSequence
-			displaySequence = this.SelectedSequence
+			this.TargetSequence = this.SelectedSequence
+			this.DisplaySequence = this.SelectedSequence
 		}
 
 		if debug {
@@ -1843,22 +1834,23 @@ func ProcessButtons(X int, Y int,
 				{Name: "SelectPattern", Value: X},
 			},
 		}
-		common.SendCommandToSequence(targetSequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		this.SelectMode[displaySequence] = NORMAL
+		this.SelectMode[this.DisplaySequence] = NORMAL
 
 		// Get an upto date copy of the sequence.
-		sequences[targetSequence] = common.RefreshSequence(targetSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
-		ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[targetSequence], displaySequence, eventsForLaunchpad, guiButtons)
+		ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		return
 	}
 
 	// F U N C T I O N  K E Y S
 	if X >= 0 && X < 8 &&
+		//!this.EditStaticColorsMode[this.TargetSequence] &&
 		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
 		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
@@ -1995,7 +1987,7 @@ func ShowFixtureStatus(selectedSequence int, sequence common.Sequence, this *Cur
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
-func ShowRGBColorSelectionButtons(master int, targetSequenceNumber int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("Show Color Selection Buttons\n")
@@ -2134,7 +2126,7 @@ func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence
 // For the given sequence show the available patterns on the relevant buttons.
 // mySequenceDisplayNumber is the sequence whos buttons you want the pattern selection to show on.
 // master is the master brightness for the same buttons.
-// targetSequence - is the squence you are updating the pattern, this could be different in the case
+// this.TargetSequence - is the squence you are updating the pattern, this could be different in the case
 // of scanner shutter chaser sequence which doesn't have it's own buttons.
 func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
@@ -2413,7 +2405,8 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
 		this.EditSequenceColorsMode = false
-		this.EditStaticColorsMode = false
+		this.EditStaticColorsMode[this.DisplaySequence] = false
+		this.EditStaticColorsMode[this.TargetSequence] = false
 		this.EditGoboSelectionMode = false
 		this.EditPatternMode = false
 		for function := range this.Functions {

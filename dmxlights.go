@@ -75,10 +75,11 @@ func main() {
 	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
 	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
+	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
 	this.EditSequenceColorsMode = false                            // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
-	this.EditStaticColorsMode = false                              // Remember when we are in editing static colors mode.
+	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
 	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
