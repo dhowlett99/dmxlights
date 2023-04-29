@@ -35,7 +35,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER {
 		this.TargetSequence = this.ChaserSequenceNumber

@@ -32,7 +32,7 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 
 func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER {
 		this.TargetSequence = this.ChaserSequenceNumber
