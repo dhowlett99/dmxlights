@@ -159,7 +159,7 @@ type StaticColorButton struct {
 	FirstPress    bool
 }
 
-type ScannerState struct {
+type FixtureState struct {
 	Enabled  bool
 	Inverted bool
 }
@@ -233,7 +233,6 @@ const (
 	UpdateAutoPattern
 	AutoPattern
 	ToggleFixtureState
-	FixtureState
 	UpdateRGBShift
 	UpdateRGBInvert
 	UpdateScannerShift
@@ -247,7 +246,6 @@ const (
 	UpdateNumberCoordinates
 	UpdateOffsetPan
 	UpdateOffsetTilt
-	EnableAllScanners
 	UpdateScannerChase
 	UpdateMusicTrigger
 	UpdateScannerHasShutterChase
@@ -346,7 +344,7 @@ type Sequence struct {
 	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
-	ScannerState                map[int]ScannerState        // Map of fixtures which are disabled.
+	FixtureState                map[int]FixtureState        // Map of fixtures which are disabled.
 	DisableOnceMutex            *sync.RWMutex               // Lock to protect DisableOnce.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
@@ -365,7 +363,6 @@ type Function struct {
 	SequenceNumber int
 	Number         int
 	State          bool
-	State2         bool
 	Flash          bool
 	Label          string
 }
@@ -397,6 +394,7 @@ type FixtureCommand struct {
 	NumberSteps    int
 	Type           string
 	SequenceNumber int
+	FixtureState   FixtureState
 
 	// Common commands.
 	Strobe      bool
@@ -418,7 +416,6 @@ type FixtureCommand struct {
 	// Scanner Commands.
 	ScannerColor             int
 	ScannerPosition          Position
-	ScannerState             ScannerState
 	ScannerDisableOnce       bool
 	ScannerChaser            bool
 	ScannerAvailableColors   []StaticColorButton
@@ -504,8 +501,8 @@ const (
 	Function8_Music_Trigger = 7 // Music trigger on and off. Both RGB and scanners.
 )
 
-func SendCommandToSequence(selectedSequence int, command Command, commandChannels []chan Command) {
-	commandChannels[selectedSequence] <- command
+func SendCommandToSequence(targetSequence int, command Command, commandChannels []chan Command) {
+	commandChannels[targetSequence] <- command
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
@@ -524,36 +521,36 @@ func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, comm
 	}
 }
 
-func SendCommandToAllSequenceExcept(selectedSequence int, command Command, commandChannels []chan Command) {
+func SendCommandToAllSequenceExcept(targetSequence int, command Command, commandChannels []chan Command) {
 	for index := range commandChannels {
-		if index != selectedSequence {
+		if index != targetSequence {
 			commandChannels[index] <- command
 		}
 	}
 }
 
-func SetMode(selectedSequence int, commandChannels []chan Command, mode string) {
+func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
 	cmd := Command{
 		Action: UpdateMode,
 		Args: []Arg{
 			{Name: "Mode", Value: mode},
 		},
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
-func RevealSequence(selectedSequence int, commandChannels []chan Command) {
+func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: UnHide,
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
-func HideSequence(selectedSequence int, commandChannels []chan Command) {
+func HideSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: Hide,
 	}
-	SendCommandToSequence(selectedSequence, cmd, commandChannels)
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and

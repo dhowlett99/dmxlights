@@ -268,7 +268,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
 		// Calulate positions for each RGB fixture.
 		sequence.Optimisation = false
-		sequence.ScannerState = map[int]common.ScannerState{
+		sequence.FixtureState = map[int]common.FixtureState{
 			0: {
 				Enabled: true,
 			},

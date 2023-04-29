@@ -74,12 +74,13 @@ func main() {
 	this.OffsetTilt = common.ScannerMidPoint                       // Start tilt from the center.
 	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
-	this.FunctionSelectMode = make([]bool, NumberOfSequences)      // Initialise four function mode states.
-	this.EditSequenceColorsMode = make([]bool, NumberOfSequences)  // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = make([]bool, NumberOfSequences)   // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = make([]bool, NumberOfSequences)   // Remember when we are in selecting gobo mode.
+	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
+	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
+	this.EditSequenceColorsMode = false                            // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
-	this.EditPatternMode = make([]bool, NumberOfSequences)         // Remember when we are in editing pattern mode.
+	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
 	this.Speed = make(map[int]int, NumberOfSequences)              // Initialise storage for four sequences.
@@ -107,14 +108,14 @@ func main() {
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
 	// Initialize eight fixture states for the four sequences.
-	this.ScannerState = make([][]common.ScannerState, 9)
+	this.FixtureState = make([][]common.FixtureState, 9)
 	for x := 0; x < 9; x++ {
-		this.ScannerState[x] = make([]common.ScannerState, 9)
+		this.FixtureState[x] = make([]common.FixtureState, 9)
 		for y := 0; y < 9; y++ {
-			newScanner := common.ScannerState{}
+			newScanner := common.FixtureState{}
 			newScanner.Enabled = true
 			newScanner.Inverted = false
-			this.ScannerState[x][y] = newScanner
+			this.FixtureState[x][y] = newScanner
 		}
 	}
 
@@ -263,8 +264,19 @@ func main() {
 			this.FunctionLabels[3] = "Scanner\nBounce"
 			this.FunctionLabels[4] = "Scanner\nColor"
 			this.FunctionLabels[5] = "Scanner\nGobo"
-			this.FunctionLabels[6] = "Chaser"
+			this.FunctionLabels[6] = "Scanner\nShutter\nChaser"
 			this.FunctionLabels[7] = "Scanner\nMusic"
+		}
+
+		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
+			this.FunctionLabels[0] = "Chaser\nPatten"
+			this.FunctionLabels[1] = "Chaser\nAuto\nColor"
+			this.FunctionLabels[2] = "Chaser\nAuto\nPatten"
+			this.FunctionLabels[3] = "Chaser\nBounce"
+			this.FunctionLabels[4] = "Chaser\nColor"
+			this.FunctionLabels[5] = "Chaser\nStatic\nColor"
+			this.FunctionLabels[6] = "Chaser\nInvert"
+			this.FunctionLabels[7] = "Chaser\nMusic"
 		}
 
 		// Make functions for each of the sequences.
