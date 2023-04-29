@@ -171,7 +171,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
+		//sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
 		if debug {
@@ -191,8 +191,8 @@ func ProcessButtons(X int, Y int,
 		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
 		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
 		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
-		pan := flashSequence.Pattern.Steps[X].Fixtures[X].Pan
-		tilt := flashSequence.Pattern.Steps[X].Fixtures[X].Tilt
+		pan := 128
+		tilt := 128
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
 		rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
 		music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
@@ -205,7 +205,9 @@ func ProcessButtons(X int, Y int,
 		if gui {
 			time.Sleep(200 * time.Millisecond)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(false, false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			brightness := 0
+			master := 0
+			fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		}
 
 		return
@@ -220,7 +222,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
+		//sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
 		if debug {
@@ -229,8 +231,24 @@ func ProcessButtons(X int, Y int,
 
 		X = X - 100
 
+		red := 0
+		green := 0
+		blue := 0
+		white := 0
+		amber := 0
+		uv := 0
+		pan := 128
+		tilt := 128
+		shutter := 0
+		rotate := 0
+		music := 0
+		gobo := 0
+		program := 0
+		brightness := 0
+		master := 0
+
 		common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, dmxController, X, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		return
 	}
 
