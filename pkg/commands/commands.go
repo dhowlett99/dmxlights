@@ -168,16 +168,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
 		}
-		sequence.Hide = true
+		if !sequence.Hidden {
+			sequence.Hide = true
+			sequence.Hidden = true
+		}
 		return sequence
 
 	case common.UnHide:
 		if debug {
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
-		sequence.PlayStaticOnce = true
-		sequence.PlaySwitchOnce = true
-		sequence.Hide = false
+		if sequence.Hidden {
+			sequence.Hide = false
+			sequence.Hidden = false
+			sequence.PlayStaticOnce = true
+			sequence.PlaySwitchOnce = true
+		}
+
 		return sequence
 
 	case common.UpdateSpeed:
@@ -290,8 +297,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Stop\n", mySequenceNumber)
 		}
-		//sequence.Functions[common.Function8_Music_Trigger].State = false
-		//sequence.Functions[common.Function6_Static_Gobo].State = false
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Static = false
@@ -409,6 +414,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
+		sequence.StaticFadeOnce = true
+		sequence.Hidden = false
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Run = false
 		return sequence
@@ -756,6 +763,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence = seq
 				// Assume we're blacked out.
 				sequence.Blackout = true
+				sequence.StaticFadeOnce = true
 				sequence.PlayStaticOnce = true
 				sequence.PlaySwitchOnce = true
 				return sequence

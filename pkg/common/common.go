@@ -322,6 +322,7 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
+	StaticFadeOnce              bool                        // Only Fade up once, used for don't fade during color config operations.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
 	LastStatic                  bool                        // Last value of static before flood.
@@ -357,6 +358,7 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBCoordinates              int                         // Number of coordinates in RGB fade.
+	Hidden                      bool                        // Is this sequence hidden on the launchpad.
 }
 
 type Function struct {
@@ -1180,9 +1182,42 @@ func Reverse(in int) int {
 		return 1
 	case 10:
 		return 0
+	default:
+		return 10
 	}
+}
 
-	return 10
+func Reverse12(in int) int {
+	switch in {
+	case 0:
+		return 12
+	case 1:
+		return 11
+	case 2:
+		return 10
+	case 3:
+		return 9
+	case 4:
+		return 8
+	case 5:
+		return 7
+	case 6:
+		return 6
+	case 7:
+		return 5
+	case 8:
+		return 4
+	case 9:
+		return 3
+	case 10:
+		return 2
+	case 11:
+		return 1
+	case 12:
+		return 0
+	default:
+		return 12
+	}
 }
 
 // CalculateFadeValues - calculate fade curve values.

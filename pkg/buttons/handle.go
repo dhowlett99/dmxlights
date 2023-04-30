@@ -371,7 +371,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// We're in Scanner Gobo Selection Mode.
-		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State && sequences[this.SelectedSequence].Type == "scanner" {
+		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
+			!this.EditStaticColorsMode[this.EditWhichSequenceStatic] &&
+			sequences[this.SelectedSequence].Type == "scanner" {
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditGoboSelectionMode = false
 		}

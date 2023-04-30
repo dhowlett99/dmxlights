@@ -170,8 +170,8 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
+		!this.EditStaticColorsMode[this.EditWhichSequenceStatic] &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		//sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
 		this.SelectedType = sequences[Y].Type
