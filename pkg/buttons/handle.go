@@ -184,8 +184,25 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		if this.SelectMode[this.SelectedSequence] == NORMAL &&
-			this.Functions[this.SelectedSequence][common.Function5_Color].State && this.EditSequenceColorsMode {
-			unSetEditSequenceColorsMode(sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+			this.Functions[this.EditWhichSequence][common.Function5_Color].State &&
+			this.EditSequenceColorsMode {
+
+			fmt.Printf("Color Edit Mode Off for sequence %d\n", this.SelectedSequence)
+
+			// Reset the color function key.
+			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+
+			// And reveal the sequence on the launchpad keys
+			common.RevealSequence(this.SelectedSequence, commandChannels)
+
+			// Turn off the function mode flag.
+			this.SelectMode[this.SelectedSequence] = NORMAL
+
+			// Now forget we pressed twice and start again.
+			this.SelectButtonPressed[this.SelectedSequence] = true
+
+			common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
 		}
 
 		// Tailor the top buttons to the sequence type.
@@ -341,14 +358,16 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// We're in RGB Color Selection Mode.
-		if this.Functions[this.SelectedSequence][common.Function5_Color].State && sequences[this.SelectedSequence].Type == "rgb" {
+		if this.Functions[this.EditWhichSequence][common.Function5_Color].State {
 			if debug {
 				fmt.Printf("Show RGB Sequence Color Selection Buttons\n")
 			}
+			// Turn off the color selection function key.
+			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 			// Set the colors.
-			sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
+			sequences[this.EditWhichSequence].CurrentColors = sequences[this.EditWhichSequence].SequenceColors
 			// Show the colors
-			ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.SelectedSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+			ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 			return
 		}
 
@@ -372,7 +391,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// We're in Scanner Gobo Selection Mode.
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-			!this.EditStaticColorsMode[this.EditWhichSequenceStatic] &&
+			!this.EditStaticColorsMode[this.EditWhichSequence] &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditGoboSelectionMode = false
@@ -423,6 +442,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
+		// Turn off the edit sequence colors button.
+		if this.EditSequenceColorsMode {
+			this.EditSequenceColorsMode = false
+			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+		}
+
 		// Remove the function pads.
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
@@ -431,7 +456,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Are we in function mode ?
-	if this.SelectMode[this.SelectedSequence] == FUNCTION {
+	if this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
 		if debug {
 			fmt.Printf("%d: Handle 3\n", this.SelectedSequence)
 		}
@@ -452,7 +477,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Turn off the edit sequence colors button.
 		if this.EditSequenceColorsMode {
 			this.EditSequenceColorsMode = false
-			this.Functions[this.TargetSequence][common.Function5_Color].State = false
+			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 		}
 
 		// Now forget we pressed twice and start again.

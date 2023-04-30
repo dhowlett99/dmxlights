@@ -18,28 +18,27 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
-	if this.Functions[this.SelectedSequence][common.Function5_Color].State &&
-		sequences[this.SelectedSequence].Type != "scanner" {
+	if this.EditSequenceColorsMode {
 
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
 			Action: common.ClearSequenceColor,
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.EditWhichSequence, cmd, commandChannels)
 
 		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+		sequences[this.EditWhichSequence] = common.RefreshSequence(this.EditWhichSequence, commandChannels, updateChannels)
 
 		// Flash the correct color buttons
-		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.SelectedSequence], this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		return
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.EditWhichSequenceStatic] {
+	if this.EditStaticColorsMode[this.EditWhichSequence] {
 
-		this.TargetSequence = this.EditWhichSequenceStatic
+		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
 
 		// Back to the begining of the rotation.

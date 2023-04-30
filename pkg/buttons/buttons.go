@@ -73,7 +73,7 @@ type CurrentState struct {
 	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditWhichSequenceStatic   int                        // Which sequence is currently be edited
+	EditWhichSequence         int                        // Which sequence is currently being edited.
 	EditPatternMode           bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode  bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness          int                        // Affects all DMX fixtures and launchpad lamps.
@@ -170,7 +170,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditStaticColorsMode[this.EditWhichSequenceStatic] &&
+		!this.EditStaticColorsMode[this.EditWhichSequence] &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -1777,13 +1777,13 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		this.EditStaticColorsMode[this.EditWhichSequenceStatic] { // Static Function On in any sequence
+		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in any sequence
 
 		if debug {
 			fmt.Printf("Update Static for X %d\n", X)
 		}
 
-		this.TargetSequence = this.EditWhichSequenceStatic
+		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
 
 		// For this button increment the color.
@@ -1875,8 +1875,8 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// F U N C T I O N  K E Y S
-	if X >= 0 && X < 8 &&
-		//!this.EditStaticColorsMode[this.TargetSequence] &&
+	if X >= 0 && X < 8 && Y >= 0 && Y < 3 &&
+		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
 		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
@@ -1929,28 +1929,6 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 	}
 	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
-}
-
-func unSetEditSequenceColorsMode(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command,
-	eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
-
-	// Turn off the edit colors bar.
-	this.Functions[this.SelectedSequence][common.Function5_Color].State = false
-
-	// Restart the sequence.
-	// cmd := common.Command{
-	// 	Action: common.Start,
-	// }
-	// common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-	// And reveal the sequence on the launchpad keys
-	common.RevealSequence(this.SelectedSequence, commandChannels)
-	// Turn off the function mode flag.
-	this.SelectMode[this.SelectedSequence] = NORMAL
-	// Now forget we pressed twice and start again.
-	this.SelectButtonPressed[this.SelectedSequence] = true
-
-	common.HideColorSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 }
 
 func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {

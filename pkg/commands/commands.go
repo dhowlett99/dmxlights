@@ -237,7 +237,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
 		}
-		sequence.RGBSize = command.Args[START].Value.(int)
+		sequence.RGBSize = getSize(command.Args[START].Value.(int))
 		return sequence
 
 	case common.UpdateScannerSize:
@@ -895,4 +895,31 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 	}
 
 	return newSwitchList
+}
+
+func getSize(size int) int {
+
+	switch size {
+	case 1:
+		return 1
+	case 2:
+		return 5
+	case 3:
+		return 15
+	case 4:
+		return 25
+	case 5:
+		return 35
+	case 6:
+		return 45
+	case 7:
+		return 55
+	case 8:
+		return 65
+	case 9:
+		return 75
+	case 10:
+		return 85
+	}
+	return 0
 }

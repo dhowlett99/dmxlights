@@ -232,6 +232,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Set the colors.
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
+		// Remember which sequence we are editing
+		this.EditWhichSequence = this.TargetSequence
+
 		// Show the colors
 		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 		return
@@ -257,6 +260,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.EditFixtureSelectionMode = true
 		this.SelectMode[this.TargetSequence] = FUNCTION
 		sequences[this.TargetSequence].StaticColors[X].FirstPress = false
+
+		// Remember which sequence we are editing
+		this.EditWhichSequence = this.TargetSequence
 
 		this.FollowingAction = "ShowScannerColorSelectionButtons"
 		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.TargetSequence], this.DisplaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
@@ -300,7 +306,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.RevealSequence(this.TargetSequence, commandChannels)
 
 		// Remember which sequence we are editing
-		this.EditWhichSequenceStatic = this.TargetSequence
+		this.EditWhichSequence = this.TargetSequence
 
 		return
 	}
