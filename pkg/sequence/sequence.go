@@ -365,14 +365,14 @@ func PlaySequence(sequence common.Sequence,
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
-			// Soft start
-			// Calulate the steps
-			fadeUpValues := common.GetFadeValues(32, float64(sequence.Master), sequence.RGBFade, false)
-
 			// Now Fade up
 			if sequence.StaticFadeOnce {
-				for _, fade := range fadeUpValues {
+				// Soft start
 
+				// Calulate the steps
+				fadeUpValues := common.GetFadeValues(32, float64(sequence.Master), sequence.RGBFade, false)
+
+				for _, fade := range fadeUpValues {
 					// Prepare a message to be sent to the fixtures in the sequence.
 					command := common.FixtureCommand{
 						Type:            sequence.Type,
