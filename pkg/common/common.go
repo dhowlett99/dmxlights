@@ -406,6 +406,7 @@ type FixtureCommand struct {
 	Blackout    bool
 	Hide        bool
 	Clear       bool
+	FadeSpeed   int
 
 	StartFlood bool
 	StopFlood  bool

@@ -70,12 +70,14 @@ type Action struct {
 	RotateSpeed string   `yaml:"rotatespeed"`
 	Program     string   `yaml:"program"`
 	Strobe      string   `yaml:"strobe"`
+	FadeSpeed   int      `yaml:"-"`
 }
 
 type ActionConfig struct {
 	Name          string
 	Colors        []common.Color
 	Fade          int
+	FadeSpeed     int
 	Size          int
 	Speed         time.Duration
 	TriggerState  bool
@@ -243,7 +245,7 @@ func FixtureReceiver(
 		sequence.StrobeSpeed = cmd.StrobeSpeed
 
 		if cmd.SetSwitch && sequence.Type == "switch" {
-			MapSwitchFixture(cmd.SwitchData, cmd.State, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+			MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 			continue
 		}
 
@@ -812,6 +814,7 @@ func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxI
 // The switch is idendifed by the sequence and switch number.
 func MapSwitchFixture(swiTch common.Switch,
 	state common.State,
+	fadeSpeed int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
 	brightness int, master int,
@@ -825,7 +828,7 @@ func MapSwitchFixture(swiTch common.Switch,
 	var useFixtureLabel string
 
 	if debug {
-		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d\n", swiTch.Number, swiTch.CurrentPosition)
+		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d fade speed %d\n", swiTch.Number, swiTch.CurrentPosition, fadeSpeed)
 	}
 
 	// We start by having the switch and its current state passed in.
@@ -884,6 +887,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.RotateSpeed = action.RotateSpeed
 			newAction.Program = action.Program
 			newAction.Strobe = action.Strobe
+			newAction.FadeSpeed = fadeSpeed
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 		}
 

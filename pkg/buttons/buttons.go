@@ -798,6 +798,8 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
+			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 		}
 
 		// Update the status bar
@@ -855,6 +857,8 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
+			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 		}
 
 		// Update the status bar
@@ -2248,9 +2252,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Preserve this.Blackout.
-	if !this.Blackout {
+	if this.Blackout {
 		cmd := common.Command{
-			Action: common.Normal,
+			Action: common.Blackout,
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
 	}

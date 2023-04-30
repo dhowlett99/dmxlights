@@ -302,7 +302,7 @@ func PlaySequence(sequence common.Sequence,
 			if debug {
 				fmt.Printf("sequence %d Play single switch mode\n", mySequenceNumber)
 			}
-			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
+			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, sequence.Speed, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
@@ -702,6 +702,7 @@ func PlaySequence(sequence common.Sequence,
 							Rotate:                   sequence.Rotate,
 							StrobeSpeed:              sequence.StrobeSpeed,
 							Strobe:                   sequence.Strobe,
+							FadeSpeed:                sequence.Speed,
 							Master:                   sequence.Master,
 							Blackout:                 sequence.Blackout,
 							Hide:                     sequence.Hide,
@@ -807,7 +808,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 	}
 }
 
-func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
+func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, fadeSpeed int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
 	switchChannels []common.SwitchChannel, SoundTriggers []*common.Trigger, soundConfig *sound.SoundConfig, dmxInterfacePresent bool) {
 
@@ -827,7 +828,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, sequence *common.
 	common.LabelButton(currentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
 
 	// Now play all the values for this state.
-	fixture.MapSwitchFixture(swiTch, state, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+	fixture.MapSwitchFixture(swiTch, state, fadeSpeed, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 
 }
 
