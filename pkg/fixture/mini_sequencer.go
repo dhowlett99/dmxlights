@@ -199,12 +199,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		fadeUpValues := common.GetFadeValues(32, float64(master), 1, false)
 
 		// Now Fade up
-		for _, fade := range fadeUpValues {
-			common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
-			MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
-			// Control how long the fade take with the speed control.
-			time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(cfg.FadeSpeed))))
-		}
+		go func() {
+			for _, fade := range fadeUpValues {
+				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+				// Control how long the fade take with the speed control.
+				time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(cfg.FadeSpeed))))
+			}
+		}()
 		return
 	}
 
