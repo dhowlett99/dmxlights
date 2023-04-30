@@ -532,15 +532,15 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 	}
 }
 
-func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
-	cmd := Command{
-		Action: UpdateMode,
-		Args: []Arg{
-			{Name: "Mode", Value: mode},
-		},
-	}
-	SendCommandToSequence(targetSequence, cmd, commandChannels)
-}
+// func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
+// 	cmd := Command{
+// 		Action: UpdateMode,
+// 		Args: []Arg{
+// 			{Name: "Mode", Value: mode},
+// 		},
+// 	}
+// 	SendCommandToSequence(targetSequence, cmd, commandChannels)
+// }
 
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{

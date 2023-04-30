@@ -420,19 +420,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = false
 		return sequence
 
-	case common.UpdateMode:
-		const MODE = 0
-		if debug {
-			fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Args[MODE].Value)
-		}
-		sequence.Mode = command.Args[MODE].Value.(string)
-		if sequence.Mode == "Static" {
-			sequence.Static = true
-		}
-		if sequence.Mode == "Sequence" {
-			sequence.Static = false
-		}
-		return sequence
+	// case common.UpdateMode:
+	// 	const MODE = 0
+	// 	if debug {
+	// 		fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Args[MODE].Value)
+	// 	}
+	// 	sequence.Mode = command.Args[MODE].Value.(string)
+	// 	if sequence.Mode == "Static" {
+	// 		sequence.Static = true
+	// 	}
+	// 	if sequence.Mode == "Sequence" {
+	// 		sequence.Static = false
+	// 	}
+	// 	return sequence
 
 	case common.UpdateStaticColor:
 		const STATIC = 0            // Boolean

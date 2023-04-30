@@ -214,13 +214,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = FUNCTION
 
 		// If static, show static colors.
-		if this.EditStaticColorsMode[this.TargetSequence] {
-			if debug {
-				fmt.Printf("Show Static Color Selection Buttons\n")
-			}
-			common.SetMode(this.TargetSequence, commandChannels, "Static")
-			//this.EditStaticColorsMode = false
-		}
+		// if this.EditStaticColorsMode[this.TargetSequence] {
+		// 	if debug {
+		// 		fmt.Printf("Show Static Color Selection Buttons\n")
+		// 	}
+		// 	common.SetMode(this.TargetSequence, commandChannels, "Static")
+		// 	//this.EditStaticColorsMode = false
+		// }
 
 		// And hide the sequence so we can only see the function buttons.
 		common.HideSequence(this.SelectedSequence, commandChannels)
@@ -231,7 +231,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Turn off any static sequence so we can see the functions.
-		common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
+		//common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
 
 		// Turn off any previous function bars.
 		for sequenceNumber := range sequences {
@@ -360,7 +360,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				if debug {
 					fmt.Printf("Show RGB Static Colors for sequence %d\n", sequenceNumber)
 				}
-				common.SetMode(sequenceNumber, commandChannels, "Static")
+				//common.SetMode(sequenceNumber, commandChannels, "Static")
 				common.RevealSequence(sequenceNumber, commandChannels)
 				//this.EditStaticColorsMode = false
 				static = true
