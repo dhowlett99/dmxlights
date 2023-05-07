@@ -128,37 +128,19 @@ func Test_getNumberOfFixtures(t *testing.T) {
 				sequenceNumber:     1,
 				fixtures: &fixture.Fixtures{
 					Fixtures: []fixture.Fixture{
-						{Name: "fixture1", Number: 1, Group: 2, NumberChannels: 8, Channels: eightColorChannels},
-						{Name: "fixture2", Number: 2, Group: 2, NumberChannels: 8, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, NumberChannels: 8, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, NumberChannels: 8, Channels: eightColorChannels},
+						{Name: "fixture1", Number: 1, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
+						{Name: "fixture2", Number: 2, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
+						{Name: "fixture3", Number: 3, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
+						{Name: "fixture3", Number: 3, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
 					},
 				},
 			},
 			want: 8,
 		},
-
-		{
-			// Uplighters with OUT their use_channels set to 8.
-			name: "four uplighters with 8 sub fixtures so 32 in all.",
-			args: args{
-				sequenceNumber:     1,
-				allPosibleFixtures: true,
-				fixtures: &fixture.Fixtures{
-					Fixtures: []fixture.Fixture{
-						{Name: "fixture1", Number: 1, Group: 2, Channels: eightColorChannels},
-						{Name: "fixture2", Number: 2, Group: 2, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, Channels: eightColorChannels},
-					},
-				},
-			},
-			want: 32,
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getNumberOfFixtures(tt.args.sequenceNumber, tt.args.fixtures, tt.args.allPosibleFixtures); got != tt.want {
+			if got := getNumberOfFixtures(tt.args.sequenceNumber, tt.args.fixtures); got != tt.want {
 				t.Errorf("getNumberOfFixtures() got=%+v, want=%+v", got, tt.want)
 			}
 		})

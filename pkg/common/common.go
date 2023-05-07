@@ -26,6 +26,8 @@ import (
 )
 
 const debug = false
+
+const MaxNumberChannelsInSequence = 8
 const MaxDMXAddress = 512
 const MaxTextEntryLength = 35
 const DefaultScannerSize = 60

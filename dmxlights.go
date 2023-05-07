@@ -21,6 +21,7 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
+	"strings"
 	"sync"
 	"syscall"
 	"time"
@@ -202,6 +203,21 @@ func main() {
 			if sequence.Group == fixture.Group {
 				fixturesConfig.Fixtures[fixtureNumber].Type = sequence.Type
 			}
+		}
+	}
+
+	for fixtureNumber, fixture := range fixturesConfig.Fixtures {
+		// Automatically set the number of sub fixtures inside a fixture.
+		var numberSubFixtures int
+		for _, channel := range fixture.Channels {
+			if strings.Contains(channel.Name, "Red") {
+				numberSubFixtures++
+			}
+		}
+		if numberSubFixtures > 1 {
+			fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
+			fixturesConfig.Fixtures[fixtureNumber].MultiFixtureDevice = true
+			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
 		}
 	}
 

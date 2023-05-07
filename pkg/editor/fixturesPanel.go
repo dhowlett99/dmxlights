@@ -241,7 +241,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		newItem.Type = f.Type
 		newItem.Channels = f.Channels
 		newItem.States = f.States
-		newItem.NumberChannels = f.NumberChannels
+		newItem.MultiFixtureDevice = f.MultiFixtureDevice
 		newItem.UseFixture = f.UseFixture
 		fp.FixtureList = append(fp.FixtureList, newItem)
 	}
@@ -1148,7 +1148,7 @@ func makeNewFixture(data [][]string, i widget.TableCellID, field int, value stri
 	// Set up the pointers to further data.
 	newFixture.Channels = fixtureList[i.Row].Channels
 	newFixture.States = fixtureList[i.Row].States
-	newFixture.NumberChannels = fixtureList[i.Row].NumberChannels
+	newFixture.MultiFixtureDevice = fixtureList[i.Row].MultiFixtureDevice
 	newFixture.UseFixture = fixtureList[i.Row].UseFixture
 
 	// Now setup the new selected value.

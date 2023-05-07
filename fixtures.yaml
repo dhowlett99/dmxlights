@@ -229,7 +229,6 @@ fixtures:
   type: rgb
   group: 1
   address: 100
-  use_channels: 8
   channels:
   - number: 1
     name: Red1
@@ -265,7 +264,6 @@ fixtures:
   type: rgb
   group: 1
   address: 114
-  use_channels: 8
   channels:
   - number: 1
     name: Red5
@@ -354,7 +352,6 @@ fixtures:
     name: Blue8
   - number: 26
     name: Strobe
-  use_channels: 8
 - id: 12
   name: Uplighter2
   label: RAIL2
@@ -416,7 +413,6 @@ fixtures:
     name: Blue8
   - number: 26
     name: Strobe
-  use_channels: 8
 - id: 13
   name: Uplighter3
   label: RAIL3
@@ -478,7 +474,6 @@ fixtures:
     name: Blue8
   - number: 26
     name: Strobe
-  use_channels: 8
 - id: 14
   name: Uplighter4
   label: RAIL4
@@ -495,7 +490,7 @@ fixtures:
   - number: 3
     name: Blue1
   - number: 4
-    name: Blue5
+    name: Red2
   - number: 5
     name: Green2
   - number: 6
@@ -536,7 +531,6 @@ fixtures:
     name: Green8
   - number: 24
     name: Blue8
-  use_channels: 8
 - id: 15
   name: Scanner 1
   label: ADJ.Com.Scan1
@@ -1033,111 +1027,6 @@ fixtures:
       number: 1
       value: "255"
 - id: 22
-  name: Scanner 8
-  label: ADJ.Inno.Spot3
-  number: 8
-  description: American DJ Inno Pocket Spot
-  type: scanner
-  group: 3
-  address: 455
-  channels:
-  - number: 1
-    name: Pan
-    maxdegrees: 540
-  - number: 2
-    name: FinePan
-  - number: 3
-    name: Tilt
-    maxdegrees: 230
-  - number: 4
-    name: FineTilt
-  - number: 5
-    name: Color
-    settings:
-    - name: White
-      number: 1
-      value: "0"
-    - name: Red
-      number: 2
-      value: "8"
-    - name: Orange
-      number: 3
-      value: "15"
-    - name: Yellow
-      number: 4
-      value: "22"
-    - name: Green
-      number: 5
-      value: "29"
-    - name: Blue
-      number: 6
-      value: "36"
-    - name: Light Blue
-      number: 7
-      value: "43"
-    - name: Pink
-      number: 8
-      value: "50"
-  - number: 6
-    name: Gobo
-    settings:
-    - name: Open
-      number: 1
-      value: "0"
-    - name: Gobo 1
-      number: 2
-      value: "8"
-    - name: Gobo 2
-      number: 3
-      value: "16"
-    - name: Gobo 3
-      number: 4
-      value: "24"
-    - name: Gobo 4
-      number: 5
-      value: "32"
-    - name: Gobo 5
-      number: 6
-      value: "40"
-    - name: Gobo 6
-      number: 7
-      value: "48"
-    - name: Gobo 7
-      number: 8
-      value: "56"
-  - number: 7
-    name: Shutter
-    settings:
-    - name: Open
-      number: 1
-      value: 248-255
-    - name: Closed
-      number: 2
-      value: "0"
-    - name: Strobe
-      number: 3
-      value: 16-131
-  - number: 8
-    name: Master
-  - number: 9
-    name: Speed
-    settings:
-    - name: Fast
-      number: 1
-      value: "255"
-  - number: 10
-    name: SoundActive
-    settings:
-    - name: "Off"
-      number: 1
-      value: "1"
-  - number: 11
-    name: DimmerCurves
-    settings:
-    - name: Default Curve
-      number: 1
-      value: "255"
-- id: 23
   name: ADJ QA PAR 38
   label: par38
   number: 1
@@ -1213,8 +1102,7 @@ fixtures:
     - name: Color Change 4
       number: 5
       value: "48"
-  use_channels: 8
-- id: 24
+- id: 23
   name: ADJ Dekker1
   label: dekker1
   number: 1
@@ -1302,7 +1190,7 @@ fixtures:
     - name: Sound Active
       number: 3
       value: "255"
-- id: 25
+- id: 24
   name: ADJ Dekker2
   label: dekker2
   number: 1
@@ -1390,7 +1278,7 @@ fixtures:
     - name: Sound Active
       number: 3
       value: "255"
-- id: 26
+- id: 25
   name: Oil
   label: Oil1
   number: 1
@@ -1408,7 +1296,7 @@ fixtures:
     - name: "On"
       number: 2
       value: "255"
-- id: 27
+- id: 26
   name: Vue1.1
   label: vue
   number: 1
@@ -1464,7 +1352,7 @@ fixtures:
     name: Speed
   - number: 6
     name: Master Reverse
-- id: 28
+- id: 27
   name: ADJ MegaBar
   label: megabar
   number: 1
@@ -1500,7 +1388,7 @@ fixtures:
       value: 16-255
   - number: 7
     name: Master
-- id: 29
+- id: 28
   name: Deluge
   label: deluge
   number: 1
@@ -1573,7 +1461,7 @@ fixtures:
       labe: Antilockwise  Slow to Fast
       number: 9
       value: 197-255
-- id: 30
+- id: 29
   name: 'Flames '
   label: flames
   number: 1
@@ -1593,7 +1481,7 @@ fixtures:
       labe: "On"
       number: 2
       value: "255"
-- id: 31
+- id: 30
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1640,7 +1528,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: Oil1
-- id: 32
+- id: 31
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1675,7 +1563,7 @@ fixtures:
       value: "On"
     flash: false
   use_fixture: flames
-- id: 33
+- id: 32
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1774,7 +1662,7 @@ fixtures:
       value: "75"
     flash: false
   use_fixture: deluge
-- id: 34
+- id: 33
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1980,7 +1868,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: vue
-- id: 35
+- id: 34
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -2158,7 +2046,7 @@ fixtures:
       value: "0"
     flash: false
   use_fixture: par38
-- id: 36
+- id: 35
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -2330,7 +2218,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker1
-- id: 37
+- id: 36
   name: switch7
   label: SW7.DERBY
   number: 7
@@ -2502,7 +2390,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker2
-- id: 38
+- id: 37
   name: switch8
   label: SW8.Booth
   number: 8

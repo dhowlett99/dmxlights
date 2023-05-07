@@ -139,9 +139,9 @@ func CreateSequence(
 	if sequenceLabel == "chaser" {
 		// TODO find the scanner sequence number from the config.
 		scannerSequenceNumber := 2
-		numberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig, false)
+		numberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
 	} else {
-		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig, false)
+		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig)
 	}
 
 	// Enable all the defined fixtures.
@@ -975,7 +975,7 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 	return availableScannerColors, scannerColors
 }
 
-func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures, allPosibleFixtures bool) int {
+func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 
 	if debug {
 		fmt.Printf("getNumberOfFixturesn for sequence %d\n", sequenceNumber)
@@ -986,26 +986,15 @@ func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures, allPosi
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group-1 == sequenceNumber {
 			// config has use_channels set.
-			if fixture.NumberChannels > 0 {
-				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberChannels)
-				if allPosibleFixtures {
-					numberFixtures = numberFixtures + fixture.NumberChannels
-				} else {
-					return fixture.NumberChannels
-				}
-
+			if fixture.MultiFixtureDevice {
+				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
+				// we always return the max channels in a sequence, currently 8
+				return common.MaxNumberChannelsInSequence
 			} else {
 				// Examine the channels and count number of color channels.
 				// We use Red for the count.
 				var subFixture int
-				if allPosibleFixtures {
-					for _, channel := range fixture.Channels {
-						if strings.Contains(channel.Name, "Red") {
-							// Found a fixture def.
-							subFixture++
-						}
-					}
-				}
 				if subFixture > 1 {
 					numberFixtures = numberFixtures + subFixture
 				} else {

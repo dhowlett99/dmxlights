@@ -94,18 +94,19 @@ type ActionConfig struct {
 }
 
 type Fixture struct {
-	ID             int       `yaml:"id"`
-	Name           string    `yaml:"name"`
-	Label          string    `yaml:"label,omitempty"`
-	Number         int       `yaml:"number"`
-	Description    string    `yaml:"description"`
-	Type           string    `yaml:"type"`
-	Group          int       `yaml:"group"`
-	Address        int16     `yaml:"address"`
-	Channels       []Channel `yaml:"channels"`
-	States         []State   `yaml:"states,omitempty"`
-	NumberChannels int       `yaml:"use_channels,omitempty"`
-	UseFixture     string    `yaml:"use_fixture,omitempty"`
+	ID                 int       `yaml:"id"`
+	Name               string    `yaml:"name"`
+	Label              string    `yaml:"label,omitempty"`
+	Number             int       `yaml:"number"`
+	Description        string    `yaml:"description"`
+	Type               string    `yaml:"type"`
+	Group              int       `yaml:"group"`
+	Address            int16     `yaml:"address"`
+	Channels           []Channel `yaml:"channels"`
+	States             []State   `yaml:"states,omitempty"`
+	MultiFixtureDevice bool      `yaml:"-"` // Calulated internally.
+	NumberSubFixtures  int       `yaml:"-"` // Calulated internally.
+	UseFixture         string    `yaml:"use_fixture,omitempty"`
 }
 
 type Setting struct {
@@ -612,7 +613,7 @@ func MapFixtures(chaser bool, hadShutterChase bool, mySequenceNumber int,
 		if fixture.Group == mySequenceNumber+1 {
 			for channelNumber, channel := range fixture.Channels {
 				// Match the fixture number unless there are mulitple sub fixtures.
-				if fixture.Number == displayFixture+1 || fixture.NumberChannels > 0 {
+				if fixture.Number == displayFixture+1 || fixture.MultiFixtureDevice {
 					if !chaser {
 						// Scanner channels
 						if strings.Contains(channel.Name, "Pan") {
