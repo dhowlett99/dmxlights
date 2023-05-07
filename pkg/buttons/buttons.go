@@ -427,7 +427,7 @@ func ProcessButtons(X int, Y int,
 			// Find the currently selected preset and save it's location.
 			for location, preset := range this.PresetsStore {
 				if preset.State && preset.Selected {
-					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label}
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: preset.ButtonColor}
 					presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 					this.LastPreset = &location
 					break
@@ -443,7 +443,7 @@ func ProcessButtons(X int, Y int,
 			// Restore the last preset
 			if this.LastPreset != nil {
 				lastPreset := this.PresetsStore[*this.LastPreset]
-				this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label}
+				this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label, ButtonColor: lastPreset.ButtonColor}
 				presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 			}
 			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
