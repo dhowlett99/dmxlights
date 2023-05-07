@@ -70,6 +70,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.MusicTrigger = false
 		sequence.Run = false
 		sequence.Clear = true
+		// Remove the hidden flag.
+		sequence.Hide = false
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = common.DefaultSequenceColors
