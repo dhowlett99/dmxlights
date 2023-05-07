@@ -596,7 +596,7 @@ func ProcessButtons(X int, Y int,
 			// clear any selected preset.
 			for location, preset := range this.PresetsStore {
 				if preset.State && preset.Selected {
-					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: "Red"}
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: current.ButtonColor}
 				}
 			}
 
