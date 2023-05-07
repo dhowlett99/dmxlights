@@ -148,7 +148,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	fp := FixturesPanel{}
 	fp.FixtureList = []fixture.Fixture{}
 
-	fp.GroupOptions = []string{"1", "2", "3", "4", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
+	fp.GroupOptions = []string{"1", "2", "3", "4", "5", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
 	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 

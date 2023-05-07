@@ -398,6 +398,7 @@ type FixtureCommand struct {
 	Step           int
 	NumberSteps    int
 	Type           string
+	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
 

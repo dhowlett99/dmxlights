@@ -249,14 +249,14 @@ func PlaySequence(sequence common.Sequence,
 	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
 
 	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(sequence, mySequenceNumber, 7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	go fixture.FixtureReceiver(7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -274,6 +274,7 @@ func PlaySequence(sequence common.Sequence,
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
+				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
 				Clear:          sequence.Clear,
 			}
@@ -317,12 +318,15 @@ func PlaySequence(sequence common.Sequence,
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:            sequence.Type,
+				Label:           sequence.Label,
 				SequenceNumber:  sequence.Number,
 				RGBStatic:       sequence.Static,
 				RGBStaticColors: sequence.StaticColors,
 				StartFlood:      sequence.StartFlood,
 				StrobeSpeed:     sequence.StrobeSpeed,
 				Strobe:          sequence.Strobe,
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -339,6 +343,7 @@ func PlaySequence(sequence common.Sequence,
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:           sequence.Type,
+				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
 				StartFlood:     sequence.StartFlood,
 				StopFlood:      sequence.StopFlood,
@@ -377,6 +382,7 @@ func PlaySequence(sequence common.Sequence,
 						// Prepare a message to be sent to the fixtures in the sequence.
 						command := common.FixtureCommand{
 							Type:            sequence.Type,
+							Label:           sequence.Label,
 							SequenceNumber:  sequence.Number,
 							RGBStatic:       sequence.Static,
 							RGBStaticColors: sequence.StaticColors,
@@ -402,6 +408,7 @@ func PlaySequence(sequence common.Sequence,
 				// Prepare a message to be sent to the fixtures in the sequence.
 				command := common.FixtureCommand{
 					Type:            sequence.Type,
+					Label:           sequence.Label,
 					SequenceNumber:  sequence.Number,
 					RGBStatic:       sequence.Static,
 					RGBStaticColors: sequence.StaticColors,
@@ -434,6 +441,7 @@ func PlaySequence(sequence common.Sequence,
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
 				Type:              sequence.Type,
+				Label:             sequence.Label,
 				SequenceNumber:    sequence.Number,
 				RGBStatic:         sequence.Static,
 				RGBPlayStaticOnce: sequence.PlayStaticOnce,
@@ -703,6 +711,9 @@ func PlaySequence(sequence common.Sequence,
 						// Even if the fixture is disabled we still need to send this message to the fixture.
 						// beacuse the fixture is the one who is responsible for turning it off.
 						command := common.FixtureCommand{
+							Type:                     sequence.Type,
+							Label:                    sequence.Label,
+							SequenceNumber:           sequence.Number,
 							Step:                     step,
 							NumberSteps:              sequence.NumberSteps,
 							Rotate:                   sequence.Rotate,
@@ -712,11 +723,9 @@ func PlaySequence(sequence common.Sequence,
 							Master:                   sequence.Master,
 							Blackout:                 sequence.Blackout,
 							Hide:                     sequence.Hide,
-							Type:                     sequence.Type,
 							RGBPosition:              RGBPositions[step],
 							StartFlood:               sequence.StartFlood,
 							StopFlood:                sequence.StopFlood,
-							SequenceNumber:           sequence.Number,
 							ScannerPosition:          scannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
 							ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
 							FixtureState:             sequence.FixtureState[fixtureNumber],
@@ -802,7 +811,9 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 		// Now send a message to the fixture to play all the values for this state.
 		command := common.FixtureCommand{
-
+			Type:               sequence.Type,
+			Label:              sequence.Label,
+			SequenceNumber:     sequence.Number,
 			SetSwitch:          true,
 			SwitchData:         switchData,
 			State:              state,

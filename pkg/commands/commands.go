@@ -536,6 +536,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticFadeOnce = false // Don't soft fade as we change the brightness.
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
+		sequence.FloodPlayOnce = true
 		sequence.Master = command.Args[MASTER].Value.(int)
 		return sequence
 
