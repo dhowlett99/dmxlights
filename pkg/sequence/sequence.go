@@ -365,10 +365,10 @@ func PlaySequence(sequence common.Sequence,
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
-			// Now Fade up
-			if sequence.StaticFadeOnce {
+			go func() {
 
-				go func() {
+				// Now Fade up
+				if sequence.StaticFadeOnce {
 					// Soft start
 					// Calulate the steps
 					fadeUpValues := common.GetFadeValues(32, float64(sequence.Master), sequence.RGBFade, false)
@@ -394,31 +394,31 @@ func PlaySequence(sequence common.Sequence,
 						time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(sequence.Speed))))
 
 					}
+				}
 
-					// Done fading for this static scene onlt reset when we set a static scene again.
-					sequence.StaticFadeOnce = false
+				// Done fading for this static scene onlt reset when we set a static scene again.
+				sequence.StaticFadeOnce = false
 
-					// Prepare a message to be sent to the fixtures in the sequence.
-					command := common.FixtureCommand{
-						Type:            sequence.Type,
-						SequenceNumber:  sequence.Number,
-						RGBStatic:       sequence.Static,
-						RGBStaticColors: sequence.StaticColors,
-						Hide:            sequence.Hide,
-						Master:          sequence.Master,
-						StrobeSpeed:     sequence.StrobeSpeed,
-						Strobe:          sequence.Strobe,
-						Blackout:        sequence.Blackout,
-					}
+				// Prepare a message to be sent to the fixtures in the sequence.
+				command := common.FixtureCommand{
+					Type:            sequence.Type,
+					SequenceNumber:  sequence.Number,
+					RGBStatic:       sequence.Static,
+					RGBStaticColors: sequence.StaticColors,
+					Hide:            sequence.Hide,
+					Master:          sequence.Master,
+					StrobeSpeed:     sequence.StrobeSpeed,
+					Strobe:          sequence.Strobe,
+					Blackout:        sequence.Blackout,
+				}
 
-					// Now tell all the fixtures what they need to do.
-					sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+				// Now tell all the fixtures what they need to do.
+				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 
-				}()
+			}()
 
-				sequence.PlayStaticOnce = false
+			sequence.PlayStaticOnce = false
 
-			}
 			continue
 		}
 
