@@ -449,6 +449,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[SELECTED_COLOR].Value, command.Args[STATIC_LAMP_FLASH].Value)
 		}
+		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
