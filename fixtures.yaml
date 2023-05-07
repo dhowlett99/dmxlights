@@ -229,6 +229,7 @@ fixtures:
   type: rgb
   group: 1
   address: 100
+  use_channels: 8
   channels:
   - number: 1
     name: Red1
@@ -264,6 +265,7 @@ fixtures:
   type: rgb
   group: 1
   address: 114
+  use_channels: 8
   channels:
   - number: 1
     name: Red5

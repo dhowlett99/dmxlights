@@ -763,8 +763,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
-				// Assume we're blacked out.
-				sequence.Blackout = true
+				// Don't assume we're blacked out.
+				sequence.Blackout = false
 				sequence.StaticFadeOnce = true
 				sequence.PlayStaticOnce = true
 				sequence.PlaySwitchOnce = true

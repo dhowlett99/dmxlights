@@ -1075,7 +1075,7 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 		}
 	}
 	if debug {
-		fmt.Printf("strobe %t speed %d\n", sequence.Strobe, sequence.StrobeSpeed)
+		fmt.Printf("strobe %t speed %d master %d blackout %t\n", sequence.Strobe, sequence.StrobeSpeed, sequence.Master, sequence.Blackout)
 	}
 	MapFixtures(false, false, sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
 

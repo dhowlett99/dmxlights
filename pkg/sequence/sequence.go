@@ -425,7 +425,7 @@ func PlaySequence(sequence common.Sequence,
 		// Turn Static Mode Off
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
-				fmt.Printf("sequence %d Static Off mode\n", mySequenceNumber)
+				fmt.Printf("sequence %d Static Off mode and Blackout is %t\n", mySequenceNumber, sequence.Blackout)
 			}
 
 			sequence.Static = false
