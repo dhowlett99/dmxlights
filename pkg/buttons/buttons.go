@@ -596,7 +596,7 @@ func ProcessButtons(X int, Y int,
 			// clear any selected preset.
 			for location, preset := range this.PresetsStore {
 				if preset.State && preset.Selected {
-					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: current.ButtonColor}
+					this.PresetsStore[location] = presets.Preset{State: preset.State, Selected: false, Label: preset.Label, ButtonColor: preset.ButtonColor}
 				}
 			}
 
@@ -2220,10 +2220,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Which forces all sequences to load their config.
 	config.AskToLoadConfig(commandChannels, X, Y)
 
-	// Turn the selected preset light flashing red / yellow.
+	// Turn the selected preset light flashing it's current color and yellow.
 	if this.LastPreset != nil {
-		current := this.PresetsStore[*this.LastPreset]
-		this.PresetsStore[*this.LastPreset] = presets.Preset{State: current.State, Selected: false, Label: current.Label, ButtonColor: current.ButtonColor}
+		last := this.PresetsStore[*this.LastPreset]
+		this.PresetsStore[*this.LastPreset] = presets.Preset{State: last.State, Selected: false, Label: last.Label, ButtonColor: last.ButtonColor}
 	}
 	current := this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)]
 	this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: current.State, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
