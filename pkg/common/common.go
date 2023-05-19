@@ -311,6 +311,9 @@ type Sequence struct {
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
 	RGBColor                    int                         // The selected RGB fixture color.
+	FadeUp                      []int                       // Fade up values.
+	FadeOn                      []int                       // Fade on values.
+	FadeDown                    []int                       // Fade down values.
 	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off
 	FadeDownAndUp               []int                       // curve fade off and on again
 	RGBFade                     int                         // RGB Fade time
@@ -1228,19 +1231,19 @@ func Reverse12(in int) int {
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
 
-	fadeUpValues := GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
-	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
-	fadeDownValues := GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
+	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
+	sequence.FadeOn = GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
+	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
 
 	sequence.FadeUpAndDown = []int{}
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeUpValues...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeOnValues...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeDownValues...)
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeUp...)
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeOn...)
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeDown...)
 
 	sequence.FadeDownAndUp = []int{}
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeDownValues...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeUpValues...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeOnValues...)
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeDown...)
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeUp...)
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeOn...)
 
 }
 
