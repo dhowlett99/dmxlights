@@ -33,6 +33,7 @@ const MaxTextEntryLength = 35
 const DefaultScannerSize = 60
 const MaxScannerSize = 120
 const MaxRGBSize = 10
+const MaxRGBShift = 10
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.
 const MaxDMXBrightness = 255
@@ -1237,6 +1238,7 @@ func CalculateFadeValues(noCoordianates int, fade int, size int) (slopeOn []int,
 
 	slopeOff = append(slopeOff, fadeDownValues...)
 	slopeOff = append(slopeOff, fadeUpValues...)
+	slopeOff = append(slopeOff, fadeOnValues...)
 
 	return slopeOn, slopeOff
 }

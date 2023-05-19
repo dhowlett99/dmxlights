@@ -100,8 +100,6 @@ func TestCalculateRGBPositions(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              0,
-					RGBSize:               255,
-					RGBFade:               0,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
 					ScannerChaser:         false,
@@ -719,7 +717,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 			want1: 8,
 		},
 		{
-			name: "Shift1 - common par fixture RGB",
+			name: "Shift 8 - common par fixture RGB",
 			args: args{
 				sequence: common.Sequence{
 					FadeUpAndDown:         []int{1, 50, 255},
@@ -728,8 +726,6 @@ func TestCalculateRGBPositions(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              8,
-					RGBSize:               255,
-					RGBFade:               10,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
 				},
@@ -856,8 +852,6 @@ func TestCalculateRGBPositions(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              8, // Eight is reversed so creates a shift of 2.
-					RGBSize:               255,
-					RGBFade:               10,
 					ScannerInvert:         false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
@@ -1013,8 +1007,6 @@ func TestCalculatePositions2(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              10,
-					RGBSize:               255,
-					RGBFade:               1,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
 				},

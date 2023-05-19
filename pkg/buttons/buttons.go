@@ -712,8 +712,8 @@ func ProcessButtons(X int, Y int,
 		}
 		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
-			if this.RGBShift[this.TargetSequence] > 50 {
-				this.RGBShift[this.TargetSequence] = 50
+			if this.RGBShift[this.TargetSequence] > common.MaxRGBShift {
+				this.RGBShift[this.TargetSequence] = common.MaxRGBShift
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
