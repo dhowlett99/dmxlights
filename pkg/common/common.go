@@ -1226,21 +1226,22 @@ func Reverse12(in int) int {
 }
 
 // CalculateFadeValues - calculate fade curve values.
-func CalculateFadeValues(noCoordianates int, fade int, size int) (slopeOn []int, slopeOff []int) {
+func CalculateFadeValues(sequence *Sequence) {
 
-	fadeUpValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, false)
-	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, size)
-	fadeDownValues := GetFadeValues(noCoordianates, MaxDMXBrightness, fade, true)
+	fadeUpValues := GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
+	fadeOnValues := GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
+	fadeDownValues := GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
 
-	slopeOn = append(slopeOn, fadeUpValues...)
-	slopeOn = append(slopeOn, fadeOnValues...)
-	slopeOn = append(slopeOn, fadeDownValues...)
+	sequence.FadeUpAndDown = []int{}
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeUpValues...)
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeOnValues...)
+	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, fadeDownValues...)
 
-	slopeOff = append(slopeOff, fadeDownValues...)
-	slopeOff = append(slopeOff, fadeUpValues...)
-	slopeOff = append(slopeOff, fadeOnValues...)
+	sequence.FadeDownAndUp = []int{}
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeDownValues...)
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeUpValues...)
+	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, fadeOnValues...)
 
-	return slopeOn, slopeOff
 }
 
 func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {

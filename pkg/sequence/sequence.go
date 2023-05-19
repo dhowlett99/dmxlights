@@ -642,7 +642,7 @@ func PlaySequence(sequence common.Sequence,
 
 				if sequence.Type == "rgb" {
 					// Calculate fade curve values.
-					sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, sequence.RGBFade, sequence.RGBSize)
+					common.CalculateFadeValues(&sequence)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence)

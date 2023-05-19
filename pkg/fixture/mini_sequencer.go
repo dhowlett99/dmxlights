@@ -271,12 +271,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			ScannerChaser:  false,
 			RGBShift:       1,
 			RGBCoordinates: common.DefaultRGBCoordinates,
+			RGBFade:        cfg.Fade,
+			RGBSize:        cfg.Size,
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 		steps := sequence.Pattern.Steps
 		sequence.NumberFixtures = 1
 		// Calculate fade curve values.
-		sequence.FadeUpAndDown, sequence.FadeDownAndUp = common.CalculateFadeValues(sequence.RGBCoordinates, cfg.Fade, cfg.Size)
+		common.CalculateFadeValues(&sequence)
 		// Calulate positions for each RGB fixture.
 		sequence.Optimisation = false
 		sequence.FixtureState = map[int]common.FixtureState{
