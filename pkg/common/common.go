@@ -314,8 +314,6 @@ type Sequence struct {
 	FadeUp                      []int                       // Fade up values.
 	FadeOn                      []int                       // Fade on values.
 	FadeDown                    []int                       // Fade down values.
-	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off
-	FadeDownAndUp               []int                       // curve fade off and on again
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
@@ -1235,15 +1233,15 @@ func CalculateFadeValues(sequence *Sequence) {
 	sequence.FadeOn = GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
 	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
 
-	sequence.FadeUpAndDown = []int{}
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeUp...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeOn...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeDown...)
+	// sequence.FadeUpAndDown = []int{}
+	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeUp...)
+	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeOn...)
+	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeDown...)
 
-	sequence.FadeDownAndUp = []int{}
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeDown...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeUp...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeOn...)
+	// sequence.FadeDownAndUp = []int{}
+	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeDown...)
+	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeUp...)
+	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeOn...)
 
 }
 

@@ -572,15 +572,15 @@ func PlaySequence(sequence common.Sequence,
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 						var positions map[int]common.Position
 						// We're playing out the scanner positions, so we won't need curve values.
-						sequence.FadeUpAndDown = []int{255}
-						sequence.FadeDownAndUp = []int{0}
+						sequence.FadeUp = []int{255}
+						sequence.FadeDown = []int{0}
 						// Turn on optimasation.
 						sequence.Optimisation = true
 
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
 						// Calulate positions for each RGB fixture.
-						positions, sequence.NumberSteps = position.CalculatePositions(steps, sequence)
+						positions, sequence.NumberSteps = position.CalculatePositions(steps, sequence, true)
 
 						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
 						scannerPositions[fixture] = make(map[int]common.Position, 9)
@@ -645,7 +645,7 @@ func PlaySequence(sequence common.Sequence,
 					common.CalculateFadeValues(&sequence)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
-					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence)
+					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence, false)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
