@@ -279,7 +279,7 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 	}
 }
 
-func Test_invertRGBColors(t *testing.T) {
+func Test_invertRGBColorsInSteps(t *testing.T) {
 
 	full := 255
 	type args struct {
@@ -348,8 +348,8 @@ func Test_invertRGBColors(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := invertRGBColors(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("invertRGBColors() = %v, want %v", got, tt.want)
+			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("invertRGBColors() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

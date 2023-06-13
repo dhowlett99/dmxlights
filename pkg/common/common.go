@@ -806,7 +806,27 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	return code
 }
 
-func HowManyColors(positionsMap map[int]Position) (colors []Color) {
+func HowManyColorsInSteps(steps []Step) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, step := range steps {
+		for _, fixture := range step.Fixtures {
+			for _, color := range fixture.Colors {
+				if color.R > 0 || color.G > 0 || color.B > 0 {
+					colorMap[color] = true
+				}
+			}
+		}
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
+}
+
+func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
 	for _, position := range positionsMap {

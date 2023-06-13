@@ -51,7 +51,7 @@ var allFixturesEnabled = map[int]common.FixtureState{
 	},
 }
 
-func TestCalculateRGBPositions(t *testing.T) {
+func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 
 	full := 255
 	type args struct {
@@ -66,7 +66,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 		want1 int
 	}{
 		{
-			name: "golden path - common par fixture RGB",
+			name: "golden path - 8 fixtures simple green chase. Should result in 48 steps",
 			args: args{
 				scanner: false,
 				sequence: common.Sequence{
@@ -176,6 +176,18 @@ func TestCalculateRGBPositions(t *testing.T) {
 						5: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
 						6: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
 						7: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0}}},
+					},
+				},
+				{
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Shutter: 255, Colors: []common.Color{{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0}}},
 					},
 				},
 			},
@@ -775,7 +787,7 @@ func TestCalculateRGBPositions(t *testing.T) {
 					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
 
 						fixture := position.Fixtures[fixtureNumber]
-						fmt.Printf("Fixture:%d R:%d\n", fixtureNumber, fixture.Colors[0].R)
+						fmt.Printf("Fixture:%d color:%+v\n", fixtureNumber, fixture.Colors[0])
 					}
 
 				}
@@ -2010,6 +2022,13 @@ func TestCalculateStandardPositions(t *testing.T) {
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						},
 					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
 				},
 			},
 			want: map[int]common.Position{
@@ -2218,6 +2237,13 @@ func TestCalculateInvertedPositions(t *testing.T) {
 							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						},
 					},
 				},

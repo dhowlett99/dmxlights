@@ -603,7 +603,7 @@ func PlaySequence(sequence common.Sequence,
 						steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColors(RGBPositions)
+							sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
 							sequence.SaveColors = false
 						}
 					}
@@ -645,7 +645,7 @@ func PlaySequence(sequence common.Sequence,
 					common.CalculateFadeValues(&sequence)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
-					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence, false)
+					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence, true)
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -671,11 +671,6 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.SelectedPattern > 3 {
 						sequence.SelectedPattern = 0
 					}
-				}
-
-				if sequence.RGBInvert {
-					sequence.SequenceColors = common.HowManyColors(RGBPositions)
-					RGBPositions = invertRGBcolorsInPositions(RGBPositions, sequence.SequenceColors)
 				}
 
 				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
@@ -745,32 +740,6 @@ func PlaySequence(sequence common.Sequence,
 			}
 		}
 	}
-}
-
-func invertRGBColors(steps []common.Step, colors []common.Color) []common.Step {
-
-	var insertColor int
-	numberColors := len(colors)
-
-	for _, step := range steps {
-		for _, fixture := range step.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				if insertColor >= numberColors {
-					insertColor = 0
-				}
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					// insert a black.
-					fixture.Colors[colorNumber] = common.Color{}
-					insertColor++
-				} else {
-					// its a blank space so insert one of the colors.
-					fixture.Colors[colorNumber] = colors[insertColor]
-				}
-			}
-		}
-	}
-
-	return steps
 }
 
 // Send a command to all the fixtures.
@@ -897,42 +866,48 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 	return stepsOut
 }
 
-func invertRGBcolorsInPositions(positions map[int]common.Position, colors []common.Color) map[int]common.Position {
+func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
 
 	var insertColor int
 	numberColors := len(colors)
-	numberPositions := len(positions)
 
-	for positionNumber := 0; positionNumber < numberPositions; positionNumber++ {
-		position := positions[positionNumber]
-		for fixtureNumber, fixture := range position.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				// found a color.
+	var stepsOut []common.Step
+
+	for _, step := range steps {
+
+		newStep := common.Step{}
+
+		newFixtures := make(map[int]common.Fixture)
+
+		newStep.Fixtures = newFixtures
+
+		for fixtureNumber, fixture := range step.Fixtures {
+
+			newFixture := common.Fixture{}
+			newFixture.MasterDimmer = fixture.MasterDimmer
+
+			for _, color := range fixture.Colors {
+
+				if insertColor >= numberColors {
+					insertColor = 0
+				}
 				if color.R > 0 || color.G > 0 || color.B > 0 {
 					// insert a black.
-					position.Fixtures[fixtureNumber].Colors[colorNumber] = common.Color{
-						R: 0,
-						G: 0,
-						B: 0,
-					}
+					newFixture.Colors = append(newFixture.Colors, common.Color{})
 					insertColor++
-					continue
+				} else {
+					// its a blank space so insert one of the colors.
+					newFixture.Colors = append(newFixture.Colors, colors[insertColor])
 				}
-				// found a black.
-				if color.R == 0 && color.G == 0 && color.B == 0 {
-					// insert one of the colors from the sequence.
-					if insertColor >= numberColors {
-						insertColor = 0
-					}
-					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
-					insertColor++
-					continue
-				}
+
 			}
+			newStep.Fixtures[fixtureNumber] = newFixture
 		}
+
+		stepsOut = append(stepsOut, newStep)
 	}
 
-	return positions
+	return stepsOut
 }
 
 func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
