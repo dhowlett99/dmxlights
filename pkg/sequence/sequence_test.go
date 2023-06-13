@@ -184,6 +184,13 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
 						},
 					},
+					{ // Only black.
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
 				},
 				colors: []common.Color{
 					{R: 255, G: 0, B: 0},
@@ -211,6 +218,13 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+					},
+				},
+				{
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					},
 				},
 			},

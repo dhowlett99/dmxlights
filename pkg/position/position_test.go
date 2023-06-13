@@ -2003,8 +2003,10 @@ func TestCalculateStandardPositions(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 3,
+					NumberFixtures:        3,
 					ScannerChaser:         false,
 					RGBShift:              0,
+					RGBInvert:             false,
 				},
 
 				steps: []common.Step{
@@ -2029,13 +2031,13 @@ func TestCalculateStandardPositions(t *testing.T) {
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						},
 					},
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
+					// {
+					// 	Fixtures: map[int]common.Fixture{
+					// 		0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// 		1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// 		2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					// 	},
+					// },
 				},
 			},
 			want: map[int]common.Position{
@@ -2224,6 +2226,7 @@ func TestCalculateInvertedPositions(t *testing.T) {
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 3,
 					ScannerChaser:         false,
+					RGBInvert:             false,
 				},
 
 				steps: []common.Step{

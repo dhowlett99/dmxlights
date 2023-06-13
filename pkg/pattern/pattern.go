@@ -165,18 +165,6 @@ func MakePatterns() map[int]common.Pattern {
 					7: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
 				},
 			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					3: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					4: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					5: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					6: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					7: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
 		},
 	}
 

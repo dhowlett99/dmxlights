@@ -30,6 +30,19 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 	var steps []common.Step
 
+	emptyStep := common.Step{}
+	emptyFixtures := make(map[int]common.Fixture, 9)
+	for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+		emptyFixture := common.Fixture{}
+		emptyFixture.Brightness = 255
+		emptyFixture.MasterDimmer = 255
+		emptyFixture.Enabled = true
+		emptyFixture.Colors = append(emptyFixture.Colors, common.Color{R: 0})
+		emptyFixtures[fixture] = emptyFixture
+	}
+	emptyStep.Fixtures = emptyFixtures
+	stepsIn = append(stepsIn, emptyStep)
+
 	if debug {
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
 	}
@@ -48,22 +61,13 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	var numberFixtures int
 	var numberFixturesInThisStep int
 	var shiftCounter int
-
 	var lastStep common.Step
-	//var nextStep common.Step
-
 	var lastStepNumber int
-	//var nextStepNumber int
-
-	//var lastIntensity int
 
 	if !sequence.ScannerInvert {
 
 		// First loop make a space in the slope values for each fixture.
 		for stepNumber, step := range steps {
-
-			fmt.Printf("=================\n")
-			fmt.Printf("Step %d\n", stepNumber)
 
 			lastStepNumber = stepNumber - 1
 			if lastStepNumber < 0 {
@@ -71,13 +75,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			}
 
 			lastStep = steps[lastStepNumber]
-
-			// nextStepNumber = stepNumber + 1
-			// if nextStepNumber > len(steps)-1 {
-			// 	nextStepNumber = 0
-			// }
-			// nextStep = steps[nextStepNumber]
-
 			numberFixturesInThisStep = 0
 
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
@@ -86,11 +83,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
 				for colorNumber, color := range fixture.Colors {
 
-					//fmt.Printf("---------------------> Color:%+v Last:%v\n", color, lastStep.Fixtures[fixtureNumber].Colors[colorNumber])
-
 					// If color is same as last time do nothing.
-					if color == lastStep.Fixtures[fixtureNumber].Colors[colorNumber] {
-						fmt.Printf("Fixture:%d Keep  Color same Color:%+v\n", fixtureNumber, color)
+					myfixture := lastStep.Fixtures[fixtureNumber]
+					if color == myfixture.Colors[colorNumber] {
 
 						var fade []int
 						fade = append(fade, sequence.FadeUp...)
@@ -111,7 +106,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 					// If color is different from last color and not black.
 					if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color != common.Black {
-						fmt.Printf("Fixture:%d Fade Up\n", fixtureNumber)
 						for _, slope := range sequence.FadeUp {
 							newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 							fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
@@ -124,7 +118,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					}
 
 					if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color == common.Black {
-						fmt.Printf("Fixture:%d Fade Down  \n", fixtureNumber)
 						shiftCounter = 0
 						for _, slope := range sequence.FadeDown {
 							if shiftCounter == shift {
@@ -136,10 +129,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 						}
 						continue
 					}
-
-					fmt.Printf("Fixture:%d Do Nothing\n", fixtureNumber)
 				}
-
 				numberFixturesInThisStep++
 			}
 			if numberFixturesInThisStep > numberFixtures {

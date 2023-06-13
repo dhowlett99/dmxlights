@@ -500,7 +500,6 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
 					sequence.UpdatePattern = false
-
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
