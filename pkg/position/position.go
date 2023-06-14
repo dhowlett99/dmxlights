@@ -30,19 +30,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 	var steps []common.Step
 
-	emptyStep := common.Step{}
-	emptyFixtures := make(map[int]common.Fixture, 9)
-	for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-		emptyFixture := common.Fixture{}
-		emptyFixture.Brightness = 255
-		emptyFixture.MasterDimmer = 255
-		emptyFixture.Enabled = true
-		emptyFixture.Colors = append(emptyFixture.Colors, common.Color{R: 0})
-		emptyFixtures[fixture] = emptyFixture
-	}
-	emptyStep.Fixtures = emptyFixtures
-	stepsIn = append(stepsIn, emptyStep)
-
 	if debug {
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
 	}
