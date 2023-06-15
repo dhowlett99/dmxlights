@@ -38,8 +38,10 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
 		steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors)
 		sequence.RGBInvert = false
+		sequence.RGBNoFadeDown = true
 	} else {
 		steps = stepsIn
+		sequence.RGBNoFadeDown = false
 	}
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
@@ -93,6 +95,14 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 					// If color is different from last color and not black.
 					if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color != common.Black {
+						if !sequence.RGBNoFadeDown {
+							// Fade down last color.
+							for _, slope := range sequence.FadeDown {
+								newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
+								fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+							}
+						}
+						// Fade up new color.
 						for _, slope := range sequence.FadeUp {
 							newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 							fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)

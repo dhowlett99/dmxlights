@@ -32,13 +32,14 @@ const MaxDMXAddress = 512
 const MaxTextEntryLength = 35
 const DefaultScannerSize = 60
 const MaxScannerSize = 120
+const MinRGBSize = 0
 const MaxRGBSize = 10
 const MaxRGBShift = 10
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.
 const MaxDMXBrightness = 255
 const DefaultPattern = 0
-const DefaultRGBSize = 1
+const DefaultRGBSize = 0
 const DefaultRGBFade = 1
 const DefaultScannerFade = 10
 const DefaultSpeed = 7
@@ -285,6 +286,7 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
+	RGBNoFadeDown               bool                        // True if your in invert.
 	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness
@@ -393,6 +395,7 @@ type Hit struct {
 }
 
 type Step struct {
+	KeyStep  bool
 	Fixtures map[int]Fixture
 }
 

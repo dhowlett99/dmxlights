@@ -165,6 +165,19 @@ func MakePatterns() map[int]common.Pattern {
 					7: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
 				},
 			},
+			{
+				KeyStep: true,
+				Fixtures: map[int]common.Fixture{
+					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					3: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					4: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					5: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					6: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+					7: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+				},
+			},
 		},
 	}
 
@@ -174,6 +187,7 @@ func MakePatterns() map[int]common.Pattern {
 		Label:  "Flash",
 		Steps: []common.Step{
 			{
+				KeyStep: true,
 				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
 					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
@@ -186,6 +200,7 @@ func MakePatterns() map[int]common.Pattern {
 				},
 			},
 			{
+				KeyStep: true,
 				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -503,18 +518,6 @@ func MakePatterns() map[int]common.Pattern {
 		Steps: []common.Step{
 			{
 				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					3: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					4: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					5: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					6: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					7: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
 					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 0}}},
@@ -587,7 +590,6 @@ func MakePatterns() map[int]common.Pattern {
 			},
 			{
 				Fixtures: map[int]common.Fixture{
-
 					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 100, G: 0, B: 255}}},
 					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
 					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -600,7 +602,6 @@ func MakePatterns() map[int]common.Pattern {
 			},
 			{
 				Fixtures: map[int]common.Fixture{
-
 					0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 0, B: 255}}},
 					1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 					2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 111, B: 0}}},
@@ -788,6 +789,10 @@ func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common
 				pattern.Steps = append(pattern.Steps, newStep)
 				break
 			}
+		}
+		// // Always add key steps.
+		if step.KeyStep {
+			pattern.Steps = append(pattern.Steps, newStep)
 		}
 	}
 

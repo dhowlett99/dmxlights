@@ -1064,8 +1064,8 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]--
-			if this.RGBSize[this.TargetSequence] < 1 {
-				this.RGBSize[this.TargetSequence] = 1
+			if this.RGBSize[this.TargetSequence] < common.MinRGBSize {
+				this.RGBSize[this.TargetSequence] = common.MinRGBSize
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
