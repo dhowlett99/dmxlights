@@ -115,14 +115,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					}
 
 					if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color == common.Black {
-						shiftCounter = 0
 						for _, slope := range sequence.FadeDown {
-							if shiftCounter == shift {
-								break
-							}
 							newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
 							fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-							shiftCounter++
 						}
 						continue
 					}
