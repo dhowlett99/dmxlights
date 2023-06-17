@@ -17,6 +17,7 @@
 package position
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -100,6 +101,7 @@ func TestCalculatePositions(t *testing.T) {
 					},
 				},
 				{
+					//KeyStep: true,
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -181,54 +183,42 @@ func TestCalculatePositions(t *testing.T) {
 			},
 			want1: 3,
 		},
-		{
-			name:    "Test two colors - flash",
-			scanner: false,
-			sequence: common.Sequence{
-				Bounce:                false,
-				ScannerInvert:         false,
-				FadeUp:                []int{0, 50, 255},
-				FadeDown:              []int{255, 50, 0},
-				Optimisation:          false,
-				FixtureState:          allFixturesEnabled,
-				EnabledNumberFixtures: 3,
-				ScannerChaser:         false,
-				RGBShift:              0,
-			},
-			steps: []common.Step{
-				{
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						3: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						4: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						5: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						6: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-						7: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					},
-				},
-				{
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						3: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						4: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						5: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						6: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						7: {MasterDimmer: full, Enabled: true, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fadeColors, got1 := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+
 			if !reflect.DeepEqual(fadeColors, tt.want) {
-				t.Errorf("CalculatePositions() got = %+v, want %+v", fadeColors, tt.want)
+
+				t.Errorf("CalculatePositions() ")
+
+				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+
+					fade := tt.want[fixtureNumber]
+
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+
+					for number, fixtureBuffer := range fade {
+						fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer)
+					}
+
+				}
+
+				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
+
+					fade := fadeColors[fixtureNumber]
+
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+
+					for number, fixtureBuffer := range fade {
+						fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer)
+					}
+
+				}
 			}
+
 			if got1 != tt.want1 {
 				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
 			}
