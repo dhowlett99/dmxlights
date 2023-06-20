@@ -494,11 +494,12 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern].Steps, sequence.FixtureState)
+					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 					steps = RGBPattern.Steps
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
+					sequence.Pattern.PatternShift = RGBPattern.PatternShift
 					sequence.UpdatePattern = false
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
@@ -578,8 +579,8 @@ func PlaySequence(sequence common.Sequence,
 
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
-						// Calulate positions for each RGB fixture.
-						fadeColors, numberFixtures := position.CalculatePositions(steps, sequence, true)
+						// Calulate positions for each scanner fixture.
+						fadeColors, numberFixtures := position.CalculatePositions(steps, sequence, true, 0)
 						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures)
 						sequence.NumberSteps = numberSteps
 
@@ -647,7 +648,7 @@ func PlaySequence(sequence common.Sequence,
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					var numberSteps int
-					fadeColors, numberFixtures := position.CalculatePositions(steps, sequence, true)
+					fadeColors, numberFixtures := position.CalculatePositions(steps, sequence, true, sequence.Pattern.PatternShift)
 					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures)
 					sequence.NumberSteps = numberSteps
 				}

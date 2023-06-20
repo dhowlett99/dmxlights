@@ -223,6 +223,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update RGB Invert to %t\n", mySequenceNumber, command.Args[INVERT].Value)
 		}
 		sequence.RGBInvert = command.Args[INVERT].Value.(bool)
+		sequence.RGBInvertOnce = command.Args[INVERT].Value.(bool)
 		return sequence
 
 	case common.UpdateScannerShift:

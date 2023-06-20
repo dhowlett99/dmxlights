@@ -216,9 +216,10 @@ func MakePatterns() map[int]common.Pattern {
 	}
 
 	rgbchase := common.Pattern{
-		Name:   "RGB Chase",
-		Number: 2,
-		Label:  "RGB.Chase",
+		Name:         "RGB Chase",
+		Number:       2,
+		Label:        "RGB.Chase",
+		PatternShift: 10,
 		Steps: []common.Step{
 			{
 				Fixtures: map[int]common.Fixture{
@@ -944,13 +945,9 @@ type scanner struct {
 // steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
 // So make sure you also turn off the fixture in the fixture receiver.
-func ApplyFixtureState(generatedSteps []common.Step, scannerState map[int]common.FixtureState) common.Pattern {
+func ApplyFixtureState(pattern common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
 
-	var pattern common.Pattern
-
-	pattern.Name = "Chase"
-	pattern.Label = "std.Scanner.Chase"
-	pattern.Steps = []common.Step{}
+	generatedSteps := pattern.Steps
 
 	if debug {
 		for fixture := 0; fixture < len(scannerState); fixture++ {

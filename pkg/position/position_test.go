@@ -777,7 +777,7 @@ func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
@@ -1040,7 +1040,7 @@ func TestCalculateMulticoloredPatten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
@@ -1209,7 +1209,7 @@ func TestCalculateShift8(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
@@ -1380,7 +1380,7 @@ func TestCalculateShift1(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
 
-			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", positions, tt.want)
@@ -1493,7 +1493,7 @@ func TestCalculatePairsPatten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			_, got1 := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
+			_, got1 := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner, 0)
 			// if !reflect.DeepEqual(got, tt.want) {
 			// 	t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
 			// }
@@ -1634,7 +1634,7 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner, 0); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
 			}
@@ -1709,7 +1709,7 @@ func Test_calculateScannerBothDoingDifferentThing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner, 0); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
 			}
@@ -1969,7 +1969,7 @@ func Test_calculateScannerCase(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner, 0); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got = %+v", got)
 				t.Errorf("want =%+v", tt.want)
 			}
@@ -2175,7 +2175,7 @@ func TestCalculateStandardPositions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures := CalculatePositions(tt.args.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.args.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
@@ -2395,7 +2395,7 @@ func TestCalculateInvertedPositions(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures := CalculatePositions(tt.args.steps, tt.args.sequence, true)
+			fadeColors, numberFixtures := CalculatePositions(tt.args.steps, tt.args.sequence, true, 0)
 			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)

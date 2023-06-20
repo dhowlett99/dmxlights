@@ -169,13 +169,14 @@ type FixtureState struct {
 }
 
 type Pattern struct {
-	Name     string
-	Label    string
-	Number   int
-	Length   int // 8, 4 or 2
-	Size     int
-	Fixtures int // 8 Fixtures
-	Steps    []Step
+	Name         string
+	Label        string
+	Number       int
+	Length       int // 8, 4 or 2
+	PatternShift int
+	Size         int
+	Fixtures     int // 8 Fixtures
+	Steps        []Step
 }
 
 type Arg struct {
@@ -286,6 +287,7 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
+	RGBInvertOnce               bool                        // Invert only in a sequence,
 	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness

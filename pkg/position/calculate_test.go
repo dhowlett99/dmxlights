@@ -186,7 +186,7 @@ func TestCalculatePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1 := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+			fadeColors, got1 := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
