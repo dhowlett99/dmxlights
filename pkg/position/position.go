@@ -156,22 +156,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 							}
 							fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 						}
-						// // Stay down for duration of the fade down cylce.
-						// for range sequence.FadeUp {
-						// 	newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
-						// 	if debug {
-						// 		fmt.Printf("\t\t\t\tAdd5 %+v\n", newColor)
-						// 	}
-						// 	fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-						// }
-						// // Stay down for the duration of the on cycle.
-						// for range sequence.FadeOn {
-						// 	newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
-						// 	if debug {
-						// 		fmt.Printf("\t\t\t\tAdd5 %+v\n", newColor)
-						// 	}
-						// 	fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-						// }
 						continue
 					}
 
