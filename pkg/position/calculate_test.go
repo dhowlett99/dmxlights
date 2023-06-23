@@ -186,7 +186,7 @@ func TestCalculatePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1 := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
+			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -229,14 +229,16 @@ func TestCalculatePositions(t *testing.T) {
 func TestAssemblePositions(t *testing.T) {
 
 	tests := []struct {
-		name           string
-		fadeColors     map[int][]common.FixtureBuffer
-		numberFixtures int
-		want           map[int]common.Position
+		name               string
+		fadeColors         map[int][]common.FixtureBuffer
+		numberFixtures     int
+		totalNumberOfSteps int
+		want               map[int]common.Position
 	}{
 		{
-			name:           "golden path assemble fade colors into positions",
-			numberFixtures: 3,
+			name:               "golden path assemble fade colors into positions",
+			numberFixtures:     3,
+			totalNumberOfSteps: 18,
 			fadeColors: map[int][]common.FixtureBuffer{
 				0: { // Fixture 1 Fade up and down.
 					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
@@ -444,7 +446,7 @@ func TestAssemblePositions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := AssemblePositions(tt.fadeColors, tt.numberFixtures); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := AssemblePositions(tt.fadeColors, tt.numberFixtures, tt.totalNumberOfSteps); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AssemblePositions() = %+v, want %+v", got, tt.want)
 			}
 		})

@@ -396,8 +396,9 @@ type Hit struct {
 }
 
 type Step struct {
-	KeyStep  bool
-	Fixtures map[int]Fixture
+	StepNumber int
+	KeyStep    bool
+	Fixtures   map[int]Fixture
 }
 
 type FixtureCommand struct {
