@@ -945,9 +945,15 @@ type scanner struct {
 // steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
 // So make sure you also turn off the fixture in the fixture receiver.
-func ApplyFixtureState(pattern common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
+func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
 
-	generatedSteps := pattern.Steps
+	generatedSteps := patternIn.Steps
+
+	var patternOut common.Pattern
+
+	patternOut.Name = patternIn.Name
+	patternOut.Label = patternIn.Label
+	patternOut.Steps = []common.Step{}
 
 	if debug {
 		for fixture := 0; fixture < len(scannerState); fixture++ {
@@ -987,18 +993,18 @@ func ApplyFixtureState(pattern common.Pattern, scannerState map[int]common.Fixtu
 		for fixtureNumber, fixture := range newStep.Fixtures {
 			// Don't add steps with no enabled fixtures.
 			if hasColors[fixtureNumber] && fixture.Enabled {
-				pattern.Steps = append(pattern.Steps, newStep)
+				patternOut.Steps = append(patternOut.Steps, newStep)
 				break
 			}
 		}
 		// // Always add key steps.
 		if step.KeyStep {
-			pattern.Steps = append(pattern.Steps, newStep)
+			patternOut.Steps = append(patternOut.Steps, newStep)
 		}
 	}
 
 	if debug {
-		for _, step := range pattern.Steps {
+		for _, step := range patternOut.Steps {
 			fmt.Printf("Fixtures \n")
 			for fixture := 0; fixture < len(step.Fixtures); fixture++ {
 				fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
@@ -1006,7 +1012,7 @@ func ApplyFixtureState(pattern common.Pattern, scannerState map[int]common.Fixtu
 		}
 	}
 
-	return pattern
+	return patternOut
 
 }
 
