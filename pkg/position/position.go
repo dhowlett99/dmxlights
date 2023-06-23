@@ -27,23 +27,15 @@ import (
 const debug = false
 
 // calculateLastStep Calculate last step.
-func calculateLastStep(stepNumber int, steps []common.Step, reverse bool) common.Step {
+func calculateLastStep(stepNumber int, steps []common.Step) common.Step {
 
 	var lastStepNumber int
 	var lastStep common.Step
 
-	if !reverse {
-		lastStepNumber = stepNumber - 1
+	lastStepNumber = stepNumber - 1
 
-		if lastStepNumber < 0 {
-			lastStepNumber = len(steps) - 1
-		}
-	} else {
-		lastStepNumber = stepNumber + 1
-
-		if lastStepNumber > len(steps)-1 {
-			lastStepNumber = 0
-		}
+	if lastStepNumber < 0 {
+		lastStepNumber = len(steps) - 1
 	}
 
 	lastStep = steps[lastStepNumber]
@@ -82,7 +74,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			}
 
 			// Calculate last step.
-			lastStep = calculateLastStep(stepNumber, steps, false)
+			lastStep = calculateLastStep(stepNumber, steps)
 
 			// Start the fixtures counter.
 			numberFixturesInThisStep = 0
@@ -123,7 +115,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				fmt.Printf("================== Step Number %d ============== No Fixtures %d\n", stepNumber, len(step.Fixtures))
 			}
 
-			lastStep = calculateLastStep(stepNumber, steps, true)
+			lastStep = calculateLastStep(stepNumber, steps)
 
 			numberFixturesInThisStep = 0
 
@@ -156,7 +148,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			}
 
 			// Calculate last step.
-			lastStep = calculateLastStep(stepNumber, steps, false)
+			lastStep = calculateLastStep(stepNumber, steps)
 
 			// Start the fixtures counter.
 			numberFixturesInThisStep = 0
@@ -238,12 +230,12 @@ func processColor(fadeColors map[int][]common.FixtureBuffer, fixture common.Fixt
 		var fade []int
 		fade = append(fade, sequence.FadeUp...)
 
-		//if !scanner {
-		if !sequence.RGBInvert {
-			fade = append(fade, sequence.FadeOn...)
+		if !scanner {
+			if !sequence.RGBInvert {
+				fade = append(fade, sequence.FadeOn...)
+			}
+			fade = append(fade, sequence.FadeDown...)
 		}
-		fade = append(fade, sequence.FadeDown...)
-		//}
 
 		var shiftCounter = 0
 		var actualShift int
@@ -271,18 +263,18 @@ func processColor(fadeColors map[int][]common.FixtureBuffer, fixture common.Fixt
 		if debug {
 			fmt.Printf("\t\t\tIf color is different from last color and not black.. %+v\n", color)
 		}
-		//if !scanner {
-		// Fade down last color but only if last color wasn't a black.
-		if lastStep.Fixtures[fixtureNumber].Colors[colorNumber] != common.Black {
-			for _, slope := range sequence.FadeDown {
-				newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd2 %+v\n", newColor)
+		if !scanner {
+			// Fade down last color but only if last color wasn't a black.
+			if lastStep.Fixtures[fixtureNumber].Colors[colorNumber] != common.Black {
+				for _, slope := range sequence.FadeDown {
+					newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
+					if debug {
+						fmt.Printf("\t\t\t\tAdd2 %+v\n", newColor)
+					}
+					fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 			}
 		}
-		//}
 
 		// Fade up new color.
 		for _, slope := range sequence.FadeUp {
@@ -292,17 +284,17 @@ func processColor(fadeColors map[int][]common.FixtureBuffer, fixture common.Fixt
 			}
 			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 		}
-		//if !scanner {
-		if !sequence.RGBInvert {
-			for _, slope := range sequence.FadeOn {
-				newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd4 %+v\n", newColor)
+		if !scanner {
+			if !sequence.RGBInvert {
+				for _, slope := range sequence.FadeOn {
+					newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
+					if debug {
+						fmt.Printf("\t\t\t\tAdd4 %+v\n", newColor)
+					}
+					fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 			}
 		}
-		//}
 
 		return
 	}
@@ -320,18 +312,18 @@ func processColor(fadeColors map[int][]common.FixtureBuffer, fixture common.Fixt
 			}
 			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 		}
-		//if !scanner {
-		if sequence.RGBInvert {
-			// Stay off for the on time.
-			for range sequence.FadeOn {
-				newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd6 %+v\n", newColor)
+		if !scanner {
+			if sequence.RGBInvert {
+				// Stay off for the on time.
+				for range sequence.FadeOn {
+					newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
+					if debug {
+						fmt.Printf("\t\t\t\tAdd6 %+v\n", newColor)
+					}
+					fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 			}
 		}
-		//}
 
 		return
 	}

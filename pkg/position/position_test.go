@@ -2453,7 +2453,6 @@ func Test_calculateLastStep(t *testing.T) {
 	type args struct {
 		stepNumber int
 		steps      []common.Step
-		reverse    bool
 	}
 	tests := []struct {
 		name string
@@ -2463,7 +2462,6 @@ func Test_calculateLastStep(t *testing.T) {
 		{
 			name: "forward steps  - send 0 want 2",
 			args: args{
-				reverse:    false,
 				stepNumber: 0,
 				steps: []common.Step{
 					{
@@ -2504,7 +2502,6 @@ func Test_calculateLastStep(t *testing.T) {
 		{
 			name: "forward steps  - send 1 want 0",
 			args: args{
-				reverse:    false,
 				stepNumber: 1,
 				steps: []common.Step{
 					{
@@ -2545,7 +2542,6 @@ func Test_calculateLastStep(t *testing.T) {
 		{
 			name: "forward steps  - send 2 want 1",
 			args: args{
-				reverse:    false,
 				stepNumber: 2,
 				steps: []common.Step{
 					{
@@ -2583,95 +2579,10 @@ func Test_calculateLastStep(t *testing.T) {
 				},
 			},
 		},
-		// Now the reverse cases
-		{
-			name: "reverse steps  - send 0 want 1",
-			args: args{
-				reverse:    true,
-				stepNumber: 0,
-				steps: []common.Step{
-					{ // Step 1
-						StepNumber: 2,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						// Step 2
-						StepNumber: 1,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						// Step 3
-						StepNumber: 0,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-				},
-			},
-			want: common.Step{
-				StepNumber: 1,
-				Fixtures: map[int]common.Fixture{
-					0: {
-						ID: "0",
-					},
-				},
-			},
-		},
-		{
-			name: "reverse steps  - send 3 want 2",
-			args: args{
-				reverse:    true,
-				stepNumber: 1,
-				steps: []common.Step{
-					{
-						StepNumber: 0,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 1,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 2,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-				},
-			},
-			want: common.Step{
-				StepNumber: 2,
-				Fixtures: map[int]common.Fixture{
-					0: {
-						ID: "0",
-					},
-				},
-			},
-		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := calculateLastStep(tt.args.stepNumber, tt.args.steps, tt.args.reverse); !reflect.DeepEqual(got, tt.want) {
+			if got := calculateLastStep(tt.args.stepNumber, tt.args.steps); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("calculateLastStep() got = %v, want %v", got, tt.want)
 			}
 		})
