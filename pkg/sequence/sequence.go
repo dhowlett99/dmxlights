@@ -581,7 +581,7 @@ func PlaySequence(sequence common.Sequence,
 						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
 						// Calulate positions for each scanner fixture.
 						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, true, 0)
-						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
 						sequence.NumberSteps = numberSteps
 
 						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
@@ -649,7 +649,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Optimisation = true
 					var numberSteps int
 					fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, false, sequence.Pattern.PatternShift)
-					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
 					sequence.NumberSteps = numberSteps
 				}
 

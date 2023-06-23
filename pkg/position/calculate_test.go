@@ -446,7 +446,7 @@ func TestAssemblePositions(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got, _ := AssemblePositions(tt.fadeColors, tt.numberFixtures, tt.totalNumberOfSteps); !reflect.DeepEqual(got, tt.want) {
+			if got, _ := AssemblePositions(tt.fadeColors, tt.numberFixtures, tt.totalNumberOfSteps, false); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("AssemblePositions() = %+v, want %+v", got, tt.want)
 			}
 		})

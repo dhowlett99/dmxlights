@@ -778,7 +778,7 @@ func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -1041,7 +1041,7 @@ func TestCalculateMulticoloredPatten(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -1218,7 +1218,7 @@ func TestCalculateShift8(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -1403,7 +1403,7 @@ func TestCalculateShift1(t *testing.T) {
 			// Optimisation is turned off for testing.
 
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", positions, tt.want)
 			}
@@ -1516,7 +1516,7 @@ func TestCalculatePairsPatten(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			_, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			_, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 
 			// if !reflect.DeepEqual(got, tt.want) {
 			// 	t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
@@ -1659,7 +1659,7 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -1736,7 +1736,7 @@ func Test_calculateScannerBothDoingDifferentThing(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -1998,7 +1998,7 @@ func Test_calculateScannerCase(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true, 0)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -2206,7 +2206,7 @@ func TestCalculateStandardPositions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.args.steps, tt.args.sequence, true, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -2426,7 +2426,7 @@ func TestCalculateInvertedPositions(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 
 			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.args.steps, tt.args.sequence, true, 0)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps)
+			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
