@@ -24,33 +24,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-var allFixtures = map[int]common.FixtureState{
-	0: {
-		Enabled: true,
-	},
-	1: {
-		Enabled: true,
-	},
-	2: {
-		Enabled: true,
-	},
-	3: {
-		Enabled: true,
-	},
-	4: {
-		Enabled: true,
-	},
-	5: {
-		Enabled: true,
-	},
-	6: {
-		Enabled: true,
-	},
-	7: {
-		Enabled: true,
-	},
-}
-
 func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 
 	full := 255
@@ -76,7 +49,7 @@ func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              0,
-					FixtureState:          allFixtures,
+					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
 					ScannerChaser:         false,
 				},
@@ -2449,141 +2422,264 @@ func TestCalculateInvertedPositions(t *testing.T) {
 	}
 }
 
-func Test_calculateLastStep(t *testing.T) {
+func Test_processDifferentColor(t *testing.T) {
+
+	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
-		stepNumber int
-		steps      []common.Step
+		fadeColors    map[int][]common.FixtureBuffer
+		fixture       common.Fixture
+		fixtureNumber int
+		color         common.Color
+		colorNumber   int
+		lastStep      common.Step
+		sequence      common.Sequence
+		shift         int
+		patternShift  int
+		scanner       bool
 	}
 	tests := []struct {
 		name string
 		args args
-		want common.Step
+		want map[int][]common.FixtureBuffer
 	}{
 		{
-			name: "forward steps  - send 0 want 2",
+			// If color is different from last color and not black.
+			// And last color was green, so fade down green first.
+			name: "process a single color red, last color was black",
 			args: args{
-				stepNumber: 0,
-				steps: []common.Step{
-					{
-						StepNumber: 0,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
+				fadeColors: fadeColors,
+				sequence: common.Sequence{
+					FadeUp:   []int{0, 50, 255},
+					FadeOn:   []int{255},
+					FadeDown: []int{255, 50, 0},
+				},
+				fixtureNumber: 0,
+				fixture: common.Fixture{
+					Colors: []common.Color{
+						{
+							R: 255,
+							G: 0,
+							B: 0,
 						},
 					},
-					{
-						StepNumber: 1,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 2,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
+				},
+				colorNumber: 0,
+				color: common.Color{
+					R: 255,
+					G: 0,
+					B: 0,
+				},
+				lastStep: common.Step{
+					Fixtures: map[int]common.Fixture{
+						0: {
+							Colors: []common.Color{
+								{
+									R: 0,
+									G: 255,
+									B: 0,
+								},
 							},
 						},
 					},
 				},
 			},
-			want: common.Step{
-				StepNumber: 2,
-				Fixtures: map[int]common.Fixture{
-					0: {
-						ID: "0",
-					},
-				},
-			},
-		},
-		{
-			name: "forward steps  - send 1 want 0",
-			args: args{
-				stepNumber: 1,
-				steps: []common.Step{
-					{
-						StepNumber: 0,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 1,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 2,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-				},
-			},
-			want: common.Step{
-				StepNumber: 0,
-				Fixtures: map[int]common.Fixture{
-					0: {
-						ID: "0",
-					},
-				},
-			},
-		},
-		{
-			name: "forward steps  - send 2 want 1",
-			args: args{
-				stepNumber: 2,
-				steps: []common.Step{
-					{
-						StepNumber: 0,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 1,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-					{
-						StepNumber: 2,
-						Fixtures: map[int]common.Fixture{
-							0: {
-								ID: "0",
-							},
-						},
-					},
-				},
-			},
-			want: common.Step{
-				StepNumber: 1,
-				Fixtures: map[int]common.Fixture{
-					0: {
-						ID: "0",
-					},
+
+			want: map[int][]common.FixtureBuffer{
+
+				0: {
+					// Fade Down Green.
+					{Color: common.Color{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 50, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Fade Up Red.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := calculateLastStep(tt.args.stepNumber, tt.args.steps); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("calculateLastStep() got = %v, want %v", got, tt.want)
+			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("processColor() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_processSameColorNotBlack(t *testing.T) {
+
+	fadeColors := make(map[int][]common.FixtureBuffer, 10)
+	type args struct {
+		fadeColors    map[int][]common.FixtureBuffer
+		fixture       common.Fixture
+		fixtureNumber int
+		color         common.Color
+		colorNumber   int
+		lastStep      common.Step
+		sequence      common.Sequence
+		shift         int
+		patternShift  int
+		scanner       bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int][]common.FixtureBuffer
+	}{
+		{
+			// If color is same as last time , play that color out again.
+			name: "process a single color red, last color was red",
+			args: args{
+				shift:      10, // inverted to represents shift 0
+				fadeColors: fadeColors,
+				sequence: common.Sequence{
+					FadeUp:   []int{0, 50, 255},
+					FadeOn:   []int{255},
+					FadeDown: []int{255, 50, 0},
+				},
+				fixtureNumber: 0,
+				// Fixture contains color Red.
+				fixture: common.Fixture{
+					Colors: []common.Color{
+						{
+							R: 255,
+							G: 0,
+							B: 0,
+						},
+					},
+				},
+				colorNumber: 0,
+				// Color is therefor Red.
+				color: common.Color{
+					R: 255,
+					G: 0,
+					B: 0,
+				},
+				// Last step was also red.
+				lastStep: common.Step{
+					Fixtures: map[int]common.Fixture{
+						0: {
+							Colors: []common.Color{
+								{
+									R: 255,
+									G: 0,
+									B: 0,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			want: map[int][]common.FixtureBuffer{
+
+				0: {
+					// Fade Up Red
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Fade On Red
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Fade Down Red
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("processColor() got = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func Test_processDiffColorBlack(t *testing.T) {
+
+	fadeColors := make(map[int][]common.FixtureBuffer, 10)
+	type args struct {
+		fadeColors    map[int][]common.FixtureBuffer
+		fixture       common.Fixture
+		fixtureNumber int
+		color         common.Color
+		colorNumber   int
+		lastStep      common.Step
+		sequence      common.Sequence
+		shift         int
+		patternShift  int
+		scanner       bool
+	}
+	tests := []struct {
+		name string
+		args args
+		want map[int][]common.FixtureBuffer
+	}{
+		{
+			// If color is different from last color and color is a black.
+			name: "process a single color black, last color was red",
+			args: args{
+				shift:      10, // inverted to represents shift 0
+				fadeColors: fadeColors,
+				sequence: common.Sequence{
+					FadeUp:   []int{0, 50, 255},
+					FadeOn:   []int{255},
+					FadeDown: []int{255, 50, 0},
+				},
+				fixtureNumber: 0,
+				// Fixture contains color Black.
+				fixture: common.Fixture{
+					Colors: []common.Color{
+						{
+							R: 0,
+							G: 0,
+							B: 0,
+						},
+					},
+				},
+				colorNumber: 0,
+				// Color is therefor Black.
+				color: common.Color{
+					R: 0,
+					G: 0,
+					B: 0,
+				},
+				// Last step was also red.
+				lastStep: common.Step{
+					Fixtures: map[int]common.Fixture{
+						0: {
+							Colors: []common.Color{
+								{
+									R: 255,
+									G: 0,
+									B: 0,
+								},
+							},
+						},
+					},
+				},
+			},
+
+			want: map[int][]common.FixtureBuffer{
+
+				0: {
+					// Fade Down Red to Black.
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
 	}
