@@ -2034,13 +2034,13 @@ func TestCalculateStandardPositions(t *testing.T) {
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						},
 					},
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						},
+					},
 				},
 			},
 			want: map[int]common.Position{
@@ -2426,6 +2426,7 @@ func Test_processDifferentColor(t *testing.T) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
+		start         bool
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
@@ -2447,6 +2448,7 @@ func Test_processDifferentColor(t *testing.T) {
 			// And last color was green, so fade down green first.
 			name: "process a single color red, last color was black",
 			args: args{
+				start:      true,
 				fadeColors: fadeColors,
 				sequence: common.Sequence{
 					FadeUp:   []int{0, 50, 255},
@@ -2495,6 +2497,7 @@ func Test_processDifferentColor(t *testing.T) {
 					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Keep Red on for on time.
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
@@ -2502,7 +2505,7 @@ func Test_processDifferentColor(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.start, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2513,6 +2516,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
+		start         bool
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
@@ -2533,6 +2537,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 			// If color is same as last time , play that color out again.
 			name: "process a single color red, last color was red",
 			args: args{
+				start:      false,
 				shift:      10, // inverted to represents shift 0
 				fadeColors: fadeColors,
 				sequence: common.Sequence{
@@ -2577,13 +2582,13 @@ func Test_processSameColorNotBlack(t *testing.T) {
 			want: map[int][]common.FixtureBuffer{
 
 				0: {
-					// Fade Up Red
+					// Play out the existing Red
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					// Fade On Red
+					// Keep Red on for the on time.
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					// Fade Down Red
+					// Keep Red on for the down time.
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
@@ -2593,7 +2598,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.start, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2604,6 +2609,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
+		start         bool
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
@@ -2624,6 +2630,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 			// If color is different from last color and color is a black.
 			name: "process a single color black, last color was red",
 			args: args{
+				start:      false,
 				shift:      10, // inverted to represents shift 0
 				fadeColors: fadeColors,
 				sequence: common.Sequence{
@@ -2672,13 +2679,19 @@ func Test_processDiffColorBlack(t *testing.T) {
 					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Keep off for the off time, same as on time.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					// Keep off for the fade up time.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := processColor(tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.start, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, tt.args.colorNumber, tt.args.lastStep, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
