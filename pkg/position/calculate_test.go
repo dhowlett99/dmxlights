@@ -100,14 +100,6 @@ func TestCalculatePositions(t *testing.T) {
 						2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 					},
 				},
-				{
-					//KeyStep: true,
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
 			},
 			want: map[int][]common.FixtureBuffer{
 				0: { // Fixture 1 Fade up and down.

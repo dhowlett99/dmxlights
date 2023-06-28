@@ -33,8 +33,10 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	var numberFixtures int
 	var numberFixturesInThisStep int
 	var lastStep common.Step
+	var nextStep common.Step
 
 	start := true
+	end := false
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
 	shift := common.Reverse(sequence.RGBShift)
@@ -60,7 +62,15 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			}
 
 			if stepNumber == 0 {
+				end = false
 				lastStep = steps[len(steps)-1]
+			}
+			// If we're at the end. next step is the first step.
+			if stepNumber == len(steps)-1 {
+				end = true
+				nextStep = steps[0]
+			} else {
+				nextStep = steps[stepNumber+1]
 			}
 
 			// Start the fixtures counter.
@@ -81,7 +91,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					if debug {
 						fmt.Printf("\t\tColor Number %d\n", colorNumber)
 					}
-					fadeColors = processColor(start, fadeColors, fixture, fixtureNumber, color, colorNumber, lastStep, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(start, end, fadeColors, fixture, fixtureNumber, color, colorNumber, lastStep, nextStep, sequence, shift, patternShift, scanner)
 				}
 
 				// Incremet the the fixture counter.
@@ -110,7 +120,16 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			// If your at the start of this reversed list of steps (i.e at the end) and your invert the previous steps
 			// have not played so the last step isn't set so set it here.
 			if stepNumber == len(steps) && sequence.ScannerInvert {
+				end = true
 				lastStep = steps[0]
+			}
+
+			// If we're at the begining. next step is the last step.
+			if stepNumber == 0 {
+				nextStep = steps[len(steps)-1]
+				end = false
+			} else {
+				nextStep = steps[stepNumber-1]
 			}
 
 			numberFixturesInThisStep = 0
@@ -126,7 +145,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				noColors := len(fixture.Colors)
 				for colorNumber := noColors; colorNumber > 0; colorNumber-- {
 					color := fixture.Colors[colorNumber-1]
-					fadeColors = processColor(start, fadeColors, fixture, fixtureNumber, color, colorNumber-1, lastStep, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(start, end, fadeColors, fixture, fixtureNumber, color, colorNumber-1, lastStep, nextStep, sequence, shift, patternShift, scanner)
 				}
 				numberFixturesInThisStep++
 			}
@@ -163,7 +182,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					if debug {
 						fmt.Printf("\t\tColor Number %d\n", colorNumber)
 					}
-					fadeColors = processColor(start, fadeColors, fixture, fixtureNumber, color, colorNumber, lastStep, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(start, end, fadeColors, fixture, fixtureNumber, color, colorNumber, lastStep, nextStep, sequence, shift, patternShift, scanner)
 				}
 
 				// Incremet the the fixture counter.
@@ -214,155 +233,25 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }
 
-func processColor(start bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, fixtureNumber int, color common.Color, colorNumber int, lastStep common.Step, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
+func processColor(start bool, end bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, fixtureNumber int, color common.Color, colorNumber int, lastStep common.Step, nextStep common.Step, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
 
-	// If color is same as last time , play that color out again. Unless its the very first step.
+	// If color is same as last time , play that color out again.
 	if color == lastStep.Fixtures[fixtureNumber].Colors[colorNumber] {
-
-		if debug {
-			fmt.Printf("\t\t\tIf color is same as last time play same color. %+v\n", color)
-		}
-
-		var fade []int
-		fade = append(fade, sequence.FadeUp...)
-
-		if !scanner {
-			if !sequence.RGBInvert {
-				fade = append(fade, sequence.FadeOn...)
-			}
-			fade = append(fade, sequence.FadeDown...)
-		}
-
-		if debug {
-			fmt.Printf("SHIFT=%d\n", shift)
-		}
-
-		var shiftCounter = 0
-		var actualShift int
-		if debug {
-			fmt.Print("Play Same Color\n")
-		}
-		for range fade {
-			if debug {
-				fmt.Printf("\t\t\t\tStart Fade \n")
-			}
-			if shift == 10 {
-				actualShift = shift + patternShift
-			} else {
-				actualShift = shift
-			}
-			if shiftCounter == actualShift {
-				if debug {
-					fmt.Printf("BREAK\n")
-				}
-				break
-			}
-			newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
-			if debug {
-				fmt.Printf("\t\t\t\tAdd1 %+v\n", newColor)
-			}
-			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-			shiftCounter++
-		}
+		fadeColors = keepSameAsLastTime(fadeColors, color, sequence, scanner, shift, patternShift, fixture, fixtureNumber)
 		return fadeColors
 	}
 
 	// If color is different from last color and not black.
 	if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color != common.Black {
-		if debug {
-			fmt.Printf("\t\t\tIf color is different from last color and not black.. %+v\n", color)
-		}
-		if !scanner {
-			// Fade down last color but only if last color wasn't a black.
-			if lastStep.Fixtures[fixtureNumber].Colors[colorNumber] != common.Black {
-				if debug {
-					fmt.Print("Fade Down\n")
-				}
-				if !start { // We're not at the start so we can safely fade this fixture down.
-					for _, slope := range sequence.FadeDown {
-						newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
-						if debug {
-							fmt.Printf("\t\t\t\tAdd2 %+v\n", newColor)
-						}
-						fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-					}
-				}
-
-			}
-		}
-
-		// Fade up new color.
-		if debug {
-			fmt.Print("Fade Up New Color\n")
-		}
-		for _, slope := range sequence.FadeUp {
-			newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-			if debug {
-				fmt.Printf("\t\t\t\tAdd3 %+v\n", newColor)
-			}
-			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-		}
-		if !scanner {
-			if !sequence.RGBInvert {
-				if debug {
-					fmt.Print("Fade ON\n")
-				}
-				for _, slope := range sequence.FadeOn {
-					newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-					if debug {
-						fmt.Printf("\t\t\t\tAdd4 %+v\n", newColor)
-					}
-					fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-				}
-			}
-		}
-
+		fadeColors = fadeUpColor(fadeColors, color, colorNumber, sequence, scanner,
+			shift, patternShift, fixture, fixtureNumber, lastStep, nextStep, start, end)
 		return fadeColors
 	}
 
 	// If color is different from last color and color is a black.
 	if color != lastStep.Fixtures[fixtureNumber].Colors[colorNumber] && color == common.Black {
-		if debug {
-			fmt.Printf("\t\t\tIf color is different from last color and color is a black.. %+v\n", color)
-		}
-		// Fade down last color, so this black can be displayed.
-		if debug {
-			fmt.Print("Fade Down\n")
-		}
-		if !start { // We're not at the start so we can safely fade this fixture down.
-			for _, slope := range sequence.FadeDown {
-				newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd5 %+v\n", newColor)
-				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-			}
-		}
-		if !scanner {
-			// Stay off for the on time.
-			if debug {
-				fmt.Print("Fade On\n")
-			}
-			for range sequence.FadeOn {
-				newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd6 %+v\n", newColor)
-				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-			}
-			// Stay off for the fade up time.
-			if debug {
-				fmt.Print("Keep Off\n")
-			}
-			for range sequence.FadeUp {
-				newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
-				if debug {
-					fmt.Printf("\t\t\t\tAdd6 %+v\n", newColor)
-				}
-				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-			}
-		}
-
+		fadeColors = fadeDownColor(fadeColors, color, colorNumber, sequence, scanner,
+			shift, patternShift, fixture, fixtureNumber, lastStep, start, end)
 		return fadeColors
 	}
 
@@ -373,10 +262,167 @@ func processColor(start bool, fadeColors map[int][]common.FixtureBuffer, fixture
 	return fadeColors
 }
 
+func fadeDownColor(fadeColors map[int][]common.FixtureBuffer, color common.Color, colorNumber int, sequence common.Sequence, scanner bool,
+	shift int, patternShift int, fixture common.Fixture, fixtureNumber int, lastStep common.Step, start bool, end bool) map[int][]common.FixtureBuffer {
+
+	if debug {
+		fmt.Printf("\t\t\tIf color is different from last color and color is a black.. %+v\n", color)
+	}
+	// Fade down last color, so this black can be displayed.
+	if debug {
+		fmt.Print("\t\t\tFade Down Last Color\n")
+	}
+	if !start { // We're not at the start so we can safely fade this fixture down.
+		for _, slope := range sequence.FadeDown {
+			newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
+			if debug {
+				fmt.Printf("\t\t\t\tAdd5 %+v\n", newColor)
+			}
+			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+		}
+	}
+	if !scanner {
+		// Now that we have faded down. Populate one up & down cycle with the black we asked for.
+
+		var fade []int
+		fade = append(fade, sequence.FadeUp...)
+		fade = append(fade, sequence.FadeOn...)
+		fade = append(fade, sequence.FadeDown...)
+
+		if debug {
+			fmt.Print("\t\t\tPopulate Fade Off.\n")
+		}
+		for range fade {
+			newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], 0, sequence.ScannerChaser)
+			if debug {
+				fmt.Printf("\t\t\t\tAdd6 %+v\n", newColor)
+			}
+			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+		}
+	}
+
+	return fadeColors
+}
+
+func fadeUpColor(fadeColors map[int][]common.FixtureBuffer, color common.Color, colorNumber int, sequence common.Sequence, scanner bool,
+	shift int, patternShift int, fixture common.Fixture, fixtureNumber int, lastStep common.Step, nextStep common.Step, start bool, end bool) map[int][]common.FixtureBuffer {
+
+	if debug {
+		fmt.Printf("\t\t\tIf color is different from last color and not black.. %+v\n", color)
+	}
+
+	if !scanner {
+		// Fade down last color but only if last color wasn't a black.
+		if lastStep.Fixtures[fixtureNumber].Colors[colorNumber] != common.Black {
+			if debug {
+				fmt.Print("\t\t\tFade Down\n")
+			}
+			if !start { // We're not at the start so we can safely fade this fixture down.
+				for _, slope := range sequence.FadeDown {
+					newColor := makeNewColor(fixture, fixtureNumber, lastStep.Fixtures[fixtureNumber].Colors[colorNumber], slope, sequence.ScannerChaser)
+					if debug {
+						fmt.Printf("\t\t\t\t\t\tAdd2 %+v\n", newColor)
+					}
+					fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+				}
+			}
+		}
+	}
+
+	// Fade up new color.
+	if debug {
+		fmt.Print("\t\t\tFade Up New Color\n")
+	}
+	for _, slope := range sequence.FadeUp {
+		newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
+		if debug {
+			fmt.Printf("\t\t\t\t\tAdd3 %+v\n", newColor)
+		}
+		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+	}
+	if !scanner {
+		if !sequence.RGBInvert {
+			if debug {
+				fmt.Print("\t\t\tFade ON\n")
+			}
+			for _, slope := range sequence.FadeOn {
+				newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
+				if debug {
+					fmt.Printf("\t\t\t\tAdd4 %+v\n", newColor)
+				}
+				fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+			}
+		}
+	}
+
+	// If the next step is black. Fade dowm this fixture down ready.
+	if nextStep.Fixtures[fixtureNumber].Colors[colorNumber] == common.Black && end {
+		for _, slope := range sequence.FadeDown {
+			newColor := makeNewColor(fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
+			if debug {
+				fmt.Printf("\t\t\t\tAdd5 %+v\n", newColor)
+			}
+			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+		}
+	}
+
+	return fadeColors
+}
+
+func keepSameAsLastTime(fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, scanner bool,
+	shift int, patternShift int, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
+	if debug {
+		fmt.Printf("\t\t\tIf color is same as last time play same color. %+v\n", color)
+	}
+
+	var fade []int
+	fade = append(fade, sequence.FadeUp...)
+	fade = append(fade, sequence.FadeOn...)
+	fade = append(fade, sequence.FadeDown...)
+
+	// if !scanner {
+	// 	if !sequence.RGBInvert {
+	// 		fade = append(fade, sequence.FadeOn...)
+	// 	}
+	// 	fade = append(fade, sequence.FadeDown...)
+	// }
+
+	// if debug {
+	// 	fmt.Printf("\t\t\tSHIFT=%d\n", shift)
+	// }
+
+	var shiftCounter = 0
+	var actualShift int
+	if debug {
+		fmt.Print("\t\t\tPlay Same Color\n")
+	}
+	for range fade {
+		if shift == 10 {
+			actualShift = shift + patternShift
+		} else {
+			actualShift = shift
+		}
+		if shiftCounter == actualShift {
+			if debug {
+				fmt.Printf("\t\t\tBREAK\n")
+			}
+			break
+		}
+		newColor := makeNewColor(fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
+		if debug {
+			fmt.Printf("\t\t\t\t\tAdd1 %+v\n", newColor)
+		}
+		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+		shiftCounter++
+	}
+
+	return fadeColors
+}
+
 func makeNewColor(fixture common.Fixture, fixtureNumber int, color common.Color, insertValue int, chase bool) common.FixtureBuffer {
 
 	if debug {
-		fmt.Printf("makeNewColor fixture %d color %+v\n", fixtureNumber, color)
+		fmt.Printf("\t\t\t\t\tmakeNewColor fixture %d color %+v\n", fixtureNumber, color)
 	}
 
 	newColor := common.FixtureBuffer{}
