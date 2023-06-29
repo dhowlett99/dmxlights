@@ -34,6 +34,7 @@ const DefaultScannerSize = 60
 const MaxScannerSize = 120
 const MinRGBSize = 0
 const MaxRGBSize = 10
+const MinRGBShift = 1
 const MaxRGBShift = 10
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.

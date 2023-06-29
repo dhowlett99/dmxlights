@@ -494,7 +494,8 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+					//RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+					RGBPattern := availablePatterns[sequence.SelectedPattern]
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 					steps = RGBPattern.Steps
 					sequence.Pattern.Name = RGBPattern.Name

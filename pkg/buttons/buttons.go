@@ -676,8 +676,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.TargetSequence].Type == "scanner" {
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
-			if this.ScannerShift[this.TargetSequence] < 0 {
-				this.ScannerShift[this.TargetSequence] = 0
+			if this.ScannerShift[this.TargetSequence] < common.MinRGBShift {
+				this.ScannerShift[this.TargetSequence] = common.MinRGBShift
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
