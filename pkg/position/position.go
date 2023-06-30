@@ -24,7 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-const debug = false
+const debug = true
 
 // CalculatePositions takes a series of steps, examaines them to see if the step should fade up
 func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner bool, patternShift int) (map[int][]common.FixtureBuffer, int, int) {
@@ -111,6 +111,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	}
 
 	if sequence.Bounce || sequence.ScannerInvert {
+		if debug {
+			fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<<< START BOUNCE >>>>>>>>>>>>>>>>>>>>>>>>>\n")
+		}
 		// Generate the positions in reverse.
 		// Reverse the steps.
 		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
@@ -121,7 +124,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 			// If your at the start of this reversed list of steps (i.e at the end) and your invert the previous steps
 			// have not played so the last step isn't set so set it here.
-			if stepNumber == len(steps) && sequence.ScannerInvert {
+			if stepNumber == len(steps) {
 				end = true
 				lastStep = steps[0]
 			}
@@ -225,16 +228,16 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	if debug {
-		// Print out the fixtures so far.
-		for fixture := 0; fixture < numberFixtures; fixture++ {
-			fmt.Printf("Fixture %d\n", fixture)
-			for out := 0; out < totalNumberOfSteps; out++ {
-				fmt.Printf("%+v\n", fadeColors[fixture][out])
-			}
-			fmt.Printf("\n")
-		}
-	}
+	// if debug {
+	// 	// Print out the fixtures so far.
+	// 	for fixture := 0; fixture < numberFixtures; fixture++ {
+	// 		fmt.Printf("Fixture %d\n", fixture)
+	// 		for out := 0; out < totalNumberOfSteps; out++ {
+	// 			fmt.Printf("%+v\n", fadeColors[fixture][out])
+	// 		}
+	// 		fmt.Printf("\n")
+	// 	}
+	// }
 
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }

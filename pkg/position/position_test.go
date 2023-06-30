@@ -2726,9 +2726,9 @@ func TestCalcShift(t *testing.T) {
 			name: "shift of 1, no shift",
 			args: args{
 				shift:        5,
-				lengthOfFade: 30,
+				lengthOfFade: 15,
 			},
-			want: 15,
+			want: 30,
 		},
 		{
 			name: "shift of 1, no shift",
