@@ -2703,3 +2703,47 @@ func Test_processDiffColorBlack(t *testing.T) {
 		})
 	}
 }
+
+func TestCalcShift(t *testing.T) {
+	type args struct {
+		shift        int
+		lengthOfFade int
+	}
+	tests := []struct {
+		name string
+		args args
+		want int
+	}{
+		{
+			name: "shift of 1, no shift",
+			args: args{
+				shift:        10,
+				lengthOfFade: 30,
+			},
+			want: 30,
+		},
+		{
+			name: "shift of 1, no shift",
+			args: args{
+				shift:        5,
+				lengthOfFade: 30,
+			},
+			want: 15,
+		},
+		{
+			name: "shift of 1, no shift",
+			args: args{
+				shift:        1,
+				lengthOfFade: 3,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := CalcShift(tt.args.shift, tt.args.lengthOfFade); got != tt.want {
+				t.Errorf("CalcShift() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

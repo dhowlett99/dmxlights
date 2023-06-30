@@ -39,7 +39,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	end := false
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
-	shift := common.Reverse(sequence.RGBShift)
+	shift := CalcShift(common.Reverse(sequence.RGBShift), 30)
 
 	if debug {
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
@@ -396,4 +396,9 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common
 	}
 
 	return stepsOut
+}
+
+func CalcShift(shift int, lengthOfFade int) int {
+	slotSize := lengthOfFade / 10
+	return slotSize * shift
 }
