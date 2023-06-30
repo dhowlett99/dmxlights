@@ -116,6 +116,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 		// Generate the positions in reverse.
 		// Reverse the steps.
+		start = true
 		for stepNumber := len(steps); stepNumber > 0; stepNumber-- {
 			step := steps[stepNumber-1]
 			if debug {
@@ -156,6 +157,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				}
 				numberFixturesInThisStep++
 			}
+			start = false
 			if numberFixturesInThisStep > numberFixtures {
 				numberFixtures = numberFixturesInThisStep
 			}
