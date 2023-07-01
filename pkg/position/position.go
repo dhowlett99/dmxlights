@@ -24,7 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-const debug = true
+const debug = false
 
 // CalculatePositions takes a series of steps, examaines them to see if the step should fade up
 func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner bool, patternShift int) (map[int][]common.FixtureBuffer, int, int) {

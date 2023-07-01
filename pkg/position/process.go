@@ -44,7 +44,6 @@ func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
 		if lastColor != common.Black && !start && !end {
-			fmt.Printf("fade down 1")
 			fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
 		}
 
@@ -79,7 +78,6 @@ func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common
 		}
 
 		// Fade down last color, so this black can be displayed.
-		fmt.Printf("fade down 4")
 		fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
 
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
