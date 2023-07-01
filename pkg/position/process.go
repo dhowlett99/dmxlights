@@ -39,7 +39,7 @@ func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common
 	if thisColor != lastColor && thisColor != common.Black {
 
 		if debug {
-			fmt.Printf("\t\t\tfixture %d If color is different from last color and not black. start %t end %t\n", fixtureNumber, start, end)
+			fmt.Printf("\t\t\tfixture %d If color is different from last color and not black. start %t end %t bounce %t\n", fixtureNumber, start, end, bounce)
 		}
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
@@ -49,7 +49,6 @@ func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common
 		}
 
 		// Fade the color up.
-		fmt.Printf("fade up 1")
 		fadeColors = fadeUpColor(fadeColors, thisColor, sequence, fixture, fixtureNumber)
 
 		// Leave the color for on time.
@@ -57,14 +56,13 @@ func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common
 
 		// If the next color is black. Fade dowm this color down ready.
 		if nextColor == common.Black && !start && end {
-			fmt.Printf("fade down 2")
 			fadeColors = fadeDownColor(shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
 		}
 
-		// if nextColor == common.Black && !start && end && bounce && fixtureNumber == 0 {
-		// 	fmt.Printf("fade down 3 THIS ONE!")
-		// 	fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
-		// }
+		//fmt.Printf("---->>> fixture %d nextColor %+v start %t end %t bounce %t\n", fixtureNumber, nextColor, start, end, bounce)
+		if nextColor != common.Black && !start && end && bounce && fixtureNumber == 0 {
+			fadeColors = fadeDownColor(shift, fadeColors, nextColor, sequence, fixture, fixtureNumber)
+		}
 
 		return fadeColors
 	}
