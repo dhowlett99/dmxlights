@@ -24,7 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func processColor(start bool, end bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, fixtureNumber int, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
+func processColor(start bool, end bool, bounce bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, fixtureNumber int, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
 
 	// If color is same as last time , play that color out again.
 	if thisColor == lastColor {
@@ -44,10 +44,12 @@ func processColor(start bool, end bool, invert bool, fadeColors map[int][]common
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
 		if lastColor != common.Black && !start && !end {
+			fmt.Printf("fade down 1")
 			fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
 		}
 
 		// Fade the color up.
+		fmt.Printf("fade up 1")
 		fadeColors = fadeUpColor(fadeColors, thisColor, sequence, fixture, fixtureNumber)
 
 		// Leave the color for on time.
@@ -55,8 +57,14 @@ func processColor(start bool, end bool, invert bool, fadeColors map[int][]common
 
 		// If the next color is black. Fade dowm this color down ready.
 		if nextColor == common.Black && !start && end {
+			fmt.Printf("fade down 2")
 			fadeColors = fadeDownColor(shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
 		}
+
+		// if nextColor == common.Black && !start && end && bounce && fixtureNumber == 0 {
+		// 	fmt.Printf("fade down 3 THIS ONE!")
+		// 	fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
+		// }
 
 		return fadeColors
 	}
@@ -73,6 +81,7 @@ func processColor(start bool, end bool, invert bool, fadeColors map[int][]common
 		}
 
 		// Fade down last color, so this black can be displayed.
+		fmt.Printf("fade down 4")
 		fadeColors = fadeDownColor(shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
 
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
