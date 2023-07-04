@@ -2022,13 +2022,6 @@ func TestCalculateStandardPositions(t *testing.T) {
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						},
 					},
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
 				},
 			},
 			want: map[int]common.Position{
@@ -2242,13 +2235,6 @@ func TestCalculateInvertedPositions(t *testing.T) {
 							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						},
 					},
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-						},
-					},
 				},
 			},
 			want: map[int]common.Position{
@@ -2416,7 +2402,9 @@ func Test_processDifferentColor(t *testing.T) {
 	type args struct {
 		start         bool
 		end           bool
+		bounce        bool
 		invert        bool
+		stepNumber    int
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
@@ -2499,7 +2487,7 @@ func Test_processDifferentColor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.start, tt.args.end, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2510,8 +2498,10 @@ func Test_processSameColorNotBlack(t *testing.T) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
+		stepNumber    int
 		start         bool
 		end           bool
+		bounce        bool
 		invert        bool
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
@@ -2598,7 +2588,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.start, tt.args.end, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2609,8 +2599,10 @@ func Test_processDiffColorBlack(t *testing.T) {
 
 	fadeColors := make(map[int][]common.FixtureBuffer, 10)
 	type args struct {
+		stepNumber    int
 		start         bool
 		end           bool
+		bounce        bool
 		invert        bool
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
@@ -2697,7 +2689,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.start, tt.args.end, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})

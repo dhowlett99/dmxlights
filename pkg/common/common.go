@@ -93,6 +93,9 @@ type FixtureBuffer struct {
 	Tilt         int
 	Shutter      int
 	Enabled      bool
+	DebugMsg     string
+	Step         int
+	Rule         int
 }
 
 type Value struct {
@@ -318,6 +321,7 @@ type Sequence struct {
 	FadeUp                      []int                       // Fade up values.
 	FadeOn                      []int                       // Fade on values.
 	FadeDown                    []int                       // Fade down values.
+	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
