@@ -42,7 +42,7 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", fixtureNumber, start, end, bounce, invert)
 		}
 
-		// Fade down last color but only if last color wasn't a black and we're not at the start.
+		// Fade down last color but only if last color wasn't a black and we're not at the start or the end.
 		if lastColor != common.Black && !start && !end {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn1", shift, fadeColors, lastColor, sequence, fixture, fixtureNumber)
 		}
@@ -102,13 +102,13 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 
 		// Now that we have faded down. Play the black for the off.
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
-		fadeColors = makeABlack(stepNumber, 3, "makeABlack3", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
+		fadeColors = makeABlack(stepNumber, 4, "makeBlak3", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
 
-		fadeColors = fadeOffColor(stepNumber, 3, "FadeOff2", fadeColors, thisColor, sequence, fixture, fixtureNumber)
+		fadeColors = fadeOffColor(stepNumber, 4, "FadeOff2", fadeColors, thisColor, sequence, fixture, fixtureNumber)
 
 		// If the next color is color fade back up.
 		if nextColor != common.Black && end && invert {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_3", fadeColors, nextColor, sequence, fixture, fixtureNumber)
+			fadeColors = fadeUpColor(stepNumber, 4, "FadeUp_3", fadeColors, nextColor, sequence, fixture, fixtureNumber)
 		}
 
 		return fadeColors

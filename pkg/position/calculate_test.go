@@ -204,8 +204,14 @@ func TestCalculatePositions(t *testing.T) {
 
 					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
+					// for number, fixtureBuffer := range fade {
+					// 	fmt.Printf("%s: \t\t\t\t\tBuffer:%d fixtureBuffer:%+v\n", fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
+					// }
+
+					step := 0
 					for number, fixtureBuffer := range fade {
-						fmt.Printf("%s: \t\t\t\t\tBuffer:%d fixtureBuffer:%+v\n", fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
+						fmt.Printf("\tstep %d rule %d %s: Buffer:%d fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
+						step++
 					}
 
 				}
