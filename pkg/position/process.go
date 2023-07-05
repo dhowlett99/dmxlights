@@ -59,7 +59,9 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 			}
 		}
 
+		// Fade down color.
 		fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn2", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
+
 		if bounce && lastColor != common.Black {
 			makeAColor(stepNumber, 2, "MakeColr", shift, fadeColors, common.Black, sequence, fixture, fixtureNumber)
 		}
