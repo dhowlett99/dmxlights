@@ -184,18 +184,18 @@ func TestCalculatePositions(t *testing.T) {
 
 				t.Errorf("CalculatePositions() ")
 
-				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
-				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+				// fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				// for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
 
-					fade := tt.want[fixtureNumber]
+				// 	fade := tt.want[fixtureNumber]
 
-					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-					for number, fixtureBuffer := range fade {
-						fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
-					}
+				// 	for number, fixtureBuffer := range fade {
+				// 		fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
+				// 	}
 
-				}
+				// }
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
 				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
@@ -204,13 +204,9 @@ func TestCalculatePositions(t *testing.T) {
 
 					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-					// for number, fixtureBuffer := range fade {
-					// 	fmt.Printf("%s: \t\t\t\t\tBuffer:%d fixtureBuffer:%+v\n", fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
-					// }
-
 					step := 0
-					for number, fixtureBuffer := range fade {
-						fmt.Printf("\tstep %d rule %d %s: Buffer:%d fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
+					for _, fixtureBuffer := range fade {
+						fmt.Printf("\tstep %d rule %d %s: fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color.R)
 						step++
 					}
 
@@ -253,6 +249,7 @@ func TestCalculatBouncePositions(t *testing.T) {
 			},
 			steps: []common.Step{
 				{
+					StepNumber: 0,
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -260,6 +257,7 @@ func TestCalculatBouncePositions(t *testing.T) {
 					},
 				},
 				{
+					StepNumber: 1,
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
@@ -267,6 +265,7 @@ func TestCalculatBouncePositions(t *testing.T) {
 					},
 				},
 				{
+					StepNumber: 2,
 					Fixtures: map[int]common.Fixture{
 						0: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						1: {MasterDimmer: full, Enabled: true, Brightness: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -420,18 +419,17 @@ func TestCalculatBouncePositions(t *testing.T) {
 
 				t.Errorf("CalculatePositions() ")
 
-				// fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
-				// for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
 
-				// 	fade := tt.want[fixtureNumber]
+					fade := tt.want[fixtureNumber]
 
-				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-				// 	for number, fixtureBuffer := range fade {
-				// 		fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
-				// 	}
-
-				// }
+					for _, fixtureBuffer := range fade {
+						fmt.Printf("\tstep %d rule %d %s: fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color.R)
+					}
+				}
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
 				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
@@ -440,8 +438,8 @@ func TestCalculatBouncePositions(t *testing.T) {
 
 					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-					for number, fixtureBuffer := range fade {
-						fmt.Printf("%s: \t\t\t\t\tBuffer:%d fixtureBuffer:%+v\n", fixtureBuffer.DebugMsg, number, fixtureBuffer.Color.R)
+					for _, fixtureBuffer := range fade {
+						fmt.Printf("\tstep %d rule %d %s: fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color.R)
 					}
 
 				}
