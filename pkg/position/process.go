@@ -87,9 +87,9 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 
 	var shiftCounter int
 	for range fade {
-		// if shiftCounter == shift {
-		// 	break
-		// }
+		if shiftCounter == shift {
+			break
+		}
 		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
 		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 		shiftCounter++
@@ -129,9 +129,9 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 
 	var shiftCounter int
 	for _, slope := range sequence.FadeDown {
-		// if shiftCounter == shift {
-		// 	break
-		// }
+		if shiftCounter == shift {
+			break
+		}
 		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
 		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 		shiftCounter++
@@ -190,9 +190,9 @@ func keepSameAsLastTime(stepNumber int, rule int, debugMsg string, shift int, fa
 	fade = append(fade, sequence.FadeDown...)
 	var shiftCounter int
 	for range fade {
-		// if shiftCounter == shift {
-		// 	break
-		// }
+		if shiftCounter == shift {
+			break
+		}
 		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
 		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
 		shiftCounter++
