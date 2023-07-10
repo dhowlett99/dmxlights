@@ -74,7 +74,6 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 		var shiftCounter int
 		for _, slope := range sequence.FadeDown {
 			if shiftCounter == shift {
-				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
 				break
 			}
 			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
@@ -101,7 +100,6 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 		var shiftCounter int
 		for _, slope := range sequence.FadeUp {
 			if shiftCounter == shift {
-				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
 				break
 			}
 			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
@@ -133,7 +131,6 @@ func keepSameAsLastTime(stepNumber int, rule int, debugMsg string, shift int, fa
 		var shiftCounter int
 		for range fade {
 			if shiftCounter == shift {
-				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
 				break
 			}
 			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
