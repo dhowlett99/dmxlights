@@ -754,6 +754,22 @@ func TestCalculateRGBPositionsSimpleGreenChase(t *testing.T) {
 					}
 
 				}
+
+				// fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
+				// for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
+				// 	positionNumber := 0
+				// 	fade := fadeColors[fixtureNumber]
+
+				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+
+				// 	step := 0
+				// 	for _, fixtureBuffer := range fade {
+				// 		fmt.Printf("\tpositionNumber %d step %d rule %d %s: fixtureBuffer:%+v\n", positionNumber, fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color)
+				// 		step++
+				// 		positionNumber++
+				// 	}
+
+				// }
 			}
 			if numberPositions != tt.want1 {
 				t.Errorf("CalculatePositions() got1 = %v, want %v", numberPositions, tt.want1)
@@ -1013,7 +1029,7 @@ func TestCalculateMulticoloredPatten(t *testing.T) {
 					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
 
 						fixture := position.Fixtures[fixtureNumber]
-						fmt.Printf("Fixture:%d R:%d\n", fixtureNumber, fixture.Colors[0].R)
+						fmt.Printf("Fixture:%d Color:%+v\n", fixtureNumber, fixture.Colors[0])
 					}
 
 				}
@@ -2435,7 +2451,6 @@ func Test_processDifferentColor(t *testing.T) {
 					FadeOn:   []int{255},
 					FadeDown: []int{255, 50, 0},
 				},
-				fixtureNumber: 0,
 				fixture: common.Fixture{
 					Colors: []common.Color{
 						{
@@ -2487,7 +2502,7 @@ func Test_processDifferentColor(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2588,7 +2603,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
 			}
 		})
@@ -2689,52 +2704,8 @@ func Test_processDiffColorBlack(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
 			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.fixtureNumber, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
+			if got := processColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift, tt.args.patternShift, tt.args.scanner); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func TestCalcShift(t *testing.T) {
-	type args struct {
-		shift        int
-		lengthOfFade int
-	}
-	tests := []struct {
-		name string
-		args args
-		want int
-	}{
-		{
-			name: "shift of 1, no shift",
-			args: args{
-				shift:        10,
-				lengthOfFade: 30,
-			},
-			want: 30,
-		},
-		{
-			name: "shift of 1, no shift",
-			args: args{
-				shift:        5,
-				lengthOfFade: 15,
-			},
-			want: 30,
-		},
-		{
-			name: "shift of 1, no shift",
-			args: args{
-				shift:        1,
-				lengthOfFade: 3,
-			},
-			want: 0,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := CalcShift(tt.args.shift, tt.args.lengthOfFade); got != tt.want {
-				t.Errorf("CalcShift() = %v, want %v", got, tt.want)
 			}
 		})
 	}

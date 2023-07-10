@@ -24,14 +24,14 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, fixtureNumber int, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
+func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
 	if thisColor == lastColor {
 		if debug {
-			fmt.Printf("\t\tRULE#1 - fixture %d If color is same as last time , play that color out again. start %t end %t bounce %t invert %t\n", fixtureNumber, start, end, bounce, invert)
+			fmt.Printf("\t\tRULE#1 - fixture %d If color is same as last time , play that color out again. start %t end %t bounce %t invert %t\n", fixture.Number, start, end, bounce, invert)
 		}
-		fadeColors = keepSameAsLastTime(stepNumber, 1, "SameColr", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
+		fadeColors = keepSameAsLastTime(stepNumber, 1, "SameColr", shift, fadeColors, thisColor, sequence, fixture)
 		return fadeColors
 	}
 
@@ -39,165 +39,108 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 	if thisColor != lastColor {
 
 		if debug {
-			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", fixtureNumber, start, end, bounce, invert)
+			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", fixture.Number, start, end, bounce, invert)
 		}
 
-		fadeColors = fadeOffColor(stepNumber, 2, "FadeOff1", fadeColors, thisColor, sequence, fixture, fixtureNumber)
-
-		// Don't fade up if last color was a black.
-		if lastColor == common.Black {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", fadeColors, thisColor, sequence, fixture, fixtureNumber)
+		if lastColor != common.Black {
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn2", shift, fadeColors, thisColor, sequence, fixture)
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture, fixture.Number)
+		} else {
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture, fixture.Number)
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn2", shift, fadeColors, thisColor, sequence, fixture)
 		}
-
-		// Leave the color for on time.
-		fadeColors = fadeOnColor(stepNumber, 2, "FadeOn_1", fadeColors, thisColor, sequence, fixture, fixtureNumber)
-
-		// if next color is the same as this color keep it on.
-		if !bounce {
-			if nextColor == thisColor {
-				makeAColor(stepNumber, 2, "MakeColr", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
-			}
-		}
-
-		// Fade down color.
-		fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn2", shift, fadeColors, thisColor, sequence, fixture, fixtureNumber)
-
-		if bounce && lastColor != common.Black {
-			makeAColor(stepNumber, 2, "MakeColr", shift, fadeColors, common.Black, sequence, fixture, fixtureNumber)
-		}
-
 		return fadeColors
 	}
 
 	if debug {
-		fmt.Printf("\t\tRULE#5 fixture %d No rule fired. start %t end %t bounce %t invert %t\n", fixtureNumber, start, end, bounce, invert)
+		fmt.Printf("\t\tRULE#5 fixture %d No rule fired. start %t end %t bounce %t invert %t\n", fixture.Number, start, end, bounce, invert)
 	}
 
 	return fadeColors
 }
 
-func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
+func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
-		fmt.Printf("\t\t\tfixture:%d makeAColor color %+v\n", fixtureNumber, color)
+		fmt.Printf("\t\t\t\tfixture:%d fadeDownColor color %+v\n", fixture.Number, color)
 	}
 
-	var fade []int
-	fade = append(fade, sequence.FadeUp...)
-	// fade = append(fade, sequence.FadeOn...)
-	// fade = append(fade, sequence.FadeDown...)
-
-	var shiftCounter int
-	for range fade {
-		if shiftCounter == shift {
-			break
+	if color.R > 0 || color.G > 0 || color.B > 0 {
+		for _, slope := range sequence.FadeDown {
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		}
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-		shiftCounter++
+	} else {
+		var shiftCounter int
+		for _, slope := range sequence.FadeDown {
+			if shiftCounter == shift {
+				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
+				break
+			}
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
+			shiftCounter++
+		}
 	}
 
 	return fadeColors
 }
 
-// func makeABlack(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
-
-// 	if debug {
-// 		fmt.Printf("\t\t\tfixture:%d makeABlack color %+v\n", fixtureNumber, color)
-// 	}
-
-// 	var fade []int
-// 	fade = append(fade, sequence.FadeUp...)
-// 	fade = append(fade, sequence.FadeOn...)
-// 	fade = append(fade, sequence.FadeDown...)
-// 	var shiftCounter int
-// 	for range fade {
-// 		// if shiftCounter == shift {
-// 		// 	break
-// 		// }
-// 		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, 0, sequence.ScannerChaser)
-// 		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-// 		shiftCounter++
-// 	}
-
-// 	return fadeColors
-// }
-
-func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
-
-	if debug {
-		fmt.Printf("\t\t\t\tfixture:%d fadeDownColor color %+v\n", fixtureNumber, color)
-	}
-
-	var shiftCounter int
-	for _, slope := range sequence.FadeDown {
-		if shiftCounter == shift {
-			break
-		}
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-		shiftCounter++
-	}
-	return fadeColors
-}
-
-func fadeUpColor(stepNumber int, rule int, debugMsg string, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
+func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d fadeUpColor color %+v\n", fixtureNumber, color)
 	}
 
-	for _, slope := range sequence.FadeUp {
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+	if color.R > 0 || color.G > 0 || color.B > 0 {
+		for _, slope := range sequence.FadeUp {
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+		}
+	} else {
+		var shiftCounter int
+		for _, slope := range sequence.FadeUp {
+			if shiftCounter == shift {
+				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
+				break
+			}
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
+			shiftCounter++
+		}
 	}
+
 	return fadeColors
 }
 
-func fadeOnColor(stepNumber int, rule int, debugMsg string, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
+func keepSameAsLastTime(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
-		fmt.Printf("\t\t\t\tfixture:%d fadeOnColor color %+v\n", fixtureNumber, color)
-	}
-
-	for _, slope := range sequence.FadeOn {
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-	}
-	return fadeColors
-}
-
-func fadeOffColor(stepNumber int, rule int, debugMsg string, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
-
-	if debug {
-		fmt.Printf("\t\t\t\tfixture:%d fadeOffColor color %+v\n", fixtureNumber, color)
-	}
-
-	for _, slope := range sequence.FadeOn {
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, slope, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-	}
-	return fadeColors
-}
-
-func keepSameAsLastTime(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture, fixtureNumber int) map[int][]common.FixtureBuffer {
-
-	if debug {
-		fmt.Printf("\t\t\t\tfixture:%d keepSameAsLastTime color %+v\n", fixtureNumber, color)
+		fmt.Printf("\t\t\t\tfixture:%d keepSameAsLastTime color %+v\n", fixture.Number, color)
 	}
 
 	var fade []int
 	fade = append(fade, sequence.FadeUp...)
 	fade = append(fade, sequence.FadeOn...)
 	fade = append(fade, sequence.FadeDown...)
-	var shiftCounter int
-	for range fade {
-		if shiftCounter == shift {
-			break
+
+	if color.R > 0 || color.G > 0 || color.B > 0 {
+		for range fade {
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
+			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		}
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, fixtureNumber, color, 255, sequence.ScannerChaser)
-		fadeColors[fixtureNumber] = append(fadeColors[fixtureNumber], newColor)
-		shiftCounter++
+	} else {
+		var shiftCounter int
+		for range fade {
+			if shiftCounter == shift {
+				fmt.Printf("----> shiftCounter %d shift %d\n", shiftCounter, shift)
+				break
+			}
+			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
+			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
+			shiftCounter++
+		}
 	}
+
 	return fadeColors
 }

@@ -40,7 +40,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	invert := false
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
-	shift := CalcShift(common.Reverse(sequence.RGBShift), 30)
+	shift := common.Reverse(sequence.RGBShift)
 
 	if debug {
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
@@ -65,6 +65,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				fmt.Printf("Step Number %d No Fixtures %d\n", stepNumber, len(step.Fixtures))
 			}
 
+			// Calculate last step.
 			if stepNumber == 0 {
 				end = false
 				lastStep = steps[len(steps)-1]
@@ -83,6 +84,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			// Fixtures forward.
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
+				fixture.Number = fixtureNumber
 
 				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
 
@@ -90,7 +92,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, fixtureNumber, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
 				}
 
 				// Incremet the the fixture counter.
@@ -142,6 +144,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			for fixtureNumber := 0; fixtureNumber <= len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
 				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
+				fixture.Number = fixtureNumber
 
 				// Reverse the colors.
 				noColors := len(fixture.Colors)
@@ -149,7 +152,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					color := fixture.Colors[colorNumber-1]
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, fixtureNumber, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
 				}
 				numberFixturesInThisStep++
 			}
@@ -175,6 +178,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			// Fixtures forward.
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
 				fixture := step.Fixtures[fixtureNumber]
+				fixture.Number = fixtureNumber
 
 				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
 
@@ -182,7 +186,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, fixtureNumber, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
+					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, patternShift, scanner)
 				}
 
 				// Incremet the the fixture counter.
@@ -233,10 +237,10 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }
 
-func makeNewColor(stepNumber int, rule int, debugMsg string, fixture common.Fixture, fixtureNumber int, color common.Color, insertValue int, chase bool) common.FixtureBuffer {
+func makeNewColor(stepNumber int, rule int, debugMsg string, fixture common.Fixture, color common.Color, insertValue int, chase bool) common.FixtureBuffer {
 
 	if debug {
-		fmt.Printf("\t\t\t\t\tStep %d func=%s makeNewColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, fixtureNumber, color, insertValue)
+		fmt.Printf("\t\t\t\t\tStep %d func=%s makeNewColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, fixture.Number, color, insertValue)
 	}
 
 	newColor := common.FixtureBuffer{}
@@ -291,47 +295,47 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixture := 0; fixture <= numberFixtures; fixture++ {
+		for fixtureNumber := 0; fixtureNumber <= numberFixtures; fixtureNumber++ {
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
 
-			lenghtOfSteps := len(fadeColors[fixture])
+			lenghtOfSteps := len(fadeColors[fixtureNumber])
 			if step < lenghtOfSteps {
 
 				// We've found a color.
-				if fadeColors[fixture][step].Color.R > 0 || fadeColors[fixture][step].Color.G > 0 || fadeColors[fixture][step].Color.B > 0 || fadeColors[fixture][step].Color.W > 0 {
+				if fadeColors[fixtureNumber][step].Color.R > 0 || fadeColors[fixtureNumber][step].Color.G > 0 || fadeColors[fixtureNumber][step].Color.B > 0 || fadeColors[fixtureNumber][step].Color.W > 0 {
 
-					newColor.R = fadeColors[fixture][step].Color.R
-					newColor.G = fadeColors[fixture][step].Color.G
-					newColor.B = fadeColors[fixture][step].Color.B
-					newColor.W = fadeColors[fixture][step].Color.W
+					newColor.R = fadeColors[fixtureNumber][step].Color.R
+					newColor.G = fadeColors[fixtureNumber][step].Color.G
+					newColor.B = fadeColors[fixtureNumber][step].Color.B
+					newColor.W = fadeColors[fixtureNumber][step].Color.W
 					newFixture.Colors = append(newFixture.Colors, newColor)
-					newFixture.Enabled = fadeColors[fixture][step].Enabled
-					newFixture.Gobo = fadeColors[fixture][step].Gobo
-					newFixture.Pan = fadeColors[fixture][step].Pan
-					newFixture.Tilt = fadeColors[fixture][step].Tilt
-					newFixture.Shutter = fadeColors[fixture][step].Shutter
-					lampOn[fixture] = true
-					lampOff[fixture] = false
-					newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-					newFixture.Brightness = fadeColors[fixture][step].Brightness
-					newPosition.Fixtures[fixture] = newFixture
+					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
+					newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
+					newFixture.Pan = fadeColors[fixtureNumber][step].Pan
+					newFixture.Tilt = fadeColors[fixtureNumber][step].Tilt
+					newFixture.Shutter = fadeColors[fixtureNumber][step].Shutter
+					lampOn[fixtureNumber] = true
+					lampOff[fixtureNumber] = false
+					newFixture.MasterDimmer = fadeColors[fixtureNumber][step].MasterDimmer
+					newFixture.Brightness = fadeColors[fixtureNumber][step].Brightness
+					newPosition.Fixtures[fixtureNumber] = newFixture
 				} else {
 					// turn the lamp off, but only if its already on.
-					if lampOn[fixture] || !lampOff[fixture] || !Optimisation {
+					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !Optimisation {
 						newFixture.Colors = append(newFixture.Colors, common.Color{})
-						newFixture.Enabled = fadeColors[fixture][step].Enabled
-						newFixture.Gobo = fadeColors[fixture][step].Gobo
-						newFixture.Pan = fadeColors[fixture][step].Pan
-						newFixture.Tilt = fadeColors[fixture][step].Tilt
-						newFixture.Shutter = fadeColors[fixture][step].Shutter
-						lampOn[fixture] = false
-						newFixture.MasterDimmer = fadeColors[fixture][step].MasterDimmer
-						newFixture.Brightness = fadeColors[fixture][step].Brightness
-						newPosition.Fixtures[fixture] = newFixture
+						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
+						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
+						newFixture.Pan = fadeColors[fixtureNumber][step].Pan
+						newFixture.Tilt = fadeColors[fixtureNumber][step].Tilt
+						newFixture.Shutter = fadeColors[fixtureNumber][step].Shutter
+						lampOn[fixtureNumber] = false
+						newFixture.MasterDimmer = fadeColors[fixtureNumber][step].MasterDimmer
+						newFixture.Brightness = fadeColors[fixtureNumber][step].Brightness
+						newPosition.Fixtures[fixtureNumber] = newFixture
 					}
-					lampOff[fixture] = true
+					lampOff[fixtureNumber] = true
 				}
 			}
 		}
@@ -346,8 +350,8 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		for positionNumber := 0; positionNumber < len(positionsOut); positionNumber++ {
 			position := positionsOut[positionNumber]
 			fmt.Printf("Position %d\n", positionNumber)
-			for fixture := 0; fixture < len(position.Fixtures); fixture++ {
-				fmt.Printf("\tFixture %d Enabled %t Values %+v\n", fixture, position.Fixtures[fixture].Enabled, position.Fixtures[fixture].Colors)
+			for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
+				fmt.Printf("\tFixture %d Enabled %t Values %+v\n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Colors)
 			}
 		}
 	}
@@ -397,9 +401,4 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common
 	}
 
 	return stepsOut
-}
-
-func CalcShift(shift int, lengthOfFade int) int {
-	slotSize := lengthOfFade / 10
-	return slotSize * shift
 }

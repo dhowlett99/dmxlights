@@ -467,6 +467,7 @@ type Position struct {
 // a scanner.
 type Fixture struct {
 	ID           string
+	Number       int
 	Name         string
 	Label        string
 	MasterDimmer int
