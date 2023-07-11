@@ -38,6 +38,7 @@ const MinRGBShift = 1
 const MaxRGBShift = 10
 const MaxRGBFade = 10
 const MaxColorBar = 9 // Eight colors and a default color bar.
+const MinDMXBrightness = 0
 const MaxDMXBrightness = 255
 const DefaultPattern = 0
 const DefaultRGBSize = 0
@@ -1259,21 +1260,10 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-
 	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
 	sequence.FadeOn = GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
 	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
-
-	// sequence.FadeUpAndDown = []int{}
-	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeUp...)
-	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeOn...)
-	// sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeDown...)
-
-	// sequence.FadeDownAndUp = []int{}
-	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeDown...)
-	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeUp...)
-	// sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeOn...)
-
+	sequence.FadeOff = GetFadeOnValues(MinDMXBrightness, sequence.RGBSize)
 }
 
 func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {

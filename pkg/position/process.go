@@ -126,14 +126,18 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 		fmt.Printf("\t\t\t\tfixture:%d fadeDownColor color %+v\n", fixture.Number, color)
 	}
 
+	var fade []int
+	fade = append(fade, sequence.FadeDown...)
+	fade = append(fade, sequence.FadeOff...)
+
 	if color.R > 0 || color.G > 0 || color.B > 0 {
-		for _, slope := range sequence.FadeDown {
+		for _, slope := range fade {
 			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
 			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		}
 	} else {
 		var shiftCounter int
-		for _, slope := range sequence.FadeDown {
+		for _, slope := range fade {
 			if shiftCounter == shift {
 				break
 			}
@@ -186,6 +190,7 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 	fade = append(fade, sequence.FadeUp...)
 	fade = append(fade, sequence.FadeOn...)
 	fade = append(fade, sequence.FadeDown...)
+	fade = append(fade, sequence.FadeOff...)
 
 	if color.R > 0 || color.G > 0 || color.B > 0 {
 		for range fade {
