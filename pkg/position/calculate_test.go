@@ -184,18 +184,18 @@ func TestCalculatePositions(t *testing.T) {
 
 				t.Errorf("CalculatePositions() ")
 
-				// fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
-				// for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
 
-				// 	fade := tt.want[fixtureNumber]
+					fade := tt.want[fixtureNumber]
 
-				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-				// 	for number, fixtureBuffer := range fade {
-				// 		fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
-				// 	}
+					for number, fixtureBuffer := range fade {
+						fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
+					}
 
-				// }
+				}
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
 				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
