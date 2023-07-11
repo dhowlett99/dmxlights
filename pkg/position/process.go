@@ -47,10 +47,14 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn1", shift, fadeColors, lastColor, sequence, fixture)
 		}
 
+		if !invert {
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
+		}
+
 		// Fade the color up.
-		//if !invert {
-		fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
-		//}
+		if !start && invert {
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
+		}
 
 		if invert { // Make a color
 			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, nextColor, sequence, fixture)
@@ -98,7 +102,9 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 
 		// Now that we have faded down. Play the black for the off.
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
-		fadeColors = makeAColor(stepNumber, 3, "makeABlack3", shift, fadeColors, thisColor, sequence, fixture)
+		if !invert {
+			fadeColors = makeAColor(stepNumber, 3, "makeABlack3", shift, fadeColors, thisColor, sequence, fixture)
+		}
 
 		// If the next color is color fade back up.
 		if nextColor != common.Black && end && invert {

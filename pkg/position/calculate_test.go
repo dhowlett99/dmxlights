@@ -608,13 +608,11 @@ func TestCalculateNoBounceInvertedPositions(t *testing.T) {
 
 			scanner: false,
 			sequence: common.Sequence{
-				Bounce:        false,
-				RGBInvert:     true,
-				RGBInvertOnce: true,
-				ScannerInvert: false,
-				FadeUp:        []int{0, 50, 255},
-				// FadeOn:                []int{255},
-				// FadeOff:               []int{0},
+				Bounce:                false,
+				RGBInvert:             true,
+				RGBInvertOnce:         true,
+				ScannerInvert:         false,
+				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
 				FixtureState:          allFixturesEnabled,
@@ -732,18 +730,18 @@ func TestCalculateNoBounceInvertedPositions(t *testing.T) {
 
 				t.Errorf("CalculatePositions() ")
 
-				// fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
-				// for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
 
-				// 	fade := tt.want[fixtureNumber]
+					fade := tt.want[fixtureNumber]
 
-				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-				// 	for number, fixtureBuffer := range fade {
-				// 		fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
-				// 	}
+					for number, fixtureBuffer := range fade {
+						fmt.Printf("Buffer:%d fixtureBuffer:%+v\n", number, fixtureBuffer.Color.R)
+					}
 
-				// }
+				}
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
 				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
