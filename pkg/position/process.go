@@ -192,21 +192,14 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 	fade = append(fade, sequence.FadeDown...)
 	fade = append(fade, sequence.FadeOff...)
 
-	if color.R > 0 || color.G > 0 || color.B > 0 {
-		for range fade {
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
-			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
+	var shiftCounter int
+	for range fade {
+		if shiftCounter == shift {
+			break
 		}
-	} else {
-		var shiftCounter int
-		for range fade {
-			if shiftCounter == shift {
-				break
-			}
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
-			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
-			shiftCounter++
-		}
+		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
+		fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
+		shiftCounter++
 	}
 
 	return fadeColors
