@@ -1061,7 +1061,6 @@ func TestCalculateShift8(t *testing.T) {
 				scanner: false,
 				sequence: common.Sequence{
 					FadeUp:                []int{1, 50, 255},
-					FadeDown:              []int{255, 50, 1},
 					Optimisation:          false,
 					Bounce:                false,
 					RGBInvert:             false,
@@ -1244,7 +1243,6 @@ func TestCalculateShift1(t *testing.T) {
 				scanner: false,
 				sequence: common.Sequence{
 					FadeUp:                []int{1, 50, 255},
-					FadeDown:              []int{255, 50, 1},
 					Optimisation:          false,
 					Bounce:                false,
 					RGBInvert:             false,
@@ -1398,7 +1396,7 @@ func TestCalculatePairsPatten(t *testing.T) {
 		{
 			name: "Pairs case",
 			args: args{
-				scanner: true,
+				scanner: false,
 				sequence: common.Sequence{
 					Bounce:                false,
 					FadeUp:                []int{0, 50, 255},
