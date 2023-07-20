@@ -68,6 +68,11 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn3", shift, fadeColors, thisColor, sequence, fixture)
 		}
 
+		// If the next color is another color but not black. Fade dowm this color down ready.
+		if nextColor != common.Black && thisColor != nextColor && !start {
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn4", shift, fadeColors, thisColor, sequence, fixture)
+		}
+
 		// If next color is not black and we're at the end or bouncing and we're the first fixture.
 		if nextColor != common.Black && !start && end && bounce && fixture.Number == 0 {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn4", shift, fadeColors, nextColor, sequence, fixture)
