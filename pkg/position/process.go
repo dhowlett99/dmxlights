@@ -20,11 +20,14 @@ package position
 
 import (
 	"fmt"
+	"math"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, patternShift int, scanner bool) map[int][]common.FixtureBuffer {
+// processColor takes this color and next color and adds a fade color to the fadeColors map.
+// This function uses simple rules to decide which fade value to add.
+func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, scanner bool) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
 	if thisColor == lastColor {
@@ -120,6 +123,7 @@ func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool
 	return fadeColors
 }
 
+// fadeDownColor fades down the given color using the sequences fade down and fade off values.
 func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
@@ -132,7 +136,7 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 
 	if color.R > 0 || color.G > 0 || color.B > 0 {
 		for _, slope := range fade {
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			newColor := addColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
 			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		}
 	} else {
@@ -141,7 +145,7 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 			if shiftCounter == shift {
 				break
 			}
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			newColor := addColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
 			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 			shiftCounter++
 		}
@@ -150,6 +154,7 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 	return fadeColors
 }
 
+// fadeUpColor fades up the given color using the sequences fade up and fade on values.
 func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
@@ -162,7 +167,7 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 
 	if color.R > 0 || color.G > 0 || color.B > 0 {
 		for _, slope := range fade {
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			newColor := addColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
 			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		}
 	} else {
@@ -171,7 +176,7 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 			if shiftCounter == shift {
 				break
 			}
-			newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
+			newColor := addColor(stepNumber, rule, debugMsg, fixture, color, slope, sequence.ScannerChaser)
 			fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 			shiftCounter++
 		}
@@ -180,6 +185,7 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 	return fadeColors
 }
 
+// makeAColor is used to add a color to the fixture buffer map of size fadeUp, fadeOn, FadeDown and fadeOff, which is the width of one cycle.
 func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, fixture common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
@@ -197,10 +203,45 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 		if shiftCounter == shift {
 			break
 		}
-		newColor := makeNewColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
+		newColor := addColor(stepNumber, rule, debugMsg, fixture, color, 255, sequence.ScannerChaser)
 		fadeColors[fixture.Number] = append(fadeColors[fixture.Number], newColor)
 		shiftCounter++
 	}
 
 	return fadeColors
+}
+
+// addColor adds a color to the fixtures buffer array, which is used later for assembling the positions.
+func addColor(stepNumber int, rule int, debugMsg string, fixture common.Fixture, color common.Color, insertValue int, chase bool) common.FixtureBuffer {
+
+	if debug {
+		fmt.Printf("\t\t\t\t\tStep %d func=%s addColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, fixture.Number, color, insertValue)
+	}
+
+	newColor := common.FixtureBuffer{}
+
+	if debug {
+		newColor.DebugMsg = debugMsg
+		newColor.Step = stepNumber
+		newColor.Rule = rule
+	}
+
+	newColor.Color = common.Color{}
+	newColor.Gobo = fixture.Gobo
+	newColor.Pan = fixture.Pan
+	newColor.Tilt = fixture.Tilt
+	newColor.Shutter = fixture.Shutter
+	newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(insertValue) / 2.55)))
+	if !chase {
+		newColor.Brightness = 255
+	} else {
+		newColor.Brightness = int(math.Round((float64(fixture.MasterDimmer) / 100) * (float64(insertValue) / 2.55)))
+	}
+
+	newColor.Enabled = fixture.Enabled
+	newColor.MasterDimmer = fixture.MasterDimmer
+	return newColor
 }

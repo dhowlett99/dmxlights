@@ -178,7 +178,7 @@ func TestCalculatePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
+			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -317,7 +317,7 @@ func TestCalculatePositionsWithShift(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
+			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -552,7 +552,7 @@ func TestCalculatBouncePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
+			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -724,7 +724,7 @@ func TestCalculateNoBounceInvertedPositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner, 0)
+			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 

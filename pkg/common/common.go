@@ -174,14 +174,13 @@ type FixtureState struct {
 }
 
 type Pattern struct {
-	Name         string
-	Label        string
-	Number       int
-	Length       int // 8, 4 or 2
-	PatternShift int
-	Size         int
-	Fixtures     int // 8 Fixtures
-	Steps        []Step
+	Name     string
+	Label    string
+	Number   int
+	Length   int // 8, 4 or 2
+	Size     int
+	Fixtures int // 8 Fixtures
+	Steps    []Step
 }
 
 type Arg struct {

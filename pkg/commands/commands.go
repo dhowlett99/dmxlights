@@ -257,7 +257,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Set Fade to %d\n", mySequenceNumber, command.Args[FADE_SPEED].Value)
 		}
 		sequence.RGBFade = command.Args[FADE_SPEED].Value.(int)
-		sequence.RGBCoordinates = common.Reverse(command.Args[FADE_SPEED].Value.(int)) + 1
 		return sequence
 
 	case common.UpdateColor:
