@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/process"
 )
 
 const debug = false
@@ -91,7 +92,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
 				}
 
 				// Incremet the the fixture counter.
@@ -151,7 +152,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					color := fixture.Colors[colorNumber-1]
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
 				}
 				numberFixturesInThisStep++
 			}
@@ -185,7 +186,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = processColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
 				}
 
 				// Incremet the the fixture counter.

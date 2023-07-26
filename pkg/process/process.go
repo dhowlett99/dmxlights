@@ -16,7 +16,7 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package position
+package process
 
 import (
 	"fmt"
@@ -25,9 +25,11 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+const debug = false
+
 // processColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
-func processColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, scanner bool) map[int][]common.FixtureBuffer {
+func ProcessColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, scanner bool) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
 	if thisColor == lastColor {
