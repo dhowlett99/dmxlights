@@ -17,6 +17,7 @@
 package pattern
 
 import (
+	"fmt"
 	"reflect"
 	"testing"
 
@@ -953,7 +954,7 @@ func Test_getEnabledScanner(t *testing.T) {
 	}
 }
 
-func TestApplyScannerState(t *testing.T) {
+func TestApplyScannerState2And4Disabled(t *testing.T) {
 	type args struct {
 		steps        []common.Step
 		scannerState map[int]common.FixtureState
@@ -1092,8 +1093,7 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 			want: common.Pattern{
-				Name:  "Chase",
-				Label: "std.Scanner.Chase",
+
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -1143,18 +1143,6 @@ func TestApplyScannerState(t *testing.T) {
 							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
 						},
 					},
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
 					{
 						Fixtures: map[int]common.Fixture{
 							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -1194,6 +1182,30 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerState4Enabled4Disabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
 		{
 			name: "4 enabled and 4 disabled.",
 			args: args{
@@ -1323,8 +1335,6 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 			want: common.Pattern{
-				Name:  "Chase",
-				Label: "std.Scanner.Chase",
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -1377,6 +1387,30 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerStateAllEnabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
 		{
 			name: "standard 2 steps All enabled.",
 			args: args{
@@ -1404,8 +1438,6 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 			want: common.Pattern{
-				Name:  "Chase",
-				Label: "std.Scanner.Chase",
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -1422,6 +1454,31 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerStateFirst4Disabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
+
 		{
 			name: "standard 8 steps  first 4 disabled",
 			args: args{
@@ -1551,57 +1608,8 @@ func TestApplyScannerState(t *testing.T) {
 				},
 			},
 			want: common.Pattern{
-				Name:  "Chase",
-				Label: "std.Scanner.Chase",
+
 				Steps: []common.Step{
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					// 		1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					// 		3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
-					// {
-					// 	Fixtures: map[int]common.Fixture{
-					// 		0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Colors: []common.Color{{R: 255, G: 255, B: 255}}},
-					// 		4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					// 	},
-					// },
 					{
 						Fixtures: map[int]common.Fixture{
 							0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
@@ -1662,6 +1670,14 @@ func TestApplyScannerState(t *testing.T) {
 			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
 				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+
+				for stepNumber, step := range got.Steps {
+					fmt.Printf("Step %d\n", stepNumber)
+					for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+						fixture := step.Fixtures[fixtureNumber]
+						fmt.Printf("\t\tFixture %d Enabled %t Master %d Brightness %d Shutter %d Color %+v\n", fixtureNumber, fixture.Enabled, fixture.MasterDimmer, fixture.Brightness, fixture.Shutter, fixture.Colors)
+					}
+				}
 			}
 		})
 	}
