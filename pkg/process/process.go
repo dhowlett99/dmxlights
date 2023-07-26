@@ -27,9 +27,18 @@ import (
 
 const debug = false
 
-// processColor takes this color and next color and adds a fade color to the fadeColors map.
+// processScannerColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
-func ProcessColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int, scanner bool) map[int][]common.FixtureBuffer {
+func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
+
+	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
+	return fadeColors
+
+}
+
+// processRGBColor takes this color and next color and adds a fade color to the fadeColors map.
+// This function uses simple rules to decide which fade value to add.
+func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
 	if thisColor == lastColor {

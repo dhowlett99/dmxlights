@@ -92,7 +92,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					if scanner {
+						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					} else {
+						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					}
 				}
 
 				// Incremet the the fixture counter.
@@ -152,7 +156,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					color := fixture.Colors[colorNumber-1]
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
-					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					if scanner {
+						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					} else {
+						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					}
 				}
 				numberFixturesInThisStep++
 			}
@@ -186,7 +194,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				for colorNumber, color := range fixture.Colors {
 					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
 					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					fadeColors = process.ProcessColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift, scanner)
+					if scanner {
+						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					} else {
+						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
+					}
 				}
 
 				// Incremet the the fixture counter.
