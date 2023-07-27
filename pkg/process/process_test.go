@@ -160,7 +160,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 			name: "process a single color red, last color was red",
 			args: args{
 				start:      false,
-				end:        true,
+				end:        false,
 				shift:      10, // inverted to represents shift 0
 				fadeColors: fadeColors,
 				sequence: common.Sequence{
@@ -287,7 +287,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 			name: "process a single color black, last color was red",
 			args: args{
 				start:      false,
-				end:        true,
+				end:        false,
 				shift:      10, // inverted to represents shift 0
 				fadeColors: fadeColors,
 				sequence: common.Sequence{
