@@ -31,7 +31,7 @@ const debug = false
 // This function uses simple rules to decide which fade value to add.
 func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, fixture common.Fixture, thisColor common.Color, lastColor common.Color, nextColor common.Color, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
 
-	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
+	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisColor, sequence, fixture)
 	return fadeColors
 
 }
@@ -67,10 +67,11 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 
 		// Fade the color up.
 		if !start && invert {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisColor, sequence, fixture)
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_2", shift, fadeColors, thisColor, sequence, fixture)
 		}
 
-		if invert { // Make a color
+		// Make a color
+		if invert {
 			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, nextColor, sequence, fixture)
 		}
 
@@ -86,7 +87,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 
 		// If next color is not black and we're at the end or bouncing and we're the first fixture.
 		if nextColor != common.Black && !start && end && bounce && fixture.Number == 0 {
-			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn4", shift, fadeColors, nextColor, sequence, fixture)
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn5", shift, fadeColors, nextColor, sequence, fixture)
 		}
 
 		return fadeColors
@@ -101,7 +102,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 
 		if start && invert {
 			//Fade down last color, so this black can be displayed.
-			fadeColors = fadeDownColor(stepNumber, 3, "FadeDwn5", shift, fadeColors, lastColor, sequence, fixture)
+			fadeColors = fadeDownColor(stepNumber, 3, "FadeDwn6", shift, fadeColors, lastColor, sequence, fixture)
 		} else {
 			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, thisColor, sequence, fixture)
 		}
@@ -117,7 +118,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		}
 
 		// Fade down last color, so this black can be displayed.
-		fadeColors = fadeDownColor(stepNumber, 4, "FadeDwn6", shift, fadeColors, lastColor, sequence, fixture)
+		fadeColors = fadeDownColor(stepNumber, 4, "FadeDwn7", shift, fadeColors, lastColor, sequence, fixture)
 
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
 		if !invert {
