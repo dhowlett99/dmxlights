@@ -107,9 +107,9 @@ func Test_processDifferentColor(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
+			lastFixture := tt.args.lastStep.Fixtures[tt.args.fixtureNumber]
+			nextFixture := tt.args.nextStep.Fixtures[tt.args.fixtureNumber]
+			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, &tt.args.fixture, &lastFixture, &nextFixture, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", fadeColors, tt.want)
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
@@ -234,9 +234,9 @@ func Test_processSameColorNotBlack(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
+			lastFixture := tt.args.lastStep.Fixtures[tt.args.fixtureNumber]
+			nextFixture := tt.args.nextStep.Fixtures[tt.args.fixtureNumber]
+			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, &tt.args.fixture, &lastFixture, &nextFixture, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", fadeColors, tt.want)
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
@@ -368,9 +368,9 @@ func Test_processDiffColorBlack(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			lastColor := tt.args.lastStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			nextColor := tt.args.nextStep.Fixtures[tt.args.fixtureNumber].Colors[tt.args.colorNumber]
-			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, tt.args.fixture, tt.args.color, lastColor, nextColor, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
+			lastFixture := tt.args.lastStep.Fixtures[tt.args.fixtureNumber]
+			nextFixture := tt.args.nextStep.Fixtures[tt.args.fixtureNumber]
+			if fadeColors := ProcessRGBColor(tt.args.stepNumber, tt.args.start, tt.args.end, tt.args.bounce, tt.args.invert, tt.args.fadeColors, &tt.args.fixture, &lastFixture, &nextFixture, tt.args.sequence, tt.args.shift); !reflect.DeepEqual(fadeColors, tt.want) {
 				t.Errorf("processColor() got = %v, want %v", fadeColors, tt.want)
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")

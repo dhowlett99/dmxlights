@@ -83,22 +83,18 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 			// Fixtures forward.
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
-				fixture := step.Fixtures[fixtureNumber]
-				fixture.Number = fixtureNumber
-
-				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
-
-				// Color in forward.
-				for colorNumber, color := range fixture.Colors {
-					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					if scanner {
-						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					} else {
-						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					}
+				thisFixture := step.Fixtures[fixtureNumber]
+				thisFixture.Number = fixtureNumber
+				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
+				lastFixture := lastStep.Fixtures[fixtureNumber]
+				nextFixture := nextStep.Fixtures[fixtureNumber]
+				if scanner {
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+				} else {
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					// Remember State of fixture.
+					step.Fixtures[fixtureNumber] = thisFixture
 				}
-
 				// Incremet the the fixture counter.
 				numberFixturesInThisStep++
 			}
@@ -132,7 +128,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			if stepNumber == len(steps) {
 				end = true // Because we play the step backwards the end is true for the first step.
 				lastStep = steps[0]
-				nextStep = steps[stepNumber-1]
 			}
 
 			// If we're at the begining. next step is the last step.
@@ -145,22 +140,18 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 			numberFixturesInThisStep = 0
 
-			for fixtureNumber := 0; fixtureNumber <= len(step.Fixtures); fixtureNumber++ {
-				fixture := step.Fixtures[fixtureNumber]
-				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
-				fixture.Number = fixtureNumber
-
-				// Reverse the colors.
-				noColors := len(fixture.Colors)
-				for colorNumber := noColors; colorNumber > 0; colorNumber-- {
-					color := fixture.Colors[colorNumber-1]
-					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
-					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber-1]
-					if scanner {
-						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					} else {
-						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					}
+			for fixtureNumber := 0; fixtureNumber <= len(step.Fixtures)-1; fixtureNumber++ {
+				thisFixture := step.Fixtures[fixtureNumber]
+				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
+				thisFixture.Number = fixtureNumber
+				lastFixture := lastStep.Fixtures[fixtureNumber]
+				nextFixture := nextStep.Fixtures[fixtureNumber]
+				if scanner {
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+				} else {
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					// Remember State of fixture.
+					step.Fixtures[fixtureNumber] = thisFixture
 				}
 				numberFixturesInThisStep++
 			}
@@ -185,22 +176,18 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 			// Fixtures forward.
 			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
-				fixture := step.Fixtures[fixtureNumber]
-				fixture.Number = fixtureNumber
-
-				fixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
-
-				// Colors forward.
-				for colorNumber, color := range fixture.Colors {
-					lastColor := lastStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					nextColor := nextStep.Fixtures[fixtureNumber].Colors[colorNumber]
-					if scanner {
-						fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					} else {
-						fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, fixture, color, lastColor, nextColor, sequence, shift)
-					}
+				thisFixture := step.Fixtures[fixtureNumber]
+				thisFixture.Number = fixtureNumber
+				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
+				lastFixture := lastStep.Fixtures[fixtureNumber]
+				nextFixture := nextStep.Fixtures[fixtureNumber]
+				if scanner {
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+				} else {
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					// Remember State of fixture.
+					step.Fixtures[fixtureNumber] = thisFixture
 				}
-
 				// Incremet the the fixture counter.
 				numberFixturesInThisStep++
 			}
@@ -208,7 +195,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 			if numberFixturesInThisStep > numberFixtures {
 				numberFixtures = numberFixturesInThisStep
 			}
-
 			lastStep = step
 		}
 	}
@@ -277,7 +263,6 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
-
 			lenghtOfSteps := len(fadeColors[fixtureNumber])
 			if step < lenghtOfSteps {
 

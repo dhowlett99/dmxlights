@@ -482,6 +482,7 @@ type Fixture struct {
 	Gobo         int
 	Program      int
 	Enabled      bool
+	State        int
 }
 
 type ButtonPresets struct {
