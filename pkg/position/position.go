@@ -348,10 +348,10 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
 				// insert a black.
 				newFixture.Color = common.Color{}
-				insertColor++
 			} else {
 				// its a blank space so insert one of the colors.
 				newFixture.Color = colors[insertColor]
+				insertColor++
 			}
 
 			newStep.Fixtures[fixtureNumber] = newFixture
