@@ -35,7 +35,7 @@ const FADEDOWN = 3
 // This function uses simple rules to decide which fade value to add.
 func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
 
-	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 	return fadeColors
 
 }
@@ -45,62 +45,62 @@ func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, inve
 func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
-	thisColor := thisFixture.Colors[0]
-	lastColor := lastFixture.Colors[0]
+	thisColor := thisFixture.Color
+	lastColor := lastFixture.Color
 	if thisColor == lastColor {
 		if debug {
 			fmt.Printf("\t\tRULE#1 - fixture %d If color is same as last time , play that color out again. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
 		}
-		fadeColors = makeAColor(stepNumber, 1, "SameColr1", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+		fadeColors = makeAColor(stepNumber, 1, "SameColr1", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 
 		return fadeColors
 	}
 
 	// RULE 2 - If color is different from last color and not black.
-	if thisFixture.Colors[0] != lastFixture.Colors[0] && thisFixture.Colors[0] != common.Black {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color != common.Black {
 
 		if debug {
 			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
 		}
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
-		if lastFixture.Colors[0] != common.Black && !start && !end && lastFixture.State != FADEDOWN {
-			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn1 this state %d last state %d", thisFixture.State, lastFixture.State), shift, fadeColors, lastFixture.Colors[0], sequence, thisFixture)
+		if lastFixture.Color != common.Black && !start && !end && lastFixture.State != FADEDOWN {
+			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn1 this state %d last state %d", thisFixture.State, lastFixture.State), shift, fadeColors, lastFixture.Color, sequence, thisFixture)
 		}
 
 		if !invert {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_1", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// Fade the color up.
 		if !start && invert {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_2", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_2", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// Make a color
 		if invert {
-			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, nextFixture.Colors[0], sequence, thisFixture)
+			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 
 		// If the next color is black. Fade dowm this color down ready.
-		if nextFixture.Colors[0] == common.Black && !start && end && thisFixture.State != FADEDOWN {
-			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn3", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+		if nextFixture.Color == common.Black && !start && end && thisFixture.State != FADEDOWN {
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn3", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If the next color is another color but not black. Fade dowm this color down ready.
-		if lastFixture.Colors[0] != common.Black && nextFixture.Colors[0] != common.Black && thisFixture.Colors[0] != nextFixture.Colors[0] && !start && thisFixture.State != FADEDOWN {
-			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn4 state %d", thisFixture.State), shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+		if lastFixture.Color != common.Black && nextFixture.Color != common.Black && thisFixture.Color != nextFixture.Color && !start && thisFixture.State != FADEDOWN {
+			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn4 state %d", thisFixture.State), shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If next color is not black and we're at the end or bouncing and we're the first fixture.
-		if nextFixture.Colors[0] != common.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
-			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn5", shift, fadeColors, nextFixture.Colors[0], sequence, thisFixture)
+		if nextFixture.Color != common.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
+			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn5", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 		return fadeColors
 	}
 
 	// RULE #3 - If this color is different from last color and is a black and at the start.
-	if thisFixture.Colors[0] != lastFixture.Colors[0] && thisFixture.Colors[0] == common.Black && start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#3 -fixture %d If this color is different from last colar and a is a black and at the start.. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
@@ -108,31 +108,31 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 
 		if start && invert {
 			//Fade down last color, so this black can be displayed.
-			fadeColors = fadeDownColor(stepNumber, 3, "FadeDwn6", shift, fadeColors, lastFixture.Colors[0], sequence, thisFixture)
+			fadeColors = fadeDownColor(stepNumber, 3, "FadeDwn6", shift, fadeColors, lastFixture.Color, sequence, thisFixture)
 		} else {
-			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+			fadeColors = makeAColor(stepNumber, 3, "MakeCLR1", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 		return fadeColors
 	}
 
 	// RULE #4 - If color is different from last color and color is a black.
-	if thisFixture.Colors[0] != lastFixture.Colors[0] && thisFixture.Colors[0] == common.Black && !start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && !start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#4 fixture %d If color is different from last color and color is a black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
 		}
 
 		// Fade down last color, so this black can be displayed.
-		fadeColors = fadeDownColor(stepNumber, 4, "FadeDwn7", shift, fadeColors, lastFixture.Colors[0], sequence, thisFixture)
+		fadeColors = fadeDownColor(stepNumber, 4, "FadeDwn7", shift, fadeColors, lastFixture.Color, sequence, thisFixture)
 
 		// Now that we have faded down. Populate one up,on & down cycle with the black we asked for.
 		if !invert {
-			fadeColors = makeAColor(stepNumber, 3, "makeABlack3", shift, fadeColors, thisFixture.Colors[0], sequence, thisFixture)
+			fadeColors = makeAColor(stepNumber, 3, "makeABlack3", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If the next color is color fade back up.
-		if nextFixture.Colors[0] != common.Black && end && invert {
-			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_3", shift, fadeColors, nextFixture.Colors[0], sequence, thisFixture)
+		if nextFixture.Color != common.Black && end && invert {
+			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_3", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 
 		return fadeColors

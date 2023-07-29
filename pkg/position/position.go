@@ -273,7 +273,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newColor.G = fadeColors[fixtureNumber][step].Color.G
 					newColor.B = fadeColors[fixtureNumber][step].Color.B
 					newColor.W = fadeColors[fixtureNumber][step].Color.W
-					newFixture.Colors = append(newFixture.Colors, newColor)
+					newFixture.Color = newColor
 					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 					newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 					newFixture.Pan = fadeColors[fixtureNumber][step].Pan
@@ -287,7 +287,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 				} else {
 					// turn the lamp off, but only if its already on.
 					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !Optimisation {
-						newFixture.Colors = append(newFixture.Colors, common.Color{})
+						newFixture.Color = common.Color{}
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 						newFixture.Pan = fadeColors[fixtureNumber][step].Pan
@@ -314,7 +314,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 			position := positionsOut[positionNumber]
 			fmt.Printf("Position %d\n", positionNumber)
 			for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-				fmt.Printf("\tFixture %d Enabled %t Values %+v\n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Colors)
+				fmt.Printf("\tFixture %d Enabled %t Values %+v\n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Color)
 			}
 		}
 	}
@@ -342,21 +342,18 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common
 			newFixture := common.Fixture{}
 			newFixture.MasterDimmer = fixture.MasterDimmer
 
-			for _, color := range fixture.Colors {
-
-				if insertColor >= numberColors {
-					insertColor = 0
-				}
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					// insert a black.
-					newFixture.Colors = append(newFixture.Colors, common.Color{})
-					insertColor++
-				} else {
-					// its a blank space so insert one of the colors.
-					newFixture.Colors = append(newFixture.Colors, colors[insertColor])
-				}
-
+			if insertColor >= numberColors {
+				insertColor = 0
 			}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				// insert a black.
+				newFixture.Color = common.Color{}
+				insertColor++
+			} else {
+				// its a blank space so insert one of the colors.
+				newFixture.Color = colors[insertColor]
+			}
+
 			newStep.Fixtures[fixtureNumber] = newFixture
 		}
 

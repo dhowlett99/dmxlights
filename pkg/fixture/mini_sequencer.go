@@ -419,10 +419,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
-						for _, color := range fixture.Colors {
-							common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: 255, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
-							MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
-						}
+						common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: 255, Red: fixture.Color.R, Green: fixture.Color.G, Blue: fixture.Color.B}, eventsForLaunchpad, guiButtons)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, fixture.Color.R, fixture.Color.G, fixture.Color.B, fixture.Color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 					}
 
 					rotateCounter++

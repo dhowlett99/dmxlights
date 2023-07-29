@@ -46,12 +46,10 @@ func Test_processDifferentColor(t *testing.T) {
 					FadeDown: []int{255, 50, 0},
 				},
 				fixture: common.Fixture{
-					Colors: []common.Color{
-						{
-							R: 255,
-							G: 0,
-							B: 0,
-						},
+					Color: common.Color{
+						R: 255,
+						G: 0,
+						B: 0,
 					},
 				},
 				colorNumber: 0,
@@ -63,12 +61,10 @@ func Test_processDifferentColor(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 0,
-									G: 255,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 0,
+								G: 255,
+								B: 0,
 							},
 						},
 					},
@@ -76,12 +72,10 @@ func Test_processDifferentColor(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 0,
-									G: 0,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 0,
+								G: 0,
+								B: 0,
 							},
 						},
 					},
@@ -171,12 +165,10 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Red.
 				fixture: common.Fixture{
-					Colors: []common.Color{
-						{
-							R: 255,
-							G: 0,
-							B: 0,
-						},
+					Color: common.Color{
+						R: 255,
+						G: 0,
+						B: 0,
 					},
 				},
 				colorNumber: 0,
@@ -190,12 +182,10 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 255,
-									G: 0,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 255,
+								G: 0,
+								B: 0,
 							},
 						},
 					},
@@ -203,12 +193,10 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 0,
-									G: 0,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 0,
+								G: 0,
+								B: 0,
 							},
 						},
 					},
@@ -299,12 +287,10 @@ func Test_processDiffColorBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Black.
 				fixture: common.Fixture{
-					Colors: []common.Color{
-						{
-							R: 0,
-							G: 0,
-							B: 0,
-						},
+					Color: common.Color{
+						R: 0,
+						G: 0,
+						B: 0,
 					},
 				},
 				colorNumber: 0,
@@ -318,12 +304,10 @@ func Test_processDiffColorBlack(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 255,
-									G: 0,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 255,
+								G: 0,
+								B: 0,
 							},
 						},
 					},
@@ -331,12 +315,10 @@ func Test_processDiffColorBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Colors: []common.Color{
-								{
-									R: 0,
-									G: 0,
-									B: 0,
-								},
+							Color: common.Color{
+								R: 0,
+								G: 0,
+								B: 0,
 							},
 						},
 					},

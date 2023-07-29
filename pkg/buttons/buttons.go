@@ -187,12 +187,12 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 
-		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
-		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
-		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
-		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
-		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
-		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
+		red := flashSequence.Pattern.Steps[X].Fixtures[X].Color.R
+		green := flashSequence.Pattern.Steps[X].Fixtures[X].Color.G
+		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Color.B
+		white := flashSequence.Pattern.Steps[X].Fixtures[X].Color.W
+		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Color.A
+		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Color.UV
 		pan := 128
 		tilt := 128
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter

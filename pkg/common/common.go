@@ -476,7 +476,7 @@ type Fixture struct {
 	MasterDimmer int
 	Brightness   int
 	ScannerColor Color
-	Colors       []Color
+	Color        Color
 	Pan          int
 	Tilt         int
 	Shutter      int
@@ -826,10 +826,8 @@ func HowManyColorsInSteps(steps []Step) (colors []Color) {
 	colorMap := make(map[Color]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
-			for _, color := range fixture.Colors {
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					colorMap[color] = true
-				}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
 			}
 		}
 	}
@@ -846,10 +844,8 @@ func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
 	colorMap := make(map[Color]bool)
 	for _, position := range positionsMap {
 		for _, fixture := range position.Fixtures {
-			for _, color := range fixture.Colors {
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					colorMap[color] = true
-				}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
 			}
 		}
 	}
@@ -866,10 +862,8 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	colorMap := make(map[Color]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
-			for _, color := range fixture.Colors {
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					colorMap[color] = true
-				}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
 			}
 		}
 	}
@@ -892,9 +886,7 @@ func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
 		fixtureLen := len(positionMap.Fixtures)
 		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
 			fixture := positionMap.Fixtures[fixtureNumber]
-			for _, color := range fixture.Colors {
-				colorMap[color] = true
-			}
+			colorMap[fixture.Color] = true
 		}
 	}
 

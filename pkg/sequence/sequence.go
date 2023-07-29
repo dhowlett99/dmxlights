@@ -842,16 +842,18 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 
 	for stepNumber, step := range steps {
 		for fixtureNumber, fixture := range step.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				// found a color.
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					if insertColor >= numberColors {
-						insertColor = 0
-					}
-					stepsOut[stepNumber].Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
-					insertColor++
+
+			// found a color.
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				if insertColor >= numberColors {
+					insertColor = 0
 				}
+				newFixture := stepsOut[stepNumber].Fixtures[fixtureNumber]
+				newFixture.Color = colors[insertColor]
+				stepsOut[stepNumber].Fixtures[fixtureNumber] = newFixture
+				insertColor++
 			}
+
 		}
 	}
 
@@ -860,55 +862,9 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 			fmt.Printf("Step %d\n", stepNumber)
 			for fixtureNumber, fixture := range step.Fixtures {
 				fmt.Printf("\tFixture %d\n", fixtureNumber)
-				for _, color := range fixture.Colors {
-					fmt.Printf("\t\tColor %+v\n", color)
-				}
+				fmt.Printf("\t\tColor %+v\n", fixture.Color)
 			}
 		}
-	}
-
-	return stepsOut
-}
-
-func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
-
-	var insertColor int
-	numberColors := len(colors)
-
-	var stepsOut []common.Step
-
-	for _, step := range steps {
-
-		newStep := common.Step{}
-
-		newFixtures := make(map[int]common.Fixture)
-
-		newStep.Fixtures = newFixtures
-
-		for fixtureNumber, fixture := range step.Fixtures {
-
-			newFixture := common.Fixture{}
-			newFixture.MasterDimmer = fixture.MasterDimmer
-
-			for _, color := range fixture.Colors {
-
-				if insertColor >= numberColors {
-					insertColor = 0
-				}
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					// insert a black.
-					newFixture.Colors = append(newFixture.Colors, common.Color{})
-					insertColor++
-				} else {
-					// its a blank space so insert one of the colors.
-					newFixture.Colors = append(newFixture.Colors, colors[insertColor])
-				}
-
-			}
-			newStep.Fixtures[fixtureNumber] = newFixture
-		}
-
-		stepsOut = append(stepsOut, newStep)
 	}
 
 	return stepsOut
