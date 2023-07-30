@@ -42,7 +42,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.DisplaySequence = this.SelectedSequence
 
 		// Back to the begining of the rotation.
-		if this.SelectColorBar[this.TargetSequence] > common.MaxColorBar {
+		if this.SelectColorBar[this.TargetSequence] > common.MAX_COLOR_BAR {
 			this.SelectColorBar[this.TargetSequence] = 0
 		}
 
@@ -120,30 +120,30 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {
-		this.SelectedSequence = 0                                                  // Update the status bar for the first sequnce. Because that will be the one selected after a clear.
-		this.Strobe[sequenceNumber] = false                                        // Turn off the strobe.
-		this.StrobeSpeed[sequenceNumber] = 255                                     // Reset to fastest strobe.
-		this.Running[sequenceNumber] = false                                       // Stop the sequence.
-		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Reset the speed back to the default.
-		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Reset the RGB shift back to the default.
-		this.RGBSize[sequenceNumber] = common.DefaultRGBSize                       // Reset the RGB Size back to the default.
-		this.RGBFade[sequenceNumber] = common.DefaultRGBFade                       // Reset the RGB fade speed back to the default
-		this.OffsetPan = common.ScannerMidPoint                                    // Reset pan to the center
-		this.OffsetTilt = common.ScannerMidPoint                                   // Reset tilt to the center
-		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Reset the number of coordinates.
-		this.ScannerSize[this.SelectedSequence] = common.DefaultScannerSize        // Reset the scanner size back to default.
-		this.ScannerPattern = common.DefaultPattern                                // Reset the scanner pattern back to default.
-		this.SwitchPositions = [9][9]int{}                                         // Clear switch positions to their first positions.
-		this.EditFixtureSelectionMode = false                                      // Clear fixture selecetd mode.
-		this.SelectMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
-		this.SelectButtonPressed[sequenceNumber] = false                           // Clear buttoned selecetd mode.
-		this.EditGoboSelectionMode = false                                         // Clear edit gobo mode.
-		this.EditPatternMode = false                                               // Clear edit pattern mode.
-		this.EditScannerColorsMode = false                                         // Clear scanner color mode.
-		this.EditSequenceColorsMode = false                                        // Clear rgb color mode.
-		this.EditStaticColorsMode[this.TargetSequence] = false                     // Clear static color mode.
-		this.MasterBrightness = common.MaxDMXBrightness                            // Reset brightness to max.
-		this.ScannerChaser = false                                                 // Clear the scanner chase mode.
+		this.SelectedSequence = 0                                                    // Update the status bar for the first sequnce. Because that will be the one selected after a clear.
+		this.Strobe[sequenceNumber] = false                                          // Turn off the strobe.
+		this.StrobeSpeed[sequenceNumber] = 255                                       // Reset to fastest strobe.
+		this.Running[sequenceNumber] = false                                         // Stop the sequence.
+		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Reset the speed back to the default.
+		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Reset the RGB shift back to the default.
+		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                       // Reset the RGB Size back to the default.
+		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                       // Reset the RGB fade speed back to the default
+		this.OffsetPan = common.SCANNER_MID_POINT                                    // Reset pan to the center
+		this.OffsetTilt = common.SCANNER_MID_POINT                                   // Reset tilt to the center
+		this.ScannerCoordinates[sequenceNumber] = common.DEFAULT_SCANNER_COORDNIATES // Reset the number of coordinates.
+		this.ScannerSize[this.SelectedSequence] = common.DEFAULT_SCANNER_SIZE        // Reset the scanner size back to default.
+		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
+		this.SwitchPositions = [9][9]int{}                                           // Clear switch positions to their first positions.
+		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
+		this.SelectMode[sequenceNumber] = NORMAL                                     // Clear function selecetd mode.
+		this.SelectButtonPressed[sequenceNumber] = false                             // Clear buttoned selecetd mode.
+		this.EditGoboSelectionMode = false                                           // Clear edit gobo mode.
+		this.EditPatternMode = false                                                 // Clear edit pattern mode.
+		this.EditScannerColorsMode = false                                           // Clear scanner color mode.
+		this.EditSequenceColorsMode = false                                          // Clear rgb color mode.
+		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
+		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
+		this.ScannerChaser = false                                                   // Clear the scanner chase mode.
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {

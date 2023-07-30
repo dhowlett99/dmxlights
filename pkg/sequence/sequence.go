@@ -169,31 +169,31 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		RGBFade:                common.DefaultRGBFade,
+		RGBFade:                common.DEFAULT_RGB_FADE,
 		MusicTrigger:           false,
 		Run:                    false,
 		Bounce:                 false,
-		ScannerSize:            common.DefaultScannerSize,
+		ScannerSize:            common.DEFAULT_SCANNER_SIZE,
 		SequenceColors:         common.DefaultSequenceColors,
-		RGBSize:                common.DefaultRGBSize,
-		Speed:                  common.DefaultSpeed,
-		ScannerShift:           common.DefaultScannerShift,
-		RGBShift:               common.DefaultRGBShift,
-		RGBCoordinates:         common.DefaultRGBCoordinates,
+		RGBSize:                common.DEFAULT_RGB_SIZE,
+		Speed:                  common.DEFAULT_SPEED,
+		ScannerShift:           common.DEFAULT_SCANNER_SHIFT,
+		RGBShift:               common.DEFAULT_RGB_SHIFT,
+		RGBCoordinates:         common.DEFAULT_RGB_COORDNIATES,
 		Blackout:               false,
-		Master:                 common.MaxDMXBrightness,
+		Master:                 common.MAX_DMX_BRIGHTNESS,
 		ScannerGobo:            scannerGobos,
 		StartFlood:             false,
 		RGBColor:               1,
 		AutoColor:              false,
 		AutoPattern:            false,
-		SelectedPattern:        common.DefaultPattern,
+		SelectedPattern:        common.DEFAULT_PATTERN,
 		FixtureState:           FixtureState,
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
-		ScannerOffsetPan:       common.ScannerMidPoint,
-		ScannerOffsetTilt:      common.ScannerMidPoint,
+		ScannerOffsetPan:       common.SCANNER_MID_POINT,
+		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
 	}
 
@@ -936,7 +936,7 @@ func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
 				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
 				// we always return the max channels in a sequence, currently 8
-				return common.MaxNumberChannelsInSequence
+				return common.MAX_NUMBER_OF_CHANNELS
 			} else {
 				// Examine the channels and count number of color channels.
 				// We use Red for the count.

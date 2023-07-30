@@ -27,31 +27,31 @@ import (
 
 const debug = false
 
-const MaxNumberChannelsInSequence = 8
-const MaxDMXAddress = 512
-const MaxTextEntryLength = 35
-const DefaultScannerSize = 60
-const MaxScannerSize = 120
-const MinRGBSize = 0
-const MaxRGBSize = 10
-const MinRGBShift = 1
-const MaxRGBShift = 10
-const MaxRGBFade = 10
-const MaxColorBar = 9 // Eight colors and a default color bar.
-const MinDMXBrightness = 0
-const MaxDMXBrightness = 255
-const DefaultPattern = 0
-const DefaultRGBSize = 0
-const DefaultRGBFade = 1
-const DefaultScannerFade = 10
-const DefaultSpeed = 7
-const DefaultRGBShift = 0
-const DefaultScannerColor = 1
-const DefaultScannerGobo = 1
-const DefaultScannerShift = 0
-const DefaultScannerCoordinates = 0
-const ScannerMidPoint = 127
-const DefaultRGBCoordinates = 10
+const MAX_NUMBER_OF_CHANNELS = 8
+const MAX_DMX_ADDRESS = 512
+const MAX_TEXT_ENTRY_LENGTH = 35
+const DEFAULT_SCANNER_SIZE = 60
+const MAX_SCANNER_SIZE = 120
+const MIN_RGB_SIZE = 0
+const MAX_RGB_SIZE = 10
+const MIN_RGB_SHIFT = 1
+const MAX_RGB_SHIFT = 10
+const MAX_RGB_FADE = 10
+const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
+const MIN_DMX_BRIGHTNESS = 0
+const MAX_DMX_BRIGHTNESS = 255
+const DEFAULT_PATTERN = 0
+const DEFAULT_RGB_SIZE = 0
+const DEFAULT_RGB_FADE = 1
+const DEFAULT_SCANNER_FADE = 10
+const DEFAULT_SPEED = 7
+const DEFAULT_RGB_SHIFT = 0
+const DEFAULT_SCANNER_COLOR = 1
+const DEFAULT_SCANNER_GOBO = 1
+const DEFAULT_SCANNER_SHIFT = 0
+const DEFAULT_SCANNER_COORDNIATES = 0
+const SCANNER_MID_POINT = 127
+const DEFAULT_RGB_COORDNIATES = 10
 
 const IS_SCANNER = true
 const IS_RGB = false
@@ -1255,10 +1255,10 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
-	sequence.FadeOn = GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
-	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
-	sequence.FadeOff = GetFadeOnValues(MinDMXBrightness, sequence.RGBSize)
+	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
+	sequence.FadeOn = GetFadeOnValues(MAX_DMX_BRIGHTNESS, sequence.RGBSize)
+	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, true)
+	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 
 func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {

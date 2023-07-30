@@ -270,7 +270,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			Bounce:         false,
 			ScannerChaser:  false,
 			RGBShift:       1,
-			RGBCoordinates: common.DefaultRGBCoordinates,
+			RGBCoordinates: common.DEFAULT_RGB_COORDNIATES,
 			RGBFade:        cfg.Fade,
 			RGBSize:        cfg.Size,
 		}
