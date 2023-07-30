@@ -221,16 +221,16 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	// if debug {
-	// 	// Print out the fixtures so far.
-	// 	for fixture := 0; fixture < numberFixtures; fixture++ {
-	// 		fmt.Printf("Fixture %d\n", fixture)
-	// 		for out := 0; out < totalNumberOfSteps; out++ {
-	// 			fmt.Printf("%+v\n", fadeColors[fixture][out])
-	// 		}
-	// 		fmt.Printf("\n")
-	// 	}
-	// }
+	if debug {
+		// Print out the fixtures so far.
+		for fixture := 0; fixture < numberFixtures; fixture++ {
+			fmt.Printf("Fixture %d\n", fixture)
+			for out := 0; out < totalNumberOfSteps; out++ {
+				fmt.Printf("%+v\n", fadeColors[fixture][out])
+			}
+			fmt.Printf("\n")
+		}
+	}
 
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }
