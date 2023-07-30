@@ -169,31 +169,31 @@ func CreateSequence(
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
 		Number:                 mySequenceNumber,
-		RGBFade:                common.DefaultRGBFade,
+		RGBFade:                common.DEFAULT_RGB_FADE,
 		MusicTrigger:           false,
 		Run:                    false,
 		Bounce:                 false,
-		ScannerSize:            common.DefaultScannerSize,
+		ScannerSize:            common.DEFAULT_SCANNER_SIZE,
 		SequenceColors:         common.DefaultSequenceColors,
-		RGBSize:                common.DefaultRGBSize,
-		Speed:                  common.DefaultSpeed,
-		ScannerShift:           common.DefaultScannerShift,
-		RGBShift:               common.DefaultRGBShift,
-		RGBCoordinates:         common.DefaultRGBCoordinates,
+		RGBSize:                common.DEFAULT_RGB_SIZE,
+		Speed:                  common.DEFAULT_SPEED,
+		ScannerShift:           common.DEFAULT_SCANNER_SHIFT,
+		RGBShift:               common.DEFAULT_RGB_SHIFT,
+		RGBCoordinates:         common.DEFAULT_RGB_COORDNIATES,
 		Blackout:               false,
-		Master:                 common.MaxDMXBrightness,
+		Master:                 common.MAX_DMX_BRIGHTNESS,
 		ScannerGobo:            scannerGobos,
 		StartFlood:             false,
 		RGBColor:               1,
 		AutoColor:              false,
 		AutoPattern:            false,
-		SelectedPattern:        common.DefaultPattern,
+		SelectedPattern:        common.DEFAULT_PATTERN,
 		FixtureState:           FixtureState,
 		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
-		ScannerOffsetPan:       common.ScannerMidPoint,
-		ScannerOffsetTilt:      common.ScannerMidPoint,
+		ScannerOffsetPan:       common.SCANNER_MID_POINT,
+		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
 	}
 
@@ -494,13 +494,12 @@ func PlaySequence(sequence common.Sequence,
 
 				// Setup rgb patterns.
 				if sequence.Type == "rgb" {
-					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern].Steps, sequence.FixtureState)
+					RGBPattern := pattern.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
 					sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 					steps = RGBPattern.Steps
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
 					sequence.UpdatePattern = false
-
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
@@ -572,15 +571,17 @@ func PlaySequence(sequence common.Sequence,
 					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 						var positions map[int]common.Position
 						// We're playing out the scanner positions, so we won't need curve values.
-						sequence.FadeUpAndDown = []int{255}
-						sequence.FadeDownAndUp = []int{0}
+						sequence.FadeUp = []int{255}
+						sequence.FadeDown = []int{0}
 						// Turn on optimasation.
 						sequence.Optimisation = true
 
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
-						// Calulate positions for each RGB fixture.
-						positions, sequence.NumberSteps = position.CalculatePositions(steps, sequence)
+						// Calulate positions for each scanner fixture.
+						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
+						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
+						sequence.NumberSteps = numberSteps
 
 						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
 						scannerPositions[fixture] = make(map[int]common.Position, 9)
@@ -603,7 +604,7 @@ func PlaySequence(sequence common.Sequence,
 						steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColors(RGBPositions)
+							sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
 							sequence.SaveColors = false
 						}
 					}
@@ -645,7 +646,10 @@ func PlaySequence(sequence common.Sequence,
 					common.CalculateFadeValues(&sequence)
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
-					RGBPositions, sequence.NumberSteps = position.CalculatePositions(steps, sequence)
+					var numberSteps int
+					fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
+					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
+					sequence.NumberSteps = numberSteps
 				}
 
 				// If we are setting the pattern automatically for rgb fixtures.
@@ -671,11 +675,6 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.SelectedPattern > 3 {
 						sequence.SelectedPattern = 0
 					}
-				}
-
-				if sequence.RGBInvert {
-					sequence.SequenceColors = common.HowManyColors(RGBPositions)
-					RGBPositions = invertRGBcolorsInPositions(RGBPositions, sequence.SequenceColors)
 				}
 
 				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
@@ -745,32 +744,6 @@ func PlaySequence(sequence common.Sequence,
 			}
 		}
 	}
-}
-
-func invertRGBColors(steps []common.Step, colors []common.Color) []common.Step {
-
-	var insertColor int
-	numberColors := len(colors)
-
-	for _, step := range steps {
-		for _, fixture := range step.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				if insertColor >= numberColors {
-					insertColor = 0
-				}
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					// insert a black.
-					fixture.Colors[colorNumber] = common.Color{}
-					insertColor++
-				} else {
-					// its a blank space so insert one of the colors.
-					fixture.Colors[colorNumber] = colors[insertColor]
-				}
-			}
-		}
-	}
-
-	return steps
 }
 
 // Send a command to all the fixtures.
@@ -869,16 +842,18 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 
 	for stepNumber, step := range steps {
 		for fixtureNumber, fixture := range step.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				// found a color.
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					if insertColor >= numberColors {
-						insertColor = 0
-					}
-					stepsOut[stepNumber].Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
-					insertColor++
+
+			// found a color.
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				if insertColor >= numberColors {
+					insertColor = 0
 				}
+				newFixture := stepsOut[stepNumber].Fixtures[fixtureNumber]
+				newFixture.Color = colors[insertColor]
+				stepsOut[stepNumber].Fixtures[fixtureNumber] = newFixture
+				insertColor++
 			}
+
 		}
 	}
 
@@ -887,52 +862,12 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 			fmt.Printf("Step %d\n", stepNumber)
 			for fixtureNumber, fixture := range step.Fixtures {
 				fmt.Printf("\tFixture %d\n", fixtureNumber)
-				for _, color := range fixture.Colors {
-					fmt.Printf("\t\tColor %+v\n", color)
-				}
+				fmt.Printf("\t\tColor %+v\n", fixture.Color)
 			}
 		}
 	}
 
 	return stepsOut
-}
-
-func invertRGBcolorsInPositions(positions map[int]common.Position, colors []common.Color) map[int]common.Position {
-
-	var insertColor int
-	numberColors := len(colors)
-	numberPositions := len(positions)
-
-	for positionNumber := 0; positionNumber < numberPositions; positionNumber++ {
-		position := positions[positionNumber]
-		for fixtureNumber, fixture := range position.Fixtures {
-			for colorNumber, color := range fixture.Colors {
-				// found a color.
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					// insert a black.
-					position.Fixtures[fixtureNumber].Colors[colorNumber] = common.Color{
-						R: 0,
-						G: 0,
-						B: 0,
-					}
-					insertColor++
-					continue
-				}
-				// found a black.
-				if color.R == 0 && color.G == 0 && color.B == 0 {
-					// insert one of the colors from the sequence.
-					if insertColor >= numberColors {
-						insertColor = 0
-					}
-					position.Fixtures[fixtureNumber].Colors[colorNumber] = colors[insertColor]
-					insertColor++
-					continue
-				}
-			}
-		}
-	}
-
-	return positions
 }
 
 func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
@@ -1001,7 +936,7 @@ func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
 				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
 				// we always return the max channels in a sequence, currently 8
-				return common.MaxNumberChannelsInSequence
+				return common.MAX_NUMBER_OF_CHANNELS
 			} else {
 				// Examine the channels and count number of color channels.
 				// We use Red for the count.

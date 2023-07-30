@@ -865,8 +865,8 @@ func checkDMXAddress(value string) error {
 	if address == 0 {
 		return fmt.Errorf("DMX Address error, cannot be zero")
 	}
-	if address > common.MaxDMXAddress {
-		return fmt.Errorf("DMX Address error, cannot be greater than %d", common.MaxDMXAddress)
+	if address > common.MAX_DMX_ADDRESS {
+		return fmt.Errorf("DMX Address error, cannot be greater than %d", common.MAX_DMX_ADDRESS)
 	}
 	return nil
 }
@@ -933,8 +933,8 @@ func checkDMXnumber(value string) error {
 	if address < 0 {
 		return fmt.Errorf("DMX Number error, cannot be less than zero")
 	}
-	if address > common.MaxDMXAddress {
-		return fmt.Errorf("DMX Number error, cannot be greater than %d", common.MaxDMXAddress)
+	if address > common.MAX_DMX_ADDRESS {
+		return fmt.Errorf("DMX Number error, cannot be greater than %d", common.MAX_DMX_ADDRESS)
 	}
 
 	return nil
@@ -955,8 +955,8 @@ func checkTextEntry(value string) error {
 		return fmt.Errorf("must only contain letters and numbers, underscore and dots are allowed")
 	}
 
-	if len(value) > common.MaxTextEntryLength {
-		return fmt.Errorf("cannot be greater than %d characters", common.MaxTextEntryLength)
+	if len(value) > common.MAX_TEXT_ENTRY_LENGTH {
+		return fmt.Errorf("cannot be greater than %d characters", common.MAX_TEXT_ENTRY_LENGTH)
 	}
 	return nil
 }

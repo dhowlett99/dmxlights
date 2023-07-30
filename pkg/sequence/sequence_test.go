@@ -165,23 +165,30 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						},
+					},
+					{ // Only black.
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 						},
 					},
 				},
@@ -194,23 +201,30 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 255}},
+					},
+				},
+				{
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 					},
 				},
 			},
@@ -221,23 +235,23 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 255, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 255, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 255}}},
+							0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 255}},
 						},
 					},
 				},
@@ -248,23 +262,23 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
 					},
 				},
 			},
@@ -274,82 +288,6 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := replaceRGBcolorsInSteps(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("replaceRGBcolorsInSteps() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
-func Test_invertRGBColors(t *testing.T) {
-
-	full := 255
-	type args struct {
-		steps  []common.Step
-		colors []common.Color
-	}
-	tests := []struct {
-		name string
-		args args
-		want []common.Step
-	}{
-		{
-			name: "invert a single color.",
-			args: args{
-				steps: []common.Step{
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						},
-					},
-					{
-						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-							2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 255}}},
-						},
-					},
-				},
-				colors: []common.Color{
-					{R: 0, G: 255, B: 0},
-				},
-			},
-			want: []common.Step{
-				{
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-					},
-				},
-				{
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-					},
-				},
-				{
-					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						1: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 255, B: 0}}},
-						2: {MasterDimmer: full, Colors: []common.Color{{R: 0, G: 0, B: 0}}},
-					},
-				},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := invertRGBColors(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("invertRGBColors() = %v, want %v", got, tt.want)
 			}
 		})
 	}

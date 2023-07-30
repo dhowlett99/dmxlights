@@ -27,28 +27,34 @@ import (
 
 const debug = false
 
-const MaxNumberChannelsInSequence = 8
-const MaxDMXAddress = 512
-const MaxTextEntryLength = 35
-const DefaultScannerSize = 60
-const MaxScannerSize = 120
-const MaxRGBSize = 10
-const MaxRGBShift = 10
-const MaxRGBFade = 10
-const MaxColorBar = 9 // Eight colors and a default color bar.
-const MaxDMXBrightness = 255
-const DefaultPattern = 0
-const DefaultRGBSize = 1
-const DefaultRGBFade = 1
-const DefaultScannerFade = 10
-const DefaultSpeed = 7
-const DefaultRGBShift = 0
-const DefaultScannerColor = 1
-const DefaultScannerGobo = 1
-const DefaultScannerShift = 0
-const DefaultScannerCoordinates = 0
-const ScannerMidPoint = 127
-const DefaultRGBCoordinates = 10
+const MAX_NUMBER_OF_CHANNELS = 8
+const MAX_DMX_ADDRESS = 512
+const MAX_TEXT_ENTRY_LENGTH = 35
+const DEFAULT_SCANNER_SIZE = 60
+const MAX_SCANNER_SIZE = 120
+const MIN_RGB_SIZE = 0
+const MAX_RGB_SIZE = 10
+const MIN_RGB_SHIFT = 1
+const MAX_RGB_SHIFT = 10
+const MAX_RGB_FADE = 10
+const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
+const MIN_DMX_BRIGHTNESS = 0
+const MAX_DMX_BRIGHTNESS = 255
+const DEFAULT_PATTERN = 0
+const DEFAULT_RGB_SIZE = 0
+const DEFAULT_RGB_FADE = 1
+const DEFAULT_SCANNER_FADE = 10
+const DEFAULT_SPEED = 7
+const DEFAULT_RGB_SHIFT = 0
+const DEFAULT_SCANNER_COLOR = 1
+const DEFAULT_SCANNER_GOBO = 1
+const DEFAULT_SCANNER_SHIFT = 0
+const DEFAULT_SCANNER_COORDNIATES = 0
+const SCANNER_MID_POINT = 127
+const DEFAULT_RGB_COORDNIATES = 10
+
+const IS_SCANNER = true
+const IS_RGB = false
 
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 
@@ -91,6 +97,9 @@ type FixtureBuffer struct {
 	Tilt         int
 	Shutter      int
 	Enabled      bool
+	DebugMsg     string
+	Step         int
+	Rule         int
 }
 
 type Value struct {
@@ -285,6 +294,7 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
+	RGBInvertOnce               bool                        // Invert only in a sequence,
 	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness
@@ -314,8 +324,7 @@ type Sequence struct {
 	FadeUp                      []int                       // Fade up values.
 	FadeOn                      []int                       // Fade on values.
 	FadeDown                    []int                       // Fade down values.
-	FadeUpAndDown               []int                       // curve fade on and stay on and time to fade off
-	FadeDownAndUp               []int                       // curve fade off and on again
+	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
@@ -395,7 +404,9 @@ type Hit struct {
 }
 
 type Step struct {
-	Fixtures map[int]Fixture
+	StepNumber int
+	KeyStep    bool
+	Fixtures   map[int]Fixture
 }
 
 type FixtureCommand struct {
@@ -459,12 +470,13 @@ type Position struct {
 // a scanner.
 type Fixture struct {
 	ID           string
+	Number       int
 	Name         string
 	Label        string
 	MasterDimmer int
 	Brightness   int
 	ScannerColor Color
-	Colors       []Color
+	Color        Color
 	Pan          int
 	Tilt         int
 	Shutter      int
@@ -473,6 +485,7 @@ type Fixture struct {
 	Gobo         int
 	Program      int
 	Enabled      bool
+	State        int
 }
 
 type ButtonPresets struct {
@@ -808,15 +821,31 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	return code
 }
 
-func HowManyColors(positionsMap map[int]Position) (colors []Color) {
+func HowManyColorsInSteps(steps []Step) (colors []Color) {
+
+	colorMap := make(map[Color]bool)
+	for _, step := range steps {
+		for _, fixture := range step.Fixtures {
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
+			}
+		}
+	}
+
+	for color := range colorMap {
+		colors = append(colors, color)
+	}
+
+	return colors
+}
+
+func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
 
 	colorMap := make(map[Color]bool)
 	for _, position := range positionsMap {
 		for _, fixture := range position.Fixtures {
-			for _, color := range fixture.Colors {
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					colorMap[color] = true
-				}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
 			}
 		}
 	}
@@ -833,10 +862,8 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	colorMap := make(map[Color]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
-			for _, color := range fixture.Colors {
-				if color.R > 0 || color.G > 0 || color.B > 0 {
-					colorMap[color] = true
-				}
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				colorMap[fixture.Color] = true
 			}
 		}
 	}
@@ -859,9 +886,7 @@ func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
 		fixtureLen := len(positionMap.Fixtures)
 		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
 			fixture := positionMap.Fixtures[fixtureNumber]
-			for _, color := range fixture.Colors {
-				colorMap[color] = true
-			}
+			colorMap[fixture.Color] = true
 		}
 	}
 
@@ -1230,21 +1255,10 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-
-	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, false)
-	sequence.FadeOn = GetFadeOnValues(MaxDMXBrightness, sequence.RGBSize)
-	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MaxDMXBrightness, sequence.RGBFade, true)
-
-	sequence.FadeUpAndDown = []int{}
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeUp...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeOn...)
-	sequence.FadeUpAndDown = append(sequence.FadeUpAndDown, sequence.FadeDown...)
-
-	sequence.FadeDownAndUp = []int{}
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeDown...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeUp...)
-	sequence.FadeDownAndUp = append(sequence.FadeDownAndUp, sequence.FadeOn...)
-
+	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
+	sequence.FadeOn = GetFadeOnValues(MAX_DMX_BRIGHTNESS, sequence.RGBSize)
+	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, true)
+	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 
 func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out []int) {

@@ -71,8 +71,8 @@ func main() {
 	this.Strobe = make(map[int]bool, NumberOfSequences)            // Initialise storage for four sequences.
 	this.MasterBrightness = 255                                    // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                                             // Fine gain -0.09 -> 0.09
-	this.OffsetPan = common.ScannerMidPoint                        // Start pan from the center
-	this.OffsetTilt = common.ScannerMidPoint                       // Start tilt from the center.
+	this.OffsetPan = common.SCANNER_MID_POINT                      // Start pan from the center
+	this.OffsetTilt = common.SCANNER_MID_POINT                     // Start tilt from the center.
 	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
 	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
@@ -238,17 +238,17 @@ func main() {
 		sequences = append(sequences, &newSequence)
 
 		// Setup Default State.
-		this.Speed[sequenceNumber] = common.DefaultSpeed                           // Selected speed for the sequence. Common to all types of sequence.
-		this.Running[sequenceNumber] = false                                       // Set this sequence to be in the not running state. Common to all types of sequence.
-		this.Strobe[sequenceNumber] = false                                        // Set strobe to be off for all sequences.
-		this.StrobeSpeed[sequenceNumber] = 255                                     // Set the strob speed to be the fastest for this sequence.
-		this.RGBShift[sequenceNumber] = common.DefaultRGBShift                     // Default RGB shift size.
-		this.ScannerShift[sequenceNumber] = common.DefaultScannerShift             // Default scanner shift size.
-		this.RGBSize[sequenceNumber] = common.DefaultRGBSize                       // Set the defaults size for the RGB fixtures.
-		this.ScannerSize[sequenceNumber] = common.DefaultScannerSize               // Set the defaults size for the scanner fixtures.
-		this.RGBFade[sequenceNumber] = common.DefaultRGBFade                       // Set the default fade time for RGB fixtures.
-		this.ScannerFade[sequenceNumber] = common.DefaultScannerFade               // Set the default fade time for scanners.
-		this.ScannerCoordinates[sequenceNumber] = common.DefaultScannerCoordinates // Set the default fade time for scanners.
+		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Selected speed for the sequence. Common to all types of sequence.
+		this.Running[sequenceNumber] = false                                         // Set this sequence to be in the not running state. Common to all types of sequence.
+		this.Strobe[sequenceNumber] = false                                          // Set strobe to be off for all sequences.
+		this.StrobeSpeed[sequenceNumber] = 255                                       // Set the strob speed to be the fastest for this sequence.
+		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.
+		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT             // Default scanner shift size.
+		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                       // Set the defaults size for the RGB fixtures.
+		this.ScannerSize[sequenceNumber] = common.DEFAULT_SCANNER_SIZE               // Set the defaults size for the scanner fixtures.
+		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                       // Set the default fade time for RGB fixtures.
+		this.ScannerFade[sequenceNumber] = common.DEFAULT_SCANNER_FADE               // Set the default fade time for scanners.
+		this.ScannerCoordinates[sequenceNumber] = common.DEFAULT_SCANNER_COORDNIATES // Set the default fade time for scanners.
 
 		if newSequence.Label == "switch" {
 			this.SwitchSequenceNumber = sequenceNumber
@@ -387,10 +387,10 @@ func main() {
 	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName)
 
 	// Create objects for bottom status bar.
-	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DefaultSpeed))
-	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DefaultRGBShift))
-	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DefaultRGBSize))
-	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DefaultRGBFade))
+	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED))
+	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DEFAULT_RGB_SHIFT))
+	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DEFAULT_RGB_SIZE))
+	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
 	panel.VersionLabel = widget.NewButton("Version 2.0", func() {})
 	panel.VersionLabel.Hidden = false
 

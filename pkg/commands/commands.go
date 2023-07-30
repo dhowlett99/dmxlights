@@ -77,8 +77,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.SequenceColors = common.DefaultSequenceColors
 		sequence.CurrentColors = []common.Color{}
 		// Reset the speed back to the default.
-		sequence.Speed = common.DefaultSpeed
-		sequence.CurrentSpeed = SetSpeed(common.DefaultSpeed)
+		sequence.Speed = common.DEFAULT_SPEED
+		sequence.CurrentSpeed = SetSpeed(common.DEFAULT_SPEED)
 		// Stop the strobe mode.
 		sequence.Strobe = false
 		sequence.StrobeSpeed = 0
@@ -86,15 +86,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
 		// Set Master brightness back to max.
-		sequence.Master = common.MaxDMXBrightness
+		sequence.Master = common.MAX_DMX_BRIGHTNESS
 
 		if sequence.Type == "rgb" {
 			// Reset the RGB shift back to the default.
-			sequence.RGBShift = common.DefaultRGBShift
+			sequence.RGBShift = common.DEFAULT_RGB_SHIFT
 			// Reset the RGB Size back to the default.
-			sequence.RGBSize = common.DefaultRGBSize
+			sequence.RGBSize = common.DEFAULT_RGB_SIZE
 			// Reset the RGB fade speed back to the default
-			sequence.RGBFade = common.DefaultRGBFade
+			sequence.RGBFade = common.DEFAULT_RGB_FADE
 			// Stop the flood mode.
 			sequence.StartFlood = false
 			sequence.StopFlood = true
@@ -102,30 +102,30 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		if sequence.Type == "scanner" {
 			// Reset pan and tilt to the center
-			sequence.ScannerOffsetPan = common.ScannerMidPoint
-			sequence.ScannerOffsetTilt = common.ScannerMidPoint
+			sequence.ScannerOffsetPan = common.SCANNER_MID_POINT
+			sequence.ScannerOffsetTilt = common.SCANNER_MID_POINT
 			// Enable all scanners and reset colors and gobo's.
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
 				newScannerState := common.FixtureState{}
 				newScannerState.Enabled = true
 				newScannerState.Inverted = false
 				sequence.FixtureState[scanner] = newScannerState
-				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
-				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
+				sequence.ScannerColor[scanner] = common.DEFAULT_SCANNER_COLOR // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DEFAULT_SCANNER_GOBO   // Reset Selected Gobo
 			}
 			// Reset the number of coordinates.
-			sequence.ScannerSelectedCoordinates = common.DefaultScannerCoordinates
+			sequence.ScannerSelectedCoordinates = common.DEFAULT_SCANNER_COORDNIATES
 			// Reset the scanner size and shift back to defaults.
-			sequence.ScannerSize = common.DefaultScannerSize
-			sequence.ScannerShift = common.DefaultScannerShift
+			sequence.ScannerSize = common.DEFAULT_SCANNER_SIZE
+			sequence.ScannerShift = common.DEFAULT_SCANNER_SHIFT
 			// Reset the scanner pattern back to default.
 			sequence.UpdateSequenceColor = false
 			sequence.RecoverSequenceColors = false
 			sequence.UpdatePattern = true
-			sequence.SelectedPattern = common.DefaultPattern
+			sequence.SelectedPattern = common.DEFAULT_PATTERN
 		}
 		// Clear all the function buttons for this sequence.
-		sequence.SelectedPattern = common.DefaultPattern
+		sequence.SelectedPattern = common.DEFAULT_PATTERN
 		sequence.AutoColor = false
 		sequence.AutoPattern = false
 		sequence.Bounce = false
@@ -223,6 +223,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update RGB Invert to %t\n", mySequenceNumber, command.Args[INVERT].Value)
 		}
 		sequence.RGBInvert = command.Args[INVERT].Value.(bool)
+		sequence.RGBInvertOnce = command.Args[INVERT].Value.(bool)
 		return sequence
 
 	case common.UpdateScannerShift:
@@ -677,8 +678,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// If switch auto color off and we are a scanner then reset the gobo and color back to the defaults.
 		if !sequence.AutoColor && selectedType == "scanner" {
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
-				sequence.ScannerColor[scanner] = common.DefaultScannerColor // Reset Selected Color
-				sequence.ScannerGobo[scanner] = common.DefaultScannerGobo   // Reset Selected Gobo
+				sequence.ScannerColor[scanner] = common.DEFAULT_SCANNER_COLOR // Reset Selected Color
+				sequence.ScannerGobo[scanner] = common.DEFAULT_SCANNER_GOBO   // Reset Selected Gobo
 			}
 		}
 

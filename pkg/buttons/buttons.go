@@ -187,12 +187,12 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 
-		red := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].R
-		green := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].G
-		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].B
-		white := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].W
-		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].A
-		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Colors[0].UV
+		red := flashSequence.Pattern.Steps[X].Fixtures[X].Color.R
+		green := flashSequence.Pattern.Steps[X].Fixtures[X].Color.G
+		blue := flashSequence.Pattern.Steps[X].Fixtures[X].Color.B
+		white := flashSequence.Pattern.Steps[X].Fixtures[X].Color.W
+		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Color.A
+		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Color.UV
 		pan := 128
 		tilt := 128
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
@@ -531,8 +531,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		this.MasterBrightness = this.MasterBrightness + 10
-		if this.MasterBrightness > common.MaxDMXBrightness {
-			this.MasterBrightness = common.MaxDMXBrightness
+		if this.MasterBrightness > common.MAX_DMX_BRIGHTNESS {
+			this.MasterBrightness = common.MAX_DMX_BRIGHTNESS
 		}
 		cmd := common.Command{
 			Action: common.Master,
@@ -676,8 +676,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.TargetSequence].Type == "scanner" {
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
-			if this.ScannerShift[this.TargetSequence] < 0 {
-				this.ScannerShift[this.TargetSequence] = 0
+			if this.ScannerShift[this.TargetSequence] < common.MIN_RGB_SHIFT {
+				this.ScannerShift[this.TargetSequence] = common.MIN_RGB_SHIFT
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
@@ -712,8 +712,8 @@ func ProcessButtons(X int, Y int,
 		}
 		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
-			if this.RGBShift[this.TargetSequence] > common.MaxRGBShift {
-				this.RGBShift[this.TargetSequence] = common.MaxRGBShift
+			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
+				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
@@ -1064,8 +1064,8 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]--
-			if this.RGBSize[this.TargetSequence] < 1 {
-				this.RGBSize[this.TargetSequence] = 1
+			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
+				this.RGBSize[this.TargetSequence] = common.MIN_RGB_SIZE
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
@@ -1120,8 +1120,8 @@ func ProcessButtons(X int, Y int,
 
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]++
-			if this.RGBSize[this.TargetSequence] > common.MaxRGBSize {
-				this.RGBSize[this.TargetSequence] = common.MaxRGBSize
+			if this.RGBSize[this.TargetSequence] > common.MAX_RGB_SIZE {
+				this.RGBSize[this.TargetSequence] = common.MAX_RGB_SIZE
 			}
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
@@ -1138,8 +1138,8 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.TargetSequence].Type == "scanner" {
 			// Send Update Scanner Size.
 			this.ScannerSize[this.TargetSequence] = this.ScannerSize[this.TargetSequence] + 10
-			if this.ScannerSize[this.TargetSequence] > common.MaxScannerSize {
-				this.ScannerSize[this.TargetSequence] = common.MaxScannerSize
+			if this.ScannerSize[this.TargetSequence] > common.MAX_SCANNER_SIZE {
+				this.ScannerSize[this.TargetSequence] = common.MAX_SCANNER_SIZE
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
@@ -1231,8 +1231,8 @@ func ProcessButtons(X int, Y int,
 		}
 		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
 			this.RGBFade[this.TargetSequence]++
-			if this.RGBFade[this.TargetSequence] > common.MaxRGBFade {
-				this.RGBFade[this.TargetSequence] = common.MaxRGBFade
+			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {
+				this.RGBFade[this.TargetSequence] = common.MAX_RGB_FADE
 			}
 			// Send fade update command.
 			cmd := common.Command{
