@@ -579,7 +579,7 @@ func PlaySequence(sequence common.Sequence,
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
 						// Calulate positions for each scanner fixture.
-						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.SCANNER)
+						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
 						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
 						sequence.NumberSteps = numberSteps
 
@@ -647,7 +647,7 @@ func PlaySequence(sequence common.Sequence,
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					var numberSteps int
-					fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.RGB)
+					fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
 					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
 					sequence.NumberSteps = numberSteps
 				}

@@ -53,8 +53,8 @@ const DefaultScannerCoordinates = 0
 const ScannerMidPoint = 127
 const DefaultRGBCoordinates = 10
 
-const SCANNER = true
-const RGB = false
+const IS_SCANNER = true
+const IS_RGB = false
 
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 
