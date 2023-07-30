@@ -42,6 +42,22 @@ func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, inve
 
 // processRGBColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
+// This is complicated because we want to support complex patterns which have colors stay on
+// from one step to another, the simple fade up the color then fade down the color doesn't work
+// for these use cases.
+//
+// There are a number of different inputs which controll the way we process the fading of the color.
+//  1. We notice when we are at the start and the end of sequences, which prevents us starting with the fading
+//     down of the last fixture and also helps us manage the change in direction of bounces.
+//  2. We notice when we are bouncing to control the pattern reversal.
+//  3. We notice when we select inverted sequence so we can cater for the pattern being upside down.
+//  4. We pass pointers to the thisFixture, lastFixture and nextFixture so we know what we did last and
+//     also we use these pointers to modify the state of the fixture, used for tracking when we last faded down.
+//     Only used in the multicolor patterns.
+//  5. We care about the next color being Black as we don't need to fade to black if we are already black.
+//
+// Note We pass debug messages into the fixture buffer, for each operation, so that when in debug mode you
+// can see how the fadeColors were created.
 func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
 
 	// RULE #1 - If color is same as last time , play that color out again.
