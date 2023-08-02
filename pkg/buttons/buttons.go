@@ -193,8 +193,8 @@ func ProcessButtons(X int, Y int,
 		white := flashSequence.Pattern.Steps[X].Fixtures[X].Color.W
 		amber := flashSequence.Pattern.Steps[X].Fixtures[X].Color.A
 		uv := flashSequence.Pattern.Steps[X].Fixtures[X].Color.UV
-		pan := 128
-		tilt := 128
+		pan := common.SCANNER_MID_POINT
+		tilt := common.SCANNER_MID_POINT
 		shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
 		rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
 		music := flashSequence.Pattern.Steps[X].Fixtures[X].Music

@@ -43,6 +43,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 	}
 	if debug {
 		fmt.Printf("Function Key X:%d Y:%d\n", X, Y)
+		fmt.Printf("this.TargetSequence %d\n", this.TargetSequence)
+		fmt.Printf("this.DisplaySequence %d\n", this.DisplaySequence)
 	}
 
 	if debug {

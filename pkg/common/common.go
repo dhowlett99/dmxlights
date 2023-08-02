@@ -553,16 +553,6 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 	}
 }
 
-// func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
-// 	cmd := Command{
-// 		Action: UpdateMode,
-// 		Args: []Arg{
-// 			{Name: "Mode", Value: mode},
-// 		},
-// 	}
-// 	SendCommandToSequence(targetSequence, cmd, commandChannels)
-// }
-
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: UnHide,
@@ -819,6 +809,35 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	}
 
 	return code
+}
+
+func GetColorNameByRGB(color Color) string {
+	switch color {
+	case Color{R: 0, G: 196, B: 255}:
+		return "Light Blue"
+	case Color{R: 255, G: 0, B: 0}:
+		return "Red"
+	case Color{R: 255, G: 111, B: 0}:
+		return "Orange"
+	case Color{R: 255, G: 255, B: 0}:
+		return "Yellow"
+	case Color{R: 0, G: 255, B: 0}:
+		return "Green"
+	case Color{R: 0, G: 255, B: 255}:
+		return "Cyan"
+	case Color{R: 0, G: 0, B: 255}:
+		return "Blue"
+	case Color{R: 100, G: 0, B: 255}:
+		return "Purple"
+	case Color{R: 255, G: 0, B: 255}:
+		return "Pink"
+	case Color{R: 255, G: 255, B: 255}:
+		return "White"
+	case Color{R: 0, G: 0, B: 0}:
+		return "Black"
+	}
+
+	return "White"
 }
 
 func HowManyColorsInSteps(steps []Step) (colors []Color) {
