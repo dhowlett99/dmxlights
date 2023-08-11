@@ -862,55 +862,6 @@ func Test_generatePattern(t *testing.T) {
 	}
 }
 
-func TestScanGenerateSineWave(t *testing.T) {
-	type args struct {
-		size      float64
-		frequency float64
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantOut []Coordinate
-	}{
-		{
-			name: "5000hz sawtooth",
-			args: args{
-				size:      255,
-				frequency: 5000,
-			},
-			wantOut: []Coordinate{
-				{156, 1},
-				{273, 26},
-				{352, 52},
-				{229, 77},
-				{159, 103},
-				{286, 128},
-				{348, 154},
-				{217, 179},
-				{163, 205},
-				{298, 230},
-				{343, 256},
-				{205, 281},
-				{169, 307},
-				{310, 332},
-				{336, 358},
-				{194, 383},
-				{177, 409},
-				{320, 434},
-				{328, 460},
-				{184, 485},
-			},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if gotOut := ScanGenerateSineWave(tt.args.size, tt.args.frequency, 10); !reflect.DeepEqual(gotOut, tt.wantOut) {
-				t.Errorf("ScanGenerateSineWave() = %v, want %v", gotOut, tt.wantOut)
-			}
-		})
-	}
-}
-
 func Test_getEnabledScanner(t *testing.T) {
 	type args struct {
 		scannerState          map[int]common.FixtureState
@@ -1677,6 +1628,117 @@ func TestApplyScannerStateFirst4Disabled(t *testing.T) {
 						fixture := step.Fixtures[fixtureNumber]
 						fmt.Printf("\t\tFixture %d Enabled %t Master %d Brightness %d Shutter %d Color %+v\n", fixtureNumber, fixture.Enabled, fixture.MasterDimmer, fixture.Brightness, fixture.Shutter, fixture.Color)
 					}
+				}
+			}
+		})
+	}
+}
+
+func TestScanGenerateSawTooth(t *testing.T) {
+	tests := []struct {
+		name              string
+		size              float64
+		frequency         float64
+		numberCoordinates float64
+		posX              float64
+		posY              float64
+		wantOut           []Coordinate
+	}{
+		{
+			name:              "simple case",
+			size:              127,
+			frequency:         50,
+			numberCoordinates: 25,
+			posX:              127,
+			posY:              127,
+			wantOut: []Coordinate{
+				{
+					Pan: 1, Tilt: 10,
+				},
+				{
+					Pan: 11, Tilt: 113,
+				},
+				{
+					Pan: 21, Tilt: 216,
+				},
+				{
+					Pan: 31, Tilt: 188,
+				},
+				{
+					Pan: 41, Tilt: 84,
+				},
+				{
+					Pan: 51, Tilt: 18,
+				},
+				{
+					Pan: 61, Tilt: 121,
+				},
+				{
+					Pan: 72, Tilt: 224,
+				},
+				{
+					Pan: 82, Tilt: 180,
+				},
+				{
+					Pan: 92, Tilt: 76,
+				},
+				{
+					Pan: 102, Tilt: 26,
+				},
+				{
+					Pan: 112, Tilt: 129,
+				},
+				{
+					Pan: 122, Tilt: 232,
+				},
+				{
+					Pan: 133, Tilt: 171,
+				},
+				{
+					Pan: 143, Tilt: 68,
+				},
+				{
+					Pan: 153, Tilt: 34,
+				},
+				{
+					Pan: 163, Tilt: 137,
+				},
+				{
+					Pan: 173, Tilt: 240,
+				},
+				{
+					Pan: 183, Tilt: 163,
+				},
+				{
+					Pan: 194, Tilt: 60,
+				},
+				{
+					Pan: 204, Tilt: 42,
+				},
+				{
+					Pan: 214, Tilt: 145,
+				},
+				{
+					Pan: 224, Tilt: 249,
+				},
+				{
+					Pan: 234, Tilt: 155,
+				},
+				{
+					Pan: 244, Tilt: 52,
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOut := ScanGenerateSawTooth(tt.size, tt.frequency, tt.numberCoordinates, tt.posX, tt.posY); !reflect.DeepEqual(gotOut, tt.wantOut) {
+				t.Errorf("ScanGenerateSawTooth() = %v, want %v", gotOut, tt.wantOut)
+
+				for _, coordinate := range gotOut {
+
+					fmt.Printf("%d,%d\n", coordinate.Pan, coordinate.Tilt)
+
 				}
 			}
 		})

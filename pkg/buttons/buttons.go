@@ -245,8 +245,8 @@ func ProcessButtons(X int, Y int,
 		white := 0
 		amber := 0
 		uv := 0
-		pan := 128
-		tilt := 128
+		pan := common.SCANNER_MID_POINT
+		tilt := common.SCANNER_MID_POINT
 		shutter := 0
 		rotate := 0
 		music := 0
@@ -1454,11 +1454,12 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 
-		this.OffsetPan = this.OffsetPan - 5
+		this.OffsetPan = this.OffsetPan + 5
 
-		if this.OffsetPan < 0 {
-			this.OffsetPan = 0
+		if this.OffsetPan > 255 {
+			this.OffsetPan = 255
 		}
+
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
 			Action: common.UpdateOffsetPan,
@@ -1483,11 +1484,12 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
 
-		this.OffsetPan = this.OffsetPan + 5
+		this.OffsetPan = this.OffsetPan - 5
 
-		if this.OffsetPan > 255 {
-			this.OffsetPan = 255
+		if this.OffsetPan < 0 {
+			this.OffsetPan = 0
 		}
+
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
 			Action: common.UpdateOffsetPan,

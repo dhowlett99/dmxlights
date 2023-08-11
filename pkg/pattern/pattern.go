@@ -930,24 +930,38 @@ func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float
 	return out
 }
 
-func ScanGenerateSineWave(size float64, frequency float64, NumberCoordinates float64) (out []Coordinate) {
-	var t float64
+func ScanGenerateSawTooth(size float64, frequency float64, NumberCoordinates float64, posX float64, posY float64) (out []Coordinate) {
+
+	var y float64
+	var x float64
+
 	size = size * 2
-	T := float64(size)
-	for t = 1; t < T-1; t += float64((255 / NumberCoordinates)) {
+
+	lift := (common.MAX_DMX_BRIGHTNESS - size) / 2
+
+	max := posY * 2
+
+	for y = 255 - max; y < max; y += (max / NumberCoordinates) {
 		n := Coordinate{}
-		x := (float64(size)/2 + math.Sin(t*float64(frequency))*100)
-		n.Tilt = int(x)
-		n.Pan = int(t)
+		x = traingle(y, size, frequency)
+		n.Tilt = int(x) + int(lift) - 127 + int(posX)
+		n.Pan = int(y)
 		out = append(out, n)
 	}
 	return out
 }
 
-func ScanGeneratorUpDown(size float64, NumberCoordinates float64) (out []Coordinate) {
+// traingle creates a symmetrical triangle
+func traingle(y float64, size float64, freq float64) float64 {
+	arg := math.Round(y/freq) - (y / freq)
+	x := size * 2 * math.Abs(arg)
+	return x
+}
+
+func ScanGeneratorUpDown(size float64, NumberCoordinates float64, posX float64, posY float64) (out []Coordinate) {
 	var tilt float64
 	var divideBy float64
-	pan := 128
+	pan := posY
 	size = size * 2
 	if size > 255 {
 		size = 255
@@ -956,25 +970,25 @@ func ScanGeneratorUpDown(size float64, NumberCoordinates float64) (out []Coordin
 
 	for tilt = 0; tilt < size; tilt += divideBy {
 		n := Coordinate{}
-		n.Tilt = int(tilt)
+		n.Tilt = int(tilt) + int(posX)
 		n.Pan = int(pan)
 		out = append(out, n)
 	}
 	return out
 }
 
-func ScanGeneratorLeftRight(size float64, NumberCoordinates float64) (out []Coordinate) {
+func ScanGeneratorLeftRight(size float64, NumberCoordinates float64, posX float64, posY float64) (out []Coordinate) {
 	var tilt float64
 	var pan float64
-	tilt = 128
-	size = size * 2
+	tilt = posX
+	size = (size * 2)
 	if size > 255 {
 		size = 255
 	}
 	for pan = 0; pan < size; pan += (255 / NumberCoordinates) {
 		n := Coordinate{}
 		n.Tilt = int(tilt)
-		n.Pan = int(pan)
+		n.Pan = int(pan) + int(posY)
 		out = append(out, n)
 	}
 	return out
