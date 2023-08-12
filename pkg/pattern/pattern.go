@@ -996,6 +996,9 @@ func ScanGeneratorUpDown(size float64, NumberCoordinates float64, posX float64, 
 	var divideBy float64
 	pan := posY
 	size = size * 2
+
+	lift := (common.MAX_DMX_BRIGHTNESS - size) / 2
+
 	if size > 255 {
 		size = 255
 	}
@@ -1003,7 +1006,7 @@ func ScanGeneratorUpDown(size float64, NumberCoordinates float64, posX float64, 
 
 	for tilt = 0; tilt < size; tilt += divideBy {
 		n := Coordinate{}
-		n.Tilt = int(tilt) + int(posX)
+		n.Tilt = int(tilt) + int(lift) - 127 + int(posX)
 		n.Pan = int(pan)
 		out = append(out, n)
 	}
@@ -1015,13 +1018,16 @@ func ScanGeneratorLeftRight(size float64, NumberCoordinates float64, posX float6
 	var pan float64
 	tilt = posX
 	size = (size * 2)
+
+	lift := (common.MAX_DMX_BRIGHTNESS - size) / 2
+
 	if size > 255 {
 		size = 255
 	}
 	for pan = 0; pan < size; pan += (255 / NumberCoordinates) {
 		n := Coordinate{}
 		n.Tilt = int(tilt)
-		n.Pan = int(pan) + int(posY)
+		n.Pan = int(pan) + int(lift) - 127 + int(posY)
 		out = append(out, n)
 	}
 	return out
