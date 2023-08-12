@@ -302,8 +302,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 3rd Press Status Mode and we are scanner - we display the shutter chaser function buttons.
+	// 3rd Press Status Mode and we are scanner and the shutter chaser is running - we display the shutter chaser function buttons.
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
+		this.ScannerChaser &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
 		this.SelectedType == "scanner" {
@@ -425,7 +426,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// 4th Press Normal Mode and we are a scanner- we head fixture status mode.
-	if this.SelectMode[this.SelectedSequence] == CHASER &&
+	if (this.SelectMode[this.SelectedSequence] == CHASER || !this.ScannerChaser) &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
 		this.SelectedType == "scanner" {

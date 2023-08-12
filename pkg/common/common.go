@@ -31,7 +31,7 @@ const MAX_NUMBER_OF_CHANNELS = 8
 const MAX_DMX_ADDRESS = 512
 const MAX_TEXT_ENTRY_LENGTH = 35
 const DEFAULT_SCANNER_SIZE = 60
-const MAX_SCANNER_SIZE = 120
+const MAX_SCANNER_SIZE = 127
 const MIN_RGB_SIZE = 0
 const MAX_RGB_SIZE = 10
 const MIN_RGB_SHIFT = 1
@@ -39,6 +39,7 @@ const MAX_RGB_SHIFT = 10
 const MAX_RGB_FADE = 10
 const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
 const MIN_DMX_BRIGHTNESS = 0
+const CENTER_DMX_BRIGHTNESS = 127
 const MAX_DMX_BRIGHTNESS = 255
 const DEFAULT_PATTERN = 0
 const DEFAULT_RGB_SIZE = 0
@@ -553,16 +554,6 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 	}
 }
 
-// func SetMode(targetSequence int, commandChannels []chan Command, mode string) {
-// 	cmd := Command{
-// 		Action: UpdateMode,
-// 		Args: []Arg{
-// 			{Name: "Mode", Value: mode},
-// 		},
-// 	}
-// 	SendCommandToSequence(targetSequence, cmd, commandChannels)
-// }
-
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
 		Action: UnHide,
@@ -819,6 +810,35 @@ func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
 	}
 
 	return code
+}
+
+func GetColorNameByRGB(color Color) string {
+	switch color {
+	case Color{R: 0, G: 196, B: 255}:
+		return "Light Blue"
+	case Color{R: 255, G: 0, B: 0}:
+		return "Red"
+	case Color{R: 255, G: 111, B: 0}:
+		return "Orange"
+	case Color{R: 255, G: 255, B: 0}:
+		return "Yellow"
+	case Color{R: 0, G: 255, B: 0}:
+		return "Green"
+	case Color{R: 0, G: 255, B: 255}:
+		return "Cyan"
+	case Color{R: 0, G: 0, B: 255}:
+		return "Blue"
+	case Color{R: 100, G: 0, B: 255}:
+		return "Purple"
+	case Color{R: 255, G: 0, B: 255}:
+		return "Pink"
+	case Color{R: 255, G: 255, B: 255}:
+		return "White"
+	case Color{R: 0, G: 0, B: 0}:
+		return "Black"
+	}
+
+	return "White"
 }
 
 func HowManyColorsInSteps(steps []Step) (colors []Color) {

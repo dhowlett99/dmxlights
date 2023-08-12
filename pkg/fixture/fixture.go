@@ -387,7 +387,7 @@ func FixtureReceiver(
 							common.LabelButton(myFixtureNumber, cmd.SequenceNumber, "", guiButtons)
 						} else {
 							// If the pattern has colors use them.
-							if fixture.Color != fixture.Color {
+							if fixture.Color != common.Black {
 								common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: fixture.Color.R, Green: fixture.Color.G, Blue: fixture.Color.B, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 								common.LabelButton(myFixtureNumber, cmd.SequenceNumber, "", guiButtons)
 							} else {
@@ -1059,7 +1059,13 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	if debug {
 		fmt.Printf("strobe %t speed %d master %d blackout %t\n", sequence.Strobe, sequence.StrobeSpeed, sequence.Master, sequence.Blackout)
 	}
-	MapFixtures(false, false, sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
+
+	// Find a suitable gobo based on the requested static lamp color.
+	scannerGobo := FindGobo(myFixtureNumber, sequence.Number, common.GetColorNameByRGB(lamp.Color), fixturesConfig)
+	// Find a suitable color wheel settin based on the requested static lamp color.
+	scannerColor := FindColor(myFixtureNumber, sequence.Number, common.GetColorNameByRGB(lamp.Color), fixturesConfig)
+
+	MapFixtures(false, false, sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, 0, scannerGobo, scannerColor, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
 
 	// Only play once, we don't want to flood the DMX universe with
 	// continual commands.
