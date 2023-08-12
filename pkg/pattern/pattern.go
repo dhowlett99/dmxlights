@@ -930,7 +930,40 @@ func CircleGenerator(radius int, NumberCoordinates int, posX float64, posY float
 	return out
 }
 
-func ScanGenerateSawTooth(size float64, frequency float64, NumberCoordinates float64, posX float64, posY float64) (out []Coordinate) {
+// posY runs from 0 to 255 and starts in the centre at 127.
+// The goal here is to return the start and stop values for the scanner pattern generators
+// so that we can pan the pattern from left to right.
+func findStart(posY int, maxDMX int) (start float64, stop float64) {
+
+	if posY == common.CENTER_DMX_BRIGHTNESS {
+		start = 0
+		stop = common.MAX_DMX_BRIGHTNESS
+		return start, stop
+	}
+	if posY < common.CENTER_DMX_BRIGHTNESS {
+		in := []int{posY}
+		out := scaleBetween(in, 1, maxDMX, 0, maxDMX)
+		start = common.MIN_DMX_BRIGHTNESS
+		stop = float64(out[0]) * 2
+	}
+	if posY > common.CENTER_DMX_BRIGHTNESS {
+		in := []int{posY / 2}
+		out := scaleBetween(in, 0, maxDMX-1, 0, maxDMX)
+		start = float64(out[0]) * 2
+		stop = common.MAX_DMX_BRIGHTNESS
+	}
+	return start, stop
+}
+
+func scaleBetween(unscaledNum []int, minAllowed int, maxAllowed int, min int, max int) (out []int) {
+	for _, number := range unscaledNum {
+		arg := (maxAllowed-minAllowed)*(number-min)/max - min + minAllowed
+		out = append(out, arg)
+	}
+	return out
+}
+
+func ScanGenerateSawTooth(size float64, frequency float64, numberCoordinates float64, posX float64, posY float64) (out []Coordinate) {
 
 	var y float64
 	var x float64
@@ -939,9 +972,9 @@ func ScanGenerateSawTooth(size float64, frequency float64, NumberCoordinates flo
 
 	lift := (common.MAX_DMX_BRIGHTNESS - size) / 2
 
-	max := posY * 2
+	start, stop := findStart(int(posY), 127)
 
-	for y = 255 - max; y < max; y += (max / NumberCoordinates) {
+	for y = start; y < stop; y += float64(255 / numberCoordinates) {
 		n := Coordinate{}
 		x = traingle(y, size, frequency)
 		n.Tilt = int(x) + int(lift) - 127 + int(posX)

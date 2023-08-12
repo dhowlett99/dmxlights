@@ -39,6 +39,7 @@ const MAX_RGB_SHIFT = 10
 const MAX_RGB_FADE = 10
 const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
 const MIN_DMX_BRIGHTNESS = 0
+const CENTER_DMX_BRIGHTNESS = 127
 const MAX_DMX_BRIGHTNESS = 255
 const DEFAULT_PATTERN = 0
 const DEFAULT_RGB_SIZE = 0

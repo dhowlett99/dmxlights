@@ -1744,3 +1744,117 @@ func TestScanGenerateSawTooth(t *testing.T) {
 		})
 	}
 }
+
+func Test_findStart(t *testing.T) {
+	type args struct {
+		posY   int
+		maxDMX int
+	}
+	tests := []struct {
+		name  string
+		args  args
+		start float64
+		stop  float64
+	}{
+
+		{
+			name: "pan right",
+			args: args{
+				posY:   255,
+				maxDMX: 127,
+			},
+			start: 252,
+			stop:  255,
+		},
+
+		{
+			name: "half pan right",
+			args: args{
+				posY:   190,
+				maxDMX: 127,
+			},
+			start: 188,
+			stop:  255,
+		},
+
+		{
+			name: "centre point",
+			args: args{
+				posY:   127,
+				maxDMX: 127,
+			},
+			start: 0,
+			stop:  255,
+		},
+
+		{
+			name: "half pan left",
+			args: args{
+				posY:   64,
+				maxDMX: 127,
+			},
+			start: 0,
+			stop:  128,
+		},
+
+		{
+			name: "pan left",
+			args: args{
+				posY:   1,
+				maxDMX: 127,
+			},
+			start: 0,
+			stop:  2,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			if start, stop := findStart(tt.args.posY, tt.args.maxDMX); start != tt.start || stop != tt.stop {
+
+				if !reflect.DeepEqual(start, tt.start) {
+					t.Errorf("findStart(start) = %v, want %v", start, tt.start)
+				}
+
+				if !reflect.DeepEqual(stop, tt.stop) {
+					t.Errorf("findStart(stop) = %v, want %v", stop, tt.stop)
+				}
+
+			}
+		})
+	}
+}
+
+func Test_scaleBetween(t *testing.T) {
+	type args struct {
+		unscaledNum []int
+		minAllowed  int
+		maxAllowed  int
+		min         int
+		max         int
+	}
+	tests := []struct {
+		name    string
+		args    args
+		wantOut []int
+	}{
+		{
+			name: "fisrt pass",
+			args: args{
+				unscaledNum: []int{0, 64, 127},
+				minAllowed:  0,
+				maxAllowed:  10,
+				min:         0,
+				max:         127,
+			},
+			wantOut: []int{0, 5, 10},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if gotOut := scaleBetween(tt.args.unscaledNum, tt.args.minAllowed, tt.args.maxAllowed, tt.args.min, tt.args.max); !reflect.DeepEqual(gotOut, tt.wantOut) {
+				t.Errorf("scaleBetween() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
