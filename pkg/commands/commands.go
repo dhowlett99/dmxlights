@@ -88,6 +88,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Set Master brightness back to max.
 		sequence.Master = common.MAX_DMX_BRIGHTNESS
 
+		// Enable all fixtures
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+			newScannerState := common.FixtureState{}
+			newScannerState.Enabled = true
+			newScannerState.Inverted = false
+			sequence.FixtureState[fixture] = newScannerState
+		}
+
 		if sequence.Type == "rgb" {
 			// Reset the RGB shift back to the default.
 			sequence.RGBShift = common.DEFAULT_RGB_SHIFT
@@ -104,12 +112,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Reset pan and tilt to the center
 			sequence.ScannerOffsetPan = common.SCANNER_MID_POINT
 			sequence.ScannerOffsetTilt = common.SCANNER_MID_POINT
-			// Enable all scanners and reset colors and gobo's.
+			// Reset colors and gobo's.
 			for scanner := 0; scanner < sequence.NumberFixtures; scanner++ {
-				newScannerState := common.FixtureState{}
-				newScannerState.Enabled = true
-				newScannerState.Inverted = false
-				sequence.FixtureState[scanner] = newScannerState
 				sequence.ScannerColor[scanner] = common.DEFAULT_SCANNER_COLOR // Reset Selected Color
 				sequence.ScannerGobo[scanner] = common.DEFAULT_SCANNER_GOBO   // Reset Selected Gobo
 			}
