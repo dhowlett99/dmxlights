@@ -37,7 +37,6 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 	start := true
 	end := false
-	invert := false
 
 	fadeColors := make(map[int][]common.FixtureBuffer)
 	shift := common.Reverse(sequence.RGBShift)
@@ -46,16 +45,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
 	}
 
-	// Invert the RGB sequence.
-	if sequence.RGBInvert && sequence.RGBInvertOnce {
-		sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
-		steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors)
-		sequence.RGBInvertOnce = false
-		invert = true
-	} else {
-		steps = stepsIn
-		invert = false
-	}
+	// Apply inverted selection from fixtureState to the RGB sequence.
+	sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
+	steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors, sequence.FixtureState)
 
 	if !sequence.ScannerInvert {
 		// Steps forward.
@@ -89,9 +81,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				lastFixture := lastStep.Fixtures[fixtureNumber]
 				nextFixture := nextStep.Fixtures[fixtureNumber]
 				if scanner {
-					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
@@ -147,9 +139,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				lastFixture := lastStep.Fixtures[fixtureNumber]
 				nextFixture := nextStep.Fixtures[fixtureNumber]
 				if scanner {
-					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
@@ -182,9 +174,9 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				lastFixture := lastStep.Fixtures[fixtureNumber]
 				nextFixture := nextStep.Fixtures[fixtureNumber]
 				if scanner {
-					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, invert, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
+					fadeColors = process.ProcessRGBColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
@@ -322,7 +314,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureState map[int]common.FixtureState) []common.Step {
 
 	var insertColor int
 	numberColors := len(colors)
@@ -345,16 +337,23 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color) []common
 			if insertColor >= numberColors {
 				insertColor = 0
 			}
-			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
-				// insert a black.
-				newFixture.Color = common.Color{}
-			} else {
-				// its a blank space so insert one of the colors.
-				newFixture.Color = colors[insertColor]
-				insertColor++
-			}
 
-			newStep.Fixtures[fixtureNumber] = newFixture
+			if fixtureState[fixtureNumber].Inverted {
+				if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+					// insert a black.
+					newFixture.Color = common.Color{}
+				} else {
+					// its a blank space so insert one of the colors.
+					newFixture.Color = colors[insertColor]
+					insertColor++
+				}
+				newFixture.Inverted = true
+				newStep.Fixtures[fixtureNumber] = newFixture
+			} else {
+				// Just copy what was there.
+				fixture.Inverted = false
+				newStep.Fixtures[fixtureNumber] = fixture
+			}
 		}
 
 		stepsOut = append(stepsOut, newStep)

@@ -295,7 +295,6 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
-	RGBInvertOnce               bool                        // Invert only in a sequence,
 	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness
@@ -486,7 +485,8 @@ type Fixture struct {
 	Gobo         int
 	Program      int
 	Enabled      bool
-	State        int
+	Inverted     bool
+	State        int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
 }
 
 type ButtonPresets struct {

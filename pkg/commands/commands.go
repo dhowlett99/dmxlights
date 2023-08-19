@@ -227,7 +227,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update RGB Invert to %t\n", mySequenceNumber, command.Args[INVERT].Value)
 		}
 		sequence.RGBInvert = command.Args[INVERT].Value.(bool)
-		sequence.RGBInvertOnce = command.Args[INVERT].Value.(bool)
+
+		// Set all the fixtures to Invert
+		if sequence.RGBInvert {
+			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+				state := sequence.FixtureState[fixtureNumber]
+				state.Inverted = true
+				sequence.FixtureState[fixtureNumber] = state
+			}
+		} else {
+			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+				state := sequence.FixtureState[fixtureNumber]
+				state.Inverted = false
+				sequence.FixtureState[fixtureNumber] = state
+			}
+		}
+		fmt.Printf("%d: Sequence FixtureState: %+v\n", mySequenceNumber, sequence.FixtureState)
+
 		return sequence
 
 	case common.UpdateScannerShift:

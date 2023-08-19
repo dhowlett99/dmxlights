@@ -1645,88 +1645,161 @@ func TestScanGenerateSawTooth(t *testing.T) {
 		wantOut           []Coordinate
 	}{
 		{
-			name:              "simple case",
+			name:              "simple case - frequency 64",
 			size:              127,
-			frequency:         50,
-			numberCoordinates: 25,
+			frequency:         64,
+			numberCoordinates: 64,
 			posX:              127,
 			posY:              127,
 			wantOut: []Coordinate{
-				{
-					Pan: 1, Tilt: 10,
-				},
-				{
-					Pan: 11, Tilt: 113,
-				},
-				{
-					Pan: 21, Tilt: 216,
-				},
-				{
-					Pan: 31, Tilt: 188,
-				},
-				{
-					Pan: 41, Tilt: 84,
-				},
-				{
-					Pan: 51, Tilt: 18,
-				},
-				{
-					Pan: 61, Tilt: 121,
-				},
-				{
-					Pan: 72, Tilt: 224,
-				},
-				{
-					Pan: 82, Tilt: 180,
-				},
-				{
-					Pan: 92, Tilt: 76,
-				},
-				{
-					Pan: 102, Tilt: 26,
-				},
-				{
-					Pan: 112, Tilt: 129,
-				},
-				{
-					Pan: 122, Tilt: 232,
-				},
-				{
-					Pan: 133, Tilt: 171,
-				},
-				{
-					Pan: 143, Tilt: 68,
-				},
-				{
-					Pan: 153, Tilt: 34,
-				},
-				{
-					Pan: 163, Tilt: 137,
-				},
-				{
-					Pan: 173, Tilt: 240,
-				},
-				{
-					Pan: 183, Tilt: 163,
-				},
-				{
-					Pan: 194, Tilt: 60,
-				},
-				{
-					Pan: 204, Tilt: 42,
-				},
-				{
-					Pan: 214, Tilt: 145,
-				},
-				{
-					Pan: 224, Tilt: 249,
-				},
-				{
-					Pan: 234, Tilt: 155,
-				},
-				{
-					Pan: 244, Tilt: 52,
-				},
+				{Pan: 0, Tilt: 0},
+				{Pan: 3, Tilt: 31},
+				{Pan: 7, Tilt: 63},
+				{Pan: 11, Tilt: 94},
+				{Pan: 15, Tilt: 126},
+				{Pan: 19, Tilt: 158},
+				{Pan: 23, Tilt: 189},
+				{Pan: 27, Tilt: 221},
+				{Pan: 31, Tilt: 253},
+				{Pan: 35, Tilt: 223},
+				{Pan: 39, Tilt: 191},
+				{Pan: 43, Tilt: 160},
+				{Pan: 47, Tilt: 128},
+				{Pan: 51, Tilt: 96},
+				{Pan: 55, Tilt: 65},
+				{Pan: 59, Tilt: 33},
+				{Pan: 63, Tilt: 1},
+				{Pan: 67, Tilt: 29},
+				{Pan: 71, Tilt: 61},
+				{Pan: 75, Tilt: 92},
+				{Pan: 79, Tilt: 124},
+				{Pan: 83, Tilt: 156},
+				{Pan: 87, Tilt: 187},
+				{Pan: 91, Tilt: 219},
+				{Pan: 95, Tilt: 251},
+				{Pan: 99, Tilt: 225},
+				{Pan: 103, Tilt: 193},
+				{Pan: 107, Tilt: 162},
+				{Pan: 111, Tilt: 130},
+				{Pan: 115, Tilt: 98},
+				{Pan: 119, Tilt: 67},
+				{Pan: 123, Tilt: 35},
+				{Pan: 127, Tilt: 3},
+				{Pan: 131, Tilt: 27},
+				{Pan: 135, Tilt: 59},
+				{Pan: 139, Tilt: 90},
+				{Pan: 143, Tilt: 122},
+				{Pan: 147, Tilt: 154},
+				{Pan: 151, Tilt: 185},
+				{Pan: 155, Tilt: 217},
+				{Pan: 159, Tilt: 249},
+				{Pan: 163, Tilt: 227},
+				{Pan: 167, Tilt: 195},
+				{Pan: 171, Tilt: 164},
+				{Pan: 175, Tilt: 132},
+				{Pan: 179, Tilt: 100},
+				{Pan: 183, Tilt: 69},
+				{Pan: 187, Tilt: 37},
+				{Pan: 191, Tilt: 5},
+				{Pan: 195, Tilt: 25},
+				{Pan: 199, Tilt: 57},
+				{Pan: 203, Tilt: 88},
+				{Pan: 207, Tilt: 120},
+				{Pan: 211, Tilt: 152},
+				{Pan: 215, Tilt: 183},
+				{Pan: 219, Tilt: 215},
+				{Pan: 223, Tilt: 247},
+				{Pan: 227, Tilt: 229},
+				{Pan: 231, Tilt: 197},
+				{Pan: 235, Tilt: 166},
+				{Pan: 239, Tilt: 134},
+				{Pan: 243, Tilt: 102},
+				{Pan: 247, Tilt: 71},
+				{Pan: 251, Tilt: 39},
+			},
+		},
+		{
+			name:              "simple case - frequency 32",
+			size:              127,
+			frequency:         32,
+			numberCoordinates: 32,
+			posX:              127,
+			posY:              127,
+			wantOut: []Coordinate{
+				{Pan: 0, Tilt: 0},
+				{Pan: 7, Tilt: 126},
+				{Pan: 15, Tilt: 253},
+				{Pan: 23, Tilt: 128},
+				{Pan: 31, Tilt: 1},
+				{Pan: 39, Tilt: 124},
+				{Pan: 47, Tilt: 251},
+				{Pan: 55, Tilt: 130},
+				{Pan: 63, Tilt: 3},
+				{Pan: 71, Tilt: 122},
+				{Pan: 79, Tilt: 249},
+				{Pan: 87, Tilt: 132},
+				{Pan: 95, Tilt: 5},
+				{Pan: 103, Tilt: 120},
+				{Pan: 111, Tilt: 247},
+				{Pan: 119, Tilt: 134},
+				{Pan: 127, Tilt: 7},
+				{Pan: 135, Tilt: 118},
+				{Pan: 143, Tilt: 245},
+				{Pan: 151, Tilt: 136},
+				{Pan: 159, Tilt: 9},
+				{Pan: 167, Tilt: 116},
+				{Pan: 175, Tilt: 243},
+				{Pan: 183, Tilt: 138},
+				{Pan: 191, Tilt: 11},
+				{Pan: 199, Tilt: 114},
+				{Pan: 207, Tilt: 241},
+				{Pan: 215, Tilt: 140},
+				{Pan: 223, Tilt: 13},
+				{Pan: 231, Tilt: 112},
+				{Pan: 239, Tilt: 239},
+				{Pan: 247, Tilt: 142},
+			},
+		},
+		{
+			name:              "simple case - frequency 24",
+			size:              127,
+			frequency:         24,
+			numberCoordinates: 24,
+			posX:              127,
+			posY:              127,
+			wantOut: []Coordinate{
+				{Pan: 0, Tilt: 0},
+				{Pan: 7, Tilt: 126},
+				{Pan: 15, Tilt: 253},
+				{Pan: 23, Tilt: 128},
+				{Pan: 31, Tilt: 1},
+				{Pan: 39, Tilt: 124},
+				{Pan: 47, Tilt: 251},
+				{Pan: 55, Tilt: 130},
+				{Pan: 63, Tilt: 3},
+				{Pan: 71, Tilt: 122},
+				{Pan: 79, Tilt: 249},
+				{Pan: 87, Tilt: 132},
+				{Pan: 95, Tilt: 5},
+				{Pan: 103, Tilt: 120},
+				{Pan: 111, Tilt: 247},
+				{Pan: 119, Tilt: 134},
+				{Pan: 127, Tilt: 7},
+				{Pan: 135, Tilt: 118},
+				{Pan: 143, Tilt: 245},
+				{Pan: 151, Tilt: 136},
+				{Pan: 159, Tilt: 9},
+				{Pan: 167, Tilt: 116},
+				{Pan: 175, Tilt: 243},
+				{Pan: 183, Tilt: 138},
+				{Pan: 191, Tilt: 11},
+				{Pan: 199, Tilt: 114},
+				{Pan: 207, Tilt: 241},
+				{Pan: 215, Tilt: 140},
+				{Pan: 223, Tilt: 13},
+				{Pan: 231, Tilt: 112},
+				{Pan: 239, Tilt: 239},
+				{Pan: 247, Tilt: 142},
 			},
 		},
 	}
@@ -1735,6 +1808,11 @@ func TestScanGenerateSawTooth(t *testing.T) {
 			if gotOut := ScanGenerateSawTooth(tt.size, tt.frequency, tt.numberCoordinates, tt.posX, tt.posY); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("ScanGenerateSawTooth() = %v, want %v", gotOut, tt.wantOut)
 
+				for _, coordinate := range gotOut {
+
+					fmt.Printf("{Pan: %d,Tilt:%d},\n", coordinate.Pan, coordinate.Tilt)
+
+				}
 				for _, coordinate := range gotOut {
 
 					fmt.Printf("%d,%d\n", coordinate.Pan, coordinate.Tilt)
@@ -1854,6 +1932,73 @@ func Test_scaleBetween(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if gotOut := scaleBetween(tt.args.unscaledNum, tt.args.minAllowed, tt.args.maxAllowed, tt.args.min, tt.args.max); !reflect.DeepEqual(gotOut, tt.wantOut) {
 				t.Errorf("scaleBetween() = %v, want %v", gotOut, tt.wantOut)
+			}
+		})
+	}
+}
+
+func Test_traingle(t *testing.T) {
+	type args struct {
+		y    float64
+		size float64
+		freq float64
+	}
+	tests := []struct {
+		name string
+		args args
+		want float64
+	}{
+		{
+			name: "standard triangle",
+			args: args{
+				y:    0,
+				size: 255,
+				freq: 50,
+			},
+			want: 0,
+		},
+		{
+			name: "half triangle",
+			args: args{
+				y:    25,
+				size: 255,
+				freq: 50,
+			},
+			want: 255,
+		},
+		{
+			name: "2nd cylce triangle",
+			args: args{
+				y:    50,
+				size: 255,
+				freq: 50,
+			},
+			want: 0,
+		},
+
+		{
+			name: "2nd half cylce triangle",
+			args: args{
+				y:    75,
+				size: 255,
+				freq: 50,
+			},
+			want: 255,
+		},
+		{
+			name: "3rd cylce triangle",
+			args: args{
+				y:    100,
+				size: 255,
+				freq: 50,
+			},
+			want: 0,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := traingle(tt.args.y, tt.args.size, tt.args.freq); got != tt.want {
+				t.Errorf("traingle() = %v, want %v", got, tt.want)
 			}
 		})
 	}
