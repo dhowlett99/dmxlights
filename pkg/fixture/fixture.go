@@ -312,7 +312,7 @@ func FixtureReceiver(
 					scannerFixturesSequenceNumber := 2 // Scanner sequence.
 					if !cmd.Hide {
 						if cmd.FixtureState.Inverted {
-							common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: common.ReverseDmx(fixture.Brightness)}, eventsForLauchpad, guiButtons)
+							common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: common.ReverseDmx(red), Green: common.ReverseDmx(green), Blue: common.ReverseDmx(blue), Brightness: common.ReverseDmx(fixture.Brightness)}, eventsForLauchpad, guiButtons)
 						} else {
 							common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 						}

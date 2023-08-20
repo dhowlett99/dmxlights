@@ -46,6 +46,7 @@ import (
 
 const debug = false
 const NumberOfSequences = 5
+const NumberOfFixtures = 8
 const NumberOfSwitches = 8
 
 func main() {
@@ -109,14 +110,15 @@ func main() {
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
 	// Initialize eight fixture states for the four sequences.
-	this.FixtureState = make([][]common.FixtureState, 9)
-	for x := 0; x < 9; x++ {
-		this.FixtureState[x] = make([]common.FixtureState, 9)
-		for y := 0; y < 9; y++ {
-			newScanner := common.FixtureState{}
-			newScanner.Enabled = true
-			newScanner.Inverted = false
-			this.FixtureState[x][y] = newScanner
+	this.FixtureState = make([][]common.FixtureState, NumberOfSequences)
+	// Populate each sequence with fixtures.
+	for sequenceNumber := 0; sequenceNumber < NumberOfSequences; sequenceNumber++ {
+		this.FixtureState[sequenceNumber] = make([]common.FixtureState, NumberOfFixtures)
+		for fixtureNumber := 0; fixtureNumber < NumberOfFixtures; fixtureNumber++ {
+			newFixture := common.FixtureState{}
+			newFixture.Enabled = true
+			newFixture.Inverted = false
+			this.FixtureState[sequenceNumber][fixtureNumber] = newFixture
 		}
 	}
 

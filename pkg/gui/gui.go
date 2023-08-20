@@ -400,6 +400,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 				}
 			}
 			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
+
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {

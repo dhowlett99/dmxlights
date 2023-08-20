@@ -23,7 +23,7 @@ import (
 //	    |				|
 //	    V				V
 //	 +-------------------+
-//	 |       STATUS      |
+//	 |  FIXTURE STATUS   |
 //	 +-------------------+
 //	          |
 //	          V
@@ -48,8 +48,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if debug {
 		fmt.Printf("HANDLE: this.Type = %s \n", this.SelectedType)
 		for functionNumber := 0; functionNumber < 8; functionNumber++ {
-			state := this.Functions[this.TargetSequence][functionNumber].State
-			fmt.Printf("HANDLE: function %d state %t\n", functionNumber, state)
+			state := this.Functions[this.TargetSequence][functionNumber]
+			fmt.Printf("HANDLE: SEQ: %d function %d state %+v\n", this.TargetSequence, functionNumber, state)
 		}
 		fmt.Printf("HANDLE: this.ChaserRunning %t \n", this.ScannerChaser)
 
@@ -297,7 +297,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// Show the Fixture Status Buttons.
-		ShowFixtureStatus(this.TargetSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -453,7 +453,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// Show the Fixture Status Buttons.
-		ShowFixtureStatus(this.TargetSequence, *sequences[this.SelectedSequence], this, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
 	// Are we in function mode ?
