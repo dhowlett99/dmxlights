@@ -1985,7 +1985,7 @@ func ShowFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures 
 		}
 
 		// Not enabled and not inverted then off and blue.
-		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].Inverted {
+		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled {
 			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Off", guiButtons)
 		}

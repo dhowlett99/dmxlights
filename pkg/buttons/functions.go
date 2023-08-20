@@ -394,7 +394,6 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Turn on invert means all the fixture states should be inverted.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
 			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.Enabled = true
 			state.Inverted = true
 			this.FixtureState[this.TargetSequence][fixtureNumber] = state
 		}
