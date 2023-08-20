@@ -197,8 +197,11 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 }
 
 func (panel *MyPanel) UpdateButtonLabel(X int, Y int, label string) {
+	// If the label contains a space, replace it with a new line.
+	label = strings.Replace(label, " ", "\n", 2)
 	// If the label contains a period, replace it with a new line.
-	panel.Buttons[X][Y].button.Text = strings.Replace(label, ".", "\n", 2)
+	label = strings.Replace(label, ".", "\n", 2)
+	panel.Buttons[X][Y].button.Text = label
 	panel.Buttons[X][Y].button.Refresh()
 }
 
