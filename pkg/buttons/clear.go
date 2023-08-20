@@ -147,8 +147,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-			this.FixtureState[fixtureNumber][sequence.Number].Enabled = true
-			this.FixtureState[fixtureNumber][sequence.Number].Inverted = false
+			this.FixtureState[sequence.Number][fixtureNumber].Enabled = true
+			this.FixtureState[sequence.Number][fixtureNumber].Inverted = false
 		}
 
 		// Clear all the function buttons for this sequence.

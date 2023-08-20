@@ -242,7 +242,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.FixtureState[fixtureNumber] = state
 			}
 		}
-		fmt.Printf("%d: Sequence FixtureState: %+v\n", mySequenceNumber, sequence.FixtureState)
 
 		return sequence
 

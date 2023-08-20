@@ -23,7 +23,7 @@ import (
 //	    |				|
 //	    V				V
 //	 +-------------------+
-//	 |       STATUS      |
+//	 |  FIXTURE STATUS   |
 //	 +-------------------+
 //	          |
 //	          V
@@ -48,8 +48,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if debug {
 		fmt.Printf("HANDLE: this.Type = %s \n", this.SelectedType)
 		for functionNumber := 0; functionNumber < 8; functionNumber++ {
-			state := this.Functions[this.TargetSequence][functionNumber].State
-			fmt.Printf("HANDLE: function %d state %t\n", functionNumber, state)
+			state := this.Functions[this.TargetSequence][functionNumber]
+			fmt.Printf("HANDLE: SEQ: %d function %d state %+v\n", this.TargetSequence, functionNumber, state)
 		}
 		fmt.Printf("HANDLE: this.ChaserRunning %t \n", this.ScannerChaser)
 
