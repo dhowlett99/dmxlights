@@ -391,6 +391,19 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
+		// Turn on invert means all the fixture states should be inverted.
+		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
+			state := this.FixtureState[this.TargetSequence][fixtureNumber]
+			state.Inverted = true
+			this.FixtureState[this.TargetSequence][fixtureNumber] = state
+		}
+
+		if debug {
+			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+			}
+		}
+
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
@@ -413,6 +426,19 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// Turn off invert means all the fixture states should be not inverted.
+		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
+			state := this.FixtureState[this.TargetSequence][fixtureNumber]
+			state.Inverted = false
+			this.FixtureState[this.TargetSequence][fixtureNumber] = state
+		}
+
+		if debug {
+			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+			}
+		}
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return

@@ -1032,7 +1032,7 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 	scannerPattens[2] = upDownPatten
 
 	// // Scanner zig zag pattern 3
-	coordinates = pattern.ScanGenerateSawTooth(float64(sequence.ScannerSize), 50, float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
+	coordinates = pattern.ScanGenerateSawTooth(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
 	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	zigZagPatten.Name = "zigzag"
 	zigZagPatten.Number = 3

@@ -51,6 +51,41 @@ var allFixturesEnabled = map[int]common.FixtureState{
 	},
 }
 
+var allFixturesInverted = map[int]common.FixtureState{
+	0: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	1: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	2: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	3: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	4: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	5: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	6: {
+		Enabled:  true,
+		Inverted: true,
+	},
+	7: {
+		Enabled:  true,
+		Inverted: true,
+	},
+}
+
 func TestCalculateRGB3FixturesPositions(t *testing.T) {
 
 	var full = 255
@@ -609,13 +644,11 @@ func TestCalculateRGBNoBounceInvertedPositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				RGBInvert:             true,
-				RGBInvertOnce:         true,
 				ScannerInvert:         false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
-				FixtureState:          allFixturesEnabled,
+				FixtureState:          allFixturesInverted,
 				EnabledNumberFixtures: 3,
 				ScannerChaser:         false,
 				RGBShift:              0,
@@ -3725,12 +3758,14 @@ func Test_calculateScannerInvertedBounceCase(t *testing.T) {
 	}
 }
 
+// Which fixtures are inverted are controlled by the scanner state.
 func Test_invertRGBColorsInSteps(t *testing.T) {
 
 	full := 255
 	type args struct {
-		steps  []common.Step
-		colors []common.Color
+		steps        []common.Step
+		colors       []common.Color
+		fixtureState map[int]common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -3740,6 +3775,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		{
 			name: "invert a single color.",
 			args: args{
+				fixtureState: allFixturesInverted,
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -3770,23 +3806,23 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
 					},
 				},
 			},
@@ -3794,7 +3830,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
+			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors, tt.args.fixtureState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("invertRGBColors() = %+v, want %+v", got, tt.want)
 			}
 		})
