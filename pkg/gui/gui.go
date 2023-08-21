@@ -86,9 +86,9 @@ func NewPanel() MyPanel {
 }
 
 func (panel *MyPanel) LabelRightHandButtons() {
-	panel.UpdateButtonLabel(8, 1, "  >  ")
-	panel.UpdateButtonLabel(8, 2, "  >  ")
-	panel.UpdateButtonLabel(8, 3, "  >  ")
+	panel.UpdateButtonLabel(8, 1, ">")
+	panel.UpdateButtonLabel(8, 2, ">")
+	panel.UpdateButtonLabel(8, 3, ">")
 
 	panel.UpdateButtonLabel(8, 4, "FLOOD")
 	panel.UpdateButtonLabel(8, 5, "SAVE")
