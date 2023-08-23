@@ -297,7 +297,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// Show the Fixture Status Buttons.
-		ShowFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+		showFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -453,7 +453,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 		// Show the Fixture Status Buttons.
-		ShowFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+		showFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
 	// Are we in function mode ?

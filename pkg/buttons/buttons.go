@@ -1322,7 +1322,7 @@ func ProcessButtons(X int, Y int,
 		setFixtureStatus(this, Y, X, commandChannels, sequences[Y])
 
 		// Show the status.
-		ShowFixtureStatus(Y, sequences[Y].Number, sequences[Y].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+		showFixtureStatus(Y, sequences[Y].Number, sequences[Y].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 
 	}
 
@@ -1863,43 +1863,6 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
-	}
-}
-
-// Show Scanner status - Dim White is disabled, White is enabled.
-// Uses the >-this<- representation of the fixture status. Not actual sequences which are stored in the threads below us.
-func ShowFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
-
-	if debug {
-		fmt.Printf("Show Scanner Status for sequence %d number of scanners %d\n", sequenceNumber, NumberFixtures)
-	}
-
-	common.HideSequence(selectedSequence, commandChannels)
-
-	for fixtureNumber := 0; fixtureNumber < NumberFixtures; fixtureNumber++ {
-
-		if debug {
-			fmt.Printf("%d: Scanner %d Enabled %t Inverted %t\n", sequenceNumber, fixtureNumber, this.FixtureState[sequenceNumber][fixtureNumber].Enabled, this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted)
-		}
-
-		// Enabled but not inverted then On and green.
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "On", guiButtons)
-		}
-
-		// Enabled and inverted then Invert and red.
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Invert", guiButtons)
-		}
-
-		// Not enabled and not inverted then off and blue.
-		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 0, Green: 100, Blue: 150}, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Off", guiButtons)
-		}
-
 	}
 }
 
