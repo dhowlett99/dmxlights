@@ -1,3 +1,19 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This implements the function keys, used by the buttons package.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package buttons
 
 import (
@@ -394,7 +410,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Turn on invert means all the fixture states should be inverted.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
 			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.Inverted = true
+			state.RGBInverted = true
 			this.FixtureState[this.TargetSequence][fixtureNumber] = state
 		}
 
@@ -430,7 +446,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Turn off invert means all the fixture states should be not inverted.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
 			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.Inverted = false
+			state.RGBInverted = false
+			state.ScannerPatternReversed = false
 			this.FixtureState[this.TargetSequence][fixtureNumber] = state
 		}
 

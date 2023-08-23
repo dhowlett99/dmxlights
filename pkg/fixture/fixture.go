@@ -223,7 +223,6 @@ func GetFixureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) 
 // Each FixtureReceiver knows which step they belong too and when triggered they start a fade up
 // and fade down events which get sent to the launchpad lamps and the DMX fixtures.
 func FixtureReceiver(
-	//mySequenceNumber int,
 	myFixtureNumber int,
 	fixtureStepChannel chan common.FixtureCommand,
 	eventsForLauchpad chan common.ALight,
@@ -325,9 +324,10 @@ func FixtureReceiver(
 			}
 		}
 
+		// If we are a scanner, implement the scanner movements.
 		if cmd.Type == "scanner" {
 
-			// Turn off the scanners in flood mode.
+			// Flood on. Turn on the scanners in flood mode.
 			if cmd.StartFlood {
 				turnOnFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
@@ -335,18 +335,17 @@ func FixtureReceiver(
 				continue
 			}
 
+			// Stop flood.
 			if cmd.StopFlood {
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
 
-			// find the fixture
+			// Find the fixture
 			fixture := cmd.ScannerPosition.Fixtures[myFixtureNumber]
 
+			// If enabled activate the physical scanner.
 			if fixture.Enabled {
-
-				// If enables activate the physical scanner.
-				scannerColor := cmd.ScannerColor
 
 				// In the case of a scanner, they usually have a shutter and a master dimmer to control the brightness
 				// of the lamp. Problem is we can't use the shutter for the control of the overall brightness and the
@@ -355,9 +354,11 @@ func FixtureReceiver(
 				// brightness for control. Which means I need to combine the master and the control brightness
 				// at this stage.
 				scannerBrightness := int(math.Round((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55)))
+				// Tell the scanner what to do.
 				MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, dmxController, myFixtureNumber, fixture.ScannerColor.R, fixture.ScannerColor.G, fixture.ScannerColor.B, fixture.ScannerColor.W, fixture.ScannerColor.A, fixture.ScannerColor.UV, fixture.Pan, fixture.Tilt,
-					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					fixture.Shutter, cmd.Rotate, cmd.Music, cmd.Program, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 
+				// Work out what to do with the launchpad lamps.
 				if !cmd.Hide {
 					if cmd.ScannerChaser && cmd.Label == "chaser" {
 						// We are chase mode, we want the buttons to be the color selected for this scanner.

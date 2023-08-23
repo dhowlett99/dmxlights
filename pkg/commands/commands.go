@@ -92,7 +92,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			newScannerState := common.FixtureState{}
 			newScannerState.Enabled = true
-			newScannerState.Inverted = false
+			newScannerState.RGBInverted = false
+			newScannerState.ScannerPatternReversed = false
 			sequence.FixtureState[fixture] = newScannerState
 		}
 
@@ -232,13 +233,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if sequence.RGBInvert {
 			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 				state := sequence.FixtureState[fixtureNumber]
-				state.Inverted = true
+				state.RGBInverted = true
+				state.ScannerPatternReversed = false
 				sequence.FixtureState[fixtureNumber] = state
 			}
 		} else {
 			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 				state := sequence.FixtureState[fixtureNumber]
-				state.Inverted = false
+				state.RGBInverted = false
+				state.ScannerPatternReversed = false
 				sequence.FixtureState[fixtureNumber] = state
 			}
 		}
@@ -640,17 +643,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// Here we want to disable/enable the selected scanner.
 	case common.ToggleFixtureState:
-		const FIXTURE_NUMBER = 0   // Integer
-		const FIXTURE_STATE = 1    // Boolean
-		const FIXTURE_INVERTED = 2 // Boolean
+		const FIXTURE_NUMBER = 0       // Integer
+		const FIXTURE_STATE = 1        // Boolean
+		const FIXTURE_RGB_INVERTED = 2 // Boolean
+		const FIXTURE_SCANNER_REVERSED = 3
 		if debug {
-			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_INVERTED].Value)
+			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t reversed %t\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_RGB_INVERTED].Value, command.Args[FIXTURE_SCANNER_REVERSED].Value)
 		}
 
 		if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
 			newScannerState := common.FixtureState{}
 			newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)
-			newScannerState.Inverted = command.Args[FIXTURE_INVERTED].Value.(bool)
+			newScannerState.RGBInverted = command.Args[FIXTURE_RGB_INVERTED].Value.(bool)
+			newScannerState.ScannerPatternReversed = command.Args[FIXTURE_SCANNER_REVERSED].Value.(bool)
 			sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 		}
 

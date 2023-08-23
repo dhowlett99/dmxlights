@@ -40,6 +40,12 @@ func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, inve
 
 }
 
+func ProcessSimpleColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
+	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
+	fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn1", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
+	return fadeColors
+}
+
 // processRGBColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
 // This is complicated because we want to support complex patterns which have colors stay on

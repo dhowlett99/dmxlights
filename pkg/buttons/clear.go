@@ -1,3 +1,19 @@
+// Copyright (C) 2022, 2023 dhowlett99.
+// This is clear function, used by the buttons package.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
 package buttons
 
 import (
@@ -148,7 +164,8 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 			this.FixtureState[sequence.Number][fixtureNumber].Enabled = true
-			this.FixtureState[sequence.Number][fixtureNumber].Inverted = false
+			this.FixtureState[sequence.Number][fixtureNumber].RGBInverted = false
+			this.FixtureState[sequence.Number][fixtureNumber].ScannerPatternReversed = false
 		}
 
 		// Clear all the function buttons for this sequence.
