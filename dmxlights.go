@@ -117,7 +117,8 @@ func main() {
 		for fixtureNumber := 0; fixtureNumber < NumberOfFixtures; fixtureNumber++ {
 			newFixture := common.FixtureState{}
 			newFixture.Enabled = true
-			newFixture.Inverted = false
+			newFixture.RGBInverted = false
+			newFixture.ScannerPatternReversed = false
 			this.FixtureState[sequenceNumber][fixtureNumber] = newFixture
 		}
 	}

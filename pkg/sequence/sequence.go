@@ -148,7 +148,8 @@ func CreateSequence(
 	for x := 0; x < numberFixtures; x++ {
 		newScanner := common.FixtureState{}
 		newScanner.Enabled = true
-		newScanner.Inverted = false
+		newScanner.RGBInverted = false
+		newScanner.ScannerPatternReversed = false
 		FixtureState[x] = newScanner
 		// Set the first gobo for every fixture.
 		scannerGobos[x] = 1
@@ -577,7 +578,7 @@ func PlaySequence(sequence common.Sequence,
 						sequence.Optimisation = true
 
 						// Pass through the inverted / reverse flag.
-						sequence.ScannerInvert = sequence.FixtureState[fixture].Inverted
+						sequence.ScannerInvert = sequence.FixtureState[fixture].ScannerPatternReversed
 						// Calulate positions for each scanner fixture.
 						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
 						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)

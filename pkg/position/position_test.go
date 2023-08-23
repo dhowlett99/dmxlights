@@ -51,38 +51,38 @@ var allFixturesEnabled = map[int]common.FixtureState{
 	},
 }
 
-var allFixturesInverted = map[int]common.FixtureState{
+var allFixturesRGBInverted = map[int]common.FixtureState{
 	0: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	1: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	2: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	3: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	4: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	5: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	6: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 	7: {
-		Enabled:  true,
-		Inverted: true,
+		Enabled:     true,
+		RGBInverted: true,
 	},
 }
 
@@ -626,7 +626,7 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 	}
 }
 
-func TestCalculateRGBNoBounceInvertedPositions(t *testing.T) {
+func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 
 	var full = 255
 
@@ -648,7 +648,7 @@ func TestCalculateRGBNoBounceInvertedPositions(t *testing.T) {
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
-				FixtureState:          allFixturesInverted,
+				FixtureState:          allFixturesRGBInverted,
 				EnabledNumberFixtures: 3,
 				ScannerChaser:         false,
 				RGBShift:              0,
@@ -2376,7 +2376,7 @@ func TestCalculateRGBShift1(t *testing.T) {
 		want1 int
 	}{
 		{
-			name: "Shift1 - Not Inverted common par fixture RGB",
+			name: "Shift1 - Not RGBInverted common par fixture RGB",
 			args: args{
 				scanner: false,
 				sequence: common.Sequence{
@@ -3586,7 +3586,7 @@ func Test_calculateScannerPairsCase(t *testing.T) {
 	}
 }
 
-func Test_calculateScannerInvertedCase(t *testing.T) {
+func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 
 	full := 255
 	type args struct {
@@ -3665,7 +3665,7 @@ func Test_calculateScannerInvertedCase(t *testing.T) {
 	}
 }
 
-func Test_calculateScannerInvertedBounceCase(t *testing.T) {
+func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 
 	full := 255
 	type args struct {
@@ -3775,7 +3775,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		{
 			name: "invert a single color.",
 			args: args{
-				fixtureState: allFixturesInverted,
+				fixtureState: allFixturesRGBInverted,
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{

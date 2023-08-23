@@ -173,8 +173,9 @@ type StaticColorButton struct {
 }
 
 type FixtureState struct {
-	Enabled  bool
-	Inverted bool
+	Enabled                bool
+	RGBInverted            bool
+	ScannerPatternReversed bool
 }
 
 type Pattern struct {
