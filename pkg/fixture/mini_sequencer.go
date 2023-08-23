@@ -265,7 +265,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		}
 
 		sequence := common.Sequence{
-			ScannerInvert:  false,
+			ScannerReverse: false,
 			RGBInvert:      false,
 			Bounce:         false,
 			ScannerChaser:  false,

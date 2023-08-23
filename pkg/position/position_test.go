@@ -104,7 +104,7 @@ func TestCalculateRGB3FixturesPositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				ScannerInvert:         false,
+				ScannerReverse:        false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -273,7 +273,7 @@ func TestCalculateRGBPositionsWithShift(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				ScannerInvert:         false,
+				ScannerReverse:        false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -412,7 +412,7 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                true,
-				ScannerInvert:         false,
+				ScannerReverse:        false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -644,7 +644,7 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 			scanner: false,
 			sequence: common.Sequence{
 				Bounce:                false,
-				ScannerInvert:         false,
+				ScannerReverse:        false,
 				FadeUp:                []int{0, 50, 255},
 				FadeDown:              []int{255, 50, 0},
 				Optimisation:          false,
@@ -1934,9 +1934,9 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 			args: args{
 				scanner: false,
 				sequence: common.Sequence{
-					Bounce:        false,
-					ScannerInvert: false,
-					FadeUp:        []int{255},
+					Bounce:         false,
+					ScannerReverse: false,
+					FadeUp:         []int{255},
 					//FadeDown:              []int{0},
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
@@ -2386,7 +2386,7 @@ func TestCalculateRGBShift1(t *testing.T) {
 					Bounce:                false,
 					RGBInvert:             false,
 					RGBShift:              8, // Eight is reversed so creates a shift of 2.
-					ScannerInvert:         false,
+					ScannerReverse:        false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
 				},
@@ -3606,7 +3606,7 @@ func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 				scanner: true,
 				sequence: common.Sequence{
 					Bounce:                false,
-					ScannerInvert:         true,
+					ScannerReverse:        true,
 					FadeUp:                []int{255},
 					FadeDown:              []int{0},
 					Optimisation:          false,
@@ -3684,7 +3684,7 @@ func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 				scanner: true,
 				sequence: common.Sequence{
 					Bounce:                true,
-					ScannerInvert:         true,
+					ScannerReverse:        true,
 					FadeUp:                []int{255},
 					FadeDown:              []int{0},
 					Optimisation:          false,

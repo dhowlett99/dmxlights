@@ -46,10 +46,14 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	}
 
 	// Apply inverted selection from fixtureState to the RGB sequence.
-	sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
-	steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors, sequence.FixtureState)
+	if sequence.Type == "rgb" {
+		sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
+		steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors, sequence.FixtureState)
+	} else {
+		steps = stepsIn
+	}
 
-	if !sequence.ScannerInvert {
+	if !sequence.ScannerReverse {
 		// Steps forward.
 		for stepNumber, step := range steps {
 			if debug {
@@ -101,7 +105,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	if sequence.Bounce || sequence.ScannerInvert {
+	if sequence.Bounce || sequence.ScannerReverse {
 		if debug {
 			fmt.Printf("<<<<<<<<<<<<<<<<<<<<<<<<< START BOUNCE >>>>>>>>>>>>>>>>>>>>>>>>>\n")
 		}
@@ -156,7 +160,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	if sequence.Bounce && sequence.ScannerInvert {
+	if sequence.Bounce && sequence.ScannerReverse {
 		// Steps forward.
 		for stepNumber, step := range steps {
 			if debug {

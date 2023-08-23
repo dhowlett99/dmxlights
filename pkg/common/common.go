@@ -356,7 +356,7 @@ type Sequence struct {
 	ScannerShift                int                         // Used for shifting scanners patterns apart.
 	ScannerGobo                 map[int]int                 // Eight scanners per sequence, each can have their own gobo.
 	ScannerChaser               bool                        // Chase the scanner shutters instead of allways being on.
-	ScannerInvert               bool                        // Invert the scanner, i.e scanner in the opposite direction.
+	ScannerReverse              bool                        // Reverse the scanner, i.e scan in the opposite direction.
 	ScannerColor                map[int]int                 // Eight scanners per sequence, each can have their own color.
 	ScannerCoordinates          []int                       // Number of scanner coordinates.
 	ScannerSelectedCoordinates  int                         // index into scanner coordinates.
