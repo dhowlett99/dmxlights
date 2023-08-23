@@ -643,6 +643,7 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 
 			scanner: false,
 			sequence: common.Sequence{
+				Type:                  "rgb",
 				Bounce:                false,
 				ScannerReverse:        false,
 				FadeUp:                []int{0, 50, 255},
