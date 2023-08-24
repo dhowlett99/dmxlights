@@ -346,7 +346,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 			position := positionsOut[positionNumber]
 			fmt.Printf("Position %d\n", positionNumber)
 			for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-				fmt.Printf("\tFixture %d Enabled %t Values %+v\n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Color)
+				fmt.Printf("\tFixture %d Enabled %t Values %+v Brightness %d \n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Color, position.Fixtures[fixtureNumber].Brightness)
 			}
 		}
 	}
