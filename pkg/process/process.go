@@ -249,11 +249,20 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 	fade = append(fade, sequence.FadeOff...)
 
 	var shiftCounter int
+	var insertValue int
 	for range fade {
 		if shiftCounter == shift {
 			break
 		}
-		newColor := addColor(stepNumber, rule, debugMsg, thisFixture, color, 255, sequence.ScannerChaser)
+		// If we insert a color that is black, also reduce the insert value
+		// so the brightness is also set to zero for scanners that only
+		// have shutter control.
+		if color.R == 0 && color.G == 0 && color.B == 0 {
+			insertValue = 0
+		} else {
+			insertValue = 255
+		}
+		newColor := addColor(stepNumber, rule, debugMsg, thisFixture, color, insertValue, sequence.ScannerChaser)
 		fadeColors[thisFixture.Number] = append(fadeColors[thisFixture.Number], newColor)
 		shiftCounter++
 	}
