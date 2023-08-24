@@ -84,6 +84,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
 		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
+		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
+		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
 
 		// Reload the fixture state.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.SelectedSequence].NumberFixtures; fixtureNumber++ {
