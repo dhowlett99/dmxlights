@@ -676,8 +676,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.TargetSequence].Type == "scanner" {
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
-			if this.ScannerShift[this.TargetSequence] < common.MIN_RGB_SHIFT {
-				this.ScannerShift[this.TargetSequence] = common.MIN_RGB_SHIFT
+			if this.ScannerShift[this.TargetSequence] < common.MIN_SCANNER_SHIFT {
+				this.ScannerShift[this.TargetSequence] = common.MIN_SCANNER_SHIFT
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
@@ -730,8 +730,8 @@ func ProcessButtons(X int, Y int,
 
 		if sequences[this.TargetSequence].Type == "scanner" {
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] + 1
-			if this.ScannerShift[this.TargetSequence] > 3 {
-				this.ScannerShift[this.TargetSequence] = 3
+			if this.ScannerShift[this.TargetSequence] > common.MAX_SCANNER_SHIFT {
+				this.ScannerShift[this.TargetSequence] = common.MAX_SCANNER_SHIFT
 			}
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
