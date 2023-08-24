@@ -371,6 +371,11 @@ func PlaySequence(sequence common.Sequence,
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
+			// Copy in the fixture status into the static color buffer.
+			for fixtureNumber := range sequence.StaticColors {
+				sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
+			}
+
 			go func() {
 
 				// Now Fade up
