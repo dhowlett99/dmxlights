@@ -172,6 +172,7 @@ type StaticColorButton struct {
 	Flash         bool
 	Setting       int
 	FirstPress    bool
+	Enabled       bool
 }
 
 type FixtureState struct {

@@ -241,11 +241,17 @@ func FixtureReceiver(
 		cmd := <-fixtureStepChannel
 
 		if cmd.SetSwitch && cmd.Type == "switch" {
+			if debug {
+				fmt.Printf("Fixture:%d Command Set Switch\n", myFixtureNumber)
+			}
 			MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 			continue
 		}
 
 		if cmd.Clear {
+			if debug {
+				fmt.Printf("Fixture:%d Command Clear Fixture\n", myFixtureNumber)
+			}
 			turnOffFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 			continue
 		}
@@ -253,8 +259,14 @@ func FixtureReceiver(
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
 			if cmd.StartFlood && cmd.Label != "chaser" {
+				if debug {
+					fmt.Printf("Fixture:%d Set RGB Flood\n", myFixtureNumber)
+				}
 				var lamp common.Color
 				if cmd.RGBStatic {
+					if debug {
+						fmt.Printf("%d: Fixture:%d Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber)
+					}
 					lamp = cmd.RGBStaticColors[myFixtureNumber].Color
 				} else {
 					lamp = common.Color{R: 255, G: 255, B: 255}
@@ -264,31 +276,47 @@ func FixtureReceiver(
 				continue
 			}
 			if cmd.StopFlood && cmd.Label != "chaser" {
+				if debug {
+					fmt.Printf("Fixture:%d Set Stop RGB Flood\n", myFixtureNumber)
+				}
 				MapFixtures(false, false, cmd.SequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
 
 			if cmd.RGBStatic {
-				sequence := common.Sequence{}
-				sequence.Type = cmd.Type
-
-				if cmd.SequenceNumber == 4 {
-					cmd.SequenceNumber = 2
+				if debug {
+					fmt.Printf("%d: Fixture:%d Trying to Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber)
 				}
-				sequence.Number = cmd.SequenceNumber
-				sequence.Master = cmd.Master
-				sequence.Blackout = cmd.Blackout
-				sequence.Hide = false
-				sequence.StaticColors = cmd.RGBStaticColors
-				sequence.Static = cmd.RGBStatic
-				sequence.StrobeSpeed = cmd.StrobeSpeed
-				sequence.Strobe = cmd.Strobe
+				if cmd.RGBStaticColors[myFixtureNumber].Enabled {
 
-				lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
-				continue
+					if debug {
+						fmt.Printf("%d: Fixture:%d Set RGB Static Color %+v\n", cmd.SequenceNumber, myFixtureNumber, cmd.RGBStaticColors[myFixtureNumber])
+					}
+
+					sequence := common.Sequence{}
+					sequence.Type = cmd.Type
+
+					if cmd.SequenceNumber == 4 {
+						cmd.SequenceNumber = 2
+					}
+					sequence.Number = cmd.SequenceNumber
+					sequence.Master = cmd.Master
+					sequence.Blackout = cmd.Blackout
+					sequence.Hide = false
+					sequence.StaticColors = cmd.RGBStaticColors
+					sequence.Static = cmd.RGBStatic
+					sequence.StrobeSpeed = cmd.StrobeSpeed
+					sequence.Strobe = cmd.Strobe
+
+					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
+					continue
+				}
 			}
 			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce && cmd.Label != "chaser" {
+				if debug {
+					fmt.Printf("Fixture:%d Turn RGB Off\n", myFixtureNumber)
+				}
 				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				continue
@@ -329,6 +357,9 @@ func FixtureReceiver(
 
 			// Flood on. Turn on the scanners in flood mode.
 			if cmd.StartFlood {
+				if debug {
+					fmt.Printf("Fixture:%d Scanner Start Flood\n", myFixtureNumber)
+				}
 				turnOnFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLauchpad, guiButtons)
 				common.LabelButton(myFixtureNumber, cmd.SequenceNumber, "", guiButtons)
@@ -337,6 +368,9 @@ func FixtureReceiver(
 
 			// Stop flood.
 			if cmd.StopFlood {
+				if debug {
+					fmt.Printf("Fixture:%d Scanner Start Flood\n", myFixtureNumber)
+				}
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: 0}, eventsForLauchpad, guiButtons)
 				continue
 			}
@@ -346,6 +380,10 @@ func FixtureReceiver(
 
 			// If enabled activate the physical scanner.
 			if fixture.Enabled {
+
+				if debug {
+					fmt.Printf("Fixture:%d Play Scanner \n", myFixtureNumber)
+				}
 
 				// In the case of a scanner, they usually have a shutter and a master dimmer to control the brightness
 				// of the lamp. Problem is we can't use the shutter for the control of the overall brightness and the
@@ -1048,13 +1086,27 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 		}
 	}
 	if debug {
-		fmt.Printf("strobe %t speed %d master %d blackout %t\n", sequence.Strobe, sequence.StrobeSpeed, sequence.Master, sequence.Blackout)
+		fmt.Printf("seq %d fixture %d strobe %t speed %d master %d blackout %t\n", sequence.Number, myFixtureNumber, sequence.Strobe, sequence.StrobeSpeed, sequence.Master, sequence.Blackout)
+	}
+
+	if debug {
+		fmt.Printf("lightStaticFixtur: Looking for Color seq %d fixture %d color %+v\n", sequence.Number, myFixtureNumber, lamp.Color)
+	}
+
+	// Look for a matching color
+	color := common.GetColorNameByRGB(lamp.Color)
+	if debug {
+		fmt.Printf("lightStaticFixture seq %d fixture %d Matching color -> lamp.Color %+v Found Name color %s \n", sequence.Number, myFixtureNumber, lamp.Color, color)
 	}
 
 	// Find a suitable gobo based on the requested static lamp color.
-	scannerGobo := FindGobo(myFixtureNumber, sequence.Number, common.GetColorNameByRGB(lamp.Color), fixturesConfig)
+	scannerGobo := FindGobo(myFixtureNumber, sequence.Number, color, fixturesConfig)
 	// Find a suitable color wheel settin based on the requested static lamp color.
-	scannerColor := FindColor(myFixtureNumber, sequence.Number, common.GetColorNameByRGB(lamp.Color), fixturesConfig)
+	scannerColor := FindColor(myFixtureNumber, sequence.Number, color, fixturesConfig)
+
+	if debug {
+		fmt.Printf("lightStaticFixture seq %d fixture %d Found -> scannerGobo %d scannerColor %d\n", sequence.Number, myFixtureNumber, scannerGobo, scannerColor)
+	}
 
 	MapFixtures(false, false, sequence.Number, dmxController, myFixtureNumber, lamp.Color.R, lamp.Color.G, lamp.Color.B, 0, 0, 0, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, 0, scannerGobo, scannerColor, fixturesConfig, sequence.Blackout, sequence.Master, sequence.Master, sequence.Strobe, sequence.StrobeSpeed, dmxInterfacePresent)
 
