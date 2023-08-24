@@ -124,6 +124,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 				}
 			}
 		}
+
+		// Show the static and switch settings.
+		cmd := common.Command{
+			Action: common.UnHide,
+		}
+		common.SendCommandToAllSequence(cmd, commandChannels)
+
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
