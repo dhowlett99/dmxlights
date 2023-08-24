@@ -299,8 +299,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = true
 
 		if this.ScannerChaser {
-			// Turn on edit static color mode
-			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true // Turn off edit static color mode.
+			// Turn on edit static color mode in the scanner sequence.
+			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
 		}
 
 		// Starting a static sequence will turn off any running sequence, so turn off the start lamp
@@ -349,8 +349,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
 
 		if this.ScannerChaser {
-			// Turn on edit static color mode
-			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true // Turn off edit static color mode.
+			// Turn on edit static color mode in the scanner sequence.
+			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
 		}
 
 		// Go straight to static color selection mode, don't wait for a another select press.
