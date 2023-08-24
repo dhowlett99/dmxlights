@@ -2136,6 +2136,11 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
 		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
 
+		// Reload the fixture state.
+		for fixtureNumber := 0; fixtureNumber < sequences[this.SelectedSequence].NumberFixtures; fixtureNumber++ {
+			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
+		}
+
 		// Restore the functions states from the sequence.
 		if sequence.Type == "rgb" {
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
@@ -2149,6 +2154,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
 			this.ScannerChaser = sequences[sequenceNumber].ScannerChaser
 		}
