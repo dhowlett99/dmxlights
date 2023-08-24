@@ -59,6 +59,7 @@ type CurrentState struct {
 	Running                   map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
 	Strobe                    map[int]bool               // We are in strobe mode. True if strobing
 	StrobeSpeed               map[int]int                // Strobe speed. value is speed 0-255, indexed by sequence number.
+	LastStrobeSpeed           map[int]int                // Last Strobe speed selected. value is speed 0-255, indexed by sequence number.
 	SavePreset                bool                       // Save a preset flag.
 	Config                    bool                       // Flag to indicate we are in fixture config mode.
 	Blackout                  bool                       // Blackout all fixtures.
@@ -770,6 +771,10 @@ func ProcessButtons(X int, Y int,
 			if this.StrobeSpeed[this.TargetSequence] < 0 {
 				this.StrobeSpeed[this.TargetSequence] = 0
 			}
+
+			// Store the last strobe speed.
+			this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.TargetSequence]
+
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
@@ -830,6 +835,10 @@ func ProcessButtons(X int, Y int,
 			if this.StrobeSpeed[this.TargetSequence] > 255 {
 				this.StrobeSpeed[this.TargetSequence] = 255
 			}
+
+			// Store the last strobe speed.
+			this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.TargetSequence]
+
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
@@ -1024,9 +1033,17 @@ func ProcessButtons(X int, Y int,
 			return
 
 		} else {
-			// Start strobing for this sequence.
+			// Start strobing for this sequence. Strobe on.
 			this.Strobe[this.SelectedSequence] = true
-			this.StrobeSpeed[this.SelectedSequence] = 255
+
+			if this.LastStrobeSpeed[this.SelectedSequence] != this.StrobeSpeed[this.SelectedSequence] {
+				// Then use it.
+				this.StrobeSpeed[this.SelectedSequence] = this.LastStrobeSpeed[this.SelectedSequence]
+			} else {
+				// Use the default.
+				this.StrobeSpeed[this.SelectedSequence] = 255
+			}
+
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
