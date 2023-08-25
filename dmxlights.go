@@ -419,17 +419,10 @@ func main() {
 	panel.MasterLabel = masterLabel
 
 	// Create a thread to handle GUI button events.
-	go func(panel gui.MyPanel, guiButtons chan common.ALight, GuiFlashButtons [][]common.ALight) {
-		for {
-			alight := <-guiButtons
-			panel.UpdateButtonColor(alight, GuiFlashButtons)
-		}
-	}(panel, guiButtons, GuiFlashButtons)
+	panel.ListenAndSendToGUI(guiButtons, GuiFlashButtons)
 
 	// Now create a thread to handle launchpad light button events.
-	go func() {
-		launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
-	}()
+	launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 
 	// Add buttons to the main panel.
 	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)

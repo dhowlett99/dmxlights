@@ -400,8 +400,8 @@ func FixtureReceiver(
 				if !cmd.Hide {
 					if cmd.ScannerChaser && cmd.Label == "chaser" {
 						// We are chase mode, we want the buttons to be the color selected for this scanner.
-						// Remember that fixtures in the real world start with 1 not 0.
-						//realFixture := myFixtureNumber + 1
+						// Remember that fixtures in the real world we start counting from 1 not 0.
+						// i.e. realFixture := myFixtureNumber + 1
 						// Find the color that has been selected for this fixture.
 						// selected color is an index into the scanner colors selected.
 						selectedColor := cmd.ScannerColor

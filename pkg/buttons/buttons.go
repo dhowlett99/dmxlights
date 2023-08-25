@@ -793,9 +793,23 @@ func ProcessButtons(X int, Y int,
 		// Decrease Speed.
 		if !sequences[this.TargetSequence].MusicTrigger {
 			this.Speed[this.TargetSequence]--
-			if this.Speed[this.TargetSequence] < 0 {
+			if this.Speed[this.TargetSequence] == 1 {
 				this.Speed[this.TargetSequence] = 1
 			}
+
+			// If you reached the min speed blink the increase button.
+			if this.Speed[this.TargetSequence] == common.MIN_SPEED {
+				common.FlashLight(X, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+			} else {
+				// If you reached the half speed blink both buttons.
+				if this.Speed[this.TargetSequence] == common.MAX_SPEED/2 {
+					common.FlashLight(X, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+					common.FlashLight(X+1, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+				} else {
+					common.LightLamp(common.ALight{X: X + 1, Y: Y, Brightness: 255, Red: 0, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+				}
+			}
+
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{
@@ -859,6 +873,20 @@ func ProcessButtons(X int, Y int,
 			if this.Speed[this.TargetSequence] > 12 {
 				this.Speed[this.TargetSequence] = 12
 			}
+
+			// If you reached the max speed blink the increase button.
+			if this.Speed[this.TargetSequence] == common.MAX_SPEED {
+				common.FlashLight(X, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+			} else {
+				// If you reached the half speed blink both buttons.
+				if this.Speed[this.TargetSequence] == common.MAX_SPEED/2 {
+					common.FlashLight(X, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+					common.FlashLight(X-1, Y, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
+				} else {
+					common.LightLamp(common.ALight{X: X - 1, Y: Y, Brightness: 255, Red: 0, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+				}
+			}
+
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
 				Args: []common.Arg{

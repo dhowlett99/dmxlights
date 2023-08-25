@@ -32,6 +32,8 @@ const MAX_DMX_ADDRESS = 512
 const MAX_TEXT_ENTRY_LENGTH = 35
 const DEFAULT_SCANNER_SIZE = 60
 const MAX_SCANNER_SIZE = 127
+const MIN_SPEED = 0
+const MAX_SPEED = 12
 const MIN_RGB_SIZE = 0
 const MAX_RGB_SIZE = 10
 const MIN_RGB_SHIFT = 1
@@ -1120,7 +1122,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		OnColor:    Light.OnColor,
 		OffColor:   Light.OffColor,
 	}
-	eventsForLauchpad <- event
+	eventsForLauchpad <- event // Event will be received by pkg/launchpad/launchpad.go ListenAndSendToLaunchPad()
 
 	// Send message to fyne.io GUI.
 	event = ALight{
@@ -1135,7 +1137,7 @@ func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALig
 		OffColor:   Light.OffColor,
 		Label:      Light.Label,
 	}
-	guiButtons <- event
+	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
 func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALight) {
@@ -1160,7 +1162,7 @@ func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad c
 		OnColor:    onColor,
 		OffColor:   offColor,
 	}
-	eventsForLauchpad <- e
+	eventsForLauchpad <- e // Event will be received by pkg/launchpad/launchpad.go ListenAndSendToLaunchPad()
 
 	// Send message to GUI
 	event := ALight{
@@ -1171,7 +1173,8 @@ func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad c
 		OnColor:    onColor,
 		OffColor:   offColor,
 	}
-	guiButtons <- event
+	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
+
 }
 
 // InvertColor just reverses the DMX values.

@@ -70,65 +70,68 @@ type coordinate struct {
 // launch pad. A channel is used to queue the events to be sent.
 func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadConnected bool) {
 
-	launchPadMap := make(map[coordinate]common.Color, 81)
+	go func() {
 
-	for key := range launchPadMap {
-		launchPadMap[key] = common.Color{R: 0, G: 0, B: 0}
-	}
+		launchPadMap := make(map[coordinate]common.Color, 81)
 
-	for {
-		// Wait for the event.
-		alight := <-eventsForLauchpad
+		for key := range launchPadMap {
+			launchPadMap[key] = common.Color{R: 0, G: 0, B: 0}
+		}
 
-		if LaunchPadConnected {
-			// Wait for a few millisecond so the launchpad and the gui step at the same time
-			time.Sleep(14 * time.Microsecond)
+		for {
+			// Wait for the event.
+			alight := <-eventsForLauchpad
 
-			// What was the lamp previously set too ?
-			whichLamp := coordinate{X: alight.X, Y: alight.Y}
-			storedColor := common.Color{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
+			if LaunchPadConnected {
+				// Wait for a few millisecond so the launchpad and the gui step at the same time
+				time.Sleep(14 * time.Microsecond)
 
-			// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-			Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-			Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-			Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				// What was the lamp previously set too ?
+				whichLamp := coordinate{X: alight.X, Y: alight.Y}
+				storedColor := common.Color{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
 
-			// We're in standard turn the light on.
-			if !alight.Flash {
+				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
+				Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
 
-				// If we have this color already don't write again.
-				newColor := common.Color{R: Red, G: Green, B: Blue}
+				// We're in standard turn the light on.
+				if !alight.Flash {
 
-				if storedColor != newColor || storedColor.Flash {
-					// Now light the launchpad button.
+					// If we have this color already don't write again.
+					newColor := common.Color{R: Red, G: Green, B: Blue}
+
+					if storedColor != newColor || storedColor.Flash {
+						// Now light the launchpad button.
+						if debug {
+							fmt.Printf("X:%d Y:%d Stored Color is %+v  New Color is %+v\n", whichLamp.X, whichLamp.Y, storedColor, newColor)
+						}
+						err := pad.Light(alight.X, alight.Y, Red, Green, Blue)
+						if err != nil {
+							fmt.Printf("error writing to launchpad %s\n" + err.Error())
+						}
+					}
+
+				} else {
+					// Now we're been asked go flash this button.
 					if debug {
-						fmt.Printf("X:%d Y:%d Stored Color is %+v  New Color is %+v\n", whichLamp.X, whichLamp.Y, storedColor, newColor)
+						fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadColorCodeByRGB(alight.OnColor))
+						fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadColorCodeByRGB(alight.OffColor))
 					}
-					err := pad.Light(alight.X, alight.Y, Red, Green, Blue)
+					err := pad.FlashLight(alight.X, alight.Y, int(common.GetLaunchPadColorCodeByRGB(alight.OnColor)), int(common.GetLaunchPadColorCodeByRGB(alight.OffColor)))
 					if err != nil {
-						fmt.Printf("error writing to launchpad %s\n" + err.Error())
+						fmt.Printf("flash: error writing to launchpad %s\n" + err.Error())
 					}
-				}
 
-			} else {
-				// Now we're been asked go flash this button.
-				if debug {
-					fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadColorCodeByRGB(alight.OnColor))
-					fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadColorCodeByRGB(alight.OffColor))
 				}
-				err := pad.FlashLight(alight.X, alight.Y, int(common.GetLaunchPadColorCodeByRGB(alight.OnColor)), int(common.GetLaunchPadColorCodeByRGB(alight.OffColor)))
-				if err != nil {
-					fmt.Printf("flash: error writing to launchpad %s\n" + err.Error())
+				// Remember what lamps are light.
+				launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
+					R:     Red,
+					G:     Green,
+					B:     Blue,
+					Flash: true,
 				}
-
-			}
-			// Remember what lamps are light.
-			launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
-				R:     Red,
-				G:     Green,
-				B:     Blue,
-				Flash: true,
 			}
 		}
-	}
+	}()
 }

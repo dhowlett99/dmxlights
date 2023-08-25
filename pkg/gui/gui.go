@@ -98,6 +98,15 @@ func (panel *MyPanel) LabelRightHandButtons() {
 	panel.UpdateButtonLabel(8, 8, "BLACK.OUT")
 }
 
+func (panel *MyPanel) ListenAndSendToGUI(guiButtons chan common.ALight, GuiFlashButtons [][]common.ALight) {
+	go func() {
+		for {
+			alight := <-guiButtons
+			panel.UpdateButtonColor(alight, GuiFlashButtons)
+		}
+	}()
+}
+
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
 
 	// Check for requests outside buttons avaialable.
