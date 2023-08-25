@@ -232,14 +232,14 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	}
 
 	if debug {
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[0]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[1]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[2]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[3]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[4]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[5]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[6]))
-		fmt.Printf("FadeColors 0=%d\n", len(fadeColors[7]))
+		fmt.Printf("FadeColors Fixture 0=%d ", len(fadeColors[0]))
+		fmt.Printf("FadeColors Fixture 1=%d ", len(fadeColors[1]))
+		fmt.Printf("FadeColors Fixture 2=%d ", len(fadeColors[2]))
+		fmt.Printf("FadeColors Fixture 3=%d ", len(fadeColors[3]))
+		fmt.Printf("FadeColors Fixture 4=%d ", len(fadeColors[4]))
+		fmt.Printf("FadeColors Fixture 5=%d ", len(fadeColors[5]))
+		fmt.Printf("FadeColors Fixture 6=%d ", len(fadeColors[6]))
+		fmt.Printf("FadeColors Fixture 7=%d\n", len(fadeColors[7]))
 	}
 
 	// Setup the counters for the lengths for each fixture.
@@ -284,6 +284,8 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		fmt.Printf("totalNumberOfSteps %d\n", totalNumberOfSteps)
 	}
 
+	var newStep int
+
 	// Assemble the positions.
 	for step := 0; step < totalNumberOfSteps; step++ {
 		// Create a new position.
@@ -292,6 +294,10 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
 		for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+
+			if !fadeColors[fixtureNumber][step].Enabled {
+				continue
+			}
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
@@ -337,7 +343,8 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 
 		// Only add a position if there are some enabled scanners in the fixture list.
 		if len(newPosition.Fixtures) != 0 {
-			positionsOut[step] = newPosition
+			positionsOut[newStep] = newPosition
+			newStep++
 		}
 	}
 
@@ -408,7 +415,7 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 // So make sure you also turn off the fixture in the fixture receiver.
 func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
 
-	debug := true
+	debug := false
 
 	generatedSteps := patternIn.Steps
 
