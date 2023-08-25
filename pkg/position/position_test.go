@@ -24,6 +24,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+const full int = 255
+
 var allFixturesEnabled = map[int]common.FixtureState{
 	0: {
 		Enabled: true,
@@ -626,6 +628,404 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 	}
 }
 
+func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
+
+	var full = 255
+
+	tests := []struct {
+		name     string
+		steps    []common.Step
+		sequence common.Sequence
+		scanner  bool
+		want     map[int][]common.FixtureBuffer
+		want1    int
+	}{
+		{
+			name: "Standard 8 fixtures but only theree enabled forward chase.",
+
+			scanner: false,
+			sequence: common.Sequence{
+				Type:           "rgb",
+				Bounce:         false,
+				ScannerReverse: false,
+				FadeUp:         []int{0, 50, 255},
+				FadeDown:       []int{255, 50, 0},
+				Optimisation:   true,
+				FixtureState: map[int]common.FixtureState{
+					0: {
+						Enabled: true,
+					},
+					1: {
+						Enabled: true,
+					},
+					2: {
+						Enabled: true,
+					},
+					3: {
+						Enabled: false,
+					},
+					4: {
+						Enabled: false,
+					},
+					5: {
+						Enabled: false,
+					},
+					6: {
+						Enabled: false,
+					},
+					7: {
+						Enabled: false,
+					},
+				},
+				EnabledNumberFixtures: 3,
+				ScannerChaser:         false,
+				RGBShift:              0,
+			},
+			steps: []common.Step{
+				{
+					StepNumber: 0,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 1,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 2,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 3,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 4,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 5,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 6,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+					},
+				},
+				{
+					StepNumber: 7,
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						4: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						5: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						6: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 0}},
+						7: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}},
+					},
+				},
+			},
+			want: map[int][]common.FixtureBuffer{
+				0: { // Fixture 1 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 1 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 1 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+
+				1: {
+					// Fixture 2 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+
+				2: {
+					// Fixture 3 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 3 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+				3: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				4: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				5: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				6: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				7: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+			},
+			want1: 8,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+
+			pattern := common.Pattern{}
+			pattern.Steps = tt.steps
+
+			for _, step := range pattern.Steps {
+				fmt.Printf("Step %d\n", step.StepNumber)
+				for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+					fixture := step.Fixtures[fixtureNumber]
+					fmt.Printf("Fixture %d Color %+v\n", fixture.Number, fixture.Color)
+				}
+			}
+
+			RGBPattern := ApplyFixtureState(pattern, tt.sequence.FixtureState)
+			fadeColors, got1, _ := CalculatePositions(RGBPattern.Steps, tt.sequence, tt.scanner)
+
+			if !reflect.DeepEqual(fadeColors, tt.want) {
+
+				t.Errorf("CalculatePositions() ")
+
+				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(tt.want); fixtureNumber++ {
+
+					fade := tt.want[fixtureNumber]
+
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+
+					for _, fixtureBuffer := range fade {
+						fmt.Printf("\tstep %d rule %d %s: fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color.R)
+					}
+				}
+
+				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
+				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
+
+					fade := fadeColors[fixtureNumber]
+
+					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+
+					for _, fixtureBuffer := range fade {
+						fmt.Printf("\tstep %d rule %d %s: fixtureBuffer:%+v\n", fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color.R)
+					}
+
+				}
+			}
+
+			if got1 != tt.want1 {
+				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
+			}
+		})
+	}
+}
+
 func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 
 	var full = 255
@@ -1153,6 +1553,360 @@ func TestAssemblePositions(t *testing.T) {
 						fixture := position.Fixtures[fixtureNumber]
 
 						fmt.Printf("fixture %+v\n", fixture.Color)
+
+					}
+				}
+
+			}
+		})
+	}
+}
+
+func TestAssemblePositionsOnlyThreeEnabled(t *testing.T) {
+
+	tests := []struct {
+		name               string
+		fadeColors         map[int][]common.FixtureBuffer
+		numberFixtures     int
+		totalNumberOfSteps int
+		optimasation       bool
+		want               map[int]common.Position
+	}{
+		{
+			name:               "golden path assemble fade colors into positions",
+			optimasation:       false,
+			numberFixtures:     3,
+			totalNumberOfSteps: 24,
+			fadeColors: map[int][]common.FixtureBuffer{
+				0: { // Fixture 1 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 1 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 1 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+
+				1: {
+					// Fixture 2 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+
+				2: {
+					// Fixture 3 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 3 OFF
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					// Fixture 2 Fade up and down.
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: true},
+				},
+				3: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				4: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				5: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				6: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+				7: {
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 255, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+				},
+			},
+			want: map[int]common.Position{
+				0: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+
+				1: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				2: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				3: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				4: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				5: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				6: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				7: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				8: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				9: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				10: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				11: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				12: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				13: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				14: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				15: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				16: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+				17: {
+					Fixtures: map[int]common.Fixture{
+						0: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						1: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+						2: {MasterDimmer: 255, Brightness: 255, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0, Enabled: true},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if positions, _ := AssemblePositions(tt.fadeColors, tt.numberFixtures, tt.totalNumberOfSteps, tt.optimasation); !reflect.DeepEqual(positions, tt.want) {
+				t.Errorf("AssemblePositions() = %+v, want %+v", positions, tt.want)
+
+				for positionNumber := 0; positionNumber < len(positions); positionNumber++ {
+
+					position := positions[positionNumber]
+
+					fmt.Printf("Position %d\n", positionNumber)
+
+					for fixtureNumber := 0; fixtureNumber < tt.numberFixtures; fixtureNumber++ {
+
+						fixture := position.Fixtures[fixtureNumber]
+
+						fmt.Printf("\t fixture %d %+v\n", fixture.Number, fixture.Color)
 
 					}
 				}
@@ -3833,6 +4587,735 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors, tt.args.fixtureState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("invertRGBColors() = %+v, want %+v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerState2And4Disabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
+		{
+			name: "standard 8 steps fixture 2 & 4 disabled",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+				scannerState: map[int]common.FixtureState{
+					0: {
+						Enabled: true,
+					},
+					1: {
+						Enabled: true,
+					},
+					2: {
+						Enabled: false, // Disabled.
+					},
+					3: {
+						Enabled: true,
+					},
+					4: {
+						Enabled: false, // Disabled.
+					},
+					5: {
+						Enabled: true,
+					},
+					6: {
+						Enabled: true,
+					},
+					7: {
+						Enabled: true,
+					},
+				},
+			},
+			want: common.Pattern{
+
+				Steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					// {
+					// 	Fixtures: map[int]common.Fixture{
+					// 		0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+					// 		3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 		7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+					// 	},
+					// },
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerState4Enabled4Disabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
+		{
+			name: "4 enabled and 4 disabled.",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+				scannerState: map[int]common.FixtureState{
+					0: {
+						Enabled: true,
+					},
+					1: {
+						Enabled: true,
+					},
+					2: {
+						Enabled: true,
+					},
+					3: {
+						Enabled: true,
+					},
+					4: {
+						Enabled: false,
+					},
+					5: {
+						Enabled: false,
+					},
+					6: {
+						Enabled: false,
+					},
+					7: {
+						Enabled: false,
+					},
+				},
+			},
+			want: common.Pattern{
+				Steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							4: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerStateAllEnabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
+		{
+			name: "standard 2 steps All enabled.",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+				scannerState: map[int]common.FixtureState{
+					0: {
+						Enabled: true,
+					},
+					1: {
+						Enabled: true,
+					},
+				},
+			},
+			want: common.Pattern{
+				Steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+			}
+		})
+	}
+}
+
+func TestApplyScannerStateFirst4Disabled(t *testing.T) {
+	type args struct {
+		steps        []common.Step
+		scannerState map[int]common.FixtureState
+	}
+	tests := []struct {
+		name string
+		args args
+		want common.Pattern
+	}{
+
+		{
+			name: "standard 8 steps  first 4 disabled",
+			args: args{
+				steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+				scannerState: map[int]common.FixtureState{
+					0: {
+						Enabled: false, // Disabled.
+					},
+					1: {
+						Enabled: false, // Disabled.
+					},
+					2: {
+						Enabled: false, // Disabled.
+					},
+					3: {
+						Enabled: false, // Disabled.
+					},
+					4: {
+						Enabled: true,
+					},
+					5: {
+						Enabled: true,
+					},
+					6: {
+						Enabled: true,
+					},
+					7: {
+						Enabled: true,
+					},
+				},
+			},
+			want: common.Pattern{
+
+				Steps: []common.Step{
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+						},
+					},
+					{
+						Fixtures: map[int]common.Fixture{
+							0: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							1: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							2: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							3: {MasterDimmer: full, Enabled: false, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							4: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							5: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							6: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 0, Color: common.Color{R: 0, G: 0, B: 0}},
+							7: {MasterDimmer: full, Enabled: true, Brightness: 0, Shutter: 255, Color: common.Color{R: 255, G: 255, B: 255}},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		pattern := common.Pattern{}
+		pattern.Steps = tt.args.steps
+		t.Run(tt.name, func(t *testing.T) {
+			if got := ApplyFixtureState(pattern, tt.args.scannerState); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GenerateStandardChasePatterm() got = %+v", got)
+				t.Errorf("GenerateStandardChasePatterm() want %+v", tt.want)
+
+				for stepNumber, step := range got.Steps {
+					fmt.Printf("Step %d\n", stepNumber)
+					for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+						fixture := step.Fixtures[fixtureNumber]
+						fmt.Printf("\t\tFixture %d Enabled %t Master %d Brightness %d Shutter %d Color %+v\n", fixtureNumber, fixture.Enabled, fixture.MasterDimmer, fixture.Brightness, fixture.Shutter, fixture.Color)
+					}
+				}
 			}
 		})
 	}
