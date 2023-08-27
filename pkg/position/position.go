@@ -247,9 +247,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
 	totalNumberOfSteps := 1000
-	for fixture := 0; fixture < numberFixtures; fixture++ {
-		if len(fadeColors[fixture]) != 0 && len(fadeColors[fixture]) < totalNumberOfSteps {
-			totalNumberOfSteps = len(fadeColors[fixture])
+	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+		if sequence.FixtureState[fixtureNumber].Enabled {
+			if len(fadeColors[fixtureNumber]) != 0 && len(fadeColors[fixtureNumber]) < totalNumberOfSteps {
+				totalNumberOfSteps = len(fadeColors[fixtureNumber])
+			}
 		}
 	}
 
@@ -267,7 +269,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }
 
-func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, Optimisation bool) (map[int]common.Position, int) {
+func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, fixtureState map[int]common.FixtureState, optimisation bool) (map[int]common.Position, int) {
 
 	if debug {
 		fmt.Printf("assemblePositions\n")
@@ -295,7 +297,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 
 		for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
 
-			if !fadeColors[fixtureNumber][step].Enabled {
+			if !fixtureState[fixtureNumber].Enabled {
 				continue
 			}
 
@@ -324,7 +326,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newPosition.Fixtures[fixtureNumber] = newFixture
 				} else {
 					// turn the lamp off, but only if its already on.
-					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !Optimisation {
+					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
 						newFixture.Color = common.Color{}
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo

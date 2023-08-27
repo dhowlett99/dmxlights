@@ -299,7 +299,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			},
 		}
 		fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
-		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.Optimisation)
+		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 		var rotateCounter int
 		var clockwise int
