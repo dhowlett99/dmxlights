@@ -65,8 +65,8 @@ type CurrentState struct {
 	Blackout                  bool                       // Blackout all fixtures.
 	Flood                     bool                       // Flood all fixtures.
 	SelectMode                []int                      // What mode each sequence is in : normal mode, function mode, status selection mode.
-	LastMode                  []int                      //Last mode sequence was in : normal mode, function mode, status selection mode.
-	Functions                 map[int][]common.Function  // Map indexed sequence of functions
+	LastMode                  []int                      // Last mode sequence was in : normal mode, function mode, status selection mode.
+	Functions                 map[int][]common.Function  // Map indexed by sequence of functions
 	FunctionLabels            [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed       []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions           [9][9]int                  // Sorage for switch positions.
@@ -1364,6 +1364,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Fixture State Enabled %t  Inverted %t Reversed %t\n", this.FixtureState[Y][X].Enabled, this.FixtureState[Y][X].RGBInverted, this.FixtureState[Y][X].RGBInverted)
 		}
 
+		// Rotate the  fixture state based on last fixture state.
 		setFixtureStatus(this, Y, X, commandChannels, sequences[Y])
 
 		// Show the status.
