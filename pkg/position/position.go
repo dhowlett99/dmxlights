@@ -232,14 +232,14 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	}
 
 	if debug {
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[0]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[1]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[2]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[3]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[4]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[5]))
-		fmt.Printf("FadeColors 0=%d ", len(fadeColors[6]))
-		fmt.Printf("FadeColors 0=%d\n", len(fadeColors[7]))
+		fmt.Printf("FadeColors Fixture 0=%d ", len(fadeColors[0]))
+		fmt.Printf("FadeColors Fixture 1=%d ", len(fadeColors[1]))
+		fmt.Printf("FadeColors Fixture 2=%d ", len(fadeColors[2]))
+		fmt.Printf("FadeColors Fixture 3=%d ", len(fadeColors[3]))
+		fmt.Printf("FadeColors Fixture 4=%d ", len(fadeColors[4]))
+		fmt.Printf("FadeColors Fixture 5=%d ", len(fadeColors[5]))
+		fmt.Printf("FadeColors Fixture 6=%d ", len(fadeColors[6]))
+		fmt.Printf("FadeColors Fixture 7=%d\n", len(fadeColors[7]))
 	}
 
 	// Setup the counters for the lengths for each fixture.
@@ -247,9 +247,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
 	totalNumberOfSteps := 1000
-	for fixture := 0; fixture < numberFixtures; fixture++ {
-		if len(fadeColors[fixture]) != 0 && len(fadeColors[fixture]) < totalNumberOfSteps {
-			totalNumberOfSteps = len(fadeColors[fixture])
+	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+		if sequence.FixtureState[fixtureNumber].Enabled {
+			if len(fadeColors[fixtureNumber]) != 0 && len(fadeColors[fixtureNumber]) < totalNumberOfSteps {
+				totalNumberOfSteps = len(fadeColors[fixtureNumber])
+			}
 		}
 	}
 
@@ -267,7 +269,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	return fadeColors, numberFixtures, totalNumberOfSteps
 }
 
-func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, Optimisation bool) (map[int]common.Position, int) {
+func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, fixtureState map[int]common.FixtureState, optimisation bool) (map[int]common.Position, int) {
 
 	if debug {
 		fmt.Printf("assemblePositions\n")
@@ -284,6 +286,8 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		fmt.Printf("totalNumberOfSteps %d\n", totalNumberOfSteps)
 	}
 
+	var newStep int
+
 	// Assemble the positions.
 	for step := 0; step < totalNumberOfSteps; step++ {
 		// Create a new position.
@@ -291,7 +295,11 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 		// Add some space for the fixtures.
 		newPosition.Fixtures = make(map[int]common.Fixture)
 
-		for fixtureNumber := 0; fixtureNumber <= numberFixtures; fixtureNumber++ {
+		for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+
+			if !fixtureState[fixtureNumber].Enabled {
+				continue
+			}
 
 			newFixture := common.Fixture{}
 			newColor := common.Color{}
@@ -318,7 +326,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newPosition.Fixtures[fixtureNumber] = newFixture
 				} else {
 					// turn the lamp off, but only if its already on.
-					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !Optimisation {
+					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
 						newFixture.Color = common.Color{}
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
@@ -337,7 +345,8 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 
 		// Only add a position if there are some enabled scanners in the fixture list.
 		if len(newPosition.Fixtures) != 0 {
-			positionsOut[step] = newPosition
+			positionsOut[newStep] = newPosition
+			newStep++
 		}
 	}
 
@@ -400,4 +409,80 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 	}
 
 	return stepsOut
+}
+
+// ApplyFixtureState - Apply the state of the fixtures to the pattern, fixture disabling works by disabling the
+// steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
+// catch steps that have more than one fixture alight in any one step.
+// So make sure you also turn off the fixture in the fixture receiver.
+func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
+
+	debug := false
+
+	generatedSteps := patternIn.Steps
+
+	var patternOut common.Pattern
+
+	patternOut.Name = patternIn.Name
+	patternOut.Label = patternIn.Label
+	patternOut.Steps = []common.Step{}
+
+	if debug {
+		for fixture := 0; fixture < len(scannerState); fixture++ {
+			fmt.Printf("ApplyFixtureState: Fixture:%d State %t\n", fixture, scannerState[fixture].Enabled)
+		}
+	}
+
+	for _, step := range generatedSteps {
+
+		newStep := step
+		newStep.Fixtures = make(map[int]common.Fixture)
+		hasColors := make(map[int]bool)
+		for fixtureNumber, fixture := range step.Fixtures {
+			newFixture := common.Fixture{}
+			newFixture.Enabled = scannerState[fixtureNumber].Enabled
+			newFixture.MasterDimmer = 255
+			newFixture.Shutter = fixture.Shutter
+			newFixture.Color = fixture.Color
+
+			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				hasColors[fixtureNumber] = true
+			} else {
+				hasColors[fixtureNumber] = false
+			}
+
+			newStep.Fixtures[fixtureNumber] = newFixture
+		}
+
+		if debug {
+			fmt.Printf("Fixtures \n")
+			for fixture := 0; fixture < len(newStep.Fixtures); fixture++ {
+				fmt.Printf("Fixture %d Enabled %t Colors %+v\n", fixture, newStep.Fixtures[fixture].Enabled, newStep.Fixtures[fixture].Color)
+			}
+		}
+
+		for fixtureNumber, fixture := range newStep.Fixtures {
+			// Don't add steps with no enabled fixtures.
+			if hasColors[fixtureNumber] && fixture.Enabled {
+				patternOut.Steps = append(patternOut.Steps, newStep)
+				break
+			}
+		}
+		// // Always add key steps.
+		if step.KeyStep {
+			patternOut.Steps = append(patternOut.Steps, newStep)
+		}
+	}
+
+	if debug {
+		for _, step := range patternOut.Steps {
+			fmt.Printf("Fixtures \n")
+			for fixture := 0; fixture < len(step.Fixtures); fixture++ {
+				fmt.Printf("Fixture %d Enabled %t Values %+v\n", fixture, step.Fixtures[fixture].Enabled, step.Fixtures[fixture])
+			}
+		}
+	}
+
+	return patternOut
+
 }

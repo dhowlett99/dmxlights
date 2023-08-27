@@ -1221,11 +1221,11 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 func Reverse(in int) int {
 	switch in {
 	case 0:
-		return 10
+		return 20
 	case 1:
-		return 9
+		return 15
 	case 2:
-		return 8
+		return 10
 	case 3:
 		return 7
 	case 4:
@@ -1243,7 +1243,7 @@ func Reverse(in int) int {
 	case 10:
 		return 0
 	default:
-		return 10
+		return 20
 	}
 }
 
