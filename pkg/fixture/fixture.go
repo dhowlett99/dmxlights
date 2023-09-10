@@ -341,6 +341,7 @@ func FixtureReceiver(
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 					}
 					// Fixture brightness is sent as master in this case.
+					// TODO find a suitable color in the scanner's wheel that matches the fixture's color.
 					// TODO Integrate cmd.master with fixture.Brightness.
 					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {

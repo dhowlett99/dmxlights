@@ -506,6 +506,8 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
 					sequence.UpdatePattern = false
+
+					// Initialise chaser.
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
@@ -603,10 +605,12 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
+							// Recover origial colors after auto color is switched off.
 							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
+						// We are updating color in sequence.
 						steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 						// Save the current color selection.
 						if sequence.SaveColors {
