@@ -1930,7 +1930,7 @@ func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, di
 			}
 			color := colorpicker.GetColor(hue)
 			hue++
-			fmt.Printf("Name: %s Red %d Green %d Blue %d\n", color.Name, int(color.RGB[0]), int(color.RGB[1]), int(color.RGB[2]))
+			//label := fmt.Sprintf("%s %d,%d,%d\n", color.Name, int(color.RGB[0]), int(color.RGB[1]), int(color.RGB[2]))
 			common.LightLamp(common.ALight{X: y, Y: x, Brightness: master, Red: int(color.RGB[0]), Green: int(color.RGB[1]), Blue: int(color.RGB[2])}, eventsForLaunchpad, guiButtons)
 			common.LabelButton(y, x, color.Name, guiButtons)
 		}
