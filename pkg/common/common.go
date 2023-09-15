@@ -92,6 +92,12 @@ type Color struct {
 	Flash bool
 }
 
+type ColorPicker struct {
+	Name string
+	ID   int
+	RGB  []int
+}
+
 // Used in calculating Positions.
 type FixtureBuffer struct {
 	Color        Color
