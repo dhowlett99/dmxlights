@@ -1955,26 +1955,6 @@ func sineLED(angle int, lights []int) (r, g, b int) {
 	return lights[(angle+30)%360], lights[angle], lights[(angle+240)%360]
 }
 
-// func sineLED(angle int) (r, g, b int) {
-
-// 	red := float64((angle + 120) % 360)
-// 	fmt.Printf("Red %f\n", red)
-
-// 	fmt.Printf("Sin Red %d\n", r)
-
-// 	green := float64(angle)
-// 	// Convert angle to radians
-// 	thetaGreen := (green - 90) * math.Pi / 180
-// 	g = int(255 - math.Sin(float64(thetaGreen)))
-
-// 	blue := float64((angle + 240) % 360)
-// 	// Convert angle to radians
-// 	thetaBlue := (blue - 90) * math.Pi / 180
-// 	b = int(255 - math.Sin(thetaBlue))
-
-// 	return r, g, b
-// }
-
 // For the given sequence show the available scanner selection colors on the relevant buttons.
 func ShowSelectFixtureButtons(targetSequence common.Sequence, displaySequence int, this *CurrentState, eventsForLaunchpad chan common.ALight, action string, guiButtons chan common.ALight) int {
 
