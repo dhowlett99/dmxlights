@@ -581,6 +581,15 @@ func HideSequence(targetSequence int, commandChannels []chan Command) {
 	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
+func HideAllSequences(commandChannels []chan Command) {
+
+	fmt.Printf("Hide All\n")
+	cmd := Command{
+		Action: Hide,
+	}
+	SendCommandToAllSequence(cmd, commandChannels)
+}
+
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
 // returns the color array
 func GetColorButtonsArray(color int) Color {
@@ -959,6 +968,15 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
+	}
+}
+
+func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	for y := 0; y < 8; y++ {
+		for x := 0; x < 8; x++ {
+			LightLamp(ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			LabelButton(x, y, "", guiButtons)
+		}
 	}
 }
 

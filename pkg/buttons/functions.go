@@ -253,6 +253,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Remember which sequence we are editing
 		this.EditWhichSequence = this.TargetSequence
 
+		// We use the whole launchpad for choosing from 64 colors.
+		common.HideAllSequences(commandChannels)
+
 		// Show the colors
 		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 		return

@@ -4,6 +4,7 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 )
 
@@ -230,25 +231,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Set function mode.
 		this.SelectMode[this.SelectedSequence] = FUNCTION
 
-		// If static, show static colors.
-		// if this.EditStaticColorsMode[this.TargetSequence] {
-		// 	if debug {
-		// 		fmt.Printf("Show Static Color Selection Buttons\n")
-		// 	}
-		// 	common.SetMode(this.TargetSequence, commandChannels, "Static")
-		// 	//this.EditStaticColorsMode = false
-		// }
-
 		// And hide the sequence so we can only see the function buttons.
 		common.HideSequence(this.SelectedSequence, commandChannels)
 
-		// If the chase is running, hide it.
+		// If the shutter chaser is running, hide it.
 		if this.ScannerChaser && this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-
-		// Turn off any static sequence so we can see the functions.
-		//common.SetMode(this.SelectedSequence, commandChannels, "Sequence")
 
 		// Turn off any previous function bars.
 		for sequenceNumber := range sequences {
@@ -479,6 +468,16 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if this.EditSequenceColorsMode {
 			this.EditSequenceColorsMode = false
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+			// Clear the launchpad and remove the 64 color choices.
+			// Reset the launchpad.
+			common.ClearAllButtons(eventsForLaunchpad, guiButtons)
+			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+			common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+			// Show the static and switch settings.
+			cmd := common.Command{
+				Action: common.UnHide,
+			}
+			common.SendCommandToAllSequence(cmd, commandChannels)
 		}
 
 		// Now forget we pressed twice and start again.

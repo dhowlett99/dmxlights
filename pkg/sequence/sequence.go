@@ -164,6 +164,7 @@ func CreateSequence(
 		NumberFixtures:         numberFixtures,
 		Type:                   sequenceType,
 		Hide:                   false,
+		Hidden:                 false,
 		Mode:                   "Sequence",
 		StaticColors:           staticColorsButtons,
 		RGBAvailableColors:     sequenceColorButtons,

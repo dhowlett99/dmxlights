@@ -176,6 +176,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
 		}
 		if !sequence.Hidden {
+			if debug {
+				fmt.Printf("%d: Command Actually Hide\n", mySequenceNumber)
+			}
 			sequence.Hide = true
 			sequence.Hidden = true
 		}
@@ -186,6 +189,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
 		if sequence.Hidden {
+			if debug {
+				fmt.Printf("%d: Command Actually UnHide\n", mySequenceNumber)
+			}
 			sequence.Hide = false
 			sequence.Hidden = false
 			sequence.PlayStaticOnce = true
