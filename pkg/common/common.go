@@ -170,17 +170,18 @@ type Switch struct {
 }
 
 type StaticColorButton struct {
-	Name          string
-	Label         string
-	Number        int
-	X             int
-	Y             int
-	Color         Color
-	SelectedColor int
-	Flash         bool
-	Setting       int
-	FirstPress    bool
-	Enabled       bool
+	Name             string
+	Label            string
+	Number           int
+	X                int
+	Y                int
+	SelectedSequence int
+	Color            Color
+	SelectedColor    int
+	Flash            bool
+	Setting          int
+	FirstPress       bool
+	Enabled          bool
 }
 
 type FixtureState struct {
@@ -1212,13 +1213,33 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 	// Make an array to hold static colors.
 	staticColorsButtons := []StaticColorButton{}
 
+	var selectedColor int
+
 	for X := 0; X < 8; X++ {
-		staticColorButton := StaticColorButton{}
-		staticColorButton.X = X
-		staticColorButton.Y = selectedSequence
-		staticColorButton.SelectedColor = X
-		staticColorButton.Color = GetColorButtonsArray(X)
-		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+
+		for Y := 0; Y < 8; Y++ {
+			if selectedColor >= 64 {
+				break
+			}
+
+			staticColorButton := StaticColorButton{}
+
+			color := Color{}
+			colorPicker := GetColor(selectedColor)
+			color.R = colorPicker.RGB[0]
+			color.G = colorPicker.RGB[1]
+			color.B = colorPicker.RGB[2]
+
+			staticColorButton.Name = colorPicker.Name
+			staticColorButton.Color = color
+			staticColorButton.X = X
+			staticColorButton.Y = Y
+			staticColorButton.SelectedColor = selectedColor
+			selectedColor++
+
+			staticColorsButtons = append(staticColorsButtons, staticColorButton)
+		}
+
 	}
 
 	return staticColorsButtons
@@ -1402,4 +1423,76 @@ func FormatLabel(label string) string {
 	// replace any spaces with new lines.
 	// new lines are represented by a dot in code beneath us.
 	return strings.Replace(label, " ", ".", -1)
+}
+
+func GetColor(id int) ColorPicker {
+
+	colors := []ColorPicker{
+		{ID: 0, Name: "black", RGB: []int{0, 0, 0}},
+		{ID: 1, Name: "brown", RGB: []int{165, 42, 42}},
+		{ID: 2, Name: "firebrick", RGB: []int{178, 34, 34}},
+		{ID: 3, Name: "crimson", RGB: []int{220, 20, 60}},
+		{ID: 4, Name: "red", RGB: []int{255, 0, 0}},
+		{ID: 5, Name: "tomato", RGB: []int{255, 99, 71}},
+		{ID: 6, Name: "coral", RGB: []int{255, 127, 80}},
+		{ID: 7, Name: "light", RGB: []int{240, 128, 128}},
+		{ID: 8, Name: "dark salmon", RGB: []int{233, 150, 122}},
+		{ID: 0, Name: "salmon", RGB: []int{250, 128, 114}},
+		{ID: 0, Name: "light", RGB: []int{255, 160, 122}},
+		{ID: 0, Name: "dark orange", RGB: []int{255, 140, 0}},
+		{ID: 0, Name: "orange", RGB: []int{255, 165, 0}},
+		{ID: 0, Name: "gold", RGB: []int{255, 215, 0}},
+		{ID: 0, Name: "yellow", RGB: []int{255, 255, 0}},
+		{ID: 0, Name: "yellow green", RGB: []int{154, 205, 50}},
+		{ID: 0, Name: "lawn green", RGB: []int{124, 252, 0}},
+		{ID: 0, Name: "chart reuse", RGB: []int{127, 255, 0}},
+		{ID: 0, Name: "green yellow", RGB: []int{173, 255, 47}},
+		{ID: 0, Name: "dark green", RGB: []int{0, 100, 0}},
+		{ID: 0, Name: "green", RGB: []int{0, 255, 0}},
+		{ID: 0, Name: "forest green", RGB: []int{34, 139, 34}},
+		{ID: 0, Name: "sea green", RGB: []int{46, 139, 87}},
+		{ID: 0, Name: "medium sea green", RGB: []int{60, 179, 113}},
+		{ID: 0, Name: "light sea green", RGB: []int{32, 178, 170}},
+		{ID: 0, Name: "aqua", RGB: []int{0, 255, 255}},
+		{ID: 0, Name: "cyan", RGB: []int{0, 255, 255}},
+		{ID: 0, Name: "dark turquoise", RGB: []int{0, 206, 209}},
+		{ID: 0, Name: "turquoise", RGB: []int{64, 224, 208}},
+		{ID: 0, Name: "medium turquoise", RGB: []int{72, 209, 204}},
+		{ID: 0, Name: "aqua marine", RGB: []int{127, 255, 212}},
+		{ID: 0, Name: "deep sky blue", RGB: []int{0, 191, 255}},
+		{ID: 0, Name: "dodger blue", RGB: []int{30, 144, 255}},
+		{ID: 0, Name: "light blue", RGB: []int{173, 216, 230}},
+		{ID: 0, Name: "sky blue", RGB: []int{135, 206, 235}},
+		{ID: 0, Name: "midnight blue", RGB: []int{25, 25, 112}},
+		{ID: 0, Name: "navy", RGB: []int{0, 0, 128}},
+		{ID: 0, Name: "dark blue", RGB: []int{0, 0, 139}},
+		{ID: 0, Name: "medium blue", RGB: []int{0, 0, 205}},
+		{ID: 0, Name: "blue", RGB: []int{0, 0, 255}},
+		{ID: 0, Name: "royal blue", RGB: []int{65, 105, 225}},
+		{ID: 0, Name: "blue violet", RGB: []int{138, 43, 226}},
+		{ID: 0, Name: "dark orchid", RGB: []int{153, 50, 204}},
+		{ID: 0, Name: "violet", RGB: []int{238, 130, 238}},
+		{ID: 0, Name: "magenta / fuchsia", RGB: []int{255, 0, 255}},
+		{ID: 0, Name: "orchid", RGB: []int{218, 112, 214}},
+		{ID: 0, Name: "medium violet red", RGB: []int{199, 21, 133}},
+		{ID: 0, Name: "deep pink", RGB: []int{255, 20, 147}},
+		{ID: 0, Name: "hot pink", RGB: []int{255, 105, 180}},
+		{ID: 0, Name: "light pink", RGB: []int{255, 182, 193}},
+		{ID: 0, Name: "pink", RGB: []int{255, 192, 203}},
+		{ID: 0, Name: "sienna", RGB: []int{160, 82, 45}},
+		{ID: 0, Name: "chocolate", RGB: []int{210, 105, 30}},
+		{ID: 0, Name: "peru", RGB: []int{205, 133, 63}},
+		{ID: 0, Name: "sandy brown", RGB: []int{244, 164, 96}},
+		{ID: 0, Name: "tan", RGB: []int{210, 180, 140}},
+		{ID: 0, Name: "rosy brown", RGB: []int{188, 143, 143}},
+		{ID: 0, Name: "moccasin", RGB: []int{255, 228, 181}},
+		{ID: 0, Name: "navajo white", RGB: []int{255, 222, 173}},
+		{ID: 0, Name: "slate gray", RGB: []int{112, 128, 144}},
+		{ID: 0, Name: "light steel blue", RGB: []int{176, 196, 222}},
+		{ID: 0, Name: "lavender", RGB: []int{230, 230, 250}},
+		{ID: 0, Name: "alice blue", RGB: []int{240, 248, 255}},
+		{ID: 0, Name: "white", RGB: []int{255, 255, 255}},
+	}
+
+	return colors[id]
 }

@@ -29,8 +29,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
-
-	"github.com/dhowlett99/dmxlights/pkg/colorpicker"
 )
 
 const debug = false
@@ -1915,49 +1913,39 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
+// With the new color picker there can be 64 colors displayed.
 func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("Show Color Selection Buttons\n")
 	}
 
-	var hue int
-	hue = 0
-	for x := 0; x < 8; x++ {
-		for y := 0; y < 8; y++ {
-			if hue >= 64 {
-				break
+	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
+
+		fmt.Printf("---->Static Color Button %+v\n", lamp)
+
+		// Check if we need to flash this button.
+		for index, availableColor := range targetSequence.RGBAvailableColors {
+			for _, sequenceColor := range targetSequence.CurrentColors {
+				if availableColor.Color == sequenceColor {
+					if debug {
+						fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+					}
+					if myFixtureNumber == index {
+						lamp.Flash = true
+					}
+				}
 			}
-			color := colorpicker.GetColor(hue)
-			hue++
-			//label := fmt.Sprintf("%s %d,%d,%d\n", color.Name, int(color.RGB[0]), int(color.RGB[1]), int(color.RGB[2]))
-			common.LightLamp(common.ALight{X: y, Y: x, Brightness: master, Red: int(color.RGB[0]), Green: int(color.RGB[1]), Blue: int(color.RGB[2])}, eventsForLaunchpad, guiButtons)
-			common.LabelButton(y, x, color.Name, guiButtons)
 		}
+		if lamp.Flash {
+			Black := common.Color{R: 0, G: 0, B: 0}
+			common.FlashLight(lamp.X, lamp.Y, lamp.Color, Black, eventsForLaunchpad, guiButtons)
+		} else {
+			common.LightLamp(common.ALight{X: lamp.X, Y: lamp.Y, Brightness: master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLaunchpad, guiButtons)
+		}
+		common.LabelButton(lamp.X, lamp.Y, lamp.Name, guiButtons)
+
 	}
-
-	// // Check if we need to flash this button.
-	// for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
-
-	// 	for index, availableColor := range targetSequence.RGBAvailableColors {
-	// 		for _, sequenceColor := range targetSequence.CurrentColors {
-	// 			if availableColor.Color == sequenceColor {
-	// 				if debug {
-	// 					fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
-	// 				}
-	// 				if myFixtureNumber == index {
-	// 					lamp.Flash = true
-	// 				}
-	// 			}
-	// 		}
-	// 	}
-	// 	if lamp.Flash {
-	// 		Black := common.Color{R: 0, G: 0, B: 0}
-	// 		common.FlashLight(myFixtureNumber, displaySequence, lamp.Color, Black, eventsForLaunchpad, guiButtons)
-	// 	} else {
-	// 		common.LightLamp(common.ALight{X: myFixtureNumber, Y: displaySequence, Brightness: master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLaunchpad, guiButtons)
-	// 	}
-	// }
 }
 
 func sineLED(angle int, lights []int) (r, g, b int) {
