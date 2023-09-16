@@ -2029,6 +2029,12 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 
 	// if there are no colors available for this fixture turn everything off and print an error.
 	if sequence.ScannerAvailableColors[this.SelectedFixture+1] == nil {
+
+		// Turn off the color edit mode.
+		this.EditSequenceColorsMode = false
+		// And since we seem to be using two flags for the same thing, turn this off too.
+		this.Functions[this.SelectedSequence][common.Function5_Color].State = false
+
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == this.SelectedSequence+1 {
 				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
