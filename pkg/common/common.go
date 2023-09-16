@@ -583,7 +583,6 @@ func HideSequence(targetSequence int, commandChannels []chan Command) {
 
 func HideAllSequences(commandChannels []chan Command) {
 
-	fmt.Printf("Hide All\n")
 	cmd := Command{
 		Action: Hide,
 	}
