@@ -20,6 +20,10 @@ import (
 	"fmt"
 	"time"
 
+	"fyne.io/fyne/v2"
+	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -40,6 +44,8 @@ const CHASER = 2
 const STATUS = 3
 
 type CurrentState struct {
+	MyWindow                  fyne.Window                // Pointer to main window.
+	GUI                       bool                       // Flag to indicate use of GUI.
 	Crash1                    bool                       // Flags to detect launchpad crash.
 	Crash2                    bool                       // Flags to detect launchpad crash.
 	SelectedSequence          int                        // The currently selected sequence.
@@ -120,8 +126,7 @@ func ProcessButtons(X int, Y int,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
-	updateChannels []chan common.Sequence,
-	gui bool) {
+	updateChannels []chan common.Sequence) {
 
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
@@ -211,7 +216,7 @@ func ProcessButtons(X int, Y int,
 			fixture.MapFixtures(false, false, Y, dmxController, X, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
 		}
 
-		if gui {
+		if this.GUI {
 			time.Sleep(200 * time.Millisecond)
 			brightness := 0
 			master := 0
@@ -319,7 +324,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// C L E A R  - clear all from the GUI.
-	if X == 0 && Y == -1 && gui {
+	if X == 0 && Y == -1 && this.GUI {
 
 		if debug {
 			fmt.Printf("GUI Clear Pressed X:%d Y:%d\n", X, Y)
@@ -331,7 +336,7 @@ func ProcessButtons(X int, Y int,
 
 	// C L E A R  - Start the timer, waiting for a long press to clear all.
 	// Because a short press in scanner mode shifts the scanners up.
-	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
+	if X == 0 && Y == -1 && !this.GUI && sequences[this.SelectedSequence].Type == "scanner" {
 
 		if debug {
 			fmt.Printf("Clear Pressed Start Timer X:%d Y:%d\n", X, Y)
@@ -343,7 +348,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	//  C L E A R - clear all if we're not in the scanner mode.
-	if X == 0 && Y == -1 && !gui && sequences[this.SelectedSequence].Type != "scanner" {
+	if X == 0 && Y == -1 && !this.GUI && sequences[this.SelectedSequence].Type != "scanner" {
 		if debug {
 			fmt.Printf("Clear All If We're Not in Scanner Mode X:%d Y:%d\n", X, Y)
 		}
@@ -352,7 +357,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// C L E A R  - We have a long press.
-	if X == 100 && Y == -1 && !gui && sequences[this.SelectedSequence].Type == "scanner" {
+	if X == 100 && Y == -1 && !this.GUI && sequences[this.SelectedSequence].Type == "scanner" {
 
 		if debug {
 			fmt.Printf("Clear Pressed Long Press X:%d Y:%d\n", X, Y)
@@ -605,7 +610,7 @@ func ProcessButtons(X int, Y int,
 			this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
-			if gui {
+			if this.GUI {
 				this.SavePreset = false
 			}
 
@@ -613,7 +618,7 @@ func ProcessButtons(X int, Y int,
 			// L O A D - Load config, but only if it exists in the presets map.
 			if this.PresetsStore[location].State {
 
-				if gui { // GUI path.
+				if this.GUI { // GUI path.
 					if this.SavePreset {
 						this.SavePreset = false
 					}
@@ -2029,6 +2034,10 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 				common.LightLamp(common.ALight{X: fixture.Number - 1, Y: this.SelectedSequence, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLaunchpad, guiButtons)
 			}
 		}
+		if this.GUI {
+			displayErrorPopUp(this.MyWindow, fmt.Sprintf("no colors available for this fixture"))
+		}
+
 		return fmt.Errorf("error: no colors available for fixture number %d", this.SelectedFixture+1)
 	}
 
@@ -2052,6 +2061,37 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		common.LabelButton(fixtureNumber, this.SelectedSequence, "", guiButtons)
 	}
 	return nil
+}
+
+func displayErrorPopUp(w fyne.Window, errorMessage string) (modal *widget.PopUp) {
+
+	title := widget.NewLabel("Error")
+	title.TextStyle = fyne.TextStyle{
+		Bold: true,
+	}
+
+	errorText := widget.NewLabel(errorMessage)
+
+	// Ok button.
+	button := widget.NewButton("Dismiss", func() {
+		modal.Hide()
+	})
+
+	// Layout of settings panel.
+	modal = widget.NewModalPopUp(
+		container.NewVBox(
+			title,
+			errorText,
+			widget.NewLabel(""),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		w.Canvas(),
+	)
+
+	modal.Resize(fyne.NewSize(250, 250))
+	modal.Show()
+
+	return modal
 }
 
 // For the given sequence clear the available this.Patterns on the relevant buttons.

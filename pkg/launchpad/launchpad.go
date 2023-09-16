@@ -56,7 +56,8 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentSt
 	// Main loop reading commands from the Novation Launchpad.
 	for {
 		hit := <-buttonChannel
-		buttons.ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, false)
+		this.GUI = false
+		buttons.ProcessButtons(hit.X, hit.Y, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 	}
 }
 

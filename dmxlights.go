@@ -65,7 +65,7 @@ func main() {
 
 	// Setup the current state.
 	this := buttons.CurrentState{}
-
+	this.MyWindow = myWindow                                       // Pointer to main window.
 	this.Blackout = false                                          // Blackout starts in off.
 	this.Flood = false                                             // Flood starts in off.
 	this.Running = make(map[int]bool, NumberOfSequences)           // Initialise storage for four sequences.
