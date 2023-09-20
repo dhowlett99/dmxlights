@@ -1569,9 +1569,9 @@ func ProcessButtons(X int, Y int,
 		!this.EditScannerColorsMode &&
 		this.EditSequenceColorsMode {
 
-		//if debug {
-		fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
-		//}
+		if debug {
+			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
+		}
 
 		if this.SelectMode[this.SelectedSequence] == CHASER {
 			this.TargetSequence = this.ChaserSequenceNumber
