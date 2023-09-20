@@ -93,9 +93,11 @@ type Color struct {
 }
 
 type ColorPicker struct {
-	Name string
-	ID   int
-	RGB  []int
+	Name  string
+	ID    int
+	Color Color
+	X     int
+	Y     int
 }
 
 // Used in calculating Positions.
@@ -1240,15 +1242,10 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 			}
 
 			staticColorButton := StaticColorButton{}
-
-			color := Color{}
-			colorPicker := GetColor(selectedColor)
-			color.R = colorPicker.RGB[0]
-			color.G = colorPicker.RGB[1]
-			color.B = colorPicker.RGB[2]
-
+			newColorPickerDatabase := NewColorPicker()
+			colorPicker := GetColor(X, Y, newColorPickerDatabase)
 			staticColorButton.Name = colorPicker.Name
-			staticColorButton.Color = color
+			staticColorButton.Color = colorPicker.Color
 			staticColorButton.X = X
 			staticColorButton.Y = Y
 			staticColorButton.SelectedColor = selectedColor
@@ -1442,74 +1439,93 @@ func FormatLabel(label string) string {
 	return strings.Replace(label, " ", ".", -1)
 }
 
-func GetColor(id int) ColorPicker {
+func NewColorPicker() []ColorPicker {
 
 	colors := []ColorPicker{
-		{ID: 0, Name: "black", RGB: []int{0, 0, 0}},
-		{ID: 1, Name: "brown", RGB: []int{165, 42, 42}},
-		{ID: 2, Name: "firebrick", RGB: []int{178, 34, 34}},
-		{ID: 3, Name: "crimson", RGB: []int{220, 20, 60}},
-		{ID: 4, Name: "red", RGB: []int{255, 0, 0}},
-		{ID: 5, Name: "tomato", RGB: []int{255, 99, 71}},
-		{ID: 6, Name: "coral", RGB: []int{255, 127, 80}},
-		{ID: 7, Name: "light", RGB: []int{240, 128, 128}},
-		{ID: 8, Name: "dark salmon", RGB: []int{233, 150, 122}},
-		{ID: 0, Name: "salmon", RGB: []int{250, 128, 114}},
-		{ID: 0, Name: "light", RGB: []int{255, 160, 122}},
-		{ID: 0, Name: "dark orange", RGB: []int{255, 140, 0}},
-		{ID: 0, Name: "orange", RGB: []int{255, 165, 0}},
-		{ID: 0, Name: "gold", RGB: []int{255, 215, 0}},
-		{ID: 0, Name: "yellow", RGB: []int{255, 255, 0}},
-		{ID: 0, Name: "yellow green", RGB: []int{154, 205, 50}},
-		{ID: 0, Name: "lawn green", RGB: []int{124, 252, 0}},
-		{ID: 0, Name: "chart reuse", RGB: []int{127, 255, 0}},
-		{ID: 0, Name: "green yellow", RGB: []int{173, 255, 47}},
-		{ID: 0, Name: "dark green", RGB: []int{0, 100, 0}},
-		{ID: 0, Name: "green", RGB: []int{0, 255, 0}},
-		{ID: 0, Name: "forest green", RGB: []int{34, 139, 34}},
-		{ID: 0, Name: "sea green", RGB: []int{46, 139, 87}},
-		{ID: 0, Name: "medium sea green", RGB: []int{60, 179, 113}},
-		{ID: 0, Name: "light sea green", RGB: []int{32, 178, 170}},
-		{ID: 0, Name: "aqua", RGB: []int{0, 255, 255}},
-		{ID: 0, Name: "cyan", RGB: []int{0, 255, 255}},
-		{ID: 0, Name: "dark turquoise", RGB: []int{0, 206, 209}},
-		{ID: 0, Name: "turquoise", RGB: []int{64, 224, 208}},
-		{ID: 0, Name: "medium turquoise", RGB: []int{72, 209, 204}},
-		{ID: 0, Name: "aqua marine", RGB: []int{127, 255, 212}},
-		{ID: 0, Name: "deep sky blue", RGB: []int{0, 191, 255}},
-		{ID: 0, Name: "dodger blue", RGB: []int{30, 144, 255}},
-		{ID: 0, Name: "light blue", RGB: []int{173, 216, 230}},
-		{ID: 0, Name: "sky blue", RGB: []int{135, 206, 235}},
-		{ID: 0, Name: "midnight blue", RGB: []int{25, 25, 112}},
-		{ID: 0, Name: "navy", RGB: []int{0, 0, 128}},
-		{ID: 0, Name: "dark blue", RGB: []int{0, 0, 139}},
-		{ID: 0, Name: "medium blue", RGB: []int{0, 0, 205}},
-		{ID: 0, Name: "blue", RGB: []int{0, 0, 255}},
-		{ID: 0, Name: "royal blue", RGB: []int{65, 105, 225}},
-		{ID: 0, Name: "blue violet", RGB: []int{138, 43, 226}},
-		{ID: 0, Name: "dark orchid", RGB: []int{153, 50, 204}},
-		{ID: 0, Name: "violet", RGB: []int{238, 130, 238}},
-		{ID: 0, Name: "magenta / fuchsia", RGB: []int{255, 0, 255}},
-		{ID: 0, Name: "orchid", RGB: []int{218, 112, 214}},
-		{ID: 0, Name: "medium violet red", RGB: []int{199, 21, 133}},
-		{ID: 0, Name: "deep pink", RGB: []int{255, 20, 147}},
-		{ID: 0, Name: "hot pink", RGB: []int{255, 105, 180}},
-		{ID: 0, Name: "light pink", RGB: []int{255, 182, 193}},
-		{ID: 0, Name: "pink", RGB: []int{255, 192, 203}},
-		{ID: 0, Name: "sienna", RGB: []int{160, 82, 45}},
-		{ID: 0, Name: "chocolate", RGB: []int{210, 105, 30}},
-		{ID: 0, Name: "peru", RGB: []int{205, 133, 63}},
-		{ID: 0, Name: "sandy brown", RGB: []int{244, 164, 96}},
-		{ID: 0, Name: "tan", RGB: []int{210, 180, 140}},
-		{ID: 0, Name: "rosy brown", RGB: []int{188, 143, 143}},
-		{ID: 0, Name: "moccasin", RGB: []int{255, 228, 181}},
-		{ID: 0, Name: "navajo white", RGB: []int{255, 222, 173}},
-		{ID: 0, Name: "slate gray", RGB: []int{112, 128, 144}},
-		{ID: 0, Name: "light steel blue", RGB: []int{176, 196, 222}},
-		{ID: 0, Name: "lavender", RGB: []int{230, 230, 250}},
-		{ID: 0, Name: "alice blue", RGB: []int{240, 248, 255}},
-		{ID: 0, Name: "white", RGB: []int{255, 255, 255}},
+		{ID: 0, X: 0, Y: 0, Name: "black", Color: Color{R: 0, G: 0, B: 0}},
+		{ID: 1, X: 1, Y: 0, Name: "brown", Color: Color{R: 165, G: 42, B: 42}},
+		{ID: 2, X: 2, Y: 0, Name: "firebrick", Color: Color{R: 178, G: 34, B: 34}},
+		{ID: 3, X: 3, Y: 0, Name: "crimson", Color: Color{R: 220, G: 20, B: 60}},
+		{ID: 4, X: 4, Y: 0, Name: "red", Color: Color{R: 255, G: 0, B: 0}},
+		{ID: 5, X: 5, Y: 0, Name: "tomato", Color: Color{R: 255, G: 99, B: 71}},
+		{ID: 6, X: 6, Y: 0, Name: "coral", Color: Color{R: 255, G: 127, B: 80}},
+		{ID: 7, X: 7, Y: 0, Name: "light", Color: Color{R: 240, G: 128, B: 128}},
+		{ID: 8, X: 0, Y: 1, Name: "dark salmon", Color: Color{R: 233, G: 150, B: 122}},
+		{ID: 9, X: 1, Y: 1, Name: "salmon", Color: Color{R: 250, G: 128, B: 114}},
+		{ID: 10, X: 2, Y: 1, Name: "light", Color: Color{R: 255, G: 160, B: 122}},
+		{ID: 11, X: 3, Y: 1, Name: "dark orange", Color: Color{R: 255, G: 140, B: 0}},
+		{ID: 12, X: 4, Y: 1, Name: "orange", Color: Color{R: 255, G: 165, B: 0}},
+		{ID: 13, X: 5, Y: 1, Name: "gold", Color: Color{R: 255, G: 215, B: 0}},
+		{ID: 14, X: 6, Y: 1, Name: "yellow", Color: Color{R: 255, G: 255, B: 0}},
+		{ID: 15, X: 7, Y: 1, Name: "yellow green", Color: Color{R: 154, G: 205, B: 50}},
+		{ID: 16, X: 0, Y: 2, Name: "lawn green", Color: Color{R: 124, G: 252, B: 0}},
+		{ID: 17, X: 1, Y: 2, Name: "chart reuse", Color: Color{R: 127, G: 255, B: 0}},
+		{ID: 18, X: 2, Y: 2, Name: "green yellow", Color: Color{R: 173, G: 255, B: 47}},
+		{ID: 19, X: 3, Y: 2, Name: "dark green", Color: Color{R: 0, G: 100, B: 0}},
+		{ID: 20, X: 4, Y: 2, Name: "green", Color: Color{R: 0, G: 255, B: 0}},
+		{ID: 21, X: 5, Y: 2, Name: "forest green", Color: Color{R: 34, G: 139, B: 34}},
+		{ID: 22, X: 6, Y: 2, Name: "sea green", Color: Color{R: 46, G: 139, B: 87}},
+		{ID: 23, X: 7, Y: 2, Name: "medium sea green", Color: Color{R: 60, G: 179, B: 113}},
+		{ID: 24, X: 0, Y: 3, Name: "light sea green", Color: Color{R: 32, G: 178, B: 170}},
+		{ID: 25, X: 1, Y: 3, Name: "aqua", Color: Color{R: 0, G: 255, B: 255}},
+		{ID: 26, X: 2, Y: 3, Name: "cyan", Color: Color{R: 0, G: 255, B: 255}},
+		{ID: 27, X: 3, Y: 3, Name: "dark turquoise", Color: Color{R: 0, G: 206, B: 209}},
+		{ID: 28, X: 4, Y: 3, Name: "turquoise", Color: Color{R: 64, G: 224, B: 208}},
+		{ID: 29, X: 5, Y: 3, Name: "medium turquoise", Color: Color{R: 72, G: 209, B: 204}},
+		{ID: 30, X: 6, Y: 3, Name: "aqua marine", Color: Color{R: 127, G: 255, B: 212}},
+		{ID: 31, X: 7, Y: 3, Name: "deep sky blue", Color: Color{R: 0, G: 191, B: 255}},
+		{ID: 32, X: 0, Y: 4, Name: "dodger blue", Color: Color{R: 30, G: 144, B: 255}},
+		{ID: 33, X: 1, Y: 4, Name: "light blue", Color: Color{R: 173, G: 216, B: 230}},
+		{ID: 34, X: 2, Y: 4, Name: "sky blue", Color: Color{R: 135, G: 206, B: 235}},
+		{ID: 35, X: 3, Y: 4, Name: "midnight blue", Color: Color{R: 25, G: 25, B: 112}},
+		{ID: 36, X: 4, Y: 4, Name: "navy", Color: Color{R: 0, G: 0, B: 128}},
+		{ID: 37, X: 5, Y: 4, Name: "dark blue", Color: Color{R: 0, G: 0, B: 139}},
+		{ID: 38, X: 6, Y: 4, Name: "medium blue", Color: Color{R: 0, G: 0, B: 205}},
+		{ID: 39, X: 7, Y: 4, Name: "blue", Color: Color{R: 0, G: 0, B: 255}},
+		{ID: 40, X: 0, Y: 5, Name: "royal blue", Color: Color{R: 65, G: 105, B: 225}},
+		{ID: 41, X: 1, Y: 5, Name: "blue violet", Color: Color{R: 138, G: 43, B: 226}},
+		{ID: 42, X: 2, Y: 5, Name: "dark orchid", Color: Color{R: 153, G: 50, B: 204}},
+		{ID: 43, X: 3, Y: 5, Name: "violet", Color: Color{R: 238, G: 130, B: 238}},
+		{ID: 44, X: 4, Y: 5, Name: "magenta / fuchsia", Color: Color{R: 255, G: 0, B: 255}},
+		{ID: 45, X: 5, Y: 5, Name: "orchid", Color: Color{R: 218, G: 112, B: 214}},
+		{ID: 46, X: 6, Y: 5, Name: "medium violet red", Color: Color{R: 199, G: 21, B: 133}},
+		{ID: 47, X: 7, Y: 5, Name: "deep pink", Color: Color{R: 255, G: 20, B: 147}},
+		{ID: 48, X: 0, Y: 6, Name: "hot pink", Color: Color{R: 255, G: 105, B: 180}},
+		{ID: 49, X: 1, Y: 6, Name: "light pink", Color: Color{R: 255, G: 182, B: 193}},
+		{ID: 50, X: 2, Y: 6, Name: "pink", Color: Color{R: 255, G: 192, B: 203}},
+		{ID: 51, X: 3, Y: 6, Name: "sienna", Color: Color{R: 160, G: 82, B: 45}},
+		{ID: 52, X: 4, Y: 6, Name: "chocolate", Color: Color{R: 210, G: 105, B: 30}},
+		{ID: 53, X: 5, Y: 6, Name: "peru", Color: Color{R: 205, G: 133, B: 63}},
+		{ID: 54, X: 6, Y: 6, Name: "sandy brown", Color: Color{R: 244, G: 164, B: 96}},
+		{ID: 54, X: 7, Y: 6, Name: "tan", Color: Color{R: 210, G: 180, B: 140}},
+		{ID: 56, X: 0, Y: 7, Name: "rosy brown", Color: Color{R: 188, G: 143, B: 143}},
+		{ID: 57, X: 1, Y: 7, Name: "moccasin", Color: Color{R: 255, G: 228, B: 181}},
+		{ID: 58, X: 2, Y: 7, Name: "navajo white", Color: Color{R: 255, G: 222, B: 173}},
+		{ID: 59, X: 3, Y: 7, Name: "slate gray", Color: Color{R: 112, G: 128, B: 144}},
+		{ID: 60, X: 4, Y: 7, Name: "light steel blue", Color: Color{R: 176, G: 196, B: 222}},
+		{ID: 61, X: 5, Y: 7, Name: "lavender", Color: Color{R: 230, G: 230, B: 250}},
+		{ID: 62, X: 6, Y: 7, Name: "alice blue", Color: Color{R: 240, G: 248, B: 255}},
+		{ID: 63, X: 7, Y: 7, Name: "white", Color: Color{R: 255, G: 255, B: 255}},
 	}
+	return colors
+}
 
-	return colors[id]
+func GetIDfromCoordinates(X int, Y int, colors []ColorPicker) int {
+	for _, color := range colors {
+
+		if color.X == X && color.Y == Y {
+			return color.ID
+		}
+	}
+	return 0
+}
+
+func GetColor(X int, Y int, colors []ColorPicker) ColorPicker {
+	for _, color := range colors {
+
+		if color.X == X && color.Y == Y {
+			return color
+		}
+	}
+	return ColorPicker{}
 }

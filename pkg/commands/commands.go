@@ -491,13 +491,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
 
 	case common.UpdateSequenceColor:
-		const SELECTED_COLOR = 0
+		const SELECTED_X = 0
+		const SELECTED_Y = 1
+
+		X := command.Args[SELECTED_X].Value.(int)
+		Y := command.Args[SELECTED_Y].Value.(int)
+
+		newColor := common.GetColor(X, Y, common.NewColorPicker())
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
+			fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
 		}
+
+		sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
 		sequence.UpdateSequenceColor = true
 		sequence.SaveColors = true
-		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.Args[SELECTED_COLOR].Value.(int)))
+
 		return sequence
 
 	case common.UpdateScannerColor:

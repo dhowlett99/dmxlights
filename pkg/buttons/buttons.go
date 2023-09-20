@@ -76,7 +76,7 @@ type CurrentState struct {
 	FunctionLabels            [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed       []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions           [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in sequence colors editing mode.
+	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in select sequence colors editing mode.
 	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
@@ -177,6 +177,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		!this.EditStaticColorsMode[Y] &&
+		!this.EditSequenceColorsMode &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -235,8 +236,8 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
+		!this.EditSequenceColorsMode &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		//sequences[Y].Type != "scanner" && // As long as we're not a scanner sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
 		if debug {
@@ -268,6 +269,7 @@ func ProcessButtons(X int, Y int,
 
 	// P R E S E T S - recall (short press) or delete (long press) the preset.
 	if X >= 100 && X < 108 &&
+		!this.EditSequenceColorsMode &&
 		(Y > 3 && Y < 7) {
 
 		if debug {
@@ -577,7 +579,8 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// P R E S E T S
-	if X < 8 && (Y > 3 && Y < 7) {
+	if X < 8 && (Y > 3 && Y < 7) &&
+		!this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Ask For Config\n")
@@ -646,7 +649,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Decrease Shift.
-	if X == 2 && Y == 7 {
+	if X == 2 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Decrease Shift\n")
@@ -701,7 +704,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Shift.
-	if X == 3 && Y == 7 {
+	if X == 3 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Increase Shift \n")
@@ -755,7 +758,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Decrease speed of selected sequence.
-	if X == 0 && Y == 7 {
+	if X == 0 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Decrease Speed \n")
@@ -833,7 +836,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase speed of selected sequence.
-	if X == 1 && Y == 7 {
+	if X == 1 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Increase Speed \n")
@@ -988,6 +991,8 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 
+		this.EditSequenceColorsMode = false
+
 		// S T O P - If sequence is running, stop it
 		if this.Running[this.SelectedSequence] {
 			if debug {
@@ -1095,7 +1100,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Size decrease.
-	if X == 4 && Y == 7 {
+	if X == 4 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Decrease Size\n")
@@ -1150,7 +1155,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Size.
-	if X == 5 && Y == 7 {
+	if X == 5 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Increase Size\n")
@@ -1207,7 +1212,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time decrease.
-	if X == 6 && Y == 7 {
+	if X == 6 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Decrease Fade Time\n")
@@ -1264,7 +1269,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time increase.
-	if X == 7 && Y == 7 {
+	if X == 7 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
 			fmt.Printf("Increase Fade Time\n")
@@ -1320,6 +1325,7 @@ func ProcessButtons(X int, Y int,
 
 	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
 	if X >= 0 && X < 8 && this.SelectMode[this.SelectedSequence] == NORMAL &&
+		!this.EditSequenceColorsMode &&
 		Y >= 0 &&
 		Y < 4 &&
 		sequences[Y].Type == "switch" {
@@ -1557,15 +1563,15 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E L E C T   R G B   S E Q U E N C E   C O L O R
-	if X >= 0 && X < 8 && Y != -1 &&
-		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
+	if X >= 0 && X < 8 &&
+		Y != -1 && Y < 8 && // Make sure the buttons pressed are within the 64 colors available.
 		!this.EditFixtureSelectionMode &&
 		!this.EditScannerColorsMode &&
 		this.EditSequenceColorsMode {
 
-		if debug {
-			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
-		}
+		//if debug {
+		fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
+		//}
 
 		if this.SelectMode[this.SelectedSequence] == CHASER {
 			this.TargetSequence = this.ChaserSequenceNumber
@@ -1578,7 +1584,8 @@ func ProcessButtons(X int, Y int,
 		cmd := common.Command{
 			Action: common.UpdateSequenceColor,
 			Args: []common.Arg{
-				{Name: "SelectedColor", Value: X},
+				{Name: "SelectedX", Value: X},
+				{Name: "SelectedY", Value: Y},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1955,11 +1962,6 @@ func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, di
 	}
 }
 
-func sineLED(angle int, lights []int) (r, g, b int) {
-
-	return lights[(angle+30)%360], lights[angle], lights[(angle+240)%360]
-}
-
 // For the given sequence show the available scanner selection colors on the relevant buttons.
 func ShowSelectFixtureButtons(targetSequence common.Sequence, displaySequence int, this *CurrentState, eventsForLaunchpad chan common.ALight, action string, guiButtons chan common.ALight) int {
 
@@ -2041,7 +2043,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 			}
 		}
 		if this.GUI {
-			displayErrorPopUp(this.MyWindow, fmt.Sprintf("no colors available for this fixture"))
+			displayErrorPopUp(this.MyWindow, "no colors available for this fixture")
 		}
 
 		return fmt.Errorf("error: no colors available for fixture number %d", this.SelectedFixture+1)
