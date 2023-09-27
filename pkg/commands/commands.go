@@ -497,7 +497,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		X := command.Args[SELECTED_X].Value.(int)
 		Y := command.Args[SELECTED_Y].Value.(int)
 
-		newColor := common.GetColor(X, Y, common.NewColorPicker())
+		newColor := common.GetColor(X, Y)
 		if debug {
 			fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
 		}

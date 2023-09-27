@@ -481,6 +481,7 @@ func main() {
 
 	// Clear the pad. Strobe is set to 0.
 	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
+	buttons.Clear(0, 0, &this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
 	// If present create a thread to listen to launchpad button events.
 	if this.LaunchPadConnected {

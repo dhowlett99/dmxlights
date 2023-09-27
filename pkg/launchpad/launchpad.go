@@ -116,10 +116,10 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 				} else {
 					// Now we're been asked go flash this button.
 					if debug {
-						fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadColorCodeByRGB(alight.OnColor))
-						fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadColorCodeByRGB(alight.OffColor))
+						fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadCodeByRGBColor(alight.OnColor))
+						fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadCodeByRGBColor(alight.OffColor))
 					}
-					err := pad.FlashLight(alight.X, alight.Y, int(common.GetLaunchPadColorCodeByRGB(alight.OnColor)), int(common.GetLaunchPadColorCodeByRGB(alight.OffColor)))
+					err := pad.FlashLight(alight.X, alight.Y, common.GetLaunchPadCodeByRGBColor(alight.OnColor), common.GetLaunchPadCodeByRGBColor(alight.OffColor))
 					if err != nil {
 						fmt.Printf("flash: error writing to launchpad %s\n" + err.Error())
 					}

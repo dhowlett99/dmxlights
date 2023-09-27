@@ -154,7 +154,7 @@ func (pad *Pad) Light(x, y, red int, green int, blue int) error {
 
 // FlashLight flashes the button at x,y with the on and off colors as defined in the
 // Novation Launchpad programmer guide.
-func (pad *Pad) FlashLight(x int, y int, onColor int, offColor int) error {
+func (pad *Pad) FlashLight(x int, y int, onColor byte, offColor byte) error {
 	led := int64((8-y)*10 + x + 1)
 
 	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})
@@ -172,7 +172,7 @@ func (pad *Pad) FlashLight(x int, y int, onColor int, offColor int) error {
 		return err
 	}
 
-	_, err = pad.Write([]byte{byte(onColor), byte(offColor), 0xF7})
+	_, err = pad.Write([]byte{onColor, offColor, 0xF7})
 	if err != nil {
 		return err
 	}
