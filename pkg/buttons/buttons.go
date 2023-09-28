@@ -1959,6 +1959,7 @@ func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, di
 		}
 		common.LabelButton(lamp.X, lamp.Y, lamp.Name, guiButtons)
 
+		time.Sleep(10 * time.Millisecond)
 	}
 }
 

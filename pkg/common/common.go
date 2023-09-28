@@ -1237,8 +1237,8 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 
 	for X := 0; X < 8; X++ {
 
-		for Y := 0; Y < 8; Y++ {
-			if selectedColor >= 64 {
+		for Y := 0; Y < 3; Y++ {
+			if selectedColor >= 24 {
 				break
 			}
 
@@ -1445,7 +1445,7 @@ func newColorPicker() []ColorPicker {
 	colors := []ColorPicker{
 
 		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Color{R: 255, G: 0, B: 0}},
-		{ID: 1, X: 1, Y: 0, Name: "Dark Orange", Code: 0x60, Color: Color{R: 255, G: 111, B: 0}},
+		{ID: 1, X: 1, Y: 0, Name: "Dark Orange", Code: 0x0a, Color: Color{R: 215, G: 65, B: 0}},
 		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Color{R: 255, G: 255, B: 0}},
 		{ID: 3, X: 3, Y: 0, Name: "Forest Green", Code: 0x4C, Color: Color{R: 34, G: 139, B: 34}},
 		{ID: 4, X: 4, Y: 0, Name: "Teal", Code: 0x25, Color: Color{R: 0, G: 128, B: 128}},
@@ -1453,7 +1453,7 @@ func newColorPicker() []ColorPicker {
 		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x51, Color: Color{R: 100, G: 0, B: 255}},
 		{ID: 7, X: 7, Y: 0, Name: "Deep Pink", Code: 0x34, Color: Color{R: 255, G: 20, B: 147}},
 
-		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x048, Color: Color{R: 220, G: 20, B: 60}},
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x039, Color: Color{R: 220, G: 20, B: 60}},
 		{ID: 9, X: 1, Y: 1, Name: "Orange", Code: 0x0A, Color: Color{R: 255, G: 140, B: 0}},
 		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x0A, Color: Color{R: 255, G: 215, B: 0}},
 		{ID: 11, X: 3, Y: 1, Name: "Green", Code: 0x15, Color: Color{R: 0, G: 255, B: 0}},
@@ -1462,7 +1462,7 @@ func newColorPicker() []ColorPicker {
 		{ID: 6, X: 6, Y: 1, Name: "Purple", Code: 0x51, Color: Color{R: 138, G: 43, B: 226}},
 		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Color{R: 255, G: 0, B: 255}},
 
-		{ID: 1, X: 0, Y: 2, Name: "Salmon", Code: 0x0A, Color: Color{R: 250, G: 128, B: 114}},
+		{ID: 1, X: 0, Y: 2, Name: "Salmon", Code: 0x04, Color: Color{R: 250, G: 128, B: 114}},
 		{ID: 1, X: 1, Y: 2, Name: "Light Orange", Code: 0x0d, Color: Color{R: 255, G: 175, B: 0}},
 		{ID: 1, X: 2, Y: 2, Name: "Olive", Code: 0x0d, Color: Color{R: 128, G: 128, B: 0}},
 		{ID: 1, X: 3, Y: 2, Name: "Lawn green", Code: 0x0A, Color: Color{R: 124, G: 252, B: 0}},
