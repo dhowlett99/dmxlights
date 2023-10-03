@@ -76,7 +76,7 @@ type CurrentState struct {
 	FunctionLabels            [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed       []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions           [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in select sequence colors editing mode.
+	EditSequenceColorsMode    bool                       // This flag is true when the sequence is in select sequence chase colors editing mode.
 	EditScannerColorsMode     bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode     bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode      []bool                     // This flag is true when the sequence is in static colors editing mode.
@@ -269,7 +269,6 @@ func ProcessButtons(X int, Y int,
 
 	// P R E S E T S - recall (short press) or delete (long press) the preset.
 	if X >= 100 && X < 108 &&
-		!this.EditSequenceColorsMode &&
 		(Y > 3 && Y < 7) {
 
 		if debug {
@@ -297,6 +296,10 @@ func ProcessButtons(X int, Y int,
 		// Delete a preset - If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
 
+			if debug {
+				fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
+			}
+
 			// Delete the config file
 			config.DeleteConfig(fmt.Sprintf("config%d.%d.json", X, Y))
 
@@ -310,6 +313,10 @@ func ProcessButtons(X int, Y int,
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 		} else {
+			if debug {
+				fmt.Printf("Load Preset X:%d Y:%d\n", X, Y)
+			}
+
 			// Short press means load the config.
 			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
 			this.SelectedSequence = 0
@@ -579,11 +586,15 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// P R E S E T S
-	if X < 8 && (Y > 3 && Y < 7) &&
-		!this.EditSequenceColorsMode {
+	if X < 8 && (Y > 3 && Y < 7) {
 
 		if debug {
 			fmt.Printf("Ask For Config\n")
+		}
+
+		if this.EditSequenceColorsMode {
+			this.EditSequenceColorsMode = false
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		location := fmt.Sprint(X) + "," + fmt.Sprint(Y)
@@ -991,7 +1002,9 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 
-		this.EditSequenceColorsMode = false
+		if this.EditSequenceColorsMode {
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+		}
 
 		// S T O P - If sequence is running, stop it
 		if this.Running[this.SelectedSequence] {
@@ -1324,14 +1337,17 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
-	if X >= 0 && X < 8 && this.SelectMode[this.SelectedSequence] == NORMAL &&
-		!this.EditSequenceColorsMode &&
+	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
 		sequences[Y].Type == "switch" {
 
 		if debug {
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
+		}
+
+		if this.EditSequenceColorsMode {
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// Get an upto date copy of the switch information by updating our copy of the switch sequence.
@@ -1562,9 +1578,9 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// S E L E C T   R G B   S E Q U E N C E   C O L O R
+	// S E L E C T   R G B   S E Q U E N C E  C H A S E  C O L O R's
 	if X >= 0 && X < 8 &&
-		Y != -1 && Y < 8 && // Make sure the buttons pressed are within the 64 colors available.
+		Y != -1 && Y < 3 &&
 		!this.EditFixtureSelectionMode &&
 		!this.EditScannerColorsMode &&
 		this.EditSequenceColorsMode {

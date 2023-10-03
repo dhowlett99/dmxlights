@@ -466,18 +466,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Turn off the edit sequence colors button.
 		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
-			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
-			// Clear the launchpad and remove the 64 color choices.
-			// Reset the launchpad.
-			common.ClearAllButtons(eventsForLaunchpad, guiButtons)
-			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-			common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
-			// Show the static and switch settings.
-			cmd := common.Command{
-				Action: common.UnHide,
-			}
-			common.SendCommandToAllSequence(cmd, commandChannels)
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// Now forget we pressed twice and start again.
@@ -485,5 +474,25 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		return
 	}
+
+}
+
+func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	this.EditSequenceColorsMode = false
+	this.SelectButtonPressed[this.SelectedSequence] = false
+	this.SelectMode[this.SelectedSequence] = NORMAL
+
+	this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+	// Clear the launchpad and remove the 64 color choices.
+	// Reset the launchpad.
+	common.ClearAllButtons(eventsForLaunchpad, guiButtons)
+	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+	common.ShowBottomButtons(this.SelectedType, eventsForLaunchpad, guiButtons)
+	// Show the static and switch settings.
+	cmd := common.Command{
+		Action: common.UnHide,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
 
 }
