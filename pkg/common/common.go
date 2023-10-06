@@ -1544,12 +1544,15 @@ func newColorPicker() []ColorPicker {
 func GetLaunchPadCodeByRGBColor(selectedColor Color) byte {
 
 	colors := newColorPicker()
-	fmt.Printf("Selected Color %+v\n", selectedColor)
+	if debug {
+		fmt.Printf("Selected Color %+v\n", selectedColor)
+	}
 	for _, color := range colors {
 
 		if selectedColor == color.Color {
-
-			fmt.Printf("Color Code %x\n", color.Code)
+			if debug {
+				fmt.Printf("Color Code %x\n", color.Code)
+			}
 			return color.Code
 		}
 	}

@@ -1864,7 +1864,7 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 && Y >= 0 && Y < 3 &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
-		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels)
+		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
 

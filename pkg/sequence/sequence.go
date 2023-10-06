@@ -640,9 +640,9 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Label != "Color.Chase" {
 
 					// Find a new color.
-					newColor := []common.Color{}
-					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
-					sequence.SequenceColors = newColor
+					newColors := []common.Color{}
+					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
+					sequence.SequenceColors = newColors
 
 					// Step through the available colors.
 					sequence.RGBColor++
@@ -693,6 +693,9 @@ func PlaySequence(sequence common.Sequence,
 				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 					sequence.CurrentColors = common.HowManyScannerColors(scannerPositions[fixture])
 				}
+
+				// Make sure the sequence colors holds the correct color from the pattern steps.
+				sequence.SequenceColors = common.HowManyColorsInSteps(steps)
 
 				// This is the inner loop where the sequence runs.
 				// Run through the steps in the sequence.

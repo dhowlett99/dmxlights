@@ -74,7 +74,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Hide = false
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = common.DefaultSequenceColors
+		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
 		sequence.CurrentColors = []common.Color{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED

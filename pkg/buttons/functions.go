@@ -46,7 +46,7 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 	}
 }
 
-func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	debug := false
 
@@ -248,6 +248,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.ClearSelectedRowOfButtons(this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		// Set the colors.
+		// Get an upto date copy of the sequence.
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Remember which sequence we are editing

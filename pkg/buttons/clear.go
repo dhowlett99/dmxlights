@@ -45,6 +45,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Get an upto date copy of the sequence.
 		sequences[this.EditWhichSequence] = common.RefreshSequence(this.EditWhichSequence, commandChannels, updateChannels)
 
+		// Set the colors.
+		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
+
 		// Flash the correct color buttons
 		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
@@ -198,9 +201,14 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 				}
 			}
 		}
+
+		// Set the colors.
+		sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
+
 	}
 
 	// Send reset to all sequences.
+	// Look at the reset process in commands.go as a lot of stuff in the sequence is reset there.
 	cmd := common.Command{
 		Action: common.Reset,
 	}
