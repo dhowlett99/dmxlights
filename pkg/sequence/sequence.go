@@ -642,11 +642,12 @@ func PlaySequence(sequence common.Sequence,
 					// Find a new color.
 					newColors := []common.Color{}
 					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
+					numberOfColors := len(sequence.RGBAvailableColors) - 1
 					sequence.SequenceColors = newColors
 
 					// Step through the available colors.
 					sequence.RGBColor++
-					if sequence.RGBColor > 7 {
+					if sequence.RGBColor > numberOfColors {
 						sequence.RGBColor = 0
 					}
 					steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
@@ -686,12 +687,6 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.SelectedPattern > 3 {
 						sequence.SelectedPattern = 0
 					}
-				}
-
-				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
-				// with the colors from that pattern.
-				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-					sequence.CurrentColors = common.HowManyScannerColors(scannerPositions[fixture])
 				}
 
 				// Make sure the sequence colors holds the correct color from the pattern steps.

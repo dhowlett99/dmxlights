@@ -1611,9 +1611,6 @@ func ProcessButtons(X int, Y int,
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		// Set the colors.
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
-
 		// We call ShowRGBColorSelectionButtons here so the selections will flash as you press them.
 		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
@@ -1659,9 +1656,6 @@ func ProcessButtons(X int, Y int,
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		// Set the colors.
-		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single color DMX message.
 		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.ScannerColor, this.DmxInterfacePresent)
@@ -1956,7 +1950,7 @@ func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, di
 
 		// Check if we need to flash this button.
 		for index, availableColor := range targetSequence.RGBAvailableColors {
-			for _, sequenceColor := range targetSequence.CurrentColors {
+			for _, sequenceColor := range targetSequence.SequenceColors {
 				if availableColor.Color == sequenceColor {
 					if debug {
 						fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)

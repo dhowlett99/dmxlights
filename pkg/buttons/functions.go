@@ -247,10 +247,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 		common.ClearSelectedRowOfButtons(this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
-		// Set the colors.
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Remember which sequence we are editing
 		this.EditWhichSequence = this.TargetSequence
