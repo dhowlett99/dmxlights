@@ -324,6 +324,7 @@ type Sequence struct {
 	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
+	CurrentColors               []Color                     // Storage for the colors in a sequence.
 	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.

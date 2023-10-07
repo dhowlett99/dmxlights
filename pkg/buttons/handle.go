@@ -354,6 +354,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			// Turn off the color selection function key.
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+			// Set the colors.
+			sequences[this.EditWhichSequence].CurrentColors = sequences[this.EditWhichSequence].SequenceColors
 			// Show the colors
 			ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 			return
