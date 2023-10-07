@@ -250,8 +250,12 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Set the colors.
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+
+		// Make sure the sequence colors holds the correct colors from the pattern steps.
+		sequences[this.TargetSequence].SequenceColors = common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps)
+
 		if debug {
-			fmt.Printf("sequences[this.TargetSequence].SequenceColors %+v\n", sequences[this.TargetSequence].SequenceColors)
+			fmt.Printf("Map Function 5 RGB ====> sequences[%d].SequenceColors %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 		}
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 

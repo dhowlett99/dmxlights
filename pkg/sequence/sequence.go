@@ -620,6 +620,8 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 				}
+				// Save the steps temporarily
+				sequence.Pattern.Steps = steps
 
 				if sequence.Label == "chaser" {
 					if sequence.AutoColor {
@@ -693,9 +695,6 @@ func PlaySequence(sequence common.Sequence,
 				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 					sequence.CurrentColors = common.HowManyScannerColors(scannerPositions[fixture])
 				}
-
-				// Make sure the sequence colors holds the correct color from the pattern steps.
-				sequence.SequenceColors = common.HowManyColorsInSteps(steps)
 
 				// This is the inner loop where the sequence runs.
 				// Run through the steps in the sequence.

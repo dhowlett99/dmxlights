@@ -199,8 +199,8 @@ type Pattern struct {
 	Number   int
 	Length   int // 8, 4 or 2
 	Size     int
-	Fixtures int // 8 Fixtures
-	Steps    []Step
+	Fixtures int    // 8 Fixtures
+	Steps    []Step `json:"-"` // Don't save the steps as they can be very large.
 }
 
 type Arg struct {
@@ -867,6 +867,9 @@ func GetColorNameByRGB(color Color) string {
 
 func HowManyColorsInSteps(steps []Step) (colors []Color) {
 
+	if debug {
+		fmt.Printf("HowManyColorsInSteps \n")
+	}
 	colorMap := make(map[Color]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
@@ -877,6 +880,9 @@ func HowManyColorsInSteps(steps []Step) (colors []Color) {
 	}
 
 	for color := range colorMap {
+		if debug {
+			fmt.Printf("add color %+v\n", color)
+		}
 		colors = append(colors, color)
 	}
 
