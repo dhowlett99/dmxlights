@@ -250,6 +250,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Set the colors.
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+		if debug {
+			fmt.Printf("sequences[this.TargetSequence].SequenceColors %+v\n", sequences[this.TargetSequence].SequenceColors)
+		}
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Remember which sequence we are editing
