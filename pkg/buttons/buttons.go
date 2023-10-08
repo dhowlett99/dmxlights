@@ -1615,8 +1615,8 @@ func ProcessButtons(X int, Y int,
 		// Set the colors.
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
-		// We call ShowRGBColorSelectionButtons here so the selections will flash as you press them.
-		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		// We call ShowRGBColorPicker here so the selections will flash as you press them.
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		return
 	}
@@ -1767,7 +1767,7 @@ func ProcessButtons(X int, Y int,
 		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in any sequence
 
 		if debug {
-			fmt.Printf("Update Static for X %d\n", X)
+			fmt.Printf("Update Static for X %d  Y %d\n", X, Y)
 		}
 
 		this.TargetSequence = this.EditWhichSequence
@@ -1942,11 +1942,11 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
-// With the new color picker there can be 64 colors displayed.
-func ShowRGBColorSelectionButtons(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+// With the new color picker there can be 24 colors displayed.
+func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("Show Color Selection Buttons\n")
+		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
 	}
 
 	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
