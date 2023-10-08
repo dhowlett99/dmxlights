@@ -51,6 +51,7 @@ type CurrentState struct {
 	SelectedSequence          int                        // The currently selected sequence.
 	TargetSequence            int                        // The current target sequence.
 	DisplaySequence           int                        // The current display sequence.
+	SavedSequenceColors       map[int][]common.Color     // Local storage for sequence colors.
 	SelectedType              string                     // The currently selected sequenece type.
 	LastSelectedSequence      int                        // Store fof the last selected squence.
 	Speed                     map[int]int                // Local copy of sequence speed. Indexed by sequence.
@@ -1598,7 +1599,7 @@ func ProcessButtons(X int, Y int,
 		}
 		// Add the selected color to the sequence.
 		cmd := common.Command{
-			Action: common.UpdateSequenceColor,
+			Action: common.UpdateASingeSequenceColor,
 			Args: []common.Arg{
 				{Name: "SelectedX", Value: X},
 				{Name: "SelectedY", Value: Y},

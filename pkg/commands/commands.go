@@ -453,20 +453,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = false
 		return sequence
 
-	// case common.UpdateMode:
-	// 	const MODE = 0
-	// 	if debug {
-	// 		fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Args[MODE].Value)
-	// 	}
-	// 	sequence.Mode = command.Args[MODE].Value.(string)
-	// 	if sequence.Mode == "Static" {
-	// 		sequence.Static = true
-	// 	}
-	// 	if sequence.Mode == "Sequence" {
-	// 		sequence.Static = false
-	// 	}
-	// 	return sequence
-
 	case common.UpdateStaticColor:
 		const STATIC = 0            // Boolean
 		const STATIC_LAMP = 1       // Integer
@@ -490,7 +476,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
 		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
 
-	case common.UpdateSequenceColor:
+	case common.UpdateASingeSequenceColor:
 		const SELECTED_X = 0
 		const SELECTED_Y = 1
 
@@ -503,6 +489,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 
 		sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
+		sequence.UpdateSequenceColor = true
+		sequence.SaveColors = true
+
+		return sequence
+
+	case common.UpdateSequenceColors:
+		const COLORS = 0
+		if debug {
+			fmt.Printf("%d: Command Update Sequence Color to %+v\n", mySequenceNumber, command.Args[COLORS].Value)
+		}
+
+		sequence.SequenceColors = command.Args[COLORS].Value.([]common.Color)
 		sequence.UpdateSequenceColor = true
 		sequence.SaveColors = true
 

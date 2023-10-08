@@ -223,7 +223,8 @@ const (
 	UpdateStatic
 	UpdateBounce
 	UpdateStaticColor
-	UpdateSequenceColor
+	UpdateASingeSequenceColor
+	UpdateSequenceColors
 	PlayStaticOnce
 	PlaySwitchOnce
 	UnHide

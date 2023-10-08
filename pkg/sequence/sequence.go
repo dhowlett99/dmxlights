@@ -506,6 +506,11 @@ func PlaySequence(sequence common.Sequence,
 					steps = RGBPattern.Steps
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
+
+					// If we are updating the pattern, we also set the represention of the sequence colors.
+					if sequence.UpdatePattern {
+						sequence.SequenceColors = common.HowManyColorsInSteps(steps)
+					}
 					sequence.UpdatePattern = false
 
 					// Initialise chaser.

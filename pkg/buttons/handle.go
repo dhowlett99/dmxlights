@@ -467,6 +467,22 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Turn off the edit sequence colors button.
 		if this.EditSequenceColorsMode {
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			// If the Selected Color has come back as empty this means we didn't select any colors.
+			// So restore the colors that were already there.
+			fmt.Printf("sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+			if len(sequences[this.SelectedSequence].SequenceColors) == 0 {
+				fmt.Printf("Restore Sequence Colors\n")
+				sequences[this.SelectedSequence].SequenceColors = this.SavedSequenceColors[this.SelectedSequence]
+				fmt.Printf("Now set to ----> sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+				// Tell the sequence that we have restored the colors.
+				cmd := common.Command{
+					Action: common.UpdateSequenceColors,
+					Args: []common.Arg{
+						{Name: "Colors", Value: sequences[this.SelectedSequence].SequenceColors},
+					},
+				}
+				common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			}
 		}
 
 		// Now forget we pressed twice and start again.

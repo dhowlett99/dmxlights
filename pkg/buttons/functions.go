@@ -259,6 +259,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
+		// Also save the sequence colors in local represention, so if the user doesn't select any colors we can restore the existing colors.
+		this.SavedSequenceColors[this.SelectedSequence] = sequences[this.SelectedSequence].SequenceColors
+
 		// Remember which sequence we are editing
 		this.EditWhichSequence = this.TargetSequence
 
