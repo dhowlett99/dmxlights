@@ -1787,9 +1787,9 @@ func ProcessButtons(X int, Y int,
 
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])
 
-		//if debug {
-		fmt.Printf("Fixture %d Setting Current Color as %+v\n", this.SelectedFixtureNumber, color)
-		//}
+		if debug {
+			fmt.Printf("Fixture %d Setting Current Color as %+v\n", this.SelectedFixtureNumber, color)
+		}
 
 		// Set the fixture color so that it flashs in the color picker.
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
@@ -1995,7 +1995,9 @@ func SetRGBColorPicker(selectedColor common.Color, targetSequence common.Sequenc
 
 	for _, availableColor := range targetSequence.RGBAvailableColors {
 		if availableColor.Color == selectedColor {
-			fmt.Printf("Adding color %+v\n", selectedColor)
+			if debug {
+				fmt.Printf("Adding color %+v\n", selectedColor)
+			}
 			targetSequence.CurrentColors = append(targetSequence.CurrentColors, selectedColor)
 		}
 	}
@@ -2046,7 +2048,9 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 		}
 		if lamp.Flash {
 			Black := common.Color{R: 0, G: 0, B: 0}
-			fmt.Printf("FLASH myFixtureNumber X:%d Y:%d Color %+v \n", lamp.X, lamp.Y, lamp.Color)
+			if debug {
+				fmt.Printf("FLASH myFixtureNumber X:%d Y:%d Color %+v \n", lamp.X, lamp.Y, lamp.Color)
+			}
 			common.FlashLight(lamp.X, lamp.Y, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
 			common.LightLamp(common.ALight{X: lamp.X, Y: lamp.Y, Brightness: master, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B}, eventsForLaunchpad, guiButtons)
