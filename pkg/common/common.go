@@ -1557,7 +1557,7 @@ func GetLaunchPadCodeByRGBColor(selectedColor Color) byte {
 
 		if selectedColor == color.Color {
 			if debug {
-				fmt.Printf("Color Code %x\n", color.Code)
+				fmt.Printf("Color Name %s Code %x\n", color.Name, color.Code)
 			}
 			return color.Code
 		}

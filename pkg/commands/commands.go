@@ -454,15 +454,15 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.UpdateStaticColor:
-		const STATIC = 0            // Boolean
-		const STATIC_LAMP = 1       // Integer
-		const STATIC_LAMP_FLASH = 2 // Boolean
-		const SELECTED_COLOR = 3    // Integer
-		const STATIC_COLOR = 4      // Color
+		const STATIC = 0                // Boolean
+		const STATIC_FIXTURE_NUMBER = 1 // Integer
+		const STATIC_FIXTURE_FLASH = 2  // Boolean
+		const SELECTED_COLOR = 3        // Integer
+		const STATIC_COLOR = 4          // Color
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
-			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[SELECTED_COLOR].Value, command.Args[STATIC_LAMP_FLASH].Value)
+			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 		}
 		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
@@ -472,9 +472,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			sequence.StaticColors[fixture].Flash = false
 		}
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].SelectedColor = command.Args[SELECTED_COLOR].Value.(int)
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].SelectedColor = command.Args[SELECTED_COLOR].Value.(int)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 
 	case common.UpdateASingeSequenceColor:
 		const SELECTED_X = 0
