@@ -616,12 +616,14 @@ func PlaySequence(sequence common.Sequence,
 							sequence.AutoColor = false
 						}
 					} else {
-						// We are updating color in sequence.
-						steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-						// Save the current color selection.
-						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
-							sequence.SaveColors = false
+						// We are updating color in sequence and sequence colors are set.
+						if len(sequence.SequenceColors) > 0 {
+							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+							// Save the current color selection.
+							if sequence.SaveColors {
+								sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
+								sequence.SaveColors = false
+							}
 						}
 					}
 				}
