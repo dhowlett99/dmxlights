@@ -60,6 +60,10 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
 
+		if this.EditStaticColorsMode[this.EditWhichSequence] {
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+		}
+
 		// Back to the begining of the rotation.
 		if this.SelectColorBar[this.TargetSequence] > common.MAX_COLOR_BAR {
 			this.SelectColorBar[this.TargetSequence] = 0

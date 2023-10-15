@@ -523,7 +523,6 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 	this.SelectButtonPressed[this.SelectedSequence] = false
 	this.SelectMode[this.SelectedSequence] = NORMAL
-
 	this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 
 	// Clear the first three launchpad rows used by the color picker.
