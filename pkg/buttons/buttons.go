@@ -1766,7 +1766,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   S T A T I C   C O L O R
+	// S E L E C T   S T A T I C   F I X T U R E
 	if X >= 0 && X < 8 &&
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
@@ -1785,17 +1785,15 @@ func ProcessButtons(X int, Y int,
 		color := sequences[this.TargetSequence].StaticColors[X].Color
 		empty := common.Color{}
 		if color == empty {
-			color = FindCurrentColor(X, Y, *sequences[this.TargetSequence])
+			color = FindCurrentColor(this.SelectedFixtureNumber, this.SelectedSequence, *sequences[this.TargetSequence])
 		}
 
 		if debug {
-			fmt.Printf("Fixture %d Setting Current Color as %+v\n", this.SelectedFixtureNumber, color)
+			fmt.Printf("Sequence %d Fixture %d Setting Current Color as %+v\n", this.SelectedSequence, this.SelectedFixtureNumber, color)
 		}
 
 		// Set the fixture color so that it flashs in the color picker.
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
-
-		// time.Sleep(100 * time.Millisecond)
 
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
 		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
@@ -1807,28 +1805,24 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E T   S T A T I C   C O L O R
-	if X >= 0 && X < 8 &&
-		Y != -1 &&
-		!this.EditFixtureSelectionMode &&
+	if X >= 0 && X < 8 && Y != -1 &&
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
-		this.EditColorPicker && // In Color Picker Mode.
-		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in any sequence
+		this.EditColorPicker && // Now We Are In Color Picker Mode.
+		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
+		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in this sequence
 
+		// Find the color from the button pressed.
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])
 
 		if debug {
-			fmt.Printf("Selected Static Color for X %d  Y %d to Color %+v\n", X, Y, color)
+			fmt.Printf("Selected Static Color for X %d  Y %d to Color %+v\n", this.SelectedFixtureNumber, Y, color)
 		}
-
-		//sequences[this.TargetSequence].CurrentColors = append(sequences[this.TargetSequence].CurrentColors, colorPicker.Color)
-
-		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
 
 		// Set the fixture color so that it flashs in the color picker.
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// Set our local copy of the color.
-		sequences[this.TargetSequence].StaticColors[X].Color = color
+		sequences[this.TargetSequence].StaticColors[this.SelectedFixtureNumber].Color = color
 
 		// Tell the sequence about the new color and where we are in the
 		// color cycle.
@@ -1838,21 +1832,22 @@ func ProcessButtons(X int, Y int,
 				{Name: "Static", Value: true},
 				{Name: "FixtureNumber", Value: this.SelectedFixtureNumber},
 				{Name: "StaticLampFlash", Value: false},
-				{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[X].SelectedColor},
-				{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[X].Color},
+				{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedFixtureNumber].SelectedColor},
+				{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedFixtureNumber].Color},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		this.LastStaticColorButtonX = X
+		this.LastStaticColorButtonX = this.SelectedFixtureNumber
 		this.LastStaticColorButtonY = Y
 
+		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
 		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
 			sequences[this.TargetSequence].StaticColors[x].FirstPress = false
 		}
-		sequences[this.TargetSequence].StaticColors[X].FirstPress = true
+		sequences[this.TargetSequence].StaticColors[this.SelectedFixtureNumber].FirstPress = true
 
 		// Remove the color picker and reveal the sequence.
 		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
