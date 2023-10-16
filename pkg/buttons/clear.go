@@ -64,11 +64,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
-		// Back to the begining of the rotation.
-		if this.SelectColorBar[this.TargetSequence] > common.MAX_COLOR_BAR {
-			this.SelectColorBar[this.TargetSequence] = 0
-		}
-
 		// First press resets the colors to the default color bar.
 		if this.SelectColorBar[this.TargetSequence] == 0 {
 			// Clear the sequence colors for this sequence.
@@ -77,22 +72,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
-
-		// Rotate around solid colors.
-		if this.SelectColorBar[this.TargetSequence] > 0 {
-
-			// Clear the sequence colors for this sequence.
-			cmd := common.Command{
-				Action: common.SetStaticColorBar,
-				Args: []common.Arg{
-					{Name: "Selection", Value: this.SelectColorBar[this.TargetSequence]},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
-		// Now increment the color bar.
-		this.SelectColorBar[this.TargetSequence]++
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
@@ -105,8 +84,11 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.DisplaySequence, guiButtons)
 		this.SelectMode[this.SelectedSequence] = this.LastMode[this.SelectedSequence]
-		// The sequence will automatically display the static colors now!
 
+		// Clear the select all fixtures flag.
+		this.SelectAllStaticFixtures = false
+
+		// The sequence will automatically display the static colors now!
 		return
 	}
 
