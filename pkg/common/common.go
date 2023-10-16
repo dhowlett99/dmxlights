@@ -221,6 +221,7 @@ const (
 	Reset
 	UpdateMode
 	UpdateStatic
+	UpdateFlashAllStaticColorButtons
 	UpdateBounce
 	UpdateStaticColor
 	UpdateASingeSequenceColor

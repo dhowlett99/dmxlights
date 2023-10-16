@@ -409,7 +409,7 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				// Done fading for this static scene onlt reset when we set a static scene again.
+				// Done fading for this static scene only reset when we set a static scene again.
 				sequence.StaticFadeOnce = false
 
 				// Prepare a message to be sent to the fixtures in the sequence.

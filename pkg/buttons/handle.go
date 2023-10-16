@@ -35,7 +35,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -138,11 +138,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
 
-		if this.EditStaticColorsMode[this.DisplaySequence] && !this.EditColorPicker {
+		if !this.SelectAllStaticFixtures && this.EditStaticColorsMode[this.DisplaySequence] && !this.EditColorPicker {
 			if debug {
 				fmt.Printf("%d: Select All\n", this.DisplaySequence)
 			}
 			this.SelectAllStaticFixtures = true
+			// Update all the fixtures so they will flash.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Assume everything else is off.
@@ -257,6 +265,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Set function mode.
 		this.SelectMode[this.SelectedSequence] = FUNCTION
+
+		// Toggle the select all static fixuure off.
+		if this.SelectAllStaticFixtures {
+			this.SelectAllStaticFixtures = false
+			// Update all the fixtures so they will stop flashing.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		}
 
 		// And hide the sequence so we can only see the function buttons.
 		common.HideSequence(this.SelectedSequence, commandChannels)
