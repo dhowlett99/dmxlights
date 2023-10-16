@@ -34,7 +34,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
-	if this.EditSequenceColorsMode {
+	if this.EditSequenceColorsMode && !this.ClearPressed[this.TargetSequence] {
 
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
@@ -50,6 +50,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Flash the correct color buttons
 		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+
+		// Clear has been pressed, next time we press clear we will get the full clear.
+		this.ClearPressed[this.TargetSequence] = true
 
 		return
 	}

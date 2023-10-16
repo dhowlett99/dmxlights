@@ -1606,6 +1606,10 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 			this.DisplaySequence = this.SelectedSequence
 		}
+
+		// Reset the clear button so you can clear this selection if required.
+		this.ClearPressed[this.TargetSequence] = false
+
 		// Add the selected color to the sequence.
 		cmd := common.Command{
 			Action: common.UpdateASingeSequenceColor,
