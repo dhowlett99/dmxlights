@@ -314,6 +314,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = true
 
+		// Start off in single fixture edit mode.
+		this.SelectAllStaticFixtures = false
+
 		if this.ScannerChaser {
 			// Turn on edit static color mode in the scanner sequence.
 			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true

@@ -35,7 +35,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := false
+	debug := true
 
 	if this.SelectMode[this.SelectedSequence] == CHASER {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -136,6 +136,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		!this.SelectButtonPressed[this.DisplaySequence] {
 		if debug {
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
+		}
+
+		if this.EditStaticColorsMode[this.DisplaySequence] && !this.EditColorPicker {
+			if debug {
+				fmt.Printf("%d: Select All\n", this.DisplaySequence)
+			}
+			this.SelectAllStaticFixtures = true
 		}
 
 		// Assume everything else is off.
