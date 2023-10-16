@@ -55,7 +55,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.EditWhichSequence] {
+	if this.EditStaticColorsMode[this.EditWhichSequence] && !this.ClearPressed[this.TargetSequence] {
 
 		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -65,7 +65,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// First press resets the colors to the default color bar.
-		if this.SelectColorBar[this.TargetSequence] == 0 {
+		if !this.ClearPressed[this.TargetSequence] {
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.ClearStaticColor,
@@ -87,6 +87,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Clear the select all fixtures flag.
 		this.SelectAllStaticFixtures = false
+
+		// Clear has been pressed, next time we press clear we will get the full clear.
+		this.ClearPressed[this.TargetSequence] = true
 
 		// The sequence will automatically display the static colors now!
 		return
@@ -215,6 +218,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Clear the graphics labels.
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
+	// Reset the counter that counts how many times we've pressed the clear button.
+	this.ClearPressed[this.TargetSequence] = false
 
 	// Reset the launchpad.
 	if this.LaunchPadConnected {

@@ -110,7 +110,7 @@ type CurrentState struct {
 	StaticButtons               []common.StaticColorButton // Storage for the color of the static buttons.
 	SelectedGobo                int                        // The selected GOBO.
 	ButtonTimer                 *time.Time                 // Button Timer
-	SelectColorBar              map[int]int                // Storage for color bar in static color selection. Indexed by sequence.
+	ClearPressed                map[int]bool               // Storage clear pressed in static color selection. Indexed by sequence.
 	SwitchChannels              []common.SwitchChannel     // Used for communicating with mini-sequencers on switches.
 	LaunchPadConnected          bool                       // Flag to indicate presence of Novation Launchpad.
 	DmxInterfacePresent         bool                       // Flag to indicate precence of DMX interface card
@@ -1781,6 +1781,9 @@ func ProcessButtons(X int, Y int,
 
 		// Save the selected fixture number.
 		this.SelectedStaticFixtureNumber = X
+
+		// Reset Clear pressed flag so we can clear next selection
+		this.ClearPressed[this.TargetSequence] = false
 
 		// The current color is help in our local copy.
 		color := sequences[this.TargetSequence].StaticColors[X].Color
