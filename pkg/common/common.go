@@ -1451,99 +1451,33 @@ func newColorPicker() []ColorPicker {
 
 	colors := []ColorPicker{
 
-		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Color{R: 255, G: 0, B: 0}},
-		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x0a, Color: Color{R: 255, G: 140, B: 0}},
-		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Color{R: 255, G: 255, B: 0}},
-		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Color{R: 0, G: 255, B: 0}},
-		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Color{R: 0, G: 255, B: 255}},
-		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Color{R: 0, G: 0, B: 255}},
-		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x51, Color: Color{R: 100, G: 0, B: 255}},
-		{ID: 7, X: 7, Y: 0, Name: "Pink", Code: 0x34, Color: Color{R: 255, G: 0, B: 255}},
+		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Color{R: 255, G: 0, B: 0}},      // Launchpad code checked.
+		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Color{R: 255, G: 100, B: 0}}, // Launchpad code checked.
+		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Color{R: 255, G: 255, B: 0}}, // Launchpad code checked.
+		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Color{R: 0, G: 255, B: 0}},    // Launchpad code checked.
+		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x24, Color: Color{R: 0, G: 255, B: 255}},
+		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Color{R: 0, G: 0, B: 255}},      // Launchpad code checked.
+		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x51, Color: Color{R: 100, G: 0, B: 255}},  // Launchpad code checked.
+		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Color{R: 255, G: 0, B: 255}}, // Launchpad code checked.
 
-		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x039, Color: Color{R: 220, G: 20, B: 60}},
-		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0b, Color: Color{R: 215, G: 50, B: 0}},
-		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x0A, Color: Color{R: 255, G: 215, B: 0}},
-		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x4C, Color: Color{R: 34, G: 139, B: 34}},
-		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x25, Color: Color{R: 127, G: 255, B: 212}},
-		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x43, Color: Color{R: 0, G: 191, B: 255}},
-		{ID: 6, X: 6, Y: 1, Name: "Purple", Code: 0x51, Color: Color{R: 138, G: 43, B: 226}},
-		{ID: 15, X: 7, Y: 1, Name: "Deep Pink", Code: 0x34, Color: Color{R: 255, G: 20, B: 147}},
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x3a, Color: Color{R: 220, G: 20, B: 60}},
+		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: Color{R: 215, G: 50, B: 0}},  // Launchpad code checked.
+		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Color{R: 255, G: 215, B: 0}},       // Launchpad code checked.
+		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: Color{R: 0, G: 100, B: 0}}, // Launchpad code checked.
+		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Color{R: 127, G: 255, B: 212}},     // Launchpad code checked.
+		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: Color{R: 0, G: 191, B: 255}},   // Launchpad code checked.
+		{ID: 14, X: 6, Y: 1, Name: "Purple", Code: 0x35, Color: Color{R: 138, G: 43, B: 226}},
+		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Color{R: 255, G: 105, B: 180}}, // Launchpad code checked.
 
-		{ID: 1, X: 0, Y: 2, Name: "Salmon", Code: 0x04, Color: Color{R: 250, G: 128, B: 114}},
-		{ID: 1, X: 1, Y: 2, Name: "Light Orange", Code: 0x6C, Color: Color{R: 255, G: 175, B: 0}},
-		{ID: 1, X: 2, Y: 2, Name: "Olive", Code: 0x0d, Color: Color{R: 128, G: 128, B: 0}},
-		{ID: 1, X: 3, Y: 2, Name: "Lawn green", Code: 0x0A, Color: Color{R: 124, G: 252, B: 0}},
-		{ID: 1, X: 4, Y: 2, Name: "Teal", Code: 0x25, Color: Color{R: 0, G: 128, B: 128}},
-		{ID: 1, X: 5, Y: 2, Name: "Light Blue", Code: 0x25, Color: Color{R: 173, G: 216, B: 230}},
-		{ID: 14, X: 6, Y: 2, Name: "Violet", Code: 0x51, Color: Color{R: 199, G: 21, B: 133}},
-		{ID: 1, X: 7, Y: 2, Name: "White", Code: 0x03, Color: Color{R: 255, G: 255, B: 255}},
+		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x78, Color: Color{R: 250, G: 128, B: 114}},
+		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x09, Color: Color{R: 255, G: 175, B: 0}},
+		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x13, Color: Color{R: 150, G: 150, B: 0}},
+		{ID: 9, X: 3, Y: 2, Name: "Lawn green", Code: 0x15, Color: Color{R: 124, G: 252, B: 0}},
+		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Color{R: 0, G: 128, B: 128}}, // Launchpad code checked.
+		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x25, Color: Color{R: 173, G: 216, B: 230}},
+		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x51, Color: Color{R: 199, G: 21, B: 133}},
+		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: Color{R: 255, G: 255, B: 255}}, // Launchpad code checked.
 	}
-
-	// {ID: 2, X: 2, Y: 0, Name: "firebrick", Code: 0x75, Color: Color{R: 178, G: 34, B: 34}},
-	// {ID: 3, X: 3, Y: 0, Name: "crimson", Code: 0x048, Color: Color{R: 220, G: 20, B: 60}},
-	// {ID: 4, X: 4, Y: 0, Name: "red", Code: 0x05, Color: Color{R: 255, G: 0, B: 0}},
-	// {ID: 5, X: 5, Y: 0, Name: "tomato", Code: 0x6b, Color: Color{R: 255, G: 99, B: 71}},
-
-	// {ID: 6, X: 6, Y: 0, Name: "coral", Code: 0x54, Color: Color{R: 255, G: 127, B: 80}},
-	// {ID: 7, X: 7, Y: 0, Name: "light", Code: 0x0A, Color: Color{R: 240, G: 128, B: 128}},
-	// {ID: 0, X: 0, Y: 0, Name: "black", Code: 0x00, Color: Color{R: 0, G: 0, B: 0}},
-
-	// {ID: 8, X: 0, Y: 1, Name: "dark salmon", Code: 0x0A, Color: Color{R: 233, G: 150, B: 122}},
-	// {ID: 9, X: 1, Y: 1, Name: "salmon", Code: 0x0A, Color: Color{R: 250, G: 128, B: 114}},
-	// {ID: 10, X: 2, Y: 1, Name: "light", Code: 0x0A, Color: Color{R: 255, G: 160, B: 122}},
-	// {ID: 11, X: 3, Y: 1, Name: "dark orange", Code: 0x0A, Color: Color{R: 255, G: 140, B: 0}},
-	// {ID: 12, X: 4, Y: 1, Name: "orange", Code: 0x0A, Color: Color{R: 255, G: 165, B: 0}},
-	// {ID: 13, X: 5, Y: 1, Name: "gold", Code: 0x0A, Color: Color{R: 255, G: 215, B: 0}},
-	// {ID: 14, X: 6, Y: 1, Name: "yellow", Code: 0x0A, Color: Color{R: 255, G: 255, B: 0}},
-	// {ID: 15, X: 7, Y: 1, Name: "yellow green", Code: 0x0A, Color: Color{R: 154, G: 205, B: 50}},
-	// {ID: 16, X: 0, Y: 2, Name: "lawn green", Code: 0x0A, Color: Color{R: 124, G: 252, B: 0}},
-	// {ID: 17, X: 1, Y: 2, Name: "chart reuse", Code: 0x0A, Color: Color{R: 127, G: 255, B: 0}},
-	// {ID: 18, X: 2, Y: 2, Name: "green yellow", Code: 0x0A, Color: Color{R: 173, G: 255, B: 47}},
-	// {ID: 19, X: 3, Y: 2, Name: "dark green", Code: 0x0A, Color: Color{R: 0, G: 100, B: 0}},
-	// {ID: 20, X: 4, Y: 2, Name: "green", Code: 0x0A, Color: Color{R: 0, G: 255, B: 0}},
-	// {ID: 21, X: 5, Y: 2, Name: "forest green", Code: 0x0A, Color: Color{R: 34, G: 139, B: 34}},
-	// {ID: 22, X: 6, Y: 2, Name: "sea green", Code: 0x0A, Color: Color{R: 46, G: 139, B: 87}},
-	// {ID: 23, X: 7, Y: 2, Name: "medium sea green", Code: 0x0A, Color: Color{R: 60, G: 179, B: 113}},
-	// {ID: 24, X: 0, Y: 3, Name: "light sea green", Code: 0x0A, Color: Color{R: 32, G: 178, B: 170}},
-	// {ID: 25, X: 1, Y: 3, Name: "aqua", Code: 0x0A, Color: Color{R: 0, G: 255, B: 255}},
-	// {ID: 26, X: 2, Y: 3, Name: "cyan", Code: 0x0A, Color: Color{R: 0, G: 255, B: 255}},
-	// {ID: 27, X: 3, Y: 3, Name: "dark turquoise", Code: 0x0A, Color: Color{R: 0, G: 206, B: 209}},
-	// {ID: 28, X: 4, Y: 3, Name: "turquoise", Code: 0x0A, Color: Color{R: 64, G: 224, B: 208}},
-	// {ID: 29, X: 5, Y: 3, Name: "medium turquoise", Code: 0x0A, Color: Color{R: 72, G: 209, B: 204}},
-	// {ID: 30, X: 6, Y: 3, Name: "aqua marine", Code: 0x0A, Color: Color{R: 127, G: 255, B: 212}},
-	// {ID: 31, X: 7, Y: 3, Name: "deep sky blue", Code: 0x0A, Color: Color{R: 0, G: 191, B: 255}},
-	// {ID: 32, X: 0, Y: 4, Name: "dodger blue", Code: 0x0A, Color: Color{R: 30, G: 144, B: 255}},
-	// {ID: 33, X: 1, Y: 4, Name: "light blue", Code: 0x0A, Color: Color{R: 173, G: 216, B: 230}},
-	// {ID: 34, X: 2, Y: 4, Name: "sky blue", Code: 0x0A, Color: Color{R: 135, G: 206, B: 235}},
-	// {ID: 35, X: 3, Y: 4, Name: "midnight blue", Code: 0x0A, Color: Color{R: 25, G: 25, B: 112}},
-	// {ID: 36, X: 4, Y: 4, Name: "navy", Code: 0x0A, Color: Color{R: 0, G: 0, B: 128}},
-	// {ID: 37, X: 5, Y: 4, Name: "dark blue", Code: 0x0A, Color: Color{R: 0, G: 0, B: 139}},
-	// {ID: 38, X: 6, Y: 4, Name: "medium blue", Code: 0x0A, Color: Color{R: 0, G: 0, B: 205}},
-	// {ID: 39, X: 7, Y: 4, Name: "blue", Code: 0x0A, Color: Color{R: 0, G: 0, B: 255}},
-	// {ID: 40, X: 0, Y: 5, Name: "royal blue", Code: 0x0A, Color: Color{R: 65, G: 105, B: 225}},
-	// {ID: 41, X: 1, Y: 5, Name: "blue violet", Code: 0x0A, Color: Color{R: 138, G: 43, B: 226}},
-	// {ID: 42, X: 2, Y: 5, Name: "dark orchid", Code: 0x0A, Color: Color{R: 153, G: 50, B: 204}},
-	// {ID: 43, X: 3, Y: 5, Name: "violet", Code: 0x0A, Color: Color{R: 238, G: 130, B: 238}},
-	// {ID: 44, X: 4, Y: 5, Name: "magenta / fuchsia", Code: 0x0A, Color: Color{R: 255, G: 0, B: 255}},
-	// {ID: 45, X: 5, Y: 5, Name: "orchid", Code: 0x0A, Color: Color{R: 218, G: 112, B: 214}},
-	// {ID: 46, X: 6, Y: 5, Name: "medium violet red", Code: 0x0A, Color: Color{R: 199, G: 21, B: 133}},
-	// {ID: 47, X: 7, Y: 5, Name: "deep pink", Code: 0x0A, Color: Color{R: 255, G: 20, B: 147}},
-	// {ID: 48, X: 0, Y: 6, Name: "hot pink", Code: 0x0A, Color: Color{R: 255, G: 105, B: 180}},
-	// {ID: 49, X: 1, Y: 6, Name: "light pink", Code: 0x0A, Color: Color{R: 255, G: 182, B: 193}},
-	// {ID: 50, X: 2, Y: 6, Name: "pink", Code: 0x0A, Color: Color{R: 255, G: 192, B: 203}},
-	// {ID: 51, X: 3, Y: 6, Name: "sienna", Code: 0x0A, Color: Color{R: 160, G: 82, B: 45}},
-	// {ID: 52, X: 4, Y: 6, Name: "chocolate", Code: 0x0A, Color: Color{R: 210, G: 105, B: 30}},
-	// {ID: 53, X: 5, Y: 6, Name: "peru", Code: 0x0A, Color: Color{R: 205, G: 133, B: 63}},
-	// {ID: 54, X: 6, Y: 6, Name: "sandy brown", Code: 0x0A, Color: Color{R: 244, G: 164, B: 96}},
-	// {ID: 54, X: 7, Y: 6, Name: "tan", Code: 0x0A, Color: Color{R: 210, G: 180, B: 140}},
-	// {ID: 56, X: 0, Y: 7, Name: "rosy brown", Code: 0x0A, Color: Color{R: 188, G: 143, B: 143}},
-	// {ID: 57, X: 1, Y: 7, Name: "moccasin", Code: 0x0A, Color: Color{R: 255, G: 228, B: 181}},
-	// {ID: 58, X: 2, Y: 7, Name: "navajo white", Code: 0x0A, Color: Color{R: 255, G: 222, B: 173}},
-	// {ID: 59, X: 3, Y: 7, Name: "slate gray", Code: 0x0A, Color: Color{R: 112, G: 128, B: 144}},
-	// {ID: 60, X: 4, Y: 7, Name: "light steel blue", Code: 0x0A, Color: Color{R: 176, G: 196, B: 222}},
-	// {ID: 61, X: 5, Y: 7, Name: "lavender", Code: 0x0A, Color: Color{R: 230, G: 230, B: 250}},
-	// {ID: 62, X: 6, Y: 7, Name: "alice blue", Code: 0x0A, Color: Color{R: 240, G: 248, B: 255}},
-	// {ID: 63, X: 7, Y: 7, Name: "white", Code: 0x0A, Color: Color{R: 255, G: 255, B: 255}},
 
 	return colors
 }
