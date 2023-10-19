@@ -195,33 +195,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		Bold: true,
 	}
 
-	var headerText = [][]string{{"ID", "Type", "Group", "No", "Name", "Label", "DMX", "Description", "-", "+", "Channels"},
-		{"ID", "Type", "Group", "No", "Name", "Label", "DMX", "Description", "-", "+", "Channels"}}
-
-	header := widget.NewTable(
-
-		func() (int, int) {
-			return len(headerText), len(headerText[0])
-		},
-		func() fyne.CanvasObject {
-			return widget.NewLabel("headerText items")
-		},
-		func(i widget.TableCellID, o fyne.CanvasObject) {
-			o.(*widget.Label).SetText(headerText[i.Row][i.Col])
-		})
-
-	header.SetColumnWidth(0, 40)  // Id
-	header.SetColumnWidth(1, 100) // Type
-	header.SetColumnWidth(2, 61)  // Sequence Number
-	header.SetColumnWidth(3, 59)  // Fixture Number
-	header.SetColumnWidth(4, 80)  // Name
-	header.SetColumnWidth(5, 80)  // Label
-	header.SetColumnWidth(6, 50)  // DMX Address
-	header.SetColumnWidth(7, 140) // Description
-	header.SetColumnWidth(8, 20)  // Delete Button
-	header.SetColumnWidth(9, 20)  // Add Button
-	header.SetColumnWidth(10, 40) // Channels Button
-
 	// Geneate the fixture list.
 	for no, f := range fixtures.Fixtures {
 		newItem := fixture.Fixture{}
@@ -247,7 +220,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	}
 
 	// Create a new fixtures list.
-	fp.FixturePanel = widget.NewTable(
+	fp.FixturePanel = widget.NewTableWithHeaders(
 		// Function to find length of this table.
 		func() (int, int) {
 			if fp.UpdateChannels {
@@ -618,6 +591,10 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 			}
 		},
 	)
+	// Add headers
+	fp.FixturePanel.ShowHeaderColumn = false
+	fp.FixturePanel.CreateHeader = headerCreate
+	fp.FixturePanel.UpdateHeader = headerUpdate
 
 	fp.FixturePanel.SetColumnWidth(0, 40)  // Id
 	fp.FixturePanel.SetColumnWidth(1, 100) // Type
@@ -715,12 +692,11 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		popupFixturePanel.Hide()
 	})
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
-	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 430, Width: 750}), fp.FixturePanel)
+	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 500, Width: 750}), fp.FixturePanel)
 
 	content := fyne.Container{}
-	main := container.NewBorder(title, nil, nil, nil, header)
-	two := container.NewBorder(main, nil, nil, nil, panel)
-	content = *container.NewBorder(two, nil, nil, nil, saveCancel)
+	main := container.NewBorder(title, nil, nil, nil, panel)
+	content = *container.NewBorder(main, nil, nil, nil, saveCancel)
 
 	// popup fixture panel.
 	popupFixturePanel = widget.NewModalPopUp(
@@ -1183,4 +1159,60 @@ func makeNewFixture(data [][]string, i widget.TableCellID, field int, value stri
 
 	}
 	return newFixture
+}
+
+type ActiveHeader struct {
+	widget.Label
+	OnTapped func()
+}
+
+func headerCreate() fyne.CanvasObject {
+	h := &ActiveHeader{}
+	h.ExtendBaseWidget(h)
+	h.SetText("000")
+	return h
+}
+
+func headerUpdate(id widget.TableCellID, o fyne.CanvasObject) {
+	header := o.(*ActiveHeader)
+	header.TextStyle.Bold = true
+	switch id.Col {
+	case -1:
+		header.SetText(strconv.Itoa(id.Row + 1))
+	case 0:
+		header.SetText("ID")
+	case 1:
+		header.SetText("Type")
+	case 2:
+		header.SetText("Group")
+	case 3:
+		header.SetText("No")
+	case 4:
+		header.SetText("Name")
+	case 5:
+		header.SetText("Label")
+	case 6:
+		header.SetText("DMX")
+	case 7:
+		header.SetText("Description")
+	case 8:
+		header.SetText("-")
+	case 9:
+		header.SetText("+")
+	case 10:
+		header.SetText("Select")
+	}
+
+	// header.OnTapped = func() {
+	// 	fmt.Printf("Header %d tapped\n", id.Col)
+	// }
+}
+
+func (h *ActiveHeader) Tapped(_ *fyne.PointEvent) {
+	if h.OnTapped != nil {
+		h.OnTapped()
+	}
+}
+
+func (h *ActiveHeader) TappedSecondary(_ *fyne.PointEvent) {
 }
