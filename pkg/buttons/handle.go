@@ -396,7 +396,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// We're in RGB Color Selection Mode.
-		if this.Functions[this.EditWhichSequence][common.Function5_Color].State {
+		if this.SelectedType == "rgb" && this.Functions[this.EditWhichSequence][common.Function5_Color].State {
 			if debug {
 				fmt.Printf("Show RGB Sequence Color Selection Buttons\n")
 			}
