@@ -163,7 +163,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = NORMAL
 		this.SelectButtonPressed[this.SelectedSequence] = true
 
-		// Turn off the color picke if set.
+		// Turn off the color picker if set.
 		if this.EditColorPicker {
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 			this.EditColorPicker = false
