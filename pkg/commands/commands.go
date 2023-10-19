@@ -74,7 +74,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Hide = false
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = common.DefaultSequenceColors
+		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
 		sequence.CurrentColors = []common.Color{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
@@ -176,6 +176,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Hide\n", mySequenceNumber)
 		}
 		if !sequence.Hidden {
+			if debug {
+				fmt.Printf("%d: Command Actually Hide\n", mySequenceNumber)
+			}
 			sequence.Hide = true
 			sequence.Hidden = true
 		}
@@ -186,6 +189,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
 		if sequence.Hidden {
+			if debug {
+				fmt.Printf("%d: Command Actually UnHide\n", mySequenceNumber)
+			}
 			sequence.Hide = false
 			sequence.Hidden = false
 			sequence.PlayStaticOnce = true
@@ -434,43 +440,43 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Bounce = command.Args[STATE].Value.(bool)
 		return sequence
 
-	case common.UpdateStatic:
+	case common.UpdateStatic: // Update Static will force the sequence to play the static scene.
 		const STATIC = 0
 		if debug {
 			fmt.Printf("%d: Command Update Static to %t\n", mySequenceNumber, command.Args[STATIC].Value)
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
-		sequence.StaticFadeOnce = true
+		sequence.StaticFadeOnce = false
 		sequence.Hidden = false
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Run = false
 		return sequence
 
-	// case common.UpdateMode:
-	// 	const MODE = 0
-	// 	if debug {
-	// 		fmt.Printf("%d: Command Update Mode to %s\n", mySequenceNumber, command.Args[MODE].Value)
-	// 	}
-	// 	sequence.Mode = command.Args[MODE].Value.(string)
-	// 	if sequence.Mode == "Static" {
-	// 		sequence.Static = true
-	// 	}
-	// 	if sequence.Mode == "Sequence" {
-	// 		sequence.Static = false
-	// 	}
-	// 	return sequence
+	case common.UpdateFlashAllStaticColorButtons:
+		const STATIC_FLASH = 0
+		if debug {
+			fmt.Printf("%d: Command Flash All Static Colors to %t\n", mySequenceNumber, command.Args[STATIC_FLASH].Value)
+		}
+		for staticColor := range sequence.StaticColors {
+			sequence.StaticColors[staticColor].Flash = command.Args[STATIC_FLASH].Value.(bool)
+		}
+		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.PlayStaticOnce = true
+		sequence.Static = true
+		sequence.Hide = true
+		return sequence
 
 	case common.UpdateStaticColor:
-		const STATIC = 0            // Boolean
-		const STATIC_LAMP = 1       // Integer
-		const STATIC_LAMP_FLASH = 2 // Boolean
-		const SELECTED_COLOR = 3    // Integer
-		const STATIC_COLOR = 4      // Color
+		const STATIC = 0                // Boolean
+		const STATIC_FIXTURE_NUMBER = 1 // Integer
+		const STATIC_FIXTURE_FLASH = 2  // Boolean
+		const STATIC_SELECTED_COLOR = 3 // Integer
+		const STATIC_COLOR = 4          // Color
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
-			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[SELECTED_COLOR].Value, command.Args[STATIC_LAMP_FLASH].Value)
+			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 		}
 		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
@@ -480,18 +486,39 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			sequence.StaticColors[fixture].Flash = false
 		}
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].SelectedColor = command.Args[SELECTED_COLOR].Value.(int)
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
-		sequence.StaticColors[command.Args[STATIC_LAMP].Value.(int)].Flash = command.Args[STATIC_LAMP_FLASH].Value.(bool)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
+		return sequence
 
-	case common.UpdateSequenceColor:
-		const SELECTED_COLOR = 0
+	case common.UpdateASingeSequenceColor:
+		const SELECTED_X = 0
+		const SELECTED_Y = 1
+
+		X := command.Args[SELECTED_X].Value.(int)
+		Y := command.Args[SELECTED_Y].Value.(int)
+
+		newColor := common.GetColor(X, Y)
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %d\n", mySequenceNumber, command.Args[SELECTED_COLOR].Value)
+			fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
 		}
+
+		sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
 		sequence.UpdateSequenceColor = true
 		sequence.SaveColors = true
-		sequence.SequenceColors = append(sequence.SequenceColors, common.GetColorButtonsArray(command.Args[SELECTED_COLOR].Value.(int)))
+
+		return sequence
+
+	case common.UpdateSequenceColors:
+		const COLORS = 0
+		if debug {
+			fmt.Printf("%d: Command Update Sequence Color to %+v\n", mySequenceNumber, command.Args[COLORS].Value)
+		}
+
+		sequence.SequenceColors = command.Args[COLORS].Value.([]common.Color)
+		sequence.UpdateSequenceColor = true
+		sequence.SaveColors = true
+
 		return sequence
 
 	case common.UpdateScannerColor:

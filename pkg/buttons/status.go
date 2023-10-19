@@ -289,7 +289,7 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("Show Scanner Status for sequence %d number of scanners %d\n", sequenceNumber, NumberFixtures)
+		fmt.Printf("Show Fixture Status for sequence %d number of fixtures %d\n", sequenceNumber, NumberFixtures)
 	}
 
 	common.HideSequence(selectedSequence, commandChannels)
@@ -297,7 +297,7 @@ func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures 
 	for fixtureNumber := 0; fixtureNumber < NumberFixtures; fixtureNumber++ {
 
 		if debug {
-			fmt.Printf("%d: Scanner %d Enabled %t Inverted %t\n", sequenceNumber, fixtureNumber, this.FixtureState[sequenceNumber][fixtureNumber].Enabled, this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted)
+			fmt.Printf("Sequence %d: Fixture %d Enabled %t Inverted %t\n", sequenceNumber, fixtureNumber, this.FixtureState[sequenceNumber][fixtureNumber].Enabled, this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted)
 		}
 
 		// Enabled but not inverted then On and green.

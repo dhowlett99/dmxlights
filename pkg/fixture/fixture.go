@@ -341,6 +341,7 @@ func FixtureReceiver(
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 					}
 					// Fixture brightness is sent as master in this case.
+					// TODO find a suitable color in the scanner's wheel that matches the fixture's color.
 					// TODO Integrate cmd.master with fixture.Brightness.
 					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {
@@ -1080,8 +1081,14 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 		if lamp.Flash {
 			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
 			Black := common.Color{R: 0, G: 0, B: 0}
+			if debug {
+				fmt.Printf("FlashLamp Y:%d X:%d\n", sequence.Number, myFixtureNumber)
+			}
 			common.FlashLight(myFixtureNumber, sequence.Number, onColor, Black, eventsForLauchpad, guiButtons)
 		} else {
+			if debug {
+				fmt.Printf("LightLamp Y:%d X:%d\n", sequence.Number, myFixtureNumber)
+			}
 			common.LightLamp(common.ALight{X: myFixtureNumber, Y: sequence.Number, Red: lamp.Color.R, Green: lamp.Color.G, Blue: lamp.Color.B, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
 		}
 	}

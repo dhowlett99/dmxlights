@@ -411,7 +411,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					popup.Show()
 				}
 			}
-			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, true)
+			this.GUI = true
+			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 			skipPopup = false
 		})

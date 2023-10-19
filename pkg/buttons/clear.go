@@ -26,7 +26,7 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	if debug {
@@ -34,7 +34,7 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
-	if this.EditSequenceColorsMode {
+	if this.EditSequenceColorsMode && !this.ClearPressed[this.TargetSequence] {
 
 		// Clear the sequence colors for this sequence.
 		cmd := common.Command{
@@ -45,47 +45,36 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Get an upto date copy of the sequence.
 		sequences[this.EditWhichSequence] = common.RefreshSequence(this.EditWhichSequence, commandChannels, updateChannels)
 
+		// Set the colors.
+		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
+
 		// Flash the correct color buttons
-		ShowRGBColorSelectionButtons(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+
+		// Clear has been pressed, next time we press clear we will get the full clear.
+		this.ClearPressed[this.TargetSequence] = true
 
 		return
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.EditWhichSequence] {
+	if this.EditStaticColorsMode[this.EditWhichSequence] && !this.ClearPressed[this.TargetSequence] {
 
 		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
 
-		// Back to the begining of the rotation.
-		if this.SelectColorBar[this.TargetSequence] > common.MAX_COLOR_BAR {
-			this.SelectColorBar[this.TargetSequence] = 0
+		if this.EditStaticColorsMode[this.EditWhichSequence] {
+			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// First press resets the colors to the default color bar.
-		if this.SelectColorBar[this.TargetSequence] == 0 {
+		if !this.ClearPressed[this.TargetSequence] {
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.ClearStaticColor,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
-
-		// Rotate around solid colors.
-		if this.SelectColorBar[this.TargetSequence] > 0 {
-
-			// Clear the sequence colors for this sequence.
-			cmd := common.Command{
-				Action: common.SetStaticColorBar,
-				Args: []common.Arg{
-					{Name: "Selection", Value: this.SelectColorBar[this.TargetSequence]},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
-		// Now increment the color bar.
-		this.SelectColorBar[this.TargetSequence]++
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
@@ -98,8 +87,14 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.DisplaySequence, guiButtons)
 		this.SelectMode[this.SelectedSequence] = this.LastMode[this.SelectedSequence]
-		// The sequence will automatically display the static colors now!
 
+		// Clear the select all fixtures flag.
+		this.SelectAllStaticFixtures = false
+
+		// Clear has been pressed, next time we press clear we will get the full clear.
+		this.ClearPressed[this.TargetSequence] = true
+
+		// The sequence will automatically display the static colors now!
 		return
 	}
 
@@ -198,9 +193,14 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 				}
 			}
 		}
+
+		// Set the colors.
+		sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
+
 	}
 
 	// Send reset to all sequences.
+	// Look at the reset process in commands.go as a lot of stuff in the sequence is reset there.
 	cmd := common.Command{
 		Action: common.Reset,
 	}
@@ -221,6 +221,9 @@ func clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Clear the graphics labels.
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
+	// Reset the counter that counts how many times we've pressed the clear button.
+	this.ClearPressed[this.TargetSequence] = false
 
 	// Reset the launchpad.
 	if this.LaunchPadConnected {

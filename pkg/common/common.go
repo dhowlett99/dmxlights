@@ -92,6 +92,15 @@ type Color struct {
 	Flash bool
 }
 
+type ColorPicker struct {
+	Name  string
+	ID    int
+	Code  byte // Launchpad hex code for this color
+	Color Color
+	X     int
+	Y     int
+}
+
 // Used in calculating Positions.
 type FixtureBuffer struct {
 	Color        Color
@@ -164,17 +173,18 @@ type Switch struct {
 }
 
 type StaticColorButton struct {
-	Name          string
-	Label         string
-	Number        int
-	X             int
-	Y             int
-	Color         Color
-	SelectedColor int
-	Flash         bool
-	Setting       int
-	FirstPress    bool
-	Enabled       bool
+	Name             string
+	Label            string
+	Number           int
+	X                int
+	Y                int
+	SelectedSequence int
+	Color            Color
+	SelectedColor    int
+	Flash            bool
+	Setting          int
+	FirstPress       bool
+	Enabled          bool
 }
 
 type FixtureState struct {
@@ -189,8 +199,8 @@ type Pattern struct {
 	Number   int
 	Length   int // 8, 4 or 2
 	Size     int
-	Fixtures int // 8 Fixtures
-	Steps    []Step
+	Fixtures int    // 8 Fixtures
+	Steps    []Step `json:"-"` // Don't save the steps as they can be very large.
 }
 
 type Arg struct {
@@ -211,9 +221,11 @@ const (
 	Reset
 	UpdateMode
 	UpdateStatic
+	UpdateFlashAllStaticColorButtons
 	UpdateBounce
 	UpdateStaticColor
-	UpdateSequenceColor
+	UpdateASingeSequenceColor
+	UpdateSequenceColors
 	PlayStaticOnce
 	PlaySwitchOnce
 	UnHide
@@ -574,6 +586,14 @@ func HideSequence(targetSequence int, commandChannels []chan Command) {
 	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
 
+func HideAllSequences(commandChannels []chan Command) {
+
+	cmd := Command{
+		Action: Hide,
+	}
+	SendCommandToAllSequence(cmd, commandChannels)
+}
+
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
 // returns the color array
 func GetColorButtonsArray(color int) Color {
@@ -849,6 +869,9 @@ func GetColorNameByRGB(color Color) string {
 
 func HowManyColorsInSteps(steps []Step) (colors []Color) {
 
+	if debug {
+		fmt.Printf("HowManyColorsInSteps \n")
+	}
 	colorMap := make(map[Color]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
@@ -859,6 +882,9 @@ func HowManyColorsInSteps(steps []Step) (colors []Color) {
 	}
 
 	for color := range colorMap {
+		if debug {
+			fmt.Printf("add color %+v\n", color)
+		}
 		colors = append(colors, color)
 	}
 
@@ -952,6 +978,15 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 	for x := 0; x < 8; x++ {
 		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
+	}
+}
+
+func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	for y := 0; y < 8; y++ {
+		for x := 0; x < 8; x++ {
+			LightLamp(ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			LabelButton(x, y, "", guiButtons)
+		}
 	}
 }
 
@@ -1206,13 +1241,27 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 	// Make an array to hold static colors.
 	staticColorsButtons := []StaticColorButton{}
 
-	for X := 0; X < 8; X++ {
-		staticColorButton := StaticColorButton{}
-		staticColorButton.X = X
-		staticColorButton.Y = selectedSequence
-		staticColorButton.SelectedColor = X
-		staticColorButton.Color = GetColorButtonsArray(X)
-		staticColorsButtons = append(staticColorsButtons, staticColorButton)
+	var selectedColor int
+
+	for Y := 0; Y < 3; Y++ {
+		for X := 0; X < 8; X++ {
+			if selectedColor >= 24 {
+				break
+			}
+
+			staticColorButton := StaticColorButton{}
+
+			colorPicker := GetColor(X, Y)
+			staticColorButton.Name = colorPicker.Name
+			staticColorButton.Color = colorPicker.Color
+			staticColorButton.X = X
+			staticColorButton.Y = Y
+			staticColorButton.SelectedColor = selectedColor
+			selectedColor++
+
+			staticColorsButtons = append(staticColorsButtons, staticColorButton)
+		}
+
 	}
 
 	return staticColorsButtons
@@ -1396,4 +1445,84 @@ func FormatLabel(label string) string {
 	// replace any spaces with new lines.
 	// new lines are represented by a dot in code beneath us.
 	return strings.Replace(label, " ", ".", -1)
+}
+
+func newColorPicker() []ColorPicker {
+
+	colors := []ColorPicker{
+
+		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Color{R: 255, G: 0, B: 0}},
+		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Color{R: 255, G: 100, B: 0}},
+		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Color{R: 255, G: 255, B: 0}},
+		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Color{R: 0, G: 255, B: 0}},
+		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Color{R: 0, G: 255, B: 255}},
+		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Color{R: 0, G: 0, B: 255}},
+		{ID: 14, X: 6, Y: 1, Name: "Purple", Code: 0x32, Color: Color{R: 50, G: 0, B: 100}},
+		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Color{R: 255, G: 0, B: 255}},
+
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: Color{R: 220, G: 20, B: 60}},
+		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: Color{R: 215, G: 50, B: 0}},
+		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Color{R: 255, G: 215, B: 0}},
+		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: Color{R: 0, G: 100, B: 0}},
+		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Color{R: 127, G: 255, B: 212}},
+		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: Color{R: 0, G: 191, B: 255}},
+		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x51, Color: Color{R: 100, G: 0, B: 255}},
+		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Color{R: 255, G: 105, B: 180}},
+
+		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Color{R: 250, G: 128, B: 114}},
+		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: Color{R: 255, G: 175, B: 0}},
+		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: Color{R: 150, G: 150, B: 0}},
+		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: Color{R: 124, G: 252, B: 0}},
+		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Color{R: 0, G: 128, B: 128}},
+		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: Color{R: 100, G: 185, B: 255}},
+		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: Color{R: 199, G: 21, B: 133}},
+		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: Color{R: 255, G: 255, B: 255}},
+	}
+
+	return colors
+}
+
+func GetLaunchPadCodeByRGBColor(selectedColor Color) byte {
+
+	colors := newColorPicker()
+	if debug {
+		fmt.Printf("Selected Color %+v\n", selectedColor)
+	}
+	for _, color := range colors {
+
+		if selectedColor == color.Color {
+			if debug {
+				fmt.Printf("Color Name %s Code %x\n", color.Name, color.Code)
+			}
+			return color.Code
+		}
+	}
+	return 0
+
+}
+
+func GetIDfromCoordinates(X int, Y int) int {
+
+	colors := newColorPicker()
+
+	for _, color := range colors {
+
+		if color.X == X && color.Y == Y {
+			return color.ID
+		}
+	}
+	return 0
+}
+
+func GetColor(X int, Y int) ColorPicker {
+
+	colors := newColorPicker()
+
+	for _, color := range colors {
+
+		if color.X == X && color.Y == Y {
+			return color
+		}
+	}
+	return ColorPicker{}
 }

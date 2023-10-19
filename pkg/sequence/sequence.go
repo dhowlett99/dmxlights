@@ -164,6 +164,7 @@ func CreateSequence(
 		NumberFixtures:         numberFixtures,
 		Type:                   sequenceType,
 		Hide:                   false,
+		Hidden:                 false,
 		Mode:                   "Sequence",
 		StaticColors:           staticColorsButtons,
 		RGBAvailableColors:     sequenceColorButtons,
@@ -408,7 +409,7 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				// Done fading for this static scene onlt reset when we set a static scene again.
+				// Done fading for this static scene only reset when we set a static scene again.
 				sequence.StaticFadeOnce = false
 
 				// Prepare a message to be sent to the fixtures in the sequence.
@@ -505,7 +506,14 @@ func PlaySequence(sequence common.Sequence,
 					steps = RGBPattern.Steps
 					sequence.Pattern.Name = RGBPattern.Name
 					sequence.Pattern.Label = RGBPattern.Label
+
+					// If we are updating the pattern, we also set the represention of the sequence colors.
+					if sequence.UpdatePattern {
+						sequence.SequenceColors = common.HowManyColorsInSteps(steps)
+					}
 					sequence.UpdatePattern = false
+
+					// Initialise chaser.
 					if sequence.Label == "chaser" {
 						// Set the chase RGB steps used to chase the shutter.
 						sequence.ScannerChaser = true
@@ -603,18 +611,24 @@ func PlaySequence(sequence common.Sequence,
 				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
 					if sequence.RecoverSequenceColors {
 						if sequence.SavedSequenceColors != nil {
+							// Recover origial colors after auto color is switched off.
 							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 							sequence.AutoColor = false
 						}
 					} else {
-						steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-						// Save the current color selection.
-						if sequence.SaveColors {
-							sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
-							sequence.SaveColors = false
+						// We are updating color in sequence and sequence colors are set.
+						if len(sequence.SequenceColors) > 0 {
+							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+							// Save the current color selection.
+							if sequence.SaveColors {
+								sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
+								sequence.SaveColors = false
+							}
 						}
 					}
 				}
+				// Save the steps temporarily
+				sequence.Pattern.Steps = steps
 
 				if sequence.Label == "chaser" {
 					if sequence.AutoColor {
@@ -635,9 +649,9 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Label != "Color.Chase" {
 
 					// Find a new color.
-					newColor := []common.Color{}
-					newColor = append(newColor, sequence.RGBAvailableColors[sequence.RGBColor].Color)
-					sequence.SequenceColors = newColor
+					newColors := []common.Color{}
+					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
+					sequence.SequenceColors = newColors
 
 					// Step through the available colors.
 					sequence.RGBColor++
