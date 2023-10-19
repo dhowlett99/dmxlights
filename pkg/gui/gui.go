@@ -417,7 +417,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
-			button := widget.NewButton("MYDMXV2", func() {
+			button := widget.NewButton("DMXLIGI", func() {
 				modal, err := editor.NewFixturePanel(sequences, myWindow, Y, X, fixturesConfig, commandChannels)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)

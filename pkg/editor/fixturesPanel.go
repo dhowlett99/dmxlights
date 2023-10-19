@@ -692,7 +692,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		popupFixturePanel.Hide()
 	})
 	saveCancel := container.NewHBox(layout.NewSpacer(), buttonCancel, buttonSave)
-	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 430, Width: 750}), fp.FixturePanel)
+	panel := container.New(layout.NewGridWrapLayout(fyne.Size{Height: 500, Width: 750}), fp.FixturePanel)
 
 	content := fyne.Container{}
 	main := container.NewBorder(title, nil, nil, nil, panel)
