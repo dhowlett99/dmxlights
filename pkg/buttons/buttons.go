@@ -39,10 +39,11 @@ const debug = false
 
 // Select modes.
 const (
-	NORMAL int = iota
-	FUNCTION
-	CHASER
-	STATUS
+	NORMAL          int = iota // Normal RGB or Scanner Rotation display.
+	CHASER_DISPLAY             //  Show the scanner shutter display.
+	FUNCTION                   // Show the RGB or Scanner functions.
+	CHASER_FUNCTION            // Show the scammer shutter chaser functions.
+	STATUS                     // Show the fixture status states.
 )
 
 type CurrentState struct {
@@ -116,7 +117,6 @@ type CurrentState struct {
 	DmxInterfacePresent         bool                       // Flag to indicate precence of DMX interface card
 	DmxInterfacePresentConfig   *usbdmx.ControllerConfig   // DMX Interface card config.
 	LaunchpadName               string                     // Storage for launchpad config.
-	Chaser                      common.Sequence            // Sequence for chaser.
 	ScannerChaser               bool                       // Chaser is running.
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
@@ -677,14 +677,14 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
 			if this.RGBShift[this.TargetSequence] < 0 {
 				this.RGBShift[this.TargetSequence] = 0
@@ -732,13 +732,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
 			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
 				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
@@ -776,7 +776,7 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// Decrease speed of selected sequence.
+	// S E L E C T   S P E E D - Decrease speed of selected sequence.
 	if X == 0 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
@@ -786,8 +786,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
@@ -820,7 +820,7 @@ func ProcessButtons(X int, Y int,
 		// Decrease Speed.
 		if !sequences[this.TargetSequence].MusicTrigger {
 			this.Speed[this.TargetSequence]--
-			if this.Speed[this.TargetSequence] == 1 {
+			if this.Speed[this.TargetSequence] < 1 {
 				this.Speed[this.TargetSequence] = 1
 			}
 
@@ -854,7 +854,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// Increase speed of selected sequence.
+	// S E L E C T   S P E E D - Increase speed of selected sequence.
 	if X == 1 && Y == 7 && !this.EditSequenceColorsMode {
 
 		if debug {
@@ -863,9 +863,9 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		// If we're a scanner and we're in shutter chase mode
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
@@ -979,6 +979,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
 		this.EditSequenceColorsMode = false
 		this.EditGoboSelectionMode = false
 
@@ -1131,14 +1132,14 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]--
 			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
@@ -1186,14 +1187,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" ||
-			this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]++
@@ -1243,13 +1243,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]--
 			if this.RGBFade[this.TargetSequence] < 1 {
 				this.RGBFade[this.TargetSequence] = 1
@@ -1300,13 +1300,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]++
 			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {
 				this.RGBFade[this.TargetSequence] = common.MAX_RGB_FADE
@@ -1599,7 +1599,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
 		}
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
+		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
 		} else {
@@ -1903,7 +1903,7 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode {
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
+		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
 		} else {
@@ -1939,7 +1939,7 @@ func ProcessButtons(X int, Y int,
 	// F U N C T I O N  K E Y S
 	if X >= 0 && X < 8 && Y >= 0 && Y < 3 &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
+		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}

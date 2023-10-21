@@ -10,8 +10,13 @@ import (
 //	+-------------------+
 //	|       NORMAL      |
 //	+-------------------+
-//	         |
-//	         V
+//	    |            |
+//	    |            | If Scanner
+//	    V            V
+//	    |       +-------------------+
+//	    |       |  CHASER DISPLAY   |
+//	    |       +-------------------+
+//	    V            |
 //	+-------------------+
 //	|     FUNCTION      |
 //	+-------------------+
@@ -20,8 +25,8 @@ import (
 //	    |       +-------------------+
 //	    |       |  CHASER FUNCTIONS |
 //	    |       +-------------------+
-//	    |				|
-//	    V				V
+//	    |		     |
+//	    V			 V
 //	 +-------------------+
 //	 |  FIXTURE STATUS   |
 //	 +-------------------+
@@ -35,9 +40,9 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := false
+	debug := true
 
-	if this.SelectMode[this.SelectedSequence] == CHASER {
+	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
@@ -58,10 +63,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if this.SelectMode[this.DisplaySequence] == NORMAL {
 			fmt.Printf("HANDLE: this.SelectMode[%d] = NORMAL \n", this.TargetSequence)
 		}
+		if this.SelectMode[this.DisplaySequence] == CHASER_DISPLAY {
+			fmt.Printf("HANDLE: this.SelectMode[%d] = CHASER_DISPLAY \n", this.SelectedSequence)
+		}
 		if this.SelectMode[this.DisplaySequence] == FUNCTION {
 			fmt.Printf("HANDLE: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
 		}
-		if this.SelectMode[this.DisplaySequence] == CHASER {
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
 			fmt.Printf("HANDLE: this.SelectMode[%d] = CHASER \n", this.SelectedSequence)
 		}
 		if this.SelectMode[this.DisplaySequence] == STATUS {
@@ -253,10 +261,36 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 2nd Press same select button go into Function Mode for this sequence.
-	if this.SelectMode[this.SelectedSequence] == NORMAL && sequences[this.SelectedSequence].Type != "switch" || // Don't alow functions in switch mode.
-		this.SelectMode[this.SelectedSequence] == NORMAL && // Function select mode is off
-			this.EditStaticColorsMode[this.TargetSequence] && // AND static colol mode, the case when we leave static colors edit mode.
+	// 2nd Press but in scanner mode same select button go into Function Mode for this sequence.
+	if this.SelectMode[this.SelectedSequence] == NORMAL &&
+		this.ScannerChaser &&
+		this.SelectedType == "scanner" &&
+		this.SelectButtonPressed[this.SelectedSequence] {
+
+		if debug {
+			fmt.Printf("%d: We are a SCANNER - 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
+		}
+
+		// Set function mode.
+		this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+
+		// Hide the rotating sequence.
+		common.HideSequence(this.SelectedSequence, commandChannels)
+
+		// Clear the sequence.
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+		// And show the chaser sequence.
+		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+
+		return
+	}
+
+	// 2nd Press in rgb mode same select button go into Function Mode for this sequence.
+	if (this.SelectMode[this.SelectedSequence] == NORMAL && this.SelectedType == "rgb") ||
+		(this.SelectMode[this.SelectedSequence] == NORMAL && !this.ScannerChaser) ||
+		(this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.SelectedType == "scanner") &&
+			//this.EditStaticColorsMode[this.TargetSequence] && // AND static color mode, the case when we leave static colors edit mode.
 			this.SelectButtonPressed[this.SelectedSequence] {
 
 		if debug {
@@ -351,7 +385,23 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Turn on shutter chaser mode.
-		this.SelectMode[this.SelectedSequence] = CHASER
+		this.SelectMode[this.SelectedSequence] = CHASER_FUNCTION
+
+		// Update the buttons: speed
+		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
+		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
+
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+
+		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+
+		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+
+		common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
+		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
 
 		// If the chase is running, hide it.
 		if this.ScannerChaser && this.SelectedType == "scanner" {
@@ -451,7 +501,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("%d: Reveal Sequence\n", this.ChaserSequenceNumber)
 			}
-			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
 		// Turn off the function mode flag.
@@ -463,7 +513,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// 4th Press Normal Mode and we are a scanner- we head fixture status mode.
-	if (this.SelectMode[this.SelectedSequence] == CHASER || !this.ScannerChaser) &&
+	if (this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || !this.ScannerChaser) &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
 		this.SelectedType == "scanner" {
@@ -474,6 +524,28 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Turn on status mode
 		this.SelectMode[this.SelectedSequence] = STATUS
+
+		// Update the buttons: speed
+		common.LabelButton(0, 7, "Speed\nDown", guiButtons)
+		common.LabelButton(1, 7, "Speed\nUp", guiButtons)
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+		common.LabelButton(2, 7, "Shift\nDown", guiButtons)
+		common.LabelButton(3, 7, "Shift\nUp", guiButtons)
+
+		common.LabelButton(4, 7, "Size\nDown", guiButtons)
+		common.LabelButton(5, 7, "Size\nUp", guiButtons)
+
+		if this.SelectedType == "rgb" {
+			common.LabelButton(6, 7, "Fade\nSoft", guiButtons)
+			common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
+		}
+
+		if this.SelectedType == "scanner" {
+			common.LabelButton(6, 7, "Coord\nDown", guiButtons)
+			common.LabelButton(7, 7, "Coord\nUp", guiButtons)
+		}
 
 		// If the chase is running, hide it.
 		if this.ScannerChaser && this.SelectedType == "scanner" {
@@ -494,7 +566,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Are we in function mode ?
-	if this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
+	if this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		if debug {
 			fmt.Printf("%d: Handle 7 - Back to NORMAL mode.\n", this.SelectedSequence)
 		}

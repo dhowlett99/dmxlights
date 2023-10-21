@@ -33,10 +33,10 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 		if debug {
 			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
 		}
-		if !function.State && this.SelectMode[this.DisplaySequence] != CHASER { // Cyan
+		if !function.State && this.SelectMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
 			common.LightLamp(common.ALight{X: index, Y: this.DisplaySequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
 		}
-		if !function.State && this.SelectMode[this.DisplaySequence] == CHASER { // Yellow
+		if !function.State && this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
 			common.LightLamp(common.ALight{X: index, Y: this.DisplaySequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
 		}
 		if function.State { // Purple
@@ -50,7 +50,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	debug := false
 
-	if this.SelectMode[this.SelectedSequence] == CHASER {
+	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
@@ -79,8 +79,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		if this.SelectMode[this.TargetSequence] == FUNCTION {
 			fmt.Printf("FUNCS: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
 		}
-		if this.SelectMode[this.TargetSequence] == CHASER {
-			fmt.Printf("FUNCS: this.SelectMode[%d] = CHASER \n", this.SelectedSequence)
+		if this.SelectMode[this.TargetSequence] == CHASER_FUNCTION {
+			fmt.Printf("FUNCS: this.SelectMode[%d] = CHASER_FUNCTION \n", this.SelectedSequence)
 		}
 		if this.SelectMode[this.TargetSequence] == STATUS {
 			fmt.Printf("FUNCS: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
@@ -492,6 +492,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 	if X == common.Function7_Invert_Chase &&
+		!this.ScannerChaser &&
 		!this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State &&
 		sequences[this.TargetSequence].Type == "scanner" {
 
@@ -521,25 +522,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// Update the buttons: speed
-		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
-		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
-
-		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
-		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
-
-		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
-		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
-
-		common.LabelButton(6, 7, "Chase\nFase\nSoft", guiButtons)
-		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
-
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		return
 	}
 
-	// Function 7 - Toggle the shutter chaser mode. Stop the chaser.
+	// Function 7 - Toggle the shutter chaser mode off. Stop the chaser.
 	if X == common.Function7_Invert_Chase &&
+		this.ScannerChaser &&
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State &&
 		sequences[this.TargetSequence].Type == "scanner" {
 
@@ -589,7 +578,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send start music trigger for scanner & rgb sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.SelectMode[this.TargetSequence] != CHASER &&
+		this.SelectMode[this.TargetSequence] != CHASER_FUNCTION &&
 		!this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
 
 		if debug {
@@ -649,7 +638,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 8 MUSIC TRIGGER  - Send stop music trigger chaser sequences.
 	if X == common.Function8_Music_Trigger &&
-		this.SelectMode[this.TargetSequence] != CHASER &&
+		this.SelectMode[this.TargetSequence] != CHASER_FUNCTION &&
 		this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
 
 		if debug {
