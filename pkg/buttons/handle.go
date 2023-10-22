@@ -146,6 +146,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
 
+		// Flash all static fixtures. Represents all fixtures selected.
 		if !this.SelectAllStaticFixtures && this.EditStaticColorsMode[this.DisplaySequence] && !this.EditColorPicker {
 			if debug {
 				fmt.Printf("%d: Select All\n", this.DisplaySequence)
@@ -167,8 +168,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectButtonPressed[2] = false
 		this.SelectButtonPressed[3] = false
 
-		// But remember we have pressed this select button once.
-		this.SelectMode[this.SelectedSequence] = NORMAL
+		// Remember which select button has been pressed.
 		this.SelectButtonPressed[this.SelectedSequence] = true
 
 		// Turn off the color picker if set.
@@ -184,11 +184,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 			// If the chaser is running, reveal it.
 			if this.ScannerChaser && this.SelectedType == "scanner" {
+				common.HideSequence(this.SelectedSequence, commandChannels)
 				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+				this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+			} else {
+				// Turn off the function mode flag.
+				this.SelectMode[this.SelectedSequence] = NORMAL
 			}
-
-			// Turn off the function mode flag.
-			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
 		// Turn off any previous function or status bars.
@@ -215,11 +217,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			// And reveal the sequence.
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
-			// If the chase is running, reveal it.
-			if this.ScannerChaser && this.SelectedType == "scanner" {
-				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
-			}
-
 			// Editing pattern is over for this sequence.
 			this.EditPatternMode = false
 
@@ -237,7 +234,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 
 			// And reveal the sequence on the launchpad keys
-			common.RevealSequence(this.SelectedSequence, commandChannels)
+			// Only reveal if we're not a shutter chaser.
+			if this.ScannerChaser && this.SelectedType == "scanner" {
+				common.RevealSequence(this.SelectedSequence, commandChannels)
+			}
 
 			// Turn off the function mode flag.
 			this.SelectMode[this.SelectedSequence] = NORMAL
@@ -257,6 +257,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Show this sequence running status in the start/stop button.
 		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+
+		// Now select the correct exit mode based on if we're a scanner or not.
+		if this.ScannerChaser && this.SelectedType == "scanner" {
+			common.HideSequence(this.SelectedSequence, commandChannels)
+			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		} else {
+			this.SelectMode[this.SelectedSequence] = NORMAL
+		}
 
 		return
 	}
@@ -581,8 +590,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
-		// Turn off the function mode flag.
-		this.SelectMode[this.SelectedSequence] = NORMAL
+		// Now select the correct exit mode based on which mode we came in on.
+		if this.SelectMode[this.SelectedSequence] == FUNCTION {
+			this.SelectMode[this.SelectedSequence] = NORMAL
+		}
+		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		}
 
 		// Turn off the edit sequence colors button.
 		if this.EditSequenceColorsMode {
