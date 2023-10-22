@@ -180,16 +180,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			// Turn off function mode. Remove the function pads.
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
-			// And reveal the sequence on the launchpad keys
-			common.RevealSequence(this.SelectedSequence, commandChannels)
-
 			// If the chaser is running, reveal it.
-			if this.ScannerChaser && this.SelectedType == "scanner" {
+			if this.ScannerChaser && this.SelectedType == "scanner" && this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY {
 				common.HideSequence(this.SelectedSequence, commandChannels)
 				common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 				this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 			} else {
-				// Turn off the function mode flag.
+				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+				// And reveal the sequence on the launchpad keys
+				common.RevealSequence(this.SelectedSequence, commandChannels)
 				this.SelectMode[this.SelectedSequence] = NORMAL
 			}
 		}
@@ -201,6 +200,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 				// And reveal all the other sequence that isn't us.
 				if sequenceNumber != this.SelectedSequence {
+					if this.ScannerChaser {
+						common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+					}
 					common.RevealSequence(sequenceNumber, commandChannels)
 					// And turn off the function selected.
 					this.SelectMode[sequenceNumber] = NORMAL
@@ -216,6 +218,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			ClearPatternSelectionButtons(this.SelectedSequence, *sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 			// And reveal the sequence.
+			if this.ScannerChaser {
+				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			}
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
 			// Editing pattern is over for this sequence.
@@ -235,10 +240,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 
 			// And reveal the sequence on the launchpad keys
-			// Only reveal if we're not a shutter chaser.
+			// and hide the shutter chaser.
 			if this.ScannerChaser && this.SelectedType == "scanner" {
-				common.RevealSequence(this.SelectedSequence, commandChannels)
+				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			}
+			common.RevealSequence(this.SelectedSequence, commandChannels)
 
 			// Turn off the function mode flag.
 			this.SelectMode[this.SelectedSequence] = NORMAL
@@ -259,16 +265,17 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Show this sequence running status in the start/stop button.
 		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
 		// Now select the correct exit mode based on if we're a scanner or not.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		if this.SelectMode[this.SelectedSequence] == NORMAL && this.ScannerChaser && this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+			common.RevealSequence(this.SelectedSequence, commandChannels)
 		} else {
 			this.SelectMode[this.SelectedSequence] = NORMAL
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
-		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		return
 	}
@@ -285,13 +292,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Set function mode. And take note if we arrived using the shortcut.
 		if this.DisplayChaserShortCut {
-			fmt.Printf("%d: Chaser Display entered via DisplayChaserShortCut\n", this.SelectedSequence)
-			this.SelectMode[this.SelectedSequence] = NORMAL
+			if debug {
+				fmt.Printf("%d: Chaser Display entered via DisplayChaserShortCut\n", this.SelectedSequence)
+			}
 			this.DisplayChaserShortCut = false
 			this.SelectButtonPressed[this.SelectedSequence] = false
-		} else {
-			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 		}
+
+		this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 
 		// Hide the rotating sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
@@ -587,7 +595,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Are we in function mode ?
 	if this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		if debug {
-			fmt.Printf("%d: Handle 7 - Back to NORMAL mode.\n", this.SelectedSequence)
+			fmt.Printf("HANDLE %d: Handle 7 - Back to NORMAL mode.\n", this.SelectedSequence)
 		}
 		// Turn off function mode. Remove the function pads.
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -639,6 +647,18 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectButtonPressed[this.SelectedSequence] = false
 
 		return
+	}
+
+	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser {
+		if debug {
+			fmt.Printf("HANDLE %d: Handle 8 - Back to NORMAL mode from Shutter Chaser.\n", this.SelectedSequence)
+		}
+		this.SelectMode[this.SelectedSequence] = NORMAL
+		return
+	}
+
+	if debug {
+		fmt.Printf("HANDLE: Sequence %d Nothing Handled  \n", this.TargetSequence)
 	}
 
 }
