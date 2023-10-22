@@ -77,6 +77,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
+		fmt.Printf("HANDLE: this.DisplayChaserShortCut = %t \n", this.DisplayChaserShortCut)
 		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.TargetSequence, this.EditSequenceColorsMode)
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.TargetSequence, this.EditStaticColorsMode)
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.TargetSequence, this.EditGoboSelectionMode)
@@ -260,28 +261,37 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Now select the correct exit mode based on if we're a scanner or not.
 		if this.ScannerChaser && this.SelectedType == "scanner" {
-			common.HideSequence(this.SelectedSequence, commandChannels)
-			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 		} else {
 			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
+		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		common.RevealSequence(this.SelectedSequence, commandChannels)
+
 		return
 	}
 
 	// 2nd Press but in scanner mode same select button go into Function Mode for this sequence.
-	if this.SelectMode[this.SelectedSequence] == NORMAL &&
+	if (this.SelectMode[this.SelectedSequence] == NORMAL &&
 		this.ScannerChaser &&
 		this.SelectedType == "scanner" &&
-		this.SelectButtonPressed[this.SelectedSequence] {
+		this.SelectButtonPressed[this.SelectedSequence]) || this.DisplayChaserShortCut {
 
 		if debug {
 			fmt.Printf("%d: We are a SCANNER - 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
 		}
 
-		// Set function mode.
-		this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		// Set function mode. And take note if we arrived using the shortcut.
+		if this.DisplayChaserShortCut {
+			fmt.Printf("%d: Chaser Display entered via DisplayChaserShortCut\n", this.SelectedSequence)
+			this.SelectMode[this.SelectedSequence] = NORMAL
+			this.DisplayChaserShortCut = false
+			this.SelectButtonPressed[this.SelectedSequence] = false
+		} else {
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		}
 
 		// Hide the rotating sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
@@ -505,12 +515,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
-		// If the chase is running, reveal it.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		// If the chase is running, reveal it. But only if we're in CHASER_DISPLAY mode.
+		if this.ScannerChaser && this.SelectedType == "scanner" && this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY {
 			if debug {
 				fmt.Printf("%d: Reveal Sequence\n", this.ChaserSequenceNumber)
 			}
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
 		// Turn off the function mode flag.

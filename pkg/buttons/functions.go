@@ -522,6 +522,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+		// CJump straigt to showing the shutter chaser.
+		this.DisplayChaserShortCut = true
+
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 		return
 	}

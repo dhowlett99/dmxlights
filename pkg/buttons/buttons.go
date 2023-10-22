@@ -118,6 +118,7 @@ type CurrentState struct {
 	DmxInterfacePresentConfig   *usbdmx.ControllerConfig   // DMX Interface card config.
 	LaunchpadName               string                     // Storage for launchpad config.
 	ScannerChaser               bool                       // Chaser is running.
+	DisplayChaserShortCut       bool                       // Flag to indicate we've taken a shortcut to the chaser display
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
@@ -1014,6 +1015,12 @@ func ProcessButtons(X int, Y int,
 		if this.EditSequenceColorsMode {
 			this.EditSequenceColorsMode = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+		}
+
+		if this.ScannerChaser {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
 		// S T O P - If sequence is running, stop it
