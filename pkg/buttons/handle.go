@@ -40,7 +40,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -276,7 +276,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Show this sequence running status in the start/stop button.
 		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
-		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		// Clear the select unless we're in static mode for this sequence.
+		if !this.EditStaticColorsMode[this.SelectedSequence] {
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+		}
 
 		// Now select the correct exit mode based on if we're a scanner or not.
 		if this.SelectMode[this.SelectedSequence] == NORMAL && this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
