@@ -280,14 +280,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 2nd Press but in scanner mode same select button go into Function Mode for this sequence.
+	// 2nd Press but in scanner mode Shutter Chaser Mode for this sequence.
 	if (this.SelectMode[this.SelectedSequence] == NORMAL &&
 		this.ScannerChaser &&
 		this.SelectedType == "scanner" &&
 		this.SelectButtonPressed[this.SelectedSequence]) || this.DisplayChaserShortCut {
 
 		if debug {
-			fmt.Printf("%d: We are a SCANNER - 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
+			fmt.Printf("%d: We are a SCANNER - 2nd Press Shutter Chase Mode - Handle Step 2\n", this.SelectedSequence)
 		}
 
 		// Set function mode. And take note if we arrived using the shortcut.
@@ -299,6 +299,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			this.SelectButtonPressed[this.SelectedSequence] = false
 		}
 
+		// Update the bottom buttons.
+		common.UpdateBottomButtons("rgb", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.ChaserSequenceNumber]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.ChaserSequenceNumber]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.ChaserSequenceNumber]), "fade", false, guiButtons)
+
+		// Set the Shutter Chaser mode.
 		this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 
 		// Hide the rotating sequence.
@@ -552,27 +560,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Turn on status mode
 		this.SelectMode[this.SelectedSequence] = STATUS
 
-		// Update the buttons: speed
-		common.LabelButton(0, 7, "Speed\nDown", guiButtons)
-		common.LabelButton(1, 7, "Speed\nUp", guiButtons)
 		// Update the status bar
 		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
 
-		common.LabelButton(2, 7, "Shift\nDown", guiButtons)
-		common.LabelButton(3, 7, "Shift\nUp", guiButtons)
-
-		common.LabelButton(4, 7, "Size\nDown", guiButtons)
-		common.LabelButton(5, 7, "Size\nUp", guiButtons)
-
-		if this.SelectedType == "rgb" {
-			common.LabelButton(6, 7, "Fade\nSoft", guiButtons)
-			common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
-		}
-
-		if this.SelectedType == "scanner" {
-			common.LabelButton(6, 7, "Coord\nDown", guiButtons)
-			common.LabelButton(7, 7, "Coord\nUp", guiButtons)
-		}
+		// Update the buttons: speed
+		common.UpdateBottomButtons(this.SelectedType, guiButtons)
 
 		// If the chase is running, hide it.
 		if this.ScannerChaser && this.SelectedType == "scanner" {

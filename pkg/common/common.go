@@ -1078,8 +1078,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
 	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
 	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: White}
-	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: White}
+	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: Cyan}
+	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: Cyan}
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
@@ -1184,6 +1184,28 @@ func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALi
 		Hidden:       hide,
 	}
 	guiButtons <- event
+}
+
+func UpdateBottomButtons(selectedType string, guiButtons chan ALight) {
+
+	LabelButton(0, 7, "Speed\nDown", guiButtons)
+	LabelButton(1, 7, "Speed\nUp", guiButtons)
+
+	LabelButton(2, 7, "Shift\nDown", guiButtons)
+	LabelButton(3, 7, "Shift\nUp", guiButtons)
+
+	LabelButton(4, 7, "Size\nDown", guiButtons)
+	LabelButton(5, 7, "Size\nUp", guiButtons)
+
+	if selectedType == "rgb" {
+		LabelButton(6, 7, "Fade\nSoft", guiButtons)
+		LabelButton(7, 7, "Fade\nSharp", guiButtons)
+	}
+
+	if selectedType == "scanner" {
+		LabelButton(6, 7, "Coord\nDown", guiButtons)
+		LabelButton(7, 7, "Coord\nUp", guiButtons)
+	}
 }
 
 func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
