@@ -141,8 +141,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 1st Press Select Sequence - This the first time we have pressed the select button.
 	// Simply select the selected sequence.
 	// But remember we have pressed this select button once.
-	if this.SelectMode[this.DisplaySequence] == NORMAL &&
-		!this.SelectButtonPressed[this.DisplaySequence] {
+	if this.SelectMode[this.DisplaySequence] == NORMAL && !this.SelectButtonPressed[this.DisplaySequence] && !this.ScannerChaser ||
+		this.DisplayChaserShortCut && this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser {
+
+		// OK this is complicated,, but if we have switched on the shutter chaser from the scanner sequence function key 7 "Scanner Shutter Chase"
+		// We would at arrive at Step 2 below, where we would have switched the mode to CHASER_DISPLAY and force the display to show the shutter chaser.
+		// What we are doing here is using the DisplayChaserShortCut flag to detect that this has happened and force the next step in the select press sequence to
+		// go back to the NORMAL mode and resume the sequence of select presses to as described in the header of this Handle() function.
+		if this.DisplayChaserShortCut {
+			this.SelectMode[this.DisplaySequence] = NORMAL
+			// And now forget this ever happened. Well untill the next shortcut is called.
+			this.DisplayChaserShortCut = false
+		}
+
 		if debug {
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
@@ -295,7 +306,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			if debug {
 				fmt.Printf("%d: Chaser Display entered via DisplayChaserShortCut\n", this.SelectedSequence)
 			}
-			this.DisplayChaserShortCut = false
 			this.SelectButtonPressed[this.SelectedSequence] = false
 		}
 
@@ -638,14 +648,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Now forget we pressed twice and start again.
 		this.SelectButtonPressed[this.SelectedSequence] = false
 
-		return
-	}
-
-	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser {
-		if debug {
-			fmt.Printf("HANDLE %d: Handle 8 - Back to NORMAL mode from Shutter Chaser.\n", this.SelectedSequence)
-		}
-		this.SelectMode[this.SelectedSequence] = NORMAL
 		return
 	}
 
