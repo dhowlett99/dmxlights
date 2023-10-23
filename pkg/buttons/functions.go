@@ -69,7 +69,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			state := this.Functions[this.TargetSequence][functionNumber].State
 			fmt.Printf("FUNCS: function %d state %t\n", functionNumber, state)
 		}
-		fmt.Printf("FUNCS: this.ChaserRunning %t \n", this.ScannerChaser)
+		fmt.Printf("FUNCS: this.ChaserRunning %t \n", this.ScannerChaser[this.DisplaySequence])
 
 		fmt.Printf("================== WHAT SELECT MODE =================\n")
 		fmt.Printf("FUNCS: this.SelectButtonPressed[%d] = %t \n", this.DisplaySequence, this.SelectButtonPressed[this.DisplaySequence])
@@ -317,7 +317,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Start off in single fixture edit mode.
 		this.SelectAllStaticFixtures = false
 
-		if this.ScannerChaser {
+		if this.ScannerChaser[this.SelectedSequence] {
 			// Turn on edit static color mode in the scanner sequence.
 			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
 		}
@@ -367,7 +367,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off edit static color mode.
 		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
 
-		if this.ScannerChaser {
+		if this.ScannerChaser[this.SelectedSequence] {
 			// Turn on edit static color mode in the scanner sequence.
 			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
 		}
@@ -492,7 +492,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 7 - Toggle the shutter chaser mode. Start the chaser.
 	if X == common.Function7_Invert_Chase &&
-		!this.ScannerChaser &&
+		!this.ScannerChaser[this.SelectedSequence] &&
 		!this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State &&
 		sequences[this.TargetSequence].Type == "scanner" {
 
@@ -500,7 +500,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode On\n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
-		this.ScannerChaser = true
+		this.ScannerChaser[this.SelectedSequence] = true
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = true // Chaser
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -510,7 +510,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
-				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
+				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
@@ -531,7 +531,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 	// Function 7 - Toggle the shutter chaser mode off. Stop the chaser.
 	if X == common.Function7_Invert_Chase &&
-		this.ScannerChaser &&
+		this.ScannerChaser[this.SelectedSequence] &&
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State &&
 		sequences[this.TargetSequence].Type == "scanner" {
 
@@ -539,7 +539,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function7_Invert_Chase Scanner Shutter Chaser Mode Off\n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
-		this.ScannerChaser = false
+		this.ScannerChaser[this.SelectedSequence] = false
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -550,7 +550,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
-				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
+				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
@@ -649,17 +649,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State = false
-		this.ScannerChaser = false
+		this.ScannerChaser[this.SelectedSequence] = false
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
 		// Tell scanner & chaser sequence that the scanner shutter chase flag is off.
-		this.Running[this.ChaserSequenceNumber] = this.ScannerChaser
+		this.Running[this.ChaserSequenceNumber] = this.ScannerChaser[this.SelectedSequence]
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
-				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser},
+				{Name: "ScannerHasShutterChase", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.DisplaySequence, cmd, commandChannels)
@@ -669,7 +669,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		cmd = common.Command{
 			Action: common.UpdateMusicTrigger,
 			Args: []common.Arg{
-				{Name: "MusicTriger", Value: this.ScannerChaser},
+				{Name: "MusicTriger", Value: this.ScannerChaser[this.SelectedSequence]},
 			},
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)

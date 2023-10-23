@@ -143,6 +143,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.OffsetTilt = common.SCANNER_MID_POINT                                   // Reset tilt to the center
 		this.ScannerCoordinates[sequenceNumber] = common.DEFAULT_SCANNER_COORDNIATES // Reset the number of coordinates.
 		this.ScannerSize[this.SelectedSequence] = common.DEFAULT_SCANNER_SIZE        // Reset the scanner size back to default.
+		this.ScannerChaser[sequenceNumber] = false                                   // Clear the scanner chase mode.
 		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
 		this.SwitchPositions = [9][9]int{}                                           // Clear switch positions to their first positions.
 		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
@@ -154,7 +155,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditSequenceColorsMode = false                                          // Clear rgb color mode.
 		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
-		this.ScannerChaser = false                                                   // Clear the scanner chase mode.
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {

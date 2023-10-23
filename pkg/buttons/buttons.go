@@ -117,7 +117,7 @@ type CurrentState struct {
 	DmxInterfacePresent         bool                       // Flag to indicate precence of DMX interface card
 	DmxInterfacePresentConfig   *usbdmx.ControllerConfig   // DMX Interface card config.
 	LaunchpadName               string                     // Storage for launchpad config.
-	ScannerChaser               bool                       // Chaser is running.
+	ScannerChaser               map[int]bool               // Chaser is running.
 	DisplayChaserShortCut       bool                       // Flag to indicate we've taken a shortcut to the chaser display
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
@@ -678,7 +678,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -733,7 +733,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -787,7 +787,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -865,7 +865,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1017,7 +1017,7 @@ func ProcessButtons(X int, Y int,
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
-		if this.ScannerChaser {
+		if this.ScannerChaser[this.SelectedSequence] {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.SelectMode[this.SelectedSequence] = NORMAL
@@ -1139,7 +1139,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1194,7 +1194,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1250,7 +1250,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1307,7 +1307,7 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser &&
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1665,7 +1665,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateScannerColor,
 				Args: []common.Arg{
@@ -1750,7 +1750,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateGobo,
 				Args: []common.Arg{
