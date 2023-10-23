@@ -294,7 +294,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 2nd Press but in scanner mode Shutter Chaser Mode for this sequence.
+	// 2nd Press in scanner mode go into Shutter Chaser Mode for this sequence.
 	if (this.SelectMode[this.SelectedSequence] == NORMAL &&
 		this.ScannerChaser[this.SelectedSequence] &&
 		this.SelectedType == "scanner" &&

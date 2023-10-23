@@ -1913,9 +1913,14 @@ func ProcessButtons(X int, Y int,
 		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
+			// This is the way we get the shutter chaser to be displayed as we exit
+			// the pattern selection
+			this.DisplayChaserShortCut = true
+			this.SelectMode[this.DisplaySequence] = CHASER_FUNCTION
 		} else {
 			this.TargetSequence = this.SelectedSequence
 			this.DisplaySequence = this.SelectedSequence
+			this.SelectMode[this.DisplaySequence] = NORMAL
 		}
 
 		if debug {
@@ -1930,8 +1935,6 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		this.SelectMode[this.DisplaySequence] = NORMAL
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
