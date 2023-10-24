@@ -117,7 +117,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		return
 	}
 
-	// Function 2 Set Auto Color - Toggle the auto color feature.
+	// Function 2 Set Auto Color - Toggle the auto color feature on.
 	if X == common.Function2_Auto_Color && !this.Functions[this.TargetSequence][common.Function2_Auto_Color].State {
 
 		if debug {
@@ -145,6 +145,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		return
 	}
+	// Function 2 Set Auto Color - Toggle the auto color feature off.
 	if X == common.Function2_Auto_Color && this.Functions[this.TargetSequence][common.Function2_Auto_Color].State {
 
 		if debug {
@@ -163,10 +164,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
-	// Function 3 Set Auto Pattern - Toggle Auto Pattern.
+	// Function 3 Set Auto Pattern - Toggle Auto Pattern on.
 	if X == common.Function3_Auto_Pattern && !this.Functions[this.TargetSequence][common.Function3_Auto_Pattern].State {
 
 		if debug {
@@ -193,6 +201,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		return
 	}
+	// Function 3 Set Auto Pattern - Toggle Auto Pattern off.
 	if X == common.Function3_Auto_Pattern && this.Functions[this.TargetSequence][common.Function3_Auto_Pattern].State {
 
 		if debug {
@@ -210,6 +219,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
@@ -258,6 +274,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
@@ -522,6 +545,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
@@ -675,6 +705,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
