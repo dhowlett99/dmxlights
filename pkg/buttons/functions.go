@@ -108,6 +108,12 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		ShowPatternSelectionButtons(this, sequences[this.TargetSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
@@ -130,6 +136,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 	if X == common.Function2_Auto_Color && this.Functions[this.TargetSequence][common.Function2_Auto_Color].State {
@@ -171,6 +184,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 	if X == common.Function3_Auto_Pattern && this.Functions[this.TargetSequence][common.Function3_Auto_Pattern].State {
@@ -193,7 +213,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		return
 	}
 
-	// Function 4 Bounce - Toggle bounce feature.
+	// Function 4 Bounce - Toggle bounce feature on.
 	if X == common.Function4_Bounce && !this.Functions[this.TargetSequence][common.Function4_Bounce].State {
 
 		if debug {
@@ -211,8 +231,16 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
+	// Function 4 Bounce - Toggle bounce feature off.
 	if X == common.Function4_Bounce && this.Functions[this.TargetSequence][common.Function4_Bounce].State {
 
 		if debug {
@@ -450,6 +478,13 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
+
 		return
 	}
 
@@ -522,7 +557,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// Jump straigt to showing the shutter chaser.
+		// Jump straight to showing the shutter chaser.
 		this.DisplayChaserShortCut = true
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -606,6 +641,12 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
+		if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+		}
 
 		// We want to exit from functioms immediately so we call handle.
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)

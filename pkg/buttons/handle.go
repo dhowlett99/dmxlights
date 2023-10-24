@@ -7,34 +7,35 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 )
 
-//	+-------------------+
-//	|       NORMAL      |
-//	+-------------------+
-//	    |            |
-//	    |            | If Scanner
-//	    V            V
-//	    |       +-------------------+
-//	    |       |  CHASER DISPLAY   |
-//	    |       +-------------------+
-//	    V            |
-//	+-------------------+
-//	|     FUNCTION      |
-//	+-------------------+
-//	    |            | If Scanner
-//	    V            V
-//	    |       +-------------------+
-//	    |       |  CHASER FUNCTIONS |
-//	    |       +-------------------+
-//	    |		     |
-//	    V			 V
-//	 +-------------------+
-//	 |  FIXTURE STATUS   |
-//	 +-------------------+
-//	          |
-//	          V
-//	 +-------------------+
-//	 |       NORMAL      |
-//	 +-------------------+
+//		+-------------------+
+//		|       NORMAL      |
+//		+-------------------+
+//		    |            |
+//		    |            | If Scanner
+//	     |            | or if the DisplayChaserShortCut is set.
+//		    V            V
+//		    |       +-------------------+
+//		    |       |  CHASER DISPLAY   |
+//		    |       +-------------------+
+//		    V            |
+//		+-------------------+
+//		|     FUNCTION      |
+//		+-------------------+
+//		    |            | If Scanner
+//		    V            V
+//		    |       +-------------------+
+//		    |       |  CHASER FUNCTIONS |
+//		    |       +-------------------+
+//		    |		     |
+//		    V			 V
+//		 +-------------------+
+//		 |  FIXTURE STATUS   |
+//		 +-------------------+
+//		          |
+//		          V
+//		 +-------------------+
+//		 |       NORMAL      |
+//		 +-------------------+
 //
 // HandleSelect - Runs when you press a select button to select a sequence.
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
