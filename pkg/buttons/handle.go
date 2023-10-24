@@ -41,7 +41,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -385,6 +385,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Clear the buttons.
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+		// If we're trying to display the function bar we don't want a shutter chaser in view.
+		if !this.ScannerChaser[this.SelectedSequence] {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		}
 
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
