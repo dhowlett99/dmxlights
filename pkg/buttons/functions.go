@@ -560,7 +560,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Jump straight to showing the shutter chaser.
 		this.DisplayChaserShortCut = true
 
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -610,7 +610,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.LabelButton(6, 7, "Fase\nSoft", guiButtons)
 		common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
 
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -648,8 +648,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			this.DisplayChaserShortCut = true
 		}
 
-		// We want to exit from functioms immediately so we call handle.
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -675,8 +674,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// We want to exit from functioms immediately so we call handle.
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -715,8 +713,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// We want to exit from functioms immediately so we call handle.
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
 }
