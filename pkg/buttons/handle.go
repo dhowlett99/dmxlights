@@ -142,8 +142,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 1st Press Select Sequence - This the first time we have pressed the select button.
 	// Simply select the selected sequence.
 	// But remember we have pressed this select button once.
-	if this.SelectMode[this.DisplaySequence] == NORMAL && !this.SelectButtonPressed[this.DisplaySequence] || //&& !this.ScannerChaser[this.SelectedSequence] ||
-		this.DisplayChaserShortCut && this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser[this.SelectedSequence] {
+	if this.SelectMode[this.DisplaySequence] == NORMAL && !this.SelectButtonPressed[this.DisplaySequence] || // Normal mode and first time pressed.
+		// OR we're in the CHASER_DISPLAY mode with the chaser on and the DisplayChaserShortCut has fired
+		this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser[this.SelectedSequence] && this.DisplayChaserShortCut {
 
 		// OK this is complicated,, but if we have switched on the shutter chaser from the scanner sequence function key 7 "Scanner Shutter Chase"
 		// We would at arrive at Step 2 below, where we would have switched the mode to CHASER_DISPLAY and force the display to show the shutter chaser.
@@ -295,7 +296,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 2nd Press in scanner mode go into Shutter Chaser Mode for this sequence.
+	// First option of the 2nd Press in scanner mode go into Shutter Chaser Mode for this sequence.
+	// We're in Normal mode, We've Pressed twice and the scanner chaser is on and we're a scanner sequence.
+	// Or the DisplayChaserShortCut has fired.
 	if (this.SelectMode[this.SelectedSequence] == NORMAL &&
 		this.ScannerChaser[this.SelectedSequence] &&
 		this.SelectedType == "scanner" &&
@@ -335,12 +338,16 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		return
 	}
 
-	// 2nd Press in rgb mode same select button go into Function Mode for this sequence.
+	// Second option of the 2nd Press in rgb mode same select button go into Function Mode for this sequence.
+	// We're in Normal mode, We've Pressed twice. we're a rgb sequence.
+	// Or
+	// We're in Normal mode, We've Pressed twice. but the scanner chaser is off
+	// Or
+	// We're in Chaser Display mode. and scanner sequence.
 	if (this.SelectMode[this.SelectedSequence] == NORMAL && this.SelectedType == "rgb") ||
 		(this.SelectMode[this.SelectedSequence] == NORMAL && !this.ScannerChaser[this.SelectedSequence]) ||
 		(this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.SelectedType == "scanner") &&
-			//this.EditStaticColorsMode[this.TargetSequence] && // AND static color mode, the case when we leave static colors edit mode.
-			this.SelectButtonPressed[this.SelectedSequence] {
+			this.SelectButtonPressed[this.SelectedSequence] { // Pressed twice.
 
 		if debug {
 			fmt.Printf("%d: 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
@@ -401,13 +408,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// 3rd Press Status Mode and not a scanner - we display the fixture status enable/invert/disable buttons.
+	// We're in Function mode, pressed twice. and we're in edit sequence color mode. and we're NOT a scanner.
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
 		!this.EditSequenceColorsMode &&
 		this.SelectedType != "scanner" {
 
 		if debug {
-			fmt.Printf("%d: Handle Step 3 Status Mode, Not a Scanner, Function Bar off, status buttons on\n", this.SelectedSequence)
+			fmt.Printf("%d: Handle 3 - Status Buttons on\n", this.SelectedSequence)
 		}
 
 		// Turn on status mode
@@ -560,7 +568,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Turn off the function mode flag.
 		this.SelectMode[this.SelectedSequence] = NORMAL
-		// Now forget we pressed twice and start again.
+		// Remember that we've preseed twice.
 		this.SelectButtonPressed[this.SelectedSequence] = true
 
 		return
@@ -601,6 +609,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Show the Fixture Status Buttons.
 		showFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+
+		return
 	}
 
 	// Are we in function mode ?
