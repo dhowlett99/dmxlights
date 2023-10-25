@@ -947,6 +947,7 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorsMode = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
 
 		return
 	}
@@ -965,6 +966,7 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorsMode = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
 
 		return
 	}
@@ -1005,6 +1007,7 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorsMode = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
 
 		return
 	}
@@ -2427,5 +2430,23 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		for function := range this.Functions {
 			this.Functions[sequenceNumber][function].State = false
 		}
+	}
+}
+
+func printMode(this *CurrentState) {
+	if this.SelectMode[this.DisplaySequence] == NORMAL {
+		fmt.Printf("PrintMode: this.SelectMode[%d] = NORMAL \n", this.TargetSequence)
+	}
+	if this.SelectMode[this.DisplaySequence] == CHASER_DISPLAY {
+		fmt.Printf("PrintMode: this.SelectMode[%d] = CHASER_DISPLAY \n", this.SelectedSequence)
+	}
+	if this.SelectMode[this.DisplaySequence] == FUNCTION {
+		fmt.Printf("PrintMode: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
+	}
+	if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
+		fmt.Printf("PrintMode: this.SelectMode[%d] = CHASER_FUNCTION \n", this.SelectedSequence)
+	}
+	if this.SelectMode[this.DisplaySequence] == STATUS {
+		fmt.Printf("PrintMode: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
 	}
 }

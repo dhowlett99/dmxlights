@@ -73,19 +73,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		fmt.Printf("================== WHAT SELECT MODE =================\n")
 		fmt.Printf("FUNCS: this.SelectButtonPressed[%d] = %t \n", this.DisplaySequence, this.SelectButtonPressed[this.DisplaySequence])
-		if this.SelectMode[this.TargetSequence] == NORMAL {
-			fmt.Printf("FUNCS: this.SelectMode[%d] = NORMAL \n", this.DisplaySequence)
-		}
-		if this.SelectMode[this.TargetSequence] == FUNCTION {
-			fmt.Printf("FUNCS: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
-		}
-		if this.SelectMode[this.TargetSequence] == CHASER_FUNCTION {
-			fmt.Printf("FUNCS: this.SelectMode[%d] = CHASER_FUNCTION \n", this.SelectedSequence)
-		}
-		if this.SelectMode[this.TargetSequence] == STATUS {
-			fmt.Printf("FUNCS: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
-		}
-
+		printMode(this)
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
 		fmt.Printf("FUNCS: this.EditSequenceColorsMode[%d] = %t \n", this.DisplaySequence, this.EditSequenceColorsMode)
 		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", this.DisplaySequence, this.EditStaticColorsMode)
