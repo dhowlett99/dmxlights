@@ -29,7 +29,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
-	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
@@ -49,7 +48,7 @@ const (
 type CurrentState struct {
 	MyWindow                    fyne.Window                // Pointer to main window.
 	GUI                         bool                       // Flag to indicate use of GUI.
-	Crash1                      bool                       // Flags to detect launchpad crash.
+	Crash1                      bool                       // Flags to detect launpad crash.
 	Crash2                      bool                       // Flags to detect launchpad crash.
 	SelectedSequence            int                        // The currently selected sequence.
 	TargetSequence              int                        // The current target sequence.
@@ -2320,7 +2319,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 }
 
@@ -2449,4 +2448,21 @@ func printMode(this *CurrentState) {
 	if this.SelectMode[this.DisplaySequence] == STATUS {
 		fmt.Printf("PrintMode: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
 	}
+}
+
+func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
+	// Turn off all sequence lights.
+	for seq := 0; seq < 3; seq++ {
+		common.LightLamp(common.ALight{X: 8, Y: seq, Brightness: 255, Red: 100, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	}
+
+	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+		(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
+		// If we are in shutter chaser mode, light the lamp yellow.
+		common.LightLamp(common.ALight{X: 8, Y: this.SelectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+	} else {
+		// Now turn pink the selected sequence select light.
+		common.LightLamp(common.ALight{X: 8, Y: this.SelectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+	}
+
 }

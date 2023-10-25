@@ -22,7 +22,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
-	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/oliread/usbdmx/ft232"
 )
 
@@ -217,7 +216,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Light the correct sequence selector button.
-	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 	// Clear the graphics labels.
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)

@@ -4,7 +4,6 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/sequence"
 )
 
 //		+-------------------+
@@ -115,9 +114,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Light the top buttons.
 	common.ShowTopButtons(sequences[this.DisplaySequence].Type, eventsForLaunchpad, guiButtons)
-
-	// Light the sequence selector button.
-	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.DisplaySequence)
 
 	// Light the strobe button.
 	common.ShowStrobeButtonStatus(this.Strobe[this.DisplaySequence], eventsForLaunchpad, guiButtons)
@@ -273,17 +269,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			if this.SelectMode[this.SelectedSequence] == NORMAL {
 				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
-				this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 				common.RevealSequence(this.SelectedSequence, commandChannels)
-			} else {
-				this.SelectMode[this.SelectedSequence] = NORMAL
-				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			}
 		}
 		if debug {
 			printMode(this)
 		}
-
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -330,6 +323,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			printMode(this)
 		}
 
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -402,6 +397,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			printMode(this)
 		}
 
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -434,6 +431,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			printMode(this)
 		}
 
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -484,6 +483,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			printMode(this)
 		}
 
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -510,6 +511,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			this.EditPatternMode = true
 			common.HideSequence(this.SelectedSequence, commandChannels)
 			ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.SelectedSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+			// Light the sequence selector button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 			return
 		}
 
@@ -524,6 +527,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			sequences[this.EditWhichSequence].CurrentColors = sequences[this.EditWhichSequence].SequenceColors
 			// Show the colors
 			ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+			// Light the sequence selector button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 			return
 		}
 
@@ -542,6 +547,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 		}
 		if static {
+			// Light the sequence selector button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 			return
 		}
 
@@ -580,7 +587,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if debug {
 			printMode(this)
 		}
-
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -623,7 +631,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if debug {
 			printMode(this)
 		}
-
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
@@ -684,7 +693,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if debug {
 			printMode(this)
 		}
-
+		// Light the sequence selector button.
+		SequenceSelect(eventsForLaunchpad, guiButtons, this)
 		return
 	}
 
