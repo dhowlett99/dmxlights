@@ -1019,7 +1019,8 @@ func ProcessButtons(X int, Y int,
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
-		if this.ScannerChaser[this.SelectedSequence] {
+		// Start in normal mode, hide the shutter chaser.
+		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 			this.SelectMode[this.SelectedSequence] = NORMAL
@@ -1037,10 +1038,34 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			this.Running[this.SelectedSequence] = false
+
+			// Stop should also stop the shutter chaser.
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+
+				cmd := common.Command{
+					Action: common.Stop,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.ChaserSequenceNumber]},
+					},
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+				this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+				this.ScannerChaser[this.SelectedSequence] = false
+				this.SelectMode[this.SelectedSequence] = NORMAL
+				this.Running[this.ChaserSequenceNumber] = false
+			}
+
+			// Turn of the start lamp.
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
+			// Set the correct color for the select button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
+
 			return
+
 		} else {
 			// Start this sequence.
 			if debug {
@@ -1062,6 +1087,9 @@ func ProcessButtons(X int, Y int,
 
 			// Reveal the now running sequence
 			common.RevealSequence(this.SelectedSequence, commandChannels)
+
+			// Set the correct color for the select button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 			return
 		}
