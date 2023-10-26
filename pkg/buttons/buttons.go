@@ -48,7 +48,7 @@ const (
 type CurrentState struct {
 	MyWindow                    fyne.Window                // Pointer to main window.
 	GUI                         bool                       // Flag to indicate use of GUI.
-	Crash1                      bool                       // Flags to detect launpad crash.
+	Crash1                      bool                       // Flags to detect launchpad crash.
 	Crash2                      bool                       // Flags to detect launchpad crash.
 	SelectedSequence            int                        // The currently selected sequence.
 	TargetSequence              int                        // The current target sequence.
