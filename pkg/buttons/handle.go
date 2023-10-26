@@ -526,7 +526,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			// Set the colors.
 			sequences[this.EditWhichSequence].CurrentColors = sequences[this.EditWhichSequence].SequenceColors
 			// Show the colors
-			ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+			ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 			// Light the sequence selector button.
 			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 			return
