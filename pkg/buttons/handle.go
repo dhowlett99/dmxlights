@@ -64,7 +64,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
 		fmt.Printf("HANDLE: this.DisplayChaserShortCut = %t \n", this.DisplayChaserShortCut)
-		fmt.Printf("HANDLE: this.EditSequenceColorsMode[%d] = %t \n", this.TargetSequence, this.EditSequenceColorsMode)
+		fmt.Printf("HANDLE: this.EditSequenceColorPickerMode[%d] = %t \n", this.TargetSequence, this.EditSequenceColorPickerMode)
 		fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.TargetSequence, this.EditStaticColorsMode)
 		fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.TargetSequence, this.EditGoboSelectionMode)
 		fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.TargetSequence, this.EditPatternMode)
@@ -227,7 +227,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		if this.SelectMode[this.SelectedSequence] == NORMAL &&
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State &&
-			this.EditSequenceColorsMode {
+			this.EditSequenceColorPickerMode {
 
 			fmt.Printf("Color Edit Mode Off for sequence %d\n", this.SelectedSequence)
 
@@ -406,7 +406,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// We're in Function mode, pressed twice. and we're in edit sequence color mode. and we're NOT a scanner.
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode &&
+		!this.EditSequenceColorPickerMode &&
 		this.SelectedType != "scanner" {
 
 		if debug {
@@ -440,7 +440,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	if this.SelectMode[this.SelectedSequence] == FUNCTION &&
 		this.ScannerChaser[this.SelectedSequence] &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode &&
+		!this.EditSequenceColorPickerMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {
@@ -491,7 +491,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 4th Press Normal Mode - we head back to normal mode.
 	if this.SelectMode[this.SelectedSequence] == STATUS &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode {
+		!this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("%d: Handle Step 5 - Normal Mode From Non Scanner, Function Bar off\n", this.SelectedSequence)
@@ -595,7 +595,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 4th Press Normal Mode and we are a scanner- we head fixture status mode.
 	if (this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || !this.ScannerChaser[this.SelectedSequence]) &&
 		!this.SelectButtonPressed[this.SelectedSequence] &&
-		!this.EditSequenceColorsMode &&
+		!this.EditSequenceColorPickerMode &&
 		this.SelectedType == "scanner" {
 
 		if debug {
@@ -617,8 +617,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Turn off the edit sequence colors button.
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.EditSequenceColorPickerMode {
+			this.EditSequenceColorPickerMode = false
 			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
 		}
 
@@ -661,7 +661,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// Turn off the edit sequence colors button.
-		if this.EditSequenceColorsMode {
+		if this.EditSequenceColorPickerMode {
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 			// If the Selected Color has come back as empty this means we didn't select any colors.
 			// So restore the colors that were already there.

@@ -75,7 +75,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		fmt.Printf("FUNCS: this.SelectButtonPressed[%d] = %t \n", this.DisplaySequence, this.SelectButtonPressed[this.DisplaySequence])
 		printMode(this)
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
-		fmt.Printf("FUNCS: this.EditSequenceColorsMode[%d] = %t \n", this.DisplaySequence, this.EditSequenceColorsMode)
+		fmt.Printf("FUNCS: this.EditSequenceColorPickerMode[%d] = %t \n", this.DisplaySequence, this.EditSequenceColorPickerMode)
 		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", this.DisplaySequence, this.EditStaticColorsMode)
 		fmt.Printf("FUNCS: this.EditGoboSelectionMode[%d] = %t \n", this.DisplaySequence, this.EditGoboSelectionMode)
 		fmt.Printf("FUNCS: this.EditPatternMode[%d] = %t \n", this.DisplaySequence, this.EditPatternMode)
@@ -280,7 +280,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
-		this.EditSequenceColorsMode = true
+		this.EditSequenceColorPickerMode = true
 		this.Functions[this.TargetSequence][common.Function5_Color].State = true
 
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.

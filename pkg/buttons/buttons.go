@@ -81,7 +81,7 @@ type CurrentState struct {
 	FunctionLabels              [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed         []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorsMode      bool                       // This flag is true when the sequence is in select sequence chase colors editing mode.
+	EditSequenceColorPickerMode bool                       // This flag is true when the sequence is in when we are using the color picker.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in static colors editing mode.
@@ -183,7 +183,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		!this.EditStaticColorsMode[Y] &&
-		!this.EditSequenceColorsMode &&
+		!this.EditSequenceColorPickerMode &&
 		!this.EditColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
@@ -243,7 +243,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditSequenceColorsMode &&
+		!this.EditSequenceColorPickerMode &&
 		!this.EditColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
@@ -600,8 +600,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Ask For Config\n")
 		}
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.EditSequenceColorPickerMode {
+			this.EditSequenceColorPickerMode = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -668,7 +668,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Decrease Shift.
-	if X == 2 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 2 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Decrease Shift\n")
@@ -723,7 +723,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Shift.
-	if X == 3 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 3 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Increase Shift \n")
@@ -777,7 +777,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E L E C T   S P E E D - Decrease speed of selected sequence.
-	if X == 0 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 0 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Decrease Speed \n")
@@ -855,7 +855,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E L E C T   S P E E D - Increase speed of selected sequence.
-	if X == 1 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 1 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Increase Speed \n")
@@ -944,7 +944,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 
@@ -963,7 +963,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 
@@ -982,7 +982,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 
 		return
@@ -1004,7 +1004,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 
@@ -1014,8 +1014,8 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.EditSequenceColorPickerMode {
+			this.EditSequenceColorPickerMode = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -1160,7 +1160,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Size decrease.
-	if X == 4 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 4 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Decrease Size\n")
@@ -1215,7 +1215,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Size.
-	if X == 5 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 5 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Increase Size\n")
@@ -1271,7 +1271,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time decrease.
-	if X == 6 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 6 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Decrease Fade Time\n")
@@ -1328,7 +1328,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time increase.
-	if X == 7 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 7 && Y == 7 && !this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Increase Fade Time\n")
@@ -1392,8 +1392,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.EditSequenceColorPickerMode {
+			this.EditSequenceColorPickerMode = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -1630,7 +1630,7 @@ func ProcessButtons(X int, Y int,
 		Y != -1 && Y < 3 &&
 		!this.EditFixtureSelectionMode &&
 		!this.EditScannerColorsMode &&
-		this.EditSequenceColorsMode {
+		this.EditSequenceColorPickerMode {
 
 		if debug {
 			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
@@ -1657,7 +1657,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		this.EditSequenceColorsMode = true
+		this.EditSequenceColorPickerMode = true
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
@@ -1820,6 +1820,12 @@ func ProcessButtons(X int, Y int,
 		this.TargetSequence = this.EditWhichSequence
 		this.DisplaySequence = this.SelectedSequence
 
+		if debug {
+			fmt.Printf("EditWhichSequence %d\n", this.EditWhichSequence)
+			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		}
+
 		// Save the selected fixture number.
 		this.SelectedStaticFixtureNumber = X
 
@@ -1855,6 +1861,15 @@ func ProcessButtons(X int, Y int,
 		this.EditColorPicker && // Now We Are In Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
 		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in this sequence
+
+		this.TargetSequence = this.EditWhichSequence
+		this.DisplaySequence = this.SelectedSequence
+
+		if debug {
+			fmt.Printf("EditWhichSequence %d\n", this.EditWhichSequence)
+			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		}
 
 		// Find the color from the button pressed.
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])
@@ -2201,7 +2216,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	if sequence.ScannerAvailableColors[this.SelectedFixture+1] == nil {
 
 		// Turn off the color edit mode.
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		// And since we seem to be using two flags for the same thing, turn this off too.
 		this.Functions[this.SelectedSequence][common.Function5_Color].State = false
 
@@ -2450,7 +2465,7 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	for sequenceNumber := range sequences {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
-		this.EditSequenceColorsMode = false
+		this.EditSequenceColorPickerMode = false
 		this.EditStaticColorsMode[this.DisplaySequence] = false
 		this.EditStaticColorsMode[this.TargetSequence] = false
 		this.EditGoboSelectionMode = false
