@@ -2097,9 +2097,6 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
 
 		lamp.Flash = false
-		if debug {
-			fmt.Printf("Static Color Button %+v\n", lamp)
-		}
 
 		// Check if we need to flash this button.
 		for index, availableColor := range targetSequence.RGBAvailableColors {

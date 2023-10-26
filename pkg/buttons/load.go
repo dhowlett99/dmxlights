@@ -149,4 +149,18 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	} else {
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
+
+	// Stop any static flashing.
+	if sequences[this.SelectedSequence].Static {
+		this.SelectAllStaticFixtures = true
+
+		cmd := common.Command{
+			Action: common.UpdateFlashAllStaticColorButtons,
+			Args: []common.Arg{
+				{Name: "Flash", Value: false},
+			},
+		}
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+	}
 }
