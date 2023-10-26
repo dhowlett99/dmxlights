@@ -947,6 +947,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
+		this.EditWhichSequence = 0
 
 		return
 	}
@@ -966,6 +967,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
+		this.EditWhichSequence = 1
 
 		return
 	}
@@ -984,6 +986,7 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
+		this.EditWhichSequence = 2
 
 		return
 	}
@@ -1007,6 +1010,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
+		this.EditWhichSequence = 3
 
 		return
 	}
