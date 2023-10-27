@@ -86,7 +86,7 @@ type CurrentState struct {
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in static colors editing mode.
 	EditColorPicker             bool                       // This flag is true when the sequence is in color picker mode.
-	EditWhichSequence           int                        // Which sequence is currently being edited.
+	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
 	EditPatternMode             bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode    bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness            int                        // Affects all DMX fixtures and launchpad lamps.
@@ -947,7 +947,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
-		this.EditWhichSequence = 0
+		this.EditWhichStaticSequence = 0
 
 		return
 	}
@@ -967,7 +967,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
-		this.EditWhichSequence = 1
+		this.EditWhichStaticSequence = 1
 
 		return
 	}
@@ -986,7 +986,9 @@ func ProcessButtons(X int, Y int,
 
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
-		this.EditWhichSequence = 2
+		if this.ScannerChaser[this.SelectedSequence] {
+			this.EditWhichStaticSequence = 4
+		}
 
 		return
 	}
@@ -1010,7 +1012,7 @@ func ProcessButtons(X int, Y int,
 		this.EditSequenceColorPickerMode = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
-		this.EditWhichSequence = 3
+		this.EditWhichStaticSequence = 3
 
 		return
 	}
@@ -1056,6 +1058,7 @@ func ProcessButtons(X int, Y int,
 				}
 				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+				this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 				this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
 				this.ScannerChaser[this.SelectedSequence] = false
 				this.SelectMode[this.SelectedSequence] = NORMAL
@@ -1819,13 +1822,13 @@ func ProcessButtons(X int, Y int,
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
 		!this.EditColorPicker && // Not In Color Picker Mode.
-		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in any sequence
+		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in any sequence
 
-		this.TargetSequence = this.EditWhichSequence
+		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
 
 		if debug {
-			fmt.Printf("EditWhichSequence %d\n", this.EditWhichSequence)
+			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
 			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
 			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
 		}
@@ -1864,16 +1867,16 @@ func ProcessButtons(X int, Y int,
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.EditColorPicker && // Now We Are In Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in this sequence
+		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in this sequence
 
-		this.TargetSequence = this.EditWhichSequence
+		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
 
-		if debug {
-			fmt.Printf("EditWhichSequence %d\n", this.EditWhichSequence)
-			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
-			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
-		}
+		//if debug {
+		fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
+		fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+		fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		//}
 
 		// Find the color from the button pressed.
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])

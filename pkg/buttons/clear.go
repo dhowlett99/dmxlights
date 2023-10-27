@@ -45,16 +45,16 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		cmd := common.Command{
 			Action: common.ClearSequenceColor,
 		}
-		common.SendCommandToSequence(this.EditWhichSequence, cmd, commandChannels)
+		common.SendCommandToSequence(this.EditWhichStaticSequence, cmd, commandChannels)
 
 		// Get an upto date copy of the sequence.
-		sequences[this.EditWhichSequence] = common.RefreshSequence(this.EditWhichSequence, commandChannels, updateChannels)
+		sequences[this.EditWhichStaticSequence] = common.RefreshSequence(this.EditWhichStaticSequence, commandChannels, updateChannels)
 
 		// Set the colors.
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Flash the correct color buttons
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichStaticSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Clear has been pressed, next time we press clear we will get the full clear.
 		this.ClearPressed[this.TargetSequence] = true
@@ -63,13 +63,13 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.EditWhichSequence] && !this.ClearPressed[this.TargetSequence] {
+	if this.EditStaticColorsMode[this.EditWhichStaticSequence] && !this.ClearPressed[this.TargetSequence] {
 
 		if debug {
 			fmt.Printf("Shortcut to clear static colors\n")
 		}
 
-		if this.EditStaticColorsMode[this.EditWhichSequence] && this.EditSequenceColorPickerMode {
+		if this.EditStaticColorsMode[this.EditWhichStaticSequence] && this.EditSequenceColorPickerMode {
 			if debug {
 				fmt.Printf("removeColorPicker\n")
 			}

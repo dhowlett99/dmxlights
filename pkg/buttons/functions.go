@@ -302,7 +302,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.SavedSequenceColors[this.SelectedSequence] = sequences[this.SelectedSequence].SequenceColors
 
 		// Remember which sequence we are editing
-		this.EditWhichSequence = this.TargetSequence
+		this.EditWhichStaticSequence = this.TargetSequence
 
 		// We use the whole launchpad for choosing from 24 colors.
 		common.HideAllSequences(commandChannels)
@@ -335,7 +335,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		sequences[this.TargetSequence].StaticColors[X].FirstPress = false
 
 		// Remember which sequence we are editing
-		this.EditWhichSequence = this.TargetSequence
+		this.EditWhichStaticSequence = this.TargetSequence
 
 		this.FollowingAction = "ShowScannerColorSelectionButtons"
 		this.SelectedFixture = ShowSelectFixtureButtons(*sequences[this.TargetSequence], this.DisplaySequence, this, eventsForLaunchpad, this.FollowingAction, guiButtons)
@@ -387,7 +387,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.RevealSequence(this.TargetSequence, commandChannels)
 
 		// Remember which sequence we are editing
-		this.EditWhichSequence = this.TargetSequence
+		this.EditWhichStaticSequence = this.TargetSequence
 
 		return
 	}
@@ -594,6 +594,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.ScannerChaser[this.SelectedSequence] = false
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
+		// Stopping the shutter chaser should also switch off any static scene.
+		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.

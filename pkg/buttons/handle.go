@@ -155,7 +155,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
 				},
 			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.DisplaySequence] {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			} else {
+				if this.TargetSequence != 2 {
+					common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+				}
+			}
 		}
 
 		// Assume everything else is off.
@@ -226,13 +232,13 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		if this.SelectMode[this.SelectedSequence] == NORMAL &&
-			this.Functions[this.EditWhichSequence][common.Function5_Color].State &&
+			this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State &&
 			this.EditSequenceColorPickerMode {
 
 			fmt.Printf("Color Edit Mode Off for sequence %d\n", this.SelectedSequence)
 
 			// Reset the color function key.
-			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+			this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 
 			// And reveal the sequence on the launchpad keys
 			// and hide the shutter chaser.
@@ -517,16 +523,16 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 
 		// We're in RGB Color Selection Mode.
-		if this.SelectedType == "rgb" && this.Functions[this.EditWhichSequence][common.Function5_Color].State {
+		if this.SelectedType == "rgb" && this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State {
 			if debug {
 				fmt.Printf("Show RGB Sequence Color Selection Buttons\n")
 			}
 			// Turn off the color selection function key.
-			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+			this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 			// Set the colors.
-			sequences[this.EditWhichSequence].CurrentColors = sequences[this.EditWhichSequence].SequenceColors
+			sequences[this.EditWhichStaticSequence].CurrentColors = sequences[this.EditWhichStaticSequence].SequenceColors
 			// Show the colors
-			ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+			ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichStaticSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 			// Light the sequence selector button.
 			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 			return
@@ -549,12 +555,26 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		if static {
 			// Light the sequence selector button.
 			SequenceSelect(eventsForLaunchpad, guiButtons, this)
+			if debug {
+				printMode(this)
+			}
+			// Turn off the function mode flag.
+			this.SelectMode[this.SelectedSequence] = NORMAL
+			// If the chase is running, hide it.
+			if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
+				if debug {
+					fmt.Printf("%d: Hide Sequence\n", this.ChaserSequenceNumber)
+				}
+				common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			}
+			// Remember that we've preseed twice.
+			this.SelectButtonPressed[this.SelectedSequence] = true
 			return
 		}
 
 		// We're in Scanner Gobo Selection Mode.
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-			!this.EditStaticColorsMode[this.EditWhichSequence] &&
+			!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
 			sequences[this.SelectedSequence].Type == "scanner" {
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.EditGoboSelectionMode = false
@@ -619,7 +639,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Turn off the edit sequence colors button.
 		if this.EditSequenceColorPickerMode {
 			this.EditSequenceColorPickerMode = false
-			this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+			this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 		}
 
 		// Remove the function pads.
@@ -708,7 +728,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 	this.SelectButtonPressed[this.SelectedSequence] = false
 	this.SelectMode[this.SelectedSequence] = NORMAL
-	this.Functions[this.EditWhichSequence][common.Function5_Color].State = false
+	this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 
 	// Clear the first three launchpad rows used by the color picker.
 	for y := 0; y < 3; y++ {
@@ -719,6 +739,14 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 	cmd := common.Command{
 		Action: common.UnHide,
 	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
+
+	// This doesn't take account of the shutter chaser which should be shown if the chaser is running.
+	common.SendCommandToSequence(0, cmd, commandChannels)
+	common.SendCommandToSequence(1, cmd, commandChannels)
+	if !this.ScannerChaser[this.SelectedSequence] {
+		common.SendCommandToSequence(2, cmd, commandChannels)
+	} else {
+		common.SendCommandToSequence(4, cmd, commandChannels)
+	}
 
 }
