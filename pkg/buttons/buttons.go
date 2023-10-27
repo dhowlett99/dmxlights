@@ -1872,11 +1872,11 @@ func ProcessButtons(X int, Y int,
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
 
-		//if debug {
-		fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
-		fmt.Printf("TargetSequence %d\n", this.TargetSequence)
-		fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
-		//}
+		if debug {
+			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
+			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		}
 
 		// Find the color from the button pressed.
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])
