@@ -576,9 +576,6 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// Jump straight to showing the shutter chaser.
-		this.DisplayChaserShortCut = true
-
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}

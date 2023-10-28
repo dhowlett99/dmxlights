@@ -1964,6 +1964,9 @@ func ProcessButtons(X int, Y int,
 		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
+			// This is the way we get the shutter chaser to be displayed as we exit
+			// the pattern selection
+			this.DisplayChaserShortCut = true
 			this.SelectMode[this.DisplaySequence] = CHASER_FUNCTION
 		} else {
 			this.TargetSequence = this.SelectedSequence

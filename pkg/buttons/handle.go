@@ -15,6 +15,7 @@ import (
 //	|     FUNCTION      |
 //	+-------------------+
 //	    |            | If Scanner
+//	    |            | or if the DisplayChaserShortCut is set.
 //	    V            V
 //	    |       +-------------------+
 //	    |       |  CHASER DISPLAY   |
@@ -36,6 +37,7 @@ import (
 //	 |       NORMAL      |
 //	 +-------------------+
 //
+
 // HandleSelect - Runs when you press a select button to select a sequence.
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
@@ -107,7 +109,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// 1st Press Select Sequence - This the first time we have pressed the select button.
 	// Simply select the selected sequence.
 	// But remember we have pressed this select button once.
-	if this.SelectMode[this.DisplaySequence] == NORMAL && !this.SelectButtonPressed[this.DisplaySequence] {
+	if this.SelectMode[this.DisplaySequence] == NORMAL && !this.SelectButtonPressed[this.DisplaySequence] || // Normal mode and first time pressed.
+		// OR we're in the CHASER_DISPLAY mode with the chaser on and the DisplayChaserShortCut has fired
+		this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY && this.ScannerChaser[this.SelectedSequence] && this.DisplayChaserShortCut {
 
 		if debug {
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
@@ -118,6 +122,17 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectButtonPressed[1] = false
 		this.SelectButtonPressed[2] = false
 		this.SelectButtonPressed[3] = false
+
+		// OK this is complicated,, but if we have switched on the shutter chaser from the scanner sequence function key 7 "Scanner Shutter Chase"
+		// We would at arrive at Step 2 below, where we would have switched the mode to CHASER_DISPLAY and force the display to show the shutter chaser.
+		// What we are doing here is using the DisplayChaserShortCut flag to detect that this has happened and force the next step in the select press sequence to
+		// go back to the NORMAL mode and resume the sequence of select presses to as described in the header of this Handle() function.
+		if this.DisplayChaserShortCut {
+			this.SelectMode[this.DisplaySequence] = NORMAL
+			// And now forget this ever happened. Well untill the next shortcut is called.
+			this.DisplayChaserShortCut = false
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		}
 
 		// Remember which select button has been pressed.
 		this.SelectButtonPressed[this.SelectedSequence] = true
@@ -156,17 +171,27 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Second option of the 2nd Press in scanner mode go into Shutter Chaser Mode for this sequence.
 	// We're in Normal mode, We've Pressed twice and the scanner chaser is on and we're a scanner sequence.
-	if this.SelectMode[this.SelectedSequence] == NORMAL &&
+	// Or the DisplayChaserShortCut has fired.
+	if (this.SelectMode[this.SelectedSequence] == NORMAL &&
 		this.ScannerChaser[this.SelectedSequence] &&
 		this.SelectedType == "scanner" &&
-		this.SelectButtonPressed[this.SelectedSequence] {
+		this.SelectButtonPressed[this.SelectedSequence]) || this.DisplayChaserShortCut {
 
 		if debug {
 			fmt.Printf("%d: We are a SCANNER, Shutter Chaser On- 2nd Press Shutter Chase Mode - Handle Step 2\n", this.SelectedSequence)
 		}
 
-		// Calculate the next mode.
-		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence])
+		// Set function mode. And take note if we arrived using the shortcut.
+		if this.DisplayChaserShortCut {
+			if debug {
+				fmt.Printf("%d: Chaser Display entered via DisplayChaserShortCut\n", this.SelectedSequence)
+			}
+			this.SelectButtonPressed[this.SelectedSequence] = false
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		} else {
+			// Calculate normally the next mode.
+			this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence])
+		}
 
 		// Now display the selected mode.
 		displayMode(this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
