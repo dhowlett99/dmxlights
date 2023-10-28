@@ -340,6 +340,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 	switch {
 
+	default:
 	case mode == NORMAL:
 
 		if debug {
@@ -364,9 +365,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		common.HideSequence(this.SelectedSequence, commandChannels)
 
 		// Reveal the shutter chaser.
-		//if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
-		//}
 
 		return
 
@@ -376,18 +375,10 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", this.SelectedSequence, this.ScannerChaser[this.SelectedSequence])
 		}
 		// If we have a shutter chaser running hide it.
-		//if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
-		//}
+
 		// Hide the sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
-
-		// Update the bottom buttons.
-		common.UpdateBottomButtons("rgb", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.ChaserSequenceNumber]), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.ChaserSequenceNumber]), "size", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.ChaserSequenceNumber]), "fade", false, guiButtons)
 
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -405,17 +396,6 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		}
 		// Hide the normal sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
-
-		// Update the labels.
-		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
-		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
-		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
-		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
-		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
-		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
-		common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
-		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
 
 		// Show the chaser function buttons.
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -465,7 +445,7 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
-	if sequences[this.TargetSequence].Type == "rgb" {
+	if sequences[this.TargetSequence].Type == "rgb" && sequences[this.TargetSequence].Label != "chaser" {
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
@@ -475,6 +455,19 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.TargetSequence].Color.G), "green", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.TargetSequence].Color.B), "blue", false, guiButtons)
 	}
+
+	if sequences[this.TargetSequence].Type == "rgb" && sequences[this.TargetSequence].Label == "chaser" {
+		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
+		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+		common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
+		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
+	}
+
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
