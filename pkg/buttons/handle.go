@@ -42,7 +42,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -104,6 +104,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+	}
+
+	// We're in Scanner Gobo Selection Mode.
+	if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
+		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
+		sequences[this.SelectedSequence].Type == "scanner" {
+		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+		this.EditGoboSelectionMode = false
 	}
 
 	// 1st Press Select Sequence - This the first time we have pressed the select button.
@@ -327,7 +335,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	// Clear the buttons.
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
