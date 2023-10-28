@@ -492,6 +492,7 @@ func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, event
 			if sequenceNumber != this.SelectedSequence {
 				// And turn off the function selected.
 				this.SelectMode[sequenceNumber] = NORMAL
+				this.SelectedSequence = sequenceNumber
 				displayMode(NORMAL, this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
 			}
 		}
