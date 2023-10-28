@@ -385,8 +385,8 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: NORMAL\n")
 		}
 
-		// If we have a shutter chaser running hide it.
-		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
+		// Make sure we hide any shutter chaser.
+		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Reveal the selected sequence.
