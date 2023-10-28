@@ -78,7 +78,7 @@ func main() {
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
 	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
 	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
-	this.EditSequenceColorPickerMode = false                       // Remember when we are in editing sequence colors mode.
+	this.ShowRGBColorPicker = false                                // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.

@@ -39,10 +39,10 @@ const debug = false
 // Select modes.
 const (
 	NORMAL          int = iota // Normal RGB or Scanner Rotation display.
-	CHASER_DISPLAY             //  Show the scanner shutter display.
 	FUNCTION                   // Show the RGB or Scanner functions.
-	CHASER_FUNCTION            // Show the scammer shutter chaser functions.
 	STATUS                     // Show the fixture status states.
+	CHASER_DISPLAY             //  Show the scanner shutter display.
+	CHASER_FUNCTION            // Show the scammer shutter chaser functions.
 )
 
 type CurrentState struct {
@@ -81,11 +81,11 @@ type CurrentState struct {
 	FunctionLabels              [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed         []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorPickerMode bool                       // This flag is true when the sequence is in when we are using the color picker.
+	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditColorPicker             bool                       // This flag is true when the sequence is in color picker mode.
+	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in edit static colors mode.
+	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
 	EditPatternMode             bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode    bool                       // This flag is true when the sequence is in select fixture mode.
@@ -183,8 +183,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
 		!this.EditStaticColorsMode[Y] &&
-		!this.EditSequenceColorPickerMode &&
-		!this.EditColorPicker &&
+		!this.ShowRGBColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -243,8 +242,8 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditSequenceColorPickerMode &&
-		!this.EditColorPicker &&
+		!this.ShowRGBColorPicker &&
+		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -600,8 +599,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Ask For Config\n")
 		}
 
-		if this.EditSequenceColorPickerMode {
-			this.EditSequenceColorPickerMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -668,7 +667,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Decrease Shift.
-	if X == 2 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Shift\n")
@@ -723,7 +722,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Shift.
-	if X == 3 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Shift \n")
@@ -777,7 +776,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E L E C T   S P E E D - Decrease speed of selected sequence.
-	if X == 0 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Speed \n")
@@ -855,7 +854,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// S E L E C T   S P E E D - Increase speed of selected sequence.
-	if X == 1 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Speed \n")
@@ -944,7 +943,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 0
@@ -964,7 +963,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 1
@@ -984,7 +983,7 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
 		if this.ScannerChaser[this.SelectedSequence] {
 			this.EditWhichStaticSequence = 4
@@ -1009,7 +1008,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 3
@@ -1020,8 +1019,8 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 
-		if this.EditSequenceColorPickerMode {
-			this.EditSequenceColorPickerMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -1167,7 +1166,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Size decrease.
-	if X == 4 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 4 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Size\n")
@@ -1222,7 +1221,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Increase Size.
-	if X == 5 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 5 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Size\n")
@@ -1278,7 +1277,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time decrease.
-	if X == 6 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Fade Time\n")
@@ -1335,7 +1334,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Fade time increase.
-	if X == 7 && Y == 7 && !this.EditSequenceColorPickerMode {
+	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Fade Time\n")
@@ -1399,8 +1398,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
 
-		if this.EditSequenceColorPickerMode {
-			this.EditSequenceColorPickerMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -1637,7 +1636,7 @@ func ProcessButtons(X int, Y int,
 		Y != -1 && Y < 3 &&
 		!this.EditFixtureSelectionMode &&
 		!this.EditScannerColorsMode &&
-		this.EditSequenceColorPickerMode {
+		this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
@@ -1664,7 +1663,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		this.EditSequenceColorPickerMode = true
+		this.ShowRGBColorPicker = true
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
@@ -1821,7 +1820,7 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		!this.EditColorPicker && // Not In Color Picker Mode.
+		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
 		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in any sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
@@ -1856,8 +1855,8 @@ func ProcessButtons(X int, Y int,
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
 		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
-		// Switch the mode so we know we are picking a color from the color picker.
-		this.EditColorPicker = true
+		// Switch the mode so we know we are picking a static color from the color picker.
+		this.ShowStaticColorPicker = true
 
 		return
 	}
@@ -1865,7 +1864,7 @@ func ProcessButtons(X int, Y int,
 	// S E T   S T A T I C   C O L O R
 	if X >= 0 && X < 8 && Y != -1 &&
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
-		this.EditColorPicker && // Now We Are In Color Picker Mode.
+		this.ShowStaticColorPicker && // Now We Are In Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
 		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in this sequence
 
@@ -1952,7 +1951,7 @@ func ProcessButtons(X int, Y int,
 		common.RevealSequence(this.TargetSequence, commandChannels)
 
 		// Switch off the color picker.
-		this.EditColorPicker = false
+		this.ShowStaticColorPicker = false
 
 		return
 	}
@@ -1965,9 +1964,6 @@ func ProcessButtons(X int, Y int,
 		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
-			// This is the way we get the shutter chaser to be displayed as we exit
-			// the pattern selection
-			this.DisplayChaserShortCut = true
 			this.SelectMode[this.DisplaySequence] = CHASER_FUNCTION
 		} else {
 			this.TargetSequence = this.SelectedSequence
@@ -2223,7 +2219,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	if sequence.ScannerAvailableColors[this.SelectedFixture+1] == nil {
 
 		// Turn off the color edit mode.
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		// And since we seem to be using two flags for the same thing, turn this off too.
 		this.Functions[this.SelectedSequence][common.Function5_Color].State = false
 
@@ -2472,7 +2468,7 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	for sequenceNumber := range sequences {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
-		this.EditSequenceColorPickerMode = false
+		this.ShowRGBColorPicker = false
 		this.EditStaticColorsMode[this.DisplaySequence] = false
 		this.EditStaticColorsMode[this.TargetSequence] = false
 		this.EditGoboSelectionMode = false

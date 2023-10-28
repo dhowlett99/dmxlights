@@ -35,7 +35,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
-	if this.EditSequenceColorPickerMode && !this.ClearPressed[this.TargetSequence] {
+	if this.ShowRGBColorPicker && !this.ClearPressed[this.TargetSequence] {
 
 		if debug {
 			fmt.Printf("Shortcut to clear rgb chase colors\n")
@@ -69,7 +69,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			fmt.Printf("Shortcut to clear static colors\n")
 		}
 
-		if this.EditStaticColorsMode[this.EditWhichStaticSequence] && this.EditSequenceColorPickerMode {
+		if this.EditStaticColorsMode[this.EditWhichStaticSequence] && this.ShowRGBColorPicker {
 			if debug {
 				fmt.Printf("removeColorPicker\n")
 			}
@@ -168,7 +168,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditGoboSelectionMode = false                                           // Clear edit gobo mode.
 		this.EditPatternMode = false                                                 // Clear edit pattern mode.
 		this.EditScannerColorsMode = false                                           // Clear scanner color mode.
-		this.EditSequenceColorPickerMode = false                                     // Clear rgb color mode.
+		this.ShowRGBColorPicker = false                                              // Clear rgb color mode.
 		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
 

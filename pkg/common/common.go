@@ -961,16 +961,6 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	return &newSequence
 }
 
-// For the given sequence hide the available sequence colors..
-func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	if mySequenceNumber == 4 {
-		return
-	}
-	for myFixtureNumber := range sequence.RGBAvailableColors {
-		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
-	}
-}
-
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if selectedSequence == 4 {
 		return
