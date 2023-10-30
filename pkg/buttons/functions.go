@@ -615,18 +615,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// Update the buttons: speed
-		common.LabelButton(0, 7, "Speed\nDown", guiButtons)
-		common.LabelButton(1, 7, "Speed\nUp", guiButtons)
-
-		common.LabelButton(2, 7, "Shift\nDown", guiButtons)
-		common.LabelButton(3, 7, "Shift\nUp", guiButtons)
-
-		common.LabelButton(4, 7, "Size\nDown", guiButtons)
-		common.LabelButton(5, 7, "Size\nUp", guiButtons)
-
-		common.LabelButton(6, 7, "Fase\nSoft", guiButtons)
-		common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
+		// Update the labek.
+		showStatusBar(this, sequences, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return

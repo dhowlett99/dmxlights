@@ -138,6 +138,9 @@ func ProcessButtons(X int, Y int,
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
 
+	// Set the sequence type.
+	this.SelectedType = sequences[this.SelectedSequence].Type
+
 	// The Novation Launchpad is not designed for the number of MIDI
 	// Events we send when all the sequences are chasing at top
 	// Speed, so we look out for the crys for help when the Launchpad
@@ -697,7 +700,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+			UpdateShift(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBShift[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -716,7 +719,7 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
 	}
@@ -751,7 +754,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+			UpdateShift(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBShift[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -770,7 +773,7 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
 			return
 		}
 	}
@@ -848,7 +851,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		UpdateSpeed(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.Speed[this.TargetSequence], this.SelectedType, guiButtons)
 
 		return
 	}
@@ -925,7 +928,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		UpdateSpeed(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.Speed[this.TargetSequence], this.SelectedType, guiButtons)
 
 		return
 	}
@@ -1196,7 +1199,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBSize[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -1215,7 +1218,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
@@ -1251,7 +1254,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBSize[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -1270,8 +1273,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
-
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
@@ -1306,8 +1308,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
-
+			UpdateFade(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBFade[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -1327,7 +1328,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 
@@ -1363,7 +1364,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+			UpdateFade(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBFade[this.TargetSequence], this.SelectedType, guiButtons)
 			return
 		}
 
@@ -1383,7 +1384,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 	}
@@ -2515,4 +2516,64 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 		common.LightLamp(common.ALight{X: 8, Y: this.SelectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
 	}
 
+}
+
+func UpdateSpeed(sequenceNumber int, mode int, speed int, tYpe string, guiButttons chan common.ALight) {
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButttons)
+	}
+}
+
+func UpdateSize(sequenceNumber int, mode int, size int, tYpe string, guiButttons chan common.ALight) {
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", size), "size", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", size), "size", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", size), "size", false, guiButttons)
+	}
+}
+
+func UpdateShift(sequenceNumber int, mode int, shift int, tYpe string, guiButttons chan common.ALight) {
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %02d", shift), "shift", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", shift), "shift", false, guiButttons)
+	}
+}
+
+func UpdateFade(sequenceNumber int, mode int, fade int, tYpe string, guiButttons chan common.ALight) {
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", fade), "fade", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Fade %02d", fade), "fade", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", fade), "fade", false, guiButttons)
+	}
 }

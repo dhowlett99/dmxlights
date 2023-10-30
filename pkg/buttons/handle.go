@@ -469,55 +469,97 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons chan common.ALight) {
 
-	// Update the status bar
-	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-
-	// Update the buttons: speed
-	common.UpdateBottomButtons(this.SelectedType, guiButtons)
-
-	if this.Strobe[this.SelectedSequence] {
-		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
-	} else {
-		if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
-			common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-		} else {
-			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.DisplaySequence]), "speed", false, guiButtons)
-		}
-	}
-
 	sensitivity := common.FindSensitivity(this.SoundGain)
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
-	if sequences[this.TargetSequence].Type == "rgb" && sequences[this.TargetSequence].Label != "chaser" {
+	common.UpdateBottomButtons(this.SelectedType, guiButtons)
+
+	// Speed
+
+	// RGB
+	if sequences[this.TargetSequence].Type == "rgb" {
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
+		} else {
+			if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.DisplaySequence]), "speed", false, guiButtons)
+			}
+		}
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
 		common.UpdateStatusBar("       ", "tilt", false, guiButtons)
-
 		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.TargetSequence].Color.R), "red", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.TargetSequence].Color.G), "green", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.TargetSequence].Color.B), "blue", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+
+		common.LabelButton(0, 7, "Speed\nDown", guiButtons)
+		common.LabelButton(1, 7, "Speed\nUp", guiButtons)
+		common.LabelButton(2, 7, "Shift\nDown", guiButtons)
+		common.LabelButton(3, 7, "Shift\nUp", guiButtons)
+		common.LabelButton(4, 7, "Size\nDown", guiButtons)
+		common.LabelButton(5, 7, "Size\nUp", guiButtons)
+		common.LabelButton(6, 7, "Fade\nSoft", guiButtons)
+		common.LabelButton(7, 7, "Fade\nSharp", guiButtons)
 	}
 
-	if sequences[this.TargetSequence].Type == "rgb" && sequences[this.TargetSequence].Label == "chaser" {
-		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
-		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
-		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
-		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
-		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
-		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
-		common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
-		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
-	}
-
+	// SCANNER ROTATE
 	if sequences[this.SelectedSequence].Type == "scanner" {
-		label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-		common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
-		label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-		common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
+		} else {
+			if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.DisplaySequence]), "speed", false, guiButtons)
+			}
+		}
+		if this.SelectMode[this.TargetSequence] == NORMAL || this.SelectMode[this.TargetSequence] == FUNCTION || this.SelectMode[this.TargetSequence] == STATUS {
+			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+
+			common.LabelButton(0, 7, "Rotate\nSpeed\nDown", guiButtons)
+			common.LabelButton(1, 7, "Rotate\nSpeed\nUp", guiButtons)
+			common.LabelButton(2, 7, "Rotate\nShift\nDown", guiButtons)
+			common.LabelButton(3, 7, "Rotate\nShift\nUp", guiButtons)
+			common.LabelButton(4, 7, "Rotate\nSize\nDown", guiButtons)
+			common.LabelButton(5, 7, "Rotate\nSize\nUp", guiButtons)
+			common.LabelButton(6, 7, "Rotate\nCooord\nDown", guiButtons)
+			common.LabelButton(7, 7, "Rotate\nCooord\nUp", guiButtons)
+
+		}
+
+		// SHUTTER CHASER
+		if this.SelectMode[this.TargetSequence] == CHASER_DISPLAY || this.SelectMode[this.TargetSequence] == CHASER_FUNCTION {
+			if this.Strobe[this.SelectedSequence] {
+				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+			} else {
+				if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
+					common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+				} else {
+					common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+				}
+			}
+			common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+			common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
+			common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
+			common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+			common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+			common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+			common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+			common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
+			common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
+		}
 
 		// Hide the color editing buttons.
 		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
