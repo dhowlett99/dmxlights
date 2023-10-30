@@ -700,7 +700,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			UpdateShift(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBShift[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateShift(this, guiButtons)
 			return
 		}
 
@@ -754,7 +754,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			UpdateShift(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBShift[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateShift(this, guiButtons)
 			return
 		}
 
@@ -851,7 +851,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		UpdateSpeed(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.Speed[this.TargetSequence], this.SelectedType, guiButtons)
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}
@@ -928,7 +928,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		UpdateSpeed(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.Speed[this.TargetSequence], this.SelectedType, guiButtons)
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}
@@ -1199,7 +1199,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			UpdateSize(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBSize[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateSize(this, guiButtons)
 			return
 		}
 
@@ -1254,7 +1254,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			UpdateSize(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBSize[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateSize(this, guiButtons)
 			return
 		}
 
@@ -1308,7 +1308,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			UpdateFade(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBFade[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateFade(this, guiButtons)
 			return
 		}
 
@@ -1364,7 +1364,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			UpdateFade(this.TargetSequence, this.SelectMode[this.DisplaySequence], this.RGBFade[this.TargetSequence], this.SelectedType, guiButtons)
+			UpdateFade(this, guiButtons)
 			return
 		}
 
@@ -2518,7 +2518,11 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 
 }
 
-func UpdateSpeed(sequenceNumber int, mode int, speed int, tYpe string, guiButttons chan common.ALight) {
+func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.TargetSequence]
+	tYpe := this.SelectedType
+	speed := this.Speed[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -2533,7 +2537,11 @@ func UpdateSpeed(sequenceNumber int, mode int, speed int, tYpe string, guiButtto
 	}
 }
 
-func UpdateSize(sequenceNumber int, mode int, size int, tYpe string, guiButttons chan common.ALight) {
+func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.TargetSequence]
+	tYpe := this.SelectedType
+	size := this.RGBSize[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -2548,7 +2556,11 @@ func UpdateSize(sequenceNumber int, mode int, size int, tYpe string, guiButttons
 	}
 }
 
-func UpdateShift(sequenceNumber int, mode int, shift int, tYpe string, guiButttons chan common.ALight) {
+func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.TargetSequence]
+	tYpe := this.SelectedType
+	shift := this.RGBShift[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -2563,7 +2575,11 @@ func UpdateShift(sequenceNumber int, mode int, shift int, tYpe string, guiButtto
 	}
 }
 
-func UpdateFade(sequenceNumber int, mode int, fade int, tYpe string, guiButttons chan common.ALight) {
+func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.TargetSequence]
+	tYpe := this.SelectedType
+	fade := this.RGBFade[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
