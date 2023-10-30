@@ -1080,6 +1080,9 @@ func ProcessButtons(X int, Y int,
 			if debug {
 				fmt.Printf("Start Sequence %d \n", Y)
 			}
+
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+
 			sequences[this.SelectedSequence].MusicTrigger = false
 			cmd := common.Command{
 				Action: common.Start,

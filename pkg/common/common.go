@@ -246,8 +246,6 @@ const (
 	SoftFadeOn
 	SoftFadeOff
 	UpdateColor
-	UpdateFunctionMode
-	FunctionMode
 	UpdateFunctions
 	GetUpdatedSequence
 	ClearAllSwitchPositions
@@ -386,7 +384,6 @@ type Sequence struct {
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor         bool                        // Command to update the sequence colors.
-	FunctionMode                bool                        // This sequence is in function mode.
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.

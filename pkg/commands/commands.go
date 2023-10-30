@@ -302,6 +302,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Mode = "Sequence"
 		sequence.Static = false
 		sequence.Run = true
+		sequence.Hidden = true // Make sure the next call to unHide works.
 		return sequence
 
 	case common.StartChase:
@@ -597,15 +598,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Get Updated Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
-		return sequence
-
-	// Update function mode for the current sequence.
-	case common.UpdateFunctionMode:
-		const FUNCTION_MODE = 0
-		if debug {
-			fmt.Printf("%d: Command Update Function Mode %t\n", mySequenceNumber, command.Args[FUNCTION_MODE].Value)
-		}
-		sequence.FunctionMode = command.Args[FUNCTION_MODE].Value.(bool)
 		return sequence
 
 	// Clear switch positions for this sequence

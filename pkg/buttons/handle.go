@@ -56,11 +56,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		printHandleDebug(this)
 	}
 
-	// Hide any function keys.
-	if debug {
-		fmt.Printf("hideAllFunctionKeys\n")
+	// Hide any function keys. As long as we're not in static mode.
+	if !this.EditStaticColorsMode[this.SelectedSequence] {
+		hideAllFunctionKeys(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
-	hideAllFunctionKeys(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 	// Select Chase Pattern.
 	if this.EditPatternMode {
@@ -460,7 +459,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if debug {
 		fmt.Printf("showStatusBar\n")
@@ -598,6 +597,10 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 }
 
 func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, eventsForLaunchPad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("hideAllFunctionKeys\n")
+	}
 
 	savedSelectedSequence := this.SelectedSequence
 	for sequenceNumber := range sequences {
