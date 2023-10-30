@@ -130,6 +130,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
 
+		// Set all static fixures to all. So we can set a static color for all fixtures.
+		if this.EditStaticColorsMode[this.DisplaySequence] {
+			this.SelectAllStaticFixtures = true
+
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "Flash", Value: true},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		}
+
 		// Assume everything else is off.
 		this.SelectButtonPressed[0] = false
 		this.SelectButtonPressed[1] = false
@@ -168,6 +181,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		if debug {
 			fmt.Printf("%d: 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
+		}
+
+		// Turn off the all static colors flag.
+		if this.EditStaticColorsMode[this.DisplaySequence] && this.SelectAllStaticFixtures {
+			this.SelectAllStaticFixtures = false
+			this.SelectButtonPressed[this.DisplaySequence] = false
+
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "Flash", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
 
 		// Calculate the next mode.
