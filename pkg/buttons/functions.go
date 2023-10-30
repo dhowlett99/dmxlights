@@ -73,7 +73,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		fmt.Printf("================== WHAT SELECT MODE =================\n")
 		fmt.Printf("FUNCS: this.SelectButtonPressed[%d] = %t \n", this.DisplaySequence, this.SelectButtonPressed[this.DisplaySequence])
-		printMode(this)
+		fmt.Printf("Mode : %s\n", printMode(this.SelectMode[this.SelectedSequence]))
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
 		fmt.Printf("FUNCS: this.ShowRGBColorPicker[%d] = %t \n", this.DisplaySequence, this.ShowRGBColorPicker)
 		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", this.DisplaySequence, this.EditStaticColorsMode)
@@ -576,6 +576,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+		// Update the labels.
+		showStatusBar(this, sequences, guiButtons)
+
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
 	}
@@ -615,7 +618,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
-		// Update the labek.
+		// Update the labels.
 		showStatusBar(this, sequences, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)

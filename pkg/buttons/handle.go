@@ -347,28 +347,19 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 	if debug {
-		printMode(this)
+		fmt.Printf("displayMode Mode : %s\n", printMode(this.SelectMode[this.SelectedSequence]))
 	}
 
 	// Tailor the top buttons to the sequence type.
-	if debug {
-		fmt.Printf("ShowTopButtons\n")
-	}
 	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
 
 	// Tailor the bottom buttons to the sequence type.
-	if debug {
-		fmt.Printf("ShowBottomButtons\n")
-	}
 	common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
-	if debug {
-		fmt.Printf("showStatusBar\n")
-	}
 	showStatusBar(this, sequences, guiButtons)
 
 	// Light the sequence selector button.
@@ -469,16 +460,41 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons chan common.ALight) {
 
+	debug := true
+
+	if debug {
+		fmt.Printf("showStatusBar\n")
+	}
+
 	sensitivity := common.FindSensitivity(this.SoundGain)
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
 	common.UpdateBottomButtons(this.SelectedType, guiButtons)
 
-	// Speed
+	// Make sure modes are setup.
+	if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+		(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
+		this.TargetSequence = this.ChaserSequenceNumber
+		this.DisplaySequence = this.SelectedSequence
+	} else {
+		this.TargetSequence = this.SelectedSequence
+		this.DisplaySequence = this.SelectedSequence
+	}
+
+	if debug {
+		fmt.Printf("Target Sequence %d Mode %s Type %s\n", this.TargetSequence, printMode(this.SelectMode[this.TargetSequence]), sequences[this.TargetSequence].Type)
+		fmt.Printf("Display Sequence %d Mode %s Type %s\n", this.DisplaySequence, printMode(this.SelectMode[this.DisplaySequence]), sequences[this.DisplaySequence].Type)
+	}
 
 	// RGB
-	if sequences[this.TargetSequence].Type == "rgb" {
+	if sequences[this.DisplaySequence].Type == "rgb" &&
+		(this.SelectMode[this.DisplaySequence] == NORMAL || this.SelectMode[this.DisplaySequence] == FUNCTION || this.SelectMode[this.DisplaySequence] == STATUS) {
+
+		if debug {
+			fmt.Printf("showStatusBar show RGB labels\n")
+		}
+
 		if this.Strobe[this.SelectedSequence] {
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
 		} else {
@@ -508,8 +524,14 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 	}
 
 	// SCANNER ROTATE
-	if sequences[this.SelectedSequence].Type == "scanner" {
-		if this.Strobe[this.SelectedSequence] {
+	if sequences[this.DisplaySequence].Type == "scanner" &&
+		(this.SelectMode[this.DisplaySequence] == NORMAL || this.SelectMode[this.DisplaySequence] == FUNCTION || this.SelectMode[this.DisplaySequence] == STATUS) {
+
+		if debug {
+			fmt.Printf("showStatusBar show Rotate labels\n")
+		}
+
+		if this.Strobe[this.DisplaySequence] {
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
 		} else {
 			if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
@@ -536,37 +558,43 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 			common.LabelButton(7, 7, "Rotate\nCooord\nUp", guiButtons)
 
 		}
+	}
+	// SHUTTER CHASER
+	if sequences[this.DisplaySequence].Type == "scanner" &&
+		(this.SelectMode[this.DisplaySequence] == CHASER_DISPLAY || this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION) {
 
-		// SHUTTER CHASER
-		if this.SelectMode[this.TargetSequence] == CHASER_DISPLAY || this.SelectMode[this.TargetSequence] == CHASER_FUNCTION {
-			if this.Strobe[this.SelectedSequence] {
-				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-			} else {
-				if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
-					common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-				} else {
-					common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-				}
-			}
-			common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
-			common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
-			common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
-			common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
-			common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
-			common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
-			common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
-			common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
-			common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
-			common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
-			common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
+		if debug {
+			fmt.Printf("showStatusBar show Chaser labels\n")
 		}
 
-		// Hide the color editing buttons.
-		common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
-		common.UpdateStatusBar("        ", "red", false, guiButtons)
-		common.UpdateStatusBar("        ", "green", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
+		if this.Strobe[this.DisplaySequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+		} else {
+			if this.Functions[this.DisplaySequence][common.Function8_Music_Trigger].State {
+				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+			}
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+		common.LabelButton(0, 7, "Chase\nSpeed\nDown", guiButtons)
+		common.LabelButton(1, 7, "Chase\nSpeed\nUp", guiButtons)
+		common.LabelButton(2, 7, "Chase\nShift\nDown", guiButtons)
+		common.LabelButton(3, 7, "Chase\nShift\nUp", guiButtons)
+		common.LabelButton(4, 7, "Chase\nSize\nDown", guiButtons)
+		common.LabelButton(5, 7, "Chase\nSize\nUp", guiButtons)
+		common.LabelButton(6, 7, "Chase\nFade\nSoft", guiButtons)
+		common.LabelButton(7, 7, "Chase\nFade\nSharp", guiButtons)
 	}
+
+	// Hide the color editing buttons.
+	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
+	common.UpdateStatusBar("        ", "red", false, guiButtons)
+	common.UpdateStatusBar("        ", "green", false, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
+
 }
 
 func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, eventsForLaunchPad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
@@ -604,17 +632,15 @@ func printHandleDebug(this *CurrentState) {
 		state := this.Functions[this.TargetSequence][functionNumber]
 		fmt.Printf("%d function %d state %+v\n", this.TargetSequence, functionNumber, state.State)
 	}
-	fmt.Printf("HANDLE:  SEQ: %d this.ScannerChaser running %t \n", this.DisplaySequence, this.ScannerChaser[this.DisplaySequence])
-
-	fmt.Printf("================== WHAT SELECT MODE =================\n")
-	fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t \n", this.TargetSequence, this.SelectButtonPressed[this.TargetSequence])
-	printMode(this)
-
-	fmt.Printf("================== WHAT EDIT MODES =================\n")
-	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t \n", this.TargetSequence, this.ShowRGBColorPicker)
-	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t \n", this.TargetSequence, this.ShowStaticColorPicker)
-	fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t \n", this.TargetSequence, this.EditStaticColorsMode)
-	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t \n", this.TargetSequence, this.EditGoboSelectionMode)
-	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t \n", this.TargetSequence, this.EditPatternMode)
-	fmt.Printf("===============================================\n")
+	fmt.Printf("HANDLE:this.ScannerChaser[%d] running %t\n", this.DisplaySequence, this.ScannerChaser[this.DisplaySequence])
+	fmt.Printf("HANDLE:================== WHAT SELECT MODE =================\n")
+	fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t\n", this.TargetSequence, this.SelectButtonPressed[this.TargetSequence])
+	fmt.Printf("HANDLE: this.SelectMode[%d] = %s\n", this.SelectedSequence, printMode(this.SelectMode[this.SelectedSequence]))
+	fmt.Printf("HANDLE:================== WHAT EDIT MODES =================\n")
+	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t\n", this.TargetSequence, this.ShowRGBColorPicker)
+	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t\n", this.TargetSequence, this.ShowStaticColorPicker)
+	fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t\n", this.TargetSequence, this.EditStaticColorsMode)
+	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t\n", this.TargetSequence, this.EditGoboSelectionMode)
+	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t\n", this.TargetSequence, this.EditPatternMode)
+	fmt.Printf("HANDLE:===============================================\n")
 }

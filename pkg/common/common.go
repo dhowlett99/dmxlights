@@ -1044,6 +1044,10 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 
 func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
+	if debug {
+		fmt.Printf("ShowBottomButtons\n")
+	}
+
 	type bottonButton struct {
 		Label string
 		Color Color

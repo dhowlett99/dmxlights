@@ -2483,22 +2483,23 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	}
 }
 
-func printMode(this *CurrentState) {
-	if this.SelectMode[this.DisplaySequence] == NORMAL {
-		fmt.Printf("PrintMode: this.SelectMode[%d] = NORMAL \n", this.TargetSequence)
+func printMode(sequencNumber int) string {
+	if sequencNumber == NORMAL {
+		return "NORMAL"
 	}
-	if this.SelectMode[this.DisplaySequence] == CHASER_DISPLAY {
-		fmt.Printf("PrintMode: this.SelectMode[%d] = CHASER_DISPLAY \n", this.SelectedSequence)
+	if sequencNumber == CHASER_DISPLAY {
+		return "CHASER_DISPLAY"
 	}
-	if this.SelectMode[this.DisplaySequence] == FUNCTION {
-		fmt.Printf("PrintMode: this.SelectMode[%d] = FUNCTION \n", this.SelectedSequence)
+	if sequencNumber == FUNCTION {
+		return "FUNCTION"
 	}
-	if this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION {
-		fmt.Printf("PrintMode: this.SelectMode[%d] = CHASER_FUNCTION \n", this.SelectedSequence)
+	if sequencNumber == CHASER_FUNCTION {
+		return "CHASER_FUNCTION"
 	}
-	if this.SelectMode[this.DisplaySequence] == STATUS {
-		fmt.Printf("PrintMode: this.SelectMode[%d] = STATUS \n", this.SelectedSequence)
+	if sequencNumber == STATUS {
+		return "STATUS"
 	}
+	return "UNKNOWN"
 }
 
 func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
@@ -2520,7 +2521,7 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 
 func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
 
-	mode := this.SelectMode[this.TargetSequence]
+	mode := this.SelectMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
 
@@ -2539,7 +2540,7 @@ func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
 
 func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 
-	mode := this.SelectMode[this.TargetSequence]
+	mode := this.SelectMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	size := this.RGBSize[this.TargetSequence]
 
@@ -2558,7 +2559,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 
 func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 
-	mode := this.SelectMode[this.TargetSequence]
+	mode := this.SelectMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	shift := this.RGBShift[this.TargetSequence]
 
@@ -2577,7 +2578,7 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 
 func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 
-	mode := this.SelectMode[this.TargetSequence]
+	mode := this.SelectMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	fade := this.RGBFade[this.TargetSequence]
 
