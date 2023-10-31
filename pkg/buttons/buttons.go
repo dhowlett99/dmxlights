@@ -1048,6 +1048,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			this.Running[this.SelectedSequence] = false
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
 			// Stop should also stop the shutter chaser.
 			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {

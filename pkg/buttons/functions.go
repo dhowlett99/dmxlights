@@ -351,6 +351,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Static Color Mode On\n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
+		this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State = false
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = true
 
 		// Start off in single fixture edit mode.
@@ -636,6 +637,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function8_Music_Trigger Music Trigger Mode On\n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
+		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false
 		this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State = true
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
