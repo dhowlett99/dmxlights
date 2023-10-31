@@ -75,7 +75,6 @@ type CurrentState struct {
 	Config                      bool                       // Flag to indicate we are in fixture config mode.
 	Blackout                    bool                       // Blackout all fixtures.
 	Flood                       bool                       // Flood all fixtures.
-	Loading                     bool                       // True while loading a config.
 	SelectMode                  []int                      // What mode each sequence is in : normal mode, function mode, status selection mode.
 	LastMode                    []int                      // Last mode sequence was in : normal mode, function mode, status selection mode.
 	Functions                   map[int][]common.Function  // Map indexed by sequence of functions

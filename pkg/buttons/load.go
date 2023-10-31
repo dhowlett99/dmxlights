@@ -39,9 +39,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	// Used by SelectAllStaticFixtures so that we don't flash static button while loading.
-	this.Loading = true
-
 	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// Load the config.
@@ -152,4 +149,18 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	} else {
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
+
+	// Clear any flashing
+	// Set a static color for an individual fixture.
+	cmd = common.Command{
+		Action: common.UpdateStaticColor,
+		Args: []common.Arg{
+			{Name: "Static", Value: true},
+			{Name: "FixtureNumber", Value: this.SelectedStaticFixtureNumber},
+			{Name: "StaticLampFlash", Value: false},
+			{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
+			{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 }

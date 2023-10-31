@@ -404,7 +404,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.PlayStaticOnce = true
 		}
 		// Restore the state of the music trigger flag.
-		//sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
 		sequence.MusicTrigger = sequence.LastMusicTrigger
 		return sequence
 

@@ -42,7 +42,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := false
+	debug := true
 
 	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -150,22 +150,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Remember which select button has been pressed.
 		this.SelectButtonPressed[this.SelectedSequence] = true
 
-		// Set all static fixures to all. So we can set a static color for all fixtures.
-		if !this.SelectAllStaticFixtures && this.EditStaticColorsMode[this.DisplaySequence] && !this.ShowStaticColorPicker && !this.Loading {
-			if debug {
-				fmt.Printf("%d: Select All\n", this.DisplaySequence)
-			}
-			this.SelectAllStaticFixtures = true
-			// Update all the fixtures so they will flash.
-			cmd := common.Command{
-				Action: common.UpdateFlashAllStaticColorButtons,
-				Args: []common.Arg{
-					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
 		// Now display the selected mode.
 		displayMode(this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -184,19 +168,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		if debug {
 			fmt.Printf("%d: 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
-		}
-
-		// Toggle the select all static fixuure off.
-		if this.SelectAllStaticFixtures {
-			this.SelectAllStaticFixtures = false
-			// Update all the fixtures so they will stop flashing.
-			cmd := common.Command{
-				Action: common.UpdateFlashAllStaticColorButtons,
-				Args: []common.Arg{
-					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Calculate the next mode.
@@ -408,7 +379,8 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-		// Reveal the selected sequence.
+		// Force the reveal the selected sequence.
+		common.HideSequence(this.SelectedSequence, commandChannels)
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
 		return
