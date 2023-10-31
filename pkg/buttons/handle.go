@@ -130,19 +130,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
 
-		// Set all static fixures to all. So we can set a static color for all fixtures.
-		if this.EditStaticColorsMode[this.DisplaySequence] {
-			this.SelectAllStaticFixtures = true
-
-			cmd := common.Command{
-				Action: common.UpdateFlashAllStaticColorButtons,
-				Args: []common.Arg{
-					{Name: "Flash", Value: true},
-				},
-			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		}
-
 		// Assume everything else is off.
 		this.SelectButtonPressed[0] = false
 		this.SelectButtonPressed[1] = false
@@ -162,6 +149,22 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		// Remember which select button has been pressed.
 		this.SelectButtonPressed[this.SelectedSequence] = true
+
+		// Set all static fixures to all. So we can set a static color for all fixtures.
+		if !this.SelectAllStaticFixtures && this.EditStaticColorsMode[this.DisplaySequence] && !this.ShowStaticColorPicker && !this.Loading {
+			if debug {
+				fmt.Printf("%d: Select All\n", this.DisplaySequence)
+			}
+			this.SelectAllStaticFixtures = true
+			// Update all the fixtures so they will flash.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		}
 
 		// Now display the selected mode.
 		displayMode(this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
@@ -183,18 +186,17 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
 		}
 
-		// Turn off the all static colors flag.
-		if this.EditStaticColorsMode[this.DisplaySequence] && this.SelectAllStaticFixtures {
+		// Toggle the select all static fixuure off.
+		if this.SelectAllStaticFixtures {
 			this.SelectAllStaticFixtures = false
-			this.SelectButtonPressed[this.DisplaySequence] = false
-
+			// Update all the fixtures so they will stop flashing.
 			cmd := common.Command{
 				Action: common.UpdateFlashAllStaticColorButtons,
 				Args: []common.Arg{
-					{Name: "Flash", Value: false},
+					{Name: "StaticFlash", Value: this.SelectAllStaticFixtures},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Calculate the next mode.

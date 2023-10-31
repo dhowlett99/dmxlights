@@ -75,16 +75,17 @@ type CurrentState struct {
 	Config                      bool                       // Flag to indicate we are in fixture config mode.
 	Blackout                    bool                       // Blackout all fixtures.
 	Flood                       bool                       // Flood all fixtures.
+	Loading                     bool                       // True while loading a config.
 	SelectMode                  []int                      // What mode each sequence is in : normal mode, function mode, status selection mode.
 	LastMode                    []int                      // Last mode sequence was in : normal mode, function mode, status selection mode.
 	Functions                   map[int][]common.Function  // Map indexed by sequence of functions
 	FunctionLabels              [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed         []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
-	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in edit static colors mode.
+	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
 	EditPatternMode             bool                       // This flag is true when the sequence is in pattern editing mode.
@@ -185,7 +186,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditStaticColorsMode[Y] &&
+		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
 		!this.ShowRGBColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
@@ -1861,6 +1862,7 @@ func ProcessButtons(X int, Y int,
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
+		this.EditStaticColorsMode[this.SelectedSequence] = true
 
 		return
 	}
@@ -1868,7 +1870,7 @@ func ProcessButtons(X int, Y int,
 	// S E T   S T A T I C   C O L O R
 	if X >= 0 && X < 8 && Y != -1 &&
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
-		this.ShowStaticColorPicker && // Now We Are In Color Picker Mode.
+		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
 		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in this sequence
 
@@ -1877,6 +1879,7 @@ func ProcessButtons(X int, Y int,
 
 		if debug {
 			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
+			fmt.Printf("ShowStaticColorPicker %t\n", this.ShowStaticColorPicker)
 			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
 			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
 		}
@@ -2478,6 +2481,7 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.ShowRGBColorPicker = false
 		this.EditStaticColorsMode[this.DisplaySequence] = false
 		this.EditStaticColorsMode[this.TargetSequence] = false
+		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.EditPatternMode = false
 		for function := range this.Functions {

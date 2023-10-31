@@ -404,6 +404,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.EditGoboSelectionMode = false                     // Turn off the other option for this function key.
 		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off edit static color mode.
+		this.ShowStaticColorPicker = false                     // Turn off the color picker.
 		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
 
 		if this.ScannerChaser[this.SelectedSequence] {
@@ -439,6 +440,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = true
 		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off the other option for this function key.
+		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = true
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)

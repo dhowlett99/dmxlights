@@ -170,6 +170,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditScannerColorsMode = false                                           // Clear scanner color mode.
 		this.ShowRGBColorPicker = false                                              // Clear rgb color mode.
 		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
+		this.ShowStaticColorPicker = false                                           // Clear the static color picker.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
 
 		// Enable all fixtures.
