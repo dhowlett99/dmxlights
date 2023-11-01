@@ -86,3 +86,64 @@ File size is also smaller 111044.
 
 
 
+# Build Instructions
+
+## First Creat a Self Signed Cert to sign the code.
+Create self-signed certificates in Keychain Access on Mac
+1. In the Keychain Access app on your Mac, choose Keychain Access > Certificate Assistant > Create a Certificate.
+2. Enter a 'dmxlights' as the name for the certificate.
+3. Choose an identity type, 'Selft Sigbed Root Certificate'  
+4. then choose the type of certificate. 'Code Signing'
+Click Create.
+Review the certificate, then click Done.
+
+## Install Correct version of USB lib.
+
+Make sure the libusb-1.0.0.dylib  is placed in a directory called /opt/local/lib/libusb-1.0.0.dylib 
+```
+sudo mkdir -p /opt/local/lib/
+cp libusb-1.0.0.dylib /opt/local/lib/
+
+```
+
+# Fix the dmx interface
+
+You need to add a check to see if you have a valid device returned from 'OpenDeviceWithVIDPID'.
+Otherwise you will not be able to start the app without the DMX interface connected.
+```
+if device == nil {
+		return fmt.Errorf("device not available")
+	}
+```
+
+Corrected versiion of the connect() function.
+```
+// Connect handles connectio to a mock DMX controller
+func (d *DMXController) Connect() error {
+	// try to connect to device
+	device, err := d.ctx.OpenDeviceWithVIDPID(gousb.ID(d.vid), gousb.ID(d.pid))
+	if err != nil {
+		return err
+	}
+	d.device = device
+	if device == nil {
+		return fmt.Errorf("device not available")
+	}
+```
+
+# Make deploy
+
+```
+$ make deploy
+
+```
+
+# Install the Dmxlights App
+copy the dmxlights app to the /Applications directory
+
+See the dmxlight.app , drag to the dock 
+
+# Running the app will prompt you to access the microphone.
+
+
+“dmxlights.app” would like to access the microphone.
