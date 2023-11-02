@@ -1038,6 +1038,8 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
+		this.StaticFlashing = false
+
 		// S T O P - If sequence is running, stop it
 		if this.Running[this.SelectedSequence] {
 			if debug {
@@ -1054,6 +1056,8 @@ func ProcessButtons(X int, Y int,
 			this.Running[this.SelectedSequence] = false
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
+			this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+			this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
 
 			// Stop should also stop the shutter chaser.
 			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
@@ -1068,6 +1072,8 @@ func ProcessButtons(X int, Y int,
 
 				this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 				this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+				this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+				this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
 				this.ScannerChaser[this.SelectedSequence] = false
 				this.SelectMode[this.SelectedSequence] = NORMAL
 				this.Running[this.ChaserSequenceNumber] = false
