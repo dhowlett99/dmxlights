@@ -1825,8 +1825,6 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	printHandleDebug(this)
-
 	// S E L E C T   S T A T I C   F I X T U R E
 	if X >= 0 && X < 8 &&
 		Y != -1 &&
