@@ -42,7 +42,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
 		this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
@@ -173,7 +173,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	// Clear the buttons.
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -216,7 +216,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		if this.StaticFlashing {
 
 			if debug {
-				fmt.Printf("flashwStaticButtons: false\n")
+				fmt.Printf("flashwStaticButtons: %t\n", this.StaticFlashing)
 			}
 
 			// Unselect all fixtures.
@@ -224,7 +224,6 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.SelectedSequence, false, commandChannels)
-
 			this.StaticFlashing = false
 		}
 
@@ -281,6 +280,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
+			this.StaticFlashing = false
 		}
 
 		return
@@ -360,6 +360,19 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		}
 		// Hide the normal sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
+
+		if this.StaticFlashing {
+			// Unselect all fixtures.
+			this.SelectAllStaticFixtures = false
+
+			if debug {
+				fmt.Printf("flashwStaticButtons: false\n")
+			}
+
+			// Stop the flash of the static buttons,
+			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
+			this.StaticFlashing = false
+		}
 
 		// Display the fixture status bar.
 		showFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
