@@ -25,6 +25,8 @@ import (
 
 func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
+	debug := false
+
 	if debug {
 		fmt.Printf("ShowFunctionButtons sequence target %d display %d\n", this.TargetSequence, this.DisplaySequence)
 	}
@@ -357,19 +359,14 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Start off in single fixture edit mode.
 		this.SelectAllStaticFixtures = false
 
-		if this.ScannerChaser[this.SelectedSequence] {
-			// Turn on edit static color mode in the scanner sequence.
-			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
-		}
-
 		// Starting a static sequence will turn off any running sequence, so turn off the start lamp
 		common.LightLamp(common.ALight{X: X, Y: this.DisplaySequence, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
 		this.Running[this.TargetSequence] = false
 
-		this.EditGoboSelectionMode = false                    // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.TargetSequence] = true // Turn on edit static color mode.
-		this.SelectMode[this.DisplaySequence] = NORMAL        // Turn off functions.
+		this.EditGoboSelectionMode = false                     // Turn off the other option for this function key.
+		this.EditStaticColorsMode[this.DisplaySequence] = true // Turn on edit static color mode.
+		this.SelectMode[this.DisplaySequence] = NORMAL         // Turn off functions.
 
 		// Go straight to static color selection mode, don't wait for a another select press.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -390,6 +387,20 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Remember which sequence we are editing
 		this.EditWhichStaticSequence = this.TargetSequence
 
+		// If we're a scanner sequence.
+		if this.SelectedType == "scanner" {
+			// Jump straight to showing the shutter chaser.
+			this.DisplayChaserShortCut = true
+
+		}
+		if this.SelectedType == "rgb" {
+			// Short cut to get the sequence into NORMAL mode.
+			// By setting STATUS, the next menu item is NORMAL.
+			this.SelectMode[this.DisplaySequence] = STATUS
+		}
+
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
 		return
 	}
 	// Function 6 RGB - Turn off edit static color mode.
@@ -407,6 +418,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off edit static color mode.
 		this.ShowStaticColorPicker = false                     // Turn off the color picker.
 		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
+		this.StaticFlashing = false                            // Stop any flash commands being issued.
 
 		if this.ScannerChaser[this.SelectedSequence] {
 			// Turn on edit static color mode in the scanner sequence.

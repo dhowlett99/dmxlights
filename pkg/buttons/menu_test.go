@@ -1,47 +1,14 @@
 package buttons
 
 import (
-	"reflect"
 	"testing"
 )
 
-func Test_newMenu(t *testing.T) {
-	type args struct {
-		chaser bool
-	}
-	tests := []struct {
-		name string
-		args args
-		want []int
-	}{
-		{
-			name: "not a chaser",
-			args: args{
-				chaser: false,
-			},
-			want: []int{NORMAL, FUNCTION, STATUS},
-		},
-		{
-			name: "is a chaser",
-			args: args{
-				chaser: true,
-			},
-			want: []int{NORMAL, FUNCTION, CHASER_DISPLAY, CHASER_FUNCTION, STATUS},
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if got := newMenu(tt.args.chaser); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("newMenu() = %v, want %v", got, tt.want)
-			}
-		})
-	}
-}
-
 func Test_getNextMenuItem(t *testing.T) {
 	type args struct {
-		selectedMode int
-		chaser       bool
+		selectedMode    int
+		chaser          bool
+		editstaticcolor bool
 	}
 	tests := []struct {
 		name string
@@ -49,75 +16,83 @@ func Test_getNextMenuItem(t *testing.T) {
 		want int
 	}{
 		{
-			name: "get next item, normal in not a chaser mode,",
+			name: "get next item, send normal want function",
 			args: args{
-				selectedMode: NORMAL,
-				chaser:       false,
+				selectedMode:    NORMAL,
+				chaser:          false,
+				editstaticcolor: false,
 			},
 			want: FUNCTION,
 		},
 		{
-			name: "get next item, normal in not a chaser mode,",
+			name: "get next item, send function want status",
 			args: args{
-				selectedMode: FUNCTION,
-				chaser:       false,
+				selectedMode:    FUNCTION,
+				chaser:          false,
+				editstaticcolor: false,
 			},
 			want: STATUS,
 		},
 		{
-			name: "get next item, normal in not a chaser mode,",
+			name: "get next item, send status want normal",
 			args: args{
-				selectedMode: STATUS,
-				chaser:       false,
+				selectedMode:    STATUS,
+				chaser:          false,
+				editstaticcolor: false,
 			},
 			want: NORMAL,
 		},
 
 		// Chaser mode.
 		{
-			name: "get next item, normal and in chaser mode,",
+			name: "get next item, send normal want function",
 			args: args{
-				selectedMode: NORMAL,
-				chaser:       true,
+				selectedMode:    NORMAL,
+				chaser:          true,
+				editstaticcolor: false,
 			},
 			want: FUNCTION,
 		},
 		{
-			name: "get next item, function and in chaser mode,",
+			name: "get next item, send function chaser display",
 			args: args{
-				selectedMode: FUNCTION,
-				chaser:       true,
+				selectedMode:    FUNCTION,
+				chaser:          true,
+				editstaticcolor: false,
 			},
 			want: CHASER_DISPLAY,
 		},
 		{
-			name: "get next item, chaser display and in chaser mode,",
+			name: "get next item, send chaser display want chaser function",
 			args: args{
-				selectedMode: CHASER_DISPLAY,
-				chaser:       true,
+				selectedMode:    CHASER_DISPLAY,
+				chaser:          true,
+				editstaticcolor: false,
 			},
 			want: CHASER_FUNCTION,
 		},
 		{
-			name: "get next item, chaser function and in chaser mode,",
+			name: "get next item, send chaser function want status",
 			args: args{
-				selectedMode: CHASER_FUNCTION,
-				chaser:       true,
+				selectedMode:    CHASER_FUNCTION,
+				chaser:          true,
+				editstaticcolor: false,
 			},
 			want: STATUS,
 		},
 		{
-			name: "get next item, status and in chaser mode,",
+			name: "get next item, send status want normal,",
 			args: args{
-				selectedMode: STATUS,
-				chaser:       true,
+				selectedMode:    STATUS,
+				chaser:          true,
+				editstaticcolor: false,
 			},
 			want: NORMAL,
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := getNextMenuItem(tt.args.selectedMode, tt.args.chaser); got != tt.want {
+			if got := getNextMenuItem(tt.args.selectedMode, tt.args.chaser, tt.args.editstaticcolor); got != tt.want {
 				t.Errorf("getNextMenuItem() = %v, want %v", got, tt.want)
 			}
 		})

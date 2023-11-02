@@ -38,11 +38,13 @@ const debug = false
 
 // Select modes.
 const (
-	NORMAL          int = iota // Normal RGB or Scanner Rotation display.
-	FUNCTION                   // Show the RGB or Scanner functions.
-	STATUS                     // Show the fixture status states.
-	CHASER_DISPLAY             //  Show the scanner shutter display.
-	CHASER_FUNCTION            // Show the scammer shutter chaser functions.
+	NORMAL                int = iota // Normal RGB or Scanner Rotation display.
+	NORMAL_STATIC                    // Normal RGB in edit all static fixtures.
+	FUNCTION                         // Show the RGB or Scanner functions.
+	CHASER_DISPLAY                   //  Show the scanner shutter display.
+	CHASER_DISPLAY_STATIC            //  Shutter chaser in edit all fixtures mode.
+	CHASER_FUNCTION                  // Show the scammer shutter chaser functions.
+	STATUS                           // Show the fixture status states.
 )
 
 type CurrentState struct {
@@ -55,6 +57,7 @@ type CurrentState struct {
 	DisplaySequence             int                        // The current display sequence.
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
+	StaticFlashing              bool                       // Static buttons are flashing.
 	SavedSequenceColors         map[int][]common.Color     // Local storage for sequence colors.
 	SelectedType                string                     // The currently selected sequenece type.
 	LastSelectedSequence        int                        // Store fof the last selected squence.
@@ -187,6 +190,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function5_Color].State &&
 		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
 		!this.ShowRGBColorPicker &&
+		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -1821,14 +1825,19 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
+	printHandleDebug(this)
+
 	// S E L E C T   S T A T I C   F I X T U R E
 	if X >= 0 && X < 8 &&
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
+		//this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
+		(this.SelectMode[this.SelectedSequence] == NORMAL ||
+			this.SelectMode[this.SelectedSequence] == NORMAL_STATIC ||
+			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
+			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
-		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in any sequence
+		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in any sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -1874,7 +1883,7 @@ func ProcessButtons(X int, Y int,
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.EditStaticColorsMode[this.EditWhichStaticSequence] { // Static Function On in this sequence
+		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in this sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -2496,8 +2505,14 @@ func printMode(sequencNumber int) string {
 	if sequencNumber == NORMAL {
 		return "NORMAL"
 	}
+	if sequencNumber == NORMAL_STATIC {
+		return "NORMAL_STATIC"
+	}
 	if sequencNumber == CHASER_DISPLAY {
 		return "CHASER_DISPLAY"
+	}
+	if sequencNumber == CHASER_DISPLAY_STATIC {
+		return "CHASER_DISPLAY_STATIC"
 	}
 	if sequencNumber == FUNCTION {
 		return "FUNCTION"

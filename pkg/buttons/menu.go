@@ -1,51 +1,78 @@
 package buttons
 
-// Create a sequence of menu items based on if chaser is running.
-func newMenu(chaser bool) []int {
-
-	if !chaser {
-		return []int{NORMAL, FUNCTION, STATUS}
-	} else {
-		return []int{NORMAL, FUNCTION, CHASER_DISPLAY, CHASER_FUNCTION, STATUS}
-	}
-
-}
-
 // getNextMenuItem get the next items in the menu sequence.
 // Wraps if your at the end.
-func getNextMenuItem(selectedMode int, chaser bool) int {
+func getNextMenuItem(currentMode int, chaser bool, editStaticColorMode bool) int {
 
-	menuOrder := newMenu(chaser)
+	menuOrder := []int{NORMAL, NORMAL_STATIC, FUNCTION, CHASER_DISPLAY, CHASER_DISPLAY_STATIC, CHASER_FUNCTION, STATUS}
 
-	if !chaser {
+	if !chaser && !editStaticColorMode {
 		switch {
-		case selectedMode == NORMAL:
-			return menuOrder[1]
+		case currentMode == NORMAL:
+			return menuOrder[FUNCTION]
 
-		case selectedMode == FUNCTION:
-			return menuOrder[2]
+		case currentMode == FUNCTION:
+			return menuOrder[STATUS]
 
-		case selectedMode == STATUS:
-			return menuOrder[0]
+		case currentMode == STATUS:
+			return menuOrder[NORMAL]
 		}
 	}
 
-	if chaser {
+	if !chaser && editStaticColorMode {
 		switch {
-		case selectedMode == NORMAL:
-			return menuOrder[1]
+		case currentMode == NORMAL:
+			return menuOrder[NORMAL_STATIC]
 
-		case selectedMode == FUNCTION:
-			return menuOrder[2]
+		case currentMode == NORMAL_STATIC:
+			return menuOrder[FUNCTION]
 
-		case selectedMode == CHASER_DISPLAY:
-			return menuOrder[3]
+		case currentMode == FUNCTION:
+			return menuOrder[STATUS]
 
-		case selectedMode == CHASER_FUNCTION:
-			return menuOrder[4]
+		case currentMode == STATUS:
+			return menuOrder[NORMAL]
+		}
+	}
 
-		case selectedMode == STATUS:
-			return menuOrder[0]
+	if chaser && !editStaticColorMode {
+		switch {
+		case currentMode == NORMAL:
+			return menuOrder[FUNCTION]
+
+		case currentMode == FUNCTION:
+			return menuOrder[CHASER_DISPLAY]
+
+		case currentMode == CHASER_DISPLAY:
+			return menuOrder[CHASER_FUNCTION]
+
+		case currentMode == CHASER_FUNCTION:
+			return menuOrder[STATUS]
+
+		case currentMode == STATUS:
+			return menuOrder[NORMAL]
+		}
+	}
+
+	if chaser && editStaticColorMode {
+		switch {
+		case currentMode == NORMAL:
+			return menuOrder[FUNCTION]
+
+		case currentMode == FUNCTION:
+			return menuOrder[CHASER_DISPLAY]
+
+		case currentMode == CHASER_DISPLAY:
+			return menuOrder[CHASER_DISPLAY_STATIC]
+
+		case currentMode == CHASER_DISPLAY_STATIC:
+			return menuOrder[CHASER_FUNCTION]
+
+		case currentMode == CHASER_FUNCTION:
+			return menuOrder[STATUS]
+
+		case currentMode == STATUS:
+			return menuOrder[NORMAL]
 		}
 	}
 
