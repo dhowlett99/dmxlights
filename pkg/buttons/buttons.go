@@ -1048,6 +1048,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 			this.Running[this.SelectedSequence] = false
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
 			// Stop should also stop the shutter chaser.
@@ -1082,8 +1083,6 @@ func ProcessButtons(X int, Y int,
 				fmt.Printf("Start Sequence %d \n", Y)
 			}
 
-			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
-
 			sequences[this.SelectedSequence].MusicTrigger = false
 			cmd := common.Command{
 				Action: common.Start,
@@ -1093,7 +1092,10 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+
 			this.Running[this.SelectedSequence] = true
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
 			// Clear the pattern function keys
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -2510,6 +2512,11 @@ func printMode(sequencNumber int) string {
 }
 
 func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
+
+	if debug {
+		fmt.Printf("SequenceSelect\n")
+	}
+
 	// Turn off all sequence lights.
 	for seq := 0; seq < 3; seq++ {
 		common.LightLamp(common.ALight{X: 8, Y: seq, Brightness: 255, Red: 100, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)

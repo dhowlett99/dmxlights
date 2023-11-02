@@ -6,11 +6,11 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-//		+-------------------+
-//		|       NORMAL      |
-//		+-------------------+
-//		    |            |
-
+//	+-------------------+
+//  |       NORMAL      |
+//  +-------------------+
+//		      |
+//	          V
 //	+-------------------+
 //	|     FUNCTION      |
 //	+-------------------+
@@ -44,7 +44,8 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	debug := false
 
-	if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
+	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
+		this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
@@ -130,6 +131,31 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			fmt.Printf("%d: Show Sequence - Handle Step 1\n", this.SelectedSequence)
 		}
 
+		// If we're editing static mode.A second press will make the static
+		// buttons flash.
+		if this.EditStaticColorsMode[this.TargetSequence] {
+			// Select all fixtures.
+			this.SelectAllStaticFixtures = true
+			// Add the flashing static buttons.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "Flash", Value: true},
+				},
+			}
+			if this.ScannerChaser[this.TargetSequence] {
+				if debug {
+					fmt.Printf("%d: Select AllStaticFixtures On\n", this.ChaserSequenceNumber)
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			} else {
+				if debug {
+					fmt.Printf("%d: Select AllStaticFixtures On\n", this.TargetSequence)
+				}
+				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			}
+		}
+
 		// Assume everything else is off.
 		this.SelectButtonPressed[0] = false
 		this.SelectButtonPressed[1] = false
@@ -144,6 +170,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			this.SelectMode[this.DisplaySequence] = NORMAL
 			// And now forget this ever happened. Well untill the next shortcut is called.
 			this.DisplayChaserShortCut = false
+			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
+		}
+
+		if this.ScannerChaser[this.SelectedSequence] &&
+			this.EditStaticColorsMode[this.SelectedSequence] {
 			this.SelectMode[this.SelectedSequence] = CHASER_DISPLAY
 		}
 
@@ -168,6 +199,31 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		if debug {
 			fmt.Printf("%d: 2nd Press Function Bar Mode - Handle Step 2\n", this.SelectedSequence)
+		}
+
+		// If we're editing static mode, stop static buttons flashing.
+		if this.EditStaticColorsMode[this.SelectedSequence] {
+
+			// Select all fixtures.
+			this.SelectAllStaticFixtures = false
+			// Remove the flashing static buttons.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "Flash", Value: false},
+				},
+			}
+			if this.ScannerChaser[this.TargetSequence] {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+				if debug {
+					fmt.Printf("%d: Select AllStaticFixtures Off\n", this.ChaserSequenceNumber)
+				}
+			} else {
+				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+				if debug {
+					fmt.Printf("%d: Select AllStaticFixtures Off\n", this.TargetSequence)
+				}
+			}
 		}
 
 		// Calculate the next mode.
@@ -226,6 +282,12 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		// Calculate the next mode.
 		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence])
 
+		if this.EditStaticColorsMode[this.SelectedSequence] {
+			this.SelectButtonPressed[this.SelectedSequence] = false
+		} else {
+			this.SelectButtonPressed[this.SelectedSequence] = true
+		}
+
 		// Now display the selected mode.
 		displayMode(this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -257,11 +319,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		!this.ShowRGBColorPicker {
 
 		if debug {
-			fmt.Printf("%d: Handle Step 5 - Normal Mode From Non Scanner, Function Bar off\n", this.SelectedSequence)
+			fmt.Printf("%d: Handle Step 5 - Normal Mode From Status, Function Bar off\n", this.SelectedSequence)
 		}
 
-		// Remember that we've preseed twice.
-		this.SelectButtonPressed[this.SelectedSequence] = true
+		if this.EditStaticColorsMode[this.SelectedSequence] {
+			this.SelectButtonPressed[this.SelectedSequence] = false
+		} else {
+			this.SelectButtonPressed[this.SelectedSequence] = true
+		}
 
 		// Calculate the next mode.
 		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence])
@@ -280,6 +345,24 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 		if debug {
 			fmt.Printf("%d: Handle Step 6 Normal Mode, From  Scanner, Function Bar off, status buttons on\n", this.SelectedSequence)
+		}
+
+		// If we're editing static mode, stop static buttons flashing.
+		if this.EditStaticColorsMode[this.SelectedSequence] {
+			// Select all fixtures.
+			this.SelectAllStaticFixtures = false
+			// Remove the flashing static buttons.
+			cmd := common.Command{
+				Action: common.UpdateFlashAllStaticColorButtons,
+				Args: []common.Arg{
+					{Name: "Flash", Value: false},
+				},
+			}
+			if this.ScannerChaser[this.TargetSequence] {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			} else {
+				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			}
 		}
 
 		// Calculate the next mode.
@@ -362,9 +445,6 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 	showStatusBar(this, sequences, guiButtons)
 
 	// Light the sequence selector button.
-	if debug {
-		fmt.Printf("SequenceSelect\n")
-	}
 	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 	switch {
@@ -393,7 +473,8 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		// Hide the selected sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
 
-		// Reveal the shutter chaser.
+		// Force the reveal of the shutter chaser.
+		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 
 		return
@@ -404,7 +485,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", this.SelectedSequence, this.ScannerChaser[this.SelectedSequence])
 		}
 		// If we have a shutter chaser running hide it.
-		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
+		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
@@ -643,7 +724,7 @@ func printHandleDebug(this *CurrentState) {
 	fmt.Printf("HANDLE:================== WHAT EDIT MODES =================\n")
 	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t\n", this.TargetSequence, this.ShowRGBColorPicker)
 	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t\n", this.TargetSequence, this.ShowStaticColorPicker)
-	fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t\n", this.TargetSequence, this.EditStaticColorsMode)
+	fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t\n", this.TargetSequence, this.EditStaticColorsMode[this.TargetSequence])
 	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t\n", this.TargetSequence, this.EditGoboSelectionMode)
 	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t\n", this.TargetSequence, this.EditPatternMode)
 	fmt.Printf("HANDLE:===============================================\n")
