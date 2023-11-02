@@ -82,6 +82,7 @@ func main() {
 	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
+	this.StaticFlashing = make([]bool, NumberOfSequences)          // Remember when we are in static buttons are flashing.
 	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.

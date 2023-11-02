@@ -172,7 +172,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
 		this.ShowStaticColorPicker = false                                           // Clear the static color picker.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
-		this.StaticFlashing = false                                                  // Turn off any flashing static buttons.
+		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {

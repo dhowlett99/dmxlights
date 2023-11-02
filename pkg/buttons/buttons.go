@@ -57,7 +57,7 @@ type CurrentState struct {
 	DisplaySequence             int                        // The current display sequence.
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
-	StaticFlashing              bool                       // Static buttons are flashing.
+	StaticFlashing              []bool                     // Static buttons are flashing, indexed by sequence.
 	SavedSequenceColors         map[int][]common.Color     // Local storage for sequence colors.
 	SelectedType                string                     // The currently selected sequenece type.
 	LastSelectedSequence        int                        // Store fof the last selected squence.
@@ -1038,7 +1038,7 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
-		this.StaticFlashing = false
+		this.StaticFlashing[this.SelectedSequence] = false
 
 		// S T O P - If sequence is running, stop it
 		if this.Running[this.SelectedSequence] {

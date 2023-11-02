@@ -213,20 +213,6 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		common.HideSequence(this.SelectedSequence, commandChannels)
 		common.RevealSequence(this.SelectedSequence, commandChannels)
 
-		if this.StaticFlashing {
-
-			if debug {
-				fmt.Printf("flashwStaticButtons: %t\n", this.StaticFlashing)
-			}
-
-			// Unselect all fixtures.
-			this.SelectAllStaticFixtures = false
-
-			// Stop the flash of the static buttons,
-			flashwStaticButtons(this.SelectedSequence, false, commandChannels)
-			this.StaticFlashing = false
-		}
-
 		return
 
 	case mode == NORMAL_STATIC:
@@ -254,7 +240,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 		// Flash the static buttons,
 		flashwStaticButtons(this.SelectedSequence, true, commandChannels)
-		this.StaticFlashing = true
+		this.StaticFlashing[this.SelectedSequence] = true
 
 		return
 
@@ -270,7 +256,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 
-		if this.StaticFlashing {
+		if this.StaticFlashing[this.SelectedSequence] {
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 
@@ -280,7 +266,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
-			this.StaticFlashing = false
+			this.StaticFlashing[this.SelectedSequence] = false
 		}
 
 		return
@@ -309,7 +295,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 		// Flash the static buttons,
 		flashwStaticButtons(this.ChaserSequenceNumber, true, commandChannels)
-		this.StaticFlashing = true
+		this.StaticFlashing[this.SelectedSequence] = true
 
 		return
 
@@ -355,13 +341,13 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: STATUS\n")
 		}
 		// If we're a scanner sequence and trying to display the status bar we don't want a shutter chaser in view.
-		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
+		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Hide the normal sequence.
 		common.HideSequence(this.SelectedSequence, commandChannels)
 
-		if this.StaticFlashing {
+		if this.StaticFlashing[this.SelectedSequence] {
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 
@@ -371,7 +357,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
-			this.StaticFlashing = false
+			this.StaticFlashing[this.SelectedSequence] = false
 		}
 
 		// Display the fixture status bar.
@@ -581,7 +567,7 @@ func printHandleDebug(this *CurrentState) {
 	fmt.Printf("HANDLE: this.ScannerChaser[%d] running %t\n", this.DisplaySequence, this.ScannerChaser[this.DisplaySequence])
 	fmt.Printf("HANDLE: ================== WHAT SELECT MODE =================\n")
 	fmt.Printf("HANDLE: this.EditFixtureSelectionMode %t\n", this.EditFixtureSelectionMode)
-	fmt.Printf("HANDLE: this.StaticFlashing %t\n", this.StaticFlashing)
+	fmt.Printf("HANDLE: this.StaticFlashing %t\n", this.StaticFlashing[this.SelectedSequence])
 	fmt.Printf("HANDLE: this.EditWhichStaticSequence = %d\n", this.EditWhichStaticSequence)
 	fmt.Printf("HANDLE: this.SelectButtonPressed[%d] = %t\n", this.SelectedSequence, this.SelectButtonPressed[this.SelectedSequence])
 	fmt.Printf("HANDLE: this.SelectMode[%d] = %s\n", this.SelectedSequence, printMode(this.SelectMode[this.SelectedSequence]))

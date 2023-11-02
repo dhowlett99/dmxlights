@@ -418,7 +418,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off edit static color mode.
 		this.ShowStaticColorPicker = false                     // Turn off the color picker.
 		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
-		this.StaticFlashing = false                            // Stop any flash commands being issued.
+		this.StaticFlashing[this.SelectedSequence] = false     // Stop any flash commands being issued.
 
 		if this.ScannerChaser[this.SelectedSequence] {
 			// Turn on edit static color mode in the scanner sequence.
