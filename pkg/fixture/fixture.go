@@ -303,7 +303,7 @@ func FixtureReceiver(
 					sequence.Number = cmd.SequenceNumber
 					sequence.Master = cmd.Master
 					sequence.Blackout = cmd.Blackout
-					sequence.Hide = false
+					sequence.Hide = cmd.Hide
 					sequence.StaticColors = cmd.RGBStaticColors
 					sequence.Static = cmd.RGBStatic
 					sequence.StrobeSpeed = cmd.StrobeSpeed
