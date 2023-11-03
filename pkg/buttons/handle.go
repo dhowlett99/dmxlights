@@ -297,6 +297,15 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
+		// Turn off any flashing static buttons.
+		if this.StaticFlashing[sequenceNumber] {
+			// Unselect all fixtures.
+			this.SelectAllStaticFixtures = false
+			// Stop the flash of the static buttons,
+			flashwStaticButtons(sequenceNumber, false, commandChannels)
+			this.StaticFlashing[sequenceNumber] = false
+		}
+
 		// Hide the sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 

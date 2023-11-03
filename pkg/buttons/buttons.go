@@ -1918,19 +1918,17 @@ func ProcessButtons(X int, Y int,
 
 		if this.SelectAllStaticFixtures {
 			// Set the same static color for all.
-			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
-				cmd := common.Command{
-					Action: common.UpdateStaticColor,
-					Args: []common.Arg{
-						{Name: "Static", Value: true},
-						{Name: "FixtureNumber", Value: fixtureNumber},
-						{Name: "StaticLampFlash", Value: false},
-						{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
-						{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			cmd := common.Command{
+				Action: common.UpdateAllStaticColor,
+				Args: []common.Arg{
+					{Name: "Static", Value: true},
+					{Name: "StaticLampFlash", Value: false},
+					{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
+					{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
+				},
 			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			this.SelectAllStaticFixtures = false
 
 		} else {

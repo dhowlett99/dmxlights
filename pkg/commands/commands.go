@@ -473,7 +473,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
+		sequence.Hide = false
+		return sequence
+
+	case common.UpdateAllStaticColor:
+		const STATIC = 0                // Boolean
+		const STATIC_FIXTURE_FLASH = 1  // Boolean
+		const STATIC_SELECTED_COLOR = 2 // Integer
+		const STATIC_COLOR = 3          // Color
+		if debug {
+			fmt.Printf("%d: Command Update All Static Colors\n", mySequenceNumber)
+			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(common.Color))
+
+		}
+		// Set fixtures.
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+			sequence.StaticColors[fixture].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
+			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+			sequence.StaticColors[fixture].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
+		}
+		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.PlayStaticOnce = true
+		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
+
 		return sequence
 
 	case common.UpdateStaticColor:

@@ -223,6 +223,7 @@ const (
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce
+	UpdateAllStaticColor
 	UpdateStaticColor
 	UpdateASingeSequenceColor
 	UpdateSequenceColors
