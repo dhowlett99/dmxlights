@@ -55,6 +55,7 @@ type CurrentState struct {
 	SelectedSequence            int                        // The currently selected sequence.
 	TargetSequence              int                        // The current target sequence.
 	DisplaySequence             int                        // The current display sequence.
+	SequenceType                []string                   // The type, indexed by sequence.
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
 	StaticFlashing              []bool                     // Static buttons are flashing, indexed by sequence.

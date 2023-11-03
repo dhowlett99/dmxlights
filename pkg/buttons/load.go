@@ -87,6 +87,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
 
+		// Setup the correct mode for the displays.
+		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
+		this.SelectMode[sequenceNumber] = NORMAL
+		this.StaticFlashing[sequenceNumber] = false
+		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
+		this.EditStaticColorsMode[sequenceNumber] = false
+		if sequenceNumber != this.ChaserSequenceNumber {
+			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+		}
+
 		// Reload the fixture state.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.SelectedSequence].NumberFixtures; fixtureNumber++ {
 			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
@@ -111,10 +121,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 		}
 
-		this.SelectMode[this.SelectedSequence] = NORMAL
-		this.ScannerChaser[this.SelectedSequence] = sequences[sequenceNumber].ScannerChaser
-		this.EditStaticColorsMode[this.SelectedSequence] = false
-
 		// If we are loading a switch sequence, update our local copy of the switch settings.
 		if sequences[sequenceNumber].Type == "switch" {
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
@@ -130,14 +136,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
 				}
 			}
-		}
 
-		// Show the static and switch settings.
-		cmd := common.Command{
-			Action: common.UnHide,
+			// Unhide the switch sequence.
+			cmd := common.Command{
+				Action: common.UnHide,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
-
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
@@ -154,17 +159,4 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
 
-	// Clear any flashing
-	// Set a static color for an individual fixture.
-	cmd = common.Command{
-		Action: common.UpdateStaticColor,
-		Args: []common.Arg{
-			{Name: "Static", Value: true},
-			{Name: "FixtureNumber", Value: this.SelectedStaticFixtureNumber},
-			{Name: "StaticLampFlash", Value: false},
-			{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
-			{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
-		},
-	}
-	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 }

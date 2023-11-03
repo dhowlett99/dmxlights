@@ -140,7 +140,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Now display the selected mode.
-	displayMode(this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+	displayMode(this.SelectedSequence, this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 }
 
@@ -171,25 +171,25 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 }
 
-func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	debug := false
 
 	// Clear the buttons.
-	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+	common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 
 	if debug {
-		fmt.Printf("displayMode Mode : %s\n", printMode(this.SelectMode[this.SelectedSequence]))
+		fmt.Printf("displayMode Sequence %d Mode : %s\n", sequenceNumber, printMode(this.SelectMode[sequenceNumber]))
 	}
 
 	// Tailor the top buttons to the sequence type.
-	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+	common.ShowTopButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
 
 	// Tailor the bottom buttons to the sequence type.
-	common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+	common.ShowBottomButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
 
 	// Show this sequence running status in the start/stop button.
-	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+	common.ShowRunningStatus(sequenceNumber, this.Running, eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
 	showStatusBar(this, sequences, guiButtons)
@@ -202,16 +202,16 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 	case mode == NORMAL:
 
 		if debug {
-			fmt.Printf("displayMode: NORMAL\n")
+			fmt.Printf("sequence %d displayMode: NORMAL\n", sequenceNumber)
 		}
 
-		// Make sure we hide any shutter chaser.
-		if this.SelectedType == "scanner" {
+		// Make sure we hide the shutter chaser.
+		if this.SequenceType[sequenceNumber] == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Force the reveal the selected sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
-		common.RevealSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
+		common.RevealSequence(sequenceNumber, commandChannels)
 
 		return
 
@@ -221,26 +221,22 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: NORMAL STATIC\n")
 		}
 
-		this.EditStaticColorsMode[this.SelectedSequence] = true
+		this.EditStaticColorsMode[sequenceNumber] = true
 
 		// Make sure we hide any shutter chaser.
 		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Force the reveal the selected sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
-		common.RevealSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
+		common.RevealSequence(sequenceNumber, commandChannels)
 
 		// Select all fixtures.
 		this.SelectAllStaticFixtures = true
 
-		if debug {
-			fmt.Printf("flashwStaticButtons: true\n")
-		}
-
 		// Flash the static buttons,
-		flashwStaticButtons(this.SelectedSequence, true, commandChannels)
-		this.StaticFlashing[this.SelectedSequence] = true
+		flashwStaticButtons(sequenceNumber, true, commandChannels)
+		this.StaticFlashing[sequenceNumber] = true
 
 		return
 
@@ -250,23 +246,18 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: CHASER_DISPLAY\n")
 		}
 		// Hide the selected sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Force the reveal of the shutter chaser.
 		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 
-		if this.StaticFlashing[this.SelectedSequence] {
+		if this.StaticFlashing[sequenceNumber] {
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
-
-			if debug {
-				fmt.Printf("flashwStaticButtons: false\n")
-			}
-
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
-			this.StaticFlashing[this.SelectedSequence] = false
+			this.StaticFlashing[sequenceNumber] = false
 		}
 
 		return
@@ -277,10 +268,10 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: CHASER_DISPLAY\n")
 		}
 
-		this.EditStaticColorsMode[this.SelectedSequence] = true
+		this.EditStaticColorsMode[sequenceNumber] = true
 
 		// Hide the selected sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Force the reveal of the shutter chaser.
 		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
@@ -289,20 +280,16 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		// Select all fixtures.
 		this.SelectAllStaticFixtures = true
 
-		if debug {
-			fmt.Printf("flashwStaticButtons: true\n")
-		}
-
 		// Flash the static buttons,
 		flashwStaticButtons(this.ChaserSequenceNumber, true, commandChannels)
-		this.StaticFlashing[this.SelectedSequence] = true
+		this.StaticFlashing[sequenceNumber] = true
 
 		return
 
 	case mode == FUNCTION:
 
 		if debug {
-			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", this.SelectedSequence, this.ScannerChaser[this.SelectedSequence])
+			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", sequenceNumber, this.ScannerChaser[sequenceNumber])
 		}
 		// If we have a shutter chaser running hide it.
 		if this.SelectedType == "scanner" {
@@ -310,7 +297,7 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 		}
 
 		// Hide the sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -323,11 +310,11 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			fmt.Printf("displayMode: CHASER_FUNCTION\n")
 		}
 		// If we have a shutter chaser running hide it.
-		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
+		if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Hide the normal sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Show the chaser function buttons.
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -345,23 +332,19 @@ func displayMode(mode int, this *CurrentState, sequences []*common.Sequence, eve
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 		// Hide the normal sequence.
-		common.HideSequence(this.SelectedSequence, commandChannels)
+		common.HideSequence(sequenceNumber, commandChannels)
 
-		if this.StaticFlashing[this.SelectedSequence] {
+		if this.StaticFlashing[sequenceNumber] {
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 
-			if debug {
-				fmt.Printf("flashwStaticButtons: false\n")
-			}
-
 			// Stop the flash of the static buttons,
 			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
-			this.StaticFlashing[this.SelectedSequence] = false
+			this.StaticFlashing[sequenceNumber] = false
 		}
 
 		// Display the fixture status bar.
-		showFixtureStatus(this.TargetSequence, sequences[this.SelectedSequence].Number, sequences[this.SelectedSequence].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+		showFixtureStatus(this.TargetSequence, sequences[sequenceNumber].Number, sequences[sequenceNumber].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -513,6 +496,9 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 
 func flashwStaticButtons(targetSequence int, state bool, commandChannels []chan common.Command) {
 
+	if debug {
+		fmt.Printf("flashwStaticButtons set to %t\n", state)
+	}
 	// Add the flashing static buttons.
 	cmd := common.Command{
 		Action: common.UpdateFlashAllStaticColorButtons,
@@ -539,7 +525,7 @@ func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, event
 				// And turn off the function selected.
 				this.SelectMode[sequenceNumber] = NORMAL
 				this.SelectedSequence = sequenceNumber
-				displayMode(this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
+				displayMode(this.SelectedSequence, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
 			}
 		}
 
@@ -550,7 +536,7 @@ func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, event
 				// And turn off the function selected.
 				this.SelectMode[sequenceNumber] = CHASER_DISPLAY
 				this.SelectedSequence = sequenceNumber
-				displayMode(this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
+				displayMode(this.SelectedSequence, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
 			}
 		}
 	}

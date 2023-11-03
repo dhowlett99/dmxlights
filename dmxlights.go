@@ -83,6 +83,7 @@ func main() {
 	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
 	this.StaticFlashing = make([]bool, NumberOfSequences)          // Remember when we are in static buttons are flashing.
+	this.SequenceType = make([]string, NumberOfSequences)          // Remember sequence type.
 	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
@@ -251,6 +252,7 @@ func main() {
 		this.StrobeSpeed[sequenceNumber] = 255                                       // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.
 		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT             // Default scanner shift size.
+		this.SequenceType[sequenceNumber] = newSequence.Type                         // Set the sequence type.
 		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                       // Set the defaults size for the RGB fixtures.
 		this.ScannerSize[sequenceNumber] = common.DEFAULT_SCANNER_SIZE               // Set the defaults size for the scanner fixtures.
 		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                       // Set the default fade time for RGB fixtures.
