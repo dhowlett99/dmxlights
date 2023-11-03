@@ -291,8 +291,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if debug {
 			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", sequenceNumber, this.ScannerChaser[sequenceNumber])
 		}
-		// If we have a shutter chaser running hide it.
-		if this.SelectedType == "scanner" {
+		// If we have a shutter chaser running force hide it.
+		if this.SequenceType[sequenceNumber] == "scanner" {
+			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
