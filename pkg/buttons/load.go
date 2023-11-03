@@ -108,8 +108,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
-			this.ScannerChaser[this.SelectedSequence] = sequences[sequenceNumber].ScannerChaser
+
 		}
+
+		this.SelectMode[this.SelectedSequence] = NORMAL
+		this.ScannerChaser[this.SelectedSequence] = sequences[sequenceNumber].ScannerChaser
+		this.EditStaticColorsMode[this.SelectedSequence] = false
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
 		if sequences[sequenceNumber].Type == "switch" {
