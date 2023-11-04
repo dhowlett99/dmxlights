@@ -2507,26 +2507,26 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	}
 }
 
-func printMode(sequencNumber int) string {
-	if sequencNumber == NORMAL {
+func printMode(mode int) string {
+	if mode == NORMAL {
 		return "NORMAL"
 	}
-	if sequencNumber == NORMAL_STATIC {
+	if mode == NORMAL_STATIC {
 		return "NORMAL_STATIC"
 	}
-	if sequencNumber == CHASER_DISPLAY {
+	if mode == CHASER_DISPLAY {
 		return "CHASER_DISPLAY"
 	}
-	if sequencNumber == CHASER_DISPLAY_STATIC {
+	if mode == CHASER_DISPLAY_STATIC {
 		return "CHASER_DISPLAY_STATIC"
 	}
-	if sequencNumber == FUNCTION {
+	if mode == FUNCTION {
 		return "FUNCTION"
 	}
-	if sequencNumber == CHASER_FUNCTION {
+	if mode == CHASER_FUNCTION {
 		return "CHASER_FUNCTION"
 	}
-	if sequencNumber == STATUS {
+	if mode == STATUS {
 		return "STATUS"
 	}
 	return "UNKNOWN"

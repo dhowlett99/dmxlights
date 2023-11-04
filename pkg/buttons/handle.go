@@ -86,7 +86,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.ShowRGBColorPicker = false
 		this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
-		this.SelectMode[this.SelectedSequence] = NORMAL
 
 		// If the Selected Color has come back as empty this means we didn't select any colors.
 		// So restore the colors that were already there.
@@ -146,8 +145,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	this.SelectButtonPressed[this.SelectedSequence] = false
-	this.SelectMode[this.SelectedSequence] = NORMAL
 	this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 
 	// Clear the first three launchpad rows used by the color picker.
@@ -344,8 +341,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 
-			// Stop the flash of the static buttons,
-			flashwStaticButtons(sequenceNumber, false, commandChannels)
+			// Stop the flash of the static buttons, taking care to select the correct sequence.
+			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
+				flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
+			} else {
+				flashwStaticButtons(sequenceNumber, false, commandChannels)
+			}
 			this.StaticFlashing[sequenceNumber] = false
 		}
 
@@ -503,7 +504,7 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 func flashwStaticButtons(targetSequence int, state bool, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("flashwStaticButtons set to %t\n", state)
+		fmt.Printf("======> flashwStaticButtons: sequence %d set to %t\n", targetSequence, state)
 	}
 	// Add the flashing static buttons.
 	cmd := common.Command{
