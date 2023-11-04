@@ -1949,6 +1949,9 @@ func ProcessButtons(X int, Y int,
 		this.LastStaticColorButtonX = this.SelectedStaticFixtureNumber
 		this.LastStaticColorButtonY = Y
 
+		// Hide the sequence.
+		common.HideSequence(this.TargetSequence, commandChannels)
+
 		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
 		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
