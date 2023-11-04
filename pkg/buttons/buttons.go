@@ -29,7 +29,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
-	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx"
 	"github.com/oliread/usbdmx/ft232"
@@ -39,10 +38,13 @@ const debug = false
 
 // Select modes.
 const (
-	NORMAL int = iota
-	FUNCTION
-	CHASER
-	STATUS
+	NORMAL                int = iota // Normal RGB or Scanner Rotation display.
+	NORMAL_STATIC                    // Normal RGB in edit all static fixtures.
+	FUNCTION                         // Show the RGB or Scanner functions.
+	CHASER_DISPLAY                   //  Show the scanner shutter display.
+	CHASER_DISPLAY_STATIC            //  Shutter chaser in edit all fixtures mode.
+	CHASER_FUNCTION                  // Show the scammer shutter chaser functions.
+	STATUS                           // Show the fixture status states.
 )
 
 type CurrentState struct {
@@ -53,8 +55,10 @@ type CurrentState struct {
 	SelectedSequence            int                        // The currently selected sequence.
 	TargetSequence              int                        // The current target sequence.
 	DisplaySequence             int                        // The current display sequence.
+	SequenceType                []string                   // The type, indexed by sequence.
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
+	StaticFlashing              []bool                     // Static buttons are flashing, indexed by sequence.
 	SavedSequenceColors         map[int][]common.Color     // Local storage for sequence colors.
 	SelectedType                string                     // The currently selected sequenece type.
 	LastSelectedSequence        int                        // Store fof the last selected squence.
@@ -81,12 +85,12 @@ type CurrentState struct {
 	FunctionLabels              [8]string                  // Storage for the function key labels for this sequence.
 	SelectButtonPressed         []bool                     // Which sequence has its Select button pressed.
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
-	EditSequenceColorsMode      bool                       // This flag is true when the sequence is in select sequence chase colors editing mode.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in static colors editing mode.
-	EditColorPicker             bool                       // This flag is true when the sequence is in color picker mode.
-	EditWhichSequence           int                        // Which sequence is currently being edited.
+	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in edit static colors mode.
+	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
+	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
+	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
 	EditPatternMode             bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode    bool                       // This flag is true when the sequence is in select fixture mode.
 	MasterBrightness            int                        // Affects all DMX fixtures and launchpad lamps.
@@ -116,8 +120,8 @@ type CurrentState struct {
 	DmxInterfacePresent         bool                       // Flag to indicate precence of DMX interface card
 	DmxInterfacePresentConfig   *usbdmx.ControllerConfig   // DMX Interface card config.
 	LaunchpadName               string                     // Storage for launchpad config.
-	Chaser                      common.Sequence            // Sequence for chaser.
-	ScannerChaser               bool                       // Chaser is running.
+	ScannerChaser               map[int]bool               // Chaser is running.
+	DisplayChaserShortCut       bool                       // Flag to indicate we've taken a shortcut to the chaser display
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
@@ -137,6 +141,9 @@ func ProcessButtons(X int, Y int,
 	if debug {
 		fmt.Printf("ProcessButtons Called with X:%d Y:%d\n", X, Y)
 	}
+
+	// Set the sequence type.
+	this.SelectedType = sequences[this.SelectedSequence].Type
 
 	// The Novation Launchpad is not designed for the number of MIDI
 	// Events we send when all the sequences are chasing at top
@@ -182,9 +189,9 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditStaticColorsMode[Y] &&
-		!this.EditSequenceColorsMode &&
-		!this.EditColorPicker &&
+		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
+		!this.ShowRGBColorPicker &&
+		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -243,8 +250,8 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditSequenceColorsMode &&
-		!this.EditColorPicker &&
+		!this.ShowRGBColorPicker &&
+		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
@@ -600,8 +607,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Ask For Config\n")
 		}
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -668,7 +675,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Decrease Shift.
-	if X == 2 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Shift\n")
@@ -677,14 +684,14 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
 			if this.RGBShift[this.TargetSequence] < 0 {
 				this.RGBShift[this.TargetSequence] = 0
@@ -698,7 +705,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+			UpdateShift(this, guiButtons)
 			return
 		}
 
@@ -717,13 +724,13 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %0s", label), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
 	}
 
 	// Increase Shift.
-	if X == 3 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Shift \n")
@@ -732,13 +739,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
 			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
 				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
@@ -752,7 +759,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+			UpdateShift(this, guiButtons)
 			return
 		}
 
@@ -771,13 +778,13 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Shift %s", label), "shift", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
 			return
 		}
 	}
 
-	// Decrease speed of selected sequence.
-	if X == 0 && Y == 7 && !this.EditSequenceColorsMode {
+	// S E L E C T   S P E E D - Decrease speed of selected sequence.
+	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Speed \n")
@@ -786,8 +793,8 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
@@ -820,7 +827,7 @@ func ProcessButtons(X int, Y int,
 		// Decrease Speed.
 		if !sequences[this.TargetSequence].MusicTrigger {
 			this.Speed[this.TargetSequence]--
-			if this.Speed[this.TargetSequence] == 1 {
+			if this.Speed[this.TargetSequence] < 1 {
 				this.Speed[this.TargetSequence] = 1
 			}
 
@@ -849,13 +856,13 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}
 
-	// Increase speed of selected sequence.
-	if X == 1 && Y == 7 && !this.EditSequenceColorsMode {
+	// S E L E C T   S P E E D - Increase speed of selected sequence.
+	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Speed \n")
@@ -863,9 +870,9 @@ func ProcessButtons(X int, Y int,
 
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
-		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		// If we're a scanner and we're in shutter chase mode
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
@@ -926,7 +933,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}
@@ -944,8 +951,10 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorsMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
+		this.EditWhichStaticSequence = 0
 
 		return
 	}
@@ -962,8 +971,10 @@ func ProcessButtons(X int, Y int,
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-		this.EditSequenceColorsMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
+		this.EditWhichStaticSequence = 1
 
 		return
 	}
@@ -979,8 +990,12 @@ func ProcessButtons(X int, Y int,
 		}
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-		this.EditSequenceColorsMode = false
+
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
+		if this.ScannerChaser[this.SelectedSequence] {
+			this.EditWhichStaticSequence = 4
+		}
 
 		return
 	}
@@ -1001,8 +1016,10 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		this.EditSequenceColorsMode = false
+		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
+		this.EditWhichStaticSequence = 3
 
 		return
 	}
@@ -1010,10 +1027,19 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
+
+		// Start in normal mode, hide the shutter chaser.
+		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			this.SelectMode[this.SelectedSequence] = NORMAL
+		}
+
+		this.StaticFlashing[this.SelectedSequence] = false
 
 		// S T O P - If sequence is running, stop it
 		if this.Running[this.SelectedSequence] {
@@ -1027,15 +1053,47 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			this.Running[this.SelectedSequence] = false
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
+			this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+			this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
+
+			// Stop should also stop the shutter chaser.
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+
+				cmd := common.Command{
+					Action: common.Stop,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.ChaserSequenceNumber]},
+					},
+				}
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+				this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+				this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
+				this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
+				this.Functions[this.ChaserSequenceNumber][common.Function8_Music_Trigger].State = false
+				this.ScannerChaser[this.SelectedSequence] = false
+				this.SelectMode[this.SelectedSequence] = NORMAL
+				this.Running[this.ChaserSequenceNumber] = false
+			}
+
+			// Turn of the start lamp.
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+
+			// Set the correct color for the select button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
+
 			return
+
 		} else {
 			// Start this sequence.
 			if debug {
 				fmt.Printf("Start Sequence %d \n", Y)
 			}
+
 			sequences[this.SelectedSequence].MusicTrigger = false
 			cmd := common.Command{
 				Action: common.Start,
@@ -1045,13 +1103,19 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+
 			this.Running[this.SelectedSequence] = true
+			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
+			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
 			// Clear the pattern function keys
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 			// Reveal the now running sequence
 			common.RevealSequence(this.SelectedSequence, commandChannels)
+
+			// Set the correct color for the select button.
+			SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 			return
 		}
@@ -1122,7 +1186,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Size decrease.
-	if X == 4 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 4 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Size\n")
@@ -1131,14 +1195,14 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]--
 			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
@@ -1152,7 +1216,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this, guiButtons)
 			return
 		}
 
@@ -1171,13 +1235,13 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
 
 	// Increase Size.
-	if X == 5 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 5 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Size\n")
@@ -1186,14 +1250,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" ||
-			this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 
 			// Send Update RGB Size.
 			this.RGBSize[this.TargetSequence]++
@@ -1208,7 +1271,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this, guiButtons)
 			return
 		}
 
@@ -1227,14 +1290,13 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
-
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
 	}
 
 	// Fade time decrease.
-	if X == 6 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Decrease Fade Time\n")
@@ -1243,13 +1305,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]--
 			if this.RGBFade[this.TargetSequence] < 1 {
 				this.RGBFade[this.TargetSequence] = 1
@@ -1263,8 +1325,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
-
+			UpdateFade(this, guiButtons)
 			return
 		}
 
@@ -1284,14 +1345,14 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 
 	}
 
 	// Fade time increase.
-	if X == 7 && Y == 7 && !this.EditSequenceColorsMode {
+	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Increase Fade Time\n")
@@ -1300,13 +1361,13 @@ func ProcessButtons(X int, Y int,
 		buttonTouched(common.ALight{X: X, Y: Y, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" &&
-			this.ScannerChaser {
+		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
-		if sequences[this.TargetSequence].Type == "rgb" || this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State {
+		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]++
 			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {
 				this.RGBFade[this.TargetSequence] = common.MAX_RGB_FADE
@@ -1320,7 +1381,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+			UpdateFade(this, guiButtons)
 			return
 		}
 
@@ -1340,7 +1401,7 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Update the status bar
 			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Coord %s", label), "fade", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
 			return
 		}
 	}
@@ -1355,8 +1416,8 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
 		}
 
-		if this.EditSequenceColorsMode {
-			this.EditSequenceColorsMode = false
+		if this.ShowRGBColorPicker {
+			this.ShowRGBColorPicker = false
 			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
@@ -1593,13 +1654,13 @@ func ProcessButtons(X int, Y int,
 		Y != -1 && Y < 3 &&
 		!this.EditFixtureSelectionMode &&
 		!this.EditScannerColorsMode &&
-		this.EditSequenceColorsMode {
+		this.ShowRGBColorPicker {
 
 		if debug {
 			fmt.Printf("Set Sequence Color X:%d Y:%d\n", X, Y)
 		}
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
+		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
 		} else {
@@ -1620,7 +1681,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		this.EditSequenceColorsMode = true
+		this.ShowRGBColorPicker = true
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
@@ -1629,7 +1690,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -1658,7 +1719,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateScannerColor,
 				Args: []common.Arg{
@@ -1743,7 +1804,7 @@ func ProcessButtons(X int, Y int,
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
 		// If configured set scanner color in chaser.
-		if this.ScannerChaser && this.SelectedType == "scanner" {
+		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateGobo,
 				Args: []common.Arg{
@@ -1775,13 +1836,22 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 &&
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		this.SelectMode[this.SelectedSequence] == NORMAL && // Not in function Mode
-		!this.EditColorPicker && // Not In Color Picker Mode.
-		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in any sequence
+		//this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
+		(this.SelectMode[this.SelectedSequence] == NORMAL ||
+			this.SelectMode[this.SelectedSequence] == NORMAL_STATIC ||
+			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
+			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
+		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
+		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in any sequence
 
-		this.TargetSequence = this.EditWhichSequence
+		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
+
+		if debug {
+			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
+			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		}
 
 		// Save the selected fixture number.
 		this.SelectedStaticFixtureNumber = X
@@ -1804,10 +1874,11 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
-		// Switch the mode so we know we are picking a color from the color picker.
-		this.EditColorPicker = true
+		// Switch the mode so we know we are picking a static color from the color picker.
+		this.ShowStaticColorPicker = true
+		this.EditStaticColorsMode[this.TargetSequence] = true
 
 		return
 	}
@@ -1815,9 +1886,19 @@ func ProcessButtons(X int, Y int,
 	// S E T   S T A T I C   C O L O R
 	if X >= 0 && X < 8 && Y != -1 &&
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
-		this.EditColorPicker && // Now We Are In Color Picker Mode.
+		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.EditStaticColorsMode[this.EditWhichSequence] { // Static Function On in this sequence
+		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in this sequence
+
+		this.TargetSequence = this.EditWhichStaticSequence
+		this.DisplaySequence = this.SelectedSequence
+
+		if debug {
+			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
+			fmt.Printf("ShowStaticColorPicker %t\n", this.ShowStaticColorPicker)
+			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
+			fmt.Printf("DisplaySequence %d\n", this.DisplaySequence)
+		}
 
 		// Find the color from the button pressed.
 		color := FindCurrentColor(X, Y, *sequences[this.TargetSequence])
@@ -1837,19 +1918,17 @@ func ProcessButtons(X int, Y int,
 
 		if this.SelectAllStaticFixtures {
 			// Set the same static color for all.
-			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
-				cmd := common.Command{
-					Action: common.UpdateStaticColor,
-					Args: []common.Arg{
-						{Name: "Static", Value: true},
-						{Name: "FixtureNumber", Value: fixtureNumber},
-						{Name: "StaticLampFlash", Value: false},
-						{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
-						{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			cmd := common.Command{
+				Action: common.UpdateAllStaticColor,
+				Args: []common.Arg{
+					{Name: "Static", Value: true},
+					{Name: "StaticLampFlash", Value: false},
+					{Name: "SelectedColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
+					{Name: "StaticColor", Value: sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color},
+				},
 			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			this.SelectAllStaticFixtures = false
 
 		} else {
@@ -1870,8 +1949,11 @@ func ProcessButtons(X int, Y int,
 		this.LastStaticColorButtonX = this.SelectedStaticFixtureNumber
 		this.LastStaticColorButtonY = Y
 
+		// Hide the sequence.
+		common.HideSequence(this.TargetSequence, commandChannels)
+
 		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
@@ -1893,7 +1975,7 @@ func ProcessButtons(X int, Y int,
 		common.RevealSequence(this.TargetSequence, commandChannels)
 
 		// Switch off the color picker.
-		this.EditColorPicker = false
+		this.ShowStaticColorPicker = false
 
 		return
 	}
@@ -1903,12 +1985,17 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode {
 
-		if this.SelectMode[this.SelectedSequence] == CHASER {
+		if this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 			this.TargetSequence = this.ChaserSequenceNumber
 			this.DisplaySequence = this.SelectedSequence
+			// This is the way we get the shutter chaser to be displayed as we exit
+			// the pattern selection
+			this.DisplayChaserShortCut = true
+			this.SelectMode[this.DisplaySequence] = CHASER_FUNCTION
 		} else {
 			this.TargetSequence = this.SelectedSequence
 			this.DisplaySequence = this.SelectedSequence
+			this.SelectMode[this.DisplaySequence] = NORMAL
 		}
 
 		if debug {
@@ -1924,8 +2011,6 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		this.SelectMode[this.DisplaySequence] = NORMAL
-
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
@@ -1939,7 +2024,7 @@ func ProcessButtons(X int, Y int,
 	// F U N C T I O N  K E Y S
 	if X >= 0 && X < 8 && Y >= 0 && Y < 3 &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
-		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER {
+		this.SelectMode[this.SelectedSequence] == FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		processFunctions(X, Y, sequences, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
@@ -2048,18 +2133,19 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) common.Color
 // ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
 // the targetSequence .CurrentColors selects which colors are selected.
 // Returns the RGBAvailableColors []common.StaticColorButton
-func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
 	}
 
+	common.HideSequence(0, commandChannels)
+	common.HideSequence(1, commandChannels)
+	common.HideSequence(1, commandChannels)
+
 	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
 
 		lamp.Flash = false
-		if debug {
-			fmt.Printf("Static Color Button %+v\n", lamp)
-		}
 
 		// Check if we need to flash this button.
 		for index, availableColor := range targetSequence.RGBAvailableColors {
@@ -2160,7 +2246,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 	if sequence.ScannerAvailableColors[this.SelectedFixture+1] == nil {
 
 		// Turn off the color edit mode.
-		this.EditSequenceColorsMode = false
+		this.ShowRGBColorPicker = false
 		// And since we seem to be using two flags for the same thing, turn this off too.
 		this.Functions[this.SelectedSequence][common.Function5_Color].State = false
 
@@ -2307,7 +2393,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	sequence.SequenceSelect(eventsForLaunchpad, guiButtons, this.SelectedSequence)
+	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 }
 
@@ -2409,13 +2495,137 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 	for sequenceNumber := range sequences {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
-		this.EditSequenceColorsMode = false
+		this.ShowRGBColorPicker = false
 		this.EditStaticColorsMode[this.DisplaySequence] = false
 		this.EditStaticColorsMode[this.TargetSequence] = false
+		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.EditPatternMode = false
 		for function := range this.Functions {
 			this.Functions[sequenceNumber][function].State = false
 		}
+	}
+}
+
+func printMode(mode int) string {
+	if mode == NORMAL {
+		return "NORMAL"
+	}
+	if mode == NORMAL_STATIC {
+		return "NORMAL_STATIC"
+	}
+	if mode == CHASER_DISPLAY {
+		return "CHASER_DISPLAY"
+	}
+	if mode == CHASER_DISPLAY_STATIC {
+		return "CHASER_DISPLAY_STATIC"
+	}
+	if mode == FUNCTION {
+		return "FUNCTION"
+	}
+	if mode == CHASER_FUNCTION {
+		return "CHASER_FUNCTION"
+	}
+	if mode == STATUS {
+		return "STATUS"
+	}
+	return "UNKNOWN"
+}
+
+func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
+
+	if debug {
+		fmt.Printf("SequenceSelect\n")
+	}
+
+	// Turn off all sequence lights.
+	for seq := 0; seq < 3; seq++ {
+		common.LightLamp(common.ALight{X: 8, Y: seq, Brightness: 255, Red: 100, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+	}
+
+	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+		(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
+		// If we are in shutter chaser mode, light the lamp yellow.
+		common.LightLamp(common.ALight{X: 8, Y: this.SelectedSequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+	} else {
+		// Now turn pink the selected sequence select light.
+		common.LightLamp(common.ALight{X: 8, Y: this.SelectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+	}
+
+}
+
+func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.DisplaySequence]
+	tYpe := this.SelectedType
+	speed := this.Speed[this.TargetSequence]
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButttons)
+	}
+}
+
+func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.DisplaySequence]
+	tYpe := this.SelectedType
+	size := this.RGBSize[this.TargetSequence]
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", size), "size", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", size), "size", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", size), "size", false, guiButttons)
+	}
+}
+
+func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.DisplaySequence]
+	tYpe := this.SelectedType
+	shift := this.RGBShift[this.TargetSequence]
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %02d", shift), "shift", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", shift), "shift", false, guiButttons)
+	}
+}
+
+func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
+
+	mode := this.SelectMode[this.DisplaySequence]
+	tYpe := this.SelectedType
+	fade := this.RGBFade[this.TargetSequence]
+
+	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if tYpe == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", fade), "fade", false, guiButttons)
+		}
+		if tYpe == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Fade %02d", fade), "fade", false, guiButttons)
+		}
+	}
+	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", fade), "fade", false, guiButttons)
 	}
 }

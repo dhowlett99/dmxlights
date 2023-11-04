@@ -87,6 +87,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
 
+		// Setup the correct mode for the displays.
+		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
+		this.SelectMode[sequenceNumber] = NORMAL
+		this.StaticFlashing[sequenceNumber] = false
+		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
+		this.EditStaticColorsMode[sequenceNumber] = false
+		if sequenceNumber != this.ChaserSequenceNumber {
+			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+		}
+
 		// Reload the fixture state.
 		for fixtureNumber := 0; fixtureNumber < sequences[this.SelectedSequence].NumberFixtures; fixtureNumber++ {
 			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
@@ -108,7 +118,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
-			this.ScannerChaser = sequences[sequenceNumber].ScannerChaser
+
 		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
@@ -126,14 +136,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
 				}
 			}
-		}
 
-		// Show the static and switch settings.
-		cmd := common.Command{
-			Action: common.UnHide,
+			// Unhide the switch sequence.
+			cmd := common.Command{
+				Action: common.UnHide,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
-		common.SendCommandToAllSequence(cmd, commandChannels)
-
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
@@ -149,4 +158,5 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	} else {
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
 	}
+
 }

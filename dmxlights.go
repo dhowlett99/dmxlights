@@ -78,10 +78,12 @@ func main() {
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
 	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
 	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
-	this.EditSequenceColorsMode = false                            // Remember when we are in editing sequence colors mode.
+	this.ShowRGBColorPicker = false                                // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
 	this.EditStaticColorsMode = make([]bool, NumberOfSequences)    // Remember when we are in editing static colors mode.
+	this.StaticFlashing = make([]bool, NumberOfSequences)          // Remember when we are in static buttons are flashing.
+	this.SequenceType = make([]string, NumberOfSequences)          // Remember sequence type.
 	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
@@ -95,6 +97,7 @@ func main() {
 	this.StrobeSpeed = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
 	this.LastStrobeSpeed = make(map[int]int, NumberOfSequences)    // Initialise storage for four sequences.
 	this.ClearPressed = make(map[int]bool, NumberOfSequences)      // Initialise storage for four sequences.
+	this.ScannerChaser = make(map[int]bool, NumberOfSequences)     // Initialise storage for four sequences.
 	this.ScannerCoordinates = make(map[int]int, NumberOfSequences) // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
 	this.LaunchPadConnected = true                                 // Assume launchpad is present, until tested.
 	this.DmxInterfacePresent = true                                // Assume DMX interface card is present, until tested.
@@ -249,6 +252,7 @@ func main() {
 		this.StrobeSpeed[sequenceNumber] = 255                                       // Set the strob speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.
 		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT             // Default scanner shift size.
+		this.SequenceType[sequenceNumber] = newSequence.Type                         // Set the sequence type.
 		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                       // Set the defaults size for the RGB fixtures.
 		this.ScannerSize[sequenceNumber] = common.DEFAULT_SCANNER_SIZE               // Set the defaults size for the scanner fixtures.
 		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                       // Set the default fade time for RGB fixtures.
@@ -290,14 +294,14 @@ func main() {
 		}
 
 		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
-			this.FunctionLabels[0] = "Chaser\nPatten"
-			this.FunctionLabels[1] = "Chaser\nAuto\nColor"
-			this.FunctionLabels[2] = "Chaser\nAuto\nPatten"
-			this.FunctionLabels[3] = "Chaser\nBounce"
-			this.FunctionLabels[4] = "Chaser\nColor"
-			this.FunctionLabels[5] = "Chaser\nStatic\nColor"
-			this.FunctionLabels[6] = "Chaser\nInvert"
-			this.FunctionLabels[7] = "Chaser\nMusic"
+			this.FunctionLabels[0] = "Chase\nPatten"
+			this.FunctionLabels[1] = "Chase\nAuto\nColor"
+			this.FunctionLabels[2] = "Chase\nAuto\nPatten"
+			this.FunctionLabels[3] = "Chase\nBounce"
+			this.FunctionLabels[4] = "Chase\nColor"
+			this.FunctionLabels[5] = "Chase\nStatic\nColor"
+			this.FunctionLabels[6] = "Chase\nInvert"
+			this.FunctionLabels[7] = "Chase\nMusic"
 		}
 
 		// Make functions for each of the sequences.

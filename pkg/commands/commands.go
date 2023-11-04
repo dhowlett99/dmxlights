@@ -177,10 +177,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		if !sequence.Hidden {
 			if debug {
-				fmt.Printf("%d: Command Actually Hide\n", mySequenceNumber)
+				fmt.Printf("%d: Command Actually Hide Run is %t Static is %t\n", mySequenceNumber, sequence.Run, sequence.Static)
 			}
 			sequence.Hide = true
 			sequence.Hidden = true
+		} else {
+			if debug {
+				fmt.Printf("%d: Command Failed to Hide Run is %t Static is %t\n", mySequenceNumber, sequence.Run, sequence.Static)
+			}
 		}
 		return sequence
 
@@ -188,14 +192,19 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command UnHide\n", mySequenceNumber)
 		}
+		// We must have called Hide before we UnHide.
 		if sequence.Hidden {
 			if debug {
-				fmt.Printf("%d: Command Actually UnHide\n", mySequenceNumber)
+				fmt.Printf("%d: Command Actually UnHide Run is %t Static is %t\n", mySequenceNumber, sequence.Run, sequence.Static)
 			}
 			sequence.Hide = false
 			sequence.Hidden = false
 			sequence.PlayStaticOnce = true
 			sequence.PlaySwitchOnce = true
+		} else {
+			if debug {
+				fmt.Printf("%d: Command Failed to UnHide Run is %t Static is %t\n", mySequenceNumber, sequence.Run, sequence.Static)
+			}
 		}
 
 		return sequence
@@ -302,6 +311,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Mode = "Sequence"
 		sequence.Static = false
 		sequence.Run = true
+		sequence.Hidden = true // Make sure the next call to unHide works.
 		return sequence
 
 	case common.StartChase:
@@ -402,7 +412,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.PlayStaticOnce = true
 		}
 		// Restore the state of the music trigger flag.
-		//sequence.Functions[common.Function8_Music_Trigger].State = sequence.LastMusicTrigger
 		sequence.MusicTrigger = sequence.LastMusicTrigger
 		return sequence
 
@@ -448,13 +457,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.StaticFadeOnce = false
-		sequence.Hidden = false
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Run = false
 		return sequence
 
 	case common.UpdateFlashAllStaticColorButtons:
 		const STATIC_FLASH = 0
+		const STATIC_HIDDEN = 1
 		if debug {
 			fmt.Printf("%d: Command Flash All Static Colors to %t\n", mySequenceNumber, command.Args[STATIC_FLASH].Value)
 		}
@@ -464,7 +473,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
+		sequence.Hide = command.Args[STATIC_HIDDEN].Value.(bool)
+		return sequence
+
+	case common.UpdateAllStaticColor:
+		const STATIC = 0                // Boolean
+		const STATIC_FIXTURE_FLASH = 1  // Boolean
+		const STATIC_SELECTED_COLOR = 2 // Integer
+		const STATIC_COLOR = 3          // Color
+		if debug {
+			fmt.Printf("%d: Command Update All Static Colors\n", mySequenceNumber)
+			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(bool))
+
+		}
+		// Set fixtures.
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+			sequence.StaticColors[fixture].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
+			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+			sequence.StaticColors[fixture].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
+		}
+		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.PlayStaticOnce = true
+		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
+
 		return sequence
 
 	case common.UpdateStaticColor:
@@ -548,7 +582,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
-		sequence.Hide = true
+		sequence.Hide = false
 		return sequence
 
 	case common.SetStaticColorBar:
@@ -597,15 +631,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Get Updated Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
-		return sequence
-
-	// Update function mode for the current sequence.
-	case common.UpdateFunctionMode:
-		const FUNCTION_MODE = 0
-		if debug {
-			fmt.Printf("%d: Command Update Function Mode %t\n", mySequenceNumber, command.Args[FUNCTION_MODE].Value)
-		}
-		sequence.FunctionMode = command.Args[FUNCTION_MODE].Value.(bool)
 		return sequence
 
 	// Clear switch positions for this sequence
@@ -796,6 +821,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.UpdatePattern = true
 		sequence.Static = false
+		sequence.PlayStaticOnce = false
 		sequence.ChangeMusicTrigger = true
 		return sequence
 

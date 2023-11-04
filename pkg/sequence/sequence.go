@@ -1075,12 +1075,3 @@ func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern
 	return scannerPattens
 
 }
-
-func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, selectedSequence int) {
-	// Turn off all sequence lights.
-	for seq := 0; seq < 3; seq++ {
-		common.LightLamp(common.ALight{X: 8, Y: seq, Brightness: 255, Red: 100, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
-	}
-	// Now turn pink the selected sequence select light.
-	common.LightLamp(common.ALight{X: 8, Y: selectedSequence, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
-}

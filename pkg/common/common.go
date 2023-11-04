@@ -223,6 +223,7 @@ const (
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce
+	UpdateAllStaticColor
 	UpdateStaticColor
 	UpdateASingeSequenceColor
 	UpdateSequenceColors
@@ -246,8 +247,6 @@ const (
 	SoftFadeOn
 	SoftFadeOff
 	UpdateColor
-	UpdateFunctionMode
-	FunctionMode
 	UpdateFunctions
 	GetUpdatedSequence
 	ClearAllSwitchPositions
@@ -386,7 +385,6 @@ type Sequence struct {
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
 	UpdateSequenceColor         bool                        // Command to update the sequence colors.
-	FunctionMode                bool                        // This sequence is in function mode.
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
@@ -961,16 +959,6 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	return &newSequence
 }
 
-// For the given sequence hide the available sequence colors..
-func HideColorSelectionButtons(mySequenceNumber int, sequence Sequence, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	if mySequenceNumber == 4 {
-		return
-	}
-	for myFixtureNumber := range sequence.RGBAvailableColors {
-		LightLamp(ALight{X: myFixtureNumber, Y: mySequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: sequence.Master}, eventsForLauchpad, guiButtons)
-	}
-}
-
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if selectedSequence == 4 {
 		return
@@ -1054,6 +1042,10 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 
 func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
+	if debug {
+		fmt.Printf("ShowBottomButtons\n")
+	}
+
 	type bottonButton struct {
 		Label string
 		Color Color
@@ -1078,8 +1070,8 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
 	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
 	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: White}
-	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: White}
+	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: Cyan}
+	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: Cyan}
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
@@ -1184,6 +1176,28 @@ func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALi
 		Hidden:       hide,
 	}
 	guiButtons <- event
+}
+
+func UpdateBottomButtons(selectedType string, guiButtons chan ALight) {
+
+	LabelButton(0, 7, "Speed\nDown", guiButtons)
+	LabelButton(1, 7, "Speed\nUp", guiButtons)
+
+	LabelButton(2, 7, "Shift\nDown", guiButtons)
+	LabelButton(3, 7, "Shift\nUp", guiButtons)
+
+	LabelButton(4, 7, "Size\nDown", guiButtons)
+	LabelButton(5, 7, "Size\nUp", guiButtons)
+
+	if selectedType == "rgb" {
+		LabelButton(6, 7, "Fade\nSoft", guiButtons)
+		LabelButton(7, 7, "Fade\nSharp", guiButtons)
+	}
+
+	if selectedType == "scanner" {
+		LabelButton(6, 7, "Coord\nDown", guiButtons)
+		LabelButton(7, 7, "Coord\nUp", guiButtons)
+	}
 }
 
 func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
