@@ -485,7 +485,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update All Static Colors\n", mySequenceNumber)
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
-			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(common.Color))
+			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(bool))
 
 		}
 		// Set fixtures.

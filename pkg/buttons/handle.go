@@ -221,8 +221,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			fmt.Printf("displayMode: NORMAL STATIC\n")
 		}
 
-		this.EditStaticColorsMode[sequenceNumber] = true
-
 		// Make sure we hide any shutter chaser.
 		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
@@ -267,8 +265,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if debug {
 			fmt.Printf("displayMode: CHASER_DISPLAY\n")
 		}
-
-		this.EditStaticColorsMode[sequenceNumber] = true
 
 		// Hide the selected sequence.
 		common.HideSequence(sequenceNumber, commandChannels)

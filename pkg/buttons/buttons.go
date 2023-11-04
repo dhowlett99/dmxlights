@@ -1878,7 +1878,7 @@ func ProcessButtons(X int, Y int,
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
-		this.EditStaticColorsMode[this.SelectedSequence] = true
+		this.EditStaticColorsMode[this.TargetSequence] = true
 
 		return
 	}
