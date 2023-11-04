@@ -3,6 +3,7 @@
 GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
+FYNE_INSTALLER := ../../../fyne.io/fyne/v2/cmd/fyne
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
 
 # The name of the application
@@ -50,12 +51,14 @@ legacy-deploy:
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
 
-deploy:
+installer:
+	cd ${FYNE_INSTALLER}; go build
+	
+deploy: installer
 	rm -rf dmxlights.app/
-
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
-	fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png
+	${FYNE_INSTALLER}/fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png
 	# fix the Info.plist
 	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
