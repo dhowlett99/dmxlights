@@ -106,6 +106,25 @@ cp libusb-1.0.0.dylib /opt/local/lib/
 
 ```
 
+# Fix the usb driver from sending lots of timeout event messages.
+
+In the file github.com/gousb/libusb.go in the function  handleEvents on line 182
+C.libusb_handle_events_timeout_completed should be called without checking for errors.
+The final function should look like this.
+```
+func (libusbImpl) handleEvents(c *libusbContext, done <-chan struct{}) {
+    tv := C.struct_timeval{tv_usec: 100e3}
+    for {
+        select {
+        case <-done:
+            return
+        default:
+        }
+        C.libusb_handle_events_timeout_completed((*C.libusb_context)(c), &tv, nil)
+    }
+}
+```
+
 # Fix the dmx interface
 
 You need to add a check to see if you have a valid device returned from 'OpenDeviceWithVIDPID'.
