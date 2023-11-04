@@ -412,18 +412,14 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			fmt.Printf("Seq%d: Mode:%d common.Function6_Static_Gobo RGB Static Color Mode Off\n", this.TargetSequence, this.SelectMode[this.TargetSequence])
 		}
 
-		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false
+		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false // Turn off static color off.
+		this.EditGoboSelectionMode = false                                              // Turn off the other option for this function key.
+		this.EditStaticColorsMode[this.TargetSequence] = false                          // Turn off edit static color mode.
+		this.ShowStaticColorPicker = false                                              // Turn off the color picker.
+		this.StaticFlashing[this.SelectedSequence] = false                              // Stop any flash commands being issued.
 
-		this.EditGoboSelectionMode = false                     // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off edit static color mode.
-		this.ShowStaticColorPicker = false                     // Turn off the color picker.
-		this.SelectMode[this.TargetSequence] = NORMAL          // Turn off function selection mode.
-		this.StaticFlashing[this.SelectedSequence] = false     // Stop any flash commands being issued.
-
-		if this.ScannerChaser[this.SelectedSequence] {
-			// Turn on edit static color mode in the scanner sequence.
-			this.EditStaticColorsMode[this.ScannerSequenceNumber] = true
-		}
+		// Hide sequence.
+		common.HideSequence(this.TargetSequence, commandChannels)
 
 		// Go straight to static color selection mode, don't wait for a another select press.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -439,6 +435,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		if this.ScannerChaser[this.SelectedSequence] {
+			// The static scene is being turned off so restart the shutter chaser.
+			this.Running[this.ChaserSequenceNumber] = true
+			// Tell the chaser to start.
+			cmd = common.Command{
+				Action: common.StartChase,
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		}
+
 		common.RevealSequence(this.TargetSequence, commandChannels)
 		return
 	}
