@@ -44,6 +44,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	debug := false
 
+	// Setup sequence numbers.
 	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
 		this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -62,7 +63,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		hideAllFunctionKeys(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
-	// Select Chase Pattern.
+	// Clear gobo selection mode.
+	if this.EditGoboSelectionMode {
+		if debug {
+			fmt.Printf("%d: If we're in gobo selection mode. turn off gobo func key\n", this.ChaserSequenceNumber)
+		}
+
+		// Reset the gobo function key.
+		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false
+
+		// Editing gobo is over for this sequence.
+		this.EditGoboSelectionMode = false
+	}
+
+	// Clear pattern selection mode.
 	if this.EditPatternMode {
 
 		if debug {
@@ -78,7 +92,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = NORMAL
 	}
 
-	// Select Chase Sequence Colors. Turn off the edit sequence colors button.
+	// Clear RGB color picker.
 	if this.ShowRGBColorPicker {
 		if debug {
 			fmt.Printf("Turn off the edit sequence colors button. \n")
@@ -111,19 +125,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		}
 	}
 
-	// We're in Scanner Gobo Selection Mode.
-	if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
-		sequences[this.SelectedSequence].Type == "scanner" {
-		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
-		this.EditGoboSelectionMode = false
-	}
-
+	// Decide if we're on the first press of the select button.
 	if this.SelectButtonPressed[this.SelectedSequence] {
 		// Calculate the next mode.
 		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], this.EditStaticColorsMode[this.SelectedSequence])
 	}
-
 	if !this.SelectButtonPressed[this.SelectedSequence] {
 		this.SelectButtonPressed[0] = false
 		this.SelectButtonPressed[1] = false
