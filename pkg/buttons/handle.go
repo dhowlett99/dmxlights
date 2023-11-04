@@ -543,16 +543,13 @@ func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, event
 		fmt.Printf("hideAllFunctionKeys\n")
 	}
 
-	savedSelectedSequence := this.SelectedSequence
 	for sequenceNumber := range sequences {
 		if this.SelectMode[sequenceNumber] == FUNCTION {
 			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchPad, guiButtons)
 			// And reveal all the other sequence that isn't us.
 			if sequenceNumber != this.SelectedSequence {
 				// And turn off the function selected.
-				this.SelectMode[sequenceNumber] = NORMAL
-				this.SelectedSequence = sequenceNumber
-				displayMode(this.SelectedSequence, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
+				displayMode(this.SelectedSequence, NORMAL, this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
 			}
 		}
 
@@ -562,12 +559,10 @@ func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, event
 			if sequenceNumber != this.SelectedSequence {
 				// And turn off the function selected.
 				this.SelectMode[sequenceNumber] = CHASER_DISPLAY
-				this.SelectedSequence = sequenceNumber
-				displayMode(this.SelectedSequence, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
+				displayMode(sequenceNumber, CHASER_DISPLAY, this, sequences, eventsForLaunchPad, guiButtons, commandChannels)
 			}
 		}
 	}
-	this.SelectedSequence = savedSelectedSequence
 }
 
 // ALl states are based on the SelectedSequence. DisplaySequence.
