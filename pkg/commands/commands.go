@@ -582,7 +582,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
-		sequence.Hide = true
+		sequence.Hide = false
 		return sequence
 
 	case common.SetStaticColorBar:
