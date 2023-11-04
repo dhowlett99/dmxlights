@@ -230,7 +230,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		this.SelectAllStaticFixtures = true
 
 		// Flash the static buttons,
-		flashwStaticButtons(sequenceNumber, true, commandChannels)
+		flashwStaticButtons(sequenceNumber, true, false, commandChannels)
 		this.StaticFlashing[sequenceNumber] = true
 
 		return
@@ -251,7 +251,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 			// Stop the flash of the static buttons,
-			flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
+			flashwStaticButtons(this.ChaserSequenceNumber, false, false, commandChannels)
 			this.StaticFlashing[sequenceNumber] = false
 		}
 
@@ -274,7 +274,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		this.SelectAllStaticFixtures = true
 
 		// Flash the static buttons,
-		flashwStaticButtons(this.ChaserSequenceNumber, true, commandChannels)
+		flashwStaticButtons(this.ChaserSequenceNumber, true, false, commandChannels)
 		this.StaticFlashing[sequenceNumber] = true
 
 		return
@@ -290,17 +290,17 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
+		// Hide the sequence.
+		common.HideSequence(sequenceNumber, commandChannels)
+
 		// Turn off any flashing static buttons.
 		if this.StaticFlashing[sequenceNumber] {
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 			// Stop the flash of the static buttons,
-			flashwStaticButtons(sequenceNumber, false, commandChannels)
+			flashwStaticButtons(sequenceNumber, false, true, commandChannels)
 			this.StaticFlashing[sequenceNumber] = false
 		}
-
-		// Hide the sequence.
-		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -318,6 +318,19 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		}
 		// Hide the normal sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
+
+		if this.StaticFlashing[sequenceNumber] {
+			// Unselect all fixtures.
+			this.SelectAllStaticFixtures = false
+
+			// Stop the flash of the static buttons, taking care to select the correct sequence.
+			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
+				flashwStaticButtons(this.ChaserSequenceNumber, false, true, commandChannels)
+			} else {
+				flashwStaticButtons(sequenceNumber, false, true, commandChannels)
+			}
+			this.StaticFlashing[sequenceNumber] = false
+		}
 
 		// Show the chaser function buttons.
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -343,9 +356,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 			// Stop the flash of the static buttons, taking care to select the correct sequence.
 			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-				flashwStaticButtons(this.ChaserSequenceNumber, false, commandChannels)
+				flashwStaticButtons(this.ChaserSequenceNumber, false, true, commandChannels)
 			} else {
-				flashwStaticButtons(sequenceNumber, false, commandChannels)
+				flashwStaticButtons(sequenceNumber, false, true, commandChannels)
 			}
 			this.StaticFlashing[sequenceNumber] = false
 		}
@@ -501,16 +514,17 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 
 }
 
-func flashwStaticButtons(targetSequence int, state bool, commandChannels []chan common.Command) {
+func flashwStaticButtons(targetSequence int, state bool, hide bool, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("======> flashwStaticButtons: sequence %d set to %t\n", targetSequence, state)
+		fmt.Printf("======> flashwStaticButtons: sequence %d set to %t hide %t\n", targetSequence, state, hide)
 	}
 	// Add the flashing static buttons.
 	cmd := common.Command{
 		Action: common.UpdateFlashAllStaticColorButtons,
 		Args: []common.Arg{
 			{Name: "Flash", Value: state},
+			{Name: "Hide", Value: hide},
 		},
 	}
 	common.SendCommandToSequence(targetSequence, cmd, commandChannels)

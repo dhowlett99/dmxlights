@@ -464,6 +464,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.UpdateFlashAllStaticColorButtons:
 		const STATIC_FLASH = 0
+		const STATIC_HIDDEN = 1
 		if debug {
 			fmt.Printf("%d: Command Flash All Static Colors to %t\n", mySequenceNumber, command.Args[STATIC_FLASH].Value)
 		}
@@ -473,7 +474,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
-		sequence.Hide = false
+		sequence.Hide = command.Args[STATIC_HIDDEN].Value.(bool)
 		return sequence
 
 	case common.UpdateAllStaticColor:
