@@ -93,7 +93,15 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.StaticFlashing[sequenceNumber] = false
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.EditStaticColorsMode[sequenceNumber] = false
-		if sequenceNumber != this.ChaserSequenceNumber {
+
+		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
+		var displaySet bool
+		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
+			// So adjust the mode to be CHASER_DISPLAY
+			this.SelectMode[this.ScannerSequenceNumber] = CHASER_DISPLAY
+			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+		}
+		if sequenceNumber != this.ChaserSequenceNumber && !displaySet {
 			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
