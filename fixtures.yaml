@@ -1118,17 +1118,23 @@ fixtures:
       number: 1
       value: "0"
     - name: Rotate Clockwise Slow
-      number: 2
+      number: 1
       value: "1"
+    - name: Rotate Clockwise Medium
+      number: 2
+      value: "63"
     - name: Rotate Clockwise Fast
       number: 3
       value: "127"
-    - name: Rotate Anti Clockwise Fast
-      number: 4
-      value: "128"
     - name: Rotate Anti Clockwise Slow
-      number: 5
+      number: 4
       value: "255"
+    - name: Rotate Anti Clockwise Medium
+      number: 4
+      value: "191"
+    - name: Rotate Anti Clockwise Fast
+      number: 5
+      value: "128"
   - number: 2
     name: Red1
   - number: 3
@@ -1206,17 +1212,23 @@ fixtures:
       number: 1
       value: "0"
     - name: Rotate Clockwise Slow
-      number: 2
+      number: 1
       value: "1"
+    - name: Rotate Clockwise Medium
+      number: 2
+      value: "63"
     - name: Rotate Clockwise Fast
       number: 3
       value: "127"
-    - name: Rotate Anti Clockwise Fast
-      number: 4
-      value: "128"
     - name: Rotate Anti Clockwise Slow
-      number: 5
+      number: 4
       value: "255"
+    - name: Rotate Anti Clockwise Medium
+      number: 4
+      value: "191"
+    - name: Rotate Anti Clockwise Fast
+      number: 5
+      value: "128"
   - number: 2
     name: Red1
   - number: 3

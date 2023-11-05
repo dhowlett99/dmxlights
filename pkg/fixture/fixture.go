@@ -514,6 +514,13 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 		fmt.Printf("findChannelSettingByNameAndSpeed for name %s and speed %s\n", settingName, settingSpeed)
 	}
 
+	if settingName == "" {
+		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error setting name is empty")
+	}
+	if settingSpeed == "" {
+		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error setting speed is empty")
+	}
+
 	for _, fixture := range fixtures.Fixtures {
 
 		if debug {
@@ -540,6 +547,9 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Value)
 							}
 							v, _ := strconv.Atoi(setting.Value)
+							if debug {
+								fmt.Printf("findChannelSettingByNameAndSpeed: speed found is %d\n", v)
+							}
 							return v, nil
 						}
 					}

@@ -302,17 +302,18 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 		var rotateCounter int
-		var clockwise int
-		var anti int
+		var clockwiseSpeed int
+		var antiClockwiseSpeed int
 
+		// Calculate the rotation speed based on direction and soeed.
 		if cfg.Rotatable {
-			anti, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
+			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("rotate speed: %s\n", err)
+				fmt.Printf("anti clockwise rotate speed: %s\n", err)
 			}
-			clockwise, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
+			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("rotate speed: %s\n", err)
+				fmt.Printf("clockwise rotate speed: %s\n", err)
 			}
 		}
 
@@ -374,19 +375,19 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 							cfg.RotateSpeed = 0
 						}
 						if cfg.Clockwise {
-							cfg.RotateSpeed = clockwise
+							cfg.RotateSpeed = clockwiseSpeed
 						}
 						if cfg.AntiClockwise {
-							cfg.RotateSpeed = anti
+							cfg.RotateSpeed = antiClockwiseSpeed
 						}
 
 						if cfg.Auto {
 							if rotateCounter < 250 {
 								// Clockwise Speed.
-								cfg.RotateSpeed = clockwise
+								cfg.RotateSpeed = clockwiseSpeed
 							} else {
 								// Anti Clockwise Speed.
-								cfg.RotateSpeed = anti
+								cfg.RotateSpeed = antiClockwiseSpeed
 							}
 						}
 					}

@@ -965,6 +965,7 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 					newAction.Fade = action.Fade
 					newAction.Speed = action.Speed
 					newAction.Rotate = action.Rotate
+					newAction.RotateSpeed = action.RotateSpeed
 					newAction.Program = action.Program
 					newState.Actions = append(newState.Actions, newAction)
 				}
