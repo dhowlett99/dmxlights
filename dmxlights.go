@@ -112,6 +112,7 @@ func main() {
 		newSwitch.Stop = make(chan bool)
 		newSwitch.KeepRotateAlive = make(chan bool)
 		newSwitch.StopRotate = make(chan bool)
+		newSwitch.StopFade = make(chan bool)
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
 	// Initialize eight fixture states for the four sequences.

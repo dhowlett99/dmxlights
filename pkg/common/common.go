@@ -411,6 +411,7 @@ type Channels struct {
 type SwitchChannel struct {
 	Stop            chan bool
 	StopRotate      chan bool
+	StopFade        chan bool
 	KeepRotateAlive chan bool
 }
 
