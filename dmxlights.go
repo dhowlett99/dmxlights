@@ -270,6 +270,7 @@ func main() {
 
 		if newSequence.Type == "scanner" {
 			this.ScannerSequenceNumber = sequenceNumber
+			common.GlobalScannerSequenceNumber = sequenceNumber
 		}
 		// Setup Functions Labels.
 		if newSequence.Type == "rgb" {

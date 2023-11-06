@@ -137,8 +137,7 @@ func CreateSequence(
 	var numberFixtures int
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
-		// TODO find the scanner sequence number from the config.
-		scannerSequenceNumber := 2
+		scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
 		numberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
 	} else {
 		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig)

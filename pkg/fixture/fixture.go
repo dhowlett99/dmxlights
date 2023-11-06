@@ -337,8 +337,7 @@ func FixtureReceiver(
 
 				// If we're a shutter chaser flavoured RGB sequence, then disable everything except the brightness.
 				if cmd.Label == "chaser" {
-					// TODO find the scanner sequence number from the config.
-					scannerFixturesSequenceNumber := 2 // Scanner sequence.
+					scannerFixturesSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
 					if !cmd.Hide {
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 					}

@@ -62,6 +62,7 @@ const IS_SCANNER = true
 const IS_RGB = false
 
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
+var GlobalScannerSequenceNumber int
 
 type ALight struct {
 	X                int
