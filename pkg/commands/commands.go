@@ -145,7 +145,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 			// read the fixtures config currently in memory.
 			sequence.Switches = LoadSwitchConfiguration(mySequenceNumber, fixturesConfig)
-			sequence.PlaySwitchOnce = true
 
 			// Clear switch positions to their first positions.
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {

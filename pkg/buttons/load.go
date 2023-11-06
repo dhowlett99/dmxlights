@@ -144,12 +144,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
 				}
 			}
-
-			// Unhide the switch sequence.
-			cmd := common.Command{
-				Action: common.UnHide,
-			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 	}
 

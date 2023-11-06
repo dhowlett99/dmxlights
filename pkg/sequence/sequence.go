@@ -804,6 +804,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 
 		// Now send a message to the fixture to play all the values for this state.
 		command := common.FixtureCommand{
+			Master:             sequence.Master,
 			Type:               sequence.Type,
 			Label:              sequence.Label,
 			SequenceNumber:     sequence.Number,
