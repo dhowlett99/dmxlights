@@ -3,7 +3,8 @@
 GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
-FYNE_INSTALLER := ../../../fyne.io/fyne/v2/cmd/fyne
+FYNE_SRC := ../../..
+FYNE_INSTALLER := ../../../fyne.io/fyne/cmd/fyne
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
 
 # The name of the application
@@ -52,7 +53,12 @@ legacy-deploy:
 	cp *.json dmxlights.app/Contents/Resources/
 
 installer:
+ifneq ("$(wildcard $(FYNE_SRC)/fyne.io)","")
 	cd ${FYNE_INSTALLER}; go build
+else	
+	cd ${FYNE_SRC}; mkdir -p fyne.io; cd fyne.io; git clone https://github.com/fyne-io/fyne.git
+	cd ${FYNE_INSTALLER}; go build
+endif
 	
 deploy: installer
 	rm -rf dmxlights.app/
