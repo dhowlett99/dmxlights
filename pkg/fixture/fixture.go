@@ -332,6 +332,8 @@ func FixtureReceiver(
 				green := fixture.Color.G
 				blue := fixture.Color.B
 				white := fixture.Color.W
+				// Integrate cmd.master with fixture.Brightness.
+				fixture.Brightness = int((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55))
 
 				// If we're a shutter chaser flavoured RGB sequence, then disable everything except the brightness.
 				if cmd.Label == "chaser" {
@@ -340,9 +342,10 @@ func FixtureReceiver(
 					if !cmd.Hide {
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 					}
-					// Fixture brightness is sent as master in this case.
+					// Fixture brightness is sent as master in this case because a shutter chaser is controlling a scanner lamp.
+					// and these generally don't have any RGB color channels that can be controlled with brightness.
+					// So the only way to make the lamp in the scanner change intensity is to vary the master brightness channel.
 					// TODO find a suitable color in the scanner's wheel that matches the fixture's color.
-					// TODO Integrate cmd.master with fixture.Brightness.
 					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {
 					if !cmd.Hide {
