@@ -331,7 +331,7 @@ func FixtureReceiver(
 				red := fixture.Color.R
 				green := fixture.Color.G
 				blue := fixture.Color.B
-				white := fixture.Color.W
+
 				// Integrate cmd.master with fixture.Brightness.
 				fixture.Brightness = int((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55))
 
@@ -342,16 +342,26 @@ func FixtureReceiver(
 					if !cmd.Hide {
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: scannerFixturesSequenceNumber, Red: red, Green: green, Blue: blue, Brightness: fixture.Brightness}, eventsForLauchpad, guiButtons)
 					}
+
 					// Fixture brightness is sent as master in this case because a shutter chaser is controlling a scanner lamp.
 					// and these generally don't have any RGB color channels that can be controlled with brightness.
 					// So the only way to make the lamp in the scanner change intensity is to vary the master brightness channel.
-					// TODO find a suitable color in the scanner's wheel that matches the fixture's color.
-					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+
+					// Lookup chaser lamp color based on the request fixture color.
+					// GetColorNameByRGB will return white if the color is not found.
+					color := common.GetColorNameByRGB(common.Color{R: red, G: green, B: blue})
+
+					// Find a suitable gobo based on the requested chaser lamp color.
+					scannerGobo := FindGobo(myFixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
+					// Find a suitable color wheel setting based on the requested static lamp color.
+					scannerColor := FindColor(myFixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
+
+					MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				} else {
 					if !cmd.Hide {
 						common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: red, Green: green, Blue: blue, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 					}
-					MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
+					MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, dmxController, myFixtureNumber, red, green, blue, 0, 0, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 				}
 			}
 		}
