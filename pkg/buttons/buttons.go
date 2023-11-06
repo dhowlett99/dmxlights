@@ -1836,7 +1836,7 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 &&
 		Y != -1 &&
 		!this.EditFixtureSelectionMode &&
-		//this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
+		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		(this.SelectMode[this.SelectedSequence] == NORMAL ||
 			this.SelectMode[this.SelectedSequence] == NORMAL_STATIC ||
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
