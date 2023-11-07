@@ -367,7 +367,13 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 
 	var insertColor int
 	numberColors := len(colors)
-
+	for stepNumber, step := range steps {
+		fmt.Printf("Step %d \n", stepNumber)
+		for fixture := 0; fixture < len(step.Fixtures); fixture++ {
+			fmt.Printf("Fixture %d Color %+v\n", fixture, step.Fixtures[fixture].Color)
+		}
+		fmt.Printf("\n")
+	}
 	var stepsOut []common.Step
 
 	for _, step := range steps {
@@ -388,11 +394,11 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 			}
 
 			if fixtureState[fixtureNumber].RGBInverted {
-				if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				if hasColor(fixture.Color) {
 					// insert a black.
 					newFixture.Color = common.Color{}
 				} else {
-					// its a blank space so insert one of the colors.
+					// its a blank space so insert first color.
 					newFixture.Color = colors[insertColor]
 					insertColor++
 				}
@@ -405,10 +411,77 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 			}
 		}
 
+		// Once you have inverted, and inserted one of the colors
+		// Now add the others
+		//newStep.Fixtures = addColors(newStep.Fixtures, colors)
+
 		stepsOut = append(stepsOut, newStep)
 	}
 
 	return stepsOut
+}
+
+func hasColor(color common.Color) bool {
+
+	if color.R > 0 || color.G > 0 || color.B > 0 {
+		return true
+	} else {
+		return false
+	}
+}
+
+func hasAllEmptyFixures(fixtures map[int]common.Fixture) bool {
+	var emptyFixures int
+	for fixtureNumber := 0; fixtureNumber < len(fixtures); fixtureNumber++ {
+		fixture := fixtures[fixtureNumber]
+		if !hasColor(fixture.Color) {
+			emptyFixures++
+		}
+	}
+	return emptyFixures == len(fixtures)
+}
+func hasAllFullFixures(fixtures map[int]common.Fixture) bool {
+	var emptyFixures int
+	for fixtureNumber := 0; fixtureNumber < len(fixtures); fixtureNumber++ {
+		fixture := fixtures[fixtureNumber]
+		if hasColor(fixture.Color) {
+			emptyFixures++
+		}
+	}
+	return emptyFixures == len(fixtures)
+}
+
+func addColors(fixtures map[int]common.Fixture, colors []common.Color) map[int]common.Fixture {
+
+	var insertColor int
+	numberColors := len(colors)
+
+	newFixture := common.Fixture{}
+
+	newFixtures := make(map[int]common.Fixture)
+
+	// Step through the map
+	for fixtureNumber := 0; fixtureNumber < len(fixtures); fixtureNumber++ {
+
+		fixture := fixtures[fixtureNumber]
+
+		//If you find a color replace it with one of the colors available.
+		if hasColor(fixture.Color) {
+			newFixture.MasterDimmer = fixture.MasterDimmer
+			newFixture.Color = colors[insertColor]
+			insertColor++
+			if insertColor >= numberColors {
+				insertColor = 0
+			}
+		} else {
+			// insert a black.
+			newFixture.Color = common.Color{}
+		}
+		newFixtures[fixtureNumber] = newFixture
+
+	}
+
+	return newFixtures
 }
 
 // ApplyFixtureState - Apply the state of the fixtures to the pattern, fixture disabling works by disabling the
