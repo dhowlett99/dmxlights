@@ -367,7 +367,6 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 
 	var insertColor int
 	numberColors := len(colors)
-
 	var stepsOut []common.Step
 
 	for _, step := range steps {
@@ -377,24 +376,31 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 		newFixtures := make(map[int]common.Fixture)
 
 		newStep.Fixtures = newFixtures
+		newStep.KeyStep = step.KeyStep
+		newStep.StepNumber = step.StepNumber
 
-		for fixtureNumber, fixture := range step.Fixtures {
+		insertColor = numberColors - 1
+		// Step through the map
+		for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+
+			fixture := step.Fixtures[fixtureNumber]
 
 			newFixture := common.Fixture{}
 			newFixture.MasterDimmer = fixture.MasterDimmer
-
-			if insertColor >= numberColors {
-				insertColor = 0
-			}
+			newFixture.Enabled = true
 
 			if fixtureState[fixtureNumber].RGBInverted {
-				if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+				if hasColor(fixture.Color) {
 					// insert a black.
 					newFixture.Color = common.Color{}
 				} else {
-					// its a blank space so insert one of the colors.
+					// its a blank space so insert first color.
+					newFixture.MasterDimmer = fixture.MasterDimmer
 					newFixture.Color = colors[insertColor]
-					insertColor++
+					insertColor--
+					if insertColor < 0 {
+						insertColor = numberColors - 1
+					}
 				}
 				newFixture.Inverted = true
 				newStep.Fixtures[fixtureNumber] = newFixture
@@ -409,6 +415,15 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 	}
 
 	return stepsOut
+}
+
+func hasColor(color common.Color) bool {
+
+	if color.R > 0 || color.G > 0 || color.B > 0 {
+		return true
+	} else {
+		return false
+	}
 }
 
 // ApplyFixtureState - Apply the state of the fixtures to the pattern, fixture disabling works by disabling the
