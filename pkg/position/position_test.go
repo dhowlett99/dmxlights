@@ -53,6 +53,21 @@ var allFixturesEnabled = map[int]common.FixtureState{
 	},
 }
 
+var threeFixturesRGBInverted = map[int]common.FixtureState{
+	0: {
+		Enabled:     true,
+		RGBInverted: true,
+	},
+	1: {
+		Enabled:     true,
+		RGBInverted: true,
+	},
+	2: {
+		Enabled:     true,
+		RGBInverted: true,
+	},
+}
+
 var allFixturesRGBInverted = map[int]common.FixtureState{
 	0: {
 		Enabled:     true,
@@ -6758,7 +6773,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		{
 			name: "invert a single color.",
 			args: args{
-				fixtureState: allFixturesRGBInverted,
+				fixtureState: threeFixturesRGBInverted,
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -6789,23 +6804,23 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true, Enabled: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true, Enabled: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
-						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true},
-						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true},
+						0: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
+						1: {MasterDimmer: full, Color: common.Color{R: 0, G: 255, B: 0}, Inverted: true, Enabled: true},
+						2: {MasterDimmer: full, Color: common.Color{R: 0, G: 0, B: 0}, Inverted: true, Enabled: true},
 					},
 				},
 			},
@@ -6813,8 +6828,21 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+
 			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors, tt.args.fixtureState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("invertRGBColors() = %+v, want %+v", got, tt.want)
+
+				fmt.Printf("++++++++++++++ 3 Inverted GOT ++++++++++++++++++++\n")
+
+				for stepNumber, step := range got {
+
+					fmt.Printf("Step:%d ============================\n", stepNumber)
+
+					for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+						fixture := step.Fixtures[fixtureNumber]
+						fmt.Printf("\fixture %d master %d inverted %t color:%+v\n", fixtureNumber, fixture.MasterDimmer, fixture.Inverted, fixture.Color)
+					}
+				}
 			}
 		})
 	}

@@ -87,9 +87,8 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				if scanner {
 					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					if (sequence.Pattern.Name == "Pairs" ||
-						sequence.Pattern.Name == "Flash" ||
-						sequence.Pattern.Name == "Inward") && !sequence.Bounce {
+					if sequence.Pattern.Name == "Pairs" ||
+						sequence.Pattern.Name == "Flash" {
 						fadeColors = process.ProcessSimpleColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					} else {
 						if scanner {
@@ -157,9 +156,8 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				if scanner {
 					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					if (sequence.Pattern.Name == "Pairs" ||
-						sequence.Pattern.Name == "Flash" ||
-						sequence.Pattern.Name == "Inward") && !sequence.Bounce {
+					if sequence.Pattern.Name == "Pairs" ||
+						sequence.Pattern.Name == "Flash" {
 						fadeColors = process.ProcessSimpleColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					} else {
 						if scanner {
@@ -204,9 +202,8 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				if scanner {
 					fadeColors = process.ProcessScannerColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 				} else {
-					if (sequence.Pattern.Name == "Pairs" ||
-						sequence.Pattern.Name == "Flash" ||
-						sequence.Pattern.Name == "Inward") && !sequence.Bounce {
+					if sequence.Pattern.Name == "Pairs" ||
+						sequence.Pattern.Name == "Flash" {
 						fadeColors = process.ProcessSimpleColor(stepNumber, start, end, sequence.Bounce, thisFixture.Inverted, fadeColors, &thisFixture, &lastFixture, &nextFixture, sequence, shift)
 					} else {
 						if scanner {
