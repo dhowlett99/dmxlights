@@ -1,5 +1,7 @@
 # Makefile to build dmxlights.
 
+ID=Howlett
+KEY=InstallerCertificate_${ID}_PrivateKey.pem
 GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
@@ -75,3 +77,9 @@ deploy: installer
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
 
+package:	
+	random=$$$$ && openssl req -x509 -nodes -days 365 -newkey rsa:4096 -sha256 -addext basicConstraints=critical,CA:false -addext keyUsage=critical,digitalSignature  -set_serial 0x$$random  -subj "/CN=Installer Certificate $(ID)"  -out InstallerCertificate_$(ID).pem  -keyout "$(KEY)"
+	#security import "InstallerCertificate_${ID}.pem"
+	#security import $(KEY) -T /usr/bin/productbuild -T /usr/bin/pkgbuild security add-trusted-cert -d InstallerCertificate_$(ID).pem
+	productbuild --sign "Installer Certificate Howlett" --component dmxlights.app dmxlights.pkg
+	spctl -a -vvvv --type install dmxlights.pkg

@@ -1,5 +1,7 @@
 dmxlights
 *.json
+*.pem
+*.pkg
 presets.json
 dmxlights.app
 fyne_metadata_init.go
