@@ -665,7 +665,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Starting a music trigger will start the sequence, so turn on the start lamp
 		// and remember that this sequence is on.
 		this.Running[this.DisplaySequence] = true
-		common.ShowRunningStatus(this.TargetSequence, this.Running, eventsForLaunchpad, guiButtons)
+		common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
 
 		// Start the music trigger for the target sequence.
 		cmd := common.Command{
@@ -696,8 +696,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State = false
 
-		this.Running[this.TargetSequence] = false
-		common.ShowRunningStatus(this.TargetSequence, this.Running, eventsForLaunchpad, guiButtons)
+		common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
 
 		// Stop the music trigger for the target sequence.
 		cmd := common.Command{

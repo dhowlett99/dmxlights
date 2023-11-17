@@ -470,7 +470,7 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.Mode == "Sequence" {
 			for sequence.Run && !sequence.Static {
 				if debug {
-					fmt.Printf("sequence %d type %s label %s Running mode\n", mySequenceNumber, sequence.Type, sequence.Label)
+					fmt.Printf("sequence %d type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
 				}
 
 				// If the music trigger is being used then the timer is disabled.

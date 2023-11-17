@@ -1039,6 +1039,7 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] = NORMAL
 		}
 
+		this.SelectButtonPressed[this.SelectedSequence] = false
 		this.StaticFlashing[this.SelectedSequence] = false
 
 		// S T O P - If sequence is running, stop it
@@ -1080,7 +1081,10 @@ func ProcessButtons(X int, Y int,
 				this.Running[this.ChaserSequenceNumber] = false
 			}
 
-			// Turn of the start lamp.
+			// Clear the pattern function keys
+			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+			// Turn off the start lamp.
 			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			// Set the correct color for the select button.

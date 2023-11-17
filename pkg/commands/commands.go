@@ -809,7 +809,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Music Trigger to %t \n", mySequenceNumber, command.Args[STATE].Value)
 		}
 		sequence.MusicTrigger = command.Args[STATE].Value.(bool)
-		sequence.Run = command.Args[STATE].Value.(bool)
+		sequence.Run = true
 		sequence.Mode = "Sequence"
 		sequence.ScannerChaser = false
 		if sequence.Label == "chaser" && sequence.Run {

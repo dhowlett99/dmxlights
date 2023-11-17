@@ -192,7 +192,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	common.ShowBottomButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
 
 	// Show this sequence running status in the start/stop button.
-	common.ShowRunningStatus(sequenceNumber, this.Running, eventsForLaunchpad, guiButtons)
+	common.ShowRunningStatus(this.Running[sequenceNumber], eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
 	showStatusBar(this, sequences, guiButtons)
