@@ -221,17 +221,22 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 		// Now Fade up
 		go func() {
-			for _, fade := range fadeUpValues {
-				// List for stop command.
-				select {
-				case <-switchChannels[swiTch.Number].StopFade:
-					return
-				case <-time.After(10 * time.Millisecond):
+			if !action.MasterChanging {
+				for _, fade := range fadeUpValues {
+					// List for stop command.
+					select {
+					case <-switchChannels[swiTch.Number].StopFade:
+						return
+					case <-time.After(10 * time.Millisecond):
+					}
+					common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
+					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+					// Control how long the fade take with the speed control.
+					time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(cfg.FadeSpeed))))
 				}
-				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
-				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
-				// Control how long the fade take with the speed control.
-				time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(cfg.FadeSpeed))))
+			} else {
+				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: master, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 			}
 		}()
 		return

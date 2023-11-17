@@ -622,6 +622,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySwitchOnce = true
 		sequence.FloodPlayOnce = true
 		sequence.Master = command.Args[MASTER].Value.(int)
+		sequence.MasterChanging = true
 		return sequence
 
 	// If we are being asked for a updated config we must reply with our current sequence.
@@ -690,6 +691,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySingleSwitch = true
 		sequence.Run = false
 		sequence.Type = "switch"
+		sequence.MasterChanging = false
 		return sequence
 
 	// Here we want to disable/enable the selected scanner.

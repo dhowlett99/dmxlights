@@ -59,18 +59,19 @@ type State struct {
 }
 
 type Action struct {
-	Name        string `yaml:"name"`
-	Number      int
-	Colors      []string `yaml:"colors"`
-	Mode        string   `yaml:"mode"`
-	Fade        string   `yaml:"fade"`
-	Size        string   `yaml:"size"`
-	Speed       string   `yaml:"speed"`
-	Rotate      string   `yaml:"rotate"`
-	RotateSpeed string   `yaml:"rotatespeed"`
-	Program     string   `yaml:"program"`
-	Strobe      string   `yaml:"strobe"`
-	FadeSpeed   int      `yaml:"-"`
+	Name           string `yaml:"name"`
+	Number         int
+	Colors         []string `yaml:"colors"`
+	Mode           string   `yaml:"mode"`
+	Fade           string   `yaml:"fade"`
+	Size           string   `yaml:"size"`
+	Speed          string   `yaml:"speed"`
+	Rotate         string   `yaml:"rotate"`
+	RotateSpeed    string   `yaml:"rotatespeed"`
+	Program        string   `yaml:"program"`
+	Strobe         string   `yaml:"strobe"`
+	FadeSpeed      int      `yaml:"-"`
+	MasterChanging bool     `yaml:"-"`
 }
 
 type ActionConfig struct {
@@ -244,7 +245,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("Fixture:%d Command Set Switch\n", myFixtureNumber)
 			}
-			MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+			MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 			continue
 		}
 
@@ -820,7 +821,7 @@ func MapSwitchFixture(swiTch common.Switch,
 	fadeSpeed int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
-	brightness int, master int,
+	brightness int, master int, masterChanging bool,
 	switchChannels []common.SwitchChannel,
 	SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
@@ -891,6 +892,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Program = action.Program
 			newAction.Strobe = action.Strobe
 			newAction.FadeSpeed = fadeSpeed
+			newAction.MasterChanging = masterChanging
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 		}
 

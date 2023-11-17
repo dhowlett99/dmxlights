@@ -754,6 +754,7 @@ func PlaySequence(sequence common.Sequence,
 							ScannerOffsetPan:         sequence.ScannerOffsetPan,
 							ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 							ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
+							MasterChanging:           sequence.MasterChanging,
 						}
 
 						// Start the fixture group.
@@ -811,6 +812,7 @@ func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauc
 			SwitchData:         switchData,
 			State:              state,
 			CurrentSwitchState: switchData.CurrentPosition,
+			MasterChanging:     sequence.MasterChanging,
 		}
 
 		// Send a message to the fixture to operate the switch.
@@ -838,7 +840,7 @@ func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, fadeSpeed int, se
 	common.LabelButton(currentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
 
 	// Now play all the values for this state.
-	fixture.MapSwitchFixture(swiTch, state, fadeSpeed, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+	fixture.MapSwitchFixture(swiTch, state, fadeSpeed, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.MasterChanging, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
 
 }
 
