@@ -155,7 +155,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	if this.Strobe[this.SelectedSequence] {
 		this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 		// Show this sequence running status in the start/stop button.
-		common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+		common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 		common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
 	} else {
 		common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)

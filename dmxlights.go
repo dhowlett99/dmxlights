@@ -509,7 +509,7 @@ func main() {
 	}
 
 	// Show this sequence running status in the start/stop button.
-	common.ShowRunningStatus(this.SelectedSequence, this.Running, eventsForLaunchpad, guiButtons)
+	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	myWindow.SetContent(content)
 
