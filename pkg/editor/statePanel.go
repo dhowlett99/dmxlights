@@ -280,11 +280,25 @@ func addState(states []fixture.State, id int16) (outItems []fixture.State) {
 	newItem.Number = id + 1
 	newItem.Name = "New"
 
-	for _, item := range states {
-		if item.Number == id {
+	var added bool // Only add once.
+
+	for no, item := range states {
+		// Add at the start of an empty list.
+		if len(states) == 0 && !added {
 			newStates = append(newStates, newItem)
+			added = true
+		}
+		// Insert at this position.
+		if item.Number == id+1 && !added {
+			newStates = append(newStates, newItem)
+			added = true
 		}
 		newStates = append(newStates, item)
+		// Append an item at the very end.
+		if no == len(states)-1 && !added {
+			newStates = append(newStates, newItem)
+			added = true
+		}
 	}
 
 	// Now fix the item numbers
@@ -303,9 +317,6 @@ func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State)
 	}
 
 	newStates := []fixture.State{}
-	if id == 1 {
-		return stateList
-	}
 	for _, channel := range stateList {
 		if channel.Number != id {
 			newStates = append(newStates, channel)
@@ -316,6 +327,14 @@ func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State)
 	for number, indexedItem := range newStates {
 		indexedItem.Number = int16(number + 1)
 		outItems = append(outItems, indexedItem)
+	}
+
+	if len(outItems) == 0 {
+		// Create a default State
+		newItem := fixture.State{}
+		newItem.Number = 1
+		newItem.Name = "NewState"
+		outItems = append(outItems, newItem)
 	}
 
 	return outItems
