@@ -59,19 +59,18 @@ type State struct {
 }
 
 type Action struct {
-	Name           string `yaml:"name"`
-	Number         int
-	Colors         []string `yaml:"colors"`
-	Mode           string   `yaml:"mode"`
-	Fade           string   `yaml:"fade"`
-	Size           string   `yaml:"size"`
-	Speed          string   `yaml:"speed"`
-	Rotate         string   `yaml:"rotate"`
-	RotateSpeed    string   `yaml:"rotatespeed"`
-	Program        string   `yaml:"program"`
-	Strobe         string   `yaml:"strobe"`
-	FadeSpeed      int      `yaml:"-"`
-	MasterChanging bool     `yaml:"-"`
+	Name        string `yaml:"name"`
+	Number      int
+	Colors      []string `yaml:"colors"`
+	Mode        string   `yaml:"mode"`
+	Fade        string   `yaml:"fade"`
+	Size        string   `yaml:"size"`
+	Speed       string   `yaml:"speed"`
+	Rotate      string   `yaml:"rotate"`
+	RotateSpeed string   `yaml:"rotatespeed"`
+	Program     string   `yaml:"program"`
+	Strobe      string   `yaml:"strobe"`
+	FadeSpeed   int      `yaml:"-"`
 }
 
 type ActionConfig struct {
@@ -235,17 +234,25 @@ func FixtureReceiver(
 	fixtures *Fixtures,
 	dmxInterfacePresent bool) {
 
+	// Used for static fades, remember the last color.
+	var lastColor common.Color
+
 	// Outer loop wait for configuration.
 	for {
 
 		// Wait for first step
 		cmd := <-fixtureStepChannel
 
+		if cmd.Type == "lastColor" {
+			lastColor = cmd.LastColor
+			continue
+		}
+
 		if cmd.SetSwitch && cmd.Type == "switch" {
 			if debug {
 				fmt.Printf("Fixture:%d Command Set Switch\n", myFixtureNumber)
 			}
-			MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+			lastColor = MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons, fixtureStepChannel)
 			continue
 		}
 
@@ -821,13 +828,14 @@ func MapSwitchFixture(swiTch common.Switch,
 	fadeSpeed int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
-	brightness int, master int, masterChanging bool,
+	brightness int, master int, masterChanging bool, lastColor common.Color,
 	switchChannels []common.SwitchChannel,
 	SoundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool,
 	eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight) {
+	guiButtons chan common.ALight,
+	fixtureStepChannel chan common.FixtureCommand) common.Color {
 
 	var useFixtureLabel string
 
@@ -851,7 +859,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		thisFixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
 		if err != nil {
 			fmt.Printf("error %s\n", err.Error())
-			return
+			return lastColor
 		}
 
 		if debug {
@@ -892,8 +900,10 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Program = action.Program
 			newAction.Strobe = action.Strobe
 			newAction.FadeSpeed = fadeSpeed
-			newAction.MasterChanging = masterChanging
-			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLauchpad, guiButtons, fixtureStepChannel)
+			if action.Mode != "Static" {
+				lastColor = common.EmptyColor
+			}
 		}
 
 		// If there are no actions, turn off any previos mini sequencers for this switch.
@@ -902,7 +912,8 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Name = "Off"
 			newAction.Number = 1
 			newAction.Mode = "Off"
-			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, dmxInterfacePresent, eventsForLauchpad, guiButtons)
+			lastColor := common.Color{}
+			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLauchpad, guiButtons, fixtureStepChannel)
 		}
 
 		// Now play any preset DMX values directly to the universe.
@@ -969,6 +980,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			}
 		}
 	}
+	return lastColor
 }
 
 func IsNumericOnly(str string) bool {

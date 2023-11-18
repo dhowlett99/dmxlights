@@ -1315,6 +1315,20 @@ func ProcessButtons(X int, Y int,
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
+
+		// Update fade time for switch sequences.
+		this.RGBFade[this.SwitchSequenceNumber]--
+		if this.RGBFade[this.SwitchSequenceNumber] < 1 {
+			this.RGBFade[this.SwitchSequenceNumber] = 1
+		}
+		cmd := common.Command{
+			Action: common.UpdateRGBFadeSpeed,
+			Args: []common.Arg{
+				{Name: "RGBFadeSpeed", Value: this.RGBFade[this.SwitchSequenceNumber]},
+			},
+		}
+		common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+
 		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]--
 			if this.RGBFade[this.TargetSequence] < 1 {
@@ -1371,6 +1385,20 @@ func ProcessButtons(X int, Y int,
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
+
+		// Update fade time for switch sequences.
+		this.RGBFade[this.SwitchSequenceNumber]++
+		if this.RGBFade[this.SwitchSequenceNumber] > common.MAX_RGB_FADE {
+			this.RGBFade[this.SwitchSequenceNumber] = common.MAX_RGB_FADE
+		}
+		cmd := common.Command{
+			Action: common.UpdateRGBFadeSpeed,
+			Args: []common.Arg{
+				{Name: "RGBFadeSpeed", Value: this.RGBFade[this.SwitchSequenceNumber]},
+			},
+		}
+		common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+
 		if sequences[this.TargetSequence].Type == "rgb" {
 			this.RGBFade[this.TargetSequence]++
 			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {

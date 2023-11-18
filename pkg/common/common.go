@@ -294,6 +294,7 @@ var Green = Color{R: 0, G: 255, B: 0}
 var Blue = Color{R: 0, G: 0, B: 255}
 var PresetYellow = Color{R: 150, G: 150, B: 0}
 var Cyan = Color{R: 0, G: 255, B: 255}
+var EmptyColor = Color{}
 
 type Gobo struct {
 	Name    string
@@ -413,7 +414,8 @@ type Channels struct {
 type SwitchChannel struct {
 	Stop            chan bool
 	StopRotate      chan bool
-	StopFade        chan bool
+	StopFadeDown    chan bool
+	StopFadeUp      chan bool
 	KeepRotateAlive chan bool
 }
 
@@ -435,6 +437,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
+	LastColor      Color
 
 	// Common commands.
 	Strobe         bool

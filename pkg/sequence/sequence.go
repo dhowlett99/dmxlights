@@ -293,7 +293,39 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
 			}
 			// Show initial state of switches
-			ShowSwitches(mySequenceNumber, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, channels.SoundTriggers, soundConfig, fixtureStepChannels, dmxInterfacePresent)
+			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
+
+				switchData := sequence.Switches[switchNumber]
+
+				if debug {
+					fmt.Printf("switchNumber %d state %d\n", switchData.Number, switchData.CurrentPosition)
+				}
+
+				state := switchData.States[switchData.CurrentPosition]
+
+				color, _ := common.GetRGBColorByName(state.ButtonColor)
+				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+
+				// Label the switch.
+				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
+
+				// Now send a message to the fixture to play all the values for this state.
+				command := common.FixtureCommand{
+					Master:             sequence.Master,
+					Type:               sequence.Type,
+					Label:              sequence.Label,
+					SequenceNumber:     sequence.Number,
+					SetSwitch:          true,
+					SwitchData:         switchData,
+					State:              state,
+					CurrentSwitchState: switchData.CurrentPosition,
+					MasterChanging:     sequence.MasterChanging,
+					FadeSpeed:          sequence.RGBFade,
+				}
+
+				// Send a message to the fixture to operate the switch.
+				fixtureStepChannels[switchNumber] <- command
+			}
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
 			continue
@@ -304,7 +336,36 @@ func PlaySequence(sequence common.Sequence,
 			if debug {
 				fmt.Printf("sequence %d Play single switch mode\n", mySequenceNumber)
 			}
-			ShowSingleSwitch(sequence.CurrentSwitch, mySequenceNumber, sequence.Speed, &sequence, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, switchChannels, channels.SoundTriggers, soundConfig, dmxInterfacePresent)
+
+			swiTch := sequence.Switches[sequence.CurrentSwitch]
+
+			state := sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition]
+
+			// Use the button color for this state to light the correct color on the launchpad.
+			color, _ := common.GetRGBColorByName(state.ButtonColor)
+			common.LightLamp(common.ALight{X: sequence.CurrentSwitch, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+
+			// Label the switch.
+			common.LabelButton(sequence.CurrentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
+
+			fmt.Printf(" =====> sequence.RGBFade %d\n", sequence.RGBFade)
+
+			// Now send a message to the fixture to play all the values for this state.
+			command := common.FixtureCommand{
+				Master:             sequence.Master,
+				Type:               sequence.Type,
+				Label:              sequence.Label,
+				SequenceNumber:     sequence.Number,
+				SetSwitch:          true,
+				SwitchData:         sequence.Switches[sequence.CurrentSwitch],
+				State:              sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition],
+				CurrentSwitchState: swiTch.CurrentPosition,
+				MasterChanging:     sequence.MasterChanging,
+				FadeSpeed:          sequence.RGBFade,
+			}
+
+			// Send a message to the fixture to operate the switch.
+			fixtureStepChannels[sequence.CurrentSwitch] <- command
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
@@ -771,77 +832,6 @@ func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.F
 	for _, fixture := range fixtureChannels {
 		fixture <- command
 	}
-}
-
-// showSwitches - This is for switch sequences, a type of sequence which is just a set of eight switches.
-// Each switch can have a number of states as defined in the fixtures.yaml file.
-// The color of the lamp indicates which state you are in.
-// ShowSwitches relies on you giving the sequence number of the switch sequnence.
-func ShowSwitches(mySequenceNumber int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
-	SoundTriggers []*common.Trigger,
-	soundConfig *sound.SoundConfig, fixtureStepChannels []chan common.FixtureCommand, dmxInterfacePresent bool) {
-
-	if debug {
-		fmt.Printf("ShowSwitches for sequence %d\n", mySequenceNumber)
-	}
-
-	for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
-
-		switchData := sequence.Switches[switchNumber]
-
-		if debug {
-			fmt.Printf("switchNumber %d state %d\n", switchData.Number, switchData.CurrentPosition)
-		}
-
-		state := switchData.States[switchData.CurrentPosition]
-
-		color, _ := common.GetRGBColorByName(state.ButtonColor)
-		common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
-
-		// Label the switch.
-		common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
-
-		// Now send a message to the fixture to play all the values for this state.
-		command := common.FixtureCommand{
-			Master:             sequence.Master,
-			Type:               sequence.Type,
-			Label:              sequence.Label,
-			SequenceNumber:     sequence.Number,
-			SetSwitch:          true,
-			SwitchData:         switchData,
-			State:              state,
-			CurrentSwitchState: switchData.CurrentPosition,
-			MasterChanging:     sequence.MasterChanging,
-		}
-
-		// Send a message to the fixture to operate the switch.
-		fixtureStepChannels[switchNumber] <- command
-	}
-}
-
-func ShowSingleSwitch(currentSwitch int, mySequenceNumber int, fadeSpeed int, sequence *common.Sequence, eventsForLauchpad chan common.ALight,
-	guiButtons chan common.ALight, dmxController *ft232.DMXController, fixtures *fixture.Fixtures,
-	switchChannels []common.SwitchChannel, SoundTriggers []*common.Trigger, soundConfig *sound.SoundConfig, dmxInterfacePresent bool) {
-
-	if debug {
-		fmt.Printf("ShowSingleSwitch for sequence %d switch %d\n", mySequenceNumber, currentSwitch)
-	}
-
-	swiTch := sequence.Switches[currentSwitch]
-
-	state := sequence.Switches[currentSwitch].States[swiTch.CurrentPosition]
-
-	// Use the button color for this state to light the correct color on the launchpad.
-	color, _ := common.GetRGBColorByName(state.ButtonColor)
-	common.LightLamp(common.ALight{X: currentSwitch, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
-
-	// Label the switch.
-	common.LabelButton(currentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
-
-	// Now play all the values for this state.
-	fixture.MapSwitchFixture(swiTch, state, fadeSpeed, dmxController, fixtures, sequence.Blackout, sequence.Master, sequence.Master, sequence.MasterChanging, switchChannels, SoundTriggers, soundConfig, dmxInterfacePresent, eventsForLauchpad, guiButtons)
-
 }
 
 func MakeACopy(src, dist interface{}) (err error) {
