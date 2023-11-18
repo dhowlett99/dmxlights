@@ -56,7 +56,7 @@ const DEFAULT_SCANNER_GOBO = 1
 const DEFAULT_SCANNER_SHIFT = 0
 const DEFAULT_SCANNER_COORDNIATES = 0
 const SCANNER_MID_POINT = 127
-const DEFAULT_RGB_COORDNIATES = 10
+const DEFAULT_RGB_FADE_STEPS = 10
 
 const IS_SCANNER = true
 const IS_RGB = false
@@ -391,7 +391,7 @@ type Sequence struct {
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
-	RGBCoordinates              int                         // Number of coordinates in RGB fade.
+	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
 	Hidden                      bool                        // Is this sequence hidden on the launchpad.
 }
 
@@ -1348,9 +1348,9 @@ func Reverse12(in int) int {
 
 // CalculateFadeValues - calculate fade curve values.
 func CalculateFadeValues(sequence *Sequence) {
-	sequence.FadeUp = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
+	sequence.FadeUp = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, sequence.RGBFade, false)
 	sequence.FadeOn = GetFadeOnValues(MAX_DMX_BRIGHTNESS, sequence.RGBSize)
-	sequence.FadeDown = GetFadeValues(sequence.RGBCoordinates, MAX_DMX_BRIGHTNESS, sequence.RGBFade, true)
+	sequence.FadeDown = GetFadeValues(sequence.RGBNumberStepsInFade, MAX_DMX_BRIGHTNESS, sequence.RGBFade, true)
 	sequence.FadeOff = GetFadeOnValues(MIN_DMX_BRIGHTNESS, sequence.RGBSize)
 }
 

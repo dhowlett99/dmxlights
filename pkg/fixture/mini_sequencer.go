@@ -360,14 +360,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		}
 
 		sequence := common.Sequence{
-			ScannerReverse: false,
-			RGBInvert:      false,
-			Bounce:         false,
-			ScannerChaser:  false,
-			RGBShift:       1,
-			RGBCoordinates: common.DEFAULT_RGB_COORDNIATES,
-			RGBFade:        cfg.Fade,
-			RGBSize:        cfg.Size,
+			ScannerReverse:       false,
+			RGBInvert:            false,
+			Bounce:               false,
+			ScannerChaser:        false,
+			RGBShift:             1,
+			RGBNumberStepsInFade: 32,
+			RGBFade:              cfg.Fade,
+			RGBSize:              cfg.Size,
 		}
 		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 		steps := sequence.Pattern.Steps

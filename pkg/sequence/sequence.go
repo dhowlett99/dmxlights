@@ -180,7 +180,7 @@ func CreateSequence(
 		Speed:                  common.DEFAULT_SPEED,
 		ScannerShift:           common.DEFAULT_SCANNER_SHIFT,
 		RGBShift:               common.DEFAULT_RGB_SHIFT,
-		RGBCoordinates:         common.DEFAULT_RGB_COORDNIATES,
+		RGBNumberStepsInFade:   common.DEFAULT_RGB_FADE_STEPS,
 		Blackout:               false,
 		Master:                 common.MAX_DMX_BRIGHTNESS,
 		ScannerGobo:            scannerGobos,
