@@ -247,7 +247,6 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		go func(lastColor common.Color) {
 
 			// If last color is set then fade down first.
-			fmt.Printf("lastColor %+v\n", lastColor)
 			if lastColor != common.EmptyColor {
 				for _, fade := range fadeDownValues {
 					// Listen for stop command.
@@ -282,7 +281,6 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				}
 				select {
 				case fixtureStepChannel <- command:
-					fmt.Printf("send last color %+v\n", color)
 				case <-time.After(100 * time.Millisecond):
 				}
 			} else {

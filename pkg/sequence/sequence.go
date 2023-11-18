@@ -348,8 +348,6 @@ func PlaySequence(sequence common.Sequence,
 			// Label the switch.
 			common.LabelButton(sequence.CurrentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
 
-			fmt.Printf(" =====> sequence.RGBFade %d\n", sequence.RGBFade)
-
 			// Now send a message to the fixture to play all the values for this state.
 			command := common.FixtureCommand{
 				Master:             sequence.Master,
