@@ -244,6 +244,9 @@ func FixtureReceiver(
 		cmd := <-fixtureStepChannel
 
 		if cmd.Type == "lastColor" {
+			if debug {
+				fmt.Printf("Fixture:%d Command Set Last Color to %+v\n", myFixtureNumber, cmd.LastColor)
+			}
 			lastColor = cmd.LastColor
 			continue
 		}
@@ -325,7 +328,7 @@ func FixtureReceiver(
 				if debug {
 					fmt.Printf("Fixture:%d Turn RGB Off\n", myFixtureNumber)
 				}
-				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, dmxInterfacePresent)
+				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, lastColor, fixtures, dmxController, dmxInterfacePresent)
 				common.LightLamp(common.ALight{X: myFixtureNumber, Y: cmd.SequenceNumber, Red: 0, Green: 0, Blue: 0, Brightness: cmd.Master}, eventsForLauchpad, guiButtons)
 				continue
 			}
@@ -431,7 +434,7 @@ func FixtureReceiver(
 				}
 			} else {
 				// This scanner is disabled, shut it off.
-				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, dmxInterfacePresent)
+				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, lastColor, fixtures, dmxController, dmxInterfacePresent)
 			}
 		}
 	}
@@ -1268,7 +1271,11 @@ func turnOnFixtures(cmd common.FixtureCommand, myFixtureNumber int, mySequenceNu
 	MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, red, green, blue, white, amber, uv, pan, tilt, shutter, rotate, music, program, gobo, scannerColor, fixtures, false, brightness, master, cmd.Strobe, cmd.StrobeSpeed, dmxInterfacePresent)
 }
 
-func turnOffFixture(myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func turnOffFixture(myFixtureNumber int, mySequenceNumber int, lastColor common.Color, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+
+	if lastColor != common.EmptyColor {
+		return
+	}
 
 	blackout := false
 	master := 0
