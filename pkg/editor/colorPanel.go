@@ -166,15 +166,23 @@ func SetFromCheckState(cp *ColorPanel) {
 	// Clear Rectangles
 	for x := 0; x < 10; x++ {
 		cp.Rectanges[x].FillColor = color.White
+		cp.Rectanges[x].StrokeColor = color.White
+		cp.Rectanges[x].StrokeWidth = 1
 	}
 
 	// Now set the selected colors in the display.
 	var count int
-	for key, button := range cp.Buttons {
+
+	// Enforce which order colors come back from the map in.
+	labels := []string{"Red", "Orange", "Yellow", "Green", "Cyan", "Blue", "Purple", "Pink", "White", "Black"}
+	for key := 0; key < len(labels); key++ {
+		button := cp.Buttons[labels[key]]
 		if button.check.Checked {
-			color, _ := common.GetRGBColorByName(key)
-			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(color)
-			colorSelection = append(colorSelection, key)
+			currentColor, _ := common.GetRGBColorByName(labels[key])
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(currentColor)
+			cp.Rectanges[count].StrokeColor = color.Black
+			cp.Rectanges[count].StrokeWidth = 1
+			colorSelection = append(colorSelection, labels[key])
 			count++
 		}
 	}
@@ -202,16 +210,23 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 	// Clear Rectangles
 	for x := 0; x < 10; x++ {
 		cp.Rectanges[x].FillColor = color.White
+		cp.Rectanges[x].StrokeColor = color.White
+		cp.Rectanges[x].StrokeWidth = 1
 	}
 
 	var count int
+	fmt.Printf("Colors %+v\n", colors)
 	for _, c := range colors {
 		if c != "" && c != "Off" {
 			RGBcolor, _ := common.GetRGBColorByName(c)
 			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBcolor)
+			cp.Rectanges[count].StrokeColor = color.Black
+			cp.Rectanges[count].StrokeWidth = 1
 			cp.Buttons[c].check.Checked = true
 		} else {
 			cp.Rectanges[count].FillColor = color.White
+			cp.Rectanges[count].StrokeColor = color.White
+			cp.Rectanges[count].StrokeWidth = 1
 		}
 		count++
 	}
