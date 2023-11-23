@@ -283,6 +283,15 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						// Control how long the fade take with the fade speed control.
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.FadeSpeed))))
 					}
+					// Fade down complete, set lastColor to empty in the fixture.
+					command := common.FixtureCommand{
+						Type:      "lastColor",
+						LastColor: common.EmptyColor,
+					}
+					select {
+					case fixtureStepChannel <- command:
+					case <-time.After(100 * time.Millisecond):
+					}
 				}
 				for _, fade := range fadeUpValues {
 					// Listen for stop command.
@@ -446,6 +455,12 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
+				}
+
+				// Consume any left over stop commands before starting.
+				select {
+				case <-switchChannels[swiTch.Number].StopRotate:
+				case <-time.After(10 * time.Millisecond):
 				}
 
 				// Thread to run the rotator
