@@ -70,14 +70,12 @@ type Action struct {
 	RotateSpeed string   `yaml:"rotatespeed"`
 	Program     string   `yaml:"program"`
 	Strobe      string   `yaml:"strobe"`
-	FadeSpeed   int      `yaml:"-"`
 }
 
 type ActionConfig struct {
 	Name          string
 	Colors        []common.Color
 	Fade          int
-	FadeSpeed     int
 	Size          int
 	Speed         time.Duration
 	TriggerState  bool
@@ -902,7 +900,6 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.RotateSpeed = action.RotateSpeed
 			newAction.Program = action.Program
 			newAction.Strobe = action.Strobe
-			newAction.FadeSpeed = fadeSpeed
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLauchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
 				lastColor = common.EmptyColor

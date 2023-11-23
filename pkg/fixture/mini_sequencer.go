@@ -127,7 +127,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
 				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 				// Control how long the fade take with the speed control.
-				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.FadeSpeed)))
+				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
 			}
 			state := swiTch.States[0]
 			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
@@ -281,7 +281,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
 						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						// Control how long the fade take with the fade speed control.
-						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.FadeSpeed))))
+						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
 					// Fade down complete, set lastColor to empty in the fixture.
 					command := common.FixtureCommand{
@@ -303,7 +303,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
 					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 					// Control how long the fade take with the fade speed control.
-					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.FadeSpeed))))
+					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 				}
 				// Fade up complete, set lastColor up in the fixture.
 				command := common.FixtureCommand{
@@ -582,6 +582,8 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Fade = 1
 	case "Soft":
 		config.Fade = 1
+	case "Normal":
+		config.Fade = 5
 	case "Sharp":
 		config.Fade = 10
 	default:
@@ -681,8 +683,6 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Strobe = false
 		config.StrobeSpeed = 0
 	}
-
-	config.FadeSpeed = action.FadeSpeed
 
 	return config
 }

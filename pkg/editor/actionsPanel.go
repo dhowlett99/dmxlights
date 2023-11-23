@@ -69,7 +69,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 	ap.ActionsList = actionsList
 	ap.ActionModeOptions = []string{"Off", "Static", "Chase", "Control"}
 	ap.ActionSizeOptions = []string{"Off", "Short", "Medium", "Long"}
-	ap.ActionFadeOptions = []string{"Off", "Soft", "Sharp"}
+	ap.ActionFadeOptions = []string{"Off", "Soft", "Normal", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
 	ap.ActionRotateOptions = []string{"Off", "Clockwise", "Anti Clockwise", "Auto"}
 	ap.ActionRotateSpeed = []string{"Slow", "Medium", "Fast"}
@@ -219,7 +219,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					newAction.Number = ap.ActionsList[i].Number
 					newAction.Colors = ap.ActionsList[i].Colors
 					newAction.Mode = value
-					newAction.Fade = ""
+					newAction.Fade = ap.ActionsList[i].Fade
 					newAction.Size = ""
 					newAction.Speed = ""
 					newAction.Rotate = ""
@@ -243,8 +243,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = false
 
-					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 
 					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true

@@ -2302,7 +2302,7 @@ fixtures:
       colors:
       - Red
       mode: Static
-      fade: ""
+      fade: Sharp
       size: ""
       speed: ""
       rotate: ""
@@ -2321,9 +2321,9 @@ fixtures:
       colors:
       - Green
       mode: Static
-      fade: "Off"
+      fade: Sharp
       size: ""
-      speed: "Off"
+      speed: ""
       rotate: ""
       rotatespeed: ""
       program: ""
@@ -2340,9 +2340,9 @@ fixtures:
       colors:
       - Blue
       mode: Static
-      fade: "Off"
+      fade: Sharp
       size: ""
-      speed: "Off"
+      speed: ""
       rotate: ""
       rotatespeed: ""
       program: ""
