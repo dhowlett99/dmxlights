@@ -39,7 +39,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
+	//AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
 
 	// Load the config.
 	// Which forces all sequences to load their config.
@@ -126,11 +126,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
-
 		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
-		if sequences[sequenceNumber].Type == "switch" {
+		if sequence.Type == "switch" {
+
+			// Get an upto date copy of the switch sequence.
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
 			// Now set our local representation of switches

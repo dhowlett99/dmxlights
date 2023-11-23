@@ -87,32 +87,54 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fade ups.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+		if lastColor != common.EmptyColor {
+			if debug {
+				fmt.Printf("Action OFF fade to black\n")
+			}
+			fadeDownValues := common.GetFadeValues(64, float64(master), 1, true)
+			for _, fade := range fadeDownValues {
+				// Listen for stop command.
+				select {
+				case <-switchChannels[swiTch.Number].StopFadeDown:
+					return
+				case <-time.After(10 * time.Millisecond):
+				}
+				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+				// Control how long the fade take with the speed control.
+				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
+			}
+			state := swiTch.States[0]
+			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+			common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: master, Red: buttonColor.R, Green: buttonColor.G, Blue: buttonColor.B}, eventsForLaunchpad, guiButtons)
+		} else {
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+		}
 
 		return
 	}
@@ -139,32 +161,32 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
@@ -208,28 +230,28 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -246,22 +268,31 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Now Fade up
 		go func(lastColor common.Color) {
 
-			// If last color is set then fade down first.
-			if lastColor != common.EmptyColor {
-				for _, fade := range fadeDownValues {
-					// Listen for stop command.
-					select {
-					case <-switchChannels[swiTch.Number].StopFadeDown:
-						return
-					case <-time.After(10 * time.Millisecond):
-					}
-					common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
-					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
-					// Control how long the fade take with the speed control.
-					time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.FadeSpeed)))
-				}
-			}
 			if !masterChanging {
+				// If last color is set then fade down first.
+				if lastColor != common.EmptyColor {
+					for _, fade := range fadeDownValues {
+						// Listen for stop command.
+						select {
+						case <-switchChannels[swiTch.Number].StopFadeDown:
+							return
+						case <-time.After(10 * time.Millisecond):
+						}
+						common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						// Control how long the fade take with the fade speed control.
+						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
+					}
+					// Fade down complete, set lastColor to empty in the fixture.
+					command := common.FixtureCommand{
+						Type:      "lastColor",
+						LastColor: common.EmptyColor,
+					}
+					select {
+					case fixtureStepChannel <- command:
+					case <-time.After(100 * time.Millisecond):
+					}
+				}
 				for _, fade := range fadeUpValues {
 					// Listen for stop command.
 					select {
@@ -271,8 +302,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					}
 					common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
 					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
-					// Control how long the fade take with the speed control.
-					time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.FadeSpeed)))
+					// Control how long the fade take with the fade speed control.
+					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 				}
 				// Fade up complete, set lastColor up in the fixture.
 				command := common.FixtureCommand{
@@ -300,14 +331,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -335,7 +366,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Turn off the fixture.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -355,7 +386,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -424,6 +455,12 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
+				}
+
+				// Consume any left over stop commands before starting.
+				select {
+				case <-switchChannels[swiTch.Number].StopRotate:
+				case <-time.After(10 * time.Millisecond):
 				}
 
 				// Thread to run the rotator
@@ -545,6 +582,8 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Fade = 1
 	case "Soft":
 		config.Fade = 1
+	case "Normal":
+		config.Fade = 5
 	case "Sharp":
 		config.Fade = 10
 	default:
@@ -644,8 +683,6 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Strobe = false
 		config.StrobeSpeed = 0
 	}
-
-	config.FadeSpeed = action.FadeSpeed
 
 	return config
 }
