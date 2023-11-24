@@ -966,7 +966,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 		return
 	}
 	for x := 0; x < 8; x++ {
-		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: MIN_DMX_BRIGHTNESS, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}
 }
@@ -974,7 +974,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for y := 0; y < 8; y++ {
 		for x := 0; x < 8; x++ {
-			LightLamp(ALight{X: x, Y: y, Brightness: 0, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			LightLamp(ALight{X: x, Y: y, Brightness: MIN_DMX_BRIGHTNESS, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
 			LabelButton(x, y, "", guiButtons)
 		}
 	}
@@ -1102,9 +1102,9 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 
 func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if runningState {
-		LightLamp(ALight{X: 8, Y: 5, Brightness: 255, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+		LightLamp(ALight{X: 8, Y: 5, Brightness: MAX_DMX_BRIGHTNESS, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 	} else {
-		LightLamp(ALight{X: 8, Y: 5, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		LightLamp(ALight{X: 8, Y: 5, Brightness: MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 	}
 }
 
@@ -1113,7 +1113,7 @@ func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButto
 		FlashLight(8, 6, White, Pink, eventsForLaunchpad, guiButtons)
 		return
 	}
-	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	LightLamp(ALight{X: 8, Y: 6, Brightness: MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 }
 
 func LabelButton(X int, Y int, label string, guiButtons chan ALight) {

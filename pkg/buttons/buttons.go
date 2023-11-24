@@ -443,7 +443,7 @@ func ProcessButtons(X int, Y int,
 
 		// Turn off the flashing save button
 		this.SavePreset = false
-		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -586,7 +586,7 @@ func ProcessButtons(X int, Y int,
 		if this.SavePreset { // Turn the save mode off.
 			this.SavePreset = false
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			return
 		}
 		this.SavePreset = true
@@ -623,7 +623,7 @@ func ProcessButtons(X int, Y int,
 			config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
 
 			// turn off the save button from flashing.
-			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			presets.SavePresets(this.PresetsStore)
 
@@ -1088,7 +1088,7 @@ func ProcessButtons(X int, Y int,
 			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 			// Turn off the start lamp.
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 			// Set the correct color for the select button.
 			SequenceSelect(eventsForLaunchpad, guiButtons, this)
@@ -1109,7 +1109,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 
 			this.Running[this.SelectedSequence] = true
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
@@ -1139,7 +1139,7 @@ func ProcessButtons(X int, Y int,
 		// Turn off the flashing save button
 		this.SavePreset = false
 		this.SavePreset = false
-		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		// Shutdown any function bars.
 		clearAllModes(sequences, this)
@@ -2045,7 +2045,7 @@ func ProcessButtons(X int, Y int,
 
 		// Turn off the flashing save button
 		this.SavePreset = false
-		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.ALight{X: 8, Y: 4, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 
 		if !this.Blackout {
 			this.Blackout = true
@@ -2053,7 +2053,7 @@ func ProcessButtons(X int, Y int,
 				Action: common.Blackout,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 0, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
 			common.FlashLight(8, 7, common.Pink, common.White, eventsForLaunchpad, guiButtons)
 		} else {
 			this.Blackout = false
@@ -2061,7 +2061,7 @@ func ProcessButtons(X int, Y int,
 				Action: common.Normal,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
-			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.ALight{X: X, Y: Y, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 		}
 		return
 	}
@@ -2383,11 +2383,11 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	}
 
 	// Initially set the Flood, Save, Start, Stop and Blackout buttons to white.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
-	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 3, Red: 255, Green: 255, Blue: 255, Brightness: common.MAX_DMX_BRIGHTNESS}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 4, Red: 255, Green: 255, Blue: 255, Brightness: common.MAX_DMX_BRIGHTNESS}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 5, Red: 255, Green: 255, Blue: 255, Brightness: common.MAX_DMX_BRIGHTNESS}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 6, Red: 255, Green: 255, Blue: 255, Brightness: common.MAX_DMX_BRIGHTNESS}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 7, Red: 255, Green: 255, Blue: 255, Brightness: common.MAX_DMX_BRIGHTNESS}, eventsForLaunchpad, guiButtons)
 
 	// Light up any existing presets.
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
@@ -2408,7 +2408,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	// Turn the flood button back to white.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255, Flash: false}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255, Flash: false}, eventsForLaunchpad, guiButtons)
 
 	// Send a message to stop
 	cmd := common.Command{
