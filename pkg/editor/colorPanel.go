@@ -215,7 +215,6 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 	}
 
 	var count int
-	fmt.Printf("Colors %+v\n", colors)
 	for _, c := range colors {
 		if c != "" && c != "Off" {
 			RGBcolor, _ := common.GetRGBColorByName(c)
