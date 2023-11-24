@@ -193,6 +193,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[sequenceNumber], eventsForLaunchpad, guiButtons)
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
 	showStatusBar(this, sequences, guiButtons)
@@ -434,7 +435,6 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.TargetSequence].Color.R), "red", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.TargetSequence].Color.G), "green", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.TargetSequence].Color.B), "blue", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
 
 		common.LabelButton(0, 7, "Speed\nDown", guiButtons)
 		common.LabelButton(1, 7, "Speed\nUp", guiButtons)

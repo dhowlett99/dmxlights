@@ -74,7 +74,6 @@ type CurrentState struct {
 	Running                     map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
 	Strobe                      map[int]bool               // We are in strobe mode. True if strobing
 	StrobeSpeed                 map[int]int                // Strobe speed. value is speed 0-255, indexed by sequence number.
-	LastStrobeSpeed             map[int]int                // Last Strobe speed selected. value is speed 0-255, indexed by sequence number.
 	SavePreset                  bool                       // Save a preset flag.
 	Config                      bool                       // Flag to indicate we are in fixture config mode.
 	Blackout                    bool                       // Blackout all fixtures.
@@ -799,30 +798,32 @@ func ProcessButtons(X int, Y int,
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
+
+		// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
 		// Decrease Strobe Speed.
-		if this.Strobe[this.TargetSequence] {
-			this.StrobeSpeed[this.TargetSequence] -= 10
-			if this.StrobeSpeed[this.TargetSequence] < 0 {
-				this.StrobeSpeed[this.TargetSequence] = 0
+		if this.Strobe[this.SelectedSequence] {
+			this.StrobeSpeed[this.SelectedSequence] -= 10
+			if this.StrobeSpeed[this.SelectedSequence] < 0 {
+				this.StrobeSpeed[this.SelectedSequence] = 0
 			}
 
 			// Store the last strobe speed.
-			this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.TargetSequence]
+			//this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.SelectedSequence]
 
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.TargetSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
 			return
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// Decrease Speed.
 		if !sequences[this.TargetSequence].MusicTrigger {
@@ -878,24 +879,26 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if this.Strobe[this.TargetSequence] {
-			this.StrobeSpeed[this.TargetSequence] += 10
-			if this.StrobeSpeed[this.TargetSequence] > 255 {
-				this.StrobeSpeed[this.TargetSequence] = 255
+		// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
+		// Decrease Strobe Speed.
+		if this.Strobe[this.SelectedSequence] {
+			this.StrobeSpeed[this.SelectedSequence] += 10
+			if this.StrobeSpeed[this.SelectedSequence] > 255 {
+				this.StrobeSpeed[this.SelectedSequence] = 255
 			}
 
 			// Store the last strobe speed.
-			this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.TargetSequence]
+			//this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.SelectedSequence]
 
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
-					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.TargetSequence]},
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
 			return
 		}
 
@@ -1144,19 +1147,22 @@ func ProcessButtons(X int, Y int,
 
 		// If strobing, stop it
 		if this.Strobe[this.SelectedSequence] {
+
+			this.Strobe[this.SelectedSequence] = false
+
 			// Stop strobing this sequence.
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
-					{Name: "STROBE_STATE", Value: false},
+					{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.ShowStrobeButtonStatus(false, eventsForLaunchpad, guiButtons)
-			this.Strobe[this.SelectedSequence] = false
-			this.StrobeSpeed[this.SelectedSequence] = 0
+
 			// Update the status bar
+			// Update the strobe button and status bar.
+			common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
 			return
 
@@ -1164,27 +1170,22 @@ func ProcessButtons(X int, Y int,
 			// Start strobing for this sequence. Strobe on.
 			this.Strobe[this.SelectedSequence] = true
 
-			if this.LastStrobeSpeed[this.SelectedSequence] != this.StrobeSpeed[this.SelectedSequence] {
-				// Then use it.
-				this.StrobeSpeed[this.SelectedSequence] = this.LastStrobeSpeed[this.SelectedSequence]
-			} else {
-				// Use the default.
-				this.StrobeSpeed[this.SelectedSequence] = 255
-			}
-
 			cmd := common.Command{
 				Action: common.Strobe,
 				Args: []common.Arg{
-					{Name: "STROBE_STATE", Value: true},
+					{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
 			// Store the strobe flag in all sequences.
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-			common.ShowStrobeButtonStatus(true, eventsForLaunchpad, guiButtons)
 
-			// Update the status bar
+			// Update the strobe button and status bar.
+			common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+			// Update the status bar.
 			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+
 			return
 		}
 	}
@@ -2568,14 +2569,22 @@ func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButttons)
+			if !this.Strobe[this.TargetSequence] {
+				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButttons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButttons)
+			}
 		}
 		if tYpe == "scanner" {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButttons)
+		if !this.Strobe[this.TargetSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButttons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButttons)
+		}
 	}
 }
 

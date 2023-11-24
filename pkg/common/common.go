@@ -57,6 +57,7 @@ const DEFAULT_SCANNER_SHIFT = 0
 const DEFAULT_SCANNER_COORDNIATES = 0
 const SCANNER_MID_POINT = 127
 const DEFAULT_RGB_FADE_STEPS = 10
+const DEFAULT_STROBE_SPEED = 255
 
 const IS_SCANNER = true
 const IS_RGB = false
@@ -220,7 +221,6 @@ const (
 	Actions int = iota
 	Clear
 	Reset
-	UpdateMode
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce
@@ -245,12 +245,9 @@ const (
 	UpdateScannerSize
 	Blackout
 	Normal
-	SoftFadeOn
-	SoftFadeOff
 	UpdateColor
 	UpdateFunctions
 	GetUpdatedSequence
-	ClearAllSwitchPositions
 	ResetAllSwitchPositions
 	UpdateSwitch
 	Inverted
@@ -260,9 +257,7 @@ const (
 	Strobe
 	StopStrobe
 	UpdateAutoColor
-	AutoColor
 	UpdateAutoPattern
-	AutoPattern
 	ToggleFixtureState
 	UpdateRGBShift
 	UpdateRGBInvert
@@ -1115,7 +1110,7 @@ func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiBut
 
 func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
-		FlashLight(8, 6, White, Black, eventsForLaunchpad, guiButtons)
+		FlashLight(8, 6, White, Pink, eventsForLaunchpad, guiButtons)
 		return
 	}
 	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)

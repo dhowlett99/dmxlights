@@ -81,7 +81,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.CurrentSpeed = SetSpeed(common.DEFAULT_SPEED)
 		// Stop the strobe mode.
 		sequence.Strobe = false
-		sequence.StrobeSpeed = 0
+		sequence.StrobeSpeed = common.DEFAULT_STROBE_SPEED
 		sequence.StartFlood = false
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
@@ -384,7 +384,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const STROBE_STATE = 0
 		const STROBE_SPEED = 1
 		if debug {
-			fmt.Printf("%d: Command to Start Strobe\n", mySequenceNumber)
+			fmt.Printf("%d: Command to Strobe set to %t at speed %d\n", mySequenceNumber, command.Args[STROBE_STATE].Value.(bool), command.Args[STROBE_SPEED].Value.(int))
 		}
 		// Remember the state of the Music trigger flag.
 		sequence.LastMusicTrigger = sequence.MusicTrigger
@@ -403,7 +403,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command to Stop Strobe\n", mySequenceNumber)
 		}
 		sequence.Strobe = false
-		sequence.StrobeSpeed = 0
 		sequence.StartFlood = false
 		sequence.StopFlood = true
 		sequence.FloodPlayOnce = true
@@ -631,27 +630,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Get Updated Sequence\n", mySequenceNumber)
 		}
 		updateChannel <- sequence
-		return sequence
-
-	// Clear switch positions for this sequence
-	case common.ClearAllSwitchPositions:
-		if debug {
-			fmt.Printf("%d: Command ClearAllSwitchPositions n", mySequenceNumber)
-		}
-		// Loop through all the switchies. and reset their current state back to 0.
-		for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
-			newSwitch := common.Switch{}
-			newSwitch.CurrentPosition = 0
-			newSwitch.Description = sequence.Switches[switchNumber].Description
-			newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
-			newSwitch.Label = sequence.Switches[switchNumber].Label
-			newSwitch.Name = sequence.Switches[switchNumber].Name
-			newSwitch.Number = sequence.Switches[switchNumber].Number
-			newSwitch.States = sequence.Switches[switchNumber].States
-			newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
-			sequence.Switches[switchNumber] = newSwitch
-		}
-		sequence.PlaySwitchOnce = true
 		return sequence
 
 	case common.ResetAllSwitchPositions:

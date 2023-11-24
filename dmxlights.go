@@ -95,7 +95,6 @@ func main() {
 	this.RGBFade = make(map[int]int, NumberOfSequences)            // Initialise storage for four sequences.
 	this.ScannerFade = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
 	this.StrobeSpeed = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
-	this.LastStrobeSpeed = make(map[int]int, NumberOfSequences)    // Initialise storage for four sequences.
 	this.ClearPressed = make(map[int]bool, NumberOfSequences)      // Initialise storage for four sequences.
 	this.ScannerChaser = make(map[int]bool, NumberOfSequences)     // Initialise storage for four sequences.
 	this.ScannerCoordinates = make(map[int]int, NumberOfSequences) // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
@@ -251,7 +250,7 @@ func main() {
 		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Selected speed for the sequence. Common to all types of sequence.
 		this.Running[sequenceNumber] = false                                         // Set this sequence to be in the not running state. Common to all types of sequence.
 		this.Strobe[sequenceNumber] = false                                          // Set strobe to be off for all sequences.
-		this.StrobeSpeed[sequenceNumber] = 255                                       // Set the strob speed to be the fastest for this sequence.
+		this.StrobeSpeed[sequenceNumber] = common.DEFAULT_STROBE_SPEED               // Set the strobe speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.
 		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT             // Default scanner shift size.
 		this.SequenceType[sequenceNumber] = newSequence.Type                         // Set the sequence type.
@@ -511,6 +510,7 @@ func main() {
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	myWindow.SetContent(content)
 
