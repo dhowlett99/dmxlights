@@ -1110,7 +1110,7 @@ func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiBut
 
 func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
-		FlashLight(8, 6, White, Black, eventsForLaunchpad, guiButtons)
+		FlashLight(8, 6, White, Pink, eventsForLaunchpad, guiButtons)
 		return
 	}
 	LightLamp(ALight{X: 8, Y: 6, Brightness: 255, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
