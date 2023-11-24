@@ -57,6 +57,7 @@ const DEFAULT_SCANNER_SHIFT = 0
 const DEFAULT_SCANNER_COORDNIATES = 0
 const SCANNER_MID_POINT = 127
 const DEFAULT_RGB_FADE_STEPS = 10
+const DEFAULT_STROBE_SPEED = 255
 
 const IS_SCANNER = true
 const IS_RGB = false
@@ -220,7 +221,6 @@ const (
 	Actions int = iota
 	Clear
 	Reset
-	UpdateMode
 	UpdateStatic
 	UpdateFlashAllStaticColorButtons
 	UpdateBounce
@@ -245,12 +245,9 @@ const (
 	UpdateScannerSize
 	Blackout
 	Normal
-	SoftFadeOn
-	SoftFadeOff
 	UpdateColor
 	UpdateFunctions
 	GetUpdatedSequence
-	ClearAllSwitchPositions
 	ResetAllSwitchPositions
 	UpdateSwitch
 	Inverted
@@ -260,9 +257,7 @@ const (
 	Strobe
 	StopStrobe
 	UpdateAutoColor
-	AutoColor
 	UpdateAutoPattern
-	AutoPattern
 	ToggleFixtureState
 	UpdateRGBShift
 	UpdateRGBInvert
