@@ -336,9 +336,9 @@ func ProcessButtons(X int, Y int,
 			this.SelectedSequence = 0
 			// Indicate if this sequence is running.
 			if this.Running[this.SelectedSequence] {
-				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.ALight{X: 8, Y: 5, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
 			}
 			this.SelectButtonPressed[this.SelectedSequence] = false
 			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
