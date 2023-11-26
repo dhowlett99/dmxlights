@@ -218,11 +218,11 @@ func ProcessButtons(X int, Y int,
 
 		if this.SelectedType == "rgb" {
 			common.LightLamp(common.Button{X: X, Y: Y}, color, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(false, false, Y, dmxController, X, color, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 		if this.SelectedType == "scanner" {
 			common.LightLamp(common.Button{X: X, Y: Y}, common.Color{R: 255, G: 255, B: 255}, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(false, false, Y, dmxController, X, color, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 
 		if this.GUI {
@@ -230,7 +230,7 @@ func ProcessButtons(X int, Y int,
 			brightness := 0
 			master := 0
 			common.LightLamp(common.Button{X: X, Y: Y}, common.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			fixture.MapFixtures(false, false, Y, dmxController, X, color, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 
 		return
@@ -266,7 +266,7 @@ func ProcessButtons(X int, Y int,
 		master := 0
 
 		common.LightLamp(common.Button{X: X, Y: Y}, common.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, dmxController, X, common.Black, pan, tilt, shutter, rotate, music, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, X, common.Black, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		return
 	}
 
@@ -2082,7 +2082,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		if sequences[y].Type != "switch" && sequences[y].Label != "chaser" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.Button{X: x, Y: y}, common.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(false, false, y, dmxController, x, common.Black, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
+				fixture.MapFixtures(false, false, y, x, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -2093,7 +2093,7 @@ func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan com
 		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
 			if sequences[sequenceNumber].Type == "rgb" && sequences[sequenceNumber].Label != "chaser" {
 				common.LightLamp(common.Button{X: x, Y: sequenceNumber}, common.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(false, false, sequenceNumber, dmxController, x, common.Black, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, false, 0, dmxInterfacePresent)
+				fixture.MapFixtures(false, false, sequenceNumber, x, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 				common.LabelButton(x, sequenceNumber, "", guiButtons)
 			}
 		}
