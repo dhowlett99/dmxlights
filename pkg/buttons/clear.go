@@ -116,9 +116,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 	// Start full clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 	} else {
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Pink}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Pink, eventsForLaunchpad, guiButtons)
 	}
 
 	// Turn off the flashing save button.

@@ -392,7 +392,7 @@ func ProcessButtons(X int, Y int,
 					fmt.Printf("UP ARROW\n")
 				}
 
-				buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+				buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 
 				this.OffsetTilt = this.OffsetTilt + 5
 
@@ -476,7 +476,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Sound Up %f\n", this.SoundGain)
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		this.SoundGain = this.SoundGain - 0.01
 		if this.SoundGain < -0.04 {
@@ -498,7 +498,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Sound Down%f\n", this.SoundGain)
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		this.SoundGain = this.SoundGain + 0.01
 		if this.SoundGain > 0.09 {
@@ -520,7 +520,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Brightness Down \n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		this.MasterBrightness = this.MasterBrightness - 10
 		if this.MasterBrightness < 0 {
@@ -546,7 +546,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Brightness Up \n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		this.MasterBrightness = this.MasterBrightness + 10
 		if this.MasterBrightness > common.MAX_DMX_BRIGHTNESS {
@@ -669,7 +669,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Shift\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -724,7 +724,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Shift \n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -778,7 +778,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Speed \n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -858,7 +858,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Speed \n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -1186,7 +1186,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Size\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -1241,7 +1241,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Size\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -1296,7 +1296,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Decrease Fade Time\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -1353,7 +1353,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Increase Fade Time\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Cyan}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
 		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -1473,7 +1473,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("DOWN ARROW\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 
 		this.OffsetTilt = this.OffsetTilt - 5
 
@@ -1502,7 +1502,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("LEFT ARROW\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 
 		this.OffsetPan = this.OffsetPan + 5
 
@@ -1532,7 +1532,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("RIGHT ARROW\n")
 		}
 
-		buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.Cyan, OffColor: common.White}, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 
 		this.OffsetPan = this.OffsetPan - 5
 
@@ -1566,7 +1566,7 @@ func ProcessButtons(X int, Y int,
 				fmt.Printf("Choose Static Red X:%d Y:%d\n", X, Y)
 			}
 
-			buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Red}, eventsForLaunchpad, guiButtons)
+			buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Red, eventsForLaunchpad, guiButtons)
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
@@ -1597,7 +1597,7 @@ func ProcessButtons(X int, Y int,
 				fmt.Printf("Choose Static Green X:%d Y:%d\n", X, Y)
 			}
 
-			buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Green}, eventsForLaunchpad, guiButtons)
+			buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Green, eventsForLaunchpad, guiButtons)
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
@@ -1627,7 +1627,7 @@ func ProcessButtons(X int, Y int,
 				fmt.Printf("Choose Static Blue X:%d Y:%d\n", X, Y)
 			}
 
-			buttonTouched(common.ALight{Button: common.Button{X: X, Y: Y}, OnColor: common.White, OffColor: common.Blue}, eventsForLaunchpad, guiButtons)
+			buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Blue, eventsForLaunchpad, guiButtons)
 
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
@@ -2439,10 +2439,10 @@ func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft
 	this.Flood = true
 }
 
-func buttonTouched(alight common.ALight, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
-	common.LightLamp(alight.Button, alight.OnColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+func buttonTouched(button common.Button, onColor common.Color, offColor common.Color, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+	common.LightLamp(button, onColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	time.Sleep(200 * time.Millisecond)
-	common.LightLamp(alight.Button, alight.OffColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(button, offColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 }
 
 func getScannerShiftLabel(shift int) string {
