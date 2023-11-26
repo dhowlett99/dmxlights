@@ -36,13 +36,13 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
 		}
 		if !function.State && this.SelectMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
-			common.LightLamp(common.ALight{X: index, Y: this.DisplaySequence, Brightness: 255, Red: 3, Green: 255, Blue: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		if !function.State && this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
-			common.LightLamp(common.ALight{X: index, Y: this.DisplaySequence, Brightness: 255, Red: 255, Green: 255, Blue: 0}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
-		if function.State { // Purple
-			common.LightLamp(common.ALight{X: index, Y: this.DisplaySequence, Brightness: 255, Red: 200, Green: 0, Blue: 255}, eventsForLauchpad, guiButtons)
+		if function.State { // Pink
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
 	}
@@ -360,7 +360,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.SelectAllStaticFixtures = false
 
 		// Starting a static sequence will turn off any running sequence, so turn off the start lamp
-		common.LightLamp(common.ALight{X: X, Y: this.DisplaySequence, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: X, Y: this.DisplaySequence}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
 		this.Running[this.TargetSequence] = false
 

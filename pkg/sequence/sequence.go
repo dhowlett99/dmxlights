@@ -304,7 +304,7 @@ func PlaySequence(sequence common.Sequence,
 				state := switchData.States[switchData.CurrentPosition]
 
 				color, _ := common.GetRGBColorByName(state.ButtonColor)
-				common.LightLamp(common.ALight{X: switchNumber, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+				common.LightLamp(common.Button{X: switchNumber, Y: mySequenceNumber}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 
 				// Label the switch.
 				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
@@ -343,7 +343,7 @@ func PlaySequence(sequence common.Sequence,
 
 			// Use the button color for this state to light the correct color on the launchpad.
 			color, _ := common.GetRGBColorByName(state.ButtonColor)
-			common.LightLamp(common.ALight{X: sequence.CurrentSwitch, Y: mySequenceNumber, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: sequence.CurrentSwitch, Y: mySequenceNumber}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 
 			// Label the switch.
 			common.LabelButton(sequence.CurrentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)

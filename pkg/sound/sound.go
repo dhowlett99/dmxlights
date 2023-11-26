@@ -162,7 +162,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
 							// Update status bar.
-							common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 255, Red: 255, Green: 0, Blue: 255}, eventsForLaunchpad, guiButtons)
+							common.LightLamp(common.Button{X: 0, Y: -1}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
@@ -175,7 +175,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
-					common.LightLamp(common.ALight{X: 0, Y: -1, Brightness: 0, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+					common.LightLamp(common.Button{X: 0, Y: -1}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 				}
 			}
 		}

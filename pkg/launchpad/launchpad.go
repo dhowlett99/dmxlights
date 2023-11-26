@@ -88,7 +88,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 				time.Sleep(14 * time.Microsecond)
 
 				// What was the lamp previously set too ?
-				whichLamp := coordinate{X: alight.X, Y: alight.Y}
+				whichLamp := coordinate{X: alight.Button.X, Y: alight.Button.Y}
 				storedColor := common.Color{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
 
 				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
@@ -107,7 +107,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 						if debug {
 							fmt.Printf("X:%d Y:%d Stored Color is %+v  New Color is %+v\n", whichLamp.X, whichLamp.Y, storedColor, newColor)
 						}
-						err := pad.Light(alight.X, alight.Y, Red, Green, Blue)
+						err := pad.Light(alight.Button.X, alight.Button.Y, Red, Green, Blue)
 						if err != nil {
 							fmt.Printf("error writing to launchpad %s\n" + err.Error())
 						}
@@ -119,14 +119,14 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 						fmt.Printf("Want Color %+v LaunchPad On Code is %x\n", alight.OnColor, common.GetLaunchPadCodeByRGBColor(alight.OnColor))
 						fmt.Printf("Want Color %+v LaunchPad Off Code is %x\n", alight.OffColor, common.GetLaunchPadCodeByRGBColor(alight.OffColor))
 					}
-					err := pad.FlashLight(alight.X, alight.Y, common.GetLaunchPadCodeByRGBColor(alight.OnColor), common.GetLaunchPadCodeByRGBColor(alight.OffColor))
+					err := pad.FlashLight(alight.Button.X, alight.Button.Y, common.GetLaunchPadCodeByRGBColor(alight.OnColor), common.GetLaunchPadCodeByRGBColor(alight.OffColor))
 					if err != nil {
 						fmt.Printf("flash: error writing to launchpad %s\n" + err.Error())
 					}
 
 				}
 				// Remember what lamps are light.
-				launchPadMap[coordinate{X: alight.X, Y: alight.Y}] = common.Color{
+				launchPadMap[coordinate{X: alight.Button.X, Y: alight.Button.Y}] = common.Color{
 					R:     Red,
 					G:     Green,
 					B:     Blue,

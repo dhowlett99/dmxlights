@@ -124,14 +124,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					return
 				case <-time.After(10 * time.Millisecond):
 				}
-				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
-				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor, fade, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 				// Control how long the fade take with the speed control.
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
 			}
 			state := swiTch.States[0]
 			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
-			common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: master, Red: buttonColor.R, Green: buttonColor.G, Blue: buttonColor.B}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
 		} else {
 			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		}
@@ -278,8 +278,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 							return
 						case <-time.After(10 * time.Millisecond):
 						}
-						common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: lastColor.R, Green: lastColor.G, Blue: lastColor.B}, eventsForLaunchpad, guiButtons)
-						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor.R, lastColor.G, lastColor.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor, fade, eventsForLaunchpad, guiButtons)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, lastColor, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						// Control how long the fade take with the fade speed control.
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
@@ -300,8 +300,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						return
 					case <-time.After(10 * time.Millisecond):
 					}
-					common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: fade, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
-					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+					common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, color, fade, eventsForLaunchpad, guiButtons)
+					MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 					// Control how long the fade take with the fade speed control.
 					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 				}
@@ -315,8 +315,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				case <-time.After(100 * time.Millisecond):
 				}
 			} else {
-				common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: master, Red: color.R, Green: color.G, Blue: color.B}, eventsForLaunchpad, guiButtons)
-				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color.R, color.G, color.B, 0, 0, 0, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, color, master, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, color, 0, 0, 0, cfg.RotateSpeed, cfg.Music, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 			}
 		}(lastColor)
 		return
@@ -540,7 +540,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 							switchChannels[swiTch.Number].StopRotate <- true
 						}
 						// And turn the fixture off.
-						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 						return
 					case <-time.After(cfg.Speed):
 					}
@@ -552,8 +552,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
-						common.LightLamp(common.ALight{X: swiTch.Number - 1, Y: 3, Brightness: 255, Red: fixture.Color.R, Green: fixture.Color.G, Blue: fixture.Color.B}, eventsForLaunchpad, guiButtons)
-						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, fixture.Color.R, fixture.Color.G, fixture.Color.B, fixture.Color.W, 0, 0, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
+						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+						MapFixtures(false, false, mySequenceNumber, dmxController, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Strobe, cfg.StrobeSpeed, dmxInterfacePresent)
 					}
 
 					rotateCounter++
