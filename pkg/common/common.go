@@ -98,8 +98,6 @@ type ALight struct {
 }
 
 type Color struct {
-	Name  string
-	Code  byte
 	R     int
 	G     int
 	B     int
@@ -296,34 +294,34 @@ const (
 // 13 fade up values, 13 on values and 13 off values.
 const StepSize = 39
 
-var Black = Color{Name: "Black", Code: 0x00, R: 0, G: 0, B: 0}
-var Red = Color{Name: "Red", Code: 0x48, R: 255, G: 0, B: 0}
-var Green = Color{Name: "Green", Code: 0x15, R: 0, G: 255, B: 0}
-var Blue = Color{Name: "Blue", Code: 0x4f, R: 0, G: 0, B: 255}
-var PresetYellow = Color{Name: "Preset Yellow", Code: 0x38, R: 150, G: 150, B: 0}
-var Cyan = Color{Name: "Cyan", Code: 0x38, R: 0, G: 255, B: 255}
-var Yellow = Color{Name: "Yellow", Code: 0x0d, R: 255, G: 255, B: 0}
-var Orange = Color{Name: "Orange", Code: 0x60, R: 255, G: 111, B: 0}
-var Magenta = Color{Name: "Magenta", Code: 0x35, R: 255, G: 0, B: 255}
+var Black = Color{R: 0, G: 0, B: 0}
+var Red = Color{R: 255, G: 0, B: 0}
+var Green = Color{R: 0, G: 255, B: 0}
+var Blue = Color{R: 0, G: 0, B: 255}
+var PresetYellow = Color{R: 150, G: 150, B: 0}
+var Cyan = Color{R: 0, G: 255, B: 255}
+var Yellow = Color{R: 255, G: 255, B: 0}
+var Orange = Color{R: 255, G: 111, B: 0}
+var Magenta = Color{R: 255, G: 0, B: 255}
 
-var Crimson = Color{Name: "Crimson", Code: 0x38, R: 220, G: 20, B: 60}
-var DarkOrange = Color{Name: "Dark Orange", Code: 0x0a, R: 215, G: 50, B: 0}
-var Gold = Color{Name: "Gold", Code: 0x61, R: 255, G: 215, B: 0}
-var ForestGreen = Color{Name: "Forest Green", Code: 0x1b, R: 0, G: 100, B: 0}
-var Aqua = Color{Name: "Aqua", Code: 0x20, R: 127, G: 255, B: 212}
-var SkyBlue = Color{Name: "Sky Blue", Code: 0x25, R: 0, G: 191, B: 255}
-var Purple = Color{Name: "Purple", Code: 0x51, R: 100, G: 0, B: 255}
-var DarkPurple = Color{Name: "Dark Purple", Code: 0x32, R: 50, G: 0, B: 255}
+var Crimson = Color{R: 220, G: 20, B: 60}
+var DarkOrange = Color{R: 215, G: 50, B: 0}
+var Gold = Color{R: 255, G: 215, B: 0}
+var ForestGreen = Color{R: 0, G: 100, B: 0}
+var Aqua = Color{R: 127, G: 255, B: 212}
+var SkyBlue = Color{R: 0, G: 191, B: 255}
+var Purple = Color{R: 100, G: 0, B: 255}
+var DarkPurple = Color{R: 50, G: 0, B: 255}
 
-var Pink = Color{Name: "Pink", Code: 0x34, R: 255, G: 0, B: 255}
-var Salmon = Color{Name: "Salmon", Code: 0x6b, R: 250, G: 128, B: 114}
-var LightOrange = Color{Name: "Light Orange", Code: 0x0c, R: 255, G: 175, B: 0}
-var Olive = Color{Name: "Olive", Code: 0x10, R: 150, G: 150, B: 0}
-var LawnGreen = Color{Name: "Lawn Green", Code: 0x13, R: 124, G: 252, B: 0}
-var Teal = Color{Name: "Teal", Code: 0x44, R: 0, G: 128, B: 128}
-var LightBlue = Color{Name: "Light Blue", Code: 0x20, R: 100, G: 185, B: 255}
-var Violet = Color{Name: "Violet", Code: 0x5e, R: 199, G: 21, B: 133}
-var White = Color{Name: "White", Code: 0x03, R: 255, G: 255, B: 255}
+var Pink = Color{R: 255, G: 192, B: 203}
+var Salmon = Color{R: 250, G: 128, B: 114}
+var LightOrange = Color{R: 255, G: 175, B: 0}
+var Olive = Color{R: 150, G: 150, B: 0}
+var LawnGreen = Color{R: 124, G: 252, B: 0}
+var Teal = Color{R: 0, G: 128, B: 128}
+var LightBlue = Color{R: 100, G: 185, B: 255}
+var Violet = Color{R: 199, G: 21, B: 133}
+var White = Color{R: 255, G: 255, B: 255}
 var EmptyColor = Color{}
 
 type Gobo struct {
@@ -842,35 +840,6 @@ func GetRGBColorByName(color string) (Color, error) {
 
 	}
 	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
-}
-
-func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-	switch color {
-	case LightBlue:
-		return LightBlue.Code
-	case Red:
-		return Red.Code
-	case Orange:
-		return Orange.Code
-	case Yellow:
-		return Yellow.Code
-	case Green:
-		return Green.Code
-	case Cyan:
-		return Cyan.Code
-	case Blue:
-		return Blue.Code
-	case Purple:
-		return Purple.Code
-	case Pink:
-		return Pink.Code
-	case White:
-		return White.Code
-	case Black:
-		return Black.Code
-	}
-
-	return code
 }
 
 func GetColorNameByRGB(color Color) string {
@@ -1494,32 +1463,32 @@ func newColorPicker() []ColorPicker {
 
 	colors := []ColorPicker{
 
-		{ID: 0, X: 0, Y: 0, Name: Red.Name, Code: Red.Code, Color: Red},
-		{ID: 1, X: 1, Y: 0, Name: Orange.Name, Code: Orange.Code, Color: Orange},
-		{ID: 2, X: 2, Y: 0, Name: Yellow.Name, Code: Yellow.Code, Color: Yellow},
-		{ID: 3, X: 3, Y: 0, Name: Green.Name, Code: Green.Code, Color: Green},
-		{ID: 4, X: 4, Y: 0, Name: Cyan.Name, Code: Cyan.Code, Color: Cyan},
-		{ID: 5, X: 5, Y: 0, Name: Blue.Name, Code: Blue.Code, Color: Blue},
-		{ID: 6, X: 6, Y: 1, Name: Purple.Name, Code: Purple.Code, Color: Purple},
-		{ID: 7, X: 7, Y: 0, Name: Magenta.Name, Code: Magenta.Code, Color: Magenta},
+		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Red},
+		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Orange},
+		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Yellow},
+		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Green},
+		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Cyan},
+		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Blue},
+		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x32, Color: Purple},
+		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Magenta},
 
-		{ID: 8, X: 0, Y: 1, Name: Crimson.Name, Code: Crimson.Code, Color: Crimson},
-		{ID: 9, X: 1, Y: 1, Name: DarkOrange.Name, Code: DarkOrange.Code, Color: DarkOrange},
-		{ID: 10, X: 2, Y: 1, Name: Gold.Name, Code: Gold.Code, Color: Gold},
-		{ID: 11, X: 3, Y: 1, Name: ForestGreen.Name, Code: ForestGreen.Code, Color: ForestGreen},
-		{ID: 12, X: 4, Y: 1, Name: Aqua.Name, Code: Aqua.Code, Color: Aqua},
-		{ID: 13, X: 5, Y: 1, Name: SkyBlue.Name, Code: SkyBlue.Code, Color: SkyBlue},
-		{ID: 14, X: 6, Y: 0, Name: DarkPurple.Name, Code: DarkPurple.Code, Color: DarkPurple},
-		{ID: 15, X: 7, Y: 1, Name: Pink.Name, Code: 0x34, Color: Pink},
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: Crimson},
+		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: DarkOrange},
+		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Gold},
+		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: ForestGreen},
+		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Aqua},
+		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: SkyBlue},
+		{ID: 14, X: 6, Y: 1, Name: "DarkPurple", Code: 0x32, Color: DarkPurple},
+		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Pink},
 
-		{ID: 16, X: 0, Y: 2, Name: Salmon.Name, Code: Salmon.Code, Color: Salmon},
-		{ID: 17, X: 1, Y: 2, Name: LightOrange.Name, Code: LightOrange.Code, Color: LightOrange},
-		{ID: 18, X: 2, Y: 2, Name: Olive.Name, Code: Olive.Code, Color: Olive},
-		{ID: 19, X: 3, Y: 2, Name: LawnGreen.Name, Code: LawnGreen.Code, Color: LawnGreen},
-		{ID: 20, X: 4, Y: 2, Name: Teal.Name, Code: Teal.Code, Color: Teal},
-		{ID: 21, X: 5, Y: 2, Name: LightBlue.Name, Code: LawnGreen.Code, Color: LawnGreen},
-		{ID: 22, X: 6, Y: 2, Name: Violet.Name, Code: Violet.Code, Color: Violet},
-		{ID: 23, X: 7, Y: 2, Name: White.Name, Code: White.Code, Color: White},
+		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Salmon},
+		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: LightOrange},
+		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: Olive},
+		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: LawnGreen},
+		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Teal},
+		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: LightBlue},
+		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: Violet},
+		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: White},
 	}
 
 	return colors

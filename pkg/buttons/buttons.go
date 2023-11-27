@@ -1860,8 +1860,7 @@ func ProcessButtons(X int, Y int,
 
 		// The current color is help in our local copy.
 		color := sequences[this.TargetSequence].StaticColors[X].Color
-		empty := common.Color{}
-		if color == empty {
+		if color == common.EmptyColor {
 			color = FindCurrentColor(this.SelectedStaticFixtureNumber, this.SelectedSequence, *sequences[this.TargetSequence])
 		}
 
@@ -2151,9 +2150,9 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 			for _, sequenceColor := range targetSequence.CurrentColors {
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
-						if debug {
-							fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
-						}
+						//if debug {
+						fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+						//}
 						lamp.Flash = true
 					}
 				}
