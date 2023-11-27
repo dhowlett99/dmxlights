@@ -1085,11 +1085,10 @@ func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxContro
 	if !sequence.Hide {
 		if lamp.Flash {
 			onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
-			Black := common.Color{R: 0, G: 0, B: 0}
 			if debug {
 				fmt.Printf("FlashLamp Y:%d X:%d\n", sequence.Number, myFixtureNumber)
 			}
-			common.FlashLight(common.Button{X: myFixtureNumber, Y: sequence.Number}, onColor, Black, eventsForLauchpad, guiButtons)
+			common.FlashLight(common.Button{X: myFixtureNumber, Y: sequence.Number}, onColor, common.Black, eventsForLauchpad, guiButtons)
 		} else {
 			if debug {
 				fmt.Printf("LightLamp Y:%d X:%d\n", sequence.Number, myFixtureNumber)
