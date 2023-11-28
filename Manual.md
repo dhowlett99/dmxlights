@@ -238,7 +238,7 @@ The Function keys light up Magenta. Functions are labeled from the left.
 |-|-|-|
 | 1 |Patten Selection | Selects Sequence Patten|
 | 2 | Auto Color | Makes the sequence select a color automatically|Auto Patten |
-|3 | Auto Pattern | Makes the sequence select a patten automatically |
+| 3 | Auto Pattern | Makes the sequence select a patten automatically |
 | 4 |Bounce|Will make the sequence bounce. Sequence auto reverses. |
 | 5 | Chase Color Selection|  Set RGB chase colors|
 | 6 | Static Color Selection | Set static color |

@@ -297,10 +297,10 @@ func (panel *MyPanel) PopupNotFoundMessage(myWindow fyne.Window, dmxInterface De
 	modal = widget.NewModalPopUp(
 		container.NewVBox(
 			title,
-			container.NewHBox(dmxName, dmxStatus),
-			container.NewHBox(launchpadName, launchpadStatus),
+			container.NewHBox(dmxName, layout.NewSpacer(), dmxStatus),
+			container.NewHBox(launchpadName, layout.NewSpacer(), launchpadStatus),
 			widget.NewLabel(""),
-			container.NewHBox(layout.NewSpacer(), button),
+			container.NewHBox(layout.NewSpacer(), layout.NewSpacer(), button),
 		),
 		myWindow.Canvas(),
 	)
