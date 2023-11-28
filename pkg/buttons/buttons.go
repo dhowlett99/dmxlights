@@ -2087,17 +2087,6 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		}
 	}
 }
-func AllRGBFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
-	for x := 0; x < 8; x++ {
-		for sequenceNumber := 0; sequenceNumber < len(sequences); sequenceNumber++ {
-			if sequences[sequenceNumber].Type == "rgb" && sequences[sequenceNumber].Label != "chaser" {
-				common.LightLamp(common.Button{X: x, Y: sequenceNumber}, common.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-				fixture.MapFixtures(false, false, sequenceNumber, x, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
-				common.LabelButton(x, sequenceNumber, "", guiButtons)
-			}
-		}
-	}
-}
 
 func SetRGBColorPicker(selectedColor common.Color, targetSequence common.Sequence) []common.Color {
 

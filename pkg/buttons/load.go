@@ -39,8 +39,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	//AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-
 	// Load the config.
 	// Which forces all sequences to load their config.
 	config.AskToLoadConfig(commandChannels, X, Y)
