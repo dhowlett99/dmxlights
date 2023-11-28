@@ -232,7 +232,7 @@ A RGB sequence will start with a green chase from left  to right. You can config
 ## RGB Functions 
 
 To access RGB functions press the select button for this sequence twice.
-The Function keys light up pink. Functions are labeled from the left.
+The Function keys light up Magenta. Functions are labeled from the left.
 
 |Number | Function | Description |
 |-|-|-|

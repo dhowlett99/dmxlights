@@ -162,7 +162,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
 							// Update status bar.
-							common.LightLamp(common.Button{X: 0, Y: -1}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+							common.LightLamp(common.Button{X: 0, Y: -1}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:

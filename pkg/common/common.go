@@ -1001,7 +1001,7 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 	}
 	// Storage for the rgb labels on the top row.
 	var guiTopRGBButtons [8]topButton
-	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Pink}
+	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Magenta}
 	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Red}
 	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Green}
 	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Blue}
@@ -1114,7 +1114,7 @@ func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiBut
 
 func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
-		FlashLight(STROBE_BUTTON, White, Pink, eventsForLaunchpad, guiButtons)
+		FlashLight(STROBE_BUTTON, White, Magenta, eventsForLaunchpad, guiButtons)
 		return
 	}
 	LightLamp(STROBE_BUTTON, White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
@@ -1478,7 +1478,7 @@ func newColorPicker() []ColorPicker {
 		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: ForestGreen},
 		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Aqua},
 		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: SkyBlue},
-		{ID: 14, X: 6, Y: 1, Name: "DarkPurple", Code: 0x32, Color: DarkPurple},
+		{ID: 14, X: 6, Y: 1, Name: "Dark Purple", Code: 0x32, Color: DarkPurple},
 		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Pink},
 
 		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Salmon},

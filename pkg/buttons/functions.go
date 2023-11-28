@@ -41,8 +41,8 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 		if !function.State && this.SelectMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
 			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
-		if function.State { // Pink
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		if function.State { // Magenta
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
 	}

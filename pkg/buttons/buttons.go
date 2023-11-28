@@ -583,7 +583,7 @@ func ProcessButtons(X int, Y int,
 			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		}
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
-		common.FlashLight(common.SAVE_BUTTON, common.Pink, common.White, eventsForLaunchpad, guiButtons)
+		common.FlashLight(common.SAVE_BUTTON, common.Magenta, common.White, eventsForLaunchpad, guiButtons)
 
 		return
 	}
@@ -2045,7 +2045,7 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToAllSequence(cmd, commandChannels)
 			common.LightLamp(common.Button{X: X, Y: Y}, common.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.FlashLight(common.BLACKOUT_BUTTON, common.Pink, common.White, eventsForLaunchpad, guiButtons)
+			common.FlashLight(common.BLACKOUT_BUTTON, common.Magenta, common.White, eventsForLaunchpad, guiButtons)
 		} else {
 			this.Blackout = false
 			cmd := common.Command{
@@ -2150,9 +2150,9 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 			for _, sequenceColor := range targetSequence.CurrentColors {
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
-						//if debug {
-						fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
-						//}
+						if debug {
+							fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+						}
 						lamp.Flash = true
 					}
 				}
@@ -2424,7 +2424,7 @@ func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft
 	this.LastSelectedSequence = this.SelectedSequence
 
 	// Flash the flood button pink to indicate we're in flood.
-	common.FlashLight(common.FLOOD_BUTTON, common.Pink, common.White, eventsForLaunchpad, guiButtons)
+	common.FlashLight(common.FLOOD_BUTTON, common.Magenta, common.White, eventsForLaunchpad, guiButtons)
 
 	// Start flood.
 	cmd := common.Command{
@@ -2540,10 +2540,10 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY) {
 		// If we are in shutter chaser mode, light the lamp yellow.
-		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 	} else {
 		// Now turn pink the selected sequence select light.
-		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Pink, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 	}
 
 }
