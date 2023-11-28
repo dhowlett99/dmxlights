@@ -647,7 +647,7 @@ func GetColorButtonsArray(color int) Color {
 	case 6:
 		return Purple
 	case 7:
-		return Pink
+		return Magenta
 	case 8:
 		return White
 	case 9:
@@ -667,7 +667,7 @@ func GetColorButtonsArray(color int) Color {
 	case 16:
 		return Purple
 	case 17:
-		return Pink
+		return Magenta
 	case 18:
 		return White
 	case 19:
@@ -687,7 +687,7 @@ func GetColorButtonsArray(color int) Color {
 	case 26:
 		return Purple
 	case 27:
-		return Pink
+		return Magenta
 	case 28:
 		return White
 	case 29:
@@ -707,7 +707,7 @@ func GetColorButtonsArray(color int) Color {
 	case 36:
 		return Purple
 	case 37:
-		return Pink
+		return Magenta
 	case 38:
 		return White
 	case 39:
@@ -727,7 +727,7 @@ func GetColorButtonsArray(color int) Color {
 	case 46:
 		return Purple
 	case 47:
-		return Pink
+		return Magenta
 	case 48:
 		return White
 	case 49:
@@ -747,7 +747,7 @@ func GetColorButtonsArray(color int) Color {
 	case 56:
 		return Purple
 	case 57:
-		return Pink
+		return Magenta
 	case 58:
 		return White
 	case 59:
@@ -767,7 +767,7 @@ func GetColorButtonsArray(color int) Color {
 	case 66:
 		return Purple
 	case 67:
-		return Pink
+		return Magenta
 	case 68:
 		return White
 	case 69:
