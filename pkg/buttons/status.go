@@ -302,31 +302,31 @@ func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures 
 
 		// Enabled but not inverted then On and green.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "On", guiButtons)
 		}
 
 		// Enabled and inverted then Invert and puple. Not reversed
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && !this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 255, Green: 0, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Purple, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Invert", guiButtons)
 		}
 
 		// Enabled not inverted but revesed then reverse and yellow.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Reversed", guiButtons)
 		}
 
 		// Enabled  inverted and revesed then reverse and white.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Invert & Reversed", guiButtons)
 		}
 
 		// Not enabled and not inverted then off and blue.
 		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled {
-			common.LightLamp(common.ALight{X: fixtureNumber, Y: sequenceNumber, Brightness: this.MasterBrightness, Red: 255, Green: 0, Blue: 0}, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Red, this.MasterBrightness, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Off", guiButtons)
 		}
 

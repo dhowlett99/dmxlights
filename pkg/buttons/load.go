@@ -39,8 +39,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	//AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, dmxInterfacePresent)
-
 	// Load the config.
 	// Which forces all sequences to load their config.
 	config.AskToLoadConfig(commandChannels, X, Y)
@@ -65,7 +63,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Turn off the local copy of the this.Flood flag.
 	this.Flood = false
 	// And stop the flood button flashing.
-	common.LightLamp(common.ALight{X: 8, Y: 3, Brightness: common.MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.FLOOD_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Remember we selected this preset
 	last := fmt.Sprint(X) + "," + fmt.Sprint(Y)

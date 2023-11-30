@@ -110,26 +110,26 @@ func (panel *MyPanel) ListenAndSendToGUI(guiButtons chan common.ALight, GuiFlash
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
 
 	// Check for requests outside buttons avaialable.
-	if alight.X == -1 { // Addressing the top row.
+	if alight.Button.X == -1 { // Addressing the top row.
 		fmt.Printf("UpdateButtonColor: error X is -1\n")
 		return
 	}
-	if alight.Y == -1 { // Addressing the top row.
+	if alight.Button.Y == -1 { // Addressing the top row.
 		fmt.Printf("UpdateButtonColor: error Y is -1\n")
 		return
 	}
-	if alight.X > 8 {
+	if alight.Button.X > 8 {
 		fmt.Printf("UpdateButtonColor: error X is > 8 \n")
 		return
 	}
-	if alight.Y > 8 {
+	if alight.Button.Y > 8 {
 		fmt.Printf("UpdateButtonColor: error Y is > 8 \n")
 		return
 	}
 
 	// Shortcut to label a button.
 	if alight.UpdateLabel {
-		panel.UpdateButtonLabel(alight.X, alight.Y, alight.Label)
+		panel.UpdateButtonLabel(alight.Button.X, alight.Button.Y, alight.Label)
 		return
 	}
 
@@ -145,9 +145,9 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		// If the GuiFlashButtons array has a true value for this button,
 		// Then there must be a thread flashing the lamp right now.
 		// So we can assume its listening for a stop command.
-		if GuiFlashButtons[alight.X][alight.Y].Flash {
-			GuiFlashButtons[alight.X][alight.Y].FlashStopChannel <- true
-			GuiFlashButtons[alight.X][alight.Y].Flash = false
+		if GuiFlashButtons[alight.Button.X][alight.Button.Y].Flash {
+			GuiFlashButtons[alight.Button.X][alight.Button.Y].FlashStopChannel <- true
+			GuiFlashButtons[alight.Button.X][alight.Button.Y].Flash = false
 		}
 
 		// Take into account the brightness.
@@ -161,42 +161,42 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		color.B = uint8(Blue)
 		color.A = 255
 
-		panel.Buttons[alight.X][alight.Y].rectangle.FillColor = color
-		panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
+		panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = color
+		panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
 	} else {
 
 		// Stop any existing flashing.
-		if GuiFlashButtons[alight.X][alight.Y].Flash {
-			GuiFlashButtons[alight.X][alight.Y].FlashStopChannel <- true
-			GuiFlashButtons[alight.X][alight.Y].Flash = false
+		if GuiFlashButtons[alight.Button.X][alight.Button.Y].Flash {
+			GuiFlashButtons[alight.Button.X][alight.Button.Y].FlashStopChannel <- true
+			GuiFlashButtons[alight.Button.X][alight.Button.Y].Flash = false
 		}
 
 		// Let everyone know that we're flashing.
-		GuiFlashButtons[alight.X][alight.Y].Flash = true
+		GuiFlashButtons[alight.Button.X][alight.Button.Y].Flash = true
 
 		// We create a thread to flash the button.
 		go func() {
 			for {
 				// Turn on.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OnColor)
-				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OnColor)
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
-				case <-GuiFlashButtons[alight.X][alight.Y].FlashStopChannel:
+				case <-GuiFlashButtons[alight.Button.X][alight.Button.Y].FlashStopChannel:
 					return
 				case <-time.After(250 * time.Millisecond):
 				}
 
 				// Turn off.
 				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.X][alight.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OffColor)
-				panel.Buttons[alight.X][alight.Y].rectangle.Refresh()
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OffColor)
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
 				select {
-				case <-GuiFlashButtons[alight.X][alight.Y].FlashStopChannel:
+				case <-GuiFlashButtons[alight.Button.X][alight.Button.Y].FlashStopChannel:
 					return
 				case <-time.After(250 * time.Millisecond):
 				}
@@ -297,10 +297,10 @@ func (panel *MyPanel) PopupNotFoundMessage(myWindow fyne.Window, dmxInterface De
 	modal = widget.NewModalPopUp(
 		container.NewVBox(
 			title,
-			container.NewHBox(dmxName, dmxStatus),
-			container.NewHBox(launchpadName, launchpadStatus),
+			container.NewHBox(dmxName, layout.NewSpacer(), dmxStatus),
+			container.NewHBox(launchpadName, layout.NewSpacer(), launchpadStatus),
 			widget.NewLabel(""),
-			container.NewHBox(layout.NewSpacer(), button),
+			container.NewHBox(layout.NewSpacer(), layout.NewSpacer(), button),
 		),
 		myWindow.Canvas(),
 	)

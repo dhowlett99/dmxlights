@@ -45,27 +45,27 @@ func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common
 					// Selected.
 					if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor == "" {
 						// There's no color defined so flash red & yellow.
-						common.FlashLight(x, y, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
+						common.FlashLight(common.Button{X: x, Y: y}, common.Red, common.PresetYellow, eventsForLauchpad, guiButtons)
 					} else {
 						// There is a color in the presets datatbase so set the color
 						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
-						common.FlashLight(x, y, color, common.PresetYellow, eventsForLauchpad, guiButtons)
+						common.FlashLight(common.Button{X: x, Y: y}, color, common.PresetYellow, eventsForLauchpad, guiButtons)
 					}
 				} else {
 					// Not Selected and there's no button color defined so just light the lamp red.
 					if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor == "" {
 						color := common.Red
-						common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+						common.LightLamp(common.Button{X: x, Y: y}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 
 					} else {
 						// We're not selected and there is a button color specified so set that color.
 						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
-						common.LightLamp(common.ALight{X: x, Y: y, Flash: false, Red: color.R, Green: color.G, Blue: color.B, Brightness: 255}, eventsForLauchpad, guiButtons)
+						common.LightLamp(common.Button{X: x, Y: y}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 					}
 				}
 			} else {
 				// Unused preset is set to yellow.
-				common.LightLamp(common.ALight{X: x, Y: y, Red: 150, Green: 150, Blue: 0, Brightness: 255}, eventsForLauchpad, guiButtons)
+				common.LightLamp(common.Button{X: x, Y: y}, common.PresetYellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			}
 			common.LabelButton(x, y, presets[fmt.Sprint(x)+","+fmt.Sprint(y)].Label, guiButtons)
 		}

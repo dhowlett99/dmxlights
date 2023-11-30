@@ -65,9 +65,22 @@ const IS_RGB = false
 var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 var GlobalScannerSequenceNumber int
 
+var FLOOD_BUTTON = Button{X: 8, Y: 3}
+var SAVE_BUTTON = Button{X: 8, Y: 4}
+var RUNNING_BUTTON = Button{X: 8, Y: 5}
+var STROBE_BUTTON = Button{X: 8, Y: 6}
+var BLACKOUT_BUTTON = Button{X: 8, Y: 7}
+
+var RED_BUTTON = Button{X: 1, Y: -1}
+var GREEN_BUTTON = Button{X: 2, Y: -1}
+var BLUE_BUTTON = Button{X: 3, Y: -1}
+
+type Button struct {
+	X int
+	Y int
+}
 type ALight struct {
-	X                int
-	Y                int
+	Button           Button
 	Brightness       int
 	Red              int
 	Green            int
@@ -281,14 +294,34 @@ const (
 // 13 fade up values, 13 on values and 13 off values.
 const StepSize = 39
 
-var Pink = Color{R: 255, G: 0, B: 255}
-var White = Color{R: 255, G: 255, B: 255}
 var Black = Color{R: 0, G: 0, B: 0}
 var Red = Color{R: 255, G: 0, B: 0}
 var Green = Color{R: 0, G: 255, B: 0}
 var Blue = Color{R: 0, G: 0, B: 255}
 var PresetYellow = Color{R: 150, G: 150, B: 0}
 var Cyan = Color{R: 0, G: 255, B: 255}
+var Yellow = Color{R: 255, G: 255, B: 0}
+var Orange = Color{R: 255, G: 111, B: 0}
+var Magenta = Color{R: 255, G: 0, B: 255}
+
+var Crimson = Color{R: 220, G: 20, B: 60}
+var DarkOrange = Color{R: 215, G: 50, B: 0}
+var Gold = Color{R: 255, G: 215, B: 0}
+var ForestGreen = Color{R: 0, G: 100, B: 0}
+var Aqua = Color{R: 127, G: 255, B: 212}
+var SkyBlue = Color{R: 0, G: 191, B: 255}
+var Purple = Color{R: 100, G: 0, B: 255}
+var DarkPurple = Color{R: 50, G: 0, B: 255}
+
+var Pink = Color{R: 255, G: 192, B: 203}
+var Salmon = Color{R: 250, G: 128, B: 114}
+var LightOrange = Color{R: 255, G: 175, B: 0}
+var Olive = Color{R: 150, G: 150, B: 0}
+var LawnGreen = Color{R: 124, G: 252, B: 0}
+var Teal = Color{R: 0, G: 128, B: 128}
+var LightBlue = Color{R: 100, G: 185, B: 255}
+var Violet = Color{R: 199, G: 21, B: 133}
+var White = Color{R: 255, G: 255, B: 255}
 var EmptyColor = Color{}
 
 type Gobo struct {
@@ -600,145 +633,145 @@ func GetColorButtonsArray(color int) Color {
 
 	switch color {
 	case 0:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 1:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 2:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 3:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 4:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 5:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 6:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 7:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 8:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 9:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 10:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 11:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 12:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 13:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 14:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 15:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 16:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 17:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 18:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 19:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 20:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 21:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 22:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 23:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 24:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 25:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 26:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 27:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 28:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 29:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 30:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 31:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 32:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 33:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 34:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 35:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 36:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 37:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 38:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 39:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 40:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 41:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 42:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 43:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 44:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 45:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 46:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 47:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 48:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 49:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 50:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 51:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 52:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 53:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 54:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 55:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 56:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 57:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 58:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 59:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	case 60:
-		return Color{R: 255, G: 0, B: 0} // Red
+		return Red
 	case 61:
-		return Color{R: 255, G: 111, B: 0} // Orange
+		return Orange
 	case 62:
-		return Color{R: 255, G: 255, B: 0} // Yellow
+		return Yellow
 	case 63:
-		return Color{R: 0, G: 255, B: 0} // Green
+		return Green
 	case 64:
-		return Color{R: 0, G: 255, B: 255} // Cyan
+		return Cyan
 	case 65:
-		return Color{R: 0, G: 0, B: 255} // Blue
+		return Blue
 	case 66:
-		return Color{R: 100, G: 0, B: 255} // Purple
+		return Purple
 	case 67:
-		return Color{R: 255, G: 0, B: 255} // Pink
+		return Magenta
 	case 68:
-		return Color{R: 255, G: 255, B: 255} // White
+		return White
 	case 69:
-		return Color{R: 0, G: 0, B: 0} // Black
+		return Black
 	}
 	return Color{}
 }
@@ -773,94 +806,65 @@ func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
 func GetRGBColorByName(color string) (Color, error) {
 	switch color {
 	case "Red":
-		return Color{R: 255, G: 0, B: 0}, nil
+		return Red, nil
 
 	case "Orange":
-		return Color{R: 255, G: 111, B: 0}, nil
+		return Orange, nil
 
 	case "Yellow":
-		return Color{R: 255, G: 255, B: 0}, nil
+		return Yellow, nil
 
 	case "Green":
-		return Color{R: 0, G: 255, B: 0}, nil
+		return Green, nil
 
 	case "Cyan":
-		return Color{R: 0, G: 255, B: 255}, nil
+		return Cyan, nil
 
 	case "Blue":
-		return Color{R: 0, G: 0, B: 255}, nil
+		return Blue, nil
 
 	case "Purple":
-		return Color{R: 100, G: 0, B: 255}, nil
+		return Purple, nil
 
 	case "Pink":
-		return Color{R: 255, G: 0, B: 255}, nil
+		return Pink, nil
 
 	case "White":
-		return Color{R: 255, G: 255, B: 255}, nil
+		return White, nil
 
 	case "Light Blue":
-		return Color{R: 0, G: 196, B: 255}, nil
+		return LightBlue, nil
 
 	case "Black":
-		return Color{R: 0, G: 0, B: 0}, nil
+		return Black, nil
 
 	}
 	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
 }
 
-func GetLaunchPadColorCodeByRGB(color Color) (code byte) {
-	switch color {
-	case Color{R: 0, G: 196, B: 255}:
-		return 0x25 // Light Blue
-	case Color{R: 255, G: 0, B: 0}:
-		return 0x48 // Red
-	case Color{R: 255, G: 111, B: 0}:
-		return 0x60 // Orange
-	case Color{R: 255, G: 255, B: 0}:
-		return 0x0d // Yellow
-	case Color{R: 0, G: 255, B: 0}:
-		return 0x15 // Green
-	case Color{R: 0, G: 255, B: 255}:
-		return 0x25 // Cyan
-	case Color{R: 0, G: 0, B: 255}:
-		return 0x4f // Blue
-	case Color{R: 100, G: 0, B: 255}:
-		return 0x51 // Purple
-	case Color{R: 255, G: 0, B: 255}:
-		return 0x34 // Pink
-	case Color{R: 255, G: 255, B: 255}:
-		return 0x03 // White
-	case Color{R: 0, G: 0, B: 0}:
-		return 0x00 // Black
-	}
-
-	return code
-}
-
 func GetColorNameByRGB(color Color) string {
 	switch color {
-	case Color{R: 0, G: 196, B: 255}:
+	case LightBlue:
 		return "Light Blue"
-	case Color{R: 255, G: 0, B: 0}:
+	case Red:
 		return "Red"
-	case Color{R: 255, G: 111, B: 0}:
+	case Orange:
 		return "Orange"
-	case Color{R: 255, G: 255, B: 0}:
+	case Yellow:
 		return "Yellow"
-	case Color{R: 0, G: 255, B: 0}:
+	case Green:
 		return "Green"
-	case Color{R: 0, G: 255, B: 255}:
+	case Cyan:
 		return "Cyan"
-	case Color{R: 0, G: 0, B: 255}:
+	case Blue:
 		return "Blue"
-	case Color{R: 100, G: 0, B: 255}:
+	case Purple:
 		return "Purple"
-	case Color{R: 255, G: 0, B: 255}:
+	case Pink:
 		return "Pink"
-	case Color{R: 255, G: 255, B: 255}:
+	case White:
 		return "White"
-	case Color{R: 0, G: 0, B: 0}:
+	case Black:
 		return "Black"
 	}
 
@@ -966,7 +970,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 		return
 	}
 	for x := 0; x < 8; x++ {
-		LightLamp(ALight{X: x, Y: selectedSequence, Brightness: MIN_DMX_BRIGHTNESS, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+		LightLamp(Button{X: x, Y: selectedSequence}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}
 }
@@ -974,7 +978,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	for y := 0; y < 8; y++ {
 		for x := 0; x < 8; x++ {
-			LightLamp(ALight{X: x, Y: y, Brightness: MIN_DMX_BRIGHTNESS, Red: 0, Green: 0, Blue: 0}, eventsForLauchpad, guiButtons)
+			LightLamp(Button{X: x, Y: y}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			LabelButton(x, y, "", guiButtons)
 		}
 	}
@@ -997,7 +1001,7 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 	}
 	// Storage for the rgb labels on the top row.
 	var guiTopRGBButtons [8]topButton
-	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Pink}
+	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Magenta}
 	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Red}
 	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Green}
 	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Blue}
@@ -1026,7 +1030,7 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LightLamp(Button{X: index, Y: TopRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			LabelButton(index, TopRow, button.Label, guiButtons)
 		}
 	}
@@ -1036,7 +1040,7 @@ func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan 
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: TopRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LightLamp(Button{X: index, Y: TopRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			LabelButton(index, TopRow, button.Label, guiButtons)
 		}
 	}
@@ -1084,7 +1088,7 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LightLamp(Button{X: index, Y: bottomRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
@@ -1094,7 +1098,7 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 			if debug {
 				fmt.Printf("button %+v\n", button)
 			}
-			LightLamp(ALight{X: index, Y: bottomRow, Brightness: 255, Red: button.Color.R, Green: button.Color.G, Blue: button.Color.B}, eventsForLauchpad, guiButtons)
+			LightLamp(Button{X: index, Y: bottomRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
@@ -1102,18 +1106,18 @@ func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons ch
 
 func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if runningState {
-		LightLamp(ALight{X: 8, Y: 5, Brightness: MAX_DMX_BRIGHTNESS, Red: 0, Green: 255, Blue: 0}, eventsForLaunchpad, guiButtons)
+		LightLamp(RUNNING_BUTTON, Green, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	} else {
-		LightLamp(ALight{X: 8, Y: 5, Brightness: MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+		LightLamp(RUNNING_BUTTON, White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	}
 }
 
 func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
-		FlashLight(8, 6, White, Pink, eventsForLaunchpad, guiButtons)
+		FlashLight(STROBE_BUTTON, White, Magenta, eventsForLaunchpad, guiButtons)
 		return
 	}
-	LightLamp(ALight{X: 8, Y: 6, Brightness: MAX_DMX_BRIGHTNESS, Red: 255, Green: 255, Blue: 255}, eventsForLaunchpad, guiButtons)
+	LightLamp(STROBE_BUTTON, White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 }
 
 func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
@@ -1123,44 +1127,42 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 	// Send message to GUI
 	event := ALight{
 		UpdateLabel: true,
-		X:           X,
-		Y:           Y + 1,
-		Label:       label,
+		Button: Button{
+			X: X,
+			Y: Y + 1,
+		},
+		Label: label,
 	}
 	guiButtons <- event
 }
 
 // LightOn Turn on a Light.
-func LightLamp(Light ALight, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func LightLamp(button Button, color Color, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
-		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", Light.X, Light.Y, Light.Red, Light.Green, Light.Blue, Light.Brightness)
+		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", button.X, button.Y, color.R, color.G, color.B, master)
 	}
 	// Send message to Novation Launchpad.
 	event := ALight{
-		X:          Light.X,
-		Y:          Light.Y,
-		Brightness: Light.Brightness,
-		Red:        Light.Red,
-		Green:      Light.Green,
-		Blue:       Light.Blue,
-		Flash:      Light.Flash,
-		OnColor:    Light.OnColor,
-		OffColor:   Light.OffColor,
+		Button:     button,
+		Brightness: master,
+		Red:        color.R,
+		Green:      color.G,
+		Blue:       color.B,
+		Flash:      false,
 	}
 	eventsForLauchpad <- event // Event will be received by pkg/launchpad/launchpad.go ListenAndSendToLaunchPad()
 
 	// Send message to fyne.io GUI.
 	event = ALight{
-		X:          Light.X,
-		Y:          Light.Y + 1,
-		Brightness: Light.Brightness,
-		Red:        Light.Red,
-		Green:      Light.Green,
-		Blue:       Light.Blue,
-		Flash:      Light.Flash,
-		OnColor:    Light.OnColor,
-		OffColor:   Light.OffColor,
-		Label:      Light.Label,
+		Button: Button{
+			X: button.X,
+			Y: button.Y + 1,
+		},
+		Brightness: master,
+		Red:        color.R,
+		Green:      color.G,
+		Blue:       color.B,
+		Flash:      false,
 	}
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
@@ -1198,12 +1200,11 @@ func UpdateBottomButtons(selectedType string, guiButtons chan ALight) {
 	}
 }
 
-func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func FlashLight(button Button, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{
-		X:          X,
-		Y:          Y,
+		Button:     button,
 		Brightness: 255,
 		Flash:      true,
 		OnColor:    onColor,
@@ -1213,8 +1214,7 @@ func FlashLight(X int, Y int, onColor Color, offColor Color, eventsForLauchpad c
 
 	// Send message to GUI
 	event := ALight{
-		X:          e.X,
-		Y:          e.Y + 1,
+		Button:     Button{X: button.X, Y: button.Y + 1},
 		Brightness: 255,
 		Flash:      true,
 		OnColor:    onColor,
@@ -1463,32 +1463,32 @@ func newColorPicker() []ColorPicker {
 
 	colors := []ColorPicker{
 
-		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Color{R: 255, G: 0, B: 0}},
-		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Color{R: 255, G: 100, B: 0}},
-		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Color{R: 255, G: 255, B: 0}},
-		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Color{R: 0, G: 255, B: 0}},
-		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Color{R: 0, G: 255, B: 255}},
-		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Color{R: 0, G: 0, B: 255}},
-		{ID: 14, X: 6, Y: 1, Name: "Purple", Code: 0x32, Color: Color{R: 50, G: 0, B: 100}},
-		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Color{R: 255, G: 0, B: 255}},
+		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Red},
+		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Orange},
+		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Yellow},
+		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Green},
+		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Cyan},
+		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Blue},
+		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x32, Color: Purple},
+		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Magenta},
 
-		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: Color{R: 220, G: 20, B: 60}},
-		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: Color{R: 215, G: 50, B: 0}},
-		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Color{R: 255, G: 215, B: 0}},
-		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: Color{R: 0, G: 100, B: 0}},
-		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Color{R: 127, G: 255, B: 212}},
-		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: Color{R: 0, G: 191, B: 255}},
-		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x51, Color: Color{R: 100, G: 0, B: 255}},
-		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Color{R: 255, G: 105, B: 180}},
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: Crimson},
+		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: DarkOrange},
+		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Gold},
+		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: ForestGreen},
+		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Aqua},
+		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: SkyBlue},
+		{ID: 14, X: 6, Y: 1, Name: "Dark Purple", Code: 0x32, Color: DarkPurple},
+		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Pink},
 
-		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Color{R: 250, G: 128, B: 114}},
-		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: Color{R: 255, G: 175, B: 0}},
-		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: Color{R: 150, G: 150, B: 0}},
-		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: Color{R: 124, G: 252, B: 0}},
-		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Color{R: 0, G: 128, B: 128}},
-		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: Color{R: 100, G: 185, B: 255}},
-		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: Color{R: 199, G: 21, B: 133}},
-		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: Color{R: 255, G: 255, B: 255}},
+		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Salmon},
+		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: LightOrange},
+		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: Olive},
+		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: LawnGreen},
+		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Teal},
+		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: LightBlue},
+		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: Violet},
+		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: White},
 	}
 
 	return colors

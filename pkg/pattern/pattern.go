@@ -423,7 +423,7 @@ func MakePatterns() map[int]common.Pattern {
 					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 0}},
 				},
 			},
-			{ // Step 8 - Pink
+			{ // Step 8 - Magenta
 				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 0}},
 					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 0}},
@@ -452,7 +452,7 @@ func MakePatterns() map[int]common.Pattern {
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 255, B: 255}}, // Cyan
 					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 				},
 			},
 			{
@@ -463,7 +463,7 @@ func MakePatterns() map[int]common.Pattern {
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 255, B: 255}}, // Cyan
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 				},
 			},
@@ -474,7 +474,7 @@ func MakePatterns() map[int]common.Pattern {
 					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 255, B: 255}}, // Cyan
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 				},
@@ -485,7 +485,7 @@ func MakePatterns() map[int]common.Pattern {
 					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 255, B: 255}}, // Cyan
 					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 					7: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 255, B: 0}}, // Yellow
@@ -496,7 +496,7 @@ func MakePatterns() map[int]common.Pattern {
 					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 255, B: 255}}, // Cyan
 					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 					6: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 255, B: 0}}, // Yellow
@@ -507,7 +507,7 @@ func MakePatterns() map[int]common.Pattern {
 				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 0, G: 0, B: 255}},   // Blue
 					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 					5: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 255, B: 0}}, // Yellow
@@ -518,7 +518,7 @@ func MakePatterns() map[int]common.Pattern {
 			{
 				Fixtures: map[int]common.Fixture{
 					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 100, G: 0, B: 255}}, // Purple
-					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 					4: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 255, B: 0}}, // Yellow
@@ -529,7 +529,7 @@ func MakePatterns() map[int]common.Pattern {
 			},
 			{
 				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Pink
+					0: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 255}}, // Magenta
 					1: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 0, B: 0}},   // Red
 					2: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 111, B: 0}}, // Orange
 					3: {MasterDimmer: full, Enabled: true, Color: common.Color{R: 255, G: 255, B: 0}}, // Yellow
