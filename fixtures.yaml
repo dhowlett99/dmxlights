@@ -500,7 +500,7 @@ fixtures:
   - number: 8
     name: Green3
   - number: 9
-    name: Green7
+    name: Blue3
   - number: 10
     name: Red4
   - number: 11
