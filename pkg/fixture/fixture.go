@@ -623,6 +623,13 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group == mySequenceNumber+1 {
 			for channelNumber, channel := range fixture.Channels {
+
+				// Right of the bat if we're blacked out, set the channel to 0 and our work here is done.
+				if blackout {
+					SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+					continue
+				}
+
 				// Match the fixture number unless there are mulitple sub fixtures.
 				if fixture.Number == displayFixture+1 || fixture.MultiFixtureDevice {
 					if !chaser {
@@ -692,39 +699,15 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 							}
 						}
 						if strings.Contains(channel.Name, "Strobe") {
-							if blackout {
-								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+							if strobe {
+								SetChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
 							} else {
-								if strobe {
-									SetChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
-								} else {
-									SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-								}
+								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 							}
 						}
 						// Master Dimmer.
 						if !hadShutterChase {
 							if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-								if blackout {
-									SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-								} else {
-									if strings.Contains(channel.Name, "reverse") ||
-										strings.Contains(channel.Name, "Reverse") ||
-										strings.Contains(channel.Name, "invert") ||
-										strings.Contains(channel.Name, "Invert") {
-										SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
-									} else {
-										SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
-									}
-								}
-							}
-						}
-					} else { // We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
-						// Master Dimmer.
-						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-							if blackout {
-								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-							} else {
 								if strings.Contains(channel.Name, "reverse") ||
 									strings.Contains(channel.Name, "Reverse") ||
 									strings.Contains(channel.Name, "invert") ||
@@ -733,6 +716,18 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 								} else {
 									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 								}
+							}
+						}
+					} else { // We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
+						// Master Dimmer.
+						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+							if strings.Contains(channel.Name, "reverse") ||
+								strings.Contains(channel.Name, "Reverse") ||
+								strings.Contains(channel.Name, "invert") ||
+								strings.Contains(channel.Name, "Invert") {
+								SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+							} else {
+								SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 							}
 						}
 						// Scanner Color
@@ -880,6 +875,7 @@ func MapSwitchFixture(swiTch common.Switch,
 				fmt.Printf("---> SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
+			return lastColor
 		}
 
 		// Play Actions which send messages to a dedicated mini sequencer.

@@ -267,6 +267,15 @@ func PlaySequence(sequence common.Sequence,
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 
+		// Soft fade downs should be disabled for blackout.
+		if sequence.Blackout {
+			command := common.FixtureCommand{
+				Type:      "lastColor",
+				LastColor: common.Black,
+			}
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+		}
+
 		// Clear all fixtures.
 		if sequence.Clear {
 			if debug {
@@ -274,6 +283,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
 				Type:           sequence.Type,
 				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
@@ -312,6 +323,7 @@ func PlaySequence(sequence common.Sequence,
 				// Now send a message to the fixture to play all the values for this state.
 				command := common.FixtureCommand{
 					Master:             sequence.Master,
+					Blackout:           sequence.Blackout,
 					Type:               sequence.Type,
 					Label:              sequence.Label,
 					SequenceNumber:     sequence.Number,
@@ -351,6 +363,7 @@ func PlaySequence(sequence common.Sequence,
 			// Now send a message to the fixture to play all the values for this state.
 			command := common.FixtureCommand{
 				Master:             sequence.Master,
+				Blackout:           sequence.Blackout,
 				Type:               sequence.Type,
 				Label:              sequence.Label,
 				SequenceNumber:     sequence.Number,
@@ -377,6 +390,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
 				Type:            sequence.Type,
 				Label:           sequence.Label,
 				SequenceNumber:  sequence.Number,
@@ -385,8 +400,6 @@ func PlaySequence(sequence common.Sequence,
 				StartFlood:      sequence.StartFlood,
 				StrobeSpeed:     sequence.StrobeSpeed,
 				Strobe:          sequence.Strobe,
-				Master:          sequence.Master,
-				Blackout:        sequence.Blackout,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -402,6 +415,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
 				Type:           sequence.Type,
 				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
@@ -446,16 +461,16 @@ func PlaySequence(sequence common.Sequence,
 					for _, fade := range fadeUpValues {
 						// Prepare a message to be sent to the fixtures in the sequence.
 						command := common.FixtureCommand{
+							Master:          fade,
+							Blackout:        sequence.Blackout,
 							Type:            sequence.Type,
 							Label:           sequence.Label,
 							SequenceNumber:  sequence.Number,
 							RGBStatic:       sequence.Static,
 							RGBStaticColors: sequence.StaticColors,
 							Hide:            sequence.Hide,
-							Master:          fade,
 							StrobeSpeed:     sequence.StrobeSpeed,
 							Strobe:          sequence.Strobe,
-							Blackout:        sequence.Blackout,
 						}
 
 						// Now tell all the fixtures what they need to do.
@@ -472,16 +487,16 @@ func PlaySequence(sequence common.Sequence,
 
 				// Prepare a message to be sent to the fixtures in the sequence.
 				command := common.FixtureCommand{
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
 					Type:            sequence.Type,
 					Label:           sequence.Label,
 					SequenceNumber:  sequence.Number,
 					RGBStatic:       sequence.Static,
 					RGBStaticColors: sequence.StaticColors,
 					Hide:            sequence.Hide,
-					Master:          sequence.Master,
 					StrobeSpeed:     sequence.StrobeSpeed,
 					Strobe:          sequence.Strobe,
-					Blackout:        sequence.Blackout,
 				}
 
 				// Now tell all the fixtures what they need to do.
@@ -505,6 +520,8 @@ func PlaySequence(sequence common.Sequence,
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:            sequence.Master,
+				Blackout:          sequence.Blackout,
 				Type:              sequence.Type,
 				Label:             sequence.Label,
 				SequenceNumber:    sequence.Number,
@@ -512,10 +529,8 @@ func PlaySequence(sequence common.Sequence,
 				RGBPlayStaticOnce: sequence.PlayStaticOnce,
 				RGBStaticColors:   sequence.StaticColors,
 				Hide:              sequence.Hide,
-				Master:            sequence.Master,
 				StrobeSpeed:       sequence.StrobeSpeed,
 				Strobe:            sequence.Strobe,
-				Blackout:          sequence.Blackout,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -788,6 +803,8 @@ func PlaySequence(sequence common.Sequence,
 						// Even if the fixture is disabled we still need to send this message to the fixture.
 						// beacuse the fixture is the one who is responsible for turning it off.
 						command := common.FixtureCommand{
+							Master:                   sequence.Master,
+							Blackout:                 sequence.Blackout,
 							Type:                     sequence.Type,
 							Label:                    sequence.Label,
 							SequenceNumber:           sequence.Number,
@@ -797,8 +814,6 @@ func PlaySequence(sequence common.Sequence,
 							StrobeSpeed:              sequence.StrobeSpeed,
 							Strobe:                   sequence.Strobe,
 							FadeSpeed:                sequence.Speed,
-							Master:                   sequence.Master,
-							Blackout:                 sequence.Blackout,
 							Hide:                     sequence.Hide,
 							RGBPosition:              RGBPositions[step],
 							StartFlood:               sequence.StartFlood,
