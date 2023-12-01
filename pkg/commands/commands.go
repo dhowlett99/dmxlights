@@ -26,7 +26,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = true
+const debug = false
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -339,8 +339,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.MusicTrigger = false
 		sequence.Run = false
-		sequence.Static = false
-		sequence.Clear = true
+		// sequence.Static = false
+		// sequence.Clear = true
 		return sequence
 
 	case common.PlayStaticOnce:

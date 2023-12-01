@@ -578,16 +578,18 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 
 	// Fade - Time taken to fade up and down.
 	switch action.Fade {
+	case "":
+		config.Fade = 10 // Sharp
 	case "Off":
-		config.Fade = 1
+		config.Fade = 10 // Sharp
 	case "Soft":
-		config.Fade = 1
+		config.Fade = 1 // Soft
 	case "Normal":
-		config.Fade = 5
+		config.Fade = 5 // Normal
 	case "Sharp":
-		config.Fade = 10
+		config.Fade = 10 // Sharp
 	default:
-		config.Fade = 1
+		config.Fade = 10 // Sharp
 	}
 
 	// Size - How long does the lamp stay on.
