@@ -235,12 +235,15 @@ func FixtureReceiver(
 	// Used for static fades, remember the last color.
 	var lastColor common.Color
 
+	stopFadeUp := make(chan bool)
+
 	// Outer loop wait for configuration.
 	for {
 
 		// Wait for first step
 		cmd := <-fixtureStepChannel
 
+		// Command for setting fixture copy of last color.
 		if cmd.Type == "lastColor" {
 			if debug {
 				fmt.Printf("Fixture:%d Command Set Last Color to %+v\n", myFixtureNumber, cmd.LastColor)
@@ -257,9 +260,15 @@ func FixtureReceiver(
 			continue
 		}
 
-		if cmd.Clear {
+		if cmd.Clear || cmd.Blackout {
 			if debug {
 				fmt.Printf("Fixture:%d Command Clear Fixture\n", myFixtureNumber)
+			}
+			// Stop any running fade ups.
+			select {
+			case stopFadeUp <- true:
+				fmt.Printf("Send Stop COmmand\n")
+			case <-time.After(100 * time.Millisecond):
 			}
 			turnOffFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 			continue
@@ -267,6 +276,8 @@ func FixtureReceiver(
 
 		// If we're a RGB fixture implement the flood and static features.
 		if cmd.Type == "rgb" {
+
+			// Start Flood.
 			if cmd.StartFlood && cmd.Label != "chaser" {
 				if debug {
 					fmt.Printf("Fixture:%d Set RGB Flood\n", myFixtureNumber)
@@ -284,6 +295,8 @@ func FixtureReceiver(
 				common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, lamp, cmd.Master, eventsForLauchpad, guiButtons)
 				continue
 			}
+
+			// Stop Flood.
 			if cmd.StopFlood && cmd.Label != "chaser" {
 				if debug {
 					fmt.Printf("Fixture:%d Set Stop RGB Flood\n", myFixtureNumber)
@@ -293,7 +306,39 @@ func FixtureReceiver(
 				continue
 			}
 
+			// Set Static Scene.
 			if cmd.RGBStatic {
+				if debug {
+					fmt.Printf("%d: Fixture:%d Trying to Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber)
+				}
+				if cmd.RGBStaticColors[myFixtureNumber].Enabled {
+
+					if debug {
+						fmt.Printf("%d: Fixture:%d Set RGB Static Color %+v\n", cmd.SequenceNumber, myFixtureNumber, cmd.RGBStaticColors[myFixtureNumber])
+					}
+
+					if cmd.SequenceNumber == 4 {
+						cmd.SequenceNumber = 2
+					}
+
+					sequence := common.Sequence{}
+					sequence.Type = cmd.Type
+
+					sequence.Number = cmd.SequenceNumber
+					sequence.Master = cmd.Master
+					sequence.Blackout = cmd.Blackout
+					sequence.Hide = cmd.Hide
+					sequence.StaticColors = cmd.RGBStaticColors
+					sequence.Static = cmd.RGBStatic
+					sequence.StrobeSpeed = cmd.StrobeSpeed
+					sequence.Strobe = cmd.Strobe
+
+					lightStaticFixture(sequence, myFixtureNumber, eventsForLauchpad, guiButtons, fixtures, true, dmxController, dmxInterfacePresent)
+					continue
+				}
+			}
+
+			if cmd.RGBFadeUpStatic {
 				if debug {
 					fmt.Printf("%d: Fixture:%d Trying to Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber)
 				}
@@ -309,6 +354,14 @@ func FixtureReceiver(
 					if cmd.SequenceNumber == 4 {
 						cmd.SequenceNumber = 2
 					}
+
+					// Stop any running fade ups.
+					select {
+					case stopFadeUp <- true:
+						fmt.Printf("Send Stop COmmand\n")
+					case <-time.After(100 * time.Millisecond):
+					}
+
 					sequence.Number = cmd.SequenceNumber
 					sequence.Master = cmd.Master
 					sequence.Blackout = cmd.Blackout
@@ -318,10 +371,11 @@ func FixtureReceiver(
 					sequence.StrobeSpeed = cmd.StrobeSpeed
 					sequence.Strobe = cmd.Strobe
 
-					lightStaticFixture(sequence, myFixtureNumber, dmxController, eventsForLauchpad, guiButtons, fixtures, true, dmxInterfacePresent)
+					lastColor = fadeUpStaticFixture(sequence, myFixtureNumber, stopFadeUp, eventsForLauchpad, guiButtons, fixtures, true, dmxController, dmxInterfacePresent)
 					continue
 				}
 			}
+
 			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce && cmd.Label != "chaser" {
 				if debug {
 					fmt.Printf("Fixture:%d Turn RGB Off\n", myFixtureNumber)
@@ -1069,7 +1123,56 @@ func reverse_dmx(n int) int {
 	return in[n]
 }
 
-func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, dmxController *ft232.DMXController, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxInterfacePresent bool) {
+func fadeUpStaticFixture(sequence common.Sequence, myFixtureNumber int, StopFadeUp chan bool, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.Color) {
+
+	if debug {
+		fmt.Printf("fadeUpStaticFixture seq %d fixture %d \n", sequence.Number, myFixtureNumber)
+	}
+
+	lamp := sequence.StaticColors[myFixtureNumber]
+
+	// Look for a matching color
+	color := common.GetColorNameByRGB(lamp.Color)
+
+	// Find a suitable gobo based on the requested static lamp color.
+	scannerGobo := FindGobo(myFixtureNumber, sequence.Number, color, fixturesConfig)
+	// Find a suitable color wheel settin based on the requested static lamp color.
+	scannerColor := FindColor(myFixtureNumber, sequence.Number, color, fixturesConfig)
+
+	// Now Fade up
+	go func() {
+		// Soft start
+		// Calulate the steps
+		fadeUpValues := common.GetFadeValues(64, float64(sequence.Master), 1, false)
+
+		for _, fade := range fadeUpValues {
+
+			// Listen for stop command.
+			select {
+			case <-StopFadeUp:
+				fmt.Printf("Receiced Stop Fade Command\n")
+				turnOffFixture(myFixtureNumber, sequence.Number, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+				return
+			case <-time.After(10 * time.Millisecond):
+			}
+
+			common.LightLamp(common.Button{X: myFixtureNumber, Y: sequence.Number}, lamp.Color, fade, eventsForLauchpad, guiButtons)
+
+			MapFixtures(false, false, sequence.Number, myFixtureNumber, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixturesConfig, sequence.Blackout, fade, sequence.Master, 0, sequence.Strobe, sequence.StrobeSpeed, dmxController, dmxInterfacePresent)
+			// Control how long the fade take with the speed control.
+			time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse12(sequence.Speed))))
+		}
+
+	}()
+
+	// Only play once, we don't want to flood the DMX universe with
+	// continual commands.
+	sequence.PlayStaticOnce = false
+
+	return lastColor
+}
+
+func lightStaticFixture(sequence common.Sequence, myFixtureNumber int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *Fixtures, enabled bool, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("lightStaticFixture seq %d fixture %d \n", sequence.Number, myFixtureNumber)

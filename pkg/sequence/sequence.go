@@ -440,6 +440,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			sequence.Static = true
+			sequence.PlayStaticOnce = false
+
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
@@ -450,41 +452,8 @@ func PlaySequence(sequence common.Sequence,
 				sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
 			}
 
-			go func() {
-
-				// Now Fade up
-				if sequence.StaticFadeOnce {
-					// Soft start
-					// Calulate the steps
-					fadeUpValues := common.GetFadeValues(32, float64(sequence.Master), sequence.RGBFade, false)
-
-					for _, fade := range fadeUpValues {
-						// Prepare a message to be sent to the fixtures in the sequence.
-						command := common.FixtureCommand{
-							Master:          fade,
-							Blackout:        sequence.Blackout,
-							Type:            sequence.Type,
-							Label:           sequence.Label,
-							SequenceNumber:  sequence.Number,
-							RGBStatic:       sequence.Static,
-							RGBStaticColors: sequence.StaticColors,
-							Hide:            sequence.Hide,
-							StrobeSpeed:     sequence.StrobeSpeed,
-							Strobe:          sequence.Strobe,
-						}
-
-						// Now tell all the fixtures what they need to do.
-						sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-
-						// Control how long the fade take with the speed control.
-						time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(sequence.Speed))))
-
-					}
-				}
-
-				// Done fading for this static scene only reset when we set a static scene again.
-				sequence.StaticFadeOnce = false
-
+			// Now send the Fade up command to the fixture.
+			if sequence.StaticFadeUpOnce {
 				// Prepare a message to be sent to the fixtures in the sequence.
 				command := common.FixtureCommand{
 					Master:          sequence.Master,
@@ -492,7 +461,8 @@ func PlaySequence(sequence common.Sequence,
 					Type:            sequence.Type,
 					Label:           sequence.Label,
 					SequenceNumber:  sequence.Number,
-					RGBStatic:       sequence.Static,
+					RGBStatic:       false,
+					RGBFadeUpStatic: true,
 					RGBStaticColors: sequence.StaticColors,
 					Hide:            sequence.Hide,
 					StrobeSpeed:     sequence.StrobeSpeed,
@@ -502,7 +472,27 @@ func PlaySequence(sequence common.Sequence,
 				// Now tell all the fixtures what they need to do.
 				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 
-			}()
+				// Done fading for this static scene only reset when we set a static scene again.
+				sequence.StaticFadeUpOnce = false
+			} else {
+				// else just play the static scene.
+				command := common.FixtureCommand{
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
+					Type:            sequence.Type,
+					Label:           sequence.Label,
+					SequenceNumber:  sequence.Number,
+					RGBStatic:       true,
+					RGBFadeUpStatic: false,
+					RGBStaticColors: sequence.StaticColors,
+					Hide:            sequence.Hide,
+					StrobeSpeed:     sequence.StrobeSpeed,
+					Strobe:          sequence.Strobe,
+				}
+
+				// Now tell all the fixtures what they need to do.
+				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			}
 
 			sequence.PlayStaticOnce = false
 

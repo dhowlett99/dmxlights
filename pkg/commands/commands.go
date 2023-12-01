@@ -26,7 +26,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-const debug = false
+const debug = true
 const beatDebug = false
 
 // listenCommandChannelAndWait listens on channel for instructions or timeout and go to next step of sequence.
@@ -433,7 +433,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)
 		}
 		// Normal is used to recover from blackout.
-		sequence.StaticFadeOnce = true
+		sequence.StaticFadeUpOnce = true
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.Blackout = false
@@ -454,7 +454,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
-		sequence.StaticFadeOnce = false
+		sequence.StaticFadeUpOnce = false
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Run = false
 		return sequence
@@ -468,7 +468,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for staticColor := range sequence.StaticColors {
 			sequence.StaticColors[staticColor].Flash = command.Args[STATIC_FLASH].Value.(bool)
 		}
-		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = true
 		sequence.Hide = command.Args[STATIC_HIDDEN].Value.(bool)
@@ -492,7 +492,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(common.Color)
 			sequence.StaticColors[fixture].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		}
-		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
@@ -510,7 +510,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 		}
-		sequence.StaticFadeOnce = false // We don't want to fade as we set colors.
+		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
 		sequence.PlayStaticOnce = true
 		sequence.Static = command.Args[STATIC].Value.(bool)
 		sequence.Hide = true
@@ -579,6 +579,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Populate the static colors for this sequence with the defaults.
 		sequence.StaticColors = common.SetDefaultStaticColorButtons(mySequenceNumber)
 		sequence.PlayStaticOnce = true
+		sequence.StaticFadeUpOnce = false
 		sequence.Static = true
 		sequence.Hide = false
 		return sequence
@@ -616,7 +617,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, command.Args[MASTER].Value)
 		}
-		sequence.StaticFadeOnce = false // Don't soft fade as we change the brightness.
+		sequence.StaticFadeUpOnce = false // Don't soft fade as we change the brightness.
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.FloodPlayOnce = true
@@ -827,7 +828,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence = seq
 				// Don't assume we're blacked out.
 				sequence.Blackout = false
-				sequence.StaticFadeOnce = true
+				sequence.StaticFadeUpOnce = true
 				sequence.PlayStaticOnce = true
 				sequence.PlaySwitchOnce = true
 				return sequence

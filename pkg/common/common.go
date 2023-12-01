@@ -385,7 +385,7 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
-	StaticFadeOnce              bool                        // Only Fade up once, used for don't fade during color config operations.
+	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
 	LastStatic                  bool                        // Last value of static before flood.
@@ -483,6 +483,7 @@ type FixtureCommand struct {
 	// RGB commands.
 	RGBPosition       Position
 	RGBStatic         bool
+	RGBFadeUpStatic   bool
 	RGBStaticColors   []StaticColorButton
 	RGBPlayStaticOnce bool
 
