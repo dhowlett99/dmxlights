@@ -1444,14 +1444,11 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// D I S A B L E  / E N A B L E   F I X T U R E  - Used to toggle the scanner state from on, inverted or off.
+	// D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S - Used to toggle the scanner state from on, inverted or off.
 	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
-		this.SelectMode[this.SelectedSequence] == STATUS &&
-		!this.Functions[this.SelectedSequence][common.Function1_Pattern].State &&
-		!this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		!this.Functions[this.SelectedSequence][common.Function5_Color].State {
+		this.SelectMode[this.SelectedSequence] == STATUS {
 
 		if debug {
 			fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)

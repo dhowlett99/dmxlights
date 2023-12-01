@@ -341,7 +341,7 @@ func FixtureReceiver(
 
 			if cmd.RGBFadeUpStatic {
 				if debug {
-					fmt.Printf("1:%d: Fixture:%d Trying to Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber)
+					fmt.Printf("1:%d: Fixture:%d State %t Trying to Set RGB Static\n", cmd.SequenceNumber, myFixtureNumber, cmd.RGBStaticColors[myFixtureNumber].Enabled)
 				}
 				if cmd.RGBStaticColors[myFixtureNumber].Enabled {
 
@@ -379,6 +379,9 @@ func FixtureReceiver(
 					sequence.RGBFade = cmd.FadeSpeed
 					fadeUpStaticFixture(sequence, myFixtureNumber, stopFadeUp, stopFadeDown, lastColor, eventsForLauchpad, guiButtons, fixtures, true, dmxController, dmxInterfacePresent, fixtureStepChannel)
 					continue
+				} else {
+					// This fixture is disabled, shut it off.
+					turnOffFixture(myFixtureNumber, cmd.SequenceNumber, common.EmptyColor, fixtures, dmxController, dmxInterfacePresent)
 				}
 			}
 
@@ -386,7 +389,7 @@ func FixtureReceiver(
 				if debug {
 					fmt.Printf("Fixture:%d Turn RGB Off\n", myFixtureNumber)
 				}
-				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, lastColor, fixtures, dmxController, dmxInterfacePresent)
+				turnOffFixture(myFixtureNumber, cmd.SequenceNumber, common.EmptyColor, fixtures, dmxController, dmxInterfacePresent)
 				common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, common.Black, cmd.Master, eventsForLauchpad, guiButtons)
 				continue
 			}

@@ -339,8 +339,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.MusicTrigger = false
 		sequence.Run = false
-		// sequence.Static = false
-		// sequence.Clear = true
+		sequence.Static = false
 		return sequence
 
 	case common.PlayStaticOnce:
