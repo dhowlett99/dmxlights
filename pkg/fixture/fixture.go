@@ -1152,8 +1152,8 @@ func fadeUpStaticFixture(sequence common.Sequence, myFixtureNumber int, StopFade
 	go func() {
 		// Soft start
 		// Calulate the steps
-		fadeUpValues := common.GetFadeValues(64, float64(sequence.Master), 1, false)
-		fadeDownValues := common.GetFadeValues(64, float64(sequence.Master), 1, true)
+		fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, false)
+		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
 
 		if lastColor != common.EmptyColor {
 			for _, fade := range fadeDownValues {
