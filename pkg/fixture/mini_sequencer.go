@@ -262,8 +262,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 		// Soft start
 		// Calulate the steps
-		fadeUpValues := common.GetFadeValues(64, float64(master), 1, false)
-		fadeDownValues := common.GetFadeValues(64, float64(master), 1, true)
+		fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, false)
+		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
 
 		// Now Fade up
 		go func(lastColor common.Color) {
