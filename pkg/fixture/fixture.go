@@ -76,6 +76,7 @@ type ActionConfig struct {
 	Name          string
 	Colors        []common.Color
 	Fade          int
+	NumberSteps   int
 	Size          int
 	Speed         time.Duration
 	TriggerState  bool

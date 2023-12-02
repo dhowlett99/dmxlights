@@ -396,7 +396,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			Bounce:               false,
 			ScannerChaser:        false,
 			RGBShift:             1,
-			RGBNumberStepsInFade: 32,
+			RGBNumberStepsInFade: cfg.NumberSteps,
 			RGBFade:              cfg.Fade,
 			RGBSize:              cfg.Size,
 		}
@@ -646,26 +646,32 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
 		config.MusicTrigger = false
+		config.NumberSteps = 64
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
+		config.NumberSteps = 64
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
+		config.NumberSteps = 64
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
+		config.NumberSteps = 64
 	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
+		config.NumberSteps = 32
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
+		config.NumberSteps = 32
 	}
 
 	switch action.Strobe {
