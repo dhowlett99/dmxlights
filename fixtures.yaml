@@ -828,11 +828,21 @@ fixtures:
   - number: 1
     name: Pan
     maxdegrees: 540
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "540"
   - number: 2
     name: FinePan
   - number: 3
     name: Tilt
     maxdegrees: 230
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "230"
   - number: 4
     name: FineTilt
   - number: 5
@@ -933,11 +943,21 @@ fixtures:
   - number: 1
     name: Pan
     maxdegrees: 540
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "540"
   - number: 2
     name: FinePan
   - number: 3
     name: Tilt
     maxdegrees: 230
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "230"
   - number: 4
     name: FineTilt
   - number: 5

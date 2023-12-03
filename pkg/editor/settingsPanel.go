@@ -20,6 +20,7 @@ package editor
 import (
 	"fmt"
 	"image/color"
+	"strconv"
 	"strings"
 
 	"fyne.io/fyne/v2"
@@ -33,6 +34,7 @@ import (
 type SettingsPanel struct {
 	SettingsPanel     *widget.Table
 	SettingsList      []fixture.Setting
+	SettingMaxDegrees *int
 	SettingsOptions   []string
 	ChannelOptions    []string
 	CurrentChannel    int
@@ -270,27 +272,37 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 							st.NameEntryError[row] = false
 						}
 
-						// Check the text entered.
-						err := checkDMXValue(settingValue)
-						if err != nil {
-							st.DMXValueEntryError[st.SettingsList[i.Row].Number] = true
-							st.SettingsPanel.Refresh()
-							popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Value Entry Error"
-							popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
-							popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
-							o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-							st.SettingsList[i.Row].Value = data[i.Row][i.Col]
-							popupErrorPanel.Show()
-							// Disable the save button.
-							buttonSave.Disable()
-
+						if newSetting.Name == "MaxDegrees" {
+							// We're adding a MaxDegrees setting to the channel.
+							// Populate MaxDegrees - If we are a channel name of Pan or Tilt and any of the settings contain the name MaxDegrees
+							// add the value to newChannel.MaxDegrees
+							maxDegrees, _ := strconv.Atoi(newSetting.Value)
+							st.SettingMaxDegrees = &maxDegrees
+							st.UpdateSettings = true
+							st.UpdateThisChannel = st.CurrentChannel - 1
 						} else {
-							st.DMXValueEntryError[st.SettingsList[i.Row].Number] = false
-							// And make sure we refresh every row, when we update this field.
-							// So all the red error rectangls will disappear
-							st.SettingsPanel.Refresh()
-							// Enable the save button.
-							buttonSave.Enable()
+							// Check the text entered.
+							err := checkDMXValue(settingValue)
+							if err != nil {
+								st.DMXValueEntryError[st.SettingsList[i.Row].Number] = true
+								st.SettingsPanel.Refresh()
+								popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Value Entry Error"
+								popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = err.Error()
+								popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = strings.Join(reports, "\n")
+								o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+								st.SettingsList[i.Row].Value = data[i.Row][i.Col]
+								popupErrorPanel.Show()
+								// Disable the save button.
+								buttonSave.Disable()
+
+							} else {
+								st.DMXValueEntryError[st.SettingsList[i.Row].Number] = false
+								// And make sure we refresh every row, when we update this field.
+								// So all the red error rectangls will disappear
+								st.SettingsPanel.Refresh()
+								// Enable the save button.
+								buttonSave.Enable()
+							}
 						}
 					}
 				}
@@ -399,7 +411,6 @@ func addSettingsItem(items []fixture.Setting, number int, options []string) (out
 		newItems = append(newItems, item)
 		// Append an item at the very end.
 		if no == len(items)-1 && !added {
-			fmt.Printf("Append an item at the very end. \n")
 			newItems = append(newItems, newItem)
 			added = true
 		}

@@ -70,6 +70,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					st.UpdateThisChannel = 0
 				}
 				cp.ChannelList[st.UpdateThisChannel].Settings = st.SettingsList
+				cp.ChannelList[st.UpdateThisChannel].MaxDegrees = st.SettingMaxDegrees
 				st.UpdateSettings = false
 			}
 			height := len(data)
@@ -102,7 +103,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			)
 		},
 
-		// Function to update item in this table.
+		// Function to update items in this table.
 		func(i widget.TableCellID, o fyne.CanvasObject) {
 
 			// Hide all field types.
@@ -284,6 +285,7 @@ func deleteChannelItem(channelList []fixture.Channel, id int16) (outItems []fixt
 		outItems = append(outItems, indexedItem)
 	}
 
+	// If we have no items create a default one.
 	if len(outItems) == 0 {
 		// Create a default Channel
 		newItem := fixture.Channel{}
