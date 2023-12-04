@@ -349,6 +349,29 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			return
 		}
 
+		// If the last color isn't empty, fade down last color before starting chase.
+		if lastColor != common.EmptyColor {
+			if debug {
+				fmt.Printf("Action Chase STARTUP: fade down to black from %+v\n", lastColor)
+			}
+			fadeDownValues := common.GetFadeValues(64, float64(master), 1, true)
+			for _, fade := range fadeDownValues {
+				// Listen for stop command.
+				select {
+				case <-switchChannels[swiTch.Number].StopFadeDown:
+					return
+				case <-time.After(10 * time.Millisecond):
+				}
+				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor, fade, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, mySequenceNumber, myFixtureNumber, lastColor, 0, 0, 0, cfg.RotateSpeed, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+				// Control how long the fade take with the speed control.
+				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
+			}
+			state := swiTch.States[0]
+			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
+		}
+
 		// Remember that we have started this mini sequencer.
 		setSwitchState(swiTch, true, blackout, master)
 

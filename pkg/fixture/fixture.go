@@ -272,7 +272,7 @@ func FixtureReceiver(
 				fmt.Printf("Send Stop COmmand\n")
 			case <-time.After(100 * time.Millisecond):
 			}
-			turnOffFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
+			lastColor = turnOffFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
 			continue
 		}
 
@@ -377,6 +377,7 @@ func FixtureReceiver(
 					sequence.StrobeSpeed = cmd.StrobeSpeed
 					sequence.Strobe = cmd.Strobe
 					sequence.RGBFade = cmd.FadeSpeed
+					// fadeUpStaticFixture doesn't set lastColor directley, instead it sets the final fade color (lastColor) by sending a message to this thread.
 					fadeUpStaticFixture(sequence, myFixtureNumber, stopFadeUp, stopFadeDown, lastColor, eventsForLauchpad, guiButtons, fixtures, true, dmxController, dmxInterfacePresent, fixtureStepChannel)
 					continue
 				} else {
