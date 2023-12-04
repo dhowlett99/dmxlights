@@ -118,6 +118,7 @@ type ColorPicker struct {
 
 // Used in calculating Positions.
 type FixtureBuffer struct {
+	BaseColor    Color
 	Color        Color
 	MasterDimmer int
 	Brightness   int
@@ -528,6 +529,7 @@ type Fixture struct {
 	MasterDimmer int
 	Brightness   int
 	ScannerColor Color
+	BaseColor    Color
 	Color        Color
 	Pan          int
 	Tilt         int

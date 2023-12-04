@@ -419,9 +419,10 @@ func FixtureReceiver(
 					// and these generally don't have any RGB color channels that can be controlled with brightness.
 					// So the only way to make the lamp in the scanner change intensity is to vary the master brightness channel.
 
-					// Lookup chaser lamp color based on the request fixture color.
+					// Lookup chaser lamp color based on the requested fixture base color.
+					// We can't use the faded color as its impossibe to lookup the base color from a faded color.
 					// GetColorNameByRGB will return white if the color is not found.
-					color := common.GetColorNameByRGB(fixture.Color)
+					color := common.GetColorNameByRGB(fixture.BaseColor)
 
 					// Find a suitable gobo based on the requested chaser lamp color.
 					scannerGobo := FindGobo(myFixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
