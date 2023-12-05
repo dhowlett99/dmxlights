@@ -42,7 +42,7 @@ import (
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
-	debug := true
+	debug := false
 
 	// Setup sequence numbers.
 	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
@@ -191,7 +191,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	// Clear the buttons.
 	common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
@@ -228,9 +228,21 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if this.SequenceType[sequenceNumber] == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-		// Force the reveal the selected sequence.
-		common.HideSequence(sequenceNumber, commandChannels)
-		common.RevealSequence(sequenceNumber, commandChannels)
+
+		// If we are the scanner sequence take into account the state of
+		// the static flag in the shutter chaser. We don't want to shut off the scanners
+		// if we're in the middle of a static scene.
+		if this.ScannerSequenceNumber == sequenceNumber {
+			if !this.Static[this.ChaserSequenceNumber] {
+				// Force the reveal the selected sequence.
+				common.HideSequence(sequenceNumber, commandChannels)
+				common.RevealSequence(sequenceNumber, commandChannels)
+			}
+		} else {
+			// Force the reveal the selected sequence.
+			common.HideSequence(sequenceNumber, commandChannels)
+			common.RevealSequence(sequenceNumber, commandChannels)
+		}
 
 		return
 

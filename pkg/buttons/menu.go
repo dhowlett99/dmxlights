@@ -6,7 +6,9 @@ import "fmt"
 // Wraps if your at the end.
 func getNextMenuItem(currentMode int, chaser bool, staticColorMode bool) int {
 
-	fmt.Printf("------->getNextMenuItem current Mode %s chaser %t static %t\n", printMode(currentMode), chaser, staticColorMode)
+	if debug {
+		fmt.Printf("------->getNextMenuItem current Mode %s chaser %t static %t\n", printMode(currentMode), chaser, staticColorMode)
+	}
 
 	menuOrder := []int{NORMAL, NORMAL_STATIC, FUNCTION, CHASER_DISPLAY, CHASER_DISPLAY_STATIC, CHASER_FUNCTION, STATUS}
 

@@ -87,28 +87,28 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fade ups.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -133,7 +133,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
 			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
 		} else {
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		}
 
 		return
@@ -161,32 +161,32 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+		turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
@@ -230,28 +230,28 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -331,14 +331,14 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -389,7 +389,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Turn off the fixture.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -409,7 +409,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			turnOffFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
+			turnOffSingleFixture(myFixtureNumber, mySequenceNumber, lastColor, fixturesConfig, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 

@@ -468,6 +468,7 @@ func PlaySequence(sequence common.Sequence,
 					Hide:            sequence.Hide,
 					StrobeSpeed:     sequence.StrobeSpeed,
 					Strobe:          sequence.Strobe,
+					ScannerChaser:   sequence.ScannerChaser,
 				}
 
 				// Now tell all the fixtures what they need to do.
@@ -489,6 +490,7 @@ func PlaySequence(sequence common.Sequence,
 					Hide:            sequence.Hide,
 					StrobeSpeed:     sequence.StrobeSpeed,
 					Strobe:          sequence.Strobe,
+					ScannerChaser:   sequence.ScannerChaser,
 				}
 
 				// Now tell all the fixtures what they need to do.
@@ -506,7 +508,6 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("sequence %d Static Off mode and Blackout is %t\n", mySequenceNumber, sequence.Blackout)
 			}
 
-			sequence.Static = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
@@ -522,12 +523,13 @@ func PlaySequence(sequence common.Sequence,
 				Hide:              sequence.Hide,
 				StrobeSpeed:       sequence.StrobeSpeed,
 				Strobe:            sequence.Strobe,
+				ScannerChaser:     sequence.ScannerChaser,
 			}
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.PlayStaticOnce = false
-			sequence.Static = false
+
 			continue
 		}
 
