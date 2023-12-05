@@ -1838,7 +1838,7 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
-		this.Static[this.SelectedSequence] { // Static Function On in any sequence
+		getStatic(this) { // Static Function On in any sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -1883,7 +1883,7 @@ func ProcessButtons(X int, Y int,
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.Static[this.SelectedSequence] { // Static Function On in this sequence
+		getStatic(this) { // Static Function On in this or shutter chaser sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence

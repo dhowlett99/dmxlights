@@ -130,7 +130,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Decide if we're on the first press of the select button.
 	if this.SelectButtonPressed[this.SelectedSequence] {
 		// Calculate the next mode.
-		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], this.Static[this.SelectedSequence])
+		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], getStatic(this))
 	}
 	if !this.SelectButtonPressed[this.SelectedSequence] {
 		this.SelectButtonPressed[0] = false
@@ -149,6 +149,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Now display the selected mode.
 	displayMode(this.SelectedSequence, this.SelectMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
+}
+
+func getStatic(this *CurrentState) bool {
+
+	// If we're a scanner static can be from either the scanner or shutter chaser static value.
+	if this.SelectedSequence == this.ScannerSequenceNumber {
+		return this.Static[this.SelectedSequence] || this.Static[this.ChaserSequenceNumber]
+	}
+	return this.Static[this.SelectedSequence]
 }
 
 func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
@@ -589,6 +598,7 @@ func printHandleDebug(this *CurrentState) {
 	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowRGBColorPicker)
 	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowStaticColorPicker)
 	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.SelectedSequence, this.Static[this.SelectedSequence])
+	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.ChaserSequenceNumber, this.Static[this.ChaserSequenceNumber])
 	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t\n", this.SelectedSequence, this.EditGoboSelectionMode)
 	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t\n", this.SelectedSequence, this.EditPatternMode)
 	fmt.Printf("HANDLE:===============================================\n")

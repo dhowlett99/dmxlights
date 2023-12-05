@@ -365,7 +365,6 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.Running[this.TargetSequence] = false
 
 		this.EditGoboSelectionMode = false             // Turn off the other option for this function key.
-		this.Static[this.DisplaySequence] = true       // Turn on edit static color mode.
 		this.Static[this.TargetSequence] = true        // Turn on edit static color mode.
 		this.SelectMode[this.DisplaySequence] = NORMAL // Turn off functions.
 
