@@ -86,7 +86,7 @@ type CurrentState struct {
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in edit static colors mode.
+	Static                      []bool                     // This flag is true when the sequence is in edit static colors mode.
 	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
@@ -188,7 +188,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
+		!this.Static[this.EditWhichStaticSequence] &&
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
@@ -1555,7 +1555,7 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S T A T I C   C O L O R
 	// Red
-	if X == 1 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 1 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1586,7 +1586,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Green
-	if X == 2 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 2 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1616,7 +1616,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Blue
-	if X == 3 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 3 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1838,7 +1838,7 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
-		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in any sequence
+		this.Static[this.SelectedSequence] { // Static Function On in any sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -1873,7 +1873,7 @@ func ProcessButtons(X int, Y int,
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
-		this.EditStaticColorsMode[this.TargetSequence] = true
+		this.Static[this.TargetSequence] = true
 
 		return
 	}
@@ -1883,7 +1883,7 @@ func ProcessButtons(X int, Y int,
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in this sequence
+		this.Static[this.SelectedSequence] { // Static Function On in this sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -2476,8 +2476,8 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
 		this.ShowRGBColorPicker = false
-		this.EditStaticColorsMode[this.DisplaySequence] = false
-		this.EditStaticColorsMode[this.TargetSequence] = false
+		this.Static[this.DisplaySequence] = false
+		this.Static[this.TargetSequence] = false
 		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.EditPatternMode = false

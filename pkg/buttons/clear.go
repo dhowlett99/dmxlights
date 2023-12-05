@@ -63,13 +63,13 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.EditStaticColorsMode[this.EditWhichStaticSequence] && !this.ClearPressed[this.TargetSequence] {
+	if this.Static[this.EditWhichStaticSequence] && !this.ClearPressed[this.TargetSequence] {
 
 		if debug {
 			fmt.Printf("Shortcut to clear static colors\n")
 		}
 
-		if this.EditStaticColorsMode[this.EditWhichStaticSequence] && this.ShowRGBColorPicker {
+		if this.Static[this.EditWhichStaticSequence] && this.ShowRGBColorPicker {
 			if debug {
 				fmt.Printf("removeColorPicker\n")
 			}
@@ -169,7 +169,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.EditPatternMode = false                                                 // Clear edit pattern mode.
 		this.EditScannerColorsMode = false                                           // Clear scanner color mode.
 		this.ShowRGBColorPicker = false                                              // Clear rgb color mode.
-		this.EditStaticColorsMode[this.TargetSequence] = false                       // Clear static color mode.
+		this.Static[sequenceNumber] = false                                          // Clear static color mode.
 		this.ShowStaticColorPicker = false                                           // Clear the static color picker.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
 		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.

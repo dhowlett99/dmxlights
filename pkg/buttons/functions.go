@@ -78,7 +78,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		fmt.Printf("Mode : %s\n", printMode(this.SelectMode[this.SelectedSequence]))
 		fmt.Printf("================== WHAT EDIT MODES =================\n")
 		fmt.Printf("FUNCS: this.ShowRGBColorPicker[%d] = %t \n", this.DisplaySequence, this.ShowRGBColorPicker)
-		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", this.DisplaySequence, this.EditStaticColorsMode)
+		fmt.Printf("FUNCS: this.EditStaticColorsMode[%d] = %t \n", this.DisplaySequence, this.Static)
 		fmt.Printf("FUNCS: this.EditGoboSelectionMode[%d] = %t \n", this.DisplaySequence, this.EditGoboSelectionMode)
 		fmt.Printf("FUNCS: this.EditPatternMode[%d] = %t \n", this.DisplaySequence, this.EditPatternMode)
 		fmt.Printf("===============================================\n")
@@ -364,9 +364,10 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		//  and remember that this sequence is off.
 		this.Running[this.TargetSequence] = false
 
-		this.EditGoboSelectionMode = false                     // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.DisplaySequence] = true // Turn on edit static color mode.
-		this.SelectMode[this.DisplaySequence] = NORMAL         // Turn off functions.
+		this.EditGoboSelectionMode = false             // Turn off the other option for this function key.
+		this.Static[this.DisplaySequence] = true       // Turn on edit static color mode.
+		this.Static[this.TargetSequence] = true        // Turn on edit static color mode.
+		this.SelectMode[this.DisplaySequence] = NORMAL // Turn off functions.
 
 		// Go straight to static color selection mode, don't wait for a another select press.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
@@ -414,7 +415,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false // Turn off static color off.
 		this.EditGoboSelectionMode = false                                              // Turn off the other option for this function key.
-		this.EditStaticColorsMode[this.DisplaySequence] = false                         // Turn off edit static color mode.
+		this.Static[this.DisplaySequence] = false                                       // Turn off edit static color mode.
 		this.ShowStaticColorPicker = false                                              // Turn off the color picker.
 		this.StaticFlashing[this.SelectedSequence] = false                              // Stop any flash commands being issued.
 
@@ -459,7 +460,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = true
-		this.EditStaticColorsMode[this.TargetSequence] = false // Turn off the other option for this function key.
+		this.Static[this.TargetSequence] = false // Turn off the other option for this function key.
 		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = true
 
