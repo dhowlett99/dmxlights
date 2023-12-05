@@ -91,6 +91,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.StaticFlashing[sequenceNumber] = false
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.EditStaticColorsMode[sequenceNumber] = false
+		this.ShowStaticColorPicker = false
+		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		var displaySet bool

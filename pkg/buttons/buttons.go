@@ -221,7 +221,7 @@ func ProcessButtons(X int, Y int,
 			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 		if this.SelectedType == "scanner" {
-			common.LightLamp(common.Button{X: X, Y: Y}, common.Color{R: 255, G: 255, B: 255}, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: X, Y: Y}, common.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
 			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 
@@ -643,9 +643,9 @@ func ProcessButtons(X int, Y int,
 					this.SelectedSequence = 0
 					// Indicate if this sequence is running.
 					if this.Running[this.SelectedSequence] {
-						common.LightLamp(common.RUNNING_BUTTON, common.Green, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.RUNNING_BUTTON, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 					} else {
-						common.LightLamp(common.RUNNING_BUTTON, common.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.RUNNING_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 					}
 					this.SelectButtonPressed[this.SelectedSequence] = false
 					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -1576,7 +1576,7 @@ func ProcessButtons(X int, Y int,
 			}
 
 			redColor := common.Color{R: this.StaticButtons[this.SelectedSequence].Color.R, G: 0, B: 0}
-			common.LightLamp(common.RED_BUTTON, redColor, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.RED_BUTTON, redColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
@@ -1686,7 +1686,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -1869,7 +1869,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
@@ -1948,7 +1948,7 @@ func ProcessButtons(X int, Y int,
 		common.HideSequence(this.TargetSequence, commandChannels)
 
 		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
@@ -2117,7 +2117,7 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) common.Color
 // ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
 // the targetSequence .CurrentColors selects which colors are selected.
 // Returns the RGBAvailableColors []common.StaticColorButton
-func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func ShowRGBColorPicker(targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
@@ -2151,7 +2151,7 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 			}
 			common.FlashLight(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, master, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		}
 		common.LabelButton(lamp.X, lamp.Y, lamp.Name, guiButtons)
 

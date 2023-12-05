@@ -310,7 +310,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.HideAllSequences(commandChannels)
 
 		// Show the colors
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}

@@ -92,12 +92,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = NORMAL
 	}
 
-	// Clear RGB color picker.
-	if this.ShowRGBColorPicker {
+	// Clear  olor picker.
+	if this.ShowRGBColorPicker || this.ShowStaticColorPicker {
 		if debug {
 			fmt.Printf("Turn off the edit sequence colors button. \n")
 		}
 		this.ShowRGBColorPicker = false
+		this.ShowStaticColorPicker = false
+
 		this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -112,7 +114,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			sequences[this.SelectedSequence].SequenceColors = this.SavedSequenceColors[this.SelectedSequence]
 			if debug {
-				fmt.Printf("Now set to ----> sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+				fmt.Printf("Now set to sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
 			}
 			// Tell the sequence that we have restored the colors.
 			cmd := common.Command{
@@ -150,6 +152,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 }
 
 func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("removeColorPicker Turn off the color picker\n")
+	}
 
 	this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 

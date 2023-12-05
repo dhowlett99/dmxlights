@@ -54,7 +54,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Flash the correct color buttons
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.EditWhichStaticSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Clear has been pressed, next time we press clear we will get the full clear.
 		this.ClearPressed[this.TargetSequence] = true
