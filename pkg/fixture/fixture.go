@@ -286,7 +286,6 @@ func FixtureReceiver(
 			// Stop any running fade ups.
 			select {
 			case stopFadeUp <- true:
-				fmt.Printf("Send Stop COmmand\n")
 			case <-time.After(100 * time.Millisecond):
 			}
 			lastColor = turnOffAllFixtures(cmd, myFixtureNumber, cmd.SequenceNumber, fixtures, dmxController, eventsForLauchpad, guiButtons, dmxInterfacePresent)
