@@ -34,6 +34,12 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		fmt.Printf("CLEAR LAUNCHPAD\n")
 	}
 
+	if debug {
+		fmt.Printf("Target Sequence %d\n", this.TargetSequence)
+		fmt.Printf("Display Sequence %d\n", this.DisplaySequence)
+		fmt.Printf("Which Static Sequnece are we Editing %d\n", this.EditWhichStaticSequence)
+	}
+
 	// Shortcut to clear rgb chase colors. We want to clear a color selection for a selected sequence.
 	if this.ShowRGBColorPicker && !this.ClearPressed[this.TargetSequence] {
 
@@ -62,8 +68,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		return
 	}
 
-	// Shortcut to clear static colors. We want to clear a static color selection for a selected sequence.
-	if this.Static[this.EditWhichStaticSequence] && !this.ClearPressed[this.TargetSequence] {
+	// Shortcut to clear the selected set of static colors. We want to clear a static color selection for a target sequence.
+	if this.Static[this.EditWhichStaticSequence] && !this.ClearPressed[this.TargetSequence] && !this.ShowStaticColorPicker {
 
 		if debug {
 			fmt.Printf("Shortcut to clear static colors\n")
@@ -77,35 +83,35 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// First press resets the colors to the default color bar.
-		if !this.ClearPressed[this.SelectedSequence] {
+		if !this.ClearPressed[this.TargetSequence] {
 
 			if debug {
-				fmt.Printf("Clear the sequence colors for this sequence %d\n", this.SelectedSequence)
+				fmt.Printf("Clear the sequence colors for this sequence %d\n", this.TargetSequence)
 			}
 			// Clear the sequence colors for this sequence.
 			cmd := common.Command{
 				Action: common.ClearStaticColor,
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// Clear the pressed flag for all the fixtures.
 		for x := 0; x < 8; x++ {
-			sequences[this.SelectedSequence].StaticColors[x].FirstPress = false
+			sequences[this.TargetSequence].StaticColors[x].FirstPress = false
 		}
 
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
-		this.SelectMode[this.SelectedSequence] = this.LastMode[this.SelectedSequence]
+		this.SelectMode[this.DisplaySequence] = this.LastMode[this.DisplaySequence]
 
 		// Clear the select all fixtures flag.
 		this.SelectAllStaticFixtures = false
 
 		// Clear has been pressed, next time we press clear we will get the full clear.
-		this.ClearPressed[this.SelectedSequence] = true
+		this.ClearPressed[this.TargetSequence] = true
 
 		// The sequence will automatically display the static colors now!
 		return
