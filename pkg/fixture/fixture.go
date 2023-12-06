@@ -418,7 +418,7 @@ func FixtureReceiver(
 			if fixture.Enabled {
 
 				if debug {
-					fmt.Printf("%d: Fixture:%d RGB Mode\n", cmd.SequenceNumber, myFixtureNumber)
+					fmt.Printf("%d: Fixture:%d RGB Mode Strobe %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Strobe)
 				}
 
 				// Integrate cmd.master with fixture.Brightness.
@@ -821,6 +821,26 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 								SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
 							} else {
 								SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+							}
+						}
+						// Shutter
+						if strings.Contains(channel.Name, "Shutter") {
+							// If we have defined settings for the shutter channel, then use them.
+							if channel.Settings != nil {
+								// Look through any settings configured for Shutter.
+								for _, s := range channel.Settings {
+									if !strobe && (s.Name == "On" || s.Name == "Open") {
+										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
+										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									}
+									if strobe && strings.Contains(s.Name, "Strobe") {
+										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
+										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									}
+								}
+							} else {
+								// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
+								SetChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
 							}
 						}
 						// Scanner Color
