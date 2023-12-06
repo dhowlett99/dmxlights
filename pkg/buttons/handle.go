@@ -59,7 +59,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Hide any function keys. As long as we're not in static mode.
-	if !this.EditStaticColorsMode[this.SelectedSequence] {
+	if !this.Static[this.SelectedSequence] {
 		hideAllFunctionKeys(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
@@ -92,12 +92,14 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectMode[this.SelectedSequence] = NORMAL
 	}
 
-	// Clear RGB color picker.
-	if this.ShowRGBColorPicker {
+	// Clear  olor picker.
+	if this.ShowRGBColorPicker || this.ShowStaticColorPicker {
 		if debug {
 			fmt.Printf("Turn off the edit sequence colors button. \n")
 		}
 		this.ShowRGBColorPicker = false
+		this.ShowStaticColorPicker = false
+
 		this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -112,7 +114,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			sequences[this.SelectedSequence].SequenceColors = this.SavedSequenceColors[this.SelectedSequence]
 			if debug {
-				fmt.Printf("Now set to ----> sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+				fmt.Printf("Now set to sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
 			}
 			// Tell the sequence that we have restored the colors.
 			cmd := common.Command{
@@ -128,7 +130,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Decide if we're on the first press of the select button.
 	if this.SelectButtonPressed[this.SelectedSequence] {
 		// Calculate the next mode.
-		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], this.EditStaticColorsMode[this.SelectedSequence])
+		this.SelectMode[this.SelectedSequence] = getNextMenuItem(this.SelectMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], getStatic(this))
 	}
 	if !this.SelectButtonPressed[this.SelectedSequence] {
 		this.SelectButtonPressed[0] = false
@@ -149,7 +151,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 }
 
+func getStatic(this *CurrentState) bool {
+
+	// If we're a scanner static can be from either the scanner or shutter chaser static value.
+	if this.SelectedSequence == this.ScannerSequenceNumber {
+		return this.Static[this.SelectedSequence] || this.Static[this.ChaserSequenceNumber]
+	}
+	return this.Static[this.SelectedSequence]
+}
+
 func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("removeColorPicker Turn off the color picker\n")
+	}
 
 	this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 
@@ -213,9 +228,21 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if this.SequenceType[sequenceNumber] == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-		// Force the reveal the selected sequence.
-		common.HideSequence(sequenceNumber, commandChannels)
-		common.RevealSequence(sequenceNumber, commandChannels)
+
+		// If we are the scanner sequence take into account the state of
+		// the static flag in the shutter chaser. We don't want to shut off the scanners
+		// if we're in the middle of a static scene.
+		if this.ScannerSequenceNumber == sequenceNumber {
+			if !this.Static[this.ChaserSequenceNumber] {
+				// Force the reveal the selected sequence.
+				common.HideSequence(sequenceNumber, commandChannels)
+				common.RevealSequence(sequenceNumber, commandChannels)
+			}
+		} else {
+			// Force the reveal the selected sequence.
+			common.HideSequence(sequenceNumber, commandChannels)
+			common.RevealSequence(sequenceNumber, commandChannels)
+		}
 
 		return
 
@@ -267,7 +294,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == CHASER_DISPLAY_STATIC:
 
 		if debug {
-			fmt.Printf("displayMode: CHASER_DISPLAY\n")
+			fmt.Printf("displayMode: CHASER_DISPLAY_STATIC\n")
 		}
 
 		// Hide the selected sequence.
@@ -582,7 +609,8 @@ func printHandleDebug(this *CurrentState) {
 	fmt.Printf("HANDLE: ================== WHAT EDIT MODES =================\n")
 	fmt.Printf("HANDLE: this.ShowRGBColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowRGBColorPicker)
 	fmt.Printf("HANDLE: this.ShowStaticColorPicker[%d] = %t\n", this.SelectedSequence, this.ShowStaticColorPicker)
-	fmt.Printf("HANDLE: this.EditStaticColorsMode[%d] = %t\n", this.SelectedSequence, this.EditStaticColorsMode[this.SelectedSequence])
+	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.SelectedSequence, this.Static[this.SelectedSequence])
+	fmt.Printf("HANDLE: this.Static[%d] = %t\n", this.ChaserSequenceNumber, this.Static[this.ChaserSequenceNumber])
 	fmt.Printf("HANDLE: this.EditGoboSelectionMode[%d] = %t\n", this.SelectedSequence, this.EditGoboSelectionMode)
 	fmt.Printf("HANDLE: this.EditPatternMode[%d] = %t\n", this.SelectedSequence, this.EditPatternMode)
 	fmt.Printf("HANDLE:===============================================\n")

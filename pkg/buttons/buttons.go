@@ -86,7 +86,7 @@ type CurrentState struct {
 	SwitchPositions             [9][9]int                  // Sorage for switch positions.
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
-	EditStaticColorsMode        []bool                     // This flag is true when the sequence is in edit static colors mode.
+	Static                      []bool                     // This flag is true when the sequence is in edit static colors mode.
 	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
@@ -188,7 +188,7 @@ func ProcessButtons(X int, Y int,
 		!this.Functions[Y][common.Function1_Pattern].State &&
 		!this.Functions[Y][common.Function6_Static_Gobo].State &&
 		!this.Functions[Y][common.Function5_Color].State &&
-		!this.EditStaticColorsMode[this.EditWhichStaticSequence] &&
+		!this.Static[this.EditWhichStaticSequence] &&
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
@@ -221,7 +221,7 @@ func ProcessButtons(X int, Y int,
 			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 		if this.SelectedType == "scanner" {
-			common.LightLamp(common.Button{X: X, Y: Y}, common.Color{R: 255, G: 255, B: 255}, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: X, Y: Y}, common.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
 			fixture.MapFixtures(false, false, Y, X, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 		}
 
@@ -643,9 +643,9 @@ func ProcessButtons(X int, Y int,
 					this.SelectedSequence = 0
 					// Indicate if this sequence is running.
 					if this.Running[this.SelectedSequence] {
-						common.LightLamp(common.RUNNING_BUTTON, common.Green, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.RUNNING_BUTTON, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 					} else {
-						common.LightLamp(common.RUNNING_BUTTON, common.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.RUNNING_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 					}
 					this.SelectButtonPressed[this.SelectedSequence] = false
 					HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -1444,14 +1444,11 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// D I S A B L E  / E N A B L E   F I X T U R E  - Used to toggle the scanner state from on, inverted or off.
+	// D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S - Used to toggle the scanner state from on, inverted or off.
 	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
-		this.SelectMode[this.SelectedSequence] == STATUS &&
-		!this.Functions[this.SelectedSequence][common.Function1_Pattern].State &&
-		!this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State &&
-		!this.Functions[this.SelectedSequence][common.Function5_Color].State {
+		this.SelectMode[this.SelectedSequence] == STATUS {
 
 		if debug {
 			fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)
@@ -1558,7 +1555,7 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S T A T I C   C O L O R
 	// Red
-	if X == 1 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 1 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1579,7 +1576,7 @@ func ProcessButtons(X int, Y int,
 			}
 
 			redColor := common.Color{R: this.StaticButtons[this.SelectedSequence].Color.R, G: 0, B: 0}
-			common.LightLamp(common.RED_BUTTON, redColor, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.RED_BUTTON, redColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
 			// Update the status bar
@@ -1589,7 +1586,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Green
-	if X == 2 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 2 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1619,7 +1616,7 @@ func ProcessButtons(X int, Y int,
 	}
 
 	// Blue
-	if X == 3 && Y == -1 && this.EditStaticColorsMode[this.TargetSequence] {
+	if X == 3 && Y == -1 && this.Static[this.TargetSequence] {
 
 		if this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
@@ -1689,7 +1686,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -1841,7 +1838,7 @@ func ProcessButtons(X int, Y int,
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
 			this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC) && // Not in function Mode
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
-		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in any sequence
+		getStatic(this) { // Static Function On in any sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -1872,11 +1869,11 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
-		this.EditStaticColorsMode[this.TargetSequence] = true
+		this.Static[this.TargetSequence] = true
 
 		return
 	}
@@ -1886,7 +1883,7 @@ func ProcessButtons(X int, Y int,
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
-		this.EditStaticColorsMode[this.SelectedSequence] { // Static Function On in this sequence
+		getStatic(this) { // Static Function On in this or shutter chaser sequence
 
 		this.TargetSequence = this.EditWhichStaticSequence
 		this.DisplaySequence = this.SelectedSequence
@@ -1951,7 +1948,7 @@ func ProcessButtons(X int, Y int,
 		common.HideSequence(this.TargetSequence, commandChannels)
 
 		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
-		ShowRGBColorPicker(this.MasterBrightness, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
@@ -2120,7 +2117,7 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) common.Color
 // ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
 // the targetSequence .CurrentColors selects which colors are selected.
 // Returns the RGBAvailableColors []common.StaticColorButton
-func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func ShowRGBColorPicker(targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
@@ -2154,7 +2151,7 @@ func ShowRGBColorPicker(master int, targetSequence common.Sequence, displaySeque
 			}
 			common.FlashLight(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, master, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		}
 		common.LabelButton(lamp.X, lamp.Y, lamp.Name, guiButtons)
 
@@ -2479,8 +2476,8 @@ func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
 		this.SelectButtonPressed[sequenceNumber] = false
 		this.SelectMode[sequenceNumber] = NORMAL
 		this.ShowRGBColorPicker = false
-		this.EditStaticColorsMode[this.DisplaySequence] = false
-		this.EditStaticColorsMode[this.TargetSequence] = false
+		this.Static[this.DisplaySequence] = false
+		this.Static[this.TargetSequence] = false
 		this.ShowStaticColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.EditPatternMode = false

@@ -267,6 +267,15 @@ func PlaySequence(sequence common.Sequence,
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 
+		// Soft fade downs should be disabled for blackout.
+		if sequence.Blackout {
+			command := common.FixtureCommand{
+				Type:      "lastColor",
+				LastColor: common.Black,
+			}
+			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+		}
+
 		// Clear all fixtures.
 		if sequence.Clear {
 			if debug {
@@ -274,6 +283,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
 				Type:           sequence.Type,
 				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
@@ -312,6 +323,7 @@ func PlaySequence(sequence common.Sequence,
 				// Now send a message to the fixture to play all the values for this state.
 				command := common.FixtureCommand{
 					Master:             sequence.Master,
+					Blackout:           sequence.Blackout,
 					Type:               sequence.Type,
 					Label:              sequence.Label,
 					SequenceNumber:     sequence.Number,
@@ -351,6 +363,7 @@ func PlaySequence(sequence common.Sequence,
 			// Now send a message to the fixture to play all the values for this state.
 			command := common.FixtureCommand{
 				Master:             sequence.Master,
+				Blackout:           sequence.Blackout,
 				Type:               sequence.Type,
 				Label:              sequence.Label,
 				SequenceNumber:     sequence.Number,
@@ -377,6 +390,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
 				Type:            sequence.Type,
 				Label:           sequence.Label,
 				SequenceNumber:  sequence.Number,
@@ -385,8 +400,6 @@ func PlaySequence(sequence common.Sequence,
 				StartFlood:      sequence.StartFlood,
 				StrobeSpeed:     sequence.StrobeSpeed,
 				Strobe:          sequence.Strobe,
-				Master:          sequence.Master,
-				Blackout:        sequence.Blackout,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -402,6 +415,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
 				Type:           sequence.Type,
 				Label:          sequence.Label,
 				SequenceNumber: sequence.Number,
@@ -425,6 +440,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			sequence.Static = true
+			sequence.PlayStaticOnce = false
+
 			// Turn off any music trigger for this sequence.
 			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
@@ -435,59 +452,50 @@ func PlaySequence(sequence common.Sequence,
 				sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
 			}
 
-			go func() {
-
-				// Now Fade up
-				if sequence.StaticFadeOnce {
-					// Soft start
-					// Calulate the steps
-					fadeUpValues := common.GetFadeValues(32, float64(sequence.Master), sequence.RGBFade, false)
-
-					for _, fade := range fadeUpValues {
-						// Prepare a message to be sent to the fixtures in the sequence.
-						command := common.FixtureCommand{
-							Type:            sequence.Type,
-							Label:           sequence.Label,
-							SequenceNumber:  sequence.Number,
-							RGBStatic:       sequence.Static,
-							RGBStaticColors: sequence.StaticColors,
-							Hide:            sequence.Hide,
-							Master:          fade,
-							StrobeSpeed:     sequence.StrobeSpeed,
-							Strobe:          sequence.Strobe,
-							Blackout:        sequence.Blackout,
-						}
-
-						// Now tell all the fixtures what they need to do.
-						sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-
-						// Control how long the fade take with the speed control.
-						time.Sleep((10 * time.Millisecond) * (time.Duration(common.Reverse12(sequence.Speed))))
-
-					}
-				}
-
-				// Done fading for this static scene only reset when we set a static scene again.
-				sequence.StaticFadeOnce = false
-
+			// Now send the Fade up command to the fixture.
+			if sequence.StaticFadeUpOnce {
 				// Prepare a message to be sent to the fixtures in the sequence.
 				command := common.FixtureCommand{
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
 					Type:            sequence.Type,
 					Label:           sequence.Label,
 					SequenceNumber:  sequence.Number,
-					RGBStatic:       sequence.Static,
+					RGBStatic:       false,
+					RGBFadeUpStatic: true,
+					FadeSpeed:       sequence.RGBFade,
 					RGBStaticColors: sequence.StaticColors,
 					Hide:            sequence.Hide,
-					Master:          sequence.Master,
 					StrobeSpeed:     sequence.StrobeSpeed,
 					Strobe:          sequence.Strobe,
-					Blackout:        sequence.Blackout,
+					ScannerChaser:   sequence.ScannerChaser,
 				}
 
 				// Now tell all the fixtures what they need to do.
 				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 
-			}()
+				// Done fading for this static scene only reset when we set a static scene again.
+				sequence.StaticFadeUpOnce = false
+			} else {
+				// else just play the static scene.
+				command := common.FixtureCommand{
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
+					Type:            sequence.Type,
+					Label:           sequence.Label,
+					SequenceNumber:  sequence.Number,
+					RGBStatic:       true,
+					RGBFadeUpStatic: false,
+					RGBStaticColors: sequence.StaticColors,
+					Hide:            sequence.Hide,
+					StrobeSpeed:     sequence.StrobeSpeed,
+					Strobe:          sequence.Strobe,
+					ScannerChaser:   sequence.ScannerChaser,
+				}
+
+				// Now tell all the fixtures what they need to do.
+				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			}
 
 			sequence.PlayStaticOnce = false
 
@@ -500,11 +508,12 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("sequence %d Static Off mode and Blackout is %t\n", mySequenceNumber, sequence.Blackout)
 			}
 
-			sequence.Static = false
 			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
+				Master:            sequence.Master,
+				Blackout:          sequence.Blackout,
 				Type:              sequence.Type,
 				Label:             sequence.Label,
 				SequenceNumber:    sequence.Number,
@@ -512,16 +521,15 @@ func PlaySequence(sequence common.Sequence,
 				RGBPlayStaticOnce: sequence.PlayStaticOnce,
 				RGBStaticColors:   sequence.StaticColors,
 				Hide:              sequence.Hide,
-				Master:            sequence.Master,
 				StrobeSpeed:       sequence.StrobeSpeed,
 				Strobe:            sequence.Strobe,
-				Blackout:          sequence.Blackout,
+				ScannerChaser:     sequence.ScannerChaser,
 			}
 
 			// Now tell all the fixtures what they need to do.
 			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
 			sequence.PlayStaticOnce = false
-			sequence.Static = false
+
 			continue
 		}
 
@@ -788,6 +796,8 @@ func PlaySequence(sequence common.Sequence,
 						// Even if the fixture is disabled we still need to send this message to the fixture.
 						// beacuse the fixture is the one who is responsible for turning it off.
 						command := common.FixtureCommand{
+							Master:                   sequence.Master,
+							Blackout:                 sequence.Blackout,
 							Type:                     sequence.Type,
 							Label:                    sequence.Label,
 							SequenceNumber:           sequence.Number,
@@ -797,8 +807,6 @@ func PlaySequence(sequence common.Sequence,
 							StrobeSpeed:              sequence.StrobeSpeed,
 							Strobe:                   sequence.Strobe,
 							FadeSpeed:                sequence.Speed,
-							Master:                   sequence.Master,
-							Blackout:                 sequence.Blackout,
 							Hide:                     sequence.Hide,
 							RGBPosition:              RGBPositions[step],
 							StartFlood:               sequence.StartFlood,

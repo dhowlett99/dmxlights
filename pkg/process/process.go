@@ -285,6 +285,7 @@ func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fix
 		newColor.Rule = rule
 	}
 
+	newColor.BaseColor = color
 	newColor.Color = common.Color{}
 	newColor.Gobo = thisFixture.Gobo
 	newColor.Pan = thisFixture.Pan

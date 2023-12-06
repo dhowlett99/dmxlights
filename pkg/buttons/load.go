@@ -88,9 +88,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
 		this.SelectMode[sequenceNumber] = NORMAL
-		this.StaticFlashing[sequenceNumber] = false
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
-		this.EditStaticColorsMode[sequenceNumber] = false
+		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
+		this.StaticFlashing[sequenceNumber] = false
+
+		this.ShowStaticColorPicker = false
+		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		var displaySet bool
@@ -114,7 +117,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
 			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
 			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = sequences[sequenceNumber].Static
-			this.EditStaticColorsMode[sequenceNumber] = sequences[sequenceNumber].Static
 			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].RGBInvert
 			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
 		}

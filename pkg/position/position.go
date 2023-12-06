@@ -311,6 +311,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newColor.B = fadeColors[fixtureNumber][step].Color.B
 					newColor.W = fadeColors[fixtureNumber][step].Color.W
 					newFixture.Color = newColor
+					newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 					newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 					newFixture.Pan = fadeColors[fixtureNumber][step].Pan
@@ -325,6 +326,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					// turn the lamp off, but only if its already on.
 					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
 						newFixture.Color = common.Color{}
+						newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 						newFixture.Pan = fadeColors[fixtureNumber][step].Pan
