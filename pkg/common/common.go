@@ -297,11 +297,15 @@ const StepSize = 39
 
 var Black = Color{R: 0, G: 0, B: 0}
 var Red = Color{R: 255, G: 0, B: 0}
+var QuarterRed = Color{R: 50, G: 0, B: 0}
 var Green = Color{R: 0, G: 255, B: 0}
+var QuarterGreen = Color{R: 0, G: 50, B: 0}
 var Blue = Color{R: 0, G: 0, B: 255}
+var QuarterBlue = Color{R: 0, G: 0, B: 50}
 var PresetYellow = Color{R: 150, G: 150, B: 0}
 var Cyan = Color{R: 0, G: 255, B: 255}
 var Yellow = Color{R: 255, G: 255, B: 0}
+var QuarterYellow = Color{R: 50, G: 50, B: 0}
 var Orange = Color{R: 255, G: 111, B: 0}
 var Magenta = Color{R: 255, G: 0, B: 255}
 
