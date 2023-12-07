@@ -6240,44 +6240,44 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 			want: map[int]common.Position{
 				0: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				1: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				2: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 100, Tilt: 150, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				3: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 150, Tilt: 100, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				4: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 200, Tilt: 50, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				5: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Color{R: 0, G: 190, B: 255}, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Color{R: 0, G: 190, B: 255}, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 0, G: 190, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 255, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				6: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Color{R: 145, G: 0, B: 255}, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						1: {BaseColor: common.Color{R: 145, G: 0, B: 255}, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Color{R: 145, G: 0, B: 255, W: 0, A: 0, UV: 0, Flash: false}, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 			},
@@ -6292,42 +6292,38 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
 
-				fmt.Printf("++++++++++++++ GOT FADES ++++++++++++++++++++\n")
-				for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
-					positionNumber := 0
-					fade := fadeColors[fixtureNumber]
+				// fmt.Printf("++++++++++++++ GOT FADES ++++++++++++++++++++\n")
+				// for fixtureNumber := 0; fixtureNumber < len(fadeColors); fixtureNumber++ {
+				// 	positionNumber := 0
+				// 	fade := fadeColors[fixtureNumber]
 
-					fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
+				// 	fmt.Printf("fixtureNumber:%d ============================\n", fixtureNumber)
 
-					step := 0
-					for _, fixtureBuffer := range fade {
-						fmt.Printf("\tpositionNumber %d step %d rule %d %s: fixtureBuffer:%+v Pan:%d Tilt:%d\n", positionNumber, fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color, fixtureBuffer.Pan, fixtureBuffer.Tilt)
-						step++
-						positionNumber++
-					}
-				}
+				// 	step := 0
+				// 	for _, fixtureBuffer := range fade {
+				// 		fmt.Printf("\tpositionNumber %d step %d rule %d %s: fixtureBuffer:%+v Pan:%d Tilt:%d\n", positionNumber, fixtureBuffer.Step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, fixtureBuffer.Color, fixtureBuffer.Pan, fixtureBuffer.Tilt)
+				// 		step++
+				// 		positionNumber++
+				// 	}
+				// }
 
 				fmt.Printf("++++++++++++++ WANT ++++++++++++++++++++\n")
 				for positionNumber := 0; positionNumber < len(tt.want); positionNumber++ {
-
 					fmt.Printf("Position:%d ============================\n", positionNumber)
 					position := tt.want[positionNumber]
 					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-
 						fixture := position.Fixtures[fixtureNumber]
-						fmt.Printf("Fixture:%d color:%+v Pan %d Tilt %d\n", fixtureNumber, fixture.Color, fixture.Pan, fixture.Tilt)
+						fmt.Printf("Fixture:%d color:%+v Pan %d Tilt %d BaseColor %+v\n", fixtureNumber, fixture.Color, fixture.Pan, fixture.Tilt, fixture.BaseColor)
 					}
 				}
 
 				fmt.Printf("++++++++++++++ GOT ++++++++++++++++++++\n")
 				for positionNumber := 0; positionNumber < len(positions); positionNumber++ {
-
 					fmt.Printf("Position:%d ============================\n", positionNumber)
 					position := positions[positionNumber]
 					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-
 						fixture := position.Fixtures[fixtureNumber]
-						fmt.Printf("Fixture:%d color:%+v Pan %d Tilt %d\n", fixtureNumber, fixture.Color, fixture.Pan, fixture.Tilt)
+						fmt.Printf("Fixture:%d color:%+v Pan %d Tilt %d BaseColor %+v\n", fixtureNumber, fixture.Color, fixture.Pan, fixture.Tilt, fixture.BaseColor)
 					}
 				}
 			}
