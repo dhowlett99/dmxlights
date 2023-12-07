@@ -192,7 +192,7 @@ func ProcessButtons(X int, Y int,
 		!this.ShowRGBColorPicker &&
 		!this.ShowStaticColorPicker &&
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
-		this.SelectMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
+		(this.SelectMode[Y] == NORMAL || this.SelectMode[Y] == CHASER_DISPLAY) { // As long as we're in normal or shutter chaser mode for this sequence.
 
 		this.SelectedType = sequences[Y].Type
 
