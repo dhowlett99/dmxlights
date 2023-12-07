@@ -322,7 +322,7 @@ func ProcessButtons(X int, Y int,
 
 			// Short press means load the config.
 			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
-			this.SelectedSequence = 0
+			this.SelectedSequence = autoSelect(this)
 			// Indicate if this sequence is running.
 			if this.Running[this.SelectedSequence] {
 				common.LightLamp(common.RUNNING_BUTTON, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
@@ -640,7 +640,7 @@ func ProcessButtons(X int, Y int,
 						this.SavePreset = false
 					}
 					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
-					this.SelectedSequence = 0
+					this.SelectedSequence = autoSelect(this)
 					// Indicate if this sequence is running.
 					if this.Running[this.SelectedSequence] {
 						common.LightLamp(common.RUNNING_BUTTON, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)

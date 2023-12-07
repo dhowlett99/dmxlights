@@ -161,3 +161,29 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 }
+
+func autoSelect(this *CurrentState) (selectedSequence int) {
+
+	// Check for running sequences.
+	for sequenceNumber, sequenceRunning := range this.Running {
+		if sequenceRunning {
+			selectedSequence = sequenceNumber
+			if selectedSequence == this.ChaserSequenceNumber {
+				selectedSequence = this.ScannerSequenceNumber
+			}
+		}
+	}
+
+	// Check for static sequences.
+	for sequenceNumber, sequenceInStatic := range this.Static {
+		if sequenceInStatic {
+			selectedSequence = sequenceNumber
+			if selectedSequence == this.ChaserSequenceNumber {
+				selectedSequence = this.ScannerSequenceNumber
+			}
+		}
+	}
+
+	// default to first sequnce if nothings running.
+	return selectedSequence
+}
