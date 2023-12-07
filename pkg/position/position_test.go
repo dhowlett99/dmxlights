@@ -6454,12 +6454,12 @@ func Test_calculateScannerSimpleCase(t *testing.T) {
 
 				0: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 255, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 				1: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 50, Tilt: 200, Shutter: 255, Rotate: 0, Music: 0, Gobo: 36, Program: 0},
 					},
 				},
 			},
