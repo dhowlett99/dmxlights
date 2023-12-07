@@ -6702,33 +6702,33 @@ func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 			want: map[int]common.Position{
 				0: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
 					},
 				},
 
 				1: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
+						0: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
 					},
 				},
 				2: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
 					},
 				},
 				3: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 1, Shutter: 255, Pan: 0, Tilt: 0},
 					},
 				},
 				4: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
+						0: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 1, Shutter: 255, Pan: 1, Tilt: 1},
 					},
 				},
 				5: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 1, Shutter: 255, Pan: 2, Tilt: 2},
 					},
 				},
 			},
