@@ -5036,101 +5036,101 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 				// Start of want.
 				0: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 
 				1: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 
 				2: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 
 				3: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 				4: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 				5: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 				6: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 				7: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						1: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						2: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						3: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						4: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						5: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						6: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
-						7: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						0: {BaseColor: common.Magenta, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Magenta, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						1: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						2: {BaseColor: common.Orange, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Orange, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						3: {BaseColor: common.Yellow, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Yellow, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						4: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						5: {BaseColor: common.Cyan, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Cyan, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						6: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
+						7: {BaseColor: common.Purple, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Purple, Pan: 0, Tilt: 0, Shutter: 0, Rotate: 0, Music: 0, Gobo: 0, Program: 0},
 					},
 				},
 				// End of Want
@@ -5147,15 +5147,24 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
-				for positionNumber := 0; positionNumber < len(positions); positionNumber++ {
-
-					fmt.Printf("Position:%d ==========GOT===============\n", positionNumber)
-					position := positions[positionNumber]
+				fmt.Printf("==========WANT===============\n")
+				for positionNumber := 0; positionNumber < len(tt.want); positionNumber++ {
+					position := tt.want[positionNumber]
+					fmt.Printf("Positon %d\n", positionNumber)
 					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
 						fixture := position.Fixtures[fixtureNumber]
-						fmt.Printf("Fixture:%d Color:%+v BaseColor:%+v\n", fixtureNumber, fixture.Color, fixture.BaseColor)
+						fmt.Printf("step:%d FixtureBuffer%+v\n", fixtureNumber, fixture)
 					}
+				}
 
+				fmt.Printf("==========GOT===============\n")
+				for positionNumber := 0; positionNumber < len(positions); positionNumber++ {
+					position := positions[positionNumber]
+					fmt.Printf("Positon %d\n", positionNumber)
+					for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
+						fixture := position.Fixtures[fixtureNumber]
+						fmt.Printf("step:%d FixtureBuffer%+v\n", fixtureNumber, fixture)
+					}
 				}
 			}
 			if numberPositions != tt.want1 {
