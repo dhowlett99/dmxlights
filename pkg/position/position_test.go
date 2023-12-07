@@ -6625,17 +6625,17 @@ func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 			want: map[int]common.Position{
 				0: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+						0: {BaseColor: common.Blue, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Blue, Pan: 2, Tilt: 2, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
 					},
 				},
 				1: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+						0: {BaseColor: common.Green, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Green, Pan: 1, Tilt: 1, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
 					},
 				},
 				2: {
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
+						0: {BaseColor: common.Red, MasterDimmer: full, Enabled: true, Brightness: full, ScannerColor: common.Black, Color: common.Red, Pan: 0, Tilt: 0, Shutter: 255, Rotate: 0, Music: 0, Gobo: 1, Program: 0},
 					},
 				},
 			},
