@@ -1298,7 +1298,7 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" {
+		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Label == "chaser" {
 			this.RGBFade[this.TargetSequence]--
 			if this.RGBFade[this.TargetSequence] < 1 {
 				this.RGBFade[this.TargetSequence] = 1
@@ -1317,7 +1317,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update Coordinates.
-		if sequences[this.TargetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" || sequences[this.TargetSequence].Label != "chaser" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.TargetSequence]--
 			if this.ScannerCoordinates[this.TargetSequence] < 0 {
@@ -1355,7 +1355,7 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
-		if sequences[this.TargetSequence].Type == "rgb" {
+		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Label == "chaser" {
 			this.RGBFade[this.TargetSequence]++
 			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {
 				this.RGBFade[this.TargetSequence] = common.MAX_RGB_FADE
@@ -1374,7 +1374,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Update Coordinates.
-		if sequences[this.TargetSequence].Type == "scanner" {
+		if sequences[this.TargetSequence].Type == "scanner" || sequences[this.TargetSequence].Label != "chaser" {
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.TargetSequence]++
 			if this.ScannerCoordinates[this.TargetSequence] > 4 {
