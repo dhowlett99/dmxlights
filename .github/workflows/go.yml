@@ -21,6 +21,11 @@ jobs:
       with:
         go-version: '1.20'
 
+    - name: Install macOS PortAudio dependencies
+      if: runner.os == 'macOS'
+      shell: bash
+      run: brew install portaudio
+
     - name: Build
       run: go build -v ./...
 
