@@ -414,7 +414,16 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 	debug := false
 
 	if debug {
-		fmt.Printf("showStatusBar\n")
+		fmt.Printf("showStatusBar for sequence %d\n", this.SelectedSequence)
+	}
+
+	var chaser bool
+	if this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY ||
+		this.SelectMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
+		this.SelectMode[this.SelectedSequence] == CHASER_FUNCTION {
+		chaser = true
+	} else {
+		chaser = false
 	}
 
 	sensitivity := common.FindSensitivity(this.SoundGain)
@@ -438,6 +447,21 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 		fmt.Printf("Display Sequence %d Mode %s Type %s\n", this.DisplaySequence, printMode(this.SelectMode[this.DisplaySequence]), sequences[this.DisplaySequence].Type)
 	}
 
+	// Speed is common to all selectable sequences.
+	if this.Strobe[this.TargetSequence] {
+		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+	} else {
+		if this.Functions[this.DisplaySequence][common.Function8_Music_Trigger].State {
+			common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+		} else {
+			if chaser {
+				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+			}
+		}
+	}
+
 	// RGB
 	if sequences[this.DisplaySequence].Type == "rgb" &&
 		(this.SelectMode[this.DisplaySequence] == NORMAL || this.SelectMode[this.DisplaySequence] == FUNCTION || this.SelectMode[this.DisplaySequence] == STATUS) {
@@ -446,15 +470,6 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 			fmt.Printf("showStatusBar show RGB labels\n")
 		}
 
-		if this.Strobe[this.SelectedSequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
-		} else {
-			if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
-				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.DisplaySequence]), "speed", false, guiButtons)
-			}
-		}
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
@@ -481,22 +496,12 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 			fmt.Printf("showStatusBar show Rotate labels\n")
 		}
 
-		if this.Strobe[this.DisplaySequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.DisplaySequence]), "speed", false, guiButtons)
-		} else {
-			if this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State {
-				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.DisplaySequence]), "speed", false, guiButtons)
-			}
-		}
 		if this.SelectMode[this.TargetSequence] == NORMAL || this.SelectMode[this.TargetSequence] == FUNCTION || this.SelectMode[this.TargetSequence] == STATUS {
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			label = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
 
 			common.LabelButton(0, 7, "Rotate\nSpeed\nDown", guiButtons)
 			common.LabelButton(1, 7, "Rotate\nSpeed\nUp", guiButtons)

@@ -76,9 +76,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
-		this.ScannerShift[this.SelectedSequence] = sequences[sequenceNumber].ScannerShift
+		this.ScannerShift[sequenceNumber] = sequences[sequenceNumber].ScannerShift
 		this.RGBSize[sequenceNumber] = sequences[sequenceNumber].RGBSize
-		this.ScannerSize[this.SelectedSequence] = sequences[sequenceNumber].ScannerSize
+		this.ScannerSize[sequenceNumber] = sequences[sequenceNumber].ScannerSize
 		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
 		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
 		this.Running[sequenceNumber] = sequences[sequenceNumber].Run
