@@ -95,15 +95,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.ShowStaticColorPicker = false
 		this.ShowRGBColorPicker = false
 
+		// Assume we're starting in normal mode.
+		this.SelectMode[sequenceNumber] = NORMAL
+
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		var displaySet bool
 		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
-			this.SelectMode[this.ScannerSequenceNumber] = CHASER_DISPLAY
-			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
-		}
-		if sequenceNumber != this.ChaserSequenceNumber && !displaySet {
-			displayMode(sequenceNumber, this.SelectMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+			this.SelectMode[sequenceNumber] = CHASER_DISPLAY
 		}
 
 		// Reload the fixture state.
@@ -146,6 +144,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 				}
 			}
 		}
+
+		// Play out this sequence.
+		this.SelectedSequence = sequenceNumber
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
@@ -159,6 +161,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+	// Indicate if this sequence is running.
+	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+	this.SelectButtonPressed[this.SelectedSequence] = false
+
+	this.SelectedSequence = autoSelect(this)
 
 }
 
