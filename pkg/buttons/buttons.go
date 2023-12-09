@@ -2487,12 +2487,18 @@ func printMode(mode int) string {
 
 func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
 
+	NumberOfSelectableSequences := 3
+
 	if debug {
 		fmt.Printf("SequenceSelect\n")
 	}
 
+	if this.SelectedSequence > NumberOfSelectableSequences-1 {
+		return
+	}
+
 	// Turn off all sequence lights.
-	for seq := 0; seq < 3; seq++ {
+	for seq := 0; seq < NumberOfSelectableSequences; seq++ {
 		common.LightLamp(common.Button{X: 8, Y: seq}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 	}
 

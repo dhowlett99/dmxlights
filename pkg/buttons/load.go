@@ -159,15 +159,17 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 	}
 	// Show this sequence running status in the start/stop button.
-	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
-	// Indicate if this sequence is running.
-	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-
+	// Forget we've pressed twice.
 	this.SelectButtonPressed[this.SelectedSequence] = false
 
+	// Auto select the last running or static sequence which lights it's select lamp.
 	this.SelectedSequence = autoSelect(this)
+
+	// Refresh the auto selected sequence.
+	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 }
 
