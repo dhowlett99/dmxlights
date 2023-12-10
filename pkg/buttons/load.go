@@ -33,8 +33,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	guiButtons chan common.ALight, updateChannels []chan common.Sequence,
 	dmxInterfacePresent bool) {
 
-	this.Loading = true
-
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
 		Action: common.Stop,
@@ -74,7 +72,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Get an upto date copy of all of the sequences.
 	for sequenceNumber, sequence := range sequences {
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-
+		// Let everyone (currently just diplayMode) we are loading a preset.
+		this.Loading[sequenceNumber] = true
 		// restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
@@ -146,6 +145,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 				}
 			}
 		}
+
+		//fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 
 		// Play out this sequence.
 		this.SelectedSequence = sequenceNumber

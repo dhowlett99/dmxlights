@@ -84,6 +84,7 @@ func main() {
 	this.Static = make([]bool, NumberOfSequences)                  // Remember when this sequence is in static mode.
 	this.StaticFlashing = make([]bool, NumberOfSequences)          // Remember when we are in static buttons are flashing.
 	this.SequenceType = make([]string, NumberOfSequences)          // Remember sequence type.
+	this.Loading = make([]bool, NumberOfSequences)                 // Rememeber when this sequence is loading a config.
 	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
