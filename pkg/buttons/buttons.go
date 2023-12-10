@@ -55,6 +55,7 @@ type CurrentState struct {
 	SelectedSequence            int                        // The currently selected sequence.
 	TargetSequence              int                        // The current target sequence.
 	DisplaySequence             int                        // The current display sequence.
+	Loading                     bool                       // Loading a config.
 	SequenceType                []string                   // The type, indexed by sequence.
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
@@ -977,30 +978,6 @@ func ProcessButtons(X int, Y int,
 		if this.ScannerChaser[this.SelectedSequence] {
 			this.EditWhichStaticSequence = 4
 		}
-
-		return
-	}
-
-	// Select sequence 4.
-	if X == 8 && Y == 3 {
-
-		this.SelectedSequence = 3
-
-		if debug {
-			fmt.Printf("Select Sequence %d \n", this.SelectedSequence)
-		}
-
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		cmd := common.Command{
-			Action: common.PlayStaticOnce,
-		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-
-		this.ShowRGBColorPicker = false
-		this.EditGoboSelectionMode = false
-		this.DisplayChaserShortCut = false
-		this.EditWhichStaticSequence = 3
 
 		return
 	}

@@ -33,6 +33,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	guiButtons chan common.ALight, updateChannels []chan common.Sequence,
 	dmxInterfacePresent bool) {
 
+	this.Loading = true
+
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
 		Action: common.Stop,
@@ -87,16 +89,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
+
+		// Assume we're starting in normal mode.
 		this.SelectMode[sequenceNumber] = NORMAL
+
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
 		this.StaticFlashing[sequenceNumber] = false
 
 		this.ShowStaticColorPicker = false
 		this.ShowRGBColorPicker = false
-
-		// Assume we're starting in normal mode.
-		this.SelectMode[sequenceNumber] = NORMAL
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
@@ -168,8 +170,21 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Auto select the last running or static sequence which lights it's select lamp.
 	this.SelectedSequence = autoSelect(this)
 
-	// Refresh the auto selected sequence.
-	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+	// Tailor the top buttons to the sequence type.
+	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+
+	// Tailor the bottom buttons to the sequence type.
+	common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+
+	// Show this sequence running status in the start/stop button.
+	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+	// Update the status bar.
+	showStatusBar(this, sequences, guiButtons)
+
+	// Light the sequence selector button.
+	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 }
 

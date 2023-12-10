@@ -342,13 +342,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Static = false
 		return sequence
 
-	case common.PlayStaticOnce:
-		if debug {
-			fmt.Printf("%d: Command PlayStaticOnce\n", mySequenceNumber)
-		}
-		sequence.PlayStaticOnce = true
-		return sequence
-
 	case common.Blackout:
 		if debug {
 			fmt.Printf("%d: Command Blackout\n", mySequenceNumber)
@@ -468,7 +461,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StaticColors[staticColor].Flash = command.Args[STATIC_FLASH].Value.(bool)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
-		sequence.PlayStaticOnce = true
+		sequence.PlayStaticOnce = command.Args[STATIC_FLASH].Value.(bool)
 		sequence.Static = true
 		sequence.Hide = command.Args[STATIC_HIDDEN].Value.(bool)
 		return sequence

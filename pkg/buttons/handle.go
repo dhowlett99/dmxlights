@@ -193,8 +193,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 	debug := false
 
-	// Clear the buttons.
-	common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+	// If we not loading a preset clear the buttons.
+	if !this.Loading {
+		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+	}
+	this.Loading = false
 
 	if debug {
 		fmt.Printf("displayMode Sequence %d Mode : %s\n", sequenceNumber, printMode(this.SelectMode[sequenceNumber]))
