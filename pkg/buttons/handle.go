@@ -197,6 +197,24 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	if !this.Loading[sequenceNumber] {
 		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 	}
+	if !this.Static[sequenceNumber] {
+		// Turn static off
+		this.Static[sequenceNumber] = false
+	}
+
+	if !this.Static[sequenceNumber] {
+		cmd := common.Command{
+			Action: common.UpdateStaticColor,
+			Args: []common.Arg{
+				{Name: "Static", Value: false},
+				{Name: "FixtureNumber", Value: this.SelectedStaticFixtureNumber},
+				{Name: "StaticLampFlash", Value: false},
+				{Name: "SelectedColor", Value: sequences[sequenceNumber].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
+				{Name: "StaticColor", Value: sequences[sequenceNumber].StaticColors[this.SelectedStaticFixtureNumber].Color},
+			},
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+	}
 
 	this.Loading[sequenceNumber] = false
 
@@ -559,7 +577,7 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 func flashwStaticButtons(targetSequence int, state bool, hide bool, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("======> flashwStaticButtons: sequence %d set to %t hide %t\n", targetSequence, state, hide)
+		fmt.Printf("flashwStaticButtons: sequence %d set to %t hide %t\n", targetSequence, state, hide)
 	}
 	// Add the flashing static buttons.
 	cmd := common.Command{

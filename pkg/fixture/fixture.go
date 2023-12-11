@@ -275,7 +275,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("Fixture:%d Command Set Switch\n", myFixtureNumber)
 			}
-			lastColor = MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.FadeSpeed, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			lastColor = MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 		}
 
@@ -393,7 +393,7 @@ func FixtureReceiver(
 					sequence.Static = cmd.RGBStatic
 					sequence.StrobeSpeed = cmd.StrobeSpeed
 					sequence.Strobe = cmd.Strobe
-					sequence.RGBFade = cmd.FadeSpeed
+					sequence.RGBFade = cmd.RGBFade
 					// fadeUpStaticFixture doesn't set lastColor directley, instead it sets the final fade color (lastColor) by sending a message to this thread.
 					fadeUpStaticFixture(sequence, myFixtureNumber, stopFadeUp, stopFadeDown, lastColor, eventsForLaunchpad, guiButtons, fixtures, true, dmxController, dmxInterfacePresent, fixtureStepChannel)
 					continue
@@ -405,9 +405,52 @@ func FixtureReceiver(
 
 			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce && cmd.Label != "chaser" {
 				if debug {
-					fmt.Printf("Fixture:%d Turn RGB Off\n", myFixtureNumber)
+					fmt.Printf("Fixture:%d =====>  RGB Static Fade Down from LastColor %+v\n", myFixtureNumber, lastColor)
 				}
-				turnOffSingleFixture(myFixtureNumber, cmd.SequenceNumber, common.EmptyColor, fixtures, dmxController, dmxInterfacePresent)
+
+				go func() {
+					var master int
+					fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
+					if lastColor != common.EmptyColor {
+						for _, fade := range fadeDownValues {
+
+							// Look for a matching color
+							color := common.GetColorNameByRGB(lastColor)
+							// Find a suitable gobo based on the requested static lamp color.
+							scannerGobo := FindGobo(myFixtureNumber, cmd.SequenceNumber, color, fixtures)
+							// Find a suitable color wheel settin based on the requested static lamp color.
+							scannerColor := FindColor(myFixtureNumber, cmd.SequenceNumber, color, fixtures)
+
+							// Listen for stop command.
+							select {
+							case <-stopFadeDown:
+								return
+							case <-time.After(10 * time.Millisecond):
+							}
+							common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, lastColor, fade, eventsForLaunchpad, guiButtons)
+							if cmd.Label == "chaser" {
+								// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
+								// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
+								master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
+							}
+							MapFixtures(false, false, cmd.SequenceNumber, myFixtureNumber, lastColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+
+							// Control how long the fade take with the speed control.
+							time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
+						}
+						// Fade down complete, set lastColor to empty.
+						// Fade down complete, set lastColor to empty in the fixture.
+						command := common.FixtureCommand{
+							Type:      "lastColor",
+							LastColor: common.EmptyColor,
+						}
+						select {
+						case fixtureStepChannel <- command:
+						case <-time.After(100 * time.Millisecond):
+						}
+					}
+				}()
+
 				common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, common.Black, cmd.Master, eventsForLaunchpad, guiButtons)
 				continue
 			}
@@ -477,6 +520,58 @@ func FixtureReceiver(
 					fmt.Printf("Fixture:%d Scanner Start Flood\n", myFixtureNumber)
 				}
 				common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, common.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+				continue
+			}
+
+			if !cmd.RGBStatic && cmd.RGBPlayStaticOnce {
+				if debug {
+					fmt.Printf("Fixture:%d RGB Static Fade Down from LastColor %+v\n", myFixtureNumber, lastColor)
+				}
+
+				go func() {
+					var master int
+					fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
+					if lastColor != common.EmptyColor {
+						for _, fade := range fadeDownValues {
+
+							// Look for a matching color
+							color := common.GetColorNameByRGB(lastColor)
+							// Find a suitable gobo based on the requested static lamp color.
+							scannerGobo := FindGobo(myFixtureNumber, cmd.SequenceNumber, color, fixtures)
+							// Find a suitable color wheel settin based on the requested static lamp color.
+							scannerColor := FindColor(myFixtureNumber, cmd.SequenceNumber, color, fixtures)
+
+							// Listen for stop command.
+							select {
+							case <-stopFadeDown:
+								return
+							case <-time.After(10 * time.Millisecond):
+							}
+							common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, lastColor, fade, eventsForLaunchpad, guiButtons)
+							if cmd.Label == "chaser" {
+								// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because
+								// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
+								master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
+							}
+							MapFixtures(false, false, cmd.SequenceNumber, myFixtureNumber, lastColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+
+							// Control how long the fade take with the speed control.
+							time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
+						}
+						// Fade down complete, set lastColor to empty.
+						// Fade down complete, set lastColor to empty in the fixture.
+						command := common.FixtureCommand{
+							Type:      "lastColor",
+							LastColor: common.EmptyColor,
+						}
+						select {
+						case fixtureStepChannel <- command:
+						case <-time.After(100 * time.Millisecond):
+						}
+					}
+				}()
+
+				common.LightLamp(common.Button{X: myFixtureNumber, Y: cmd.SequenceNumber}, common.Black, cmd.Master, eventsForLaunchpad, guiButtons)
 				continue
 			}
 
@@ -941,7 +1036,7 @@ func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxI
 // The switch is idendifed by the sequence and switch number.
 func MapSwitchFixture(swiTch common.Switch,
 	state common.State,
-	fadeSpeed int,
+	RGBFade int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
 	brightness int, master int, masterChanging bool, lastColor common.Color,
@@ -956,7 +1051,7 @@ func MapSwitchFixture(swiTch common.Switch,
 	var useFixtureLabel string
 
 	if debug {
-		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d fade speed %d\n", swiTch.Number, swiTch.CurrentPosition, fadeSpeed)
+		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d fade speed %d\n", swiTch.Number, swiTch.CurrentPosition, RGBFade)
 	}
 
 	// We start by having the switch and its current state passed in.

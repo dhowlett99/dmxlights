@@ -332,7 +332,7 @@ func PlaySequence(sequence common.Sequence,
 					State:              state,
 					CurrentSwitchState: switchData.CurrentPosition,
 					MasterChanging:     sequence.MasterChanging,
-					FadeSpeed:          sequence.RGBFade,
+					RGBFade:            sequence.RGBFade,
 				}
 
 				// Send a message to the fixture to operate the switch.
@@ -372,7 +372,7 @@ func PlaySequence(sequence common.Sequence,
 				State:              sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition],
 				CurrentSwitchState: swiTch.CurrentPosition,
 				MasterChanging:     sequence.MasterChanging,
-				FadeSpeed:          sequence.RGBFade,
+				RGBFade:            sequence.RGBFade,
 			}
 
 			// Send a message to the fixture to operate the switch.
@@ -436,7 +436,7 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			if debug {
-				fmt.Printf("sequence %d Static mode\n", mySequenceNumber)
+				fmt.Printf("sequence %d Type %s Static mode ON and StaticFadeUpOnce=%t\n", mySequenceNumber, sequence.Type, sequence.StaticFadeUpOnce)
 			}
 
 			sequence.Static = true
@@ -463,7 +463,7 @@ func PlaySequence(sequence common.Sequence,
 					SequenceNumber:  sequence.Number,
 					RGBStatic:       false,
 					RGBFadeUpStatic: true,
-					FadeSpeed:       sequence.RGBFade,
+					RGBFade:         sequence.RGBFade,
 					RGBStaticColors: sequence.StaticColors,
 					Hide:            sequence.Hide,
 					StrobeSpeed:     sequence.StrobeSpeed,
@@ -505,7 +505,7 @@ func PlaySequence(sequence common.Sequence,
 		// Turn Static Mode Off
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
-				fmt.Printf("sequence %d Static Off mode and Blackout is %t\n", mySequenceNumber, sequence.Blackout)
+				fmt.Printf("sequence %d Type %s Label %s Static mode OFF \n", mySequenceNumber, sequence.Type, sequence.Label)
 			}
 
 			channels.SoundTriggers[mySequenceNumber].State = false
@@ -517,13 +517,14 @@ func PlaySequence(sequence common.Sequence,
 				Type:              sequence.Type,
 				Label:             sequence.Label,
 				SequenceNumber:    sequence.Number,
-				RGBStatic:         sequence.Static,
-				RGBPlayStaticOnce: sequence.PlayStaticOnce,
+				RGBStatic:         false,
+				RGBPlayStaticOnce: true,
 				RGBStaticColors:   sequence.StaticColors,
 				Hide:              sequence.Hide,
 				StrobeSpeed:       sequence.StrobeSpeed,
 				Strobe:            sequence.Strobe,
 				ScannerChaser:     sequence.ScannerChaser,
+				RGBFade:           sequence.RGBFade,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -806,7 +807,7 @@ func PlaySequence(sequence common.Sequence,
 							Rotate:                   sequence.Rotate,
 							StrobeSpeed:              sequence.StrobeSpeed,
 							Strobe:                   sequence.Strobe,
-							FadeSpeed:                sequence.Speed,
+							RGBFade:                  sequence.Speed,
 							Hide:                     sequence.Hide,
 							RGBPosition:              RGBPositions[step],
 							StartFlood:               sequence.StartFlood,
