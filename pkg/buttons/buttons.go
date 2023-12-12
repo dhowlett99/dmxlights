@@ -170,7 +170,7 @@ func ProcessButtons(X int, Y int,
 
 		// Show the static and switch settings.
 		cmd := common.Command{
-			Action: common.UnHide,
+			Action: common.Reveal,
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
 
@@ -323,6 +323,7 @@ func ProcessButtons(X int, Y int,
 
 			// Short press means load the config.
 			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
+			common.StartStaticSequences(sequences, commandChannels)
 		}
 		return
 	}
@@ -632,6 +633,7 @@ func ProcessButtons(X int, Y int,
 						this.SavePreset = false
 					}
 					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
+					common.StartStaticSequences(sequences, commandChannels)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
 					// Start a timer for this button.
