@@ -146,7 +146,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			}
 		}
 
-		//fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
+		if debug {
+			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
+		}
 
 		// Play out this sequence.
 		this.SelectedSequence = sequenceNumber

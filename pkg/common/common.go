@@ -107,6 +107,12 @@ type Color struct {
 	Flash bool
 }
 
+// Used for static fades, remember the last color.
+type LastColor struct {
+	RGBColor     Color
+	ScannerColor int
+}
+
 type ColorPicker struct {
 	Name  string
 	ID    int
@@ -244,7 +250,7 @@ const (
 	UpdateSequenceColors
 	PlayStaticOnce
 	PlaySwitchOnce
-	UnHide
+	Reveal
 	Hide
 	Start
 	StartChase
@@ -347,7 +353,7 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
-	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
+	Hidden                      bool                        // Hidden is used to indicate sequence buttons are not visible.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness
 	MasterChanging              bool                        // flag to indicate we are changing brightness.
@@ -425,7 +431,6 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
-	Hidden                      bool                        // Is this sequence hidden on the launchpad.
 }
 
 type Function struct {
@@ -473,24 +478,25 @@ type FixtureCommand struct {
 	LastColor      Color
 
 	// Common commands.
+	Hidden         bool
 	Strobe         bool
 	StrobeSpeed    int
 	Master         int
 	MasterChanging bool
 	Blackout       bool
-	Hide           bool
 	Clear          bool
-	RGBFade        int
 
 	StartFlood bool
 	StopFlood  bool
 
 	// RGB commands.
-	RGBPosition       Position
-	RGBStatic         bool
-	RGBFadeUpStatic   bool
-	RGBStaticColors   []StaticColorButton
-	RGBPlayStaticOnce bool
+	RGBPosition        Position
+	RGBStaticSwitchOff bool
+	RGBStaticSwitchOn  bool
+	RGBStaticFadeUp    bool
+	RGBStaticColors    []StaticColorButton
+	RGBPlayStaticOnce  bool
+	RGBFade            int
 
 	// Scanner Commands.
 	ScannerColor             int
@@ -511,7 +517,6 @@ type FixtureCommand struct {
 	Program int
 
 	// Switch Commands
-	SetSwitch          bool
 	SwitchData         Switch
 	State              State
 	CurrentSwitchState int
@@ -614,7 +619,7 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
-		Action: UnHide,
+		Action: Reveal,
 	}
 	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
@@ -632,6 +637,15 @@ func HideAllSequences(commandChannels []chan Command) {
 		Action: Hide,
 	}
 	SendCommandToAllSequence(cmd, commandChannels)
+}
+
+func StartStaticSequences(sequences []*Sequence, commandChannels []chan Command) {
+	for sequenceNumber := range sequences {
+		cmd := Command{
+			Action: Normal,
+		}
+		SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+	}
 }
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
@@ -973,7 +987,8 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 }
 
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	if selectedSequence == 4 {
+	// TODO replace with constants for switch and chase sequence numbers.
+	if selectedSequence == 4 || selectedSequence == 3 {
 		return
 	}
 	for x := 0; x < 8; x++ {

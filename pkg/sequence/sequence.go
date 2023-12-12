@@ -162,7 +162,6 @@ func CreateSequence(
 		ScannersAvailable:      availableFixtures,
 		NumberFixtures:         numberFixtures,
 		Type:                   sequenceType,
-		Hide:                   false,
 		Hidden:                 false,
 		Mode:                   "Sequence",
 		StaticColors:           staticColorsButtons,
@@ -327,7 +326,6 @@ func PlaySequence(sequence common.Sequence,
 					Type:               sequence.Type,
 					Label:              sequence.Label,
 					SequenceNumber:     sequence.Number,
-					SetSwitch:          true,
 					SwitchData:         switchData,
 					State:              state,
 					CurrentSwitchState: switchData.CurrentPosition,
@@ -367,7 +365,6 @@ func PlaySequence(sequence common.Sequence,
 				Type:               sequence.Type,
 				Label:              sequence.Label,
 				SequenceNumber:     sequence.Number,
-				SetSwitch:          true,
 				SwitchData:         sequence.Switches[sequence.CurrentSwitch],
 				State:              sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition],
 				CurrentSwitchState: swiTch.CurrentPosition,
@@ -390,16 +387,14 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Master:          sequence.Master,
-				Blackout:        sequence.Blackout,
-				Type:            sequence.Type,
-				Label:           sequence.Label,
-				SequenceNumber:  sequence.Number,
-				RGBStatic:       sequence.Static,
-				RGBStaticColors: sequence.StaticColors,
-				StartFlood:      sequence.StartFlood,
-				StrobeSpeed:     sequence.StrobeSpeed,
-				Strobe:          sequence.Strobe,
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
+				Type:           sequence.Type,
+				Label:          sequence.Label,
+				SequenceNumber: sequence.Number,
+				StartFlood:     sequence.StartFlood,
+				StrobeSpeed:    sequence.StrobeSpeed,
+				Strobe:         sequence.Strobe,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -436,7 +431,7 @@ func PlaySequence(sequence common.Sequence,
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			if debug {
-				fmt.Printf("sequence %d Type %s Static mode ON and StaticFadeUpOnce=%t\n", mySequenceNumber, sequence.Type, sequence.StaticFadeUpOnce)
+				fmt.Printf("%d: Static mode StaticFadeUpOnce %t\n", mySequenceNumber, sequence.StaticFadeUpOnce)
 			}
 
 			sequence.Static = true
@@ -461,11 +456,10 @@ func PlaySequence(sequence common.Sequence,
 					Type:            sequence.Type,
 					Label:           sequence.Label,
 					SequenceNumber:  sequence.Number,
-					RGBStatic:       false,
-					RGBFadeUpStatic: true,
+					RGBStaticFadeUp: true,
 					RGBFade:         sequence.RGBFade,
 					RGBStaticColors: sequence.StaticColors,
-					Hide:            sequence.Hide,
+					Hidden:          sequence.Hidden,
 					StrobeSpeed:     sequence.StrobeSpeed,
 					Strobe:          sequence.Strobe,
 					ScannerChaser:   sequence.ScannerChaser,
@@ -479,18 +473,17 @@ func PlaySequence(sequence common.Sequence,
 			} else {
 				// else just play the static scene.
 				command := common.FixtureCommand{
-					Master:          sequence.Master,
-					Blackout:        sequence.Blackout,
-					Type:            sequence.Type,
-					Label:           sequence.Label,
-					SequenceNumber:  sequence.Number,
-					RGBStatic:       true,
-					RGBFadeUpStatic: false,
-					RGBStaticColors: sequence.StaticColors,
-					Hide:            sequence.Hide,
-					StrobeSpeed:     sequence.StrobeSpeed,
-					Strobe:          sequence.Strobe,
-					ScannerChaser:   sequence.ScannerChaser,
+					Master:            sequence.Master,
+					Blackout:          sequence.Blackout,
+					Type:              sequence.Type,
+					Label:             sequence.Label,
+					SequenceNumber:    sequence.Number,
+					Hidden:            sequence.Hidden,
+					StrobeSpeed:       sequence.StrobeSpeed,
+					Strobe:            sequence.Strobe,
+					ScannerChaser:     sequence.ScannerChaser,
+					RGBStaticSwitchOn: true,
+					RGBStaticColors:   sequence.StaticColors,
 				}
 
 				// Now tell all the fixtures what they need to do.
@@ -502,29 +495,28 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Turn Static Mode Off
+		// Turn Static Off Mode
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
-				fmt.Printf("sequence %d Type %s Label %s Static mode OFF \n", mySequenceNumber, sequence.Type, sequence.Label)
+				fmt.Printf("%d: RGB Static mode OFF Type %s Label %s \n", mySequenceNumber, sequence.Type, sequence.Label)
 			}
 
 			channels.SoundTriggers[mySequenceNumber].State = false
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Master:            sequence.Master,
-				Blackout:          sequence.Blackout,
-				Type:              sequence.Type,
-				Label:             sequence.Label,
-				SequenceNumber:    sequence.Number,
-				RGBStatic:         false,
-				RGBPlayStaticOnce: true,
-				RGBStaticColors:   sequence.StaticColors,
-				Hide:              sequence.Hide,
-				StrobeSpeed:       sequence.StrobeSpeed,
-				Strobe:            sequence.Strobe,
-				ScannerChaser:     sequence.ScannerChaser,
-				RGBFade:           sequence.RGBFade,
+				Master:             sequence.Master,
+				Blackout:           sequence.Blackout,
+				Type:               sequence.Type,
+				Label:              sequence.Label,
+				SequenceNumber:     sequence.Number,
+				Hidden:             sequence.Hidden,
+				StrobeSpeed:        sequence.StrobeSpeed,
+				Strobe:             sequence.Strobe,
+				ScannerChaser:      sequence.ScannerChaser,
+				RGBStaticSwitchOff: false,
+				RGBStaticColors:    sequence.StaticColors,
+				RGBFade:            sequence.RGBFade,
 			}
 
 			// Now tell all the fixtures what they need to do.
@@ -807,8 +799,8 @@ func PlaySequence(sequence common.Sequence,
 							Rotate:                   sequence.Rotate,
 							StrobeSpeed:              sequence.StrobeSpeed,
 							Strobe:                   sequence.Strobe,
-							RGBFade:                  sequence.Speed,
-							Hide:                     sequence.Hide,
+							RGBFade:                  sequence.RGBFade,
+							Hidden:                   sequence.Hidden,
 							RGBPosition:              RGBPositions[step],
 							StartFlood:               sequence.StartFlood,
 							StopFlood:                sequence.StopFlood,

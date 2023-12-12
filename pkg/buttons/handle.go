@@ -175,7 +175,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 	// Show the static and switch settings.
 	cmd := common.Command{
-		Action: common.UnHide,
+		Action: common.Reveal,
 	}
 
 	// Take account of the shutter chaser which should be shown if the chaser is running.
@@ -191,32 +191,11 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := false
-
 	// If we not loading a preset clear the buttons.
 	if !this.Loading[sequenceNumber] {
 		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+		this.Loading[sequenceNumber] = false
 	}
-	if !this.Static[sequenceNumber] {
-		// Turn static off
-		this.Static[sequenceNumber] = false
-	}
-
-	if !this.Static[sequenceNumber] {
-		cmd := common.Command{
-			Action: common.UpdateStaticColor,
-			Args: []common.Arg{
-				{Name: "Static", Value: false},
-				{Name: "FixtureNumber", Value: this.SelectedStaticFixtureNumber},
-				{Name: "StaticLampFlash", Value: false},
-				{Name: "SelectedColor", Value: sequences[sequenceNumber].StaticColors[this.SelectedStaticFixtureNumber].SelectedColor},
-				{Name: "StaticColor", Value: sequences[sequenceNumber].StaticColors[this.SelectedStaticFixtureNumber].Color},
-			},
-		}
-		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-	}
-
-	this.Loading[sequenceNumber] = false
 
 	if debug {
 		fmt.Printf("displayMode Sequence %d Mode : %s\n", sequenceNumber, printMode(this.SelectMode[sequenceNumber]))
@@ -251,20 +230,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
-		// If we are the scanner sequence take into account the state of
-		// the static flag in the shutter chaser. We don't want to shut off the scanners
-		// if we're in the middle of a static scene.
-		if this.ScannerSequenceNumber == sequenceNumber {
-			if !this.Static[this.ChaserSequenceNumber] {
-				// Force the reveal the selected sequence.
-				common.HideSequence(sequenceNumber, commandChannels)
-				common.RevealSequence(sequenceNumber, commandChannels)
-			}
-		} else {
-			// Force the reveal the selected sequence.
-			common.HideSequence(sequenceNumber, commandChannels)
-			common.RevealSequence(sequenceNumber, commandChannels)
-		}
+		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+
+		common.RevealSequence(sequenceNumber, commandChannels)
 
 		return
 
@@ -278,8 +246,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
-		// Force the reveal the selected sequence.
-		common.HideSequence(sequenceNumber, commandChannels)
+		// Reveal the selected sequence.
 		common.RevealSequence(sequenceNumber, commandChannels)
 
 		// Select all fixtures.
@@ -299,8 +266,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Hide the selected sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 
-		// Force the reveal of the shutter chaser.
-		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		// Reveal the chaser sequence.
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 
 		if this.StaticFlashing[sequenceNumber] {
@@ -322,8 +288,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Hide the selected sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 
-		// Force the reveal of the shutter chaser.
-		common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		// Reveal the chaser sequence.
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 
 		// Select all fixtures.
@@ -340,9 +305,8 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if debug {
 			fmt.Printf("displayMode: FUNCTION  Seq:%d Shutter Chaser is %t\n", sequenceNumber, this.ScannerChaser[sequenceNumber])
 		}
-		// If we have a shutter chaser running force hide it.
+		// If we have a shutter chaser running hide it.
 		if this.SequenceType[sequenceNumber] == "scanner" {
-			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
