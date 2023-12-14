@@ -299,17 +299,26 @@ func FixtureReceiver(
 			lastColor = stopFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
+		case cmd.RGBStaticLampsOn:
+			if debug {
+				fmt.Printf("%d:%d Static Lamps On Master=%d Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Master, cmd.Hidden)
+			}
+			setStaticLampsOn(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons)
+			continue
+
 		case cmd.RGBStaticOn:
 			if debug {
-				fmt.Printf("%d:%d Static On\n", cmd.SequenceNumber, myFixtureNumber)
+				fmt.Printf("%d:%d Static On Master=%d Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Master, cmd.Hidden)
 			}
-			lastColor = setSwitch(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = setStaticOn(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			continue
 
 		case cmd.RGBStaticFadeUp:
 			if debug {
 				fmt.Printf("%d:%d Static Fade Up\n", cmd.SequenceNumber, myFixtureNumber)
 			}
-			lastColor = fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			// FadeUpStatic doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading up.
+			fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticOff:
@@ -387,11 +396,11 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 }
 
 // Switch On Static Scene.
-func setSwitch(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
 
 	if cmd.RGBStaticColors[fixtureNumber].Enabled {
 		if debug {
-			fmt.Printf("%d: Fixture:%d RGBSwitchStatic Trying to Set RGB Static\n", cmd.SequenceNumber, fixtureNumber)
+			fmt.Printf("%d: Fixture:%d RGB Switch Static On - Trying to Set RGB Static Master=%d\n", cmd.SequenceNumber, fixtureNumber, cmd.Master)
 		}
 
 		// TODO find sequence numbers from config.
@@ -424,8 +433,34 @@ func setSwitch(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 	return common.LastColor{}
 }
 
+// Switch on static indicator lamps.
+func setStaticLampsOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if cmd.RGBStaticColors[fixtureNumber].Enabled {
+		//if debug {
+		fmt.Printf("%d: Fixture:%d RGB Switch Static Lamps On - Trying to Set RGB Static Master=%d\n", cmd.SequenceNumber, fixtureNumber, cmd.Master)
+		//}
+
+		// TODO find sequence numbers from config.
+		if cmd.SequenceNumber == 4 {
+			cmd.SequenceNumber = 2
+		}
+		lamp := cmd.RGBStaticColors[fixtureNumber]
+		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
+		if !cmd.Hidden {
+			if lamp.Flash {
+				onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, common.Black, eventsForLaunchpad, guiButtons)
+			} else {
+				fmt.Printf("%d: Master = %d\n", cmd.SequenceNumber, cmd.Master)
+				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
+			}
+		}
+	}
+}
+
 // Fade Up RGB Static Scene
-func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
 	if debug {
 		fmt.Printf("%d: fadeUpStaticFixture: Fixture No %d LastColor %+v\n", cmd.SequenceNumber, fixtureNumber, lastColor)
@@ -546,13 +581,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 
 			}
 		}()
-
-	} else {
-		// This fixture is disabled, shut it off.
-		return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 	}
-
-	return common.LastColor{}
 }
 
 func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {

@@ -186,7 +186,7 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	// Tailor the top buttons to the sequence type.
 	common.ShowTopButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
@@ -209,7 +209,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == NORMAL:
 
 		if debug {
-			fmt.Printf("%d: displayMode: NORMAL\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: NORMAL\n", sequenceNumber)
 		}
 
 		// Make sure we hide the shutter chaser.
@@ -217,7 +217,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
 
-		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+		if !this.Static[sequenceNumber] {
+			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+		}
 
 		common.RevealSequence(sequenceNumber, commandChannels)
 
@@ -226,7 +228,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == NORMAL_STATIC:
 
 		if debug {
-			fmt.Printf("%d: displayMode: NORMAL STATIC\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: NORMAL STATIC\n", sequenceNumber)
 		}
 
 		// Make sure we hide any shutter chaser.
@@ -249,7 +251,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == CHASER_DISPLAY:
 
 		if debug {
-			fmt.Printf("%d: displayMode: CHASER_DISPLAY\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: CHASER_DISPLAY\n", sequenceNumber)
 		}
 		// Hide the selected sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
@@ -276,7 +278,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == CHASER_DISPLAY_STATIC:
 
 		if debug {
-			fmt.Printf("%d: displayMode: CHASER_DISPLAY_STATIC\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: CHASER_DISPLAY_STATIC\n", sequenceNumber)
 		}
 
 		// Hide the selected sequence.
@@ -297,7 +299,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == FUNCTION:
 
 		if debug {
-			fmt.Printf("%d: displayMode: FUNCTION  Shutter Chaser is %t\n", sequenceNumber, this.ScannerChaser[sequenceNumber])
+			fmt.Printf("%d: DisplayMode: FUNCTION  Shutter Chaser is %t\n", sequenceNumber, this.ScannerChaser[sequenceNumber])
 		}
 
 		hideAllFunctionKeys(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
@@ -327,7 +329,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == CHASER_FUNCTION:
 
 		if debug {
-			fmt.Printf("%d: displayMode: CHASER_FUNCTION\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: CHASER_FUNCTION\n", sequenceNumber)
 		}
 		// If we have a shutter chaser running hide it.
 		if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
@@ -358,7 +360,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	case mode == STATUS:
 
 		if debug {
-			fmt.Printf("%d: displayMode: STATUS\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: STATUS\n", sequenceNumber)
 		}
 
 		// If we're a scanner sequence and trying to display the status bar we don't want a shutter chaser in view.

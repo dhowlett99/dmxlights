@@ -394,9 +394,11 @@ type Sequence struct {
 	Clear                       bool                        // Clear all fixtures in this sequence.
 	Static                      bool                        // We're a static sequence.
 	PlayStaticOnce              bool                        // Play a static scene only once.
+	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
+	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
 	LastStatic                  bool                        // Last value of static before flood.
@@ -493,6 +495,7 @@ type FixtureCommand struct {
 	RGBPosition       Position
 	RGBStaticOff      bool
 	RGBStaticOn       bool
+	RGBStaticLampsOn  bool
 	RGBStaticFadeUp   bool
 	RGBStaticColors   []StaticColorButton
 	RGBPlayStaticOnce bool
@@ -997,15 +1000,6 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 	for x := 0; x < 8; x++ {
 		LightLamp(Button{X: x, Y: selectedSequence}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
-	}
-}
-
-func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	for y := 0; y < 8; y++ {
-		for x := 0; x < 8; x++ {
-			LightLamp(Button{X: x, Y: y}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(x, y, "", guiButtons)
-		}
 	}
 }
 

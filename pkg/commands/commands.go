@@ -179,12 +179,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	case common.Reveal:
 		if debug {
-			fmt.Printf("%d: Command Reveal\n", mySequenceNumber)
+			fmt.Printf("%d: Command Reveal Static=%t\n", mySequenceNumber, sequence.Static)
 		}
 		sequence.Hidden = false
-		if sequence.Static {
-			sequence.PlayStaticOnce = true
-		}
+		sequence.PlayStaticOnce = false
+		// if sequence.Static {
+		// 	sequence.StaticLampsOn = true
+		// 	sequence.PlayStaticLampsOnce = true
+		// }
 
 		return sequence
 
@@ -442,8 +444,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StaticColors[staticColor].Flash = command.Args[STATIC_FLASH].Value.(bool)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
-		sequence.PlayStaticOnce = command.Args[STATIC_FLASH].Value.(bool)
-		sequence.Static = true
+		sequence.PlayStaticLampsOnce = command.Args[STATIC_FLASH].Value.(bool)
+		sequence.StaticLampsOn = true
 		sequence.Hidden = command.Args[STATIC_HIDDEN].Value.(bool)
 		return sequence
 
@@ -457,7 +459,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
 			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(bool))
-
 		}
 		// Set fixtures.
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
