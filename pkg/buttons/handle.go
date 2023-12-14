@@ -246,6 +246,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		if this.SelectedType == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
 		}
+
 		// Reveal the selected sequence.
 		common.RevealSequence(sequenceNumber, commandChannels)
 
