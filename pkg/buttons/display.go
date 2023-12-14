@@ -61,7 +61,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		this.SelectAllStaticFixtures = true
 
 		// Flash the static buttons,
-		flashwStaticButtons(sequenceNumber, true, false, commandChannels)
 		this.StaticFlashing[sequenceNumber] = true
 
 		return
@@ -81,7 +80,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 			// Stop the flash of the static buttons,
-			flashwStaticButtons(this.ChaserSequenceNumber, false, false, commandChannels)
 			this.StaticFlashing[sequenceNumber] = false
 		}
 

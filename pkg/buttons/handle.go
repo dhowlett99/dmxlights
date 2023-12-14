@@ -146,7 +146,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Show the static sequence.
 	if this.Static[this.SelectedSequence] {
-		common.ShowStaticButtons(sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+		common.ShowStaticButtons(sequences[this.SelectedSequence], this.StaticFlashing[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 	}
 
 	// Now display the selected mode.

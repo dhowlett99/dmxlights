@@ -299,13 +299,6 @@ func FixtureReceiver(
 			lastColor = stopFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
-		case cmd.RGBStaticLampsOn:
-			if debug {
-				fmt.Printf("%d:%d Static Lamps On Master=%d Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Master, cmd.Hidden)
-			}
-			setStaticLampsOn(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons)
-			continue
-
 		case cmd.RGBStaticOn:
 			if debug {
 				fmt.Printf("%d:%d Static On Master=%d Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Master, cmd.Hidden)
@@ -314,29 +307,35 @@ func FixtureReceiver(
 			continue
 
 		case cmd.RGBStaticFadeUp:
-			//if debug {
-			fmt.Printf("%d:%d Static Fade Up Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
-			//}
+			if debug {
+				fmt.Printf("%d:%d Static Fade Up Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
+			}
 			// FadeUpStatic doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading up.
 			fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticOff:
 			if debug {
-				staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				fmt.Printf("%d:%d Static Off Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
+			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.Type == "scanner":
 			if debug {
-				lastColor = playScanner(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
+			lastColor = playScanner(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+
 			continue
 
 		case cmd.Type == "rgb":
 			if debug {
-				lastColor = playRGB(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
+
 			}
+			lastColor = playRGB(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+
 			continue
 		}
 	}
@@ -431,32 +430,6 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 	}
 
 	return common.LastColor{}
-}
-
-// Switch on static indicator lamps.
-func setStaticLampsOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
-
-	if cmd.RGBStaticColors[fixtureNumber].Enabled {
-		//if debug {
-		fmt.Printf("%d: Fixture:%d RGB Switch Static Lamps On - Trying to Set RGB Static Master=%d\n", cmd.SequenceNumber, fixtureNumber, cmd.Master)
-		//}
-
-		// TODO find sequence numbers from config.
-		if cmd.SequenceNumber == 4 {
-			cmd.SequenceNumber = 2
-		}
-		lamp := cmd.RGBStaticColors[fixtureNumber]
-		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
-		if !cmd.Hidden {
-			if lamp.Flash {
-				onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
-				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, common.Black, eventsForLaunchpad, guiButtons)
-			} else {
-				fmt.Printf("%d: Master = %d\n", cmd.SequenceNumber, cmd.Master)
-				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
-			}
-		}
-	}
 }
 
 // Fade Up RGB Static Scene

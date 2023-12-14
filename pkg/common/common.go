@@ -495,7 +495,6 @@ type FixtureCommand struct {
 	RGBPosition       Position
 	RGBStaticOff      bool
 	RGBStaticOn       bool
-	RGBStaticLampsOn  bool
 	RGBStaticFadeUp   bool
 	RGBStaticColors   []StaticColorButton
 	RGBPlayStaticOnce bool
@@ -989,14 +988,19 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	return &newSequence
 }
 
-func ShowStaticButtons(sequence *Sequence, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 
+	if debug {
+		fmt.Printf("%d: ShowStaticButtons\n", sequence.Number)
+	}
 	for fixtureNumber, staticColorButton := range sequence.StaticColors {
-		if staticColorButton.Flash {
+		if fixtureNumber > 7 {
+			break
+		}
+		if staticColorButton.Flash || staticFlashing {
 			onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
 			FlashLight(Button{X: fixtureNumber, Y: sequence.Number}, onColor, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			fmt.Printf("%d: Master = %d\n", sequence.Number, sequence.Master)
 			LightLamp(Button{X: fixtureNumber, Y: sequence.Number}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
 		}
 	}

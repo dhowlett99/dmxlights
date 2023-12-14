@@ -428,29 +428,6 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Play the static scene on the indicator lamps only.
-		if sequence.PlayStaticLampsOnce && sequence.StaticLampsOn && !sequence.StartFlood {
-			fmt.Printf("%d: Sequence Turn on only static lamps\n", mySequenceNumber)
-			command := common.FixtureCommand{
-				Master:           sequence.Master,
-				Blackout:         sequence.Blackout,
-				Type:             sequence.Type,
-				Label:            sequence.Label,
-				SequenceNumber:   sequence.Number,
-				Hidden:           sequence.Hidden,
-				StrobeSpeed:      sequence.StrobeSpeed,
-				Strobe:           sequence.Strobe,
-				ScannerChaser:    sequence.ScannerChaser,
-				RGBStaticLampsOn: true,
-				RGBStaticColors:  sequence.StaticColors,
-			}
-
-			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
-			sequence.PlayStaticLampsOnce = false
-			continue
-		}
-
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			//if debug {
