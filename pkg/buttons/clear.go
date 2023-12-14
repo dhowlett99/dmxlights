@@ -105,7 +105,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
-		this.SelectMode[this.DisplaySequence] = this.LastMode[this.DisplaySequence]
+		this.SelectedMode[this.DisplaySequence] = this.LastMode[this.DisplaySequence]
 
 		// Clear the select all fixtures flag.
 		this.SelectAllStaticFixtures = false
@@ -183,7 +183,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
 		this.SwitchPositions = [9][9]int{}                                           // Clear switch positions to their first positions.
 		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
-		this.SelectMode[sequenceNumber] = NORMAL                                     // Clear function selecetd mode.
+		this.SelectedMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
 		this.SelectButtonPressed[sequenceNumber] = false                             // Clear buttoned selecetd mode.
 		this.EditGoboSelectionMode = false                                           // Clear edit gobo mode.
 		this.EditPatternMode = false                                                 // Clear edit pattern mode.

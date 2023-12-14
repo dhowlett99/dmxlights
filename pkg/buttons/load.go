@@ -90,7 +90,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
 
 		// Assume we're starting in normal mode.
-		this.SelectMode[sequenceNumber] = NORMAL
+		this.SelectedMode[sequenceNumber] = NORMAL
 
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
@@ -102,7 +102,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
-			this.SelectMode[sequenceNumber] = CHASER_DISPLAY
+			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
 
 		// Reload the fixture state.

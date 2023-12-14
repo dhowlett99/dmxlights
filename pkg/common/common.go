@@ -987,7 +987,9 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 }
 
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	fmt.Printf("%d: ClearSelectedRowOfButtons\n", selectedSequence)
+	if debug {
+		fmt.Printf("%d: ClearSelectedRowOfButtons\n", selectedSequence)
+	}
 	// TODO replace with constants for switch and chase sequence numbers.
 	if selectedSequence == 4 || selectedSequence == 3 {
 		return

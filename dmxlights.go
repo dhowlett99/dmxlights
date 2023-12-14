@@ -76,7 +76,7 @@ func main() {
 	this.OffsetTilt = common.SCANNER_MID_POINT                     // Start tilt from the center.
 	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
-	this.SelectMode = make([]int, NumberOfSequences)               // Initialise four mode variables.
+	this.SelectedMode = make([]int, NumberOfSequences)             // Initialise four mode variables.
 	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
 	this.ShowRGBColorPicker = false                                // Remember when we are in editing sequence colors mode.
 	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
