@@ -365,6 +365,11 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 		fmt.Printf("Fixture:%d Set RGB Flood\n", fixtureNumber)
 	}
 
+	// TODO find sequence numbers from config.
+	if cmd.SequenceNumber == 4 {
+		cmd.SequenceNumber = 2
+	}
+
 	pan := 128
 	tilt := 128
 	shutter := FindShutter(fixtureNumber, cmd.SequenceNumber, "Open", fixtures)
@@ -386,6 +391,11 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 	if debug {
 		fmt.Printf("Fixture:%d Set Stop RGB Flood\n", fixtureNumber)
+	}
+
+	// TODO find sequence numbers from config.
+	if cmd.SequenceNumber == 4 {
+		cmd.SequenceNumber = 2
 	}
 
 	if !cmd.Hidden {
