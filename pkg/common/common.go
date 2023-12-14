@@ -990,18 +990,26 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 
 func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 
-	if debug {
-		fmt.Printf("%d: ShowStaticButtons\n", sequence.Number)
+	var sequenceNumber int
+	if sequence.Number == 4 {
+		sequenceNumber = 2
+	} else {
+		sequenceNumber = sequence.Number
 	}
+
+	if debug {
+		fmt.Printf("%d: ShowStaticButtons\n", sequenceNumber)
+	}
+
 	for fixtureNumber, staticColorButton := range sequence.StaticColors {
 		if fixtureNumber > 7 {
 			break
 		}
 		if staticColorButton.Flash || staticFlashing {
 			onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
-			FlashLight(Button{X: fixtureNumber, Y: sequence.Number}, onColor, Black, eventsForLaunchpad, guiButtons)
+			FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			LightLamp(Button{X: fixtureNumber, Y: sequence.Number}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+			LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
 		}
 	}
 }
