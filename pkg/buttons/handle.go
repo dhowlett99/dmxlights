@@ -144,6 +144,11 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Clear the buttons.
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
+	// Show the static sequence.
+	if this.Static[this.SelectedSequence] {
+		common.ShowStaticButtons(sequences[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	}
+
 	// Now display the selected mode.
 	displayMode(this.SelectedSequence, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 

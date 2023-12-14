@@ -374,6 +374,8 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		time.Sleep(250 * time.Millisecond) // But give the launchpad time to light the function key purple.
 		common.ClearSelectedRowOfButtons(this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
+		common.RevealSequence(this.TargetSequence, commandChannels)
+
 		// Switch on any static colors.
 		cmd := common.Command{
 			Action: common.UpdateStatic,
@@ -382,7 +384,6 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		common.RevealSequence(this.TargetSequence, commandChannels)
 
 		// Remember which sequence we are editing
 		this.EditWhichStaticSequence = this.TargetSequence

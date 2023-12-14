@@ -989,6 +989,19 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	return &newSequence
 }
 
+func ShowStaticButtons(sequence *Sequence, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+
+	for fixtureNumber, staticColorButton := range sequence.StaticColors {
+		if staticColorButton.Flash {
+			onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+			FlashLight(Button{X: fixtureNumber, Y: sequence.Number}, onColor, Black, eventsForLaunchpad, guiButtons)
+		} else {
+			fmt.Printf("%d: Master = %d\n", sequence.Number, sequence.Master)
+			LightLamp(Button{X: fixtureNumber, Y: sequence.Number}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+		}
+	}
+}
+
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
 		fmt.Printf("%d: ClearSelectedRowOfButtons\n", selectedSequence)
