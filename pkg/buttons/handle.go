@@ -335,23 +335,6 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 
 }
 
-func flashwStaticButtons(targetSequence int, state bool, hide bool, commandChannels []chan common.Command) {
-
-	if debug {
-		fmt.Printf("flashwStaticButtons: sequence %d set to %t hide %t\n", targetSequence, state, hide)
-	}
-	// Add the flashing static buttons.
-	cmd := common.Command{
-		Action: common.UpdateFlashAllStaticColorButtons,
-		Args: []common.Arg{
-			{Name: "Flash", Value: state},
-			{Name: "Hide", Value: hide},
-		},
-	}
-	common.SendCommandToSequence(targetSequence, cmd, commandChannels)
-
-}
-
 func hideAllFunctionKeys(this *CurrentState, sequences []*common.Sequence, eventsForLaunchPad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {

@@ -104,7 +104,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		this.SelectAllStaticFixtures = true
 
 		// Flash the static buttons,
-		flashwStaticButtons(this.ChaserSequenceNumber, true, false, commandChannels)
 		this.StaticFlashing[sequenceNumber] = true
 
 		return
@@ -130,7 +129,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			// Unselect all fixtures.
 			this.SelectAllStaticFixtures = false
 			// Stop the flash of the static buttons,
-			flashwStaticButtons(sequenceNumber, false, true, commandChannels)
 			this.StaticFlashing[sequenceNumber] = false
 		}
 
@@ -157,11 +155,10 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 			// Stop the flash of the static buttons, taking care to select the correct sequence.
 			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-				flashwStaticButtons(this.ChaserSequenceNumber, false, true, commandChannels)
+				this.StaticFlashing[this.ChaserSequenceNumber] = false
 			} else {
-				flashwStaticButtons(sequenceNumber, false, true, commandChannels)
+				this.StaticFlashing[sequenceNumber] = false
 			}
-			this.StaticFlashing[sequenceNumber] = false
 		}
 
 		// Show the chaser function buttons.
@@ -190,9 +187,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 			// Stop the flash of the static buttons, taking care to select the correct sequence.
 			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-				flashwStaticButtons(this.ChaserSequenceNumber, false, true, commandChannels)
+				this.StaticFlashing[this.ChaserSequenceNumber] = false
 			} else {
-				flashwStaticButtons(sequenceNumber, false, true, commandChannels)
+				this.StaticFlashing[sequenceNumber] = false
 			}
 			this.StaticFlashing[sequenceNumber] = false
 		}
