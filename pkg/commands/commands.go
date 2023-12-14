@@ -178,16 +178,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.Reveal:
-		//if debug {
-		fmt.Printf("%d: Command Reveal Static=%t\n", mySequenceNumber, sequence.Static)
-		//}
+		if debug {
+			fmt.Printf("%d: Command Reveal Static=%t\n", mySequenceNumber, sequence.Static)
+		}
 		sequence.Hidden = false
 		sequence.PlayStaticOnce = false
-		// if sequence.Static {
-		// 	sequence.StaticLampsOn = true
-		// 	sequence.PlayStaticLampsOnce = true
-		// }
-
 		return sequence
 
 	case common.UpdateSpeed:

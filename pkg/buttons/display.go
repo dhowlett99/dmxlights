@@ -8,7 +8,7 @@ import (
 
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	debug := true
+	debug := false
 
 	// Tailor the top buttons to the sequence type.
 	common.ShowTopButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
