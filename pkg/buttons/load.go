@@ -92,6 +92,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// Assume we're starting in normal mode.
 		this.SelectedMode[sequenceNumber] = NORMAL
 
+		// Forget we've pressed twice.
+		this.SelectButtonPressed[sequenceNumber] = false
+
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
 		this.StaticFlashing[sequenceNumber] = false
@@ -166,9 +169,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
-
-	// Forget we've pressed twice.
-	this.SelectButtonPressed[this.SelectedSequence] = false
 
 	// Auto select the last running or static sequence which lights it's select lamp.
 	this.SelectedSequence = autoSelect(this)
