@@ -453,9 +453,9 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
-			if debug {
-				fmt.Printf("%d: Sequence Static mode StaticFadeUpOnce %t\n", mySequenceNumber, sequence.StaticFadeUpOnce)
-			}
+			//if debug {
+			fmt.Printf("%d: Sequence Static mode StaticFadeUpOnce %t\n", mySequenceNumber, sequence.StaticFadeUpOnce)
+			//}
 
 			sequence.Static = true
 			sequence.PlayStaticOnce = false
@@ -472,9 +472,9 @@ func PlaySequence(sequence common.Sequence,
 
 			// Now send the Fade up command to the fixture.
 			if sequence.StaticFadeUpOnce {
-				if debug {
-					fmt.Printf("%d: Sequence Fade up static \n", mySequenceNumber)
-				}
+				//if debug {
+				fmt.Printf("%d: Sequence Fade up static \n", mySequenceNumber)
+				//}
 				// Prepare a message to be sent to the fixtures in the sequence.
 				command := common.FixtureCommand{
 					Master:          sequence.Master,
@@ -498,9 +498,9 @@ func PlaySequence(sequence common.Sequence,
 				sequence.StaticFadeUpOnce = false
 			} else {
 				// else just play the static scene.
-				if debug {
-					fmt.Printf("%d: Sequence Turn on static \n", mySequenceNumber)
-				}
+				//if debug {
+				fmt.Printf("%d: Sequence Turn on static \n", mySequenceNumber)
+				//}
 				command := common.FixtureCommand{
 					Master:          sequence.Master,
 					Blackout:        sequence.Blackout,

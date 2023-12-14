@@ -154,8 +154,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		}
 
 		// Play out this sequence.
-		this.SelectedSequence = sequenceNumber
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.

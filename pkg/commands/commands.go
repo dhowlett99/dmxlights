@@ -406,6 +406,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Normal\n", mySequenceNumber)
 		}
 		// Normal is used to recover from blackout.
+		sequence.Hidden = false
 		sequence.StaticFadeUpOnce = true
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true

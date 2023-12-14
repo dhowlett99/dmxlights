@@ -314,9 +314,9 @@ func FixtureReceiver(
 			continue
 
 		case cmd.RGBStaticFadeUp:
-			if debug {
-				fmt.Printf("%d:%d Static Fade Up\n", cmd.SequenceNumber, myFixtureNumber)
-			}
+			//if debug {
+			fmt.Printf("%d:%d Static Fade Up Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
+			//}
 			// FadeUpStatic doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading up.
 			fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
