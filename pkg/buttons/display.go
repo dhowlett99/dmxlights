@@ -41,6 +41,9 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		common.RevealSequence(sequenceNumber, commandChannels)
 
+		// Set the static buttons flashing the , so the next step will flash.
+		this.StaticFlashing[sequenceNumber] = true
+
 		return
 
 	case mode == NORMAL_STATIC:
