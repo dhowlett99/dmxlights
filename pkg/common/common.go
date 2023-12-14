@@ -490,13 +490,13 @@ type FixtureCommand struct {
 	StopFlood  bool
 
 	// RGB commands.
-	RGBPosition        Position
-	RGBStaticSwitchOff bool
-	RGBStaticSwitchOn  bool
-	RGBStaticFadeUp    bool
-	RGBStaticColors    []StaticColorButton
-	RGBPlayStaticOnce  bool
-	RGBFade            int
+	RGBPosition       Position
+	RGBStaticOff      bool
+	RGBStaticOn       bool
+	RGBStaticFadeUp   bool
+	RGBStaticColors   []StaticColorButton
+	RGBPlayStaticOnce bool
+	RGBFade           int
 
 	// Scanner Commands.
 	ScannerColor             int
@@ -987,6 +987,7 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 }
 
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+	fmt.Printf("%d: ClearSelectedRowOfButtons\n", selectedSequence)
 	// TODO replace with constants for switch and chase sequence numbers.
 	if selectedSequence == 4 || selectedSequence == 3 {
 		return

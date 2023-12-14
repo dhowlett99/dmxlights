@@ -264,43 +264,70 @@ func FixtureReceiver(
 
 		switch {
 		case cmd.Type == "lastColor":
+			if debug {
+				fmt.Printf("%d:%d LastColor set to %s\n", cmd.SequenceNumber, myFixtureNumber, common.GetColorNameByRGB(cmd.LastColor))
+			}
 			lastColor.RGBColor = cmd.LastColor
 			lastColor.ScannerColor = 0
 			continue
 
 		case cmd.Type == "switch":
+			if debug {
+				fmt.Printf("%d:%d Activate switch %s Postition %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwitchData.Name, cmd.SwitchData.CurrentPosition)
+			}
 			lastColor = MapSwitchFixture(cmd.SwitchData, cmd.State, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 
 		case cmd.Clear || cmd.Blackout:
+			if debug {
+				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
+			}
 			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
+			if debug {
+				fmt.Printf("%d:%d StartFlood\n", cmd.SequenceNumber, myFixtureNumber)
+			}
 			lastColor = startFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StopFlood:
+			if debug {
+				fmt.Printf("%d:%d StopFlood\n", cmd.SequenceNumber, myFixtureNumber)
+			}
 			lastColor = stopFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
-		case cmd.RGBStaticSwitchOn:
+		case cmd.RGBStaticOn:
+			if debug {
+				fmt.Printf("%d:%d Static On\n", cmd.SequenceNumber, myFixtureNumber)
+			}
 			lastColor = setSwitch(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 		case cmd.RGBStaticFadeUp:
+			if debug {
+				fmt.Printf("%d:%d Static Fade Up\n", cmd.SequenceNumber, myFixtureNumber)
+			}
 			lastColor = fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
-		case cmd.RGBStaticSwitchOff:
-			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+		case cmd.RGBStaticOff:
+			if debug {
+				staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			}
 			continue
 
 		case cmd.Type == "scanner":
-			lastColor = playScanner(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			if debug {
+				lastColor = playScanner(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			}
 			continue
 
 		case cmd.Type == "rgb":
-			lastColor = playRGB(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			if debug {
+				lastColor = playRGB(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			}
 			continue
 		}
 	}

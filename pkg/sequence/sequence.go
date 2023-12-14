@@ -473,17 +473,17 @@ func PlaySequence(sequence common.Sequence,
 			} else {
 				// else just play the static scene.
 				command := common.FixtureCommand{
-					Master:            sequence.Master,
-					Blackout:          sequence.Blackout,
-					Type:              sequence.Type,
-					Label:             sequence.Label,
-					SequenceNumber:    sequence.Number,
-					Hidden:            sequence.Hidden,
-					StrobeSpeed:       sequence.StrobeSpeed,
-					Strobe:            sequence.Strobe,
-					ScannerChaser:     sequence.ScannerChaser,
-					RGBStaticSwitchOn: true,
-					RGBStaticColors:   sequence.StaticColors,
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
+					Type:            sequence.Type,
+					Label:           sequence.Label,
+					SequenceNumber:  sequence.Number,
+					Hidden:          sequence.Hidden,
+					StrobeSpeed:     sequence.StrobeSpeed,
+					Strobe:          sequence.Strobe,
+					ScannerChaser:   sequence.ScannerChaser,
+					RGBStaticOn:     true,
+					RGBStaticColors: sequence.StaticColors,
 				}
 
 				// Now tell all the fixtures what they need to do.
@@ -505,18 +505,18 @@ func PlaySequence(sequence common.Sequence,
 
 			// Prepare a message to be sent to the fixtures in the sequence.
 			command := common.FixtureCommand{
-				Master:             sequence.Master,
-				Blackout:           sequence.Blackout,
-				Type:               sequence.Type,
-				Label:              sequence.Label,
-				SequenceNumber:     sequence.Number,
-				Hidden:             sequence.Hidden,
-				StrobeSpeed:        sequence.StrobeSpeed,
-				Strobe:             sequence.Strobe,
-				ScannerChaser:      sequence.ScannerChaser,
-				RGBStaticSwitchOff: false,
-				RGBStaticColors:    sequence.StaticColors,
-				RGBFade:            sequence.RGBFade,
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
+				Type:            sequence.Type,
+				Label:           sequence.Label,
+				SequenceNumber:  sequence.Number,
+				Hidden:          sequence.Hidden,
+				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
+				ScannerChaser:   sequence.ScannerChaser,
+				RGBStaticOff:    false,
+				RGBStaticColors: sequence.StaticColors,
+				RGBFade:         sequence.RGBFade,
 			}
 
 			// Now tell all the fixtures what they need to do.
