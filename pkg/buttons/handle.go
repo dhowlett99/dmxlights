@@ -144,7 +144,6 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 	// If selected show the static sequence.
-	fmt.Printf("Target is %d static is %t Flash=%t\n", this.TargetSequence, this.Static[this.TargetSequence], this.StaticFlashing[this.TargetSequence])
 	if this.Static[this.TargetSequence] {
 		if this.SelectedMode[this.DisplaySequence] == NORMAL_STATIC || this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY_STATIC {
 			this.StaticFlashing[this.TargetSequence] = true
@@ -182,19 +181,19 @@ func removeColorPicker(this *CurrentState, sequences []*common.Sequence, eventsF
 	for sequenceNumber, sequence := range sequences {
 		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 
-		if sequenceNumber > 2 {
-			return
-		}
-		// Show the static and switch settings.
-		cmd := common.Command{
-			Action: common.Reveal,
-		}
-		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		if sequenceNumber != this.SwitchSequenceNumber {
 
-		this.SelectedMode[sequenceNumber] = NORMAL
+			// Show the static and switch settings.
+			cmd := common.Command{
+				Action: common.Reveal,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-		if this.Static[sequenceNumber] {
-			common.ShowStaticButtons(sequence, false, eventsForLaunchpad, guiButtons)
+			this.SelectedMode[sequenceNumber] = NORMAL
+
+			if this.Static[sequenceNumber] {
+				common.ShowStaticButtons(sequence, false, eventsForLaunchpad, guiButtons)
+			}
 		}
 	}
 }
