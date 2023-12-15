@@ -72,8 +72,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Get an upto date copy of all of the sequences.
 	for sequenceNumber, sequence := range sequences {
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-		// Let everyone (currently just diplayMode) we are loading a preset.
-		this.Loading[sequenceNumber] = true
 		// restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
