@@ -653,6 +653,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command ToggleFixtureState for fixture number %d, state %t, inverted %t reversed %t\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[FIXTURE_STATE].Value, command.Args[FIXTURE_RGB_INVERTED].Value, command.Args[FIXTURE_SCANNER_REVERSED].Value)
 		}
 
+		// Set the state in the static color buttons.
+		sequence.StaticColors[command.Args[FIXTURE_NUMBER].Value.(int)].Enabled = command.Args[FIXTURE_STATE].Value.(bool)
+
 		if command.Args[FIXTURE_NUMBER].Value.(int) < sequence.NumberFixtures {
 			newScannerState := common.FixtureState{}
 			newScannerState.Enabled = command.Args[FIXTURE_STATE].Value.(bool)

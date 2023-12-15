@@ -1002,14 +1002,19 @@ func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchp
 	}
 
 	for fixtureNumber, staticColorButton := range sequence.StaticColors {
+
+		// Only the first 8 colors are used for static color defaults.
 		if fixtureNumber > 7 {
 			break
 		}
-		if staticColorButton.Flash || staticFlashing {
-			onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
-			FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
-		} else {
-			LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+
+		if staticColorButton.Enabled {
+			if staticColorButton.Flash || staticFlashing {
+				onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
+			} else {
+				LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+			}
 		}
 	}
 }
@@ -1310,6 +1315,7 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 			colorPicker := GetColor(X, Y)
 			staticColorButton.Name = colorPicker.Name
 			staticColorButton.Color = colorPicker.Color
+			staticColorButton.Enabled = true
 			staticColorButton.X = X
 			staticColorButton.Y = Y
 			staticColorButton.SelectedColor = selectedColor

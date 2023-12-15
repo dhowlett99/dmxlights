@@ -263,6 +263,11 @@ func PlaySequence(sequence common.Sequence,
 	for {
 		sequence.UpdateShift = false
 
+		// Copy in the fixture status into the static color buffer.
+		for fixtureNumber := range sequence.StaticColors {
+			sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
+		}
+
 		// Check for any waiting commands.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 
@@ -441,11 +446,6 @@ func PlaySequence(sequence common.Sequence,
 			sequence.MusicTrigger = false
 			// this.Functions[common.Function8_Music_Trigger].State = false
 			channels.SoundTriggers[mySequenceNumber].State = false
-
-			// Copy in the fixture status into the static color buffer.
-			for fixtureNumber := range sequence.StaticColors {
-				sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
-			}
 
 			// Now send the Fade up command to the fixture.
 			if sequence.StaticFadeUpOnce {
