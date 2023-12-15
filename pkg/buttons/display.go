@@ -41,9 +41,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		common.RevealSequence(sequenceNumber, commandChannels)
 
-		// Set the static buttons flashing the , so the next step will flash.
-		this.StaticFlashing[sequenceNumber] = true
-
 		return
 
 	case mode == NORMAL_STATIC:
@@ -60,31 +57,19 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Reveal the selected sequence.
 		common.RevealSequence(sequenceNumber, commandChannels)
 
-		// Select all fixtures.
-		this.SelectAllStaticFixtures = true
-
-		// Flash the static buttons,
-		this.StaticFlashing[sequenceNumber] = true
-
 		return
 
 	case mode == CHASER_DISPLAY:
 
 		if debug {
-			fmt.Printf("%d: DisplayMode: CHASER_DISPLAY\n", sequenceNumber)
+			fmt.Printf("%d: DisplayMode: CHASER_DISPLAY \n", sequenceNumber)
 		}
+
 		// Hide the selected sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Reveal the chaser sequence.
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
-
-		if this.StaticFlashing[sequenceNumber] {
-			// Unselect all fixtures.
-			this.SelectAllStaticFixtures = false
-			// Stop the flash of the static buttons,
-			this.StaticFlashing[sequenceNumber] = false
-		}
 
 		return
 
@@ -102,9 +87,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Select all fixtures.
 		this.SelectAllStaticFixtures = true
-
-		// Flash the static buttons,
-		this.StaticFlashing[sequenceNumber] = true
 
 		return
 
@@ -124,14 +106,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Hide the sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
 
-		// Turn off any flashing static buttons.
-		if this.StaticFlashing[sequenceNumber] {
-			// Unselect all fixtures.
-			this.SelectAllStaticFixtures = false
-			// Stop the flash of the static buttons,
-			this.StaticFlashing[sequenceNumber] = false
-		}
-
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 
@@ -148,18 +122,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		}
 		// Hide the normal sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
-
-		if this.StaticFlashing[sequenceNumber] {
-			// Unselect all fixtures.
-			this.SelectAllStaticFixtures = false
-
-			// Stop the flash of the static buttons, taking care to select the correct sequence.
-			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-				this.StaticFlashing[this.ChaserSequenceNumber] = false
-			} else {
-				this.StaticFlashing[sequenceNumber] = false
-			}
-		}
 
 		// Show the chaser function buttons.
 		this.TargetSequence = this.ChaserSequenceNumber
@@ -180,19 +142,6 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Hide the normal sequence.
 		common.HideSequence(sequenceNumber, commandChannels)
-
-		if this.StaticFlashing[sequenceNumber] {
-			// Unselect all fixtures.
-			this.SelectAllStaticFixtures = false
-
-			// Stop the flash of the static buttons, taking care to select the correct sequence.
-			if this.ScannerChaser[sequenceNumber] && this.SelectedType == "scanner" {
-				this.StaticFlashing[this.ChaserSequenceNumber] = false
-			} else {
-				this.StaticFlashing[sequenceNumber] = false
-			}
-			this.StaticFlashing[sequenceNumber] = false
-		}
 
 		// Display the fixture status bar.
 		showFixtureStatus(this.TargetSequence, sequences[sequenceNumber].Number, sequences[sequenceNumber].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)

@@ -45,9 +45,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	debug := false
 
 	// Setup sequence numbers.
-	if this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
-		this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
-		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
+	if this.ScannerChaser[this.SelectedSequence] {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
@@ -146,7 +144,15 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
 
 	// If selected show the static sequence.
+	fmt.Printf("Target is %d static is %t Flash=%t\n", this.TargetSequence, this.Static[this.TargetSequence], this.StaticFlashing[this.TargetSequence])
 	if this.Static[this.TargetSequence] {
+		if this.SelectedMode[this.DisplaySequence] == NORMAL_STATIC || this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY_STATIC {
+			this.StaticFlashing[this.TargetSequence] = true
+			this.SelectAllStaticFixtures = true
+		} else {
+			this.StaticFlashing[this.TargetSequence] = false
+			this.SelectAllStaticFixtures = false
+		}
 		common.ShowStaticButtons(sequences[this.TargetSequence], this.StaticFlashing[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	}
 
