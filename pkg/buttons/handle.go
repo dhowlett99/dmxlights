@@ -46,6 +46,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Setup sequence numbers.
 	if this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
+		this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
 		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
