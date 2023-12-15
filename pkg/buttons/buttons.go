@@ -590,7 +590,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.ShowRGBColorPicker {
 			this.ShowRGBColorPicker = false
-			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		location := fmt.Sprint(X) + "," + fmt.Sprint(Y)
@@ -989,7 +989,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.ShowRGBColorPicker {
 			this.ShowRGBColorPicker = false
-			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// Start in normal mode, hide the shutter chaser.
@@ -1366,7 +1366,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.ShowRGBColorPicker {
 			this.ShowRGBColorPicker = false
-			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// Get an upto date copy of the switch information by updating our copy of the switch sequence.
@@ -1909,7 +1909,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].FirstPress = true
 
 		// Remove the color picker and reveal the sequence.
-		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Show static colors.
 		cmd := common.Command{

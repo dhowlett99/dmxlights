@@ -96,7 +96,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.ShowStaticColorPicker = false
 
 		this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
-		removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// If the Selected Color has come back as empty this means we didn't select any colors.
 		// So restore the colors that were already there.
@@ -163,7 +163,7 @@ func getStatic(this *CurrentState) bool {
 	return this.Static[this.SelectedSequence]
 }
 
-func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func removeColorPicker(this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("removeColorPicker Turn off the color picker\n")
@@ -172,24 +172,24 @@ func removeColorPicker(this *CurrentState, eventsForLaunchpad chan common.ALight
 	this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
 
 	// Clear the first three launchpad rows used by the color picker.
-	for y := 0; y < 3; y++ {
-		common.ClearSelectedRowOfButtons(y, eventsForLaunchpad, guiButtons)
-	}
+	for sequenceNumber, sequence := range sequences {
+		common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 
-	// Show the static and switch settings.
-	cmd := common.Command{
-		Action: common.Reveal,
-	}
+		if sequenceNumber > 2 {
+			return
+		}
+		// Show the static and switch settings.
+		cmd := common.Command{
+			Action: common.Reveal,
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
-	// Take account of the shutter chaser which should be shown if the chaser is running.
-	common.SendCommandToSequence(0, cmd, commandChannels)
-	common.SendCommandToSequence(1, cmd, commandChannels)
-	if !this.ScannerChaser[this.SelectedSequence] {
-		common.SendCommandToSequence(2, cmd, commandChannels)
-	} else {
-		common.SendCommandToSequence(4, cmd, commandChannels)
-	}
+		this.SelectedMode[sequenceNumber] = NORMAL
 
+		if this.Static[sequenceNumber] {
+			common.ShowStaticButtons(sequence, false, eventsForLaunchpad, guiButtons)
+		}
+	}
 }
 
 func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons chan common.ALight) {

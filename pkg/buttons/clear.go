@@ -79,7 +79,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			if debug {
 				fmt.Printf("removeColorPicker\n")
 			}
-			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// First press resets the colors to the default color bar.
