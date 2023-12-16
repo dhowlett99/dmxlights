@@ -518,7 +518,7 @@ func PlaySequence(sequence common.Sequence,
 				StrobeSpeed:     sequence.StrobeSpeed,
 				Strobe:          sequence.Strobe,
 				ScannerChaser:   sequence.ScannerChaser,
-				RGBStaticOff:    false,
+				RGBStaticOff:    true,
 				RGBStaticColors: sequence.StaticColors,
 				RGBFade:         sequence.RGBFade,
 			}
