@@ -428,7 +428,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 			}) // button widget
 			myLogo := canvas.NewImageFromFile("dmxlights.png")
-			container1 := container.NewMax(
+			container1 := container.NewStack(
 				button,
 				myLogo,
 			)
@@ -439,7 +439,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			size.Height = 80
 			size.Width = 80
 			button.rectangle.SetMinSize(size)
-			button.container = container.NewMax(button.rectangle, button.button)
+			button.container = container.NewStack(button.rectangle, button.button)
 			containers = append(containers, button.container)
 		}
 		button.button.Importance = widget.LowImportance
