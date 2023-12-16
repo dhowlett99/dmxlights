@@ -250,24 +250,24 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		// Function to create items in this table.
 		func() (o fyne.CanvasObject) {
 
-			return container.NewMax(
+			return container.NewStack(
 				widget.NewLabel("id"), // ID.
 				widget.NewSelect(fp.TypeOptions, func(value string) {}),   // Type rgb, scanner or switch.
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(), // Name.
 				),
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(), // Label.
 				),
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(), // DMX Address.
 				),
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(), // Description.
 				),

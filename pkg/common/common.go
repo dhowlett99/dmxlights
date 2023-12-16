@@ -107,6 +107,12 @@ type Color struct {
 	Flash bool
 }
 
+// Used for static fades, remember the last color.
+type LastColor struct {
+	RGBColor     Color
+	ScannerColor int
+}
+
 type ColorPicker struct {
 	Name  string
 	ID    int
@@ -244,7 +250,7 @@ const (
 	UpdateSequenceColors
 	PlayStaticOnce
 	PlaySwitchOnce
-	UnHide
+	Reveal
 	Hide
 	Start
 	StartChase
@@ -347,7 +353,7 @@ type Sequence struct {
 	Run                         bool                        // True if this sequence is running.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
-	Hide                        bool                        // Hide is used to hide sequence buttons when using function keys.
+	Hidden                      bool                        // Hidden is used to indicate sequence buttons are not visible.
 	Type                        string                      // Type of sequnece, current valid values are :- rgb, scanner,  or switch.
 	Master                      int                         // Master Brightness
 	MasterChanging              bool                        // flag to indicate we are changing brightness.
@@ -388,9 +394,11 @@ type Sequence struct {
 	Clear                       bool                        // Clear all fixtures in this sequence.
 	Static                      bool                        // We're a static sequence.
 	PlayStaticOnce              bool                        // Play a static scene only once.
+	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
+	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
 	StopFlood                   bool                        // We're not in flood mode.
 	LastStatic                  bool                        // Last value of static before flood.
@@ -425,7 +433,6 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
-	Hidden                      bool                        // Is this sequence hidden on the launchpad.
 }
 
 type Function struct {
@@ -473,24 +480,25 @@ type FixtureCommand struct {
 	LastColor      Color
 
 	// Common commands.
+	Hidden         bool
 	Strobe         bool
 	StrobeSpeed    int
 	Master         int
 	MasterChanging bool
 	Blackout       bool
-	Hide           bool
 	Clear          bool
-	FadeSpeed      int
 
 	StartFlood bool
 	StopFlood  bool
 
 	// RGB commands.
 	RGBPosition       Position
-	RGBStatic         bool
-	RGBFadeUpStatic   bool
+	RGBStaticOff      bool
+	RGBStaticOn       bool
+	RGBStaticFadeUp   bool
 	RGBStaticColors   []StaticColorButton
 	RGBPlayStaticOnce bool
+	RGBFade           int
 
 	// Scanner Commands.
 	ScannerColor             int
@@ -511,7 +519,6 @@ type FixtureCommand struct {
 	Program int
 
 	// Switch Commands
-	SetSwitch          bool
 	SwitchData         Switch
 	State              State
 	CurrentSwitchState int
@@ -614,7 +621,7 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
 	cmd := Command{
-		Action: UnHide,
+		Action: Reveal,
 	}
 	SendCommandToSequence(targetSequence, cmd, commandChannels)
 }
@@ -632,6 +639,15 @@ func HideAllSequences(commandChannels []chan Command) {
 		Action: Hide,
 	}
 	SendCommandToAllSequence(cmd, commandChannels)
+}
+
+func StartStaticSequences(sequences []*Sequence, commandChannels []chan Command) {
+	for sequenceNumber := range sequences {
+		cmd := Command{
+			Action: Normal,
+		}
+		SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+	}
 }
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
@@ -972,22 +988,48 @@ func RefreshSequence(selectedSequence int, commandChannels []chan Command, updat
 	return &newSequence
 }
 
+func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
+
+	var sequenceNumber int
+	if sequence.Number == 4 {
+		sequenceNumber = 2
+	} else {
+		sequenceNumber = sequence.Number
+	}
+
+	if debug {
+		fmt.Printf("%d: ShowStaticButtons\n", sequenceNumber)
+	}
+
+	for fixtureNumber, staticColorButton := range sequence.StaticColors {
+
+		// Only the first 8 colors are used for static color defaults.
+		if fixtureNumber > 7 {
+			break
+		}
+
+		if staticColorButton.Enabled {
+			if staticColorButton.Flash || staticFlashing {
+				onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
+			} else {
+				LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+			}
+		}
+	}
+}
+
 func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	if selectedSequence == 4 {
+	if debug {
+		fmt.Printf("%d: ClearSelectedRowOfButtons\n", selectedSequence)
+	}
+	// TODO replace with constants for switch and chase sequence numbers.
+	if selectedSequence == 4 || selectedSequence == 3 {
 		return
 	}
 	for x := 0; x < 8; x++ {
 		LightLamp(Button{X: x, Y: selectedSequence}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
-	}
-}
-
-func ClearAllButtons(eventsForLauchpad chan ALight, guiButtons chan ALight) {
-	for y := 0; y < 8; y++ {
-		for x := 0; x < 8; x++ {
-			LightLamp(Button{X: x, Y: y}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(x, y, "", guiButtons)
-		}
 	}
 }
 
@@ -1273,6 +1315,7 @@ func SetDefaultStaticColorButtons(selectedSequence int) []StaticColorButton {
 			colorPicker := GetColor(X, Y)
 			staticColorButton.Name = colorPicker.Name
 			staticColorButton.Color = colorPicker.Color
+			staticColorButton.Enabled = true
 			staticColorButton.X = X
 			staticColorButton.Y = Y
 			staticColorButton.SelectedColor = selectedColor

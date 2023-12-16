@@ -80,7 +80,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 			// Load the fixtures into the array used by the table.
 			data = updateStatesArray(sp.StatesList)
 
-			return container.NewMax(
+			return container.NewStack(
 
 				// State Number.
 				widget.NewLabel("template"),

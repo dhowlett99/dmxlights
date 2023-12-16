@@ -191,7 +191,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 	top := container.NewBorder(title, nil, nil, nil, formTop)
 	main := container.NewBorder(top, nil, nil, nil, labelStates)
-	scrollableList := container.New(layout.NewMaxLayout(), scrollableActionsList, scrollableSettingsList)
+	scrollableList := container.New(layout.NewStackLayout(), scrollableActionsList, scrollableSettingsList)
 	forms := container.NewAdaptiveGrid(2, scrollableStateList, scrollableList)
 	bottom := container.NewBorder(main, nil, nil, nil, forms)
 	content = *container.NewBorder(bottom, nil, nil, nil, saveCancel)

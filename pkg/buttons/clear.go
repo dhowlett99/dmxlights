@@ -79,7 +79,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			if debug {
 				fmt.Printf("removeColorPicker\n")
 			}
-			removeColorPicker(this, eventsForLaunchpad, guiButtons, commandChannels)
+			removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 		}
 
 		// First press resets the colors to the default color bar.
@@ -105,7 +105,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 		// Flash the correct color buttons
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
-		this.SelectMode[this.DisplaySequence] = this.LastMode[this.DisplaySequence]
+		this.SelectedMode[this.DisplaySequence] = this.LastMode[this.DisplaySequence]
 
 		// Clear the select all fixtures flag.
 		this.SelectAllStaticFixtures = false
@@ -120,12 +120,25 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	if debug {
 		fmt.Printf("Start full clear process\n")
 	}
+
 	// Start full clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
 		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
 	} else {
 		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Magenta, eventsForLaunchpad, guiButtons)
 	}
+
+	// Reset the launchpad.
+	if this.LaunchPadConnected {
+		this.Pad.Program()
+	}
+
+	// Send reset to all sequences.
+	// Look at the reset process in commands.go as a lot of stuff in the sequence is reset there.
+	cmd := common.Command{
+		Action: common.Reset,
+	}
+	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Turn off the flashing save button.
 	this.SavePreset = false
@@ -148,6 +161,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	for _, trigger := range this.SoundTriggers {
 		trigger.State = false
 	}
+
 	// Update status bar.
 	common.UpdateStatusBar("Version 2.0", "version", false, guiButtons)
 
@@ -169,7 +183,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
 		this.SwitchPositions = [9][9]int{}                                           // Clear switch positions to their first positions.
 		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
-		this.SelectMode[sequenceNumber] = NORMAL                                     // Clear function selecetd mode.
+		this.SelectedMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
 		this.SelectButtonPressed[sequenceNumber] = false                             // Clear buttoned selecetd mode.
 		this.EditGoboSelectionMode = false                                           // Clear edit gobo mode.
 		this.EditPatternMode = false                                                 // Clear edit pattern mode.
@@ -179,6 +193,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.ShowStaticColorPicker = false                                           // Clear the static color picker.
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
 		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.
+		this.ClearPressed[this.TargetSequence] = false                               // Reset the counter that counts how many times we've pressed the clear button.
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
@@ -221,36 +236,17 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Set the colors.
 		sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
 
+		// Handle the display for this sequence.
+		this.SelectedSequence = sequenceNumber
+		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
-
-	// Send reset to all sequences.
-	// Look at the reset process in commands.go as a lot of stuff in the sequence is reset there.
-	cmd := common.Command{
-		Action: common.Reset,
-	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
 
 	// Clear the presets and display them.
 	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
-	// Turn off all fixtures.
-	cmd = common.Command{
-		Action: common.Clear,
-	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
-
-	// Light the correct sequence selector button.
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
-
-	// Clear the graphics labels.
+	// Set the first sequnence.
+	this.SelectedSequence = 0
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
-	// Reset the counter that counts how many times we've pressed the clear button.
-	this.ClearPressed[this.TargetSequence] = false
-
-	// Reset the launchpad.
-	if this.LaunchPadConnected {
-		this.Pad.Program()
-	}
 }

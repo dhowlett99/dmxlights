@@ -72,7 +72,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	// Get an upto date copy of all of the sequences.
 	for sequenceNumber, sequence := range sequences {
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-
 		// restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
@@ -87,7 +86,13 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
-		this.SelectMode[sequenceNumber] = NORMAL
+
+		// Assume we're starting in normal mode.
+		this.SelectedMode[sequenceNumber] = NORMAL
+
+		// Forget we've pressed twice.
+		this.SelectButtonPressed[sequenceNumber] = false
+
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
 		this.StaticFlashing[sequenceNumber] = false
@@ -95,13 +100,10 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.ShowStaticColorPicker = false
 		this.ShowRGBColorPicker = false
 
-		// Assume we're starting in normal mode.
-		this.SelectMode[sequenceNumber] = NORMAL
-
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
-			this.SelectMode[sequenceNumber] = CHASER_DISPLAY
+			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
 
 		// Reload the fixture state.
@@ -145,9 +147,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			}
 		}
 
+		if debug {
+			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
+		}
+
 		// Play out this sequence.
-		this.SelectedSequence = sequenceNumber
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
@@ -162,14 +167,24 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	common.ShowRunningStatus(this.Running[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
-	// Forget we've pressed twice.
-	this.SelectButtonPressed[this.SelectedSequence] = false
-
 	// Auto select the last running or static sequence which lights it's select lamp.
 	this.SelectedSequence = autoSelect(this)
 
-	// Refresh the auto selected sequence.
-	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+	// Tailor the top buttons to the sequence type.
+	common.ShowTopButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+
+	// Tailor the bottom buttons to the sequence type.
+	common.ShowBottomButtons(sequences[this.SelectedSequence].Type, eventsForLaunchpad, guiButtons)
+
+	// Show this sequence running status in the start/stop button.
+	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+
+	// Update the status bar.
+	showStatusBar(this, sequences, guiButtons)
+
+	// Light the sequence selector button.
+	SequenceSelect(eventsForLaunchpad, guiButtons, this)
 
 }
 

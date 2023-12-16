@@ -84,7 +84,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			// Load the settings into the array used by the table.
 			data = makeChannelsArray(cp.ChannelList)
 
-			return container.NewMax(
+			return container.NewStack(
 
 				// Channel Number.
 				widget.NewLabel("template"),

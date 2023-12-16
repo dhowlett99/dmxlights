@@ -118,12 +118,12 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 			// Load the settings into the array used by the table.
 			data = makeSettingsArray(st.SettingsList)
 
-			return container.NewMax(
+			return container.NewStack(
 				// SETTING_NUMBER
 				widget.NewLabel("template"),
 
 				// SETTING_NAME
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(),
 				),
@@ -132,7 +132,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				widget.NewSelect(st.ChannelOptions, func(value string) {}),
 
 				// SETTING_VALUE
-				container.NewMax(
+				container.NewStack(
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(),
 				),
