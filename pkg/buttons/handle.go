@@ -155,6 +155,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		common.ShowStaticButtons(sequences[this.TargetSequence], this.StaticFlashing[this.TargetSequence], eventsForLaunchpad, guiButtons)
 	}
 
+	// Always clear labels on the GUI.
+	common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+
 	// Now display the selected mode.
 	displayMode(this.SelectedSequence, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
