@@ -779,9 +779,6 @@ func ProcessButtons(X int, Y int,
 				this.StrobeSpeed[this.SelectedSequence] = 0
 			}
 
-			// Store the last strobe speed.
-			//this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.SelectedSequence]
-
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
@@ -2491,29 +2488,34 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 
 }
 
-func UpdateSpeed(this *CurrentState, guiButttons chan common.ALight) {
+func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
 
-	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" {
-			if !this.Strobe[this.TargetSequence] {
-				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButttons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButttons)
+	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
+		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+	} else {
+
+		if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+			if tYpe == "rgb" {
+				if !this.Strobe[this.TargetSequence] {
+					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+				} else {
+					common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+				}
+			}
+			if tYpe == "scanner" {
+				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButtons)
 			}
 		}
-		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButttons)
-		}
-	}
-	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
-		if !this.Strobe[this.TargetSequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButttons)
-		} else {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButttons)
+		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+			if !this.Strobe[this.TargetSequence] {
+				common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButtons)
+			} else {
+				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+			}
 		}
 	}
 }

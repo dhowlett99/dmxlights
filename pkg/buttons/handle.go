@@ -206,15 +206,6 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 		fmt.Printf("showStatusBar for sequence %d\n", this.SelectedSequence)
 	}
 
-	var chaser bool
-	if this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
-		this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
-		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
-		chaser = true
-	} else {
-		chaser = false
-	}
-
 	sensitivity := common.FindSensitivity(this.SoundGain)
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
@@ -237,19 +228,7 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 	}
 
 	// Speed is common to all selectable sequences.
-	if this.Strobe[this.TargetSequence] {
-		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-	} else {
-		if this.Functions[this.DisplaySequence][common.Function8_Music_Trigger].State {
-			common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-		} else {
-			if chaser {
-				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.Speed[this.ChaserSequenceNumber]), "speed", false, guiButtons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-			}
-		}
-	}
+	UpdateSpeed(this, guiButtons)
 
 	// RGB
 	if sequences[this.DisplaySequence].Type == "rgb" &&
@@ -311,15 +290,6 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 			fmt.Printf("showStatusBar show Chaser labels\n")
 		}
 
-		if this.Strobe[this.DisplaySequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-		} else {
-			if this.Functions[this.DisplaySequence][common.Function8_Music_Trigger].State {
-				common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-			}
-		}
 		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
