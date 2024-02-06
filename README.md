@@ -20,6 +20,11 @@ Built for Apple Mac (tested on Catalina 10.15.7)
 - github.com/gordonklaus/portaudio
 - fyne.io/fyne/v2
 
+<br/>
+
+# Architecture 
+
+![Architecture.](./Architecture.png)
 
 # FTDI Integration
 

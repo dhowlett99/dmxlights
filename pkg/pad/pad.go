@@ -1,4 +1,6 @@
-// Simple Midi Interface for Novation Launchpad.
+// Simple Midi Interface for Novation Launchpad inspired by work done by https://github.com/scgolang/launchpad
+// and https://github.com/rakyll/launchpad.
+
 package pad
 
 import (
