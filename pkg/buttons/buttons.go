@@ -1680,7 +1680,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single color DMX message.
-		fixture.MapFixturesColorOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.ScannerColor, this.DmxInterfacePresent)
+		fixture.MapFixturesColorOnly(this.SelectedSequence, this.SelectedFixture, this.ScannerColor, dmxController, fixturesConfig, this.DmxInterfacePresent)
 
 		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
@@ -1762,7 +1762,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// If the sequence isn't running this will force a single gobo DMX message.
-		fixture.MapFixturesGoboOnly(sequences[this.SelectedSequence], dmxController, fixturesConfig, this.SelectedGobo, this.DmxInterfacePresent)
+		fixture.MapFixturesGoboOnly(this.SelectedSequence, this.SelectedFixture, this.SelectedGobo, fixturesConfig, dmxController, this.DmxInterfacePresent)
 
 		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)

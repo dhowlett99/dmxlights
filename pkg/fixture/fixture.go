@@ -717,19 +717,27 @@ func playScanner(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan
 	return lastColor
 }
 
-func MapFixturesColorOnly(sequence *common.Sequence, dmxController *ft232.DMXController, fixtures *Fixtures, scannerColor int, dmxInterfacePresent bool) {
+func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dmxController *ft232.DMXController, fixtures *Fixtures, dmxInterfacePresent bool) {
 	if debug {
-		fmt.Printf("MapFixturesColorOnly\n")
+		fmt.Printf("MapFixturesColorOnly Sequence %d Fixture %d Gobo %d \n", sequenceNumber, selectedFixture, selectedColor)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == sequence.Number {
-			for channelNumber, channel := range fixture.Channels {
-				if strings.Contains(channel.Name, "Color") {
-					for _, setting := range channel.Settings {
-						if setting.Number-1 == scannerColor {
-							v, _ := strconv.ParseFloat(setting.Value, 32)
-							SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		// Match only this fixture.
+		if fixture.Group-1 == sequenceNumber {
+			// Match only this sequence.
+			if fixture.Group-1 == sequenceNumber {
+
+				// Match only this fixture.
+				if fixture.Number == selectedFixture+1 {
+					for channelNumber, channel := range fixture.Channels {
+						if strings.Contains(channel.Name, "Color") {
+							for _, setting := range channel.Settings {
+								if setting.Number-1 == selectedColor {
+									v, _ := strconv.ParseFloat(setting.Value, 32)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								}
+							}
 						}
 					}
 				}
@@ -864,21 +872,25 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 	return 0, fmt.Errorf("channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
 }
 
-func MapFixturesGoboOnly(sequence *common.Sequence, dmxController *ft232.DMXController,
-	fixtures *Fixtures, selectedGobo int, dmxInterfacePresent bool) {
+func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixtures *Fixtures, dmxController *ft232.DMXController,
+	dmxInterfacePresent bool) {
 
 	if debug {
-		fmt.Printf("MapFixturesGoboOnly\n")
+		fmt.Printf("MapFixturesGoboOnly Sequence %d Fixture %d Gobo %d \n", sequenceNumber, selectedFixture, selectedGobo)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == sequence.Number {
-			for channelNumber, channel := range fixture.Channels {
-				if strings.Contains(channel.Name, "Gobo") {
-					for _, setting := range channel.Settings {
-						if setting.Number == selectedGobo {
-							v, _ := strconv.Atoi(setting.Value)
-							SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		// Match only this sequence.
+		if fixture.Group-1 == sequenceNumber {
+			// Match only this fixture.
+			if fixture.Number == selectedFixture+1 {
+				for channelNumber, channel := range fixture.Channels {
+					if strings.Contains(channel.Name, "Gobo") {
+						for _, setting := range channel.Settings {
+							if setting.Number == selectedGobo {
+								v, _ := strconv.Atoi(setting.Value)
+								SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+							}
 						}
 					}
 				}
