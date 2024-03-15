@@ -1251,9 +1251,7 @@ func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 			newActions := []fixture.Action{}
 
 			for _, action := range state.Actions {
-				fmt.Printf("Action : %s\n", action.Name)
 				if action.Mode != "None" {
-					fmt.Printf("\t Add Action : %s\n", action.Name)
 					newAction := action
 					newActions = append(outActions, newAction)
 				}

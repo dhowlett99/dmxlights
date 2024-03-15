@@ -610,7 +610,9 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 func UpdateAction(currentStateName string, actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
 	newActions := []fixture.Action{}
 	for _, action := range actions {
-		fmt.Printf("UpdateAction: Name %s Mode %s\n", newAction.Name, newAction.Mode)
+		if debug {
+			fmt.Printf("UpdateAction: Name %s Mode %s\n", newAction.Name, newAction.Mode)
+		}
 		if action.Number == id {
 			// update the channel information.
 			newAction.Name = currentStateName
