@@ -18,6 +18,7 @@
 package editor
 
 import (
+	"fmt"
 	"image/color"
 	"strings"
 
@@ -63,7 +64,7 @@ const (
 	ACTIONS_STROBE
 )
 
-func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
+func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fixture.FixtureInfo) *ActionPanel {
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
@@ -304,11 +305,11 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 					// Rotate
-					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
 					// Rotate RotateSpeed
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
 					// Program
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
@@ -554,23 +555,44 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action) *ActionPanel {
 	return &ap
 }
 
+func ClearOffActions(actions []fixture.Action) (outActions []fixture.Action) {
+
+	//if debug {
+	fmt.Printf("ClearOffActions with Name \n")
+	//}
+
+	for _, action := range actions {
+		if action.Mode != "Off" {
+			outActions = append(outActions, action)
+		}
+	}
+	return outActions
+}
+
 // UpdateItem replaces the selected item by id with newItem.
 func UpdateAction(currentStateName string, actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
 	newActions := []fixture.Action{}
 	for _, action := range actions {
-		if action.Number == id {
-			// update the channel information.
-			newAction.Name = currentStateName
-			newActions = append(newActions, newAction)
-		} else {
-			// just add what was there before.
-			newActions = append(newActions, action)
+		if action.Mode != "Off" {
+			fmt.Printf("Name %s Mode %s\n", newAction.Name, newAction.Mode)
+			if action.Number == id {
+				// update the channel information.
+				newAction.Name = currentStateName
+				newActions = append(newActions, newAction)
+			} else {
+				// just add what was there before.
+				newActions = append(newActions, action)
+			}
 		}
 	}
 	return newActions
 }
 
-func CreateActionsList(stateList []fixture.State, selectedState int) (actionsList []fixture.Action) {
+func CreateActionsList(stateList []fixture.State, selectedState int) fixture.Action {
+
+	if debug {
+		fmt.Printf("CreateActionsList with Name %s\n", stateList[selectedState].Name)
+	}
 
 	newAction := fixture.Action{}
 	newAction.Name = stateList[selectedState].Name // Action Name has the same name as the state.
@@ -585,6 +607,5 @@ func CreateActionsList(stateList []fixture.State, selectedState int) (actionsLis
 	newAction.Fade = "Off"
 	newAction.Speed = "Off"
 
-	actionsList = append(actionsList, newAction)
-	return actionsList
+	return newAction
 }

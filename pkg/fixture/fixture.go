@@ -108,6 +108,12 @@ type Fixture struct {
 	UseFixture         string    `yaml:"use_fixture,omitempty"`
 }
 
+type FixtureInfo struct {
+	HasRotate     bool
+	HasGobo       bool
+	HasColorWheel bool
+}
+
 type Setting struct {
 	Name    string `yaml:"name"`
 	Label   string `yaml:"labe,omitempty"`
@@ -1525,4 +1531,21 @@ func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) 
 		}
 	}
 	return 0, fmt.Errorf("error looking for channel %s", channelName)
+}
+
+func FindFixtureInfo(thisFixture Fixture) FixtureInfo {
+	fixtureInfo := FixtureInfo{}
+	fixtureInfo.HasRotate = isThisAChannel(thisFixture, "Rotate")
+	fixtureInfo.HasColorWheel = isThisAChannel(thisFixture, "Color")
+	fixtureInfo.HasGobo = isThisAChannel(thisFixture, "Gobo")
+	return fixtureInfo
+}
+
+func isThisAChannel(thisFixture Fixture, channelName string) bool {
+	for _, channel := range thisFixture.Channels {
+		if channel.Name == channelName {
+			return true
+		}
+	}
+	return false
 }

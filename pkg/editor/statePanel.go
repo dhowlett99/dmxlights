@@ -194,10 +194,13 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 						data = updateStatesArray(sp.StatesList)
 						ap.ActionsList = sp.StatesList[index].Actions
 
+						// Remove any actions which are off from any previous selections.
+						//ap.ActionsList = ClearOffActions(ap.ActionsList)
+
 						// If the settings are empty create a new set of settings.
 						if len(ap.ActionsList) == 0 {
 							// Create new settings.
-							ap.ActionsList = CreateActionsList(sp.StatesList, thisState.Row)
+							ap.ActionsList = append(ap.ActionsList, CreateActionsList(sp.StatesList, thisState.Row))
 						}
 					}
 					ap.CurrentState = int(sp.StatesList[thisState.Row].Number - 1)

@@ -38,9 +38,22 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	// Create the save button early so we can pass the pointer to error checks.
 	buttonSave := widget.NewButton("OK", func() {})
 
+	// Get the details of this fixture.
 	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
+	}
+
+	// If this is a pretend virtual fixture i.e a switch.
+	// Find the original fixure's details so we can make decisions on
+	// what options to put in the menus based on the fixtures capabilities.
+	basedOnFixture, err := fixture.GetFixureDetailsByLabel(thisFixture.UseFixture, fixtures)
+	if err != nil {
+		return nil, fmt.Errorf("GetFixureDetailsByLabel %s", err.Error())
+	}
+	fixtureInfo := fixture.FindFixtureInfo(basedOnFixture)
+	if debug {
+		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}
 
 	// Generate a list of functions that switches can use.
@@ -69,8 +82,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.Description = value
 	}
 
-	// Create Actions Panel.
-	ap := NewActionsPanel(w, []fixture.Action{})
+	// Create Actions Panel. fixtureInfo controls what options we see.
+	ap := NewActionsPanel(w, []fixture.Action{}, fixtureInfo)
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
