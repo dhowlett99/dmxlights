@@ -611,6 +611,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	// Save button.
 	buttonSave = widget.NewButton("Save", func() {
 
+		// Remove any empty "None" actions from fixture list.
+		fp.FixtureList = removeEmptyActions(fp.FixtureList)
+
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
 
@@ -1215,4 +1218,62 @@ func (h *ActiveHeader) Tapped(_ *fyne.PointEvent) {
 }
 
 func (h *ActiveHeader) TappedSecondary(_ *fyne.PointEvent) {
+}
+
+func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
+
+	var outActions []fixture.Action
+	var newFixtureList []fixture.Fixture
+
+	for _, f := range fixtureList {
+
+		newFixture := fixture.Fixture{}
+
+		newFixture.ID = f.ID
+		newFixture.Name = f.Name
+		newFixture.Label = f.Label
+		newFixture.Number = f.Number
+		newFixture.Description = f.Description
+		newFixture.Type = f.Type
+		newFixture.Group = f.Group
+		newFixture.Address = f.Address
+		newFixture.Channels = f.Channels
+
+		newFixture.MultiFixtureDevice = f.MultiFixtureDevice
+		newFixture.NumberSubFixtures = f.NumberSubFixtures
+		newFixture.UseFixture = f.UseFixture
+
+		newStates := []fixture.State{}
+
+		for _, state := range f.States {
+
+			newState := fixture.State{}
+			newActions := []fixture.Action{}
+
+			for _, action := range state.Actions {
+				fmt.Printf("Action : %s\n", action.Name)
+				if action.Mode != "None" {
+					fmt.Printf("\t Add Action : %s\n", action.Name)
+					newAction := action
+					newActions = append(outActions, newAction)
+				}
+			}
+
+			newState.Name = state.Name
+			newState.Number = state.Number
+			newState.Label = state.Label
+			newState.ButtonColor = state.ButtonColor
+			newState.Master = state.Master
+			newState.Actions = newActions
+			newState.Settings = state.Settings
+			newState.Flash = state.Flash
+
+			newStates = append(newStates, newState)
+
+		}
+		newFixture.States = newStates
+		newFixtureList = append(newFixtureList, newFixture)
+
+	}
+	return newFixtureList
 }

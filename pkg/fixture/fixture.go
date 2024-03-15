@@ -288,7 +288,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
 			}
-			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
@@ -331,7 +331,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
-			lastColor = playScanner(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
 
@@ -340,7 +340,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 
 			}
-			lastColor = playRGB(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
 		}
@@ -348,7 +348,7 @@ func FixtureReceiver(
 }
 
 // Clear fixture.
-func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
 
 	// Stop any running fade ups.
 	select {
@@ -358,7 +358,7 @@ func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool,
 
 	// Stop any running fade downs.
 	select {
-	case stopFadeUp <- true:
+	case stopFadeDown <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
 
@@ -600,9 +600,11 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 				// Find a suitable color wheel settin based on the requested static lamp color.
 				scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
-				// Listen for stop command.
+				// Listen for stop commands.
 				select {
 				case <-stopFadeDown:
+					return
+				case <-stopFadeUp:
 					return
 				case <-time.After(10 * time.Millisecond):
 				}
@@ -617,7 +619,6 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 				// Control how long the fade take with the speed control.
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
 			}
-			// Fade down complete, set lastColor to empty.
 			// Fade down complete, set lastColor to empty in the fixture.
 			command := common.FixtureCommand{
 				Type:      "lastColor",
@@ -632,7 +633,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 
 }
 
-func playRGB(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
 	// Now play all the values for this state.
 
@@ -681,7 +682,7 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan boo
 	return lastColor
 }
 
-func playScanner(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
 	// Find the fixture
 	fixture := cmd.ScannerPosition.Fixtures[fixtureNumber]

@@ -68,7 +68,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
-	ap.ActionModeOptions = []string{"Off", "Static", "Chase", "Control"}
+	ap.ActionModeOptions = []string{"None", "Off", "Static", "Chase", "Control"}
 	ap.ActionSizeOptions = []string{"Off", "Short", "Medium", "Long"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Normal", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
@@ -163,6 +163,57 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := fixture.Action{}
+				if value == "None" || value == "" {
+					newAction.Name = ap.ActionsList[i].Name
+					newAction.Number = ap.ActionsList[i].Number
+					newAction.Colors = []string{}
+					newAction.Mode = value
+					newAction.Fade = ""
+					newAction.Size = ""
+					newAction.Speed = ""
+					newAction.Rotate = ""
+					newAction.RotateSpeed = ""
+					newAction.Program = ""
+					newAction.Strobe = ""
+					ap.ActionsList = UpdateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+					ap.UpdateActions = true
+					ap.UpdateThisAction = ap.CurrentState
+
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[2].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[3].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[4].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[5].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[6].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[7].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[8].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[9].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[10].(*canvas.Rectangle).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[11].(*canvas.Rectangle).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SIZE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
 				if value == "Off" || value == "" {
 					newAction.Name = ap.ActionsList[i].Name
 					newAction.Number = ap.ActionsList[i].Number
@@ -555,32 +606,19 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 	return &ap
 }
 
-func ClearOffActions(actions []fixture.Action) (outActions []fixture.Action) {
-
-	//if debug {
-	fmt.Printf("ClearOffActions with Name \n")
-	//}
-
-	for _, action := range actions {
-		if action.Mode != "Off" {
-			outActions = append(outActions, action)
-		}
-	}
-	return outActions
-}
-
 // UpdateItem replaces the selected item by id with newItem.
 func UpdateAction(currentStateName string, actions []fixture.Action, id int, newAction fixture.Action) []fixture.Action {
 	newActions := []fixture.Action{}
 	for _, action := range actions {
-		if action.Mode != "Off" {
-			fmt.Printf("Name %s Mode %s\n", newAction.Name, newAction.Mode)
-			if action.Number == id {
-				// update the channel information.
-				newAction.Name = currentStateName
-				newActions = append(newActions, newAction)
-			} else {
-				// just add what was there before.
+		fmt.Printf("UpdateAction: Name %s Mode %s\n", newAction.Name, newAction.Mode)
+		if action.Number == id {
+			// update the channel information.
+			newAction.Name = currentStateName
+			newActions = append(newActions, newAction)
+		} else {
+			// just add what was there before.
+			// Unless it's still set to None.
+			if action.Mode != "None" {
 				newActions = append(newActions, action)
 			}
 		}
@@ -603,7 +641,7 @@ func CreateActionsList(stateList []fixture.State, selectedState int) fixture.Act
 	newAction.Program = "Off"
 	newAction.Strobe = "Off"
 	newAction.Colors = []string{"Off"}
-	newAction.Mode = "Off"
+	newAction.Mode = "None"
 	newAction.Fade = "Off"
 	newAction.Speed = "Off"
 

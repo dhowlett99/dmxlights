@@ -224,7 +224,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 						// If the settings are empty create a new set of settings.
 						if len(st.SettingsList) == 0 {
 							// Create new settings.
-							st.SettingsList = createSettingList(sp.StatesList[thisState.Row].Number)
+							st.SettingsList = createNewSettingList()
 							st.CurrentChannel = int(sp.StatesList[thisState.Row].Number)
 
 						} else {
@@ -357,7 +357,7 @@ func populateSettingList(statesList []fixture.State, stateNumber int16) (setting
 	return settingsList
 }
 
-func createSettingList(channelNumber int16) (settingsList []fixture.Setting) {
+func createNewSettingList() (settingsList []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("createSettingList\n")

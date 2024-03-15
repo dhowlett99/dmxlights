@@ -150,7 +150,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			if i.Col == CHANNEL_ADD {
 				showChannelsField(CHANNEL_ADD, o)
 				o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).OnTapped = func() {
-					cp.ChannelList = addChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, cp.ChannelOptions)
+					cp.ChannelList = addChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number)
 					data = makeChannelsArray(cp.ChannelList)
 					cp.ChannelPanel.Refresh()
 				}
@@ -168,7 +168,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 						// If the settings are empty create a new set of settings.
 						if len(st.SettingsList) == 0 {
 							// Create new settings.
-							st.SettingsList = createChannelSettingList(cp.ChannelList[i.Row].Number)
+							st.SettingsList = createNewChannelSettingList()
 							st.CurrentChannel = int(cp.ChannelList[i.Row].Number)
 							st.SettingsPanel.Hidden = false
 							st.SettingsPanel.Refresh()
@@ -193,7 +193,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 	return &cp
 }
 
-func createChannelSettingList(channelNumber int16) (settingsList []fixture.Setting) {
+func createNewChannelSettingList() (settingsList []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("createChannelSettingList\n")
@@ -223,7 +223,7 @@ func populateChannelSettingList(channelList []fixture.Channel, channelNumber int
 	return settingsList
 }
 
-func addChannelItem(channels []fixture.Channel, number int16, options []string) (outItems []fixture.Channel) {
+func addChannelItem(channels []fixture.Channel, number int16) (outItems []fixture.Channel) {
 
 	if debug {
 		fmt.Printf("addChannelItem\n")
