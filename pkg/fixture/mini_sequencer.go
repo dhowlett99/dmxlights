@@ -344,7 +344,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 		// Don't stop this mini sequencer if there's one running already.
 		// Unless we are changing switch positions.
-		if getSwitchState(swiTch, swiTch.Number) { //&& SwitchPosition == swiTch.CurrentPosition {
+		if getSwitchState(swiTch) { //&& SwitchPosition == swiTch.CurrentPosition {
 			setSwitchState(swiTch, true, blackout, master)
 			return
 		}
@@ -773,7 +773,7 @@ func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) 
 }
 
 // getSwitchState reports on if this switch is running a mini sequence.
-func getSwitchState(swiTch common.Switch, switchNumber int) bool {
+func getSwitchState(swiTch common.Switch) bool {
 	return swiTch.MiniSequencerRunning
 }
 
