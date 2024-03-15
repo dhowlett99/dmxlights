@@ -200,7 +200,7 @@ func main() {
 	}
 
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := fixture.LoadFixtures("fixtures.yaml")
+	fixturesConfig, err := fixture.LoadFixtures("Fixtures_Default_Project.yaml")
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 		os.Exit(1)
@@ -395,7 +395,7 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons, eventsForLaunchpad)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName, fixturesConfig)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED))

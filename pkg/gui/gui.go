@@ -28,6 +28,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
@@ -458,8 +459,31 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight,
+	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures) *widget.Toolbar {
+
 	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(theme.FileIcon(), func() {
+			dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
+				if err == nil && reader != nil {
+					fixturesConfig, err = fixture.LoadFixturesReader(reader)
+					if err != nil {
+						fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
+					}
+				}
+			}, myWindow)
+		}),
+		widget.NewToolbarAction(theme.FileIcon(), func() {
+			dialog.ShowFileSave(func(writer fyne.URIWriteCloser, err error) {
+				if err == nil && writer != nil {
+					fixturesConfig, err = fixture.SaveFixturesWriter(writer)
+					if err != nil {
+						fmt.Printf("dmxlights: error failed to save fixtures: %s\n", err.Error())
+					}
+				}
+			}, myWindow)
+		}),
+		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
 			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, eventsForLaunchPad, config, launchPadName)
 			modal.Resize(fyne.NewSize(250, 250))

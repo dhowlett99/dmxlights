@@ -21,12 +21,14 @@ package fixture
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/go-yaml/yaml"
@@ -146,7 +148,34 @@ type Channel struct {
 	Settings   []Setting `yaml:"settings,omitempty"`
 }
 
-// LoadFixtures opens the fixtures config file.
+// LoadFixturesReader opens the fixtures config file using the io reader passed.
+// Returns a pointer to the fixtures config.
+// Returns an error.
+func LoadFixturesReader(reader fyne.URIReadCloser) (fixtures *Fixtures, err error) {
+
+	if debug {
+		fmt.Printf("LoadFixturesReader\n")
+	}
+
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("dmxlights: error failed to load fixtures: %s", err.Error())
+	}
+
+	// Unmarshals the fixtures.yaml file into a data struct
+	fixtures = &Fixtures{}
+	err = yaml.Unmarshal(data, fixtures)
+	if err != nil {
+		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
+	}
+	return fixtures, nil
+}
+
+func SaveFixturesWriter(writer fyne.URIWriteCloser) (fixtures *Fixtures, err error) {
+	return fixtures, nil
+}
+
+// LoadFixtures opens the fixtures config file using the filename passed.
 // Returns a pointer to the fixtures config.
 // Returns an error.
 func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
@@ -303,6 +332,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
 			}
 			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
+			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
@@ -346,6 +376,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
 			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
 
@@ -354,6 +385,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 
 			}
+			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
@@ -376,6 +408,7 @@ func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool,
 
 	// Send stop any running fade downs.
 	select {
+	case stopFadeDown <- true:
 	case stopFadeDown <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
