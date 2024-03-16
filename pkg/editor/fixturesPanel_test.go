@@ -17,7 +17,12 @@
 
 package editor
 
-import "testing"
+import (
+	"reflect"
+	"testing"
+
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+)
 
 func Test_checkDMXnumber(t *testing.T) {
 	type args struct {
@@ -91,6 +96,64 @@ func Test_checkDMXnumber(t *testing.T) {
 			err := checkDMXValue(tt.args.value)
 			if err != nil && !tt.wantErr {
 				t.Errorf("checkDMXValue() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func Test_removeEmptyActions(t *testing.T) {
+	type args struct {
+		fixtureList []fixture.Fixture
+	}
+	tests := []struct {
+		name string
+		args args
+		want []fixture.Fixture
+	}{
+		{
+			args: args{
+				fixtureList: []fixture.Fixture{
+					{
+						Name: "Fixture1",
+						States: []fixture.State{
+							{
+								Actions: []fixture.Action{
+									{
+										Name: "Action1",
+										Mode: "Chase",
+									},
+									{
+										Name: "Action2",
+										Mode: "None",
+									},
+								},
+							},
+						},
+					},
+				},
+			},
+			want: []fixture.Fixture{
+				{
+					Name: "Fixture1",
+					States: []fixture.State{
+						{
+							Actions: []fixture.Action{
+								{
+									Name: "Action1",
+									Mode: "Chase",
+								},
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := removeEmptyActions(tt.args.fixtureList); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("removeEmptyActions() got = %+v\n", got)
+				t.Errorf("removeEmptyActions() want %+v\n", tt.want)
 			}
 		})
 	}

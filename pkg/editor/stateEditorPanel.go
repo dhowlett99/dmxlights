@@ -38,9 +38,22 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	// Create the save button early so we can pass the pointer to error checks.
 	buttonSave := widget.NewButton("OK", func() {})
 
-	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
+	// Get the details of this fixture.
+	thisFixture, err := fixture.GetFixtureDetailsById(id, fixtures)
 	if err != nil {
-		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
+		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
+	}
+
+	// If this is a pretend virtual fixture i.e a switch.
+	// Find the original fixture's details so we can make decisions on
+	// what options to put in the menus based on the fixtures capabilities.
+	basedOnFixture, err := fixture.GetFixtureDetailsByLabel(thisFixture.UseFixture, fixtures)
+	if err != nil {
+		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
+	}
+	fixtureInfo := fixture.FindFixtureInfo(basedOnFixture)
+	if debug {
+		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}
 
 	// Generate a list of functions that switches can use.
@@ -69,8 +82,8 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.Description = value
 	}
 
-	// Create Actions Panel.
-	ap := NewActionsPanel(w, []fixture.Action{})
+	// Create Actions Panel. fixtureInfo controls what options we see.
+	ap := NewActionsPanel(w, []fixture.Action{}, fixtureInfo)
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
@@ -96,14 +109,14 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
 
-		useFixture, err := fixture.GetFixureDetailsByLabel(useInput.Selected, fixtures)
+		useFixture, err := fixture.GetFixtureDetailsByLabel(useInput.Selected, fixtures)
 		if err != nil {
 			addressInput.SetText("Not Found")
 		} else {
 			addressInput.SetText(fmt.Sprintf("%d", useFixture.Address))
 		}
 
-		// Based on a new use fixure - Try again to populate the program and rotate options as available for this states action.
+		// Based on a new use fixture - Try again to populate the program and rotate options as available for this states action.
 		fixture, err := findFixtureByLabel(value, fixtures)
 		if err != nil {
 			fmt.Printf("findFixtureByName: fixtureName: %s error %s\n", fixture.Name, err.Error())
@@ -111,7 +124,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 		}
 		ap.ActionProgramOptions = populateOptions(fixture, "Program", fixtures)
 
-		// Based on a new use fixure - Try again to populate the channel names in the settings panel.
+		// Based on a new use fixture - Try again to populate the channel names in the settings panel.
 		st.ChannelOptions = populateChannelNames(useFixture.Channels)
 
 	}

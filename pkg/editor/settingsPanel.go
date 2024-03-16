@@ -336,9 +336,9 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
 					if len(st.SettingsList) != 0 {
-						st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number, st.SettingsOptions)
+						st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number)
 					} else {
-						st.SettingsList = addSettingsItem(st.SettingsList, 0, st.SettingsOptions)
+						st.SettingsList = addSettingsItem(st.SettingsList, 0)
 					}
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
@@ -376,7 +376,7 @@ func addChannelOption(options []string, newOption string) []string {
 	return newOptions
 }
 
-func addSettingsItem(items []fixture.Setting, number int, options []string) (outItems []fixture.Setting) {
+func addSettingsItem(items []fixture.Setting, number int) (outItems []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("addSettingsItem\n")

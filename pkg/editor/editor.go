@@ -38,9 +38,9 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	// Create the save button early so we can pass the pointer to error checks.
 	buttonSave := widget.NewButton("OK", func() {})
 
-	thisFixture, err := fixture.GetFixureDetailsById(id, fixtures)
+	thisFixture, err := fixture.GetFixtureDetailsById(id, fixtures)
 	if err != nil {
-		return nil, fmt.Errorf("GetFixureDetailsById %s", err.Error())
+		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
 
 	// Title.
