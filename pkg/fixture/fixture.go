@@ -192,13 +192,13 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	return nil
 }
 
-// GetFixureDetailsById - find a fixture in the fixtures config.
+// GetFixtureDetailsById - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixureDetailsById(id int, fixtures *Fixtures) (Fixture, error) {
+func GetFixtureDetailsById(id int, fixtures *Fixtures) (Fixture, error) {
 
 	if debug {
-		fmt.Printf("GetFixureDetailsById\n")
+		fmt.Printf("GetFixtureDetailsById\n")
 	}
 
 	// scan the fixtures structure for the selected fixture.
@@ -217,13 +217,13 @@ func GetFixureDetailsById(id int, fixtures *Fixtures) (Fixture, error) {
 	return Fixture{}, fmt.Errorf("error: fixture id %d not found", id)
 }
 
-// GetFixureDetailsByLabel - find a fixture in the fixtures config.
+// GetFixtureDetailsByLabel - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) {
+func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
 	if debug {
-		fmt.Printf("GetFixureDetailsByLabel: Looking for Fixture by Label %s\n", label)
+		fmt.Printf("GetFixtureDetailsByLabel: Looking for Fixture by Label %s\n", label)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
@@ -350,13 +350,13 @@ func FixtureReceiver(
 // Clear fixture.
 func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
 
-	// Stop any running fade ups.
+	// Send stop any running fade ups.
 	select {
 	case stopFadeUp <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	// Stop any running fade downs.
+	// Send stop any running fade downs.
 	select {
 	case stopFadeDown <- true:
 	case <-time.After(100 * time.Millisecond):

@@ -426,7 +426,7 @@ func hasColor(color common.Color) bool {
 }
 
 // ApplyFixtureState - Apply the state of the fixtures to the pattern, fixture disabling works by disabling the
-// steps that have no enabled fixtures AND also disabling in the fixure package. If we only disable here we don't
+// steps that have no enabled fixtures AND also disabling in the fixture package. If we only disable here we don't
 // catch steps that have more than one fixture alight in any one step.
 // So make sure you also turn off the fixture in the fixture receiver.
 func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
