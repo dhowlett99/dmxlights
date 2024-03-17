@@ -1514,6 +1514,166 @@ fixtures:
       number: 2
       value: "255"
 - id: 30
+  name: Equinox
+  label: graphix
+  number: 1
+  description: Equinox Graphix
+  type: rgb
+  group: 1
+  address: 185
+  channels:
+  - number: 1
+    name: Master
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      value: 0-255
+  - number: 2
+    name: Shutter
+    value: 0
+    settings:
+    - name: Blackout
+      labe: Blackout
+      number: 1
+      value: 0-31
+    - name: Open
+      labe: Open
+      number: 2
+      value: 32-63
+    - name: Strobe
+      labe: Strobe
+      number: 3
+      value: 64-95
+    - name: Open
+      labe: Open
+      number: 4
+      value: 96-127
+    - name: Pulse
+      labe: Pulse
+      number: 5
+      value: 129-159
+    - name: Open
+      labe: Open
+      number: 6
+      value: 160-191
+    - name: Random
+      labe: Random
+      number: 7
+      value: 192-223
+    - name: Open
+      labe: Open
+      number: 8
+      value: 224-255
+  - number: 3
+    name: Gobo
+    value: 0
+    settings:
+    - name: ZigZag
+      labe: ZigZag
+      number: 1
+      value: "0"
+    - name: Horiz Waves
+      labe: Horiz Waves
+      number: 2
+      value: "18"
+    - name: Croc Petals
+      labe: Croc Petals
+      number: 3
+      value: "28"
+    - name: Rose Flowers
+      labe: Rose Flowers
+      number: 4
+      value: "44"
+    - name: Triangles
+      labe: Triangles
+      number: 5
+      value: "50"
+    - name: Vert Waves
+      labe: Vert Waves
+      number: 6
+      value: "58"
+    - name: Star Rings
+      labe: Star Rings
+      number: 7
+      value: "94"
+    - name: Circles And Squares
+      labe: Circles And Squares
+      number: 8
+      value: "110"
+    - name: Horiz Lines
+      labe: Horiz Lines
+      number: 9
+      value: "117"
+  - number: 4
+    name: Rotate
+    value: 0
+    settings:
+    - name: Mirror Rotate
+      labe: Mirror Rotate
+      number: 1
+      value: 0-127
+    - name: AntiClockwise
+      labe: AntiClockwise
+      number: 2
+      value: 128-191
+    - name: ClockWise
+      labe: ClockWise
+      number: 3
+      value: 192-255
+  - number: 5
+    name: Program
+    value: 0
+    settings:
+    - name: Blackout
+      labe: Blackout
+      number: 1
+      value: 0-3
+    - name: 'Show0 '
+      labe: 'Show0 '
+      number: 2
+      value: 4-31
+    - name: Show1
+      labe: Show1
+      number: 3
+      value: 32-59
+    - name: Show2
+      labe: Show2
+      number: 4
+      value: 60-87
+    - name: Show3
+      labe: Show3
+      number: 5
+      value: 88-115
+    - name: Show4
+      labe: Show4
+      number: 6
+      value: 116-143
+    - name: Show5
+      labe: Show5
+      number: 7
+      value: 144-171
+    - name: Show6
+      labe: Show6
+      number: 8
+      value: 172-199
+    - name: Show7
+      labe: Show7
+      number: 9
+      value: 200-227
+    - name: Show8
+      labe: Show8
+      number: 10
+      value: 228-255
+  - number: 6
+    name: ProgramSpeed
+    value: 0
+    settings:
+    - name: Speed
+      labe: Speed
+      number: 1
+      value: 0-255
+- id: 31
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1560,7 +1720,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: Oil1
-- id: 31
+- id: 32
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1595,7 +1755,7 @@ fixtures:
       value: "On"
     flash: false
   use_fixture: flames
-- id: 32
+- id: 33
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1694,7 +1854,7 @@ fixtures:
       value: "75"
     flash: false
   use_fixture: deluge
-- id: 33
+- id: 34
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1900,7 +2060,7 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: vue
-- id: 34
+- id: 35
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -2078,7 +2238,7 @@ fixtures:
       value: "0"
     flash: false
   use_fixture: par38
-- id: 35
+- id: 36
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -2250,14 +2410,14 @@ fixtures:
       strobe: ""
     flash: false
   use_fixture: dekker1
-- id: 36
+- id: 37
   name: switch7
-  label: SW7.DERBY
+  label: SW7.FLOOR
   number: 7
-  description: ADJ DEKKER 2
+  description: Equinox Graphix
   type: switch
   group: 4
-  address: 330
+  address: 36
   channels: []
   states:
   - name: "Off"
@@ -2269,160 +2429,29 @@ fixtures:
     - name: "Off"
       number: 0
       colors: []
-      mode: "Off"
+      mode: Control
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: ""
+      program: Default
       strobe: ""
-    settings:
-    - name: Rotate
-      number: 1
-      channel: Rotate
-      value: "off"
-    - name: Red1
-      number: 2
-      channel: Red1
-      value: "0"
-    - name: Green1
-      number: 3
-      channel: Green1
-      value: "0"
-    - name: Blue1
-      number: 4
-      channel: Blue1
-      value: "0"
-    - name: White1
-      number: 5
-      channel: White1
-      value: "0"
-    - name: Master
-      number: 6
-      channel: Master
-      value: "0"
-    - name: Program
-      number: 7
-      channel: Program
-      value: "0"
-    - name: ProgramSpeed
-      number: 8
-      channel: ProgramSpeed
-      value: "0"
     flash: false
-  - name: Red
+  - name: ZigZag
     number: 2
-    label: Red
+    label: ZigZag
     buttoncolor: Red
     master: 0
-    actions:
-    - name: Red
-      number: 0
-      colors:
-      - Red
-      mode: Static
-      fade: Sharp
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
+    settings:
+    - name: ZigZag
+      labe: ZigZag
+      number: 1
+      channel: Gobo
+      value: "100"
     flash: false
-  - name: Green
-    number: 3
-    label: Green
-    buttoncolor: Green
-    master: 0
-    actions:
-    - name: Green
-      number: 0
-      colors:
-      - Green
-      mode: Static
-      fade: Sharp
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
-    flash: false
-  - name: Blue
-    number: 4
-    label: Blue
-    buttoncolor: Blue
-    master: 0
-    actions:
-    - name: Blue
-      number: 0
-      colors:
-      - Blue
-      mode: Static
-      fade: Sharp
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
-    flash: false
-  - name: Soft
-    number: 5
-    label: Soft
-    buttoncolor: Yellow
-    master: 0
-    actions:
-    - name: Soft
-      number: 0
-      colors:
-      - Orange
-      - Yellow
-      - Green
-      - Cyan
-      - Blue
-      - Purple
-      - Pink
-      mode: Chase
-      fade: Soft
-      size: Short
-      speed: VeryFast
-      rotate: Anti Clockwise
-      rotatespeed: Slow
-      program: ""
-      strobe: ""
-    flash: false
-  - name: Sound
-    number: 6
-    label: Sound
-    buttoncolor: White
-    master: 0
-    actions:
-    - name: Sound
-      number: 0
-      colors:
-      - Yellow
-      - White
-      - Pink
-      - Black
-      - Red
-      - Orange
-      - Green
-      - Cyan
-      - Blue
-      - Purple
-      mode: Chase
-      fade: Soft
-      size: "Off"
-      speed: Music
-      rotate: Auto
-      rotatespeed: Fast
-      program: ""
-      strobe: ""
-    flash: false
-  use_fixture: dekker2
-- id: 37
+  use_fixture: PAR6
+- id: 38
   name: switch8
   label: SW8.Booth
   number: 8

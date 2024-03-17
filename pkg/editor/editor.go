@@ -44,7 +44,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	}
 
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("Edit Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("Edit Channel Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
@@ -85,8 +85,9 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 
 	// Create Settings Panel
 	var settingsPanel *widget.Table
-	hideChannelSettings := true
-	st = NewSettingsPanel(w, settingsList, hideChannelSettings, buttonSave)
+	channelFieldDisabled := true
+	showSelectValue := false
+	st = NewSettingsPanel(w, settingsList, channelFieldDisabled, showSelectValue, buttonSave)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.

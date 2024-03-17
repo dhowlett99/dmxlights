@@ -795,6 +795,8 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 
 func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
+	debug := true
+
 	if debug {
 		fmt.Printf("findChannelSettingByChannelNameAndSettingName for %s\n", channelName)
 	}

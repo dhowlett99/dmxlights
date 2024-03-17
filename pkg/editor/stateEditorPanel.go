@@ -60,7 +60,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	fixturesAvailable := GetFixtureLabelsForSwitches(fixtures)
 
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("ID:%d Edit Config for Sequence %d Fixture %d", thisFixture.ID, thisFixture.Group, thisFixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("ID:%d Edit Switch States for Switch %d", thisFixture.ID, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
@@ -87,7 +87,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
-	st := NewSettingsPanel(w, []fixture.Setting{}, false, buttonSave)
+	st := NewSettingsPanel(w, []fixture.Setting{}, false, true, buttonSave)
 	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
 	st.SettingsPanel.Hide()
 

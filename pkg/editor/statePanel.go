@@ -399,7 +399,7 @@ func updateStatesArray(states []fixture.State) [][]string {
 
 func showStatesField(field int, o fyne.CanvasObject) {
 	if debug {
-		fmt.Printf("showField\n")
+		fmt.Printf("showStatesField\n")
 	}
 	// Now show the selected field.
 	switch {
