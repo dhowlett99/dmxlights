@@ -59,17 +59,18 @@ type State struct {
 }
 
 type Action struct {
-	Name        string `yaml:"name"`
-	Number      int
-	Colors      []string `yaml:"colors"`
-	Mode        string   `yaml:"mode"`
-	Fade        string   `yaml:"fade"`
-	Size        string   `yaml:"size"`
-	Speed       string   `yaml:"speed"`
-	Rotate      string   `yaml:"rotate"`
-	RotateSpeed string   `yaml:"rotatespeed"`
-	Program     string   `yaml:"program"`
-	Strobe      string   `yaml:"strobe"`
+	Name         string `yaml:"name"`
+	Number       int
+	Colors       []string `yaml:"colors"`
+	Mode         string   `yaml:"mode"`
+	Fade         string   `yaml:"fade"`
+	Size         string   `yaml:"size"`
+	Speed        string   `yaml:"speed"`
+	Rotate       string   `yaml:"rotate"`
+	RotateSpeed  string   `yaml:"rotatespeed"`
+	Program      string   `yaml:"program"`
+	ProgramSpeed string   `yaml:"programspeed"`
+	Strobe       string   `yaml:"strobe"`
 }
 
 type ActionConfig struct {
@@ -86,6 +87,7 @@ type ActionConfig struct {
 	AntiClockwise bool
 	Auto          bool
 	Program       int
+	ProgramSpeed  int
 	Music         int
 	MusicTrigger  bool
 	Strobe        bool
@@ -795,8 +797,6 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 
 func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
-	debug := true
-
 	if debug {
 		fmt.Printf("findChannelSettingByChannelNameAndSettingName for %s\n", channelName)
 	}
@@ -825,7 +825,7 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 		}
 	}
 
-	return 0, fmt.Errorf("label not found in fixture :%s", fixture.Name)
+	return 0, fmt.Errorf("setting %s not found in channel %s in fixture :%s", settingName, channelName, fixture.Name)
 }
 
 func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
@@ -1205,7 +1205,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		// Look for Master channel in this fixture identified by ID.
 		masterChannel, err := FindChannelNumberByName(thisFixture, "Master")
 		if err != nil && debug {
-			fmt.Printf("warning! fixture:%s master channel not defined: %s\n", thisFixture.Name, err)
+			fmt.Printf("warning! fixture %s: %s\n", thisFixture.Name, err)
 		}
 
 		// If blackout, set master to off.
@@ -1235,6 +1235,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Rotate = action.Rotate
 			newAction.RotateSpeed = action.RotateSpeed
 			newAction.Program = action.Program
+			newAction.ProgramSpeed = action.ProgramSpeed
 			newAction.Strobe = action.Strobe
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
@@ -1533,7 +1534,7 @@ func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) 
 			return channelNumber, nil
 		}
 	}
-	return 0, fmt.Errorf("error looking for channel %s", channelName)
+	return 0, fmt.Errorf("channel %s not found in fixture %s", channelName, fixture.Name)
 }
 
 func FindFixtureInfo(thisFixture Fixture) FixtureInfo {

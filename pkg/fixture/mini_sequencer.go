@@ -191,7 +191,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
-			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
+			fmt.Printf("Switch Number %d: %s\n", swiTch.Number, err)
 			return
 		}
 

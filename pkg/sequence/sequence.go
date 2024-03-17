@@ -277,7 +277,7 @@ func PlaySequence(sequence common.Sequence,
 				Type:      "lastColor",
 				LastColor: common.Black,
 			}
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sendToAllFixtures(fixtureStepChannels, command)
 		}
 
 		// Clear all fixtures.
@@ -296,7 +296,7 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sendToAllFixtures(fixtureStepChannels, command)
 			sequence.Clear = false
 			continue
 		}
@@ -403,7 +403,7 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sendToAllFixtures(fixtureStepChannels, command)
 			sequence.FloodPlayOnce = false
 			continue
 		}
@@ -426,7 +426,7 @@ func PlaySequence(sequence common.Sequence,
 				Strobe:         sequence.Strobe,
 			}
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sendToAllFixtures(fixtureStepChannels, command)
 			sequence.StartFlood = false
 			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
@@ -469,7 +469,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Now tell all the fixtures what they need to do.
-				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+				sendToAllFixtures(fixtureStepChannels, command)
 
 				// Done fading for this static scene only reset when we set a static scene again.
 				sequence.StaticFadeUpOnce = false
@@ -493,7 +493,7 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Now tell all the fixtures what they need to do.
-				sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+				sendToAllFixtures(fixtureStepChannels, command)
 			}
 			sequence.PlayStaticOnce = false
 			continue
@@ -524,7 +524,7 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			// Now tell all the fixtures what they need to do.
-			sendToAllFixtures(sequence, fixtureStepChannels, channels, command)
+			sendToAllFixtures(fixtureStepChannels, command)
 			sequence.PlayStaticOnce = false
 
 			continue
@@ -831,7 +831,7 @@ func PlaySequence(sequence common.Sequence,
 }
 
 // Send a command to all the fixtures.
-func sendToAllFixtures(sequence common.Sequence, fixtureChannels []chan common.FixtureCommand, channels common.Channels, command common.FixtureCommand) {
+func sendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command common.FixtureCommand) {
 	for _, fixture := range fixtureChannels {
 		fixture <- command
 	}
