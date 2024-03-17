@@ -164,18 +164,19 @@ type State struct {
 }
 
 type Action struct {
-	Name        string
-	Number      int
-	Colors      []string
-	Mode        string
-	Fade        string
-	Size        string
-	Speed       string
-	Rotate      string
-	RotateSpeed string
-	Music       string
-	Program     string
-	Strobe      string
+	Name         string
+	Number       int
+	Colors       []string
+	Mode         string
+	Fade         string
+	Size         string
+	Speed        string
+	Rotate       string
+	RotateSpeed  string
+	Music        string
+	Program      string
+	ProgramSpeed string
+	Strobe       string
 }
 
 type Switch struct {

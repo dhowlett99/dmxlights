@@ -1699,6 +1699,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: "Off"
+      programspeed: ""
       strobe: ""
     flash: false
   - name: "On"
@@ -1717,6 +1718,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: "On"
+      programspeed: ""
       strobe: ""
     flash: false
   use_fixture: Oil1
@@ -2038,6 +2040,7 @@ fixtures:
       rotate: "Off"
       rotatespeed: "Off"
       program: "Off"
+      programspeed: ""
       strobe: "Off"
     flash: false
   - name: Reddy
@@ -2057,6 +2060,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   use_fixture: vue
@@ -2086,6 +2090,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     settings:
     - name: mode
@@ -2138,6 +2143,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Green
@@ -2157,6 +2163,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Blue
@@ -2176,6 +2183,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: "On"
@@ -2201,6 +2209,7 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Sound
@@ -2226,6 +2235,7 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     settings:
     - name: mode
@@ -2264,6 +2274,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     settings:
     - name: Rotate
@@ -2316,6 +2327,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Green
@@ -2335,6 +2347,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Blue
@@ -2354,6 +2367,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Soft
@@ -2379,6 +2393,7 @@ fixtures:
       rotate: Anti Clockwise
       rotatespeed: Slow
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Sound
@@ -2407,6 +2422,7 @@ fixtures:
       rotate: Auto
       rotatespeed: Fast
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   use_fixture: dekker1
@@ -2435,7 +2451,8 @@ fixtures:
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Default
+      program: None
+      programspeed: DEREK
       strobe: ""
     flash: false
   - name: ZigZag
@@ -2443,12 +2460,44 @@ fixtures:
     label: ZigZag
     buttoncolor: Red
     master: 0
+    actions:
+    - name: ZigZag
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: None
+      programspeed: Slow
+      strobe: ""
     settings:
     - name: ZigZag
       labe: ZigZag
       number: 1
       channel: Gobo
       value: "100"
+    flash: false
+  - name: qwer
+    number: 3
+    label: qwer
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: qwer
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: None
+      programspeed: Medium
+      strobe: ""
     flash: false
   use_fixture: PAR6
 - id: 38
@@ -2477,6 +2526,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Red
@@ -2496,6 +2546,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Green
@@ -2515,6 +2566,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Blue
@@ -2534,6 +2586,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Fade
@@ -2555,6 +2608,7 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     flash: false
   - name: Sound
@@ -2576,6 +2630,7 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
     settings:
     - name: mode

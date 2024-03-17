@@ -321,7 +321,7 @@ func ProcessButtons(X int, Y int,
 			}
 
 			// Short press means load the config.
-			loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
+			loadConfig(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 			common.StartStaticSequences(sequences, commandChannels)
 		}
 		return
@@ -443,7 +443,7 @@ func ProcessButtons(X int, Y int,
 					break
 				}
 			}
-			floodOn(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, replyChannels)
+			floodOn(this, commandChannels, eventsForLaunchpad, guiButtons)
 			return
 		}
 		if this.Flood { // If we are flood already then tell the sequence to stop flood.
@@ -456,7 +456,7 @@ func ProcessButtons(X int, Y int,
 				this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label, ButtonColor: lastPreset.ButtonColor}
 				presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 			}
-			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			floodOff(this, commandChannels, eventsForLaunchpad, guiButtons)
 			return
 		}
 	}
@@ -572,7 +572,7 @@ func ProcessButtons(X int, Y int,
 		}
 		this.SavePreset = true
 		if this.Flood { // Turn off flood.
-			floodOff(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			floodOff(this, commandChannels, eventsForLaunchpad, guiButtons)
 		}
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		common.FlashLight(common.SAVE_BUTTON, common.Magenta, common.White, eventsForLaunchpad, guiButtons)
@@ -631,7 +631,7 @@ func ProcessButtons(X int, Y int,
 					if this.SavePreset {
 						this.SavePreset = false
 					}
-					loadConfig(sequences, this, X, Y, common.Red, common.PresetYellow, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels, this.DmxInterfacePresent)
+					loadConfig(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 					common.StartStaticSequences(sequences, commandChannels)
 				} else { // Launchpad path.
 					// This is a valid preset we might be trying to load it or delete it.
@@ -2322,8 +2322,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 }
 
-func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
-	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
+func floodOff(this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Turn the flood button back to white.
 	common.LightLamp(common.FLOOD_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
@@ -2348,8 +2347,7 @@ func floodOff(this *CurrentState, sequences []*common.Sequence, dmxController *f
 	}
 }
 
-func floodOn(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
-	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, replyChannels []chan common.Sequence) {
+func floodOn(this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Remember which sequence is currently selected.
 	this.LastSelectedSequence = this.SelectedSequence
