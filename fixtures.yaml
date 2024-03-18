@@ -2466,9 +2466,9 @@ fixtures:
       channel: Gobo
       value: "100"
     flash: false
-  - name: Show9
+  - name: Show1
     number: 3
-    label: Show9
+    label: Show1
     buttoncolor: Orange
     master: 0
     actions:
@@ -2481,7 +2481,7 @@ fixtures:
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Show0
+      program: Show1
       programspeed: Medium
       strobe: ""
     flash: false
