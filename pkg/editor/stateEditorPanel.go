@@ -122,6 +122,7 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 			fmt.Printf("findFixtureByName: fixtureName: %s error %s\n", fixture.Name, err.Error())
 			return
 		}
+		// Look for any options for the Program channel.
 		ap.ActionProgramOptions = populateOptions(fixture, "Program", fixtures)
 
 		// Based on a new use fixture - Try again to populate the channel names in the settings panel.
@@ -218,14 +219,14 @@ func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.
 
 }
 
-func populateOptions(thisFixture *fixture.Fixture, name string, fixtures *fixture.Fixtures) []string {
+func populateOptions(thisFixture *fixture.Fixture, channelName string, fixtures *fixture.Fixtures) []string {
 
 	if debug {
-		fmt.Printf("populateOptions\n")
+		fmt.Printf("populateOptions for channel %s fixture %s\n", channelName, thisFixture.Name)
 	}
 
 	options := []string{}
-	programSettings, err := fixture.GetChannelSettinsByName(thisFixture, name, fixtures)
+	programSettings, err := fixture.GetChannelSettinsByName(thisFixture, channelName, fixtures)
 	if err == nil {
 		for _, setting := range programSettings {
 			options = append(options, setting.Name)

@@ -1623,14 +1623,13 @@ fixtures:
       value: 192-255
   - number: 5
     name: Program
-    value: 0
     settings:
     - name: Blackout
       labe: Blackout
       number: 1
       value: 0-3
-    - name: 'Show0 '
-      labe: 'Show0 '
+    - name: Show0
+      labe: Show0
       number: 2
       value: 4-31
     - name: Show1
@@ -2433,7 +2432,7 @@ fixtures:
   description: Equinox Graphix
   type: switch
   group: 4
-  address: 36
+  address: 185
   channels: []
   states:
   - name: "Off"
@@ -2495,11 +2494,11 @@ fixtures:
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: None
+      program: Show0
       programspeed: Medium
       strobe: ""
     flash: false
-  use_fixture: PAR6
+  use_fixture: graphix
 - id: 38
   name: switch8
   label: SW8.Booth

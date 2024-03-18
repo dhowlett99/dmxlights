@@ -718,7 +718,7 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	return config
 }
 
-func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixture *Fixture, channelName string, fixtures *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
 		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixture.Name)
 	}
@@ -730,9 +730,24 @@ func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) 
 		if debug_mini {
 			fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
 		}
-		if channel.Name == name {
+		if channel.Name == channelName {
 			if debug_mini {
 				fmt.Printf("Found a Program Channel\n")
+			}
+			// First look for any settings available for this channel.
+			if channel.Settings != nil {
+				for _, setting := range channel.Settings {
+					if debug_mini {
+						fmt.Printf("Looking through Settings %s\n", setting.Name)
+					}
+					v, _ := strconv.Atoi(setting.Value)
+					value := common.Setting{
+						Name:  setting.Name,
+						Value: int16(v),
+					}
+					settingNames = append(settingNames, value)
+				}
+				return settingNames, nil
 			}
 			// If the program has a hard coded value return that as a default.
 			if channel.Value != nil {
@@ -746,30 +761,10 @@ func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) 
 				settingNames = append(settingNames, value)
 				return settingNames, nil
 			}
-			// Otherwise find the settings available for this channel.
-			for _, setting := range channel.Settings {
-				if debug_mini {
-					fmt.Printf("Looking through Settings %s\n", setting.Name)
-				}
-				v, _ := strconv.Atoi(setting.Value)
-				value := common.Setting{
-					Name:  setting.Name,
-					Value: int16(v),
-				}
-				settingNames = append(settingNames, value)
-			}
 		}
 	}
-	// found some settings.
-	if len(settingNames) > 0 {
-		if debug_mini {
-			fmt.Printf("Found Settings %+v\n", settingNames)
-		}
-		return settingNames, nil
-	}
 
-	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixture.Name)
-
+	return nil, fmt.Errorf("failed to find settings for channel %s in fixture%s", channelName, fixture.Name)
 }
 
 // getSwitchState reports on if this switch is running a mini sequence.
