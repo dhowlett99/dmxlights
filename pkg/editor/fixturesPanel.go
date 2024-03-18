@@ -573,7 +573,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 					fixtures.Fixtures = fp.FixtureList
 					var modal *widget.PopUp
 					if fp.FixtureList[i.Row].Type == "switch" {
-						modal, err = NewStateEditor(w, fp.FixtureList[i.Row].ID, &fp, fixtures)
+						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, &fp, fixtures)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return

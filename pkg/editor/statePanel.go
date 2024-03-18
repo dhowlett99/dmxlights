@@ -29,7 +29,7 @@ import (
 )
 
 // Show a list of States.
-func NewStateEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewStatesEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewStateEditor\n")
