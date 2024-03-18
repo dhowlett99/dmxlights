@@ -171,3 +171,8 @@ See the dmxlight.app , drag to the dock
 
 
 “dmxlights.app” would like to access the microphone.
+
+
+# Fixtures UI Guide 
+
+![Fixtures UI Guide](./FixtureEditorUIGuide.png)
