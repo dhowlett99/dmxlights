@@ -825,7 +825,7 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 		}
 	}
 
-	return 0, fmt.Errorf("setting %s not found in channel %s in fixture :%s", settingName, channelName, fixture.Name)
+	return 0, fmt.Errorf("setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
 }
 
 func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {

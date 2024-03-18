@@ -2450,7 +2450,7 @@ fixtures:
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: None
+      program: Blackout
       programspeed: DEREK
       strobe: ""
     flash: false
@@ -2459,19 +2459,6 @@ fixtures:
     label: ZigZag
     buttoncolor: Red
     master: 0
-    actions:
-    - name: ZigZag
-      number: 1
-      colors: []
-      mode: Control
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: None
-      programspeed: Slow
-      strobe: ""
     settings:
     - name: ZigZag
       labe: ZigZag
@@ -2479,13 +2466,13 @@ fixtures:
       channel: Gobo
       value: "100"
     flash: false
-  - name: qwer
+  - name: Show9
     number: 3
-    label: qwer
+    label: Show9
     buttoncolor: Orange
     master: 0
     actions:
-    - name: qwer
+    - name: Show9
       number: 1
       colors: []
       mode: Control
