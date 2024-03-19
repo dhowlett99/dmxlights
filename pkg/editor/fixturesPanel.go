@@ -58,6 +58,8 @@ type FixturesPanel struct {
 	NameEntryError        map[int]bool
 	LabelEntryError       map[int]bool
 	DescriptionEntryError map[int]bool
+
+	Fixtures *fixture.Fixtures
 }
 
 const RECTANGLE = 0
@@ -146,6 +148,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 	}
 
 	fp := FixturesPanel{}
+	fp.Fixtures = fixtures
 	fp.FixtureList = []fixture.Fixture{}
 
 	fp.GroupOptions = []string{"1", "2", "3", "4", "5", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
@@ -573,7 +576,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 					fixtures.Fixtures = fp.FixtureList
 					var modal *widget.PopUp
 					if fp.FixtureList[i.Row].Type == "switch" {
-						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, &fp, fixtures)
+						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].UseFixture, &fp, fixtures)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return

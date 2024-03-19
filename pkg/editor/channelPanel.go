@@ -99,9 +99,8 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 
 	// Create Settings Panel
 	var settingsPanel *widget.Table
-	channelFieldDisabled := true
-	showSelectValue := false
-	st = NewSettingsPanel(w, settingsList, channelFieldDisabled, showSelectValue, buttonSave)
+	channelPanel := true
+	st = NewSettingsPanel(w, channelPanel, settingsList, buttonSave)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.

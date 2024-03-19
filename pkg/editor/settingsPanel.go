@@ -32,18 +32,23 @@ import (
 )
 
 type SettingsPanel struct {
-	SettingsPanel     *widget.Table
-	SettingsList      []fixture.Setting
-	SettingMaxDegrees *int
-	SettingsOptions   []string
-	ChannelOptions    []string
-	ValueOptions      []string
-	CurrentChannel    int
-	UpdateThisChannel int
-	UpdateSettings    bool
+	UseFixtureName string
+	ChannelName    string
+
+	SettingsPanel        *widget.Table
+	SettingsList         []fixture.Setting
+	SettingMaxDegrees    *int
+	SettingsOptions      []string
+	ChannelOptions       []string
+	SelectedValueOptions []string
+	CurrentChannel       int
+	UpdateThisChannel    int
+	UpdateSettings       bool
 
 	NameEntryError     map[int]bool
 	DMXValueEntryError map[int]bool
+
+	Fixtures *fixture.Fixtures
 }
 
 const (
@@ -73,13 +78,43 @@ const (
 )
 
 func makeDMXoptions() (options []string) {
-	for x := 0; x < 255; x++ {
+	for x := 0; x < 256; x++ {
 		options = append(options, strconv.Itoa(x))
 	}
 	return options
 }
 
-func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFieldDisabled bool, enableValueSelect bool, buttonSave *widget.Button) *SettingsPanel {
+func headerSettingsCreate() fyne.CanvasObject {
+	h := &ActiveHeader{}
+	h.ExtendBaseWidget(h)
+	h.SetText("000")
+	return h
+}
+
+func headerSettingsUpdate(id widget.TableCellID, o fyne.CanvasObject) {
+	header := o.(*ActiveHeader)
+	header.TextStyle.Bold = true
+	switch id.Col {
+	case -1:
+		header.SetText(strconv.Itoa(id.Row + 1))
+	case 0:
+		header.SetText("ID")
+	case 1:
+		header.SetText("Name")
+	case 2:
+		header.SetText("Channel")
+	case 3:
+		header.SetText("Value")
+	case 4:
+		header.SetText("Select")
+	case 5:
+		header.SetText("-")
+	case 6:
+		header.SetText("+")
+	}
+}
+
+func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.Setting, buttonSave *widget.Button) *SettingsPanel {
 
 	if debug {
 		fmt.Printf("NewSettingsPanel\n")
@@ -91,7 +126,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 	st.SettingsList = SettingsList
 	st.SettingsOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	st.ChannelOptions = []string{"None"}
-	st.ValueOptions = makeDMXoptions()
+	st.SelectedValueOptions = makeDMXoptions()
 
 	Red := color.RGBA{}
 	Red.R = uint8(255)
@@ -123,7 +158,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 	)
 
 	// Settingses Selection Panel.
-	st.SettingsPanel = widget.NewTable(
+	st.SettingsPanel = widget.NewTableWithHeaders(
 
 		// Function to find length.
 		func() (int, int) {
@@ -156,7 +191,8 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 					canvas.NewRectangle(color.White),
 					widget.NewEntry(),
 				),
-				widget.NewSelect(st.ValueOptions, func(value string) {}),
+				// SETTING_SELECT_VALUE
+				widget.NewSelect(st.SelectedValueOptions, func(value string) {}),
 
 				// SETTING_DELETE
 				widget.NewButton("-", func() {}),
@@ -174,13 +210,13 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 
 			// Show the setting a number.
 			if i.Col == SETTING_NUMBER {
-				showSettingsField(enableValueSelect, SETTING_NUMBER, o)
+				showSettingsField(SETTING_NUMBER, o)
 				o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(data[i.Row][i.Col])
 			}
 
 			// Show and Edit the Setting Name.
 			if i.Col == SETTING_NAME {
-				showSettingsField(enableValueSelect, SETTING_NAME, o)
+				showSettingsField(SETTING_NAME, o)
 				if st.NameEntryError[st.SettingsList[i.Row].Number] {
 					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
@@ -194,10 +230,9 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						newSetting.Label = settingName // Label same as name.
 						newSetting.Name = settingName
 						newSetting.Number = st.SettingsList[i.Row].Number
-						if !channelFieldDisabled {
-							newSetting.Channel = st.SettingsList[i.Row].Channel
-						}
+						newSetting.Channel = st.SettingsList[i.Row].Channel
 						newSetting.Value = st.SettingsList[i.Row].Value
+						newSetting.SelectedValue = st.SettingsList[i.Row].SelectedValue
 						st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 						data = makeSettingsArray(st.SettingsList)
 						st.UpdateSettings = true
@@ -237,7 +272,10 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 
 			// Channel number.
 			if i.Col == SETTING_CHANNEL {
-				showSettingsField(enableValueSelect, SETTING_CHANNEL, o)
+				fmt.Printf("-----> Start Set Options %+v\n", st.SelectedValueOptions)
+				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetOptions(st.SelectedValueOptions)
+
+				showSettingsField(SETTING_CHANNEL, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
 				// Update the options to include any thing that might specified in the config file.
 				st.ChannelOptions = addOption(st.ChannelOptions, data[i.Row][i.Col])
@@ -248,24 +286,40 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).SetSelected(option)
 					}
 				}
-				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = channelFieldDisabled
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = func(settingChannel string) {
 					newSetting := fixture.Setting{}
 					newSetting.Label = st.SettingsList[i.Row].Label
 					newSetting.Name = st.SettingsList[i.Row].Name
 					newSetting.Number = st.SettingsList[i.Row].Number
 					newSetting.Channel = settingChannel
+					// Now if this channel has some settings,remember the setting name.
+					st.ChannelName = settingChannel
 					newSetting.Value = st.SettingsList[i.Row].Value
+					newSetting.SelectedValue = st.SettingsList[i.Row].SelectedValue
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
+					// Now if this channel has some settings, populate the options setting value.
+					if !channelPanel {
+						if channelHasSettings(st.UseFixtureName, st.ChannelName, st.Fixtures) {
+							st.SelectedValueOptions = getSettingsForChannel(st.UseFixtureName, st.ChannelName, st.Fixtures)
+						} else {
+							st.SelectedValueOptions = makeDMXoptions()
+						}
+					}
+					fmt.Printf("-----> Set Options %+v\n", st.SelectedValueOptions)
+					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetOptions(st.SelectedValueOptions)
+					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelectedIndex(1)
+					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Show()
+					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Refresh()
+					st.SettingsPanel.Refresh()
 				}
 			}
 
 			// Show and Edit the Setting Value.
 			if i.Col == SETTING_VALUE {
-				showSettingsField(enableValueSelect, SETTING_VALUE, o)
+				showSettingsField(SETTING_VALUE, o)
 				if st.DMXValueEntryError[st.SettingsList[i.Row].Number] {
 					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
@@ -279,10 +333,9 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 						newSetting.Label = st.SettingsList[i.Row].Label
 						newSetting.Name = st.SettingsList[i.Row].Name
 						newSetting.Number = st.SettingsList[i.Row].Number
-						if !channelFieldDisabled {
-							newSetting.Channel = st.SettingsList[i.Row].Channel
-						}
+						newSetting.Channel = st.SettingsList[i.Row].Channel
 						newSetting.Value = settingValue
+						newSetting.SelectedValue = st.SettingsList[i.Row].SelectedValue
 						st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 						data = makeSettingsArray(st.SettingsList)
 						st.UpdateSettings = true
@@ -331,22 +384,34 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 
 			if i.Col == SETTING_SELECT_VALUE {
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = nil
-				showSettingsField(enableValueSelect, SETTING_SELECT_VALUE, o)
+				showSettingsField(SETTING_SELECT_VALUE, o)
+				// // Update the options to include any thing that might specified in the config file.
+				// st.SelectedValueOptions = addOption(st.SelectedValueOptions, data[i.Row][i.Col])
+				// // Match the options to the data in the field and display in anyway.
+				// for _, option := range st.SelectedValueOptions {
+				// 	if option == data[i.Row][i.Col] {
+				// 		o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
+				// 	}
+				// }
 
-				// Match the options to the data in the field and display in anyway.
-				for _, option := range st.ValueOptions {
-					if option == data[i.Row][i.Col] {
-						o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
-					}
-				}
-
-				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = func(settingChannel string) {
+				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = func(settingSelectValue string) {
 					newSetting := fixture.Setting{}
 					newSetting.Label = st.SettingsList[i.Row].Label
 					newSetting.Name = st.SettingsList[i.Row].Name
 					newSetting.Number = st.SettingsList[i.Row].Number
-					newSetting.Channel = settingChannel
-					newSetting.Value = st.SettingsList[i.Row].Value
+					newSetting.Channel = st.SettingsList[i.Row].Channel
+
+					// Is this a number.
+					if _, err := strconv.ParseInt(settingSelectValue, 10, 64); err == nil {
+						newSetting.Value = settingSelectValue
+						newSetting.SelectedValue = settingSelectValue
+					} else {
+						// Must contain letters that form a label that can be looked up in the settings.
+						newSetting.Value = findSettingValueByName(st.UseFixtureName, st.ChannelName, settingSelectValue, st.Fixtures)
+						newSetting.SelectedValue = settingSelectValue
+					}
+					st.SettingsPanel.Refresh()
+					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).Refresh()
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
@@ -356,7 +421,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 
 			// Show the Delete Setting Button.
 			if i.Col == SETTING_DELETE {
-				showSettingsField(enableValueSelect, SETTING_DELETE, o)
+				showSettingsField(SETTING_DELETE, o)
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
@@ -377,7 +442,7 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 
 			// Show the Add Setting Button.
 			if i.Col == SETTING_ADD {
-				showSettingsField(enableValueSelect, SETTING_ADD, o)
+				showSettingsField(SETTING_ADD, o)
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
@@ -395,26 +460,18 @@ func NewSettingsPanel(w fyne.Window, SettingsList []fixture.Setting, channelFiel
 		},
 	)
 
+	st.SettingsPanel.ShowHeaderColumn = false
+	st.SettingsPanel.CreateHeader = headerSettingsCreate
+	st.SettingsPanel.UpdateHeader = headerSettingsUpdate
+
 	// Setup the columns of this table.
-	st.SettingsPanel.SetColumnWidth(COLUMN_ID, 40)    // Number
-	st.SettingsPanel.SetColumnWidth(COLUMN_NAME, 100) // Name
-
-	st.SettingsPanel.SetColumnWidth(COLUMN_SELECT_VALUE, 100) // Value
-
-	if channelFieldDisabled {
-		st.SettingsPanel.SetColumnWidth(COLUMN_CHANNEL, 0)      // Channel
-		st.SettingsPanel.SetColumnWidth(COLUMN_SELECT_VALUE, 0) // Select Value
-
-	} else {
-		st.SettingsPanel.SetColumnWidth(COLUMN_CHANNEL, 100) // Channel
-	}
-
-	if enableValueSelect {
-		st.SettingsPanel.SetColumnWidth(COLUMN_SELECT_VALUE, 0) // Name
-	}
-
-	st.SettingsPanel.SetColumnWidth(COLUMN_DELETE, 20) // Delete
-	st.SettingsPanel.SetColumnWidth(COLUMN_ADD, 20)    // Add
+	st.SettingsPanel.SetColumnWidth(COLUMN_ID, 40)           // Number
+	st.SettingsPanel.SetColumnWidth(COLUMN_NAME, 100)        // Name
+	st.SettingsPanel.SetColumnWidth(COLUMN_CHANNEL, 90)      // Channel
+	st.SettingsPanel.SetColumnWidth(COLUMN_VALUE, 50)        // Value
+	st.SettingsPanel.SetColumnWidth(COLUMN_SELECT_VALUE, 90) // Select Value
+	st.SettingsPanel.SetColumnWidth(COLUMN_DELETE, 20)       // Delete
+	st.SettingsPanel.SetColumnWidth(COLUMN_ADD, 20)          // Add
 
 	return &st
 }
@@ -551,7 +608,7 @@ func makeSettingsArray(settings []fixture.Setting) [][]string {
 	return data
 }
 
-func showSettingsField(valueFieldSelect bool, field int, o fyne.CanvasObject) {
+func showSettingsField(field int, o fyne.CanvasObject) {
 	if debug {
 		fmt.Printf("showSettingsField\n")
 	}
@@ -565,12 +622,10 @@ func showSettingsField(valueFieldSelect bool, field int, o fyne.CanvasObject) {
 	case field == SETTING_CHANNEL:
 		o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = false
 	case field == SETTING_VALUE:
-		if valueFieldSelect {
-			o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Hidden = false
-		} else {
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
-			o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
-		}
+		o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
+		o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
+	case field == SETTING_SELECT_VALUE:
+		o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Hidden = false
 	case field == SETTING_DELETE:
 		o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = false
 	case field == SETTING_ADD:
@@ -591,4 +646,87 @@ func hideAllSettingsFields(o fyne.CanvasObject) {
 	o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Hidden = true
 	o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).Hidden = true
+}
+
+func channelHasSettings(useFixtureName string, channelName string, fixtures *fixture.Fixtures) bool {
+
+	if debug {
+		fmt.Printf("channelHasSettings for Fixture Name %s Name %s\n", useFixtureName, channelName)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == useFixtureName {
+			if debug {
+				fmt.Printf("channelHasSettings found fixture %+v\n", fixture)
+			}
+			for _, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, channelName) {
+					if channel.Settings != nil {
+						//if debug {
+						fmt.Printf("true\n")
+						//}
+						return true
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		fmt.Printf("false\n")
+	}
+	return false
+}
+
+func getSettingsForChannel(useFixtureName string, channelName string, fixtures *fixture.Fixtures) []string {
+
+	if debug {
+		fmt.Printf("getSettingsForChannel for Fixture Name %s Channel Name %s\n", useFixtureName, channelName)
+	}
+
+	settings := []string{}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == useFixtureName {
+			for _, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, channelName) {
+					if channel.Settings != nil {
+						for _, setting := range channel.Settings {
+							settings = append(settings, setting.Name)
+						}
+						//if debug {
+						fmt.Printf("getSettingsForChannel settings %+v\n", settings)
+						//}
+						return settings
+					}
+				}
+			}
+		}
+	}
+	return nil
+}
+
+func findSettingValueByName(useFixtureName string, channelName string, settingName string, fixtures *fixture.Fixtures) string {
+
+	if debug {
+		fmt.Printf("findSettingValueByName for Fixture Name %s Channel Name %s\n", useFixtureName, channelName)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == useFixtureName {
+			for _, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, channelName) {
+					if channel.Settings != nil {
+						for _, setting := range channel.Settings {
+							if strings.Contains(setting.Name, settingName) {
+								if debug {
+									fmt.Printf("settings %s value %s\n", setting.Name, setting.Value)
+								}
+								return setting.Value
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return ""
 }

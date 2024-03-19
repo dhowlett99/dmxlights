@@ -117,11 +117,12 @@ type FixtureInfo struct {
 }
 
 type Setting struct {
-	Name    string `yaml:"name"`
-	Label   string `yaml:"labe,omitempty"`
-	Number  int    `yaml:"number"`
-	Channel string `yaml:"channel,omitempty"`
-	Value   string `yaml:"value"`
+	Name          string `yaml:"name"`
+	Label         string `yaml:"labe,omitempty"`
+	Number        int    `yaml:"number"`
+	Channel       string `yaml:"channel,omitempty"`
+	Value         string `yaml:"value"`
+	SelectedValue string `yaml:"selectedvalue"`
 }
 
 type Channel struct {

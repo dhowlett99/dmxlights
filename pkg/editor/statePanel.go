@@ -29,7 +29,7 @@ import (
 )
 
 // Show a list of States.
-func NewStatesEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewStateEditor\n")
@@ -39,7 +39,7 @@ func NewStatesEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture
 	buttonSave := widget.NewButton("OK", func() {})
 
 	// Get the details of this fixture.
-	thisFixture, err := fixture.GetFixtureDetailsById(id, fixtures)
+	thisFixture, err := fixture.GetFixtureDetailsById(fixtureID, fixtures)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
@@ -87,9 +87,12 @@ func NewStatesEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
-	st := NewSettingsPanel(w, []fixture.Setting{}, false, true, buttonSave)
+	channelPanel := false
+	st := NewSettingsPanel(w, channelPanel, []fixture.Setting{}, buttonSave)
 	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
 	st.SettingsPanel.Hide()
+	st.Fixtures = fp.Fixtures
+	st.UseFixtureName = useFixtureName
 
 	// Use Fixture.
 	useInput := widget.NewSelect(fixturesAvailable, func(value string) {})
@@ -176,7 +179,7 @@ func NewStatesEditor(w fyne.Window, id int, fp *FixturesPanel, fixtures *fixture
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
 		for fixtureNumber, fixture := range fixtures.Fixtures {
-			if fixture.ID == id {
+			if fixture.ID == fixtureID {
 				// Insert new states into fixture above us, in the fixture selection panel.
 				fp.UpdateStates = true
 				fp.UpdateThisFixture = fixtureNumber
