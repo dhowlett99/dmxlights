@@ -2820,18 +2820,18 @@ fixtures:
     buttoncolor: Red
     master: 0
     settings:
-    - name: Master
-      labe: Master
+    - name: Ful
+      labe: Ful
       number: 1
       channel: Master
-      value: "9"
-      selectedvalue: "9"
+      value: "255"
+      selectedvalue: "255"
     - name: Shutter
       labe: Shutter
       number: 2
       channel: Shutter
-      value: 0-31
-      selectedvalue: Blackout
+      value: 32-63
+      selectedvalue: Open
     - name: ZigZag
       labe: ZigZag
       number: 3
@@ -2842,16 +2842,16 @@ fixtures:
       labe: RotateSlow
       number: 4
       channel: Rotate
-      value: "191"
-      selectedvalue: AntiClockwise
-    - name: Show
-      labe: Show
+      value: 0-127
+      selectedvalue: Mirror Rotate
+    - name: "Off"
+      labe: "Off"
       number: 5
       channel: Program
-      value: "0"
-      selectedvalue: Blackout
-    - name: New
-      labe: New
+      value: "4"
+      selectedvalue: Show0
+    - name: "Off"
+      labe: "Off"
       number: 6
       channel: ProgramSpeed
       value: 0-255

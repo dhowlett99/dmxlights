@@ -242,6 +242,21 @@ func populateOptions(thisFixture *fixture.Fixture, channelName string, fixtures 
 	return options
 }
 
+func populateSelectedValueNames(selectedChannelName string, useFixtureName string, fixtures *fixture.Fixtures) []string {
+
+	var selectedValueOptions []string
+
+	// Now if this channel has some settings, populate the options setting value.
+	if channelHasSettings(useFixtureName, selectedChannelName, fixtures) {
+		selectedValueOptions = getSettingsForChannel(useFixtureName, selectedChannelName, fixtures)
+	} else {
+		selectedValueOptions = makeDMXoptions()
+	}
+
+	// return selectable channel options.
+	return selectedValueOptions
+}
+
 func populateChannelNames(channels []fixture.Channel) []string {
 
 	if debug {
