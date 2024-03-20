@@ -2842,9 +2842,9 @@ fixtures:
     - name: Shutter
       labe: Shutter
       number: 2
-      channel: Shutter
-      value: "32"
-      selectedvalue: Open
+      channel: Gobo
+      value: "44"
+      selectedvalue: Rose Flowers
     - name: ZigZag
       labe: ZigZag
       number: 3

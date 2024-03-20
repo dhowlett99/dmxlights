@@ -140,6 +140,8 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.NameEntryError = make(map[int]bool, len(st.SettingsList))
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
 
+	nameValueWidget := make(map[int]*widget.Entry, 20)
+	inputValueWidget := make(map[int]*widget.Entry, 20)
 	selectValueWidget := make(map[int]*widget.Select, 20)
 
 	// Create a dialog for error messages.
@@ -219,6 +221,9 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 			// Show and Edit the Setting Name.
 			if i.Col == SETTING_NAME {
 				showSettingsField(SETTING_NAME, o)
+				// Remember the pointer to this name entry box widget.
+				nameValueWidget[i.Row] = o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry)
+
 				if st.NameEntryError[st.SettingsList[i.Row].Number] {
 					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
@@ -309,13 +314,16 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					}
 					// Set selectable channel options.
 					selectValueWidget[i.Row].Options = st.SelectedValueOptions
-					st.SettingsPanel.Refresh()
+					selectValueWidget[i.Row].Refresh()
 				}
 			}
 
 			// Show and Edit the Setting Value.
 			if i.Col == SETTING_VALUE {
 				showSettingsField(SETTING_VALUE, o)
+				// Remember the pointer to this select box widget.
+				inputValueWidget[i.Row] = o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry)
+
 				if st.DMXValueEntryError[st.SettingsList[i.Row].Number] {
 					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
 				} else {
@@ -400,7 +408,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					newSetting.Number = st.SettingsList[i.Row].Number
 					newSetting.Channel = st.SettingsList[i.Row].Channel
 
-					// Is this a number.
+					// Is this selected value a number.
 					if _, err := strconv.ParseInt(settingSelectValue, 10, 64); err == nil {
 						newSetting.Value = settingSelectValue
 						newSetting.SelectedValue = settingSelectValue
@@ -409,8 +417,14 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 						newSetting.Value = findSettingValueByName(st.UseFixtureName, st.ChannelName, settingSelectValue, st.Fixtures)
 						newSetting.SelectedValue = settingSelectValue
 					}
-					st.SettingsPanel.Refresh()
-					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).Refresh()
+					// Now set the value field based on what we've selected.
+					inputValueWidget[i.Row].SetText(newSetting.Value)
+					inputValueWidget[i.Row].Refresh()
+
+					// And use the name as the default name for this setting.
+					nameValueWidget[i.Row].SetText(settingSelectValue)
+					nameValueWidget[i.Row].Refresh()
+
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
