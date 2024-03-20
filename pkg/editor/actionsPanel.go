@@ -80,7 +80,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 	ap.ActionMusicOptions = []string{"Off", "On"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 
-	cp := NewColorPickerPanel(w)
+	cp := NewColorPickerPanel()
 
 	// Actions Selection Panel.
 	ap.ActionsPanel = widget.NewList(

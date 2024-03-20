@@ -1796,12 +1796,6 @@ fixtures:
   channels:
   - number: 1
     name: Master
-    settings:
-    - name: Master
-      labe: Master
-      number: 1
-      value: 0-255
-      selectedvalue: ""
   - number: 2
     name: Shutter
     value: 0
@@ -2825,25 +2819,50 @@ fixtures:
     label: ZigZag
     buttoncolor: Red
     master: 0
+    actions:
+    - name: ZigZag
+      number: 1
+      colors: []
+      mode: None
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
     settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: Shutter
+      labe: Shutter
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
     - name: ZigZag
       labe: ZigZag
-      number: 1
-      channel: Shutter
-      value: "8"
-      selectedvalue: "8"
-    - name: New
-      labe: New
-      number: 2
-      channel: (Select one)
-      value: "0"
-      selectedvalue: ""
-    - name: New
-      labe: New
       number: 3
-      channel: (Select one)
+      channel: Gobo
       value: "0"
-      selectedvalue: ""
+      selectedvalue: ZigZag
+    - name: RotateSlow
+      labe: RotateSlow
+      number: 4
+      channel: Rotate
+      value: "191"
+      selectedvalue: AntiClockwise
+    - name: Show
+      labe: Show
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
     flash: false
   - name: Show1
     number: 3

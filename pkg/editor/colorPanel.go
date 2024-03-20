@@ -47,7 +47,7 @@ type Button struct {
 	container *fyne.Container
 }
 
-func NewColorPickerPanel(w fyne.Window) *ColorPanel {
+func NewColorPickerPanel() *ColorPanel {
 
 	if debug {
 		fmt.Printf("NewColorPickerPanel\n")

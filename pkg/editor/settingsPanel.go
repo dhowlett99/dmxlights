@@ -140,6 +140,8 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.NameEntryError = make(map[int]bool, len(st.SettingsList))
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
 
+	selectValueWidget := make(map[int]*widget.Select, 20)
+
 	// Create a dialog for error messages.
 	var reports []string
 	popupErrorPanel := &widget.PopUp{}
@@ -272,9 +274,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Channel number.
 			if i.Col == SETTING_CHANNEL {
-				fmt.Printf("-----> Start Set Options %+v\n", st.SelectedValueOptions)
-				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetOptions(st.SelectedValueOptions)
-
 				showSettingsField(SETTING_CHANNEL, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
 				// Update the options to include any thing that might specified in the config file.
@@ -308,11 +307,8 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 							st.SelectedValueOptions = makeDMXoptions()
 						}
 					}
-					fmt.Printf("-----> Set Options %+v\n", st.SelectedValueOptions)
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetOptions(st.SelectedValueOptions)
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelectedIndex(1)
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Show()
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Refresh()
+					// Set selectable channel options.
+					selectValueWidget[i.Row].Options = st.SelectedValueOptions
 					st.SettingsPanel.Refresh()
 				}
 			}
@@ -393,6 +389,9 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				// 		o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
 				// 	}
 				// }
+
+				// Remember the pointer to this select box widget.
+				selectValueWidget[i.Row] = o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select)
 
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = func(settingSelectValue string) {
 					newSetting := fixture.Setting{}
@@ -662,17 +661,11 @@ func channelHasSettings(useFixtureName string, channelName string, fixtures *fix
 			for _, channel := range fixture.Channels {
 				if strings.Contains(channel.Name, channelName) {
 					if channel.Settings != nil {
-						//if debug {
-						fmt.Printf("true\n")
-						//}
 						return true
 					}
 				}
 			}
 		}
-	}
-	if debug {
-		fmt.Printf("false\n")
 	}
 	return false
 }
@@ -692,9 +685,9 @@ func getSettingsForChannel(useFixtureName string, channelName string, fixtures *
 						for _, setting := range channel.Settings {
 							settings = append(settings, setting.Name)
 						}
-						//if debug {
-						fmt.Printf("getSettingsForChannel settings %+v\n", settings)
-						//}
+						if debug {
+							fmt.Printf("getSettingsForChannel settings %+v\n", settings)
+						}
 						return settings
 					}
 				}
