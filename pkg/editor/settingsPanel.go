@@ -141,6 +141,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
 
 	nameValueWidget := make(map[int]*widget.Entry, 20)
+	valueFromTextBox := make(map[int]string, 20)
 	inputValueWidget := make(map[int]*widget.Entry, 20)
 	selectValueWidget := make(map[int]*widget.Select, 20)
 
@@ -331,6 +332,8 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				}
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
+				// Remember the text value so we can use it to match option in the select box widget.
+				valueFromTextBox[i.Row] = data[i.Row][i.Col]
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(settingValue string) {
 					if settingValue != "" {
 						newSetting := fixture.Setting{}
@@ -389,14 +392,14 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 			if i.Col == SETTING_SELECT_VALUE {
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = nil
 				showSettingsField(SETTING_SELECT_VALUE, o)
-				// // Update the options to include any thing that might specified in the config file.
-				// st.SelectedValueOptions = addOption(st.SelectedValueOptions, data[i.Row][i.Col])
-				// // Match the options to the data in the field and display in anyway.
-				// for _, option := range st.SelectedValueOptions {
-				// 	if option == data[i.Row][i.Col] {
-				// 		o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
-				// 	}
-				// }
+				// Update the options to include any thing that might specified in the config file.
+				st.SelectedValueOptions = addOption(st.SelectedValueOptions, valueFromTextBox[i.Row])
+				// Match the options to the data in the field and display in anyway.
+				for _, option := range st.SelectedValueOptions {
+					if option == valueFromTextBox[i.Row] {
+						o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
+					}
+				}
 
 				// Remember the pointer to this select box widget.
 				selectValueWidget[i.Row] = o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select)

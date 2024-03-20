@@ -2819,32 +2819,19 @@ fixtures:
     label: ZigZag
     buttoncolor: Red
     master: 0
-    actions:
-    - name: ZigZag
-      number: 1
-      colors: []
-      mode: None
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
     settings:
     - name: Master
       labe: Master
       number: 1
       channel: Master
-      value: "255"
-      selectedvalue: "255"
+      value: "9"
+      selectedvalue: "9"
     - name: Shutter
       labe: Shutter
       number: 2
-      channel: Gobo
-      value: "44"
-      selectedvalue: Rose Flowers
+      channel: Shutter
+      value: 0-31
+      selectedvalue: Blackout
     - name: ZigZag
       labe: ZigZag
       number: 3
@@ -2863,6 +2850,12 @@ fixtures:
       channel: Program
       value: "0"
       selectedvalue: Blackout
+    - name: New
+      labe: New
+      number: 6
+      channel: ProgramSpeed
+      value: 0-255
+      selectedvalue: Speed
     flash: false
   - name: Show1
     number: 3
