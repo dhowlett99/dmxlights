@@ -2848,7 +2848,7 @@ fixtures:
       labe: "Off"
       number: 5
       channel: Program
-      value: "4"
+      value: 4
       selectedvalue: Show0
     - name: "Off"
       labe: "Off"

@@ -397,7 +397,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 			if i.Col == SETTING_SELECT_VALUE {
 				if !channelPanel {
 					st.SelectedValueOptions = populateSelectedValueNames(st.ChannelName[i.Row], st.UseFixtureName, st.Fixtures)
-					//once[i.Row] = true
 				}
 
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = nil
@@ -413,7 +412,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				// Match the options to the data in the field and display in anyway.
 				for _, option := range st.SelectedValueOptions {
-					if option == valueFromTextBox[i.Row] {
+					if option == data[i.Row][i.Col] {
 						o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
 					}
 				}
@@ -630,6 +629,7 @@ func makeSettingsArray(settings []fixture.Setting) [][]string {
 		newSetting = append(newSetting, setting.Name)
 		newSetting = append(newSetting, setting.Channel)
 		newSetting = append(newSetting, setting.Value)
+		newSetting = append(newSetting, setting.SelectedValue)
 		newSetting = append(newSetting, "")
 		newSetting = append(newSetting, "-")
 		newSetting = append(newSetting, "+")
