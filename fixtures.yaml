@@ -1791,7 +1791,7 @@ fixtures:
   number: 1
   description: Equinox Graphix
   type: projector
-  group: 1
+  group: 105
   address: 185
   channels:
   - number: 1
@@ -2836,23 +2836,65 @@ fixtures:
       labe: RotateSlow
       number: 4
       channel: Rotate
-      value: "192"
-      selectedvalue: ClockWise
+      value: "200"
+      selectedvalue: AntiClockwise
     - name: Program
       labe: Program
       number: 5
       channel: Program
-      value: "32"
+      value: "0"
       selectedvalue: Show1
     - name: Speed
       labe: Speed
+      number: 6
+      channel: ProgramSpeed
+      value: "200"
+      selectedvalue: "0"
+    flash: false
+  - name: Waves
+    number: 3
+    label: Waves
+    buttoncolor: Cyan
+    master: 0
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: New
+      labe: New
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: New
+      labe: New
+      number: 3
+      channel: Gobo
+      value: "18"
+      selectedvalue: Horiz Waves
+    - name: New
+      labe: New
+      number: 4
+      channel: Rotate
+      value: "192"
+      selectedvalue: ClockWise
+    - name: New
+      labe: New
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: New
+      labe: New
       number: 6
       channel: ProgramSpeed
       value: "0"
       selectedvalue: "0"
     flash: false
   - name: Show1
-    number: 3
+    number: 4
     label: Show1
     buttoncolor: Orange
     master: 0
@@ -2860,21 +2902,73 @@ fixtures:
     - name: Show1
       number: 1
       colors: []
-      mode: Control
+      mode: "Off"
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Show1
-      programspeed: Medium
+      program: ""
+      programspeed: ""
       strobe: ""
     settings:
     - name: New Setting
       number: 1
-      channel: Program
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: New
+      labe: New
+      number: 2
+      channel: Shutter
       value: "32"
-      selectedvalue: Show1
+      selectedvalue: Open
+    - name: New
+      labe: New
+      number: 3
+      channel: Gobo
+      value: "0"
+      selectedvalue: ""
+    - name: New
+      labe: New
+      number: 4
+      channel: Rotate
+      value: "0"
+      selectedvalue: ""
+    - name: New
+      labe: New
+      number: 5
+      channel: Program
+      value: "199"
+      selectedvalue: Show6
+    - name: New
+      labe: New
+      number: 6
+      channel: ProgramSpeed
+      value: "100"
+      selectedvalue: "200"
+    flash: false
+  - name: Auto
+    number: 5
+    label: Auto
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Auto
+      number: 1
+      colors:
+      - Green
+      - Cyan
+      - Blue
+      mode: Chase
+      fade: Soft
+      size: Short
+      speed: Medium
+      rotate: Clockwise
+      rotatespeed: Medium
+      program: ""
+      programspeed: ""
+      strobe: ""
     flash: false
   use_fixture: graphix
 - id: 38
