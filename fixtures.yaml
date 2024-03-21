@@ -2918,8 +2918,50 @@ fixtures:
       value: "0"
       selectedvalue: "0"
     flash: false
-  - name: Show0
+  - name: Petals
     number: 4
+    label: Petals
+    buttoncolor: ""
+    master: 0
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: New
+      labe: New
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: New
+      labe: New
+      number: 3
+      channel: Gobo
+      value: "28"
+      selectedvalue: Croc Petals
+    - name: New
+      labe: New
+      number: 4
+      channel: Rotate
+      value: "0"
+      selectedvalue: Mirror Rotate
+    - name: New
+      labe: New
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: New
+      labe: New
+      number: 6
+      channel: ProgramSpeed
+      value: "0"
+      selectedvalue: Slow
+    flash: false
+  - name: Show0
+    number: 5
     label: Show0
     buttoncolor: Orange
     master: 0
@@ -2938,7 +2980,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show1
-    number: 5
+    number: 6
     label: Show1
     buttoncolor: Orange
     master: 0
@@ -2957,7 +2999,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show2
-    number: 6
+    number: 7
     label: Show2
     buttoncolor: Orange
     master: 0
@@ -2976,7 +3018,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show3
-    number: 7
+    number: 8
     label: Show3
     buttoncolor: Orange
     master: 0
@@ -2995,7 +3037,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show4
-    number: 8
+    number: 9
     label: Show4
     buttoncolor: Orange
     master: 0
@@ -3014,7 +3056,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show5
-    number: 9
+    number: 10
     label: Show5
     buttoncolor: Orange
     master: 0
@@ -3033,7 +3075,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show6
-    number: 10
+    number: 11
     label: Show6
     buttoncolor: Orange
     master: 0
@@ -3052,7 +3094,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show7
-    number: 11
+    number: 12
     label: Show7
     buttoncolor: Orange
     master: 0
@@ -3071,7 +3113,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Show8
-    number: 12
+    number: 13
     label: Show8
     buttoncolor: Orange
     master: 0
@@ -3090,7 +3132,7 @@ fixtures:
       strobe: ""
     flash: false
   - name: Auto
-    number: 13
+    number: 14
     label: Auto
     buttoncolor: White
     master: 0
