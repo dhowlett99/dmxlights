@@ -796,6 +796,21 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 	return 0, fmt.Errorf("label setting \"%s\" not found i channel \"%s\" fixture :%s", label, channelName, fixtureName)
 }
 
+func fixtureHasChannel(fixture *Fixture, channelName string) bool {
+
+	if debug {
+		fmt.Printf("fixtureHasChannel for %s\n", channelName)
+	}
+
+	for _, channel := range fixture.Channels {
+		if channel.Name == channelName {
+			return true
+		}
+	}
+
+	return false
+}
+
 func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
@@ -819,7 +834,28 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 					if debug {
 						fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingValue=%s\n", fixture.Name, channel.Name, settingName, setting.Value)
 					}
-					v, _ := strconv.Atoi(setting.Value)
+
+					var v int
+					var err error
+					// If the setting value contains a "-" remove it and then take the first valuel.
+					if strings.Contains(setting.Value, "-") {
+						// We've found a range of values.
+						// Find the start value
+						numbers := strings.Split(setting.Value, "-")
+						v, err = strconv.Atoi(numbers[0])
+						if err != nil {
+							return 0, err
+						}
+					} else {
+						v, err = strconv.Atoi(setting.Value)
+						if err != nil {
+							return 0, err
+						}
+					}
+					if debug {
+						fmt.Printf("Value Returned %d\n", v)
+					}
+
 					return v, nil
 				}
 			}

@@ -191,19 +191,62 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
-			fmt.Printf("Switch Number %d: %s\n", swiTch.Number, err)
-			return
+			fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 		}
 
-		// Look up the program state required.
-		v, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
-		if err != nil {
-			fmt.Printf("warning: %s\n", err)
-			return
+		if fixtureHasChannel(fixture, "Master") {
+			// Find the program speed channel for this fixture.
+			masterChannel, err := FindChannelNumberByName(fixture, "Master")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			SetChannel(fixture.Address+int16(masterChannel), byte(master), dmxController, dmxInterfacePresent)
 		}
 
-		// Now play that DMX value on the program channel of this fixture.
-		SetChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
+		if fixtureHasChannel(fixture, "Shutter") {
+			// Find the program speed channel for this fixture.
+			shutterChannel, err := FindChannelNumberByName(fixture, "Shutter")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			SetChannel(fixture.Address+int16(shutterChannel), byte(32), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Rotate") {
+			// Find the rotate channel for this fixture.
+			rotateChannel, err := FindChannelNumberByName(fixture, "Rotate")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Gobo") {
+			// Find the gobo channel for this fixture.
+			goboChannel, err := FindChannelNumberByName(fixture, "Gobo")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			SetChannel(fixture.Address+int16(goboChannel), byte(0), dmxController, dmxInterfacePresent)
+		}
+		if fixtureHasChannel(fixture, "ProgramSpeed") {
+			// Find the program speed channel for this fixture.
+			programSpeedChannel, err := FindChannelNumberByName(fixture, "ProgramSpeed")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			// Now play that DMX value on the program channel of this fixture.
+			SetChannel(fixture.Address+int16(programSpeedChannel), byte(cfg.ProgramSpeed), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Program") {
+			// Look up the program state required.
+			programState, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
+			if err != nil {
+				fmt.Printf("warning: %s\n", err)
+			}
+			SetChannel(fixture.Address+int16(programChannel), byte(programState), dmxController, dmxInterfacePresent)
+		}
 
 		return
 	}
@@ -627,6 +670,20 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Size = 10
 	default:
 		config.Size = 3
+	}
+
+	// Program Speed - Speed of programs or shows.
+	switch action.ProgramSpeed {
+	case "Off":
+		config.ProgramSpeed = 0
+	case "Slow":
+		config.ProgramSpeed = 10
+	case "Medium":
+		config.ProgramSpeed = 100
+	case "Fast":
+		config.ProgramSpeed = 200
+	default:
+		config.ProgramSpeed = 0
 	}
 
 	// Look through the available settins and see if you can find the specified program action.

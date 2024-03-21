@@ -1791,7 +1791,7 @@ fixtures:
   number: 1
   description: Equinox Graphix
   type: projector
-  group: 105
+  group: 106
   address: 185
   channels:
   - number: 1
@@ -1964,6 +1964,25 @@ fixtures:
   - number: 6
     name: ProgramSpeed
     value: 0
+    settings:
+    - name: Slow
+      labe: Slow
+      number: 1
+      channel: New
+      value: "10"
+      selectedvalue: "10"
+    - name: Medium
+      labe: Medium
+      number: 2
+      channel: New
+      value: "100"
+      selectedvalue: "100"
+    - name: Fast
+      labe: Fast
+      number: 3
+      channel: New
+      value: "200"
+      selectedvalue: "200"
 - id: 31
   name: switch1
   label: SW1.Oil
@@ -2805,8 +2824,14 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: Blackout
-      programspeed: DEREK
+      programspeed: Slow
       strobe: ""
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "0"
+      selectedvalue: ""
     flash: false
   - name: ZigZag
     number: 2
@@ -2893,63 +2918,179 @@ fixtures:
       value: "0"
       selectedvalue: "0"
     flash: false
-  - name: Show1
+  - name: Show0
     number: 4
-    label: Show1
+    label: Show0
     buttoncolor: Orange
     master: 0
     actions:
     - name: Show1
       number: 1
       colors: []
-      mode: "Off"
+      mode: Control
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: ""
+      program: Show0
+      programspeed: Slow
+      strobe: ""
+    flash: false
+  - name: Show1
+    number: 5
+    label: Show1
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show1
+      programspeed: Medium
+      strobe: ""
+    flash: false
+  - name: Show2
+    number: 6
+    label: Show2
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show2
+      programspeed: Medium
+      strobe: ""
+    flash: false
+  - name: Show3
+    number: 7
+    label: Show3
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show3
+      programspeed: Medium
+      strobe: ""
+    flash: false
+  - name: Show4
+    number: 8
+    label: Show4
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show4
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show4
+      programspeed: Medium
+      strobe: ""
+    flash: false
+  - name: Show5
+    number: 9
+    label: Show5
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show5
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show5
       programspeed: ""
       strobe: ""
-    settings:
-    - name: New Setting
+    flash: false
+  - name: Show6
+    number: 10
+    label: Show6
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show6
       number: 1
-      channel: Master
-      value: "255"
-      selectedvalue: "255"
-    - name: New
-      labe: New
-      number: 2
-      channel: Shutter
-      value: "32"
-      selectedvalue: Open
-    - name: New
-      labe: New
-      number: 3
-      channel: Gobo
-      value: "0"
-      selectedvalue: ""
-    - name: New
-      labe: New
-      number: 4
-      channel: Rotate
-      value: "0"
-      selectedvalue: ""
-    - name: New
-      labe: New
-      number: 5
-      channel: Program
-      value: "199"
-      selectedvalue: Show6
-    - name: New
-      labe: New
-      number: 6
-      channel: ProgramSpeed
-      value: "100"
-      selectedvalue: "200"
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show6
+      programspeed: Medium
+      strobe: ""
+    flash: false
+  - name: Show7
+    number: 11
+    label: Show7
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show7
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: ""
+      strobe: ""
+    flash: false
+  - name: Show8
+    number: 12
+    label: Show8
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show8
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: Fast
+      strobe: ""
     flash: false
   - name: Auto
-    number: 5
+    number: 13
     label: Auto
     buttoncolor: White
     master: 0
@@ -2963,8 +3104,8 @@ fixtures:
       mode: Chase
       fade: Soft
       size: Short
-      speed: Medium
-      rotate: Clockwise
+      speed: Music
+      rotate: Auto
       rotatespeed: Medium
       program: ""
       programspeed: ""
