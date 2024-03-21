@@ -1790,7 +1790,7 @@ fixtures:
   label: graphix
   number: 1
   description: Equinox Graphix
-  type: rgb
+  type: projector
   group: 1
   address: 185
   channels:
@@ -1964,12 +1964,6 @@ fixtures:
   - number: 6
     name: ProgramSpeed
     value: 0
-    settings:
-    - name: Speed
-      labe: Speed
-      number: 1
-      value: 0-255
-      selectedvalue: ""
 - id: 31
   name: switch1
   label: SW1.Oil
@@ -2830,7 +2824,7 @@ fixtures:
       labe: Shutter
       number: 2
       channel: Shutter
-      value: 32-63
+      value: "32"
       selectedvalue: Open
     - name: ZigZag
       labe: ZigZag
@@ -2842,20 +2836,20 @@ fixtures:
       labe: RotateSlow
       number: 4
       channel: Rotate
-      value: 0-127
-      selectedvalue: Mirror Rotate
-    - name: "Off"
-      labe: "Off"
+      value: "192"
+      selectedvalue: ClockWise
+    - name: Program
+      labe: Program
       number: 5
       channel: Program
-      value: 4
-      selectedvalue: Show0
-    - name: "Off"
-      labe: "Off"
+      value: "32"
+      selectedvalue: Show1
+    - name: Speed
+      labe: Speed
       number: 6
       channel: ProgramSpeed
-      value: 0-255
-      selectedvalue: Speed
+      value: "0"
+      selectedvalue: "0"
     flash: false
   - name: Show1
     number: 3
@@ -2863,7 +2857,7 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: Show9
+    - name: Show1
       number: 1
       colors: []
       mode: Control
@@ -2875,6 +2869,12 @@ fixtures:
       program: Show1
       programspeed: Medium
       strobe: ""
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Program
+      value: "32"
+      selectedvalue: Show1
     flash: false
   use_fixture: graphix
 - id: 38
