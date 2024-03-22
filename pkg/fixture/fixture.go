@@ -899,19 +899,12 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 
 	for _, fixture := range fixtures.Fixtures {
 
-		if debug {
-			fmt.Printf("fixture %s\n", fixture.Name)
-			fmt.Printf("channels %+v\n", fixture.Channels)
-		}
 		if fixtureName == fixture.Name {
 			for _, channel := range fixture.Channels {
 				if debug {
 					fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)
 				}
 				if channel.Name == channelName {
-					if debug {
-						fmt.Printf("channel.Settings %+v\n", channel.Settings)
-					}
 					for _, setting := range channel.Settings {
 						if debug {
 							fmt.Printf("inspect setting %+v \n", setting)
@@ -922,7 +915,25 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 							if debug {
 								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Value)
 							}
-							v, _ := strconv.Atoi(setting.Value)
+
+							// If the setting value contains a "-" remove it and then take the first valuel.
+							var err error
+							var v int
+							if strings.Contains(setting.Value, "-") {
+								// We've found a range of values.
+								// Find the start value
+								numbers := strings.Split(setting.Value, "-")
+								v, err = strconv.Atoi(numbers[0])
+								if err != nil {
+									return 0, err
+								}
+							} else {
+								v, err = strconv.Atoi(setting.Value)
+								if err != nil {
+									return 0, err
+								}
+							}
+
 							if debug {
 								fmt.Printf("findChannelSettingByNameAndSpeed: speed found is %d\n", v)
 							}

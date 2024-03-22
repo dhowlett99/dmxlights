@@ -1893,20 +1893,20 @@ fixtures:
     name: Rotate
     value: 0
     settings:
-    - name: Mirror Rotate
-      labe: Mirror Rotate
+    - name: Mirror Index
+      labe: Mirror Index
       number: 1
       value: 0-127
       selectedvalue: ""
-    - name: AntiClockwise
-      labe: AntiClockwise
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
       number: 2
-      value: 128-191
+      value: 255
       selectedvalue: ""
-    - name: ClockWise
-      labe: ClockWise
+    - name: Rotate Anti Clockwise Medium
+      labe: Rotate Anti Clockwise Medium
       number: 3
-      value: 192-255
+      value: 128-191
       selectedvalue: ""
   - number: 5
     name: Program

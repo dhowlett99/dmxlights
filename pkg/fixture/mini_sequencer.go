@@ -521,11 +521,11 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 		// Calculate the rotation speed based on direction and soeed.
 		if cfg.Rotatable {
-			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
+			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Anti Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
 				fmt.Printf("anti clockwise rotate speed: %s\n", err)
 			}
-			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
+			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
 				fmt.Printf("clockwise rotate speed: %s\n", err)
 			}
@@ -613,6 +613,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					}
 
 					if debug_mini {
+						fmt.Printf("---->Rotate Value %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, clockwiseSpeed, antiClockwiseSpeed)
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.Speed)
 					}
