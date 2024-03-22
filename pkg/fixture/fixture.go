@@ -1080,12 +1080,12 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 									strings.Contains(channel.Name, "invert") ||
 									strings.Contains(channel.Name, "Invert") {
 									if debug {
-										fmt.Printf("MapFixtures: fixture %s --->: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(master)))
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(master)))
 									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
 								} else {
 									if debug {
-										fmt.Printf("MapFixtures: fixture %s --->: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), master)
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), master)
 									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 								}
@@ -1274,7 +1274,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		if blackout {
 			// Blackout the fixture by setting master brightness to zero.
 			if debug {
-				fmt.Printf("185 ---> SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
+				fmt.Printf("SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 			return lastColor

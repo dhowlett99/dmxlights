@@ -33,8 +33,6 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 	master int,
 	dmxInterfacePresent bool) {
 
-	debug := true
-
 	if debug {
 		fmt.Printf("settings are available\n")
 	}
@@ -59,13 +57,13 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 		if strings.Contains(settingName, "reverse") || strings.Contains(settingName, "invert") {
 			// Invert the brightness value,  some fixtures have the max brightness at 0 and off at 255.
 			if debug {
-				fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
+				fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 		} else {
 			// Set the master brightness value.
 			if debug {
-				fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
+				fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(howBright), dmxController, dmxInterfacePresent)
 		}
@@ -80,7 +78,7 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 				channel, _ := strconv.Atoi(setting.Channel)
 				channel = channel - 1 // Channels are relative to the base address so deduct one to make it work.
 				if debug {
-					fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			} else {
@@ -88,7 +86,7 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 				// Look for this channels number in this fixture identified by ID.
 				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
 				if debug {
-					fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			}
@@ -106,16 +104,16 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 			if IsNumericOnly(setting.Channel) {
 				// Find the channel
 				channel, _ := strconv.ParseFloat(setting.Channel, 32)
-				//if debug {
-				fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
-				//}
+				if debug {
+					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			} else {
 				// Look for this channels number in this fixture identified by ID.
 				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-				//if debug {
-				fmt.Printf("fixture %s --->:Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
-				//}
+				if debug {
+					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			}
 		}
