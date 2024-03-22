@@ -100,7 +100,6 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 			}
 
 			// Handle the fact that the channel may be a label as well.
-			fmt.Printf("Handle the fact that the channel may be a label as well.\n")
 			if IsNumericOnly(setting.Channel) {
 				// Find the channel
 				channel, _ := strconv.ParseFloat(setting.Channel, 32)
