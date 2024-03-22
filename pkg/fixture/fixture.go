@@ -34,7 +34,7 @@ import (
 )
 
 const debug = false
-const dmxDebug = true
+const dmxDebug = false
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
