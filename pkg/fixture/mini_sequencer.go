@@ -200,6 +200,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
+			if debug {
+				fmt.Printf("fixture %s --->:Control: send master Address %d Value %d \n", fixture.Name, fixture.Address+int16(masterChannel), master)
+			}
 			SetChannel(fixture.Address+int16(masterChannel), byte(master), dmxController, dmxInterfacePresent)
 		}
 

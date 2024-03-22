@@ -799,7 +799,7 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 func fixtureHasChannel(fixture *Fixture, channelName string) bool {
 
 	if debug {
-		fmt.Printf("fixtureHasChannel for %s\n", channelName)
+		fmt.Printf("fixtureHasChannel for fixture %s channel %s\n", fixture.Name, channelName)
 	}
 
 	for _, channel := range fixture.Channels {
@@ -814,7 +814,7 @@ func fixtureHasChannel(fixture *Fixture, channelName string) bool {
 func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByChannelNameAndSettingName for %s\n", channelName)
+		fmt.Printf("findChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
 	}
 
 	for _, channel := range fixture.Channels {
