@@ -353,6 +353,10 @@ func FixtureReceiver(
 // Clear fixture.
 func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
 
+	if debug {
+		fmt.Printf("Fixture:%d clear\n", fixtureNumber)
+	}
+
 	// Send stop any running fade ups.
 	select {
 	case stopFadeUp <- true:
@@ -415,6 +419,10 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 // Switch On Static Scene.
 func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+
+	if debug {
+		fmt.Printf("Fixture:%d setStaticOn\n", fixtureNumber)
+	}
 
 	if cmd.RGBStaticColors[fixtureNumber].Enabled {
 		if debug {
@@ -578,6 +586,10 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 
 func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
+	if debug {
+		fmt.Printf("staticOff Fixture No %d", fixtureNumber)
+	}
+
 	go func() {
 		var master int
 		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
@@ -638,6 +650,9 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 
 func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
+	if debug {
+		fmt.Printf("playRGB: fixtureNumber %d", fixtureNumber)
+	}
 	// Now play all the values for this state.
 
 	// Play out fixture to DMX channels.
@@ -686,6 +701,10 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 }
 
 func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+
+	if debug {
+		fmt.Printf("Fixture:%d playScanner\n", fixtureNumber)
+	}
 
 	// Find the fixture
 	fixture := cmd.ScannerPosition.Fixtures[fixtureNumber]
@@ -1060,8 +1079,14 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 									strings.Contains(channel.Name, "Reverse") ||
 									strings.Contains(channel.Name, "invert") ||
 									strings.Contains(channel.Name, "Invert") {
+									if debug {
+										fmt.Printf("MapFixtures: fixture %s --->: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(master)))
+									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
 								} else {
+									if debug {
+										fmt.Printf("MapFixtures: fixture %s --->: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), master)
+									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 								}
 							}
@@ -1249,7 +1274,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		if blackout {
 			// Blackout the fixture by setting master brightness to zero.
 			if debug {
-				fmt.Printf("---> SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
+				fmt.Printf("185 ---> SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 			return lastColor
@@ -1292,66 +1317,8 @@ func MapSwitchFixture(swiTch common.Switch,
 
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
-		for _, setting := range state.Settings {
-
-			// Process settings.
-			if debug {
-				fmt.Printf("settings are available\n")
-			}
-
-			// Not Blackout.
-			// This should be controlled by the master brightness
-			if strings.Contains(setting.Name, "master") || strings.Contains(setting.Name, "dimmer") {
-
-				// Master brightness.
-				value, _ := strconv.ParseFloat(setting.FixtureValue, 32)
-				howBright := int((float64(value) / 100) * (float64(brightness) / 2.55))
-
-				if strings.Contains(setting.Name, "reverse") || strings.Contains(setting.Name, "invert") {
-					// Invert the brightness value,  some fixtures have the max brightness at 0 and off at 255.
-					SetChannel(thisFixture.Address+int16(masterChannel), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
-				} else {
-					// Set the master brightness value.
-					SetChannel(thisFixture.Address+int16(masterChannel), byte(howBright), dmxController, dmxInterfacePresent)
-				}
-
-			} else {
-
-				// If the setting value has is a number set it directly.
-				if IsNumericOnly(setting.FixtureValue) {
-
-					value, _ := strconv.Atoi(setting.FixtureValue)
-					if IsNumericOnly(setting.Channel) {
-						channel, _ := strconv.Atoi(setting.Channel)
-						channel = channel - 1 // Channels are relative to the base address so deduct one to make it work.
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					} else {
-						// Handle the fact that the channel may be a label as well.
-						// Look for this channels number in this fixture identified by ID.
-						channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					}
-
-				} else {
-					// The setting value is a string.
-					// Lets looks to see if the setting string contains a valid fixture label, look up the label in the fixture definition.
-					value, err := findChannelSettingByLabel(thisFixture, setting.Channel, setting.Label)
-					if err != nil {
-						fmt.Printf("error: %s\n", err.Error())
-					}
-
-					// Handle the fact that the channel may be a label as well.
-					if IsNumericOnly(setting.Channel) {
-						// Find the channel
-						channel, _ := strconv.ParseFloat(setting.Channel, 32)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					} else {
-						// Look for this channels number in this fixture identified by ID.
-						channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					}
-				}
-			}
+		for _, newSetting := range state.Settings {
+			newMiniSetter(thisFixture, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
 		}
 	}
 	return lastColor
@@ -1575,6 +1542,10 @@ func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) 
 }
 
 func FindFixtureInfo(thisFixture Fixture) FixtureInfo {
+	if debug {
+		fmt.Printf("FindFixtureInfo\n")
+	}
+
 	fixtureInfo := FixtureInfo{}
 	fixtureInfo.HasRotate = isThisAChannel(thisFixture, "Rotate")
 	fixtureInfo.HasColorWheel = isThisAChannel(thisFixture, "Color")
@@ -1583,6 +1554,11 @@ func FindFixtureInfo(thisFixture Fixture) FixtureInfo {
 }
 
 func isThisAChannel(thisFixture Fixture, channelName string) bool {
+
+	if debug {
+		fmt.Printf("isThisAChannel\n")
+	}
+
 	for _, channel := range thisFixture.Channels {
 		if channel.Name == channelName {
 			return true

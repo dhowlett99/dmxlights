@@ -2966,7 +2966,7 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: Show1
+    - name: Show0
       number: 1
       colors: []
       mode: Control

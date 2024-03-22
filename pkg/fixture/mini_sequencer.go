@@ -46,6 +46,10 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 	guiButtons chan common.ALight,
 	fixtureStepChannel chan common.FixtureCommand) {
 
+	if debug {
+		fmt.Printf("newMiniSequencer: start fixture %s\n", fixture.Name)
+	}
+
 	switchName := fmt.Sprintf("switch%d", swiTch.Number)
 
 	mySequenceNumber := fixture.Group - 1
@@ -212,6 +216,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
+			if debug {
+				fmt.Printf("fixture %s --->:Control: send Shutter Address %d Value %d \n", fixture.Name, fixture.Address+int16(shutterChannel), master)
+			}
 			SetChannel(fixture.Address+int16(shutterChannel), byte(32), dmxController, dmxInterfacePresent)
 		}
 
@@ -221,6 +228,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
+			//if debug {
+			fmt.Printf("fixture %s --->:Control: send Rotate Address %d Value %d \n", fixture.Name, fixture.Address+int16(rotateChannel), master)
+			//}
 			SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
 		}
 
@@ -230,6 +240,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
+			if debug {
+				fmt.Printf("fixture %s --->:Control: send Gobo Address %d Value %d \n", fixture.Name, fixture.Address+int16(goboChannel), master)
+			}
 			SetChannel(fixture.Address+int16(goboChannel), byte(0), dmxController, dmxInterfacePresent)
 		}
 		if fixtureHasChannel(fixture, "ProgramSpeed") {
@@ -237,6 +250,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			programSpeedChannel, err := FindChannelNumberByName(fixture, "ProgramSpeed")
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s --->:Control: send ProgramSpeed Address %d Value %d \n", fixture.Name, fixture.Address+int16(programSpeedChannel), master)
 			}
 			// Now play that DMX value on the program channel of this fixture.
 			SetChannel(fixture.Address+int16(programSpeedChannel), byte(cfg.ProgramSpeed), dmxController, dmxInterfacePresent)
@@ -247,6 +263,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			programState, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
+			}
+			if debug {
+				fmt.Printf("fixture %s --->:Control: send Program Address %d Value %d \n", fixture.Name, fixture.Address+int16(programState), master)
 			}
 			SetChannel(fixture.Address+int16(programChannel), byte(programState), dmxController, dmxInterfacePresent)
 		}
