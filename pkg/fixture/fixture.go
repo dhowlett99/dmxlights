@@ -34,7 +34,7 @@ import (
 )
 
 const debug = false
-const dmxDebug = false
+const dmxDebug = true
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
@@ -1306,14 +1306,14 @@ func MapSwitchFixture(swiTch common.Switch,
 		}
 
 		// If there are no actions, turn off any previos mini sequencers for this switch.
-		if len(state.Actions) == 0 {
-			newAction := Action{}
-			newAction.Name = "Off"
-			newAction.Number = 1
-			newAction.Mode = "Off"
-			lastColor := common.LastColor{}
-			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
-		}
+		// if len(state.Actions) == 0 {
+		// 	newAction := Action{}
+		// 	newAction.Name = "Off"
+		// 	newAction.Number = 1
+		// 	newAction.Mode = "Off"
+		// 	lastColor := common.LastColor{}
+		// 	newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+		// }
 
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.

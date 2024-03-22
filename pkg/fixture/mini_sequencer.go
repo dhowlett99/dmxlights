@@ -190,7 +190,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+		//MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")

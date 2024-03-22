@@ -2019,6 +2019,11 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 }
 
 func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures, dmxInterfacePresent bool) {
+
+	if debug {
+		fmt.Printf("AllFixturesOff\n")
+	}
+
 	for y := 0; y < len(sequences); y++ {
 		if sequences[y].Type != "switch" && sequences[y].Label != "chaser" {
 			for x := 0; x < 8; x++ {
@@ -2031,6 +2036,10 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 }
 
 func SetRGBColorPicker(selectedColor common.Color, targetSequence common.Sequence) []common.Color {
+
+	if debug {
+		fmt.Printf("SetRGBColorPicker\n")
+	}
 
 	// Clear out exiting colors.
 	targetSequence.CurrentColors = []common.Color{}
@@ -2047,6 +2056,10 @@ func SetRGBColorPicker(selectedColor common.Color, targetSequence common.Sequenc
 }
 
 func FindCurrentColor(X int, Y int, targetSequence common.Sequence) common.Color {
+
+	if debug {
+		fmt.Printf("FindCurrentColor\n")
+	}
 
 	for _, availableColor := range targetSequence.RGBAvailableColors {
 		if availableColor.X == X && availableColor.Y == Y {
