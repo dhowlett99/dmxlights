@@ -434,6 +434,10 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					nameValueWidget[i.Row].SetText(settingSelectValue)
 					nameValueWidget[i.Row].Refresh()
 
+					// Update the name and label.
+					newSetting.Name = settingSelectValue
+					newSetting.Label = settingSelectValue
+
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
 					st.UpdateSettings = true
