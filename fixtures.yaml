@@ -1901,7 +1901,7 @@ fixtures:
     - name: Rotate Clockwise Medium
       labe: Rotate Clockwise Medium
       number: 2
-      value: 255
+      value: "255"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
       labe: Rotate Anti Clockwise Medium
@@ -2921,7 +2921,7 @@ fixtures:
   - name: Petals
     number: 4
     label: Petals
-    buttoncolor: ""
+    buttoncolor: Cyan
     master: 0
     settings:
     - name: New Setting
@@ -2945,8 +2945,8 @@ fixtures:
       labe: New
       number: 4
       channel: Rotate
-      value: "0"
-      selectedvalue: Mirror Rotate
+      value: "255"
+      selectedvalue: Rotate Clockwise Medium
     - name: New
       labe: New
       number: 5
