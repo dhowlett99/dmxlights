@@ -2839,14 +2839,14 @@ fixtures:
     buttoncolor: Red
     master: 0
     settings:
-    - name: Ful
-      labe: Ful
+    - name: "255"
+      labe: "255"
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: Shutter
-      labe: Shutter
+    - name: Open
+      labe: Open
       number: 2
       channel: Shutter
       value: "32"
@@ -2857,24 +2857,24 @@ fixtures:
       channel: Gobo
       value: "18"
       selectedvalue: Horiz Waves
-    - name: RotateSlow
-      labe: RotateSlow
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
       number: 4
       channel: Rotate
-      value: "200"
-      selectedvalue: AntiClockwise
-    - name: Program
-      labe: Program
+      value: "255"
+      selectedvalue: Rotate Clockwise Medium
+    - name: Blackout
+      labe: Blackout
       number: 5
       channel: Program
       value: "0"
-      selectedvalue: Show1
-    - name: Speed
-      labe: Speed
+      selectedvalue: Blackout
+    - name: Fast
+      labe: Fast
       number: 6
       channel: ProgramSpeed
       value: "200"
-      selectedvalue: "0"
+      selectedvalue: Fast
     flash: false
   - name: Waves
     number: 3

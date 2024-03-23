@@ -31,10 +31,13 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
+const TABLE_HEIGHT int = 7
+
 type SettingsPanel struct {
 	UseFixtureName string
 	ChannelName    []string
 
+	LoadedSettingPanel   int
 	SettingsPanel        *widget.Table
 	SettingsList         []fixture.Setting
 	SettingMaxDegrees    *int
@@ -169,7 +172,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 		// Function to find length.
 		func() (int, int) {
 			height := len(data)
-			width := 7
+			width := TABLE_HEIGHT
 			return height, width
 		},
 
@@ -300,11 +303,12 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
 
+					// Now if this channel has some settings,remember the setting name.
+					st.ChannelName[i.Row] = settingChannel
+
 					// Now if this channel has some settings, populate the options for the select value.
 					if !channelPanel {
 						if channelHasSettings(st.UseFixtureName, st.ChannelName[i.Row], st.Fixtures) {
-							// Now if this channel has some settings,remember the setting name.
-							st.ChannelName[i.Row] = settingChannel
 							st.SelectedValueOptions = getSettingsForChannel(st.UseFixtureName, st.ChannelName[i.Row], st.Fixtures)
 						} else {
 							st.SelectedValueOptions = makeDMXoptions()
@@ -395,20 +399,17 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = nil
 
-				// Update the options to include any thing that might specified in the config file.
-				st.SelectedValueOptions = addOption(st.SelectedValueOptions, data[i.Row][i.Col])
-
 				// Populate the options.
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Options = st.SelectedValueOptions
 
-				// Set the default positon for the select box,
-				//o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(st.SelectedValueOptions[0])
-
 				// Match the options to the data in the field and display in anyway.
-				for _, option := range st.SelectedValueOptions {
-					if option == data[i.Row][i.Col] {
-						o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
+				if st.LoadedSettingPanel <= TABLE_HEIGHT {
+					for _, option := range st.SelectedValueOptions {
+						if option == data[i.Row][SETTING_SELECT_VALUE] {
+							o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(option)
+						}
 					}
+					st.LoadedSettingPanel++
 				}
 
 				// Remember the pointer to this select box widget.
@@ -420,11 +421,9 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					// Is this selected value a number.
 					if _, err := strconv.ParseInt(settingSelectValue, 10, 64); err == nil {
 						newSetting.Value = settingSelectValue
-						newSetting.SelectedValue = settingSelectValue
 					} else {
 						// Must contain letters that form a label that can be looked up in the settings.
 						newSetting.Value = findSettingValueByName(st.UseFixtureName, st.ChannelName[i.Row], settingSelectValue, st.Fixtures)
-						newSetting.SelectedValue = settingSelectValue
 					}
 					// Now set the value field based on what we've selected.
 					inputValueWidget[i.Row].SetText(newSetting.Value)
@@ -434,9 +433,10 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					nameValueWidget[i.Row].SetText(settingSelectValue)
 					nameValueWidget[i.Row].Refresh()
 
-					// Update the name and label.
+					// Update the fields.
 					newSetting.Name = settingSelectValue
 					newSetting.Label = settingSelectValue
+					newSetting.SelectedValue = settingSelectValue
 
 					st.SettingsList = updateSettingsItem(st.SettingsList, newSetting.Number, newSetting)
 					data = makeSettingsArray(st.SettingsList)
