@@ -2851,12 +2851,12 @@ fixtures:
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: ZigZag
-      labe: ZigZag
+    - name: Horiz Waves
+      labe: Horiz Waves
       number: 3
       channel: Gobo
-      value: "0"
-      selectedvalue: ZigZag
+      value: "18"
+      selectedvalue: Horiz Waves
     - name: RotateSlow
       labe: RotateSlow
       number: 4
