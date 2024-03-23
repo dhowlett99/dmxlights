@@ -300,7 +300,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					st.UpdateSettings = true
 					st.UpdateThisChannel = st.CurrentChannel - 1
 
-					// Now if this channel has some settings, populate the options setting value.
+					// Now if this channel has some settings, populate the options for the select value.
 					if !channelPanel {
 						if channelHasSettings(st.UseFixtureName, st.ChannelName[i.Row], st.Fixtures) {
 							// Now if this channel has some settings,remember the setting name.
@@ -312,6 +312,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					}
 					// Set selectable channel options.
 					selectValueWidget[i.Row].Options = st.SelectedValueOptions
+					selectValueWidget[i.Row].Selected = st.SelectedValueOptions[0]
 					selectValueWidget[i.Row].Refresh()
 				}
 			}
