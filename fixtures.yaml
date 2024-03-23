@@ -2849,14 +2849,14 @@ fixtures:
       labe: Open
       number: 2
       channel: Shutter
-      value: "32"
+      value: 32-63
       selectedvalue: Open
-    - name: Horiz Waves
-      labe: Horiz Waves
+    - name: ZigZag
+      labe: ZigZag
       number: 3
       channel: Gobo
-      value: "18"
-      selectedvalue: Horiz Waves
+      value: "0"
+      selectedvalue: ZigZag
     - name: Rotate Clockwise Medium
       labe: Rotate Clockwise Medium
       number: 4
