@@ -316,7 +316,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
-
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(settingValue string) {
 					if settingValue != "" {
 						newSetting := makeNewSetting(st.SettingsList, i.Row)
@@ -353,7 +352,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 								popupErrorPanel.Show()
 								// Disable the save button.
 								buttonSave.Disable()
-
 							} else {
 								st.DMXValueEntryError[st.SettingsList[i.Row].Number] = false
 								// And make sure we refresh every row, when we update this field.
