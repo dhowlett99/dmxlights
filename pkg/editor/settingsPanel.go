@@ -145,7 +145,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
 
 	nameValueWidget := make([]*widget.Entry, 20)
-	valueFromTextBox := make([]string, 20)
 	inputValueWidget := make([]*widget.Entry, 20)
 	selectValueWidget := make([]*widget.Select, 20)
 
@@ -338,8 +337,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 
-				// Remember the text value so we can use it to match option in the select box widget.
-				valueFromTextBox[i.Row] = data[i.Row][i.Col]
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(settingValue string) {
 					if settingValue != "" {
 						newSetting := makeNewSetting(st.SettingsList, i.Row)
