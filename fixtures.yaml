@@ -2849,7 +2849,7 @@ fixtures:
       labe: Open
       number: 2
       channel: Shutter
-      value: 32-63
+      value: "32"
       selectedvalue: Open
     - name: ZigZag
       labe: ZigZag
