@@ -778,7 +778,7 @@ func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dm
 func findChannelSettingByLabel(fixture *Fixture, channelName string, label string) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByLabel: looking for Label -->%s<--- in Channel -->%s<-- settings\n", label, channelName)
+		fmt.Printf("findChannelSettingByLabel: looking for Label %s in Channel %s settings\n", label, channelName)
 	}
 
 	var fixtureName string
@@ -1261,7 +1261,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		useFixtureLabel = swiTch.UseFixture
 
 		if debug {
-			fmt.Printf("useFixtureLabel -->%s<---  blackout is %t\n", useFixtureLabel, blackout)
+			fmt.Printf("useFixtureLabel %s  blackout is %t\n", useFixtureLabel, blackout)
 		}
 
 		// Find the details of the fixture for this switch.
@@ -1272,7 +1272,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		}
 
 		if debug {
-			fmt.Printf("Found fixture Name -->%s<--- \n", thisFixture.Name)
+			fmt.Printf("Found fixture Name %s \n", thisFixture.Name)
 		}
 
 		// Look for Master channel in this fixture identified by ID.

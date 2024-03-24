@@ -297,7 +297,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 					// Set selectable channel options.
 					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Options = st.SelectedValueOptions
 					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Selected = st.SelectedValueOptions[0]
-					fmt.Printf("--CHANNEL--> Row %d Seting Value to %s\n", i.Row, st.SelectedValueOptions[0])
 					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Refresh()
 					st.SettingsPanel.Refresh()
 				}
@@ -378,7 +377,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Options = st.SelectedValueOptions
 
 				// Match the options to the data in the field and display in anyway.
-				fmt.Printf("--SELECT UPDATE--> Row %d Seting Value to %s\n", i.Row, data[i.Row][SETTING_SELECT_VALUE])
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).SetSelected(data[i.Row][SETTING_SELECT_VALUE])
 
 				o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).OnChanged = func(settingSelectValue string) {

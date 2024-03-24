@@ -613,7 +613,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					}
 
 					if debug_mini {
-						fmt.Printf("---->Rotate Value %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, clockwiseSpeed, antiClockwiseSpeed)
+						fmt.Printf("Rotate Value %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, clockwiseSpeed, antiClockwiseSpeed)
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.Speed)
 					}
