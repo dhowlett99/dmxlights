@@ -485,8 +485,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 			if thisState.Col == STATE_SETTINGS {
 				showStatesField(STATE_SETTINGS, o)
 				o.(*fyne.Container).Objects[STATE_SETTINGS].(*widget.Button).OnTapped = func() {
-					// Signal we load select values at the start
-					st.LoadedSettingPanel = 0
+
 					// Highlight this channel
 					sp.StatePanel.Select(thisState)
 					if sp.StatesList != nil {
