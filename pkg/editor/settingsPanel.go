@@ -116,6 +116,28 @@ func headerSettingsUpdate(id widget.TableCellID, o fyne.CanvasObject) {
 		header.SetText("+")
 	}
 }
+func headerSettingsUpdateWithOutChannel(id widget.TableCellID, o fyne.CanvasObject) {
+	header := o.(*ActiveHeader)
+	header.TextStyle.Bold = true
+	switch id.Col {
+	case -1:
+		header.SetText(strconv.Itoa(id.Row + 1))
+	case 0:
+		header.SetText("ID")
+	case 1:
+		header.SetText("Name")
+	case 2:
+		header.SetText("")
+	case 3:
+		header.SetText("Value")
+	case 4:
+		header.SetText("Select")
+	case 5:
+		header.SetText("-")
+	case 6:
+		header.SetText("+")
+	}
+}
 
 func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.Setting, maxNumberSettings int, buttonSave *widget.Button) *SettingsPanel {
 
@@ -214,13 +236,13 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Show the setting a number.
 			if i.Col == SETTING_NUMBER {
-				showSettingsField(SETTING_NUMBER, o)
+				showSettingsField(SETTING_NUMBER, channelPanel, o)
 				o.(*fyne.Container).Objects[SETTING_NUMBER].(*widget.Label).SetText(data[i.Row][i.Col])
 			}
 
 			// Show and Edit the Setting Name.
 			if i.Col == SETTING_NAME {
-				showSettingsField(SETTING_NAME, o)
+				showSettingsField(SETTING_NAME, channelPanel, o)
 
 				if st.NameEntryError[st.SettingsList[i.Row].Number] {
 					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
@@ -273,7 +295,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Channel number.
 			if i.Col == SETTING_CHANNEL {
-				showSettingsField(SETTING_CHANNEL, o)
+				showSettingsField(SETTING_CHANNEL, channelPanel, o)
 				o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).OnChanged = nil
 				// Update the options to include any thing that might specified in the config file.
 				st.ChannelOptions = addOption(st.ChannelOptions, data[i.Row][i.Col])
@@ -306,7 +328,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Show and Edit the Setting Value.
 			if i.Col == SETTING_VALUE {
-				showSettingsField(SETTING_VALUE, o)
+				showSettingsField(SETTING_VALUE, channelPanel, o)
 
 				// Change the color of the value box if there's a DMX value error.
 				if st.DMXValueEntryError[st.SettingsList[i.Row].Number] {
@@ -367,7 +389,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 			}
 
 			if i.Col == SETTING_SELECT_VALUE {
-				showSettingsField(SETTING_SELECT_VALUE, o)
+				showSettingsField(SETTING_SELECT_VALUE, channelPanel, o)
 
 				if i.Row < maxNumberSettings {
 					selectValue[i.Row] = o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select)
@@ -419,7 +441,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Show the Delete Setting Button.
 			if i.Col == SETTING_DELETE {
-				showSettingsField(SETTING_DELETE, o)
+				showSettingsField(SETTING_DELETE, channelPanel, o)
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_DELETE].(*widget.Button).OnTapped = func() {
 					if len(st.SettingsList) != 0 {
@@ -439,7 +461,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			// Show the Add Setting Button.
 			if i.Col == SETTING_ADD {
-				showSettingsField(SETTING_ADD, o)
+				showSettingsField(SETTING_ADD, channelPanel, o)
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
 					if len(data) < maxNumberSettings {
@@ -470,7 +492,11 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 	st.SettingsPanel.ShowHeaderColumn = false
 	st.SettingsPanel.CreateHeader = headerSettingsCreate
-	st.SettingsPanel.UpdateHeader = headerSettingsUpdate
+	if !channelPanel {
+		st.SettingsPanel.UpdateHeader = headerSettingsUpdate
+	} else {
+		st.SettingsPanel.UpdateHeader = headerSettingsUpdateWithOutChannel
+	}
 
 	// Setup the columns of this table.
 	st.SettingsPanel.SetColumnWidth(COLUMN_ID, 40)           // Number
@@ -480,6 +506,11 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.SettingsPanel.SetColumnWidth(COLUMN_SELECT_VALUE, 90) // Select Value
 	st.SettingsPanel.SetColumnWidth(COLUMN_DELETE, 20)       // Delete
 	st.SettingsPanel.SetColumnWidth(COLUMN_ADD, 20)          // Add
+
+	// If we creating channel hide the channel selection box.
+	if channelPanel {
+		st.SettingsPanel.SetColumnWidth(COLUMN_CHANNEL, 0) // Channel
+	}
 
 	return &st
 }
@@ -633,7 +664,7 @@ func makeSettingsArray(settings []fixture.Setting) [][]string {
 	return data
 }
 
-func showSettingsField(field int, o fyne.CanvasObject) {
+func showSettingsField(field int, channelPanel bool, o fyne.CanvasObject) {
 	if debug {
 		fmt.Printf("showSettingsField\n")
 	}
@@ -644,7 +675,7 @@ func showSettingsField(field int, o fyne.CanvasObject) {
 	case field == SETTING_NAME:
 		o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
 		o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).Hidden = false
-	case field == SETTING_CHANNEL:
+	case field == SETTING_CHANNEL && !channelPanel:
 		o.(*fyne.Container).Objects[SETTING_CHANNEL].(*widget.Select).Hidden = false
 	case field == SETTING_VALUE:
 		o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).Hidden = false
