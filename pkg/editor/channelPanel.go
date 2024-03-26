@@ -97,10 +97,13 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	settingsList := []fixture.Setting{}
 	var st *SettingsPanel
 
-	// Create Settings Panel
+	// Create Channel Settings Panel
 	var settingsPanel *widget.Table
 	channelPanel := true
-	st = NewSettingsPanel(w, channelPanel, settingsList, buttonSave)
+	// You can have a setting for every channel on a fixture.
+	// So if your creating a fixture channel setting
+	// technically you could occupy the whole of the DMX universe.
+	st = NewSettingsPanel(w, channelPanel, settingsList, MAX_NUMBER_SETTINGS, buttonSave)
 	settingsPanel = st.SettingsPanel
 
 	// Create Channel Panel.

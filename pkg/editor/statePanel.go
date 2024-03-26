@@ -44,6 +44,12 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
 
+	// Get used fixture id from its label.
+	useFixture, err := fixture.GetFixtureDetailsByLabel(useFixtureName, fixtures)
+	if err != nil {
+		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
+	}
+
 	// If this is a pretend virtual fixture i.e a switch.
 	// Find the original fixture's details so we can make decisions on
 	// what options to put in the menus based on the fixtures capabilities.
@@ -88,8 +94,13 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 
 	// Create Settings Panel.
 	channelPanel := false
-	st := NewSettingsPanel(w, channelPanel, []fixture.Setting{}, buttonSave)
-	st.ChannelOptions = populateChannelNames(thisFixture.Channels)
+	// You can have a setting for every channel on a fixture.
+	// So if your creating a fixture channel setting
+	// technically you can only have as many settings as you can have channels.
+	// So max setting is the same as the number of channels available.
+	maxNumberSettings := len(useFixture.Channels)
+	st := NewSettingsPanel(w, channelPanel, []fixture.Setting{}, maxNumberSettings, buttonSave)
+	st.ChannelOptions = populateChannelNames(useFixture.Channels)
 	st.SettingsPanel.Hide()
 	st.Fixtures = fp.Fixtures
 	st.UseFixtureName = useFixtureName

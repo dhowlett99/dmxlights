@@ -32,6 +32,7 @@ import (
 )
 
 const TABLE_HEIGHT int = 7
+const MAX_NUMBER_SETTINGS = 512
 
 type SettingsPanel struct {
 	UseFixtureName string
@@ -45,6 +46,7 @@ type SettingsPanel struct {
 	CurrentChannel       int
 	UpdateThisChannel    int
 	UpdateSettings       bool
+	MaxNumberSettings    int
 
 	NameEntryError     map[int]bool
 	DMXValueEntryError map[int]bool
@@ -115,7 +117,7 @@ func headerSettingsUpdate(id widget.TableCellID, o fyne.CanvasObject) {
 	}
 }
 
-func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.Setting, buttonSave *widget.Button) *SettingsPanel {
+func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.Setting, maxNumberSettings int, buttonSave *widget.Button) *SettingsPanel {
 
 	if debug {
 		fmt.Printf("NewSettingsPanel\n")
@@ -140,6 +142,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	// Storage for error flags for each fixture.
 	st.NameEntryError = make(map[int]bool, len(st.SettingsList))
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
+	selectValue := make([]*widget.Select, maxNumberSettings)
 
 	// Create a dialog for error messages.
 	var reports []string
@@ -295,9 +298,8 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 						}
 					}
 					// Set selectable channel options.
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Options = st.SelectedValueOptions
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Selected = st.SelectedValueOptions[0]
-					o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select).Refresh()
+					selectValue[i.Row].Options = st.SelectedValueOptions
+					selectValue[i.Row].ClearSelected()
 					st.SettingsPanel.Refresh()
 				}
 			}
@@ -366,6 +368,10 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 			if i.Col == SETTING_SELECT_VALUE {
 				showSettingsField(SETTING_SELECT_VALUE, o)
+
+				if i.Row < maxNumberSettings {
+					selectValue[i.Row] = o.(*fyne.Container).Objects[SETTING_SELECT_VALUE].(*widget.Select)
+				}
 
 				if !channelPanel {
 					st.SelectedValueOptions = populateSelectedValueNames(data[i.Row][SETTING_CHANNEL], st.UseFixtureName, st.Fixtures)
@@ -436,15 +442,27 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				showSettingsField(SETTING_ADD, o)
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[SETTING_ADD].(*widget.Button).OnTapped = func() {
-					if len(st.SettingsList) != 0 {
-						st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number)
+					if len(data) < maxNumberSettings {
+						if len(st.SettingsList) != 0 {
+							st.SettingsList = addSettingsItem(st.SettingsList, st.SettingsList[i.Row].Number)
+						} else {
+							st.SettingsList = addSettingsItem(st.SettingsList, 0)
+						}
+						data = makeSettingsArray(st.SettingsList)
+						st.UpdateSettings = true
+						st.UpdateThisChannel = st.CurrentChannel - 1
+						st.SettingsPanel.Refresh()
 					} else {
-						st.SettingsList = addSettingsItem(st.SettingsList, 0)
+						popupErrorPanel = widget.NewModalPopUp(
+							container.NewVBox(
+								widget.NewLabel("Error"),
+								widget.NewLabel("Max number of settings exceeded"),
+								container.NewHBox(layout.NewSpacer(), button),
+							),
+							w.Canvas(),
+						)
+						popupErrorPanel.Show()
 					}
-					data = makeSettingsArray(st.SettingsList)
-					st.UpdateSettings = true
-					st.UpdateThisChannel = st.CurrentChannel - 1
-					st.SettingsPanel.Refresh()
 				}
 			}
 		},
