@@ -161,6 +161,9 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	// Populate State settings.
 	statesList := thisFixture.States
 
+	// Store the current states incase we cancel changes.
+	savedStates := append(statesList[:0:0], statesList...)
+
 	// Create States Panel.
 	var StatesPanel *widget.Table
 	sp := NewStatePanel(statesList, ap, st)
@@ -210,6 +213,10 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
+		// Restore any changed state settings.
+		for stateNumber := range thisFixture.States {
+			thisFixture.States[stateNumber].Settings = append(thisFixture.States[stateNumber].Settings[:0:0], savedStates[stateNumber].Settings...)
+		}
 		modal.Hide()
 	})
 
