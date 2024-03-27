@@ -44,7 +44,7 @@ build:
 
 legacy-deploy:
 	rm -rf dmxlights.app/
-	fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png --tags legacy
+	fyne package --appVersion 2.1 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png --tags legacy
 	cp fixtures.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
@@ -57,7 +57,7 @@ deploy: installer
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
-	$(GOPATH)/bin/fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
+	$(GOPATH)/bin/fyne package --appVersion 2.1 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
 	# fix the Info.plist
 	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
