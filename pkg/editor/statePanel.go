@@ -174,7 +174,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	scrollableStateList.SetMinSize(fyne.Size{Height: 400, Width: 300})
 
 	scrollableActionsList := container.NewScroll(ap.ActionsPanel)
-	scrollableActionsList.SetMinSize(fyne.Size{Height: 400, Width: 300})
+	scrollableActionsList.SetMinSize(fyne.Size{Height: 450, Width: 300})
 
 	scrollableSettingsList := container.NewScroll(st.SettingsPanel)
 	scrollableSettingsList.SetMinSize(fyne.Size{Height: 400, Width: 300})

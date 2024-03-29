@@ -62,6 +62,7 @@ type Action struct {
 	Name         string `yaml:"name"`
 	Number       int
 	Colors       []string `yaml:"colors"`
+	Map          string   `yaml:"map"`
 	Mode         string   `yaml:"mode"`
 	Fade         string   `yaml:"fade"`
 	Size         string   `yaml:"size"`
@@ -1310,21 +1311,12 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Program = action.Program
 			newAction.ProgramSpeed = action.ProgramSpeed
 			newAction.Strobe = action.Strobe
+			newAction.Map = action.Map
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
 				lastColor.RGBColor = common.EmptyColor
 			}
 		}
-
-		// If there are no actions, turn off any previos mini sequencers for this switch.
-		// if len(state.Actions) == 0 {
-		// 	newAction := Action{}
-		// 	newAction.Name = "Off"
-		// 	newAction.Number = 1
-		// 	newAction.Mode = "Off"
-		// 	lastColor := common.LastColor{}
-		// 	newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
-		// }
 
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
