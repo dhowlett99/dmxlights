@@ -115,6 +115,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				newAction.Size = ap.ActionsList[cp.UpdateThisAction].Size
 				newAction.Speed = ap.ActionsList[cp.UpdateThisAction].Speed
 				newAction.Rotate = ap.ActionsList[cp.UpdateThisAction].Rotate
+				newAction.RotateSpeed = ap.ActionsList[cp.UpdateThisAction].RotateSpeed
 				newAction.Program = ap.ActionsList[cp.UpdateThisAction].Program
 				newAction.Strobe = ap.ActionsList[cp.UpdateThisAction].Strobe
 				newAction.Map = ap.ActionsList[cp.UpdateThisAction].Map

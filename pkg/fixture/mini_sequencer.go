@@ -482,7 +482,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			ScannerReverse:       false,
 			RGBInvert:            false,
 			Bounce:               false,
-			ScannerChaser:        false,
+			ScannerChaser:        true,
 			RGBShift:             1,
 			RGBNumberStepsInFade: cfg.NumberSteps,
 			RGBFade:              cfg.Fade,
@@ -523,11 +523,11 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		if cfg.Rotatable {
 			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Anti Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("anti clockwise rotate speed: %s\n", err)
+				fmt.Printf("Fixture %s anti clockwise rotate speed: %s\n", fixture.Name, err)
 			}
 			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("clockwise rotate speed: %s\n", err)
+				fmt.Printf("Fixture %s clockwise rotate speed: %s\n", fixture.Name, err)
 			}
 		}
 
@@ -642,6 +642,9 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+						if cfg.Map {
+							master = fixture.Brightness
+						}
 						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
@@ -663,6 +666,16 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 			fmt.Printf("error: %s\n", err.Error())
 		}
 		config.Colors = colorLibrary
+	}
+
+	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
+	switch action.Map {
+	case "Off":
+		config.Map = false // Don't map
+	case "On":
+		config.Map = true // Map brightness to master dimmer.
+	default:
+		config.Map = false // Don't map
 	}
 
 	// Fade - Time taken to fade up and down.

@@ -77,6 +77,7 @@ type Action struct {
 type ActionConfig struct {
 	Name          string
 	Colors        []common.Color
+	Map           bool
 	Fade          int
 	NumberSteps   int
 	Size          int
@@ -888,7 +889,7 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByNameAndSpeed for name %s and speed %s\n", settingName, settingSpeed)
+		fmt.Printf("findChannelSettingByNameAndSpeed for fixture %s setting name %s and setting speed %s\n", fixtureName, settingName, settingSpeed)
 	}
 
 	if settingName == "" {
