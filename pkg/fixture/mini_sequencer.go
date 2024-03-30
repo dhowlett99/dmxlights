@@ -640,7 +640,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						if cfg.Map {
 							master = fixture.Brightness
 						}
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
 					rotateCounter++
@@ -713,8 +713,8 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		case "Auto":
 			config.Gobo = -1
 		default:
-			// find current gobo.
-			config.Gobo = FindGobo(fixture.Number, fixture.Group, action.Gobo, fixturesConfig)
+			// find current gobo number.
+			config.Gobo = FindGobo(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
 		}
 
 		// Find all the specified options for the gobo channel
