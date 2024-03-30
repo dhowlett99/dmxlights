@@ -590,6 +590,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 					}
 					modal.Resize(fyne.NewSize(800, 600))
 					modal.Show()
+					modal.Refresh()
 				}
 			}
 		},

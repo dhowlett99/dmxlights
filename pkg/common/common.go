@@ -178,6 +178,8 @@ type Action struct {
 	ProgramSpeed string
 	Strobe       string
 	Map          string
+	Gobo         string
+	GoboSpeed    string
 }
 
 type Switch struct {

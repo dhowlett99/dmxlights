@@ -72,6 +72,8 @@ type Action struct {
 	Program      string   `yaml:"program"`
 	ProgramSpeed string   `yaml:"programspeed"`
 	Strobe       string   `yaml:"strobe"`
+	Gobo         string   `yaml:"gobo"`
+	GoboSpeed    string   `yaml:"gobospeed"`
 }
 
 type ActionConfig struct {
@@ -1313,6 +1315,8 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.ProgramSpeed = action.ProgramSpeed
 			newAction.Strobe = action.Strobe
 			newAction.Map = action.Map
+			newAction.Gobo = action.Gobo
+			newAction.GoboSpeed = action.GoboSpeed
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
 				lastColor.RGBColor = common.EmptyColor

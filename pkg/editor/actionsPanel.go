@@ -45,6 +45,8 @@ type ActionPanel struct {
 	ActionProgramOptions      []string
 	ActionProgramSpeedOptions []string
 	ActionStrobeOptions       []string
+	ActionGoboOptions         []string
+	ActionGoboSpeedOptions    []string
 	UpdateActions             bool
 	UpdateThisAction          int
 	CurrentState              int
@@ -82,6 +84,8 @@ const (
 	ACTIONS_PROGRAM
 	ACTIONS_PROGRAM_SPEED
 	ACTIONS_STROBE
+	ACTIONS_GOBO
+	ACTIONS_GOBO_SPEED
 )
 
 func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fixture.FixtureInfo) *ActionPanel {
@@ -98,6 +102,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 	ap.ActionMusicOptions = []string{"Off", "On"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 	ap.ActionMapOptions = []string{"Off", "On"}
+	ap.ActionGoboOptions = []string{"Default"}
+	ap.ActionGoboSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
 	cp := NewColorPickerPanel()
 
@@ -119,6 +125,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				newAction.Program = ap.ActionsList[cp.UpdateThisAction].Program
 				newAction.Strobe = ap.ActionsList[cp.UpdateThisAction].Strobe
 				newAction.Map = ap.ActionsList[cp.UpdateThisAction].Map
+				newAction.Gobo = ap.ActionsList[cp.UpdateThisAction].Gobo
+				newAction.GoboSpeed = ap.ActionsList[cp.UpdateThisAction].GoboSpeed
 				ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[cp.UpdateThisAction].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
@@ -188,6 +196,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				container.NewHBox(
 					widget.NewLabel("Strobe"),
 					widget.NewSelect(ap.ActionStrobeOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Gobo"),
+					widget.NewSelect(ap.ActionGoboOptions, func(value string) {}),
+				),
+				container.NewHBox(
+					widget.NewLabel("Gobo Speed"),
+					widget.NewSelect(ap.ActionGoboSpeedOptions, func(value string) {}),
 				),
 			)
 		},
@@ -285,6 +301,11 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
 					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
 
+					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
+					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
+
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
 				}
 
 				if value == "Control" {
@@ -412,6 +433,25 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				ap.UpdateThisAction = ap.CurrentState
 			}
 
+			// Gobo
+			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Gobo)
+			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := createCopyOfAction(ap, i)
+				newAction.Gobo = value
+				ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
+
+			// Gobo
+			o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].GoboSpeed)
+			o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				newAction := createCopyOfAction(ap, i)
+				newAction.GoboSpeed = value
+				ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
+				ap.UpdateActions = true
+				ap.UpdateThisAction = ap.CurrentState
+			}
 		})
 
 	return &ap
@@ -431,6 +471,8 @@ func createCopyOfAction(ap ActionPanel, i int) fixture.Action {
 	newAction.Program = ap.ActionsList[i].Program
 	newAction.ProgramSpeed = ap.ActionsList[i].ProgramSpeed
 	newAction.Strobe = ap.ActionsList[i].Strobe
+	newAction.Gobo = ap.ActionsList[i].Gobo
+	newAction.GoboSpeed = ap.ActionsList[i].GoboSpeed
 	newAction.Map = ap.ActionsList[i].Map
 	return newAction
 }
@@ -449,6 +491,8 @@ func createBlankAction(ap ActionPanel, i int) fixture.Action {
 	newAction.Program = ""
 	newAction.ProgramSpeed = ""
 	newAction.Strobe = ""
+	newAction.Gobo = ""
+	newAction.GoboSpeed = ""
 	newAction.Map = ""
 	return newAction
 }
@@ -528,6 +572,12 @@ func hideAllActionFields(o fyne.CanvasObject) {
 	// Strobe
 	o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
 	o.(*fyne.Container).Objects[ACTIONS_STROBE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+	// Gobo
+	o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+	o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+	// Gobo Speed
+	o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+	o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 
 }
 
@@ -573,6 +623,8 @@ func CreateActionsList(stateList []fixture.State, selectedState int) fixture.Act
 	newAction.Mode = "None"
 	newAction.Fade = "Off"
 	newAction.Speed = "Off"
+	newAction.Gobo = "Default"
+	newAction.GoboSpeed = "Slow"
 
 	return newAction
 }
