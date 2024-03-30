@@ -57,7 +57,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
 	}
-	fixtureInfo := fixture.FindFixtureInfo(basedOnFixture)
+	fixtureInfo := fixture.FindFixtureInfo(&basedOnFixture)
 	if debug {
 		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}
@@ -90,6 +90,14 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 
 	// Create Actions Panel. fixtureInfo controls what options we see.
 	ap := NewActionsPanel(w, []fixture.Action{}, fixtureInfo)
+	ap.ActionGoboOptions = []string{"Default", "Auto"}
+
+	// If this fixture has a gobo channel.
+	if fixtureInfo.HasGobo {
+		// Add all the specified options for the gobo channel
+		ap.ActionGoboOptions = append(ap.ActionGoboOptions, populateGoboNames(useFixture, fixtures)...)
+	}
+
 	ap.ActionsPanel.Hide()
 
 	// Create Settings Panel.
@@ -273,6 +281,23 @@ func populateSelectedValueNames(selectedChannelName string, useFixtureName strin
 
 	// return selectable channel options.
 	return selectedValueOptions
+}
+
+func populateGoboNames(useFixture fixture.Fixture, fixtures *fixture.Fixtures) []string {
+
+	var actionGoboOptions []string
+
+	// Find all the specified options for the gobo channel
+	goboSettings, err := fixture.GetChannelSettinsByName(&useFixture, "Gobo", fixtures)
+	if err != nil && debug {
+		fmt.Printf("newMiniSequencer: warning! no gobos found for fixture %s\n", useFixture.Name)
+	}
+	// Look through the available gobos and populate the available gobos values.
+	for _, setting := range goboSettings {
+		actionGoboOptions = append(actionGoboOptions, setting.Name)
+	}
+
+	return actionGoboOptions
 }
 
 func populateChannelNames(channels []fixture.Channel) []string {

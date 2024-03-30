@@ -77,25 +77,29 @@ type Action struct {
 }
 
 type ActionConfig struct {
-	Name          string
-	Colors        []common.Color
-	Map           bool
-	Fade          int
-	NumberSteps   int
-	Size          int
-	Speed         time.Duration
-	TriggerState  bool
-	RotateSpeed   int
-	Rotatable     bool
-	Clockwise     bool
-	AntiClockwise bool
-	Auto          bool
-	Program       int
-	ProgramSpeed  int
-	Music         int
-	MusicTrigger  bool
-	Strobe        bool
-	StrobeSpeed   int
+	Name           string
+	Colors         []common.Color
+	Map            bool
+	Fade           int
+	NumberSteps    int
+	Size           int
+	Speed          time.Duration
+	TriggerState   bool
+	RotateSpeed    int
+	Rotatable      bool
+	Clockwise      bool
+	AntiClockwise  bool
+	Auto           bool
+	Program        int
+	ProgramOptions []string
+	ProgramSpeed   int
+	Music          int
+	MusicTrigger   bool
+	Strobe         bool
+	StrobeSpeed    int
+	Gobo           int
+	GoboSpeed      int
+	GoboOptions    []string
 }
 
 type Fixture struct {
@@ -118,6 +122,7 @@ type FixtureInfo struct {
 	HasRotate     bool
 	HasGobo       bool
 	HasColorWheel bool
+	HasProgram    bool
 }
 
 type Setting struct {
@@ -1549,15 +1554,16 @@ func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) 
 	return 0, fmt.Errorf("channel %s not found in fixture %s", channelName, fixture.Name)
 }
 
-func FindFixtureInfo(thisFixture Fixture) FixtureInfo {
+func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 	if debug {
 		fmt.Printf("FindFixtureInfo\n")
 	}
 
 	fixtureInfo := FixtureInfo{}
-	fixtureInfo.HasRotate = isThisAChannel(thisFixture, "Rotate")
-	fixtureInfo.HasColorWheel = isThisAChannel(thisFixture, "Color")
-	fixtureInfo.HasGobo = isThisAChannel(thisFixture, "Gobo")
+	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
+	fixtureInfo.HasColorWheel = isThisAChannel(*thisFixture, "Color")
+	fixtureInfo.HasGobo = isThisAChannel(*thisFixture, "Gobo")
+	fixtureInfo.HasProgram = isThisAChannel(*thisFixture, "Program")
 	return fixtureInfo
 }
 

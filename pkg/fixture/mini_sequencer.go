@@ -55,13 +55,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
-	// Find all the specified settings for the program channel
-	programSettings, err := GetChannelSettinsByName(fixture, "Program", fixturesConfig)
-	if err != nil && debug {
-		fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
-	}
-
-	cfg := getConfig(action, programSettings)
+	// Setup the configuration.
+	cfg := getConfig(action, fixture, fixturesConfig)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -655,9 +650,88 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 	}
 }
 
-func getConfig(action Action, programSettings []common.Setting) ActionConfig {
+func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) ActionConfig {
 
 	config := ActionConfig{}
+
+	var programSettings []common.Setting
+	var goboSettings []common.Setting
+	var err error
+
+	fixtureInfo := FindFixtureInfo(fixture)
+	if debug {
+		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
+	}
+
+	// Find all the specified settings for the program channel
+	if fixtureInfo.HasProgram {
+
+		programSettings, err = GetChannelSettinsByName(fixture, "Program", fixturesConfig)
+		if err != nil && debug {
+			fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
+		}
+
+		// Program Speed - Speed of programs or shows.
+		switch action.ProgramSpeed {
+		case "Off":
+			config.ProgramSpeed = 0
+		case "Slow":
+			config.ProgramSpeed = 10
+		case "Medium":
+			config.ProgramSpeed = 100
+		case "Fast":
+			config.ProgramSpeed = 200
+		default:
+			config.ProgramSpeed = 0
+		}
+
+		// Look through the available settins and see if you can find the specified program action.
+		for _, setting := range programSettings {
+			if action.Program == setting.Name || setting.Name == "Default" {
+				config.Program = int(setting.Value)
+			}
+		}
+	}
+
+	// Setup the gobos based on their name.
+	if fixtureInfo.HasGobo {
+
+		switch action.GoboSpeed {
+		case "Slow":
+			config.GoboSpeed = 10
+		case "Medium":
+			config.GoboSpeed = 100
+		case "Fast":
+			config.GoboSpeed = 200
+		default:
+			config.GoboSpeed = 0
+		}
+
+		switch action.Gobo {
+		case "Default":
+			config.Gobo = 0
+		case "Auto":
+			config.Gobo = -1
+		default:
+			// find current gobo.
+			config.Gobo = FindGobo(fixture.Number, fixture.Group, action.Gobo, fixturesConfig)
+		}
+
+		// Find all the specified options for the gobo channel
+		goboSettings, err = GetChannelSettinsByName(fixture, "Gobo", fixturesConfig)
+		if err != nil && debug {
+			fmt.Printf("newMiniSequencer: warning! no gobos found for fixture %s\n", fixture.Name)
+		}
+
+		// Gobo allways has a defult option of the first gobo.
+		config.GoboOptions = append(config.GoboOptions, "Default")
+
+		// Look through the available gobos and populate the available gobos values.
+		for _, setting := range goboSettings {
+			config.GoboOptions = append(config.GoboOptions, setting.Name)
+		}
+
+	}
 
 	if action.Colors != nil {
 		// Find the color by name from the library of supported colors.
@@ -706,27 +780,6 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Size = 10
 	default:
 		config.Size = 3
-	}
-
-	// Program Speed - Speed of programs or shows.
-	switch action.ProgramSpeed {
-	case "Off":
-		config.ProgramSpeed = 0
-	case "Slow":
-		config.ProgramSpeed = 10
-	case "Medium":
-		config.ProgramSpeed = 100
-	case "Fast":
-		config.ProgramSpeed = 200
-	default:
-		config.ProgramSpeed = 0
-	}
-
-	// Look through the available settins and see if you can find the specified program action.
-	for _, setting := range programSettings {
-		if action.Program == setting.Name || setting.Name == "Default" {
-			config.Program = int(setting.Value)
-		}
 	}
 
 	switch action.Rotate {

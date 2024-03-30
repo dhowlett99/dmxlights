@@ -102,7 +102,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 	ap.ActionMusicOptions = []string{"Off", "On"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
 	ap.ActionMapOptions = []string{"Off", "On"}
-	ap.ActionGoboOptions = []string{"Default"}
+	// ap.ActionGoboOptions are setup in the StatePanel that calls this func.
 	ap.ActionGoboSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
 	cp := NewColorPickerPanel()

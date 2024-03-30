@@ -3209,8 +3209,8 @@ fixtures:
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: Show2
-      programspeed: Slow
+      program: Show8
+      programspeed: Fast
       strobe: ""
       gobo: ""
       gobospeed: ""
