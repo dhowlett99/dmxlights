@@ -77,29 +77,32 @@ type Action struct {
 }
 
 type ActionConfig struct {
-	Name           string
-	Colors         []common.Color
-	Map            bool
-	Fade           int
-	NumberSteps    int
-	Size           int
-	Speed          time.Duration
-	TriggerState   bool
-	RotateSpeed    int
-	Rotatable      bool
-	Clockwise      bool
-	AntiClockwise  bool
-	Auto           bool
-	Program        int
-	ProgramOptions []string
-	ProgramSpeed   int
-	Music          int
-	MusicTrigger   bool
-	Strobe         bool
-	StrobeSpeed    int
-	Gobo           int
-	GoboSpeed      int
-	GoboOptions    []string
+	Name                  string
+	Colors                []common.Color
+	Map                   bool
+	Fade                  int
+	NumberSteps           int
+	Size                  int
+	Speed                 time.Duration
+	TriggerState          bool
+	RotateSpeed           int
+	Rotatable             bool
+	Clockwise             bool
+	AntiClockwise         bool
+	AutoRotate            bool
+	Program               int
+	ProgramOptions        []string
+	ProgramSpeed          int
+	Music                 int
+	MusicTrigger          bool
+	Strobe                bool
+	StrobeSpeed           int
+	Gobo                  int
+	GoboSpeed             int
+	AutoGobo              bool
+	GoboOptions           []string
+	RotateSensitivity     int
+	GoboChangeSensitivity int
 }
 
 type Fixture struct {

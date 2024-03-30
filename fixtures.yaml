@@ -1904,15 +1904,35 @@ fixtures:
       number: 1
       value: 0-127
       selectedvalue: ""
+    - name: Rotate Clockwise Slow
+      labe: Rotate Clockwise Slow
+      number: 2
+      value: "192"
+      selectedvalue: ""
     - name: Rotate Clockwise Medium
       labe: Rotate Clockwise Medium
       number: 2
+      value: "223"
+      selectedvalue: ""
+    - name: Rotate Clockwise Fast
+      labe: Rotate Clockwise Fast
+      number: 2
       value: "255"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
+      number: 3
+      value: "191"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
       labe: Rotate Anti Clockwise Medium
       number: 3
-      value: 128-191
+      value: "160"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
+      number: 3
+      value: "128"
       selectedvalue: ""
   - number: 5
     name: Program
@@ -2998,12 +3018,12 @@ fixtures:
       channel: Gobo
       value: "28"
       selectedvalue: Croc Petals
-    - name: New
-      labe: New
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
       number: 4
       channel: Rotate
-      value: "255"
-      selectedvalue: Rotate Clockwise Medium
+      value: "191"
+      selectedvalue: Rotate Anti Clockwise Slow
     - name: New
       labe: New
       number: 5
@@ -3233,12 +3253,12 @@ fixtures:
       size: Short
       speed: Music
       rotate: Auto
-      rotatespeed: Medium
+      rotatespeed: Fast
       program: ""
       programspeed: ""
       strobe: ""
-      gobo: Default
-      gobospeed: Slow
+      gobo: Auto
+      gobospeed: Fast
     flash: false
   use_fixture: graphix
 - id: 38

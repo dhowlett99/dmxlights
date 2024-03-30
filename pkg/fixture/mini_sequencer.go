@@ -511,6 +511,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 		var rotateCounter int
+		var goboChangeFrequency int
+		var goboCounter int
 		var clockwiseSpeed int
 		var antiClockwiseSpeed int
 
@@ -583,7 +585,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						case <-time.After(10 * time.Millisecond):
 						}
 
-						if rotateCounter > 500 {
+						if rotateCounter > cfg.RotateSensitivity {
 							rotateCounter = 1
 						}
 						if !cfg.Clockwise && !cfg.AntiClockwise {
@@ -596,8 +598,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 							cfg.RotateSpeed = antiClockwiseSpeed
 						}
 
-						if cfg.Auto {
-							if rotateCounter < 250 {
+						if cfg.AutoRotate {
+							if rotateCounter < (cfg.RotateSensitivity / 2) {
 								// Clockwise Speed.
 								cfg.RotateSpeed = clockwiseSpeed
 							} else {
@@ -607,8 +609,21 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						}
 					}
 
+					if cfg.AutoGobo {
+						if goboCounter >= len(cfg.GoboOptions) {
+							goboCounter = 0
+						}
+						if goboChangeFrequency > cfg.GoboChangeSensitivity {
+							goboChangeFrequency = 0
+							goboCounter++
+						}
+						goboChangeFrequency++
+						cfg.Gobo = goboCounter
+					}
+
 					if debug_mini {
-						fmt.Printf("Rotate Value %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, clockwiseSpeed, antiClockwiseSpeed)
+						fmt.Printf("Rotate Value %d Counter %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, rotateCounter, clockwiseSpeed, antiClockwiseSpeed)
+						fmt.Printf("Gobo %d goboChangeFrequency %d\n", cfg.Gobo, goboChangeFrequency)
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.Speed)
 					}
@@ -710,11 +725,14 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		switch action.Gobo {
 		case "Default":
 			config.Gobo = 0
+			config.AutoGobo = false
 		case "Auto":
 			config.Gobo = -1
+			config.AutoGobo = true
 		default:
 			// find current gobo number.
 			config.Gobo = FindGobo(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
+			config.AutoGobo = false
 		}
 
 		// Find all the specified options for the gobo channel
@@ -785,27 +803,27 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	switch action.Rotate {
 	case "Off":
 		config.Rotatable = false
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = false
 	case "Clockwise":
 		config.Rotatable = true
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = true
 		config.AntiClockwise = false
 	case "Anti Clockwise":
 		config.Rotatable = true
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = true
 	case "Auto":
 		config.Rotatable = true
-		config.Auto = true
+		config.AutoRotate = true
 		config.Clockwise = false
 		config.AntiClockwise = false
 	default:
 		config.Rotatable = false
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = false
 	}
@@ -816,31 +834,43 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.Speed = 1 * time.Second
 		config.MusicTrigger = false
 		config.NumberSteps = 64
+		config.RotateSensitivity = 10
+		config.GoboChangeSensitivity = 10
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = 64
+		config.RotateSensitivity = 10
+		config.GoboChangeSensitivity = 10
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = 64
+		config.RotateSensitivity = 10
+		config.GoboChangeSensitivity = 10
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = 64
+		config.RotateSensitivity = 10
+		config.GoboChangeSensitivity = 10
 	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
 		config.NumberSteps = 32
+		config.RotateSensitivity = 500
+		config.GoboChangeSensitivity = 10
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
 		config.NumberSteps = 32
+		config.RotateSensitivity = 10
+		config.GoboChangeSensitivity = 10
 	}
 
 	switch action.Strobe {
