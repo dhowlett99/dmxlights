@@ -218,8 +218,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 				if value == "None" || value == "" {
 					hideAllActionFields(o.(*fyne.Container))
-
 					newAction := createBlankAction(ap, i)
+					newAction.Mode = value
 					ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
@@ -227,8 +227,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 				if value == "Off" || value == "" {
 					hideAllActionFields(o.(*fyne.Container))
-
 					newAction := createBlankAction(ap, i)
+					newAction.Mode = value
 					ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
@@ -236,8 +236,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 				if value == "Static" {
 					hideAllActionFields(o.(*fyne.Container))
-
 					newAction := createBlankAction(ap, i)
+					newAction.Mode = value
 					ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState

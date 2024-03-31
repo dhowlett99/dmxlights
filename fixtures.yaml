@@ -1701,28 +1701,40 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+    - name: Rotate Clockwise Slow
+      labe: Rotate Clockwise Slow
       number: 2
-      value: 10-120
+      value: "120"
       selectedvalue: ""
-    - name: "Off"
-      labe: "Off"
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
       number: 3
-      value: 121-131
+      value: "65"
       selectedvalue: ""
-    - name: AntiClockwise Slow to FastNew
-      labe: AntiClockwise Slow to FastNew
+    - name: Rotatae Clockwise Fast
+      labe: Rotatae Clockwise Fast
       number: 4
-      value: 187-196
+      value: "10"
       selectedvalue: ""
-    - name: "Off"
-      labe: "Off"
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
       number: 5
-      value: 246-255
+      value: "135"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Medium
+      labe: Rotate Anti Clockwise Medium
+      number: 6
+      channel: (Select one)
+      value: "190"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
+      number: 7
+      channel: (Select one)
+      value: "245"
       selectedvalue: ""
   - number: 3
-    name: Color
+    name: Gobo
     settings:
     - name: White
       labe: White
@@ -1732,7 +1744,7 @@ fixtures:
     - name: Color1
       labe: Color1
       number: 2
-      value: 8-32
+      value: "8"
       selectedvalue: ""
     - name: Color2
       labe: Color2
@@ -2139,7 +2151,7 @@ fixtures:
   - name: Color1
     number: 2
     label: Color1
-    buttoncolor: Orange
+    buttoncolor: White
     master: 0
     settings:
     - name: Master
@@ -2148,18 +2160,18 @@ fixtures:
       channel: Master
       value: "255"
       selectedvalue: ""
-    - name: Rotate
-      labe: Rotate
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
       number: 2
       channel: Rotate
-      value: "12"
-      selectedvalue: ""
-    - name: Color
-      labe: Color
+      value: "245"
+      selectedvalue: Rotate Anti Clockwise Fast
+    - name: Color1
+      labe: Color1
       number: 3
-      channel: Color
-      value: "10"
-      selectedvalue: ""
+      channel: Gobo
+      value: "0"
+      selectedvalue: Color1
     flash: false
   - name: Color2
     number: 3
@@ -2179,12 +2191,12 @@ fixtures:
       channel: Rotate
       value: "12"
       selectedvalue: ""
-    - name: Color
-      labe: Color
+    - name: Color2
+      labe: Color2
       number: 3
-      channel: Color
-      value: "30"
-      selectedvalue: ""
+      channel: Gobo
+      value: "33"
+      selectedvalue: Color2
     flash: false
   - name: Color3
     number: 4
@@ -2204,12 +2216,62 @@ fixtures:
       channel: Rotate
       value: "12"
       selectedvalue: ""
-    - name: Color
-      labe: Color
+    - name: Color3
+      labe: Color3
       number: 3
-      channel: Color
-      value: "75"
+      channel: Gobo
+      value: "60"
+      selectedvalue: Color3
+    flash: false
+  - name: Color4
+    number: 5
+    label: Color4
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
       selectedvalue: ""
+    - name: Rotatae Clockwise Fast
+      labe: Rotatae Clockwise Fast
+      number: 2
+      channel: Rotate
+      value: "12"
+      selectedvalue: Rotatae Clockwise Fast
+    - name: Color4
+      labe: Color4
+      number: 3
+      channel: Gobo
+      value: "81"
+      selectedvalue: Color4
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 1
+      colors:
+      - Red
+      - Green
+      - Blue
+      map: "On"
+      mode: Chase
+      fade: Normal
+      size: Long
+      speed: Music
+      rotate: Auto
+      rotatespeed: Slow
+      program: ""
+      programspeed: ""
+      strobe: ""
+      gobo: Auto
+      gobospeed: Fast
     flash: false
   use_fixture: deluge
 - id: 34
