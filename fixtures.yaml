@@ -1754,8 +1754,8 @@ fixtures:
       number: 6
       value: 105-127
       selectedvalue: ""
-    - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+    - name: Rotate Clockwise Fast to Slow
+      labe: Rotate Clockwise Fast to Slow
       number: 7
       value: 128-186
       selectedvalue: ""
@@ -1764,8 +1764,8 @@ fixtures:
       number: 8
       value: 187-196
       selectedvalue: ""
-    - name: Antilockwise  Slow to Fast
-      labe: Antilockwise  Slow to Fast
+    - name: Rotate Anti Clockwise  Slow to Fast
+      labe: Rotate Anti Clockwise  Slow to Fast
       number: 9
       value: 197-255
       selectedvalue: ""
@@ -2683,22 +2683,6 @@ fixtures:
     label: "Off"
     buttoncolor: Green
     master: 0
-    actions:
-    - name: "Off"
-      number: 0
-      colors: []
-      map: ""
-      mode: "Off"
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      gobo: ""
-      gobospeed: ""
     settings:
     - name: Rotate
       number: 1
@@ -2831,7 +2815,7 @@ fixtures:
       fade: Soft
       size: Short
       speed: Fast
-      rotate: Anti Clockwise
+      rotate: Rotate Anti Clockwise
       rotatespeed: Slow
       program: ""
       programspeed: ""
@@ -2981,7 +2965,7 @@ fixtures:
       number: 4
       channel: Rotate
       value: "192"
-      selectedvalue: ClockWise
+      selectedvalue: Rotate ClockWise
     - name: New
       labe: New
       number: 5
