@@ -649,13 +649,17 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 					fixtures := position.Fixtures
 
+					var actualMaster int
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 						if cfg.Map {
-							master = fixture.Brightness
+							// Use sound triggered brighness and apply master
+							actualMaster = int((float64(fixture.Brightness) / 100) * (float64(master) / 2.55))
+						} else {
+							actualMaster = master
 						}
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
 					rotateCounter++
