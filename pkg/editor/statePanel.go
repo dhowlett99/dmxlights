@@ -221,9 +221,10 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
-		// Restore any changed state settings.
+		// Restore any changed state settings and actions.
 		for stateNumber := range thisFixture.States {
 			thisFixture.States[stateNumber].Settings = append(thisFixture.States[stateNumber].Settings[:0:0], savedStates[stateNumber].Settings...)
+			thisFixture.States[stateNumber].Actions = append(thisFixture.States[stateNumber].Actions[:0:0], savedStates[stateNumber].Actions...)
 		}
 		modal.Hide()
 	})
