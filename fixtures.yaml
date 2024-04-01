@@ -2262,7 +2262,7 @@ fixtures:
       - Blue
       map: On
       mode: Chase
-      fade: Normal
+      fade: Soft
       size: Long
       speed: Music
       rotate: Auto
