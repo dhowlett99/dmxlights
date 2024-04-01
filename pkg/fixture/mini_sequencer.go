@@ -33,6 +33,25 @@ import (
 
 const debug_mini bool = false
 
+const FADE_SHARP int = 10
+const FADE_NORMAL int = 5
+const FADE_SOFT int = 1
+
+const SIZE_OFF int = 0
+const SIZE_SHORT int = 1
+const SIZE_MEDIUM int = 3
+const SIZE_LONG int = 10
+
+const SENSITIVITY_LONG int = 500
+const SENSITIVITY_SHORT int = 10
+
+const LARGE_NUMBER_STEPS int = 64
+const MEDIUM_NUMBER_STEPS int = 32
+
+const STROBE_SPEED_FAST int = 255
+const STROBE_SPEED_MEDIUM int = 127
+const STROBE_SPEED_SLOW int = 0
+
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a single fixture to allow simple effects.
 // The miniSequenceer implements the actions attaced to a switch state.
 // Currently we support 1. Off 2. Control, ability to set programs 3. Static colors 4. Chase. soft, hard and timed or music triggered.
@@ -781,31 +800,31 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	// Fade - Time taken to fade up and down.
 	switch action.Fade {
 	case "":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	case "Off":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	case "Soft":
-		config.Fade = 1 // Soft
+		config.Fade = FADE_SOFT
 	case "Normal":
-		config.Fade = 5 // Normal
+		config.Fade = FADE_NORMAL
 	case "Sharp":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	default:
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	}
 
 	// Size - How long does the lamp stay on.
 	switch action.Size {
 	case "Off":
-		config.Size = 0
+		config.Size = SIZE_OFF
 	case "Short":
-		config.Size = 1
+		config.Size = SIZE_SHORT
 	case "Medium":
-		config.Size = 3
+		config.Size = SIZE_MEDIUM
 	case "Long":
-		config.Size = 10
+		config.Size = SIZE_LONG
 	default:
-		config.Size = 3
+		config.Size = SIZE_MEDIUM
 	}
 
 	switch action.Rotate {
@@ -841,59 +860,59 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
 		config.MusicTrigger = false
-		config.NumberSteps = 64
-		config.RotateSensitivity = 10
-		config.GoboChangeSensitivity = 10
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
+		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
-		config.RotateSensitivity = 10
-		config.GoboChangeSensitivity = 10
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
+		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
-		config.RotateSensitivity = 10
-		config.GoboChangeSensitivity = 10
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
+		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
-		config.RotateSensitivity = 10
-		config.GoboChangeSensitivity = 10
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
+		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
-		config.NumberSteps = 32
-		config.RotateSensitivity = 500
-		config.GoboChangeSensitivity = 500
+		config.NumberSteps = MEDIUM_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_LONG
+		config.GoboChangeSensitivity = SENSITIVITY_LONG
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
-		config.NumberSteps = 32
-		config.RotateSensitivity = 10
-		config.GoboChangeSensitivity = 10
+		config.NumberSteps = MEDIUM_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
+		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	}
 
 	switch action.Strobe {
 	case "Off":
 		config.Strobe = false
-		config.StrobeSpeed = 0
+		config.StrobeSpeed = STROBE_SPEED_SLOW
 	case "Slow":
 		config.Strobe = true
-		config.StrobeSpeed = 0
+		config.StrobeSpeed = STROBE_SPEED_SLOW
 	case "Medium":
 		config.Strobe = true
-		config.StrobeSpeed = 127
+		config.StrobeSpeed = STROBE_SPEED_MEDIUM
 	case "Fast":
 		config.Strobe = true
-		config.StrobeSpeed = 255
+		config.StrobeSpeed = STROBE_SPEED_FAST
 	default:
 		config.Strobe = false
 		config.StrobeSpeed = 0
