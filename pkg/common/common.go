@@ -1455,15 +1455,14 @@ func GetFadeValues(noCoordinates int, size float64, fade int, reverse bool) (out
 	return out
 }
 
-func GetFadeOnValues(size int, fade int) []int {
+func GetFadeOnValues(brightness int, fadeOnTime int) []int {
 
 	out := []int{}
 
 	var x int
 
-	for x = 0; x < fade; x++ {
-		x := size
-		out = append(out, x)
+	for x = 0; x < fadeOnTime; x++ {
+		out = append(out, brightness)
 	}
 
 	return out

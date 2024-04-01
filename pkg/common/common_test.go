@@ -225,8 +225,8 @@ func Test_getFadeValues(t *testing.T) {
 
 func Test_getFadeOnValues(t *testing.T) {
 	type args struct {
-		size int
-		fade int
+		brightness int
+		fade       int
 	}
 	tests := []struct {
 		name string
@@ -236,15 +236,15 @@ func Test_getFadeOnValues(t *testing.T) {
 		{
 			name: "10 slots on at 255",
 			args: args{
-				size: 255,
-				fade: 10,
+				brightness: 255,
+				fade:       10,
 			},
 			want: []int{255, 255, 255, 255, 255, 255, 255, 255, 255, 255},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetFadeOnValues(tt.args.size, tt.args.fade); !reflect.DeepEqual(got, tt.want) {
+			if got := GetFadeOnValues(tt.args.brightness, tt.args.fade); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("got %+v", got)
 				t.Errorf("want %+v", tt.want)
 			}

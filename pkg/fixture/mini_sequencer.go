@@ -526,6 +526,10 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			if err != nil {
 				fmt.Printf("Fixture %s clockwise rotate speed: %s\n", fixture.Name, err)
 			}
+			if debug {
+				fmt.Printf("clockwiseSpeed %d\n", clockwiseSpeed)
+				fmt.Printf("antiClockwiseSpeed %d\n", antiClockwiseSpeed)
+			}
 		}
 
 		go func() {
@@ -867,7 +871,7 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.MusicTrigger = true
 		config.NumberSteps = 32
 		config.RotateSensitivity = 500
-		config.GoboChangeSensitivity = 10
+		config.GoboChangeSensitivity = 500
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
