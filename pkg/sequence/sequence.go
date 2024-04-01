@@ -197,8 +197,8 @@ func CreateSequence(
 		GuiFixtureLabels:       fixtureLabels,
 	}
 
+	// Load the switch information in from the fixtures config.
 	if sequenceType == "switch" {
-		// Load the switch information in from the fixtures.yaml file.
 		sequence.Switches = commands.LoadSwitchConfiguration(mySequenceNumber, fixturesConfig)
 		sequence.PlaySwitchOnce = true
 	}
