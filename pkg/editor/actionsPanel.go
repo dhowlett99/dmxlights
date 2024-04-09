@@ -202,7 +202,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					widget.NewSelect(ap.ActionGoboOptions, func(value string) {}),
 				),
 				container.NewHBox(
-					widget.NewLabel("Gobo Speed"),
+					widget.NewLabel("Gobo Change"),
 					widget.NewSelect(ap.ActionGoboSpeedOptions, func(value string) {}),
 				),
 			)
