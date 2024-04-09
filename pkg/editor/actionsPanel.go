@@ -304,8 +304,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
 
-					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
-					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
+					if o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
+						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					} else {
+						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					}
 				}
 
 				if value == "Control" {
@@ -436,6 +441,15 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 			// Gobo
 			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Gobo)
 			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+
+				if value == "Auto" {
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+				} else {
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
+
 				newAction := createCopyOfAction(ap, i)
 				newAction.Gobo = value
 				ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
