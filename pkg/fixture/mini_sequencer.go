@@ -43,6 +43,7 @@ const SIZE_MEDIUM int = 3
 const SIZE_LONG int = 10
 
 const SENSITIVITY_LONG int = 500
+const SENSITIVITY_MEDIUM int = 100
 const SENSITIVITY_SHORT int = 10
 
 const LARGE_NUMBER_STEPS int = 64
@@ -636,7 +637,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						if goboCounter >= len(cfg.GoboOptions) {
 							goboCounter = 0
 						}
-						if goboChangeFrequency > cfg.GoboChangeSensitivity {
+						if goboChangeFrequency > cfg.GoboSpeed {
 							goboChangeFrequency = 0
 							goboCounter++
 						}
@@ -740,11 +741,11 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 		switch action.GoboSpeed {
 		case "Slow":
-			config.GoboSpeed = 10
+			config.GoboSpeed = SENSITIVITY_LONG
 		case "Medium":
-			config.GoboSpeed = 100
+			config.GoboSpeed = SENSITIVITY_MEDIUM
 		case "Fast":
-			config.GoboSpeed = 200
+			config.GoboSpeed = SENSITIVITY_SHORT
 		default:
 			config.GoboSpeed = 0
 		}
@@ -862,42 +863,36 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
-		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
-		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
-		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
-		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
 		config.NumberSteps = MEDIUM_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_LONG
-		config.GoboChangeSensitivity = SENSITIVITY_LONG
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
 		config.NumberSteps = MEDIUM_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
-		config.GoboChangeSensitivity = SENSITIVITY_SHORT
 	}
 
 	switch action.Strobe {
