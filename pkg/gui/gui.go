@@ -22,6 +22,7 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
@@ -30,6 +31,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
@@ -463,8 +465,8 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures) *widget.Toolbar {
 
 	toolbar := widget.NewToolbar(
-		widget.NewToolbarAction(theme.FileIcon(), func() {
-			dialog.ShowFileOpen(func(reader fyne.URIReadCloser, err error) {
+		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
+			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 				if err == nil && reader != nil {
 					fixturesConfig, err = fixture.LoadFixturesReader(reader)
 					if err != nil {
@@ -472,7 +474,22 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 					}
 				}
 			}, myWindow)
+			pwd, _ := os.Getwd()
+			currentmfolder, _ := filepath.Abs(pwd)
+			if currentmfolder != "" {
+				mfileURI := storage.NewFileURI(currentmfolder)
+				mfileLister, _ := storage.ListerForURI(mfileURI)
+
+				fileOpener.SetLocation(mfileLister)
+				fileOpener.SetFilter(&storage.ExtensionFileFilter{
+					Extensions: []string{
+						".yaml",
+					},
+				})
+			}
+			fileOpener.Show()
 		}),
+
 		widget.NewToolbarAction(theme.FileIcon(), func() {
 			dialog.ShowFileSave(func(writer fyne.URIWriteCloser, err error) {
 				if err == nil && writer != nil {
