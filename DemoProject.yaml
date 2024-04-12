@@ -1,0 +1,88 @@
+fixtures:
+- id: 1
+  name: FOH PAR 1
+  label: PAR1
+  number: 1
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 1
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: ColorMacros
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: Slow
+      number: 2
+      value: "16"
+  - number: 6
+    name: Programs
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 2
+  name: FOH PAR 2
+  label: PAR2
+  number: 2
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 8
+  channels:
+  - number: 1
+    name: Red2
+  - number: 2
+    name: Green2
+  - number: 3
+    name: Blue2
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 3
+  name: FOH PAR 3
+  label: PAR3
+  number: 3
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 15
+  channels:
+  - number: 1
+    name: Red3
+  - number: 2
+    name: Green3
+  - number: 3
+    name: Blue3
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
