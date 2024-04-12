@@ -805,7 +805,50 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				return sequence
 			}
 		}
+
+	case common.UpdateFixturesConfig:
+		//if debug {
+		fmt.Printf("%d: Command Update Fixure Config\n", mySequenceNumber)
+		///}
+		const FIXTURES_CONFIG = 0
+		fixturesConfig = command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures)
+		for _, fixture := range fixturesConfig.Fixtures {
+			fmt.Printf("Fixture %s\n", fixture.Name)
+		}
+
+		// Find the fixtures.
+		sequence.ScannersAvailable = SetAvalableFixtures(fixturesConfig)
+
+		// Find the number of fixtures for this sequence.
+		if sequence.Label == "chaser" {
+			scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
+			sequence.NumberFixtures = GetNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
+		} else {
+			sequence.NumberFixtures = GetNumberOfFixtures(mySequenceNumber, fixturesConfig)
+		}
+
+		// Setup fixtures labels.
+		sequence.GuiFixtureLabels = []string{}
+		for _, fixture := range fixturesConfig.Fixtures {
+			if fixture.Type == "scanner" {
+				sequence.GuiFixtureLabels = append(sequence.GuiFixtureLabels, fixture.Label)
+			}
+		}
+
+		// Enable all the defined fixtures.
+		for x := 0; x < sequence.NumberFixtures; x++ {
+			newScanner := common.FixtureState{}
+			newScanner.Enabled = true
+			newScanner.RGBInverted = false
+			newScanner.ScannerPatternReversed = false
+			sequence.FixtureState[x] = newScanner
+			// Set the first gobo for every fixture.
+			sequence.ScannerGobo[x] = 1
+		}
+
+		return sequence
 	}
+
 	return sequence
 }
 
@@ -961,4 +1004,61 @@ func getSize(size int) int {
 		return 85
 	}
 	return 0
+}
+
+func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
+
+	// You need to select a fixture before you can choose a color or gobo.
+	// availableFixtures holds a set of red buttons, one for every available fixture.
+	availableFixtures := []common.StaticColorButton{}
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
+			newFixture := common.StaticColorButton{}
+			newFixture.Name = fixture.Name
+			newFixture.Label = fixture.Label
+			newFixture.Number = fixture.Number
+			newFixture.SelectedColor = 1 // Red
+			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			availableFixtures = append(availableFixtures, newFixture)
+		}
+	}
+
+	return availableFixtures
+}
+
+func GetNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
+
+	if debug {
+		fmt.Printf("getNumberOfFixturesn for sequence %d\n", sequenceNumber)
+	}
+
+	var numberFixtures int
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group-1 == sequenceNumber {
+			// config has use_channels set.
+			if fixture.MultiFixtureDevice {
+				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
+				// we always return the max channels in a sequence, currently 8
+				return common.MAX_NUMBER_OF_CHANNELS
+			} else {
+				// Examine the channels and count number of color channels.
+				// We use Red for the count.
+				var subFixture int
+				if subFixture > 1 {
+					numberFixtures = numberFixtures + subFixture
+				} else {
+					if fixture.Number > numberFixtures {
+						numberFixtures++
+					}
+				}
+			}
+		}
+	}
+
+	if debug {
+		fmt.Printf("numberFixtures found %d\n", numberFixtures)
+	}
+	return numberFixtures
 }

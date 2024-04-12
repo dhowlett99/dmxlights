@@ -483,7 +483,7 @@ func PopupErrorMessage(myWindow fyne.Window, errorMessage string) {
 
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight,
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
 	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures) *widget.Toolbar {
 
 	toolbar := widget.NewToolbar(
@@ -499,6 +499,14 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 						return
 					} else {
 						myWindow.SetTitle("DMX Lights - Project Name :" + filename)
+						// Update the fixtures config in all the sequences.
+						cmd := common.Command{
+							Action: common.UpdateFixturesConfig,
+							Args: []common.Arg{
+								{Name: "FixturesConfig", Value: fixturesConfig},
+							},
+						}
+						common.SendCommandToAllSequence(cmd, commandChannels)
 					}
 				}
 			}, myWindow)
