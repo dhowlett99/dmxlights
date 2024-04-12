@@ -1,0 +1,2557 @@
+fixtures:
+- id: 1
+  name: FOH PAR 1
+  label: PAR1
+  number: 1
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 1
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: ColorMacros
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: Slow
+      number: 2
+      value: "16"
+  - number: 6
+    name: Programs
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 2
+  name: FOH PAR 2
+  label: PAR2
+  number: 2
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 8
+  channels:
+  - number: 1
+    name: Red2
+  - number: 2
+    name: Green2
+  - number: 3
+    name: Blue2
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 3
+  name: FOH PAR 3
+  label: PAR3
+  number: 3
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 15
+  channels:
+  - number: 1
+    name: Red3
+  - number: 2
+    name: Green3
+  - number: 3
+    name: Blue3
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 4
+  name: FOH PAR 4
+  label: PAR4
+  number: 4
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 22
+  channels:
+  - number: 1
+    name: Red4
+  - number: 2
+    name: Green4
+  - number: 3
+    name: Blue4
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 5
+  name: FOH PAR 5
+  label: PAR5
+  number: 5
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 29
+  channels:
+  - number: 1
+    name: Red5
+  - number: 2
+    name: Green5
+  - number: 3
+    name: Blue5
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 6
+  name: FOH PAR 6
+  label: PAR6
+  number: 6
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 36
+  channels:
+  - number: 1
+    name: Red6
+  - number: 2
+    name: Green6
+  - number: 3
+    name: Blue6
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 7
+  name: FOH PAR 7
+  label: PAR7
+  number: 7
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 43
+  channels:
+  - number: 1
+    name: Red7
+  - number: 2
+    name: Green7
+  - number: 3
+    name: Blue7
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 8
+  name: FOH PAR 8
+  label: PAR8
+  number: 8
+  description: Chauvet Slimpar 56 7 channel mode.
+  type: rgb
+  group: 1
+  address: 50
+  channels:
+  - number: 1
+    name: Red8
+  - number: 2
+    name: Green8
+  - number: 3
+    name: Blue8
+  - number: 4
+    name: Static
+    comment: Color Macros
+  - number: 5
+    name: Strobe
+    value: 16
+    comment: Strobe 016 to 25 / Auto Speed / Sound Sensitivity
+  - number: 6
+    name: Static
+    comment: Automatic Programs/ Sound-Active Mode
+  - number: 7
+    name: Dimmer
+- id: 9
+  name: FOH XBRICK 1
+  label: XBRICK1
+  number: 1
+  description: Stairville Xbrick
+  type: rgb
+  group: 1
+  address: 100
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Red2
+  - number: 5
+    name: Green2
+  - number: 6
+    name: Blue2
+  - number: 7
+    name: Red3
+  - number: 8
+    name: Green3
+  - number: 9
+    name: Blue3
+  - number: 10
+    name: Red4
+  - number: 11
+    name: Green4
+  - number: 12
+    name: Blue4
+  - number: 13
+    name: Master
+- id: 10
+  name: FOH XBRICK 2
+  label: XBRICK2
+  number: 1
+  description: Stairville Xbrick
+  type: rgb
+  group: 1
+  address: 114
+  channels:
+  - number: 1
+    name: Red5
+  - number: 2
+    name: Green5
+  - number: 3
+    name: Blue5
+  - number: 4
+    name: Red6
+  - number: 5
+    name: Green6
+  - number: 6
+    name: Blue6
+  - number: 7
+    name: Red7
+  - number: 8
+    name: Green7
+  - number: 9
+    name: Blue7
+  - number: 10
+    name: Red8
+  - number: 11
+    name: Green8
+  - number: 12
+    name: Blue8
+  - number: 13
+    name: Master
+- id: 11
+  name: Uplighter1
+  label: RAIL1
+  number: 1
+  description: Chauvet Color Rail IRC
+  type: rgb
+  group: 2
+  address: 200
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: Red2
+  - number: 6
+    name: Green2
+  - number: 7
+    name: Blue2
+  - number: 8
+    name: Red3
+  - number: 9
+    name: Green3
+  - number: 10
+    name: Blue3
+  - number: 11
+    name: Red4
+  - number: 12
+    name: Green4
+  - number: 13
+    name: Blue4
+  - number: 14
+    name: Red5
+  - number: 15
+    name: Green5
+  - number: 16
+    name: Blue5
+  - number: 17
+    name: Red6
+  - number: 18
+    name: Green6
+  - number: 19
+    name: Blue6
+  - number: 20
+    name: Red7
+  - number: 21
+    name: Green7
+  - number: 22
+    name: Blue7
+  - number: 23
+    name: Red8
+  - number: 24
+    name: Green8
+  - number: 25
+    name: Blue8
+  - number: 26
+    name: Strobe
+- id: 12
+  name: Uplighter2
+  label: RAIL2
+  number: 2
+  description: Chauvet Color Rail IRC
+  type: rgb
+  group: 2
+  address: 227
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: Red2
+  - number: 6
+    name: Green2
+  - number: 7
+    name: Blue2
+  - number: 8
+    name: Red3
+  - number: 9
+    name: Green3
+  - number: 10
+    name: Blue3
+  - number: 11
+    name: Red4
+  - number: 12
+    name: Green4
+  - number: 13
+    name: Blue4
+  - number: 14
+    name: Red5
+  - number: 15
+    name: Green5
+  - number: 16
+    name: Blue5
+  - number: 17
+    name: Red6
+  - number: 18
+    name: Green6
+  - number: 19
+    name: Blue6
+  - number: 20
+    name: Red7
+  - number: 21
+    name: Green7
+  - number: 22
+    name: Blue7
+  - number: 23
+    name: Red8
+  - number: 24
+    name: Green8
+  - number: 25
+    name: Blue8
+  - number: 26
+    name: Strobe
+- id: 13
+  name: Uplighter3
+  label: RAIL3
+  number: 3
+  description: Chauvet Color Rail IRC
+  type: rgb
+  group: 2
+  address: 253
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: Red2
+  - number: 6
+    name: Green2
+  - number: 7
+    name: Blue2
+  - number: 8
+    name: Red3
+  - number: 9
+    name: Green3
+  - number: 10
+    name: Blue3
+  - number: 11
+    name: Red4
+  - number: 12
+    name: Green4
+  - number: 13
+    name: Blue4
+  - number: 14
+    name: Red5
+  - number: 15
+    name: Green5
+  - number: 16
+    name: Blue5
+  - number: 17
+    name: Red6
+  - number: 18
+    name: Green6
+  - number: 19
+    name: Blue6
+  - number: 20
+    name: Red7
+  - number: 21
+    name: Green7
+  - number: 22
+    name: Blue7
+  - number: 23
+    name: Red8
+  - number: 24
+    name: Green8
+  - number: 25
+    name: Blue8
+  - number: 26
+    name: Strobe
+- id: 14
+  name: Uplighter4
+  label: RAIL4
+  number: 4
+  description: Fluxia DLB100
+  type: rgb
+  group: 2
+  address: 280
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Red2
+  - number: 5
+    name: Green2
+  - number: 6
+    name: Blue2
+  - number: 7
+    name: Red3
+  - number: 8
+    name: Green3
+  - number: 9
+    name: Blue3
+  - number: 10
+    name: Red4
+  - number: 11
+    name: Green4
+  - number: 12
+    name: Blue4
+  - number: 13
+    name: Red5
+  - number: 14
+    name: Green5
+  - number: 15
+    name: Blue5
+  - number: 16
+    name: Red6
+  - number: 17
+    name: Green6
+  - number: 18
+    name: Blue6
+  - number: 19
+    name: Red7
+  - number: 20
+    name: Green7
+  - number: 21
+    name: Blue7
+  - number: 22
+    name: Red8
+  - number: 23
+    name: Green8
+  - number: 24
+    name: Blue8
+- id: 15
+  name: Scanner 1
+  label: ADJ.Com.Scan1
+  number: 1
+  description: American DJ Comscan LED
+  type: scanner
+  group: 3
+  address: 400
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: "255"
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
+    name: Master
+- id: 16
+  name: Scanner 2
+  label: ADJ.Com.Scan2
+  number: 2
+  description: American DJ Comscan LED
+  type: scanner
+  group: 3
+  address: 405
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: "255"
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
+    name: Master
+- id: 17
+  name: Scanner 3
+  label: ADJ.Com.Scan3
+  number: 3
+  description: American DJ Comscan LED
+  type: scanner
+  group: 3
+  address: 410
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: "255"
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: MultiColor Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
+    name: Master
+- id: 18
+  name: Scanner 4
+  label: ADJ.Com.Scan4
+  number: 4
+  description: American DJ Comscan LED
+  type: scanner
+  group: 3
+  address: 415
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: "255"
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
+    name: Master
+- id: 19
+  name: Scanner 5
+  label: ADJ.Com.Scan5
+  number: 5
+  description: American DJ Comscan LED
+  type: scanner
+  group: 3
+  address: 420
+  channels:
+  - number: 1
+    name: Pan
+  - number: 2
+    name: Tilt
+  - number: 3
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: "255"
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 4
+    name: Gobo
+    settings:
+    - name: White Circle
+      number: 1
+      value: "0"
+    - name: Yellow Cluster
+      number: 2
+      value: "8"
+    - name: Red Swirl
+      number: 3
+      value: "15"
+    - name: Green Strips
+      number: 4
+      value: "22"
+    - name: Blue Star
+      number: 5
+      value: "29"
+    - name: Multi Color Coma
+      number: 6
+      value: "36"
+    - name: Purple Bub
+      number: 7
+      value: "43"
+    - name: Cyan World
+      number: 8
+      value: "50"
+    - name: Blue Circle
+      number: 9
+      value: "57"
+  - number: 5
+    name: Master
+- id: 20
+  name: Scanner 6
+  label: ADJ.Inno.Spot1
+  number: 6
+  description: American DJ Inno Pocket Spot
+  type: scanner
+  group: 3
+  address: 425
+  channels:
+  - number: 1
+    name: Pan
+    maxdegrees: 540
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "540"
+  - number: 2
+    name: FinePan
+  - number: 3
+    name: Tilt
+    maxdegrees: 230
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "230"
+  - number: 4
+    name: FineTilt
+  - number: 5
+    name: Color
+    settings:
+    - name: White
+      number: 1
+      value: "0"
+    - name: Red
+      number: 2
+      value: "8"
+    - name: Orange
+      number: 3
+      value: "15"
+    - name: Yellow
+      number: 4
+      value: "22"
+    - name: Green
+      number: 5
+      value: "29"
+    - name: Blue
+      number: 6
+      value: "36"
+    - name: Light Blue
+      number: 7
+      value: "43"
+    - name: Pink
+      number: 8
+      value: "50"
+  - number: 6
+    name: Gobo
+    settings:
+    - name: Open
+      number: 1
+      value: "0"
+    - name: Gobo 1
+      number: 2
+      value: "8"
+    - name: Gobo 2
+      number: 3
+      value: "16"
+    - name: Gobo 3
+      number: 4
+      value: "24"
+    - name: Gobo 4
+      number: 5
+      value: "32"
+    - name: Gobo 5
+      number: 6
+      value: "40"
+    - name: Gobo 6
+      number: 7
+      value: "48"
+    - name: Gobo 7
+      number: 8
+      value: "56"
+  - number: 7
+    name: Shutter
+    settings:
+    - name: Open
+      number: 0
+      value: "255"
+    - name: Closed
+      number: 0
+      value: "0"
+    - name: Strobe
+      number: 0
+      value: 16-131
+  - number: 8
+    name: Master
+  - number: 9
+    name: Speed
+    settings:
+    - name: Fast
+      number: 1
+      value: "255"
+  - number: 10
+    name: SoundActive
+    settings:
+    - name: "Off"
+      number: 1
+      value: "1"
+  - number: 11
+    name: DimmerCurve
+    settings:
+    - name: DefaultCurve
+      number: 1
+      value: "255"
+- id: 21
+  name: Scanner 7
+  label: ADJ.Inno.Spot2
+  number: 7
+  description: American DJ Inno Pocket Spot
+  type: scanner
+  group: 3
+  address: 440
+  channels:
+  - number: 1
+    name: Pan
+    maxdegrees: 540
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "540"
+  - number: 2
+    name: FinePan
+  - number: 3
+    name: Tilt
+    maxdegrees: 230
+    settings:
+    - name: MaxDegrees
+      labe: MaxDegrees
+      number: 1
+      value: "230"
+  - number: 4
+    name: FineTilt
+  - number: 5
+    name: Color
+    settings:
+    - name: White
+      number: 1
+      value: "0"
+    - name: Red
+      number: 2
+      value: "8"
+    - name: Orange
+      number: 3
+      value: "15"
+    - name: Yellow
+      number: 4
+      value: "22"
+    - name: Green
+      number: 5
+      value: "29"
+    - name: Blue
+      number: 6
+      value: "36"
+    - name: Light Blue
+      number: 7
+      value: "43"
+    - name: Pink
+      number: 8
+      value: "50"
+  - number: 6
+    name: Gobo
+    settings:
+    - name: Open
+      number: 1
+      value: "0"
+    - name: Gobo 1
+      number: 2
+      value: "8"
+    - name: Gobo 2
+      number: 3
+      value: "16"
+    - name: Gobo 3
+      number: 4
+      value: "24"
+    - name: Gobo 4
+      number: 5
+      value: "32"
+    - name: Gobo 5
+      number: 6
+      value: "40"
+    - name: Gobo 6
+      number: 7
+      value: "48"
+    - name: Gobo 7
+      number: 8
+      value: "56"
+  - number: 7
+    name: Shutter
+    settings:
+    - name: Open
+      number: 1
+      value: 248-255
+    - name: Closed
+      number: 2
+      value: "0"
+    - name: Strobe
+      number: 3
+      value: 16-131
+  - number: 8
+    name: Master
+  - number: 9
+    name: Speed
+    settings:
+    - name: Fast
+      number: 1
+      value: "255"
+  - number: 10
+    name: SoundActive
+    settings:
+    - name: "Off"
+      number: 1
+      value: "1"
+  - number: 11
+    name: DimmerCurves
+    settings:
+    - name: Default Curve
+      number: 1
+      value: "255"
+- id: 22
+  name: ADJ QA PAR 38
+  label: par38
+  number: 1
+  description: American DJ SPOT
+  type: rgb
+  group: 101
+  address: 150
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Static
+  - number: 5
+    name: Master
+  - number: 6
+    name: Program
+    settings:
+    - name: Strobe Off
+      labe: New
+      number: 1
+      value: 0-15
+    - name: Strobe
+      number: 2
+      value: 16-255
+    - name: Program Speed
+      number: 3
+      value: 0-255
+    - name: Sound Off
+      number: 4
+      value: 0-31
+    - name: Sound Sensitivity
+      number: 5
+      value: 205-255
+  - number: 7
+    name: Static
+    settings:
+    - name: Dimmer Mode
+      labe: New
+      number: 1
+      value: "0"
+    - name: Color Macro Mode
+      number: 2
+      value: "52"
+    - name: Color Change Mode
+      number: 3
+      value: "103"
+    - name: Color Fade Mode
+      number: 4
+      value: "154"
+    - name: Sound Active Mode
+      number: 5
+      value: "205"
+  - number: 8
+    name: Color
+    settings:
+    - name: Color Macros
+      labe: New
+      number: 1
+      value: 1-255
+    - name: Color Change 1
+      number: 2
+      value: "0"
+    - name: Color Change 2
+      number: 3
+      value: "16"
+    - name: Color Change 3
+      number: 4
+      value: "32"
+    - name: Color Change 4
+      number: 5
+      value: "48"
+- id: 23
+  name: ADJ Dekker1
+  label: dekker1
+  number: 1
+  description: American DJ Dekker LED Derby
+  type: rgb
+  group: 102
+  address: 320
+  channels:
+  - number: 1
+    name: Rotate
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: Rotate Clockwise Slow
+      number: 1
+      value: "1"
+    - name: Rotate Clockwise Medium
+      number: 2
+      value: "63"
+    - name: Rotate Clockwise Fast
+      number: 3
+      value: "127"
+    - name: Rotate Anti Clockwise Slow
+      number: 4
+      value: "255"
+    - name: Rotate Anti Clockwise Medium
+      number: 4
+      value: "191"
+    - name: Rotate Anti Clockwise Fast
+      number: 5
+      value: "128"
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White1
+  - number: 6
+    name: Master
+  - number: 7
+    name: Program
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: 4 Color Loop Change
+      number: 2
+      value: "1"
+    - name: 9 Color Fade Change
+      number: 3
+      value: "27"
+    - name: 4 Color Loop Change
+      number: 4
+      value: "52"
+    - name: 9 Color Fade Change
+      number: 5
+      value: "77"
+    - name: Strobe 1 Dim - Bright
+      number: 6
+      value: "102"
+    - name: Strobe 2 Bright - Dim
+      number: 7
+      value: "127"
+    - name: Strobe 3 Dim - Bright - Dim
+      number: 8
+      value: "152"
+    - name: Strobe 4 W/O Dim Effect
+      number: 9
+      value: "177"
+    - name: Strobe 5 with 9 Color
+      number: 10
+      value: "202"
+    - name: Strobe 6 with Gradual Dim
+      number: 11
+      value: "227"
+    - name: All Programs will Cycle
+      number: 12
+      value: "255"
+  - number: 8
+    name: ProgramSpeed
+    settings:
+    - name: Slow
+      number: 1
+      value: "1"
+    - name: Fast
+      number: 2
+      value: "254"
+    - name: Sound Active
+      number: 3
+      value: "255"
+- id: 24
+  name: ADJ Dekker2
+  label: dekker2
+  number: 1
+  description: American DJ Dekker LED Derby
+  type: rgb
+  group: 103
+  address: 330
+  channels:
+  - number: 1
+    name: Rotate
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: Rotate Clockwise Slow
+      number: 1
+      value: "1"
+    - name: Rotate Clockwise Medium
+      number: 2
+      value: "63"
+    - name: Rotate Clockwise Fast
+      number: 3
+      value: "127"
+    - name: Rotate Anti Clockwise Slow
+      number: 4
+      value: "255"
+    - name: Rotate Anti Clockwise Medium
+      number: 4
+      value: "191"
+    - name: Rotate Anti Clockwise Fast
+      number: 5
+      value: "128"
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: White1
+  - number: 6
+    name: Master
+  - number: 7
+    name: Program
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: 4 Color Loop Change
+      number: 2
+      value: "1"
+    - name: 9 Color Fade Change
+      number: 3
+      value: "27"
+    - name: 4 Color Loop Change
+      number: 4
+      value: "52"
+    - name: 9 Color Fade Change
+      number: 5
+      value: "77"
+    - name: Strobe 1 Dim - Bright
+      number: 6
+      value: "102"
+    - name: Strobe 2 Bright - Dim
+      number: 7
+      value: "127"
+    - name: Strobe 3 Dim - Bright - Dim
+      number: 8
+      value: "152"
+    - name: Strobe 4 W/O Dim Effect
+      number: 9
+      value: "177"
+    - name: Strobe 5 with 9 Color
+      number: 10
+      value: "202"
+    - name: Strobe 6 with Gradual Dim
+      number: 11
+      value: "227"
+    - name: All Programs will Cycle
+      number: 12
+      value: "255"
+  - number: 8
+    name: ProgramSpeed
+    settings:
+    - name: Slow
+      number: 1
+      value: "1"
+    - name: Fast
+      number: 2
+      value: "254"
+    - name: Sound Active
+      number: 3
+      value: "255"
+- id: 25
+  name: Oil
+  label: Oil1
+  number: 1
+  description: Oil
+  type: projector
+  group: 104
+  address: 69
+  channels:
+  - number: 1
+    name: Program
+    settings:
+    - name: "Off"
+      number: 1
+      value: "0"
+    - name: "On"
+      number: 2
+      value: "255"
+- id: 26
+  name: Vue1.1
+  label: vue
+  number: 1
+  description: Chauvet Vue 1.1
+  type: rgb
+  group: 105
+  address: 139
+  channels:
+  - number: 1
+    name: Program
+    settings:
+    - name: RGB Mode
+      labe: New
+      number: 1
+      value: 0-24
+    - name: Mode1
+      number: 2
+      value: 25-49
+    - name: Mode2
+      number: 3
+      value: 50-74
+    - name: Mode3
+      number: 4
+      value: 75-99
+    - name: Mode4
+      number: 5
+      value: 100-124
+    - name: Mode5
+      number: 6
+      value: 125-149
+    - name: Mode6
+      number: 7
+      value: 150-174
+    - name: Mode7
+      number: 8
+      value: 175-199
+    - name: Mode8
+      number: 9
+      value: 200-224
+    - name: Mode9
+      number: 10
+      value: 225-249
+    - name: Mode10
+      number: 11
+      value: Sound
+  - number: 2
+    name: Red1
+  - number: 3
+    name: Green1
+  - number: 4
+    name: Blue1
+  - number: 5
+    name: Speed
+  - number: 6
+    name: Master Reverse
+- id: 27
+  name: ADJ MegaBar
+  label: megabar
+  number: 1
+  description: ADJ MegaBar
+  type: rgb
+  group: 107
+  address: 90
+  channels:
+  - number: 1
+    name: Red1
+  - number: 2
+    name: Green1
+  - number: 3
+    name: Blue1
+  - number: 4
+    name: Macro
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      value: "0"
+  - number: 5
+    name: Strobe
+  - number: 6
+    name: Program
+    settings:
+    - name: New
+      number: 1
+      value: 0-15
+    - name: Strobe
+      labe: Strobe
+      number: 2
+      value: 16-255
+  - number: 7
+    name: Master
+- id: 28
+  name: Deluge
+  label: deluge
+  number: 1
+  description: Acme Deluge
+  type: projector
+  group: 109
+  address: 145
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Rotate
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      value: "0"
+    - name: Clockwise Fast to Slow
+      labe: Clockwise Fast to Slow
+      number: 2
+      value: 10-120
+    - name: "Off"
+      labe: "Off"
+      number: 3
+      value: 121-131
+    - name: AntiClockwise Slow to FastNew
+      labe: AntiClockwise Slow to FastNew
+      number: 4
+      value: 187-196
+    - name: "Off"
+      labe: "Off"
+      number: 5
+      value: 246-255
+  - number: 3
+    name: Color
+    settings:
+    - name: White
+      labe: White
+      number: 1
+      value: 0-7
+    - name: Color1
+      labe: Color1
+      number: 2
+      value: 8-32
+    - name: Color2
+      labe: Color2
+      number: 3
+      value: 33-56
+    - name: Color3
+      labe: Color3
+      number: 4
+      value: 57-80
+    - name: Color4
+      labe: Color4
+      number: 5
+      value: 81-104
+    - name: Color5
+      labe: Color5
+      number: 6
+      value: 105-127
+    - name: Clockwise Fast to Slow
+      labe: Clockwise Fast to Slow
+      number: 7
+      value: 128-186
+    - name: "Off"
+      labe: "Off"
+      number: 8
+      value: 187-196
+    - name: Antilockwise  Slow to Fast
+      labe: Antilockwise  Slow to Fast
+      number: 9
+      value: 197-255
+- id: 29
+  name: 'Flames '
+  label: flames
+  number: 1
+  description: Martin Flames Projector
+  type: projector
+  group: 108
+  address: 70
+  channels:
+  - number: 1
+    name: Program
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      value: "0"
+    - name: "On"
+      labe: "On"
+      number: 2
+      value: "255"
+- id: 30
+  name: switch1
+  label: SW1.Oil
+  number: 1
+  description: Oil Wheel Projector
+  type: switch
+  group: 4
+  address: 69
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: "Off"
+      strobe: ""
+    flash: false
+  - name: "On"
+    number: 2
+    label: "On"
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: "On"
+      number: 1
+      colors: []
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: "On"
+      strobe: ""
+    flash: false
+  use_fixture: Oil1
+- id: 31
+  name: switch2
+  label: SW2.Flame
+  number: 2
+  description: Flame Projector
+  type: switch
+  group: 4
+  address: 70
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 0
+      channel: Program
+      value: "Off"
+    flash: false
+  - name: "On"
+    number: 2
+    label: "On"
+    buttoncolor: Red
+    master: 0
+    settings:
+    - name: "On"
+      labe: "On"
+      number: 0
+      channel: Program
+      value: "On"
+    flash: false
+  use_fixture: flames
+- id: 32
+  name: switch3
+  label: SW3.Deluge
+  number: 3
+  description: ACME Deluge
+  type: switch
+  group: 4
+  address: 145
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: "Off"
+      labe: "Off"
+      number: 1
+      channel: Master
+      value: "0"
+    - name: "Off"
+      labe: "Off"
+      number: 2
+      channel: Rotate
+      value: "0"
+    - name: "Off"
+      labe: "Off"
+      number: 3
+      channel: Color
+      value: "0"
+    flash: false
+  - name: Color1
+    number: 2
+    label: Color1
+    buttoncolor: Orange
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "12"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "10"
+    flash: false
+  - name: Color2
+    number: 3
+    label: Color2
+    buttoncolor: Yellow
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "12"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "30"
+    flash: false
+  - name: Color3
+    number: 4
+    label: Color3
+    buttoncolor: Pink
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+    - name: Rotate
+      labe: Rotate
+      number: 2
+      channel: Rotate
+      value: "12"
+    - name: Color
+      labe: Color
+      number: 3
+      channel: Color
+      value: "75"
+    flash: false
+  use_fixture: deluge
+- id: 33
+  name: switch4
+  label: SW4.Vue
+  number: 4
+  description: Chauvet Vue 1.1
+  type: switch
+  group: 4
+  address: 139
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: Program
+      value: "0"
+    - name: red
+      number: 2
+      channel: Red1
+      value: "0"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: strobe
+      number: 5
+      channel: "5"
+      value: "0"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "0"
+    flash: false
+  - name: Red
+    number: 2
+    label: Red
+    buttoncolor: Red
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "0"
+    - name: red
+      number: 2
+      channel: "2"
+      value: "255"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: strobe
+      number: 5
+      channel: "5"
+      value: "0"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "255"
+    flash: false
+  - name: Slow Color Change
+    number: 3
+    label: SlwChg
+    buttoncolor: Red
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "25"
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: speed
+      number: 5
+      channel: "5"
+      value: "0"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "255"
+    flash: false
+  - name: Meduim Color Change
+    number: 4
+    label: MdChg
+    buttoncolor: Yellow
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "25"
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: speed
+      number: 5
+      channel: "5"
+      value: "100"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "255"
+    flash: false
+  - name: Sound Triggered Color Change
+    number: 5
+    label: Sound
+    buttoncolor: White
+    master: 0
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "255"
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+    - name: speed
+      number: 5
+      channel: "5"
+      value: "100"
+    - name: master reverse dimmer
+      number: 6
+      channel: "6"
+      value: "255"
+    flash: false
+  - name: Mini
+    number: 6
+    label: Mini
+    buttoncolor: Pink
+    master: 0
+    actions:
+    - name: Mini
+      number: 1
+      colors:
+      - Green
+      - Red
+      - Blue
+      mode: Chase
+      fade: Soft
+      size: "Off"
+      speed: Music
+      rotate: "Off"
+      rotatespeed: "Off"
+      program: "Off"
+      strobe: "Off"
+    flash: false
+  - name: Reddy
+    number: 7
+    label: Reddy
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Reddy
+      number: 1
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  use_fixture: vue
+- id: 34
+  name: switch5
+  label: SW5.QPar38
+  number: 5
+  description: ADJ QA PAR38
+  type: switch
+  group: 4
+  address: 150
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 0
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: mode
+      number: 1
+      channel: "150"
+      value: "0"
+    - name: mode
+      number: 2
+      channel: "151"
+      value: "0"
+    - name: mode
+      number: 3
+      channel: "152"
+      value: "0"
+    - name: mode
+      number: 4
+      channel: "153"
+      value: "0"
+    - name: mode
+      number: 5
+      channel: "154"
+      value: "0"
+    - name: mode
+      number: 6
+      channel: "155"
+      value: "0"
+    - name: mode
+      number: 7
+      channel: "156"
+      value: "0"
+    - name: mode
+      number: 8
+      channel: "157"
+      value: "0"
+    flash: false
+  - name: Red
+    number: 2
+    label: Red
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: Red
+      number: 0
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: Green
+      number: 0
+      colors:
+      - Green
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 0
+      colors:
+      - Blue
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: "On"
+    number: 5
+    label: "On"
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: "On"
+      number: 0
+      colors:
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      mode: Chase
+      fade: Soft
+      size: Long
+      speed: Fast
+      rotate: "Off"
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 0
+      colors:
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      mode: Chase
+      fade: Soft
+      size: ""
+      speed: Music
+      rotate: "Off"
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: mode
+      number: 0
+      channel: "150"
+      value: "0"
+    - name: mode
+      number: 0
+      channel: "157"
+      value: "0"
+    flash: false
+  use_fixture: par38
+- id: 35
+  name: switch6
+  label: SW6.DERBY
+  number: 6
+  description: ADJ DEKKER 1
+  type: switch
+  group: 4
+  address: 320
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 0
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: Rotate
+      number: 1
+      channel: Rotate
+      value: "off"
+    - name: Red1
+      number: 2
+      channel: Red1
+      value: "0"
+    - name: Green1
+      number: 3
+      channel: Green1
+      value: "0"
+    - name: Blue1
+      number: 4
+      channel: Blue1
+      value: "0"
+    - name: White1
+      number: 5
+      channel: White1
+      value: "0"
+    - name: Master
+      number: 6
+      channel: Master
+      value: "0"
+    - name: Program
+      number: 7
+      channel: Program
+      value: "0"
+    - name: ProgramSpeed
+      number: 8
+      channel: ProgramSpeed
+      value: "0"
+    flash: false
+  - name: Red
+    number: 2
+    label: Red
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: Red
+      number: 0
+      colors:
+      - Red
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: Green
+      number: 0
+      colors:
+      - Green
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 0
+      colors:
+      - Blue
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Soft
+    number: 5
+    label: Soft
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Soft
+      number: 0
+      colors:
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      mode: Chase
+      fade: Soft
+      size: Short
+      speed: Fast
+      rotate: Anti Clockwise
+      rotatespeed: Slow
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 0
+      colors:
+      - Yellow
+      - White
+      - Pink
+      - Black
+      - Red
+      - Orange
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      mode: Chase
+      fade: Soft
+      size: "Off"
+      speed: Music
+      rotate: Auto
+      rotatespeed: Fast
+      program: ""
+      strobe: ""
+    flash: false
+  use_fixture: dekker1
+- id: 36
+  name: switch7
+  label: SW7.DERBY
+  number: 7
+  description: ADJ DEKKER 2
+  type: switch
+  group: 4
+  address: 330
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 0
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: Rotate
+      number: 1
+      channel: Rotate
+      value: "off"
+    - name: Red1
+      number: 2
+      channel: Red1
+      value: "0"
+    - name: Green1
+      number: 3
+      channel: Green1
+      value: "0"
+    - name: Blue1
+      number: 4
+      channel: Blue1
+      value: "0"
+    - name: White1
+      number: 5
+      channel: White1
+      value: "0"
+    - name: Master
+      number: 6
+      channel: Master
+      value: "0"
+    - name: Program
+      number: 7
+      channel: Program
+      value: "0"
+    - name: ProgramSpeed
+      number: 8
+      channel: ProgramSpeed
+      value: "0"
+    flash: false
+  - name: Red
+    number: 2
+    label: Red
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: Red
+      number: 0
+      colors:
+      - Red
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: Green
+      number: 0
+      colors:
+      - Green
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 0
+      colors:
+      - Blue
+      mode: Static
+      fade: Sharp
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Soft
+    number: 5
+    label: Soft
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Soft
+      number: 0
+      colors:
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      mode: Chase
+      fade: Soft
+      size: Short
+      speed: VeryFast
+      rotate: Anti Clockwise
+      rotatespeed: Slow
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 0
+      colors:
+      - Yellow
+      - White
+      - Pink
+      - Black
+      - Red
+      - Orange
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      mode: Chase
+      fade: Soft
+      size: "Off"
+      speed: Music
+      rotate: Auto
+      rotatespeed: Fast
+      program: ""
+      strobe: ""
+    flash: false
+  use_fixture: dekker2
+- id: 37
+  name: switch8
+  label: SW8.Booth
+  number: 8
+  description: Gibraltar Booth
+  type: switch
+  group: 4
+  address: 90
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 1
+      colors: []
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Red
+    number: 2
+    label: Red
+    buttoncolor: Red
+    master: 0
+    actions:
+    - name: "On"
+      number: 1
+      colors:
+      - Red
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors:
+      - Green
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors:
+      - Blue
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Fade
+    number: 5
+    label: Fade
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Fade
+      number: 1
+      colors:
+      - Red
+      - Green
+      - Blue
+      mode: Chase
+      fade: Soft
+      size: Medium
+      speed: VeryFast
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 1
+      colors:
+      - Green
+      - Red
+      - Blue
+      mode: Chase
+      fade: Sharp
+      size: "Off"
+      speed: Music
+      rotate: "Off"
+      rotatespeed: ""
+      program: ""
+      strobe: ""
+    settings:
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "255"
+    flash: false
+  use_fixture: megabar

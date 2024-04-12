@@ -206,6 +206,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	myWindow.SetTitle("DMX Lights - Project Name :Fixtures_Default_Project.yaml")
+
 	// Update the fixture list with the sequence type.
 	for _, sequence := range sequencesConfig.Sequences {
 		for fixtureNumber, fixture := range fixturesConfig.Fixtures {

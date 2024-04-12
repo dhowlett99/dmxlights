@@ -459,6 +459,28 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	return row0
 }
 
+func PopupErrorMessage(myWindow fyne.Window, errorMessage string) {
+	// Create a dialog for error messages.
+	popupErrorPanel := &widget.PopUp{}
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		popupErrorPanel.Hide()
+	})
+
+	popupErrorPanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Title"),
+			widget.NewLabel("Error Message"),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		myWindow.Canvas(),
+	)
+
+	popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Erorr Message"
+	popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = errorMessage
+	popupErrorPanel.Show()
+}
+
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight,
@@ -468,9 +490,15 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
 			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 				if err == nil && reader != nil {
-					fixturesConfig, err = fixture.LoadFixturesReader(reader)
+					fmt.Printf("Filename %s\n", reader.URI())
+					filename := filepath.Base(reader.URI().String())
+					fixturesConfig, err = fixture.LoadFixtures(filename)
 					if err != nil {
 						fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
+						PopupErrorMessage(myWindow, "error failed to load fixture file "+filename)
+						return
+					} else {
+						myWindow.SetTitle("DMX Lights - Project Name :" + filename)
 					}
 				}
 			}, myWindow)
