@@ -98,19 +98,13 @@ func CreateSequence(
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 
 	// Find the fixtures.
-	availableFixtures := setAvalableFixtures(fixturesConfig)
+	availableFixtures := commands.SetAvalableFixtures(fixturesConfig)
 
+	// Setup fixtures labels.
 	fixtureLabels := []string{}
-	shutterAddress := make(map[int]int16)
-
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "scanner" {
 			fixtureLabels = append(fixtureLabels, fixture.Label)
-			for channelNumber, channel := range fixture.Channels {
-				if strings.Contains(channel.Name, "Shutter") {
-					shutterAddress[fixture.Number] = fixture.Address + int16(channelNumber)
-				}
-			}
 		}
 	}
 
@@ -118,7 +112,6 @@ func CreateSequence(
 	availableScannerGobos := make(map[int][]common.StaticColorButton)
 
 	// Create a map of the fixture colors.
-	// This will be protected from synchronous access by sequence.ScannerColorMutex
 	scannerColors := make(map[int]int)
 	// Create a map of the fixture gobos.
 	scannerGobos := make(map[int]int)
@@ -138,9 +131,9 @@ func CreateSequence(
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
 		scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
-		numberFixtures = getNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
+		numberFixtures = commands.GetNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
 	} else {
-		numberFixtures = getNumberOfFixtures(mySequenceNumber, fixturesConfig)
+		numberFixtures = commands.GetNumberOfFixtures(mySequenceNumber, fixturesConfig)
 	}
 
 	// Enable all the defined fixtures.
@@ -158,6 +151,7 @@ func CreateSequence(
 
 	// The actual sequence definition.
 	sequence := common.Sequence{
+		Label:                  sequenceLabel,
 		ScannerAvailableColors: availableScannerColors,
 		ScannersAvailable:      availableFixtures,
 		NumberFixtures:         numberFixtures,
@@ -885,26 +879,6 @@ func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []commo
 	return stepsOut
 }
 
-func setAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
-
-	// You need to select a fixture before you can choose a color or gobo.
-	// availableFixtures holds a set of red buttons, one for every available fixture.
-	availableFixtures := []common.StaticColorButton{}
-	for _, fixture := range fixturesConfig.Fixtures {
-		if fixture.Type == "scanner" {
-			newFixture := common.StaticColorButton{}
-			newFixture.Name = fixture.Name
-			newFixture.Label = fixture.Label
-			newFixture.Number = fixture.Number
-			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
-			availableFixtures = append(availableFixtures, newFixture)
-		}
-	}
-
-	return availableFixtures
-}
-
 // getAvailableScannerColors looks through the fixtures list and finds scanners that
 // have colors defined in their config. It then returns an array of these available colors.
 // Also returns a map of the default values for each scanner that has colors.
@@ -934,43 +908,6 @@ func getAvailableScannerColors(fixtures *fixture.Fixtures) (map[int][]common.Sta
 		}
 	}
 	return availableScannerColors, scannerColors
-}
-
-func getNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
-
-	if debug {
-		fmt.Printf("getNumberOfFixturesn for sequence %d\n", sequenceNumber)
-	}
-
-	var numberFixtures int
-
-	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == sequenceNumber {
-			// config has use_channels set.
-			if fixture.MultiFixtureDevice {
-				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
-				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
-				// we always return the max channels in a sequence, currently 8
-				return common.MAX_NUMBER_OF_CHANNELS
-			} else {
-				// Examine the channels and count number of color channels.
-				// We use Red for the count.
-				var subFixture int
-				if subFixture > 1 {
-					numberFixtures = numberFixtures + subFixture
-				} else {
-					if fixture.Number > numberFixtures {
-						numberFixtures++
-					}
-				}
-			}
-		}
-	}
-
-	if debug {
-		fmt.Printf("numberFixtures found %d\n", numberFixtures)
-	}
-	return numberFixtures
 }
 
 func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) map[int][]common.StaticColorButton {

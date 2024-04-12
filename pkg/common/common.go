@@ -295,6 +295,7 @@ const (
 	UpdateScannerChase
 	UpdateMusicTrigger
 	UpdateScannerHasShutterChase
+	UpdateFixturesConfig
 )
 
 // A full step cycle is 39 ticks ie 39 values.
