@@ -650,8 +650,8 @@ func PlaySequence(sequence common.Sequence,
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerReverse = sequence.FixtureState[fixture].ScannerPatternReversed
 						// Calulate positions for each scanner fixture.
-						fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
-						positions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
+						fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
+						positions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 						sequence.NumberSteps = numberSteps
 
 						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
@@ -724,8 +724,8 @@ func PlaySequence(sequence common.Sequence,
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					var numberSteps int
-					fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
-					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
+					fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
+					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 					sequence.NumberSteps = numberSteps
 				}
 

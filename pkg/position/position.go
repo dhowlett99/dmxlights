@@ -27,11 +27,9 @@ import (
 const debug = false
 
 // CalculatePositions takes a series of steps, examaines them to see if the step should fade up
-func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner bool) (map[int][]common.FixtureBuffer, int, int) {
+func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner bool) (map[int][]common.FixtureBuffer, int) {
 
 	var steps []common.Step
-	var numberFixtures int
-	var numberFixturesInThisStep int
 	var lastStep common.Step
 	var nextStep common.Step
 
@@ -48,7 +46,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	// Apply inverted selection from fixtureState to the RGB sequence.
 	if sequence.Type == "rgb" {
 		sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
-		steps = invertRGBColorsInSteps(stepsIn, sequence.SequenceColors, sequence.FixtureState)
+		steps = invertRGBColorsInSteps(stepsIn, sequence.NumberFixtures, sequence.SequenceColors, sequence.FixtureState)
 	} else {
 		steps = stepsIn
 	}
@@ -74,11 +72,8 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				nextStep = steps[stepNumber+1]
 			}
 
-			// Start the fixtures counter.
-			numberFixturesInThisStep = 0
-
 			// Fixtures forward.
-			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 				thisFixture := step.Fixtures[fixtureNumber]
 				thisFixture.Number = fixtureNumber
 				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
@@ -102,15 +97,13 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
-				// Incremet the the fixture counter.
-				numberFixturesInThisStep++
 			}
 
 			// Done all fixtures, so not at the start any more.
 			start = false
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
+			// if numberFixturesInThisStep > sequence.NumberFixtures {
+			// 	sequence.NumberFixtures = numberFixturesInThisStep
+			// }
 
 			lastStep = step
 		}
@@ -145,9 +138,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 				nextStep = steps[stepNumber-1]
 			}
 
-			numberFixturesInThisStep = 0
-
-			for fixtureNumber := 0; fixtureNumber <= len(step.Fixtures)-1; fixtureNumber++ {
+			for fixtureNumber := 0; fixtureNumber <= sequence.NumberFixtures-1; fixtureNumber++ {
 				thisFixture := step.Fixtures[fixtureNumber]
 				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
 				thisFixture.Number = fixtureNumber
@@ -171,12 +162,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
-				numberFixturesInThisStep++
 			}
 			start = false
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
+			// if numberFixturesInThisStep > sequence.NumberFixtures {
+			// 	sequence.NumberFixtures = numberFixturesInThisStep
+			// }
 
 			lastStep = step
 		}
@@ -186,14 +176,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		// Steps forward.
 		for stepNumber, step := range steps {
 			if debug {
-				fmt.Printf("================== Step Number %d ============== No Fixtures %d\n", stepNumber, len(step.Fixtures))
+				fmt.Printf("================== Step Number %d ============== No Fixtures %d\n", stepNumber, sequence.NumberFixtures)
 			}
 
-			// Start the fixtures counter.
-			numberFixturesInThisStep = 0
-
 			// Fixtures forward.
-			for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+			for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 				thisFixture := step.Fixtures[fixtureNumber]
 				thisFixture.Number = fixtureNumber
 				thisFixture.Enabled = sequence.FixtureState[fixtureNumber].Enabled
@@ -217,13 +204,11 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 					// Remember State of fixture.
 					step.Fixtures[fixtureNumber] = thisFixture
 				}
-				// Incremet the the fixture counter.
-				numberFixturesInThisStep++
 			}
 
-			if numberFixturesInThisStep > numberFixtures {
-				numberFixtures = numberFixturesInThisStep
-			}
+			// if numberFixturesInThisStep > sequence.NumberFixtures {
+			// 	sequence.NumberFixtures = numberFixturesInThisStep
+			// }
 			lastStep = step
 		}
 	}
@@ -244,7 +229,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 	// many fades (tramsistions) take place in a pattern.
 	// Use the shortest for safety.
 	totalNumberOfSteps := 1000
-	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 		if sequence.FixtureState[fixtureNumber].Enabled {
 			if len(fadeColors[fixtureNumber]) != 0 && len(fadeColors[fixtureNumber]) < totalNumberOfSteps {
 				totalNumberOfSteps = len(fadeColors[fixtureNumber])
@@ -254,7 +239,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 
 	if debug {
 		// Print out the fixtures so far.
-		for fixture := 0; fixture < numberFixtures; fixture++ {
+		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			fmt.Printf("Fixture %d\n", fixture)
 			for out := 0; out < totalNumberOfSteps; out++ {
 				fmt.Printf("%+v\n", fadeColors[fixture][out])
@@ -263,7 +248,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		}
 	}
 
-	return fadeColors, numberFixtures, totalNumberOfSteps
+	return fadeColors, totalNumberOfSteps
 }
 
 func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures int, totalNumberOfSteps int, fixtureState map[int]common.FixtureState, optimisation bool) (map[int]common.Position, int) {
@@ -362,7 +347,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureState map[int]common.FixtureState) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []common.Color, fixtureState map[int]common.FixtureState) []common.Step {
 
 	var insertColor int
 	numberColors := len(colors)
@@ -380,7 +365,7 @@ func invertRGBColorsInSteps(steps []common.Step, colors []common.Color, fixtureS
 
 		insertColor = numberColors - 1
 		// Step through the map
-		for fixtureNumber := 0; fixtureNumber < len(step.Fixtures); fixtureNumber++ {
+		for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
 
 			fixture := step.Fixtures[fixtureNumber]
 

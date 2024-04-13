@@ -153,10 +153,6 @@ func LoadFixturesReader(reader fyne.URIReadCloser) (fixtures *Fixtures, err erro
 		return nil, errors.New("error: unmarshalling fixtures.yaml file: fixtures are empty")
 	}
 
-	for _, fixture := range fixtures.Fixtures {
-		fmt.Printf("Fixture %s\n", fixture.Name)
-	}
-
 	return fixtures, nil
 }
 
@@ -169,9 +165,9 @@ func SaveFixturesWriter(writer fyne.URIWriteCloser) (fixtures *Fixtures, err err
 // Returns an error.
 func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
-	//if debug {
-	fmt.Printf("LoadFixtures from file %s\n", filename)
-	//}
+	if debug {
+		fmt.Printf("LoadFixtures from file %s\n", filename)
+	}
 
 	// Open the fixtures.yaml file.
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
@@ -194,10 +190,6 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
 	if len(fixtures.Fixtures) == 0 {
 		return nil, errors.New("error: unmarshalling fixtures.yaml file: fixtures are empty")
-	}
-
-	for _, fixture := range fixtures.Fixtures {
-		fmt.Printf("Fixture %s\n", fixture.Name)
 	}
 
 	return fixtures, nil

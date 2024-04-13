@@ -127,6 +127,7 @@ func TestCalculateRGB3FixturesPositions(t *testing.T) {
 				Optimisation:          false,
 				FixtureState:          allFixturesEnabled,
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        3,
 				ScannerChaser:         false,
 				RGBShift:              0,
 			},
@@ -230,7 +231,7 @@ func TestCalculateRGB3FixturesPositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+			fadeColors, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -264,10 +265,6 @@ func TestCalculateRGB3FixturesPositions(t *testing.T) {
 
 				}
 			}
-
-			if got1 != tt.want1 {
-				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
-			}
 		})
 	}
 }
@@ -296,6 +293,7 @@ func TestCalculateRGBPositionsWithShift(t *testing.T) {
 				Optimisation:          false,
 				FixtureState:          allFixturesEnabled,
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        3,
 				ScannerChaser:         false,
 				RGBShift:              9,
 			},
@@ -369,7 +367,7 @@ func TestCalculateRGBPositionsWithShift(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+			fadeColors, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -404,9 +402,6 @@ func TestCalculateRGBPositionsWithShift(t *testing.T) {
 				}
 			}
 
-			if got1 != tt.want1 {
-				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
-			}
 		})
 	}
 }
@@ -435,6 +430,7 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 				Optimisation:          false,
 				FixtureState:          allFixturesEnabled,
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        3,
 				ScannerChaser:         false,
 				RGBShift:              0,
 			},
@@ -604,7 +600,7 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+			fadeColors, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -634,10 +630,6 @@ func TestCalculatRGBBouncePositions(t *testing.T) {
 					}
 
 				}
-			}
-
-			if got1 != tt.want1 {
-				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
 			}
 		})
 	}
@@ -693,6 +685,7 @@ func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
 					},
 				},
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        8,
 				ScannerChaser:         false,
 				RGBShift:              0,
 			},
@@ -1002,7 +995,7 @@ func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
 			}
 
 			RGBPattern := ApplyFixtureState(pattern, tt.sequence.FixtureState)
-			fadeColors, got1, _ := CalculatePositions(RGBPattern.Steps, tt.sequence, tt.scanner)
+			fadeColors, _ := CalculatePositions(RGBPattern.Steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(fadeColors, tt.want) {
 
@@ -1032,10 +1025,6 @@ func TestApplyRGBChaseWithOnlyThreeEnabled(t *testing.T) {
 					}
 
 				}
-			}
-
-			if got1 != tt.want1 {
-				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
 			}
 		})
 	}
@@ -1092,6 +1081,7 @@ func TestApplyRGBChaseWithOnlyFourEnabledBounce(t *testing.T) {
 					},
 				},
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        8,
 				ScannerChaser:         false,
 			},
 			steps: []common.Step{
@@ -1708,7 +1698,7 @@ func TestApplyRGBChaseWithOnlyFourEnabledBounce(t *testing.T) {
 			// }
 
 			RGBPattern := ApplyFixtureState(pattern, tt.sequence.FixtureState)
-			got, got1, _ := CalculatePositions(RGBPattern.Steps, tt.sequence, tt.scanner)
+			got, _ := CalculatePositions(RGBPattern.Steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(got, tt.want) {
 
@@ -1738,10 +1728,6 @@ func TestApplyRGBChaseWithOnlyFourEnabledBounce(t *testing.T) {
 						//fmt.Printf("\tstep %d rule %d %s: Color:%+v BaseColor:%+v\n", step, fixtureBuffer.Rule, fixtureBuffer.DebugMsg, common.GetColorNameByRGB(fixtureBuffer.Color), common.GetColorNameByRGB(fixtureBuffer.BaseColor))
 						fmt.Printf("\tstep %d FixtureBufffer:%+v\n", step, fixtureBuffer)
 					}
-				}
-
-				if got1 != tt.want1 {
-					t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
 				}
 			}
 		})
@@ -1773,6 +1759,7 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 				Optimisation:          false,
 				FixtureState:          allFixturesRGBInverted,
 				EnabledNumberFixtures: 3,
+				NumberFixtures:        3,
 				ScannerChaser:         false,
 				RGBShift:              0,
 			},
@@ -1880,7 +1867,7 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			got, got1, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
+			got, _ := CalculatePositions(tt.steps, tt.sequence, tt.scanner)
 
 			if !reflect.DeepEqual(got, tt.want) {
 
@@ -1911,10 +1898,6 @@ func TestCalculateRGBNoBounceRGBInvertedPositions(t *testing.T) {
 					}
 
 				}
-			}
-
-			if got1 != tt.want1 {
-				t.Errorf("CalculatePositions() got1 = %+v, want %+v", got1, tt.want1)
 			}
 		})
 	}
@@ -4176,6 +4159,7 @@ func TestCalculateRGBPositionsSimpleGreenChase8Fitures(t *testing.T) {
 					RGBShift:              0,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
+					NumberFixtures:        8,
 					ScannerChaser:         false,
 				},
 			},
@@ -4863,8 +4847,8 @@ func TestCalculateRGBPositionsSimpleGreenChase8Fitures(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
+			positions, numberPositions := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -4929,6 +4913,7 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
+					NumberFixtures:        8,
 				},
 			},
 			steps: []common.Step{
@@ -5142,8 +5127,8 @@ func TestCalculateRGBMulticoloredPatten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, numberPositions := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -5201,6 +5186,7 @@ func TestCalculateRGBShift8(t *testing.T) {
 					RGBShift:              8,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
+					NumberFixtures:        4,
 				},
 			},
 			steps: []common.Step{
@@ -5319,8 +5305,8 @@ func TestCalculateRGBShift8(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, numberPositions := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", positions, tt.want)
 
@@ -5381,6 +5367,7 @@ func TestCalculateRGBShift1(t *testing.T) {
 					ScannerReverse:        false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 4,
+					NumberFixtures:        4,
 				},
 			},
 			steps: []common.Step{
@@ -5499,8 +5486,8 @@ func TestCalculateRGBShift1(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, numberPositions := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, numberPositions := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", positions, tt.want)
 			}
@@ -5535,6 +5522,7 @@ func TestCalculateRGBPairsPatten(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
+					NumberFixtures:        8,
 					ScannerChaser:         false,
 					RGBShift:              0,
 				},
@@ -5723,8 +5711,8 @@ func TestCalculateRGBPairsPatten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
-			got, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
+			got, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("calculatePositions() got = %+v, want %+v", got, tt.want)
@@ -5778,6 +5766,7 @@ func TestCalculateMultiColorChasePatten(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
+					NumberFixtures:        8,
 					ScannerChaser:         false,
 					RGBShift:              0,
 				},
@@ -6134,8 +6123,8 @@ func TestCalculateMultiColorChasePatten(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			// Optimisation is turned off for testing.
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
-			got, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, tt.args.scanner)
+			got, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("CalculatePositions() got = %v, want %v", got, tt.want)
 
@@ -6190,6 +6179,7 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 					ScannerChaser:         false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
+					NumberFixtures:        2,
 				},
 			},
 			steps: []common.Step{
@@ -6286,8 +6276,8 @@ func Test_calculateScannerBothDoingSameThing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6356,6 +6346,7 @@ func Test_calculateScannerBothDoingDifferentThing(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 2,
+					NumberFixtures:        2,
 					ScannerChaser:         false,
 				},
 			},
@@ -6398,8 +6389,8 @@ func Test_calculateScannerBothDoingDifferentThing(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6433,6 +6424,7 @@ func Test_calculateScannerSimpleCase(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
+					NumberFixtures:        1,
 				},
 			},
 			steps: []common.Step{
@@ -6468,8 +6460,8 @@ func Test_calculateScannerSimpleCase(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6502,6 +6494,7 @@ func Test_calculateScannerPairsCase(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 8,
+					NumberFixtures:        8,
 					ScannerChaser:         false,
 				},
 			},
@@ -6565,8 +6558,8 @@ func Test_calculateScannerPairsCase(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6601,6 +6594,7 @@ func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
+					NumberFixtures:        1,
 					ScannerChaser:         false,
 				},
 			},
@@ -6644,8 +6638,8 @@ func Test_calculateScannerRGBInvertedCase(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6679,6 +6673,7 @@ func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 					Optimisation:          false,
 					FixtureState:          allFixturesEnabled,
 					EnabledNumberFixtures: 1,
+					NumberFixtures:        1,
 				},
 			},
 			steps: []common.Step{
@@ -6737,8 +6732,8 @@ func Test_calculateScannerRGBInvertedBounceCase(t *testing.T) {
 
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			fadeColors, numberFixtures, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
-			positions, _ := AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
+			fadeColors, totalNumberOfSteps := CalculatePositions(tt.steps, tt.args.sequence, true)
+			positions, _ := AssemblePositions(fadeColors, tt.args.sequence.NumberFixtures, totalNumberOfSteps, tt.args.sequence.FixtureState, false)
 			if !reflect.DeepEqual(positions, tt.want) {
 				t.Errorf("got = %+v", positions)
 				t.Errorf("want =%+v", tt.want)
@@ -6752,9 +6747,10 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 
 	full := 255
 	type args struct {
-		steps        []common.Step
-		colors       []common.Color
-		fixtureState map[int]common.FixtureState
+		steps          []common.Step
+		colors         []common.Color
+		numberFixtures int
+		fixtureState   map[int]common.FixtureState
 	}
 	tests := []struct {
 		name string
@@ -6764,7 +6760,8 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 		{
 			name: "invert a single color.",
 			args: args{
-				fixtureState: threeFixturesRGBInverted,
+				fixtureState:   threeFixturesRGBInverted,
+				numberFixtures: 3,
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
@@ -6820,7 +6817,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 
-			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.colors, tt.args.fixtureState); !reflect.DeepEqual(got, tt.want) {
+			if got := invertRGBColorsInSteps(tt.args.steps, tt.args.numberFixtures, tt.args.colors, tt.args.fixtureState); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("invertRGBColors() = %+v, want %+v", got, tt.want)
 
 				fmt.Printf("++++++++++++++ 3 Inverted GOT ++++++++++++++++++++\n")
