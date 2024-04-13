@@ -807,14 +807,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 
 	case common.UpdateFixturesConfig:
-		//if debug {
-		fmt.Printf("%d: Command Update Fixure Config\n", mySequenceNumber)
-		///}
+		if debug {
+			fmt.Printf("%d: Command Update Fixure Config\n", mySequenceNumber)
+		}
 		const FIXTURES_CONFIG = 0
 		fixturesConfig = command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures)
-		for _, fixture := range fixturesConfig.Fixtures {
-			fmt.Printf("Fixture %s\n", fixture.Name)
-		}
 
 		// Find the fixtures.
 		sequence.ScannersAvailable = SetAvalableFixtures(fixturesConfig)

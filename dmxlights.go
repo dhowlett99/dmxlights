@@ -226,7 +226,9 @@ func main() {
 			}
 		}
 		if numberSubFixtures > 1 {
-			fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
+			if debug {
+				fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
+			}
 			fixturesConfig.Fixtures[fixtureNumber].MultiFixtureDevice = true
 			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
 		}
