@@ -490,7 +490,6 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
 			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 				if err == nil && reader != nil {
-					fmt.Printf("Filename %s\n", reader.URI())
 					filename := filepath.Base(reader.URI().String())
 					fixturesConfig, err = fixture.LoadFixtures(filename)
 					if err != nil {
