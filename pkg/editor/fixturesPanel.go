@@ -139,7 +139,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturePanel\n")
@@ -187,7 +187,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 	)
 
 	filename := strings.Split(w.Title(), ":")
-	fixtures, err = fixture.LoadFixtures(filename[1])
+	fixtures, err := fixture.LoadFixtures(filename[1])
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 		popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Project File Error"
