@@ -156,8 +156,26 @@ func LoadFixturesReader(reader fyne.URIReadCloser) (fixtures *Fixtures, err erro
 	return fixtures, nil
 }
 
-func SaveFixturesWriter(writer fyne.URIWriteCloser) (fixtures *Fixtures, err error) {
-	return fixtures, nil
+func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
+
+	if debug {
+		fmt.Printf("SaveFixturesWriter\n")
+	}
+
+	// Marshal the fixtures data into a yaml data structure.
+	data, err := yaml.Marshal(fixtures)
+	if err != nil {
+		return errors.New("error: marshalling fixtures.yaml file: " + err.Error())
+	}
+
+	// Write the fixtures.yaml file.
+	_, err = io.WriteString(writer, string(data))
+	if err != nil {
+		return errors.New("error: writing fixtures.yaml file: " + err.Error())
+	}
+
+	// Fixtures file saved, no errors.
+	return nil
 }
 
 // LoadFixtures opens the fixtures config file using the filename passed.
