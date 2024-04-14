@@ -499,8 +499,13 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 						return
 					} else {
 						myWindow.SetTitle("DMX Lights - Project Name :" + filename)
-						// Update the fixtures config in all the sequences.
+						// Stop all the sequences.
 						cmd := common.Command{
+							Action: common.Reset,
+						}
+						common.SendCommandToAllSequence(cmd, commandChannels)
+						// Update the fixtures config in all the sequences.
+						cmd = common.Command{
 							Action: common.UpdateFixturesConfig,
 							Args: []common.Arg{
 								{Name: "FixturesConfig", Value: fixturesConfig},
