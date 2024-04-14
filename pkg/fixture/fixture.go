@@ -441,6 +441,7 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 
 	if !cmd.Hidden {
 		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.White, cmd.Master, eventsForLaunchpad, guiButtons)
+		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 
 	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.White, pan, tilt, shutter, rotate, program, gobo, scannerColor, fixtures, false, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
@@ -461,6 +462,7 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 	if !cmd.Hidden {
 		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.Black, 0, eventsForLaunchpad, guiButtons)
+		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
