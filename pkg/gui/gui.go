@@ -486,6 +486,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
 	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures) *widget.Toolbar {
 
+	// Project open.
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
 			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
@@ -530,15 +531,31 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 			fileOpener.Show()
 		}),
 
+		// Project save.
 		widget.NewToolbarAction(theme.FileIcon(), func() {
-			dialog.ShowFileSave(func(writer fyne.URIWriteCloser, err error) {
+			fileSaver := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
 				if err == nil && writer != nil {
-					fixturesConfig, err = fixture.SaveFixturesWriter(writer)
+					err = fixture.SaveFixturesWriter(writer, fixturesConfig)
 					if err != nil {
 						fmt.Printf("dmxlights: error failed to save fixtures: %s\n", err.Error())
 					}
 				}
 			}, myWindow)
+			pwd, _ := os.Getwd()
+			currentmfolder, _ := filepath.Abs(pwd)
+			if currentmfolder != "" {
+				mfileURI := storage.NewFileURI(currentmfolder)
+				mfileLister, _ := storage.ListerForURI(mfileURI)
+
+				fileSaver.SetLocation(mfileLister)
+				fileSaver.SetFilter(&storage.ExtensionFileFilter{
+					Extensions: []string{
+						".yaml",
+					},
+				})
+			}
+			fileSaver.Show()
+
 		}),
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
