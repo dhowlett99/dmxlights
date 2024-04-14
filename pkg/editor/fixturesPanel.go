@@ -694,7 +694,8 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 
 					// OK to save.
 					// Save the new fixtures file.
-					err := fixture.SaveFixtures("fixtures.yaml", fixtures)
+					filename := strings.Split(w.Title(), ":")
+					err := fixture.SaveFixtures(filename[1], fixtures)
 					if err != nil {
 						fmt.Printf("error saving fixtures %s\n", err.Error())
 						os.Exit(1)
