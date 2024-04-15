@@ -138,7 +138,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturePanel\n")
