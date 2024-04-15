@@ -139,7 +139,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturePanel\n")
@@ -185,17 +185,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, group int, num
 		),
 		w.Canvas(),
 	)
-
-	filename := strings.Split(w.Title(), ":")
-	fixtures, err := fixture.LoadFixtures(filename[1])
-	if err != nil {
-		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
-		popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Project File Error"
-		popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "Corrupt"
-		popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = "Corrupt File is " + filename[1]
-		popupErrorPanel.Show()
-		return
-	}
 
 	// Load the fixtures into the array used by the table.
 	data := makeArray(fixtures)

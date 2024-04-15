@@ -421,7 +421,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("DMXLIGI", func() {
-				modal, err := editor.NewFixturePanel(sequences, myWindow, Y, X, commandChannels)
+				modal, err := editor.NewFixturePanel(sequences, myWindow, Y, X, fixturesConfig, commandChannels)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
@@ -492,13 +492,17 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 				if err == nil && reader != nil {
 					filename := filepath.Base(reader.URI().String())
-					fixturesConfig, err = fixture.LoadFixtures(filename)
+					newFixturesConfig, err := fixture.LoadFixtures(filename)
 					if err != nil {
 						fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 						PopupErrorMessage(myWindow, "error failed to load fixture file "+filename)
 						return
 					} else {
 						myWindow.SetTitle("DMX Lights - Project Name :" + filename)
+
+						// Copy the newFixtures into the old pointer to the fixtures config.
+						fixturesConfig.Fixtures = newFixturesConfig.Fixtures
+
 						// Stop all the sequences.
 						cmd := common.Command{
 							Action: common.Reset,
