@@ -211,13 +211,13 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 	// Open the fixtures yaml file.
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
-		return nil, errors.New("error: loading file: " + filename + err.Error())
+		return nil, err
 	}
 
 	// Reads the fixtures yaml file.
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, errors.New("error: reading file: " + filename + err.Error())
+		return nil, err
 	}
 
 	// Unmarshals the fixtures.yaml file into a data struct
