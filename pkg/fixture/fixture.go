@@ -143,15 +143,15 @@ func LoadFixturesReader(reader fyne.URIReadCloser) (fixtures *Fixtures, err erro
 		return nil, fmt.Errorf("dmxlights: error failed to load fixtures: %s", err.Error())
 	}
 
-	// Unmarshals the fixtures.yaml file into a data struct
+	// Unmarshals the fixtures yaml file into a data struct
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
+		return nil, errors.New("error: unmarshalling file: " + reader.URI().Name() + " error: " + err.Error())
 	}
 
 	if len(fixtures.Fixtures) == 0 {
-		return nil, errors.New("error: unmarshalling fixtures.yaml file: fixtures are empty")
+		return nil, errors.New("error: unmarshalling file: " + reader.URI().Name() + " error: fixtures are empty")
 	}
 
 	return fixtures, nil
@@ -166,13 +166,13 @@ func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
 	// Marshal the fixtures data into a yaml data structure.
 	data, err := yaml.Marshal(fixtures)
 	if err != nil {
-		return errors.New("error: marshalling fixtures.yaml file: " + err.Error())
+		return errors.New("error: marshalling file: " + writer.URI().Name() + " error: " + err.Error())
 	}
 
 	// Write the fixtures.yaml file.
 	_, err = io.WriteString(writer, string(data))
 	if err != nil {
-		return errors.New("error: writing fixtures.yaml file: " + err.Error())
+		return errors.New("error: writing file: " + writer.URI().Name() + " error: " + err.Error())
 	}
 
 	// Fixtures file saved, no errors.
@@ -188,33 +188,33 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 		fmt.Printf("LoadFixtures from file %s\n", filename)
 	}
 
-	// Open the fixtures.yaml file.
+	// Open the fixtures yaml file.
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
-		return nil, errors.New("error: loading fixtures.yaml file: " + err.Error())
+		return nil, errors.New("error: loading file:" + filename + " error: " + err.Error())
 	}
 
-	// Reads the fixtures.yaml file.
+	// Reads the fixtures yaml file.
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, errors.New("error: reading fixtures.yaml file: " + err.Error())
+		return nil, errors.New("error: reading file:" + filename + " error: " + err.Error())
 	}
 
 	// Unmarshals the fixtures.yaml file into a data struct
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
+		return nil, errors.New("error: unmarshalling file:" + filename + err.Error())
 	}
 
 	if len(fixtures.Fixtures) == 0 {
-		return nil, errors.New("error: unmarshalling fixtures.yaml file: fixtures are empty")
+		return nil, errors.New("error: unmarshalling file:" + filename + " error: fixtures are empty")
 	}
 
 	return fixtures, nil
 }
 
-// SaveFixtures - saves a complete list of fixtures to fixtures.yaml
+// SaveFixtures - saves a complete list of fixtures to filename.
 // Returns an error.
 func SaveFixtures(filename string, fixtures *Fixtures) error {
 
@@ -225,13 +225,13 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	// Marshal the fixtures data into a yaml data structure.
 	data, err := yaml.Marshal(fixtures)
 	if err != nil {
-		return errors.New("error: marshalling fixtures.yaml file: " + err.Error())
+		return errors.New("error: marshalling file: " + filename + " error: " + err.Error())
 	}
 
 	// Write the fixtures.yaml file.
 	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
-		return errors.New("error: writing fixtures.yaml file: " + err.Error())
+		return errors.New("error: writing file: " + filename + " error: " + err.Error())
 	}
 
 	// Fixtures file saved, no errors.
