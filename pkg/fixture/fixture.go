@@ -24,6 +24,7 @@ import (
 	"io"
 	"math"
 	"os"
+	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -1648,4 +1649,28 @@ func isThisAChannel(thisFixture Fixture, channelName string) bool {
 		}
 	}
 	return false
+}
+
+// returns true is they are the same.
+func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) bool {
+
+	if len(fixtures.Fixtures) != len(startConfig.Fixtures) {
+		if debug {
+			fmt.Printf("Length is different\n")
+		}
+		return false
+	}
+
+	for fixtureNumber, fixture := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+		}
+		if !reflect.DeepEqual(fixture, startConfig.Fixtures[fixtureNumber]) {
+			if debug {
+				fmt.Printf("Fixture Name %d is different\n", fixtureNumber)
+			}
+			return false
+		}
+	}
+	return true
 }
