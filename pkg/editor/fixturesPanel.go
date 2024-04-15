@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"image/color"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -613,7 +612,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 	fp.FixturePanel.SetColumnWidth(10, 40) // Channels Button
 
 	// Save button.
-	buttonSave = widget.NewButton("Save", func() {
+	buttonSave = widget.NewButton("OK", func() {
 
 		// Remove any empty "None" actions from fixture list.
 		fp.FixtureList = removeEmptyActions(fp.FixtureList)
@@ -680,15 +679,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 				} else {
 					// Enable the save button.
 					buttonSave.Enable()
-
-					// OK to save.
-					// Save the new fixtures file.
-					filename := strings.Split(w.Title(), ":")
-					err := fixture.SaveFixtures(filename[1], fixtures)
-					if err != nil {
-						fmt.Printf("error saving fixtures %s\n", err.Error())
-						os.Exit(1)
-					}
 					popupFixturePanel.Hide()
 				}
 			}

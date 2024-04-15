@@ -498,7 +498,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 						PopupErrorMessage(myWindow, "error failed to load fixture file "+filename)
 						return
 					} else {
-						myWindow.SetTitle("DMX Lights - Project Name :" + filename)
+						myWindow.SetTitle("DMX Lights:" + filename)
 
 						// Copy the newFixtures into the old pointer to the fixtures config.
 						fixturesConfig.Fixtures = newFixturesConfig.Fixtures
@@ -524,7 +524,6 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 			if currentmfolder != "" {
 				mfileURI := storage.NewFileURI(currentmfolder)
 				mfileLister, _ := storage.ListerForURI(mfileURI)
-
 				fileOpener.SetLocation(mfileLister)
 				fileOpener.SetFilter(&storage.ExtensionFileFilter{
 					Extensions: []string{
@@ -557,6 +556,8 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 						".yaml",
 					},
 				})
+				filename := strings.Split(myWindow.Title(), ":")
+				fileSaver.SetFileName(filename[1])
 			}
 			fileSaver.Show()
 
