@@ -519,16 +519,16 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
 			fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 				if err == nil && reader != nil {
-					filename := filepath.Base(reader.URI().String())
-					newFixturesConfig, err := fixture.LoadFixtures(filename)
+					newFixturesConfig, err := fixture.LoadFixturesReader(reader)
 					if err != nil {
 						fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
-						PopupErrorMessage(myWindow, "error failed to load fixture file "+filename)
+						PopupErrorMessage(myWindow, err.Error())
 						return
 					} else {
 						// Reset the startConfig.
 						startConfig.Fixtures = []fixture.Fixture{}
 						startConfig.Fixtures = append(startConfig.Fixtures, newFixturesConfig.Fixtures...)
+						filename := filepath.Base(reader.URI().String())
 						myWindow.SetTitle("DMX Lights:" + filename)
 
 						// Copy the newFixtures into the old pointer to the fixtures config.
