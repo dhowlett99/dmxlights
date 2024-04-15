@@ -3,7 +3,7 @@ module github.com/dhowlett99/dmxlights
 go 1.20
 
 require (
-	fyne.io/fyne/v2 v2.4.4
+	fyne.io/fyne/v2 v2.4.5
 	github.com/go-yaml/yaml v2.1.0+incompatible
 	github.com/gordonklaus/portaudio v0.0.0-20221027163845-7c3b689db3cc
 	github.com/oliread/usbdmx v0.0.0-20200510141510-3b43952fa44b
@@ -21,8 +21,8 @@ require (
 	github.com/fyne-io/glfw-js v0.0.0-20220120001248-ee7290d23504 // indirect
 	github.com/fyne-io/image v0.0.0-20220602074514-4956b0afb3d2 // indirect
 	github.com/go-gl/gl v0.0.0-20211210172815-726fda9656d6 // indirect
-	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20221017161538-93cebf72946b // indirect
-	github.com/go-text/render v0.0.0-20230619120952-35bccb6164b8 // indirect
+	github.com/go-gl/glfw/v3.3/glfw v0.0.0-20240306074159-ea2d69986ecb // indirect
+	github.com/go-text/render v0.1.0 // indirect
 	github.com/go-text/typesetting v0.1.0 // indirect
 	github.com/godbus/dbus/v5 v5.1.0 // indirect
 	github.com/google/gousb v1.1.2 // indirect

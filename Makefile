@@ -63,7 +63,7 @@ deploy: installer
 	mv /tmp/file dmxlights.app/Contents/Info.plist
 	# sign the app:
 	codesign --force --deep --entitlements entitlements.plist --verbose=2 --options runtime --sign ${CERT} -i ${APP_ID} ${APP_NAME}.app
-	cp fixtures.yaml dmxlights.app/Contents/Resources/
+	cp Default_Project.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
