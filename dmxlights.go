@@ -29,6 +29,7 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/app"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/driver/desktop"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
@@ -64,6 +65,14 @@ func main() {
 
 	myWindow := myApp.NewWindow("DMX Lights")
 	myWindow.Resize(fyne.NewSize(400, 50))
+
+	if desk, ok := myApp.(desktop.App); ok {
+		menu := fyne.NewMenu("MyApp",
+			fyne.NewMenuItem("Show", func() {
+				myWindow.Show()
+			}))
+		desk.SetSystemTrayMenu(menu)
+	}
 
 	// Setup the current state.
 	this := buttons.CurrentState{}
@@ -536,6 +545,28 @@ func main() {
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	myWindow.SetContent(content)
+
+	// Main menu.
+	openProject := fyne.NewMenuItem("Open", func() {
+		gui.FileOpen(myWindow, startConfig, fixturesConfig, commandChannels)
+	})
+	saveProject := fyne.NewMenuItem("Save", func() {
+		gui.FileSave(myWindow, startConfig, fixturesConfig, commandChannels)
+	})
+	editSettings := fyne.NewMenuItem("Edit", func() {
+		modal := gui.RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, dmxInterfaceConfig, this.LaunchpadName)
+		modal.Resize(fyne.NewSize(250, 250))
+		modal.Show()
+	})
+	editFixtures := fyne.NewMenuItem("Edit", func() {
+		gui.NewFixtureEditor(sequences, myWindow, fixturesConfig, commandChannels)
+	})
+	projectMenu := fyne.NewMenu("Project", openProject, saveProject)
+	settingsMenu := fyne.NewMenu("Settings", editSettings)
+	fixturesMenu := fyne.NewMenu("Fixtures", editFixtures)
+	helpMenu := fyne.NewMenu("Help")
+	mainMenu := fyne.NewMainMenu(projectMenu, settingsMenu, fixturesMenu, helpMenu)
+	myWindow.SetMainMenu(mainMenu)
 
 	myWindow.ShowAndRun()
 
