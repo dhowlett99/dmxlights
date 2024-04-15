@@ -481,10 +481,38 @@ func PopupErrorMessage(myWindow fyne.Window, errorMessage string) {
 	popupErrorPanel.Show()
 }
 
+func AreYouSureDialog(myWindow fyne.Window) *widget.PopUp {
+
+	// Create a dialog for error messages.
+	popupAreYouSurePanel := &widget.PopUp{}
+
+	// Ok button.
+	buttonOK := widget.NewButton("Quit Without Saving Project", func() {
+		popupAreYouSurePanel.Hide()
+		os.Exit(0)
+	})
+
+	buttonCancel := widget.NewButton("Cancel", func() {
+		popupAreYouSurePanel.Hide()
+	})
+
+	popupAreYouSurePanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Project Has Changed"),
+			widget.NewLabel("If you quit with out saving"),
+			widget.NewLabel("your changes will be lost"),
+			container.NewHBox(buttonCancel, buttonOK),
+		),
+		myWindow.Canvas(),
+	)
+
+	return popupAreYouSurePanel
+}
+
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
-	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures) *widget.Toolbar {
+	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures) *widget.Toolbar {
 
 	// Project open.
 	toolbar := widget.NewToolbar(
@@ -498,6 +526,9 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 						PopupErrorMessage(myWindow, "error failed to load fixture file "+filename)
 						return
 					} else {
+						// Reset the startConfig.
+						startConfig.Fixtures = []fixture.Fixture{}
+						startConfig.Fixtures = append(startConfig.Fixtures, newFixturesConfig.Fixtures...)
 						myWindow.SetTitle("DMX Lights:" + filename)
 
 						// Copy the newFixtures into the old pointer to the fixtures config.
@@ -542,6 +573,9 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 					if err != nil {
 						fmt.Printf("dmxlights: error failed to save fixtures: %s\n", err.Error())
 					}
+					// Reset the startConfig.
+					startConfig.Fixtures = []fixture.Fixture{}
+					startConfig.Fixtures = append(startConfig.Fixtures, fixturesConfig.Fixtures...)
 				}
 			}, myWindow)
 			pwd, _ := os.Getwd()

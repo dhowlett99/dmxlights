@@ -49,6 +49,8 @@ const NumberOfSequences = 5
 const NumberOfFixtures = 8
 const NumberOfSwitches = 8
 
+const DEFAULT_PROJECT = "Default_Project.yaml"
+
 func main() {
 
 	fmt.Println("DMX Lighting")
@@ -200,13 +202,11 @@ func main() {
 	}
 
 	// Get a list of all the fixtures in the groups.
-	fixturesConfig, err := fixture.LoadFixtures("Fixtures_Default_Project.yaml")
+	fixturesConfig, err := fixture.LoadFixtures(DEFAULT_PROJECT)
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
 		os.Exit(1)
 	}
-
-	myWindow.SetTitle("DMX Lights:Fixtures_Default_Project.yaml")
 
 	// Update the fixture list with the sequence type.
 	for _, sequence := range sequencesConfig.Sequences {
@@ -233,6 +233,23 @@ func main() {
 			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
 		}
 	}
+
+	// Now that the fixtures config is setup, make a copy.
+	startConfig := &fixture.Fixtures{}
+	startConfig.Fixtures = []fixture.Fixture{}
+	startConfig.Fixtures = append(startConfig.Fixtures, fixturesConfig.Fixtures...)
+
+	myWindow.SetTitle("DMX Lights:" + DEFAULT_PROJECT)
+
+	// If you try to quit without saving your changed project. Uses startConfig as a ref to determine changes.
+	myWindow.SetCloseIntercept(func() {
+		if fixture.CheckFixturesAreTheSame(fixturesConfig, startConfig) {
+			os.Exit(0)
+		} else {
+			model := gui.AreYouSureDialog(myWindow)
+			model.Show()
+		}
+	})
 
 	// Create the sequences from config file.
 	// Add Sequence to an array.
@@ -399,7 +416,7 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons, eventsForLaunchpad)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, commandChannels, dmxInterfaceConfig, this.LaunchpadName, fixturesConfig)
+	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, commandChannels, dmxInterfaceConfig, this.LaunchpadName, fixturesConfig, startConfig)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED))
