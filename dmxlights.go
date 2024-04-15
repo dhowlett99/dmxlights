@@ -450,8 +450,7 @@ func main() {
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
 
 	// Create top status bar.
-	topStatusBar := container.New(
-		layout.NewHBoxLayout(),
+	topStatusBar := container.New(layout.NewHBoxLayout(),
 		layout.NewSpacer(),
 		upLabel,
 		redLabel,
@@ -460,13 +459,16 @@ func main() {
 		layout.NewSpacer(),
 		layout.NewSpacer(),
 		layout.NewSpacer(),
+		layout.NewSpacer(),
 		sensitivityLabel,
+		layout.NewSpacer(),
 		layout.NewSpacer(),
 		masterLabel,
 		layout.NewSpacer(),
 		layout.NewSpacer(),
 		layout.NewSpacer(),
-		toolbar)
+		toolbar,
+	)
 
 	// Create bottom status bar.
 	bottonStatusBar := container.New(
