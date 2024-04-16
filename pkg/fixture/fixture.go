@@ -59,37 +59,49 @@ type State struct {
 }
 
 type Action struct {
-	Name        string `yaml:"name"`
-	Number      int
-	Colors      []string `yaml:"colors"`
-	Mode        string   `yaml:"mode"`
-	Fade        string   `yaml:"fade"`
-	Size        string   `yaml:"size"`
-	Speed       string   `yaml:"speed"`
-	Rotate      string   `yaml:"rotate"`
-	RotateSpeed string   `yaml:"rotatespeed"`
-	Program     string   `yaml:"program"`
-	Strobe      string   `yaml:"strobe"`
+	Name         string `yaml:"name"`
+	Number       int
+	Colors       []string `yaml:"colors"`
+	Map          string   `yaml:"map"`
+	Mode         string   `yaml:"mode"`
+	Fade         string   `yaml:"fade"`
+	Size         string   `yaml:"size"`
+	Speed        string   `yaml:"speed"`
+	Rotate       string   `yaml:"rotate"`
+	RotateSpeed  string   `yaml:"rotatespeed"`
+	Program      string   `yaml:"program"`
+	ProgramSpeed string   `yaml:"programspeed"`
+	Strobe       string   `yaml:"strobe"`
+	Gobo         string   `yaml:"gobo"`
+	GoboSpeed    string   `yaml:"gobospeed"`
 }
 
 type ActionConfig struct {
-	Name          string
-	Colors        []common.Color
-	Fade          int
-	NumberSteps   int
-	Size          int
-	Speed         time.Duration
-	TriggerState  bool
-	RotateSpeed   int
-	Rotatable     bool
-	Clockwise     bool
-	AntiClockwise bool
-	Auto          bool
-	Program       int
-	Music         int
-	MusicTrigger  bool
-	Strobe        bool
-	StrobeSpeed   int
+	Name              string
+	Colors            []common.Color
+	Map               bool
+	Fade              int
+	NumberSteps       int
+	Size              int
+	Speed             time.Duration
+	TriggerState      bool
+	RotateSpeed       int
+	Rotatable         bool
+	Clockwise         bool
+	AntiClockwise     bool
+	AutoRotate        bool
+	Program           int
+	ProgramOptions    []string
+	ProgramSpeed      int
+	Music             int
+	MusicTrigger      bool
+	Strobe            bool
+	StrobeSpeed       int
+	Gobo              int
+	GoboSpeed         int
+	AutoGobo          bool
+	GoboOptions       []string
+	RotateSensitivity int
 }
 
 type Fixture struct {
@@ -112,14 +124,16 @@ type FixtureInfo struct {
 	HasRotate     bool
 	HasGobo       bool
 	HasColorWheel bool
+	HasProgram    bool
 }
 
 type Setting struct {
-	Name    string `yaml:"name"`
-	Label   string `yaml:"labe,omitempty"`
-	Number  int    `yaml:"number"`
-	Channel string `yaml:"channel,omitempty"`
-	Value   string `yaml:"value"`
+	Name          string `yaml:"name"`
+	Label         string `yaml:"labe,omitempty"`
+	Number        int    `yaml:"number"`
+	Channel       string `yaml:"channel,omitempty"`
+	Value         string `yaml:"value"`
+	SelectedValue string `yaml:"selectedvalue"`
 }
 
 type Channel struct {
@@ -350,6 +364,10 @@ func FixtureReceiver(
 // Clear fixture.
 func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
 
+	if debug {
+		fmt.Printf("Fixture:%d clear\n", fixtureNumber)
+	}
+
 	// Send stop any running fade ups.
 	select {
 	case stopFadeUp <- true:
@@ -412,6 +430,10 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 // Switch On Static Scene.
 func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) common.LastColor {
+
+	if debug {
+		fmt.Printf("Fixture:%d setStaticOn\n", fixtureNumber)
+	}
 
 	if cmd.RGBStaticColors[fixtureNumber].Enabled {
 		if debug {
@@ -575,6 +597,10 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 
 func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.LastColor, stopFadeDown chan bool, stopFadeUp chan bool, fixtures *Fixtures, fixtureStepChannel chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 
+	if debug {
+		fmt.Printf("staticOff Fixture No %d", fixtureNumber)
+	}
+
 	go func() {
 		var master int
 		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
@@ -635,6 +661,9 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 
 func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
+	if debug {
+		fmt.Printf("playRGB: fixtureNumber %d", fixtureNumber)
+	}
 	// Now play all the values for this state.
 
 	// Play out fixture to DMX channels.
@@ -683,6 +712,10 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 }
 
 func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
+
+	if debug {
+		fmt.Printf("Fixture:%d playScanner\n", fixtureNumber)
+	}
 
 	// Find the fixture
 	fixture := cmd.ScannerPosition.Fixtures[fixtureNumber]
@@ -756,7 +789,7 @@ func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dm
 func findChannelSettingByLabel(fixture *Fixture, channelName string, label string) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByLabel: looking for Label -->%s<--- in Channel -->%s<-- settings\n", label, channelName)
+		fmt.Printf("findChannelSettingByLabel: looking for Label %s in Channel %s settings\n", label, channelName)
 	}
 
 	var fixtureName string
@@ -793,10 +826,25 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 	return 0, fmt.Errorf("label setting \"%s\" not found i channel \"%s\" fixture :%s", label, channelName, fixtureName)
 }
 
+func fixtureHasChannel(fixture *Fixture, channelName string) bool {
+
+	if debug {
+		fmt.Printf("fixtureHasChannel for fixture %s channel %s\n", fixture.Name, channelName)
+	}
+
+	for _, channel := range fixture.Channels {
+		if channel.Name == channelName {
+			return true
+		}
+	}
+
+	return false
+}
+
 func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByChannelNameAndSettingName for %s\n", channelName)
+		fmt.Printf("findChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
 	}
 
 	for _, channel := range fixture.Channels {
@@ -816,20 +864,41 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 					if debug {
 						fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingValue=%s\n", fixture.Name, channel.Name, settingName, setting.Value)
 					}
-					v, _ := strconv.Atoi(setting.Value)
+
+					var v int
+					var err error
+					// If the setting value contains a "-" remove it and then take the first valuel.
+					if strings.Contains(setting.Value, "-") {
+						// We've found a range of values.
+						// Find the start value
+						numbers := strings.Split(setting.Value, "-")
+						v, err = strconv.Atoi(numbers[0])
+						if err != nil {
+							return 0, err
+						}
+					} else {
+						v, err = strconv.Atoi(setting.Value)
+						if err != nil {
+							return 0, err
+						}
+					}
+					if debug {
+						fmt.Printf("Value Returned %d\n", v)
+					}
+
 					return v, nil
 				}
 			}
 		}
 	}
 
-	return 0, fmt.Errorf("label not found in fixture :%s", fixture.Name)
+	return 0, fmt.Errorf("setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
 }
 
 func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByNameAndSpeed for name %s and speed %s\n", settingName, settingSpeed)
+		fmt.Printf("findChannelSettingByNameAndSpeed for fixture %s setting name %s and setting speed %s\n", fixtureName, settingName, settingSpeed)
 	}
 
 	if settingName == "" {
@@ -841,19 +910,12 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 
 	for _, fixture := range fixtures.Fixtures {
 
-		if debug {
-			fmt.Printf("fixture %s\n", fixture.Name)
-			fmt.Printf("channels %+v\n", fixture.Channels)
-		}
 		if fixtureName == fixture.Name {
 			for _, channel := range fixture.Channels {
 				if debug {
 					fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)
 				}
 				if channel.Name == channelName {
-					if debug {
-						fmt.Printf("channel.Settings %+v\n", channel.Settings)
-					}
 					for _, setting := range channel.Settings {
 						if debug {
 							fmt.Printf("inspect setting %+v \n", setting)
@@ -864,7 +926,25 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 							if debug {
 								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Value)
 							}
-							v, _ := strconv.Atoi(setting.Value)
+
+							// If the setting value contains a "-" remove it and then take the first valuel.
+							var err error
+							var v int
+							if strings.Contains(setting.Value, "-") {
+								// We've found a range of values.
+								// Find the start value
+								numbers := strings.Split(setting.Value, "-")
+								v, err = strconv.Atoi(numbers[0])
+								if err != nil {
+									return 0, err
+								}
+							} else {
+								v, err = strconv.Atoi(setting.Value)
+								if err != nil {
+									return 0, err
+								}
+							}
+
 							if debug {
 								fmt.Printf("findChannelSettingByNameAndSpeed: speed found is %d\n", v)
 							}
@@ -1021,8 +1101,14 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 									strings.Contains(channel.Name, "Reverse") ||
 									strings.Contains(channel.Name, "invert") ||
 									strings.Contains(channel.Name, "Invert") {
+									if debug {
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(master)))
+									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
 								} else {
+									if debug {
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), master)
+									}
 									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
 								}
 							}
@@ -1186,7 +1272,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		useFixtureLabel = swiTch.UseFixture
 
 		if debug {
-			fmt.Printf("useFixtureLabel -->%s<---  blackout is %t\n", useFixtureLabel, blackout)
+			fmt.Printf("useFixtureLabel %s  blackout is %t\n", useFixtureLabel, blackout)
 		}
 
 		// Find the details of the fixture for this switch.
@@ -1197,20 +1283,20 @@ func MapSwitchFixture(swiTch common.Switch,
 		}
 
 		if debug {
-			fmt.Printf("Found fixture Name -->%s<--- \n", thisFixture.Name)
+			fmt.Printf("Found fixture Name %s \n", thisFixture.Name)
 		}
 
 		// Look for Master channel in this fixture identified by ID.
 		masterChannel, err := FindChannelNumberByName(thisFixture, "Master")
 		if err != nil && debug {
-			fmt.Printf("warning! fixture:%s master channel not defined: %s\n", thisFixture.Name, err)
+			fmt.Printf("warning! fixture %s: %s\n", thisFixture.Name, err)
 		}
 
 		// If blackout, set master to off.
 		if blackout {
 			// Blackout the fixture by setting master brightness to zero.
 			if debug {
-				fmt.Printf("---> SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
+				fmt.Printf("SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
 			return lastColor
@@ -1233,7 +1319,11 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Rotate = action.Rotate
 			newAction.RotateSpeed = action.RotateSpeed
 			newAction.Program = action.Program
+			newAction.ProgramSpeed = action.ProgramSpeed
 			newAction.Strobe = action.Strobe
+			newAction.Map = action.Map
+			newAction.Gobo = action.Gobo
+			newAction.GoboSpeed = action.GoboSpeed
 			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
 				lastColor.RGBColor = common.EmptyColor
@@ -1252,66 +1342,8 @@ func MapSwitchFixture(swiTch common.Switch,
 
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
-		for _, setting := range state.Settings {
-
-			// Process settings.
-			if debug {
-				fmt.Printf("settings are available\n")
-			}
-
-			// Not Blackout.
-			// This should be controlled by the master brightness
-			if strings.Contains(setting.Name, "master") || strings.Contains(setting.Name, "dimmer") {
-
-				// Master brightness.
-				value, _ := strconv.ParseFloat(setting.FixtureValue, 32)
-				howBright := int((float64(value) / 100) * (float64(brightness) / 2.55))
-
-				if strings.Contains(setting.Name, "reverse") || strings.Contains(setting.Name, "invert") {
-					// Invert the brightness value,  some fixtures have the max brightness at 0 and off at 255.
-					SetChannel(thisFixture.Address+int16(masterChannel), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
-				} else {
-					// Set the master brightness value.
-					SetChannel(thisFixture.Address+int16(masterChannel), byte(howBright), dmxController, dmxInterfacePresent)
-				}
-
-			} else {
-
-				// If the setting value has is a number set it directly.
-				if IsNumericOnly(setting.FixtureValue) {
-
-					value, _ := strconv.Atoi(setting.FixtureValue)
-					if IsNumericOnly(setting.Channel) {
-						channel, _ := strconv.Atoi(setting.Channel)
-						channel = channel - 1 // Channels are relative to the base address so deduct one to make it work.
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					} else {
-						// Handle the fact that the channel may be a label as well.
-						// Look for this channels number in this fixture identified by ID.
-						channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					}
-
-				} else {
-					// The setting value is a string.
-					// Lets looks to see if the setting string contains a valid fixture label, look up the label in the fixture definition.
-					value, err := findChannelSettingByLabel(thisFixture, setting.Channel, setting.Label)
-					if err != nil {
-						fmt.Printf("error: %s\n", err.Error())
-					}
-
-					// Handle the fact that the channel may be a label as well.
-					if IsNumericOnly(setting.Channel) {
-						// Find the channel
-						channel, _ := strconv.ParseFloat(setting.Channel, 32)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					} else {
-						// Look for this channels number in this fixture identified by ID.
-						channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-						SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
-					}
-				}
-			}
+		for _, newSetting := range state.Settings {
+			newMiniSetter(thisFixture, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
 		}
 	}
 	return lastColor
@@ -1531,18 +1563,28 @@ func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) 
 			return channelNumber, nil
 		}
 	}
-	return 0, fmt.Errorf("error looking for channel %s", channelName)
+	return 0, fmt.Errorf("channel %s not found in fixture %s", channelName, fixture.Name)
 }
 
-func FindFixtureInfo(thisFixture Fixture) FixtureInfo {
+func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
+	if debug {
+		fmt.Printf("FindFixtureInfo\n")
+	}
+
 	fixtureInfo := FixtureInfo{}
-	fixtureInfo.HasRotate = isThisAChannel(thisFixture, "Rotate")
-	fixtureInfo.HasColorWheel = isThisAChannel(thisFixture, "Color")
-	fixtureInfo.HasGobo = isThisAChannel(thisFixture, "Gobo")
+	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
+	fixtureInfo.HasColorWheel = isThisAChannel(*thisFixture, "Color")
+	fixtureInfo.HasGobo = isThisAChannel(*thisFixture, "Gobo")
+	fixtureInfo.HasProgram = isThisAChannel(*thisFixture, "Program")
 	return fixtureInfo
 }
 
 func isThisAChannel(thisFixture Fixture, channelName string) bool {
+
+	if debug {
+		fmt.Printf("isThisAChannel\n")
+	}
+
 	for _, channel := range thisFixture.Channels {
 		if channel.Name == channelName {
 			return true

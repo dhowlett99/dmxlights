@@ -33,6 +33,26 @@ import (
 
 const debug_mini bool = false
 
+const FADE_SHARP int = 10
+const FADE_NORMAL int = 5
+const FADE_SOFT int = 1
+
+const SIZE_OFF int = 0
+const SIZE_SHORT int = 1
+const SIZE_MEDIUM int = 3
+const SIZE_LONG int = 10
+
+const SENSITIVITY_LONG int = 500
+const SENSITIVITY_MEDIUM int = 100
+const SENSITIVITY_SHORT int = 10
+
+const LARGE_NUMBER_STEPS int = 64
+const MEDIUM_NUMBER_STEPS int = 32
+
+const STROBE_SPEED_FAST int = 255
+const STROBE_SPEED_MEDIUM int = 127
+const STROBE_SPEED_SLOW int = 0
+
 // newMiniSequencer is a simple sequencer which can be attached to a switch and a single fixture to allow simple effects.
 // The miniSequenceer implements the actions attaced to a switch state.
 // Currently we support 1. Off 2. Control, ability to set programs 3. Static colors 4. Chase. soft, hard and timed or music triggered.
@@ -46,18 +66,17 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 	guiButtons chan common.ALight,
 	fixtureStepChannel chan common.FixtureCommand) {
 
+	if debug {
+		fmt.Printf("newMiniSequencer: start fixture %s\n", fixture.Name)
+	}
+
 	switchName := fmt.Sprintf("switch%d", swiTch.Number)
 
 	mySequenceNumber := fixture.Group - 1
 	myFixtureNumber := fixture.Number - 1
 
-	// Find all the specified settings for the program channel
-	programSettings, err := GetChannelSettinsByName(fixture, "Program", fixturesConfig)
-	if err != nil && debug {
-		fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
-	}
-
-	cfg := getConfig(action, programSettings)
+	// Setup the configuration.
+	cfg := getConfig(action, fixture, fixturesConfig)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -186,24 +205,85 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+		//MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
-			fmt.Printf("fixture %s program channel not found: %s,", fixture.Name, err)
-			return
+			fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 		}
 
-		// Look up the program state required.
-		v, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
-		if err != nil {
-			fmt.Printf("fixture %s program state not found: %s,", fixture.Name, err)
-			return
+		if fixtureHasChannel(fixture, "Master") {
+			// Find the program speed channel for this fixture.
+			masterChannel, err := FindChannelNumberByName(fixture, "Master")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send master Address %d Value %d \n", fixture.Name, fixture.Address+int16(masterChannel), master)
+			}
+			SetChannel(fixture.Address+int16(masterChannel), byte(master), dmxController, dmxInterfacePresent)
 		}
 
-		// Now play that DMX value on the program channel of this fixture.
-		SetChannel(fixture.Address+int16(programChannel), byte(v), dmxController, dmxInterfacePresent)
+		if fixtureHasChannel(fixture, "Shutter") {
+			// Find the program speed channel for this fixture.
+			shutterChannel, err := FindChannelNumberByName(fixture, "Shutter")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send Shutter Address %d Value %d \n", fixture.Name, fixture.Address+int16(shutterChannel), master)
+			}
+			SetChannel(fixture.Address+int16(shutterChannel), byte(32), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Rotate") {
+			// Find the rotate channel for this fixture.
+			rotateChannel, err := FindChannelNumberByName(fixture, "Rotate")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send Rotate Address %d Value %d \n", fixture.Name, fixture.Address+int16(rotateChannel), master)
+			}
+			SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Gobo") {
+			// Find the gobo channel for this fixture.
+			goboChannel, err := FindChannelNumberByName(fixture, "Gobo")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send Gobo Address %d Value %d \n", fixture.Name, fixture.Address+int16(goboChannel), master)
+			}
+			SetChannel(fixture.Address+int16(goboChannel), byte(0), dmxController, dmxInterfacePresent)
+		}
+		if fixtureHasChannel(fixture, "ProgramSpeed") {
+			// Find the program speed channel for this fixture.
+			programSpeedChannel, err := FindChannelNumberByName(fixture, "ProgramSpeed")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send ProgramSpeed Address %d Value %d \n", fixture.Name, fixture.Address+int16(programSpeedChannel), master)
+			}
+			// Now play that DMX value on the program channel of this fixture.
+			SetChannel(fixture.Address+int16(programSpeedChannel), byte(cfg.ProgramSpeed), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Program") {
+			// Look up the program state required.
+			programState, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
+			if err != nil {
+				fmt.Printf("warning: %s\n", err)
+			}
+			if debug {
+				fmt.Printf("fixture %s: Control: send Program Address %d Value %d \n", fixture.Name, fixture.Address+int16(programState), master)
+			}
+			SetChannel(fixture.Address+int16(programChannel), byte(programState), dmxController, dmxInterfacePresent)
+		}
 
 		return
 	}
@@ -417,7 +497,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			ScannerReverse:       false,
 			RGBInvert:            false,
 			Bounce:               false,
-			ScannerChaser:        false,
+			ScannerChaser:        true,
 			RGBShift:             1,
 			RGBNumberStepsInFade: cfg.NumberSteps,
 			RGBFade:              cfg.Fade,
@@ -451,18 +531,24 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 		var rotateCounter int
+		var goboChangeFrequency int
+		var goboCounter int
 		var clockwiseSpeed int
 		var antiClockwiseSpeed int
 
 		// Calculate the rotation speed based on direction and soeed.
 		if cfg.Rotatable {
-			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Anti Clockwise", action.RotateSpeed, fixturesConfig)
+			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Anti Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("anti clockwise rotate speed: %s\n", err)
+				fmt.Printf("Fixture %s anti clockwise rotate speed: %s\n", fixture.Name, err)
 			}
-			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Clockwise", action.RotateSpeed, fixturesConfig)
+			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Rotate Clockwise", action.RotateSpeed, fixturesConfig)
 			if err != nil {
-				fmt.Printf("clockwise rotate speed: %s\n", err)
+				fmt.Printf("Fixture %s clockwise rotate speed: %s\n", fixture.Name, err)
+			}
+			if debug {
+				fmt.Printf("clockwiseSpeed %d\n", clockwiseSpeed)
+				fmt.Printf("antiClockwiseSpeed %d\n", antiClockwiseSpeed)
 			}
 		}
 
@@ -523,7 +609,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						case <-time.After(10 * time.Millisecond):
 						}
 
-						if rotateCounter > 500 {
+						if rotateCounter > cfg.RotateSensitivity {
 							rotateCounter = 1
 						}
 						if !cfg.Clockwise && !cfg.AntiClockwise {
@@ -536,8 +622,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 							cfg.RotateSpeed = antiClockwiseSpeed
 						}
 
-						if cfg.Auto {
-							if rotateCounter < 250 {
+						if cfg.AutoRotate {
+							if rotateCounter < (cfg.RotateSensitivity / 2) {
 								// Clockwise Speed.
 								cfg.RotateSpeed = clockwiseSpeed
 							} else {
@@ -547,7 +633,21 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						}
 					}
 
+					if cfg.AutoGobo {
+						if goboCounter >= len(cfg.GoboOptions) {
+							goboCounter = 0
+						}
+						if goboChangeFrequency > cfg.GoboSpeed {
+							goboChangeFrequency = 0
+							goboCounter++
+						}
+						goboChangeFrequency++
+						cfg.Gobo = goboCounter
+					}
+
 					if debug_mini {
+						fmt.Printf("Rotate Value %d Counter %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, rotateCounter, clockwiseSpeed, antiClockwiseSpeed)
+						fmt.Printf("Gobo %d goboChangeFrequency %d\n", cfg.Gobo, goboChangeFrequency)
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.Speed)
 						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.Speed)
 					}
@@ -573,10 +673,17 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 					fixtures := position.Fixtures
 
+					var actualMaster int
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						fixture := fixtures[fixtureNumber]
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						if cfg.Map {
+							// Use sound triggered brighness and apply master
+							actualMaster = int((float64(fixture.Brightness) / 100) * (float64(master) / 2.55))
+						} else {
+							actualMaster = master
+						}
+						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
 					rotateCounter++
@@ -586,9 +693,91 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 	}
 }
 
-func getConfig(action Action, programSettings []common.Setting) ActionConfig {
+func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) ActionConfig {
 
 	config := ActionConfig{}
+
+	var programSettings []common.Setting
+	var goboSettings []common.Setting
+	var err error
+
+	fixtureInfo := FindFixtureInfo(fixture)
+	if debug {
+		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
+	}
+
+	// Find all the specified settings for the program channel
+	if fixtureInfo.HasProgram {
+
+		programSettings, err = GetChannelSettinsByName(fixture, "Program", fixturesConfig)
+		if err != nil && debug {
+			fmt.Printf("newMiniSequencer: warning! no program settings found for fixture %s\n", fixture.Name)
+		}
+
+		// Program Speed - Speed of programs or shows.
+		switch action.ProgramSpeed {
+		case "Off":
+			config.ProgramSpeed = 0
+		case "Slow":
+			config.ProgramSpeed = 10
+		case "Medium":
+			config.ProgramSpeed = 100
+		case "Fast":
+			config.ProgramSpeed = 200
+		default:
+			config.ProgramSpeed = 0
+		}
+
+		// Look through the available settins and see if you can find the specified program action.
+		for _, setting := range programSettings {
+			if action.Program == setting.Name || setting.Name == "Default" {
+				config.Program = int(setting.Value)
+			}
+		}
+	}
+
+	// Setup the gobos based on their name.
+	if fixtureInfo.HasGobo {
+
+		switch action.GoboSpeed {
+		case "Slow":
+			config.GoboSpeed = SENSITIVITY_LONG
+		case "Medium":
+			config.GoboSpeed = SENSITIVITY_MEDIUM
+		case "Fast":
+			config.GoboSpeed = SENSITIVITY_SHORT
+		default:
+			config.GoboSpeed = 0
+		}
+
+		switch action.Gobo {
+		case "Default":
+			config.Gobo = 0
+			config.AutoGobo = false
+		case "Auto":
+			config.Gobo = -1
+			config.AutoGobo = true
+		default:
+			// find current gobo number.
+			config.Gobo = FindGobo(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
+			config.AutoGobo = false
+		}
+
+		// Find all the specified options for the gobo channel
+		goboSettings, err = GetChannelSettinsByName(fixture, "Gobo", fixturesConfig)
+		if err != nil && debug {
+			fmt.Printf("newMiniSequencer: warning! no gobos found for fixture %s\n", fixture.Name)
+		}
+
+		// Gobo allways has a defult option of the first gobo.
+		config.GoboOptions = append(config.GoboOptions, "Default")
+
+		// Look through the available gobos and populate the available gobos values.
+		for _, setting := range goboSettings {
+			config.GoboOptions = append(config.GoboOptions, setting.Name)
+		}
+
+	}
 
 	if action.Colors != nil {
 		// Find the color by name from the library of supported colors.
@@ -599,67 +788,70 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.Colors = colorLibrary
 	}
 
+	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
+	switch action.Map {
+	case "Off":
+		config.Map = false // Don't map
+	case "On":
+		config.Map = true // Map brightness to master dimmer.
+	default:
+		config.Map = false // Don't map
+	}
+
 	// Fade - Time taken to fade up and down.
 	switch action.Fade {
 	case "":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	case "Off":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	case "Soft":
-		config.Fade = 1 // Soft
+		config.Fade = FADE_SOFT
 	case "Normal":
-		config.Fade = 5 // Normal
+		config.Fade = FADE_NORMAL
 	case "Sharp":
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	default:
-		config.Fade = 10 // Sharp
+		config.Fade = FADE_SHARP
 	}
 
 	// Size - How long does the lamp stay on.
 	switch action.Size {
 	case "Off":
-		config.Size = 0
+		config.Size = SIZE_OFF
 	case "Short":
-		config.Size = 1
+		config.Size = SIZE_SHORT
 	case "Medium":
-		config.Size = 3
+		config.Size = SIZE_MEDIUM
 	case "Long":
-		config.Size = 10
+		config.Size = SIZE_LONG
 	default:
-		config.Size = 3
-	}
-
-	// Look through the available settins and see if you can find the specified program action.
-	for _, setting := range programSettings {
-		if action.Program == setting.Name || setting.Name == "Default" {
-			config.Program = int(setting.Value)
-		}
+		config.Size = SIZE_MEDIUM
 	}
 
 	switch action.Rotate {
 	case "Off":
 		config.Rotatable = false
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = false
 	case "Clockwise":
 		config.Rotatable = true
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = true
 		config.AntiClockwise = false
 	case "Anti Clockwise":
 		config.Rotatable = true
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = true
 	case "Auto":
 		config.Rotatable = true
-		config.Auto = true
+		config.AutoRotate = true
 		config.Clockwise = false
 		config.AntiClockwise = false
 	default:
 		config.Rotatable = false
-		config.Auto = false
+		config.AutoRotate = false
 		config.Clockwise = false
 		config.AntiClockwise = false
 	}
@@ -669,47 +861,53 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 		config.TriggerState = false
 		config.Speed = 1 * time.Second
 		config.MusicTrigger = false
-		config.NumberSteps = 64
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 500 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 250 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 50 * time.Millisecond
 		config.MusicTrigger = false
-		config.NumberSteps = 64
+		config.NumberSteps = LARGE_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Music":
 		config.TriggerState = true
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
-		config.NumberSteps = 32
+		config.NumberSteps = MEDIUM_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_LONG
 	default:
 		config.TriggerState = false
 		config.Speed = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
-		config.NumberSteps = 32
+		config.NumberSteps = MEDIUM_NUMBER_STEPS
+		config.RotateSensitivity = SENSITIVITY_SHORT
 	}
 
 	switch action.Strobe {
 	case "Off":
 		config.Strobe = false
-		config.StrobeSpeed = 0
+		config.StrobeSpeed = STROBE_SPEED_SLOW
 	case "Slow":
 		config.Strobe = true
-		config.StrobeSpeed = 0
+		config.StrobeSpeed = STROBE_SPEED_SLOW
 	case "Medium":
 		config.Strobe = true
-		config.StrobeSpeed = 127
+		config.StrobeSpeed = STROBE_SPEED_MEDIUM
 	case "Fast":
 		config.Strobe = true
-		config.StrobeSpeed = 255
+		config.StrobeSpeed = STROBE_SPEED_FAST
 	default:
 		config.Strobe = false
 		config.StrobeSpeed = 0
@@ -718,7 +916,7 @@ func getConfig(action Action, programSettings []common.Setting) ActionConfig {
 	return config
 }
 
-func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixture *Fixture, channelName string, fixtures *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
 		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixture.Name)
 	}
@@ -730,9 +928,24 @@ func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) 
 		if debug_mini {
 			fmt.Printf("GetChannelSettinsByName: looking at channel %s\n", channel.Name)
 		}
-		if channel.Name == name {
+		if channel.Name == channelName {
 			if debug_mini {
 				fmt.Printf("Found a Program Channel\n")
+			}
+			// First look for any settings available for this channel.
+			if channel.Settings != nil {
+				for _, setting := range channel.Settings {
+					if debug_mini {
+						fmt.Printf("Looking through Settings %s\n", setting.Name)
+					}
+					v, _ := strconv.Atoi(setting.Value)
+					value := common.Setting{
+						Name:  setting.Name,
+						Value: int16(v),
+					}
+					settingNames = append(settingNames, value)
+				}
+				return settingNames, nil
 			}
 			// If the program has a hard coded value return that as a default.
 			if channel.Value != nil {
@@ -746,30 +959,10 @@ func GetChannelSettinsByName(fixture *Fixture, name string, fixtures *Fixtures) 
 				settingNames = append(settingNames, value)
 				return settingNames, nil
 			}
-			// Otherwise find the settings available for this channel.
-			for _, setting := range channel.Settings {
-				if debug_mini {
-					fmt.Printf("Looking through Settings %s\n", setting.Name)
-				}
-				v, _ := strconv.Atoi(setting.Value)
-				value := common.Setting{
-					Name:  setting.Name,
-					Value: int16(v),
-				}
-				settingNames = append(settingNames, value)
-			}
 		}
 	}
-	// found some settings.
-	if len(settingNames) > 0 {
-		if debug_mini {
-			fmt.Printf("Found Settings %+v\n", settingNames)
-		}
-		return settingNames, nil
-	}
 
-	return nil, fmt.Errorf("failed to find program settings for fixture%s", fixture.Name)
-
+	return nil, fmt.Errorf("failed to find settings for channel %s in fixture%s", channelName, fixture.Name)
 }
 
 // getSwitchState reports on if this switch is running a mini sequence.

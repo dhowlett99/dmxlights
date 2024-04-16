@@ -21,17 +21,13 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
-	"github.com/oliread/usbdmx/ft232"
 )
 
 func loadConfig(sequences []*common.Sequence, this *CurrentState,
-	X int, Y int, Red common.Color, PresetYellow common.Color,
-	dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+	X int, Y int,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight,
-	guiButtons chan common.ALight, updateChannels []chan common.Sequence,
-	dmxInterfacePresent bool) {
+	guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	// Stop all sequences, so we start in sync.
 	cmd := common.Command{
