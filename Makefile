@@ -44,8 +44,8 @@ build:
 
 legacy-deploy:
 	rm -rf dmxlights.app/
-	fyne package --appVersion 2.1 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png --tags legacy
-	cp fixtures.yaml dmxlights.app/Contents/Resources/
+	fyne package --appVersion 2.0 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png --tags legacy
+	cp Default_Project.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
