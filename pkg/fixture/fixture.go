@@ -1659,7 +1659,9 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, s
 
 	for fixtureNumber, fixture := range fixtures.Fixtures {
 
-		fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+		if debug {
+			fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+		}
 
 		if fixture.Name != startConfig.Fixtures[fixtureNumber].Name {
 			return false, fmt.Sprintf("Fixture:%d Name is different\n", fixtureNumber+1)
