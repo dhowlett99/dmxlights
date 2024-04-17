@@ -1668,6 +1668,8 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) bool {
 		if !reflect.DeepEqual(fixture, startConfig.Fixtures[fixtureNumber]) {
 			if debug {
 				fmt.Printf("Fixture Name %d is different\n", fixtureNumber)
+				fmt.Printf("Fixture %+v\n", fixture)
+				fmt.Printf("Start Fixture %+v\n", startConfig.Fixtures[fixtureNumber])
 			}
 			return false
 		}
