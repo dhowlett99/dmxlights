@@ -226,7 +226,7 @@ func TestCheckFixturesAreTheSame(t *testing.T) {
 				},
 			},
 			{
-				Name:   "fixture30",
+				Name:   "fixture3",
 				Group:  3,
 				Number: 3,
 				Channels: []Channel{
@@ -246,7 +246,7 @@ func TestCheckFixturesAreTheSame(t *testing.T) {
 				Number: 1,
 				Channels: []Channel{
 					{
-						Name: "Red",
+						Name: "DIFFERENT Red",
 					},
 					{
 						Name: "Green",

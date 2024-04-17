@@ -1219,7 +1219,6 @@ func (h *ActiveHeader) TappedSecondary(_ *fyne.PointEvent) {
 
 func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 
-	var outActions []fixture.Action
 	var newFixtureList []fixture.Fixture
 
 	for _, f := range fixtureList {
@@ -1246,11 +1245,9 @@ func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 
 			newState := fixture.State{}
 			newActions := []fixture.Action{}
-
 			for _, action := range state.Actions {
 				if action.Mode != "None" {
-					newAction := action
-					newActions = append(outActions, newAction)
+					newActions = append(newActions, action)
 				}
 			}
 
