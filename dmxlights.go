@@ -252,11 +252,12 @@ func main() {
 
 	// If you try to quit without saving your changed project. Uses startConfig as a ref to determine changes.
 	myWindow.SetCloseIntercept(func() {
-		if fixture.CheckFixturesAreTheSame(fixturesConfig, startConfig) {
-			os.Exit(0)
-		} else {
-			model := gui.AreYouSureDialog(myWindow)
+		theSame, message := fixture.CheckFixturesAreTheSame(fixturesConfig, startConfig)
+		if !theSame {
+			model := gui.AreYouSureDialog(myWindow, message)
 			model.Show()
+		} else {
+			os.Exit(0)
 		}
 	})
 

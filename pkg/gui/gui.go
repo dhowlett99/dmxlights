@@ -493,7 +493,7 @@ func PopupErrorMessage(myWindow fyne.Window, errorMessage string) {
 	popupErrorPanel.Show()
 }
 
-func AreYouSureDialog(myWindow fyne.Window) *widget.PopUp {
+func AreYouSureDialog(myWindow fyne.Window, message string) *widget.PopUp {
 
 	// Create a dialog for error messages.
 	popupAreYouSurePanel := &widget.PopUp{}
@@ -513,6 +513,7 @@ func AreYouSureDialog(myWindow fyne.Window) *widget.PopUp {
 			widget.NewLabel("Project Has Changed"),
 			widget.NewLabel("If you quit with out saving"),
 			widget.NewLabel("your changes will be lost"),
+			widget.NewLabel(message),
 			container.NewHBox(buttonCancel, buttonOK),
 		),
 		myWindow.Canvas(),

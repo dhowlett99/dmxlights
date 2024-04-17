@@ -24,7 +24,6 @@ import (
 	"io"
 	"math"
 	"os"
-	"reflect"
 	"strconv"
 	"strings"
 	"time"
@@ -1652,27 +1651,213 @@ func isThisAChannel(thisFixture Fixture, channelName string) bool {
 }
 
 // returns true is they are the same.
-func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) bool {
+func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, string) {
 
 	if len(fixtures.Fixtures) != len(startConfig.Fixtures) {
-		if debug {
-			fmt.Printf("Length is different\n")
-		}
-		return false
+		return false, "Number of fixtures are different"
 	}
 
 	for fixtureNumber, fixture := range fixtures.Fixtures {
-		if debug {
-			fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+
+		fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+
+		if fixture.Name != startConfig.Fixtures[fixtureNumber].Name {
+			return false, fmt.Sprintf("Fixture:%d Name is different\n", fixtureNumber+1)
 		}
-		if !reflect.DeepEqual(fixture, startConfig.Fixtures[fixtureNumber]) {
-			if debug {
-				fmt.Printf("Fixture Name %d is different\n", fixtureNumber)
-				fmt.Printf("Fixture %+v\n", fixture)
-				fmt.Printf("Start Fixture %+v\n", startConfig.Fixtures[fixtureNumber])
+
+		if fixture.ID != startConfig.Fixtures[fixtureNumber].ID {
+			return false, fmt.Sprintf("Fixture:%d ID is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Label != startConfig.Fixtures[fixtureNumber].Label {
+			return false, fmt.Sprintf("Fixture:%d Label is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Number != startConfig.Fixtures[fixtureNumber].Number {
+			return false, fmt.Sprintf("Fixture:%d Number is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Description != startConfig.Fixtures[fixtureNumber].Description {
+			return false, fmt.Sprintf("Fixture:%d Description is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Type != startConfig.Fixtures[fixtureNumber].Type {
+			return false, fmt.Sprintf("Fixture:%d Type is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Group != startConfig.Fixtures[fixtureNumber].Group {
+			return false, fmt.Sprintf("Fixture:%d Group is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Address != startConfig.Fixtures[fixtureNumber].Address {
+			return false, fmt.Sprintf("Fixture:%d Address is different\n", fixtureNumber+1)
+		}
+
+		for channelNumber, channel := range fixture.Channels {
+
+			if channel.Number != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Number {
+				return false, fmt.Sprintf("Fixture:%d Channel Number is different\n", fixtureNumber+1)
 			}
-			return false
+
+			if channel.Name != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Name {
+				return false, fmt.Sprintf("Fixture:%d Channel Name is different\n", fixtureNumber+1)
+			}
+
+			if channel.Value != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Value {
+				return false, fmt.Sprintf("Fixture:%d Channel Value is different\n", fixtureNumber+1)
+			}
+
+			if channel.MaxDegrees != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].MaxDegrees {
+				return false, fmt.Sprintf("Fixture:%d Channel MaxDegrees is different\n", fixtureNumber+1)
+			}
+
+			if channel.Offset != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Offset {
+				return false, fmt.Sprintf("Fixture:%d Channel Offset is different\n", fixtureNumber+1)
+			}
+
+			if channel.Comment != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Comment {
+				return false, fmt.Sprintf("Fixture:%d Channel Comment is different\n", fixtureNumber+1)
+			}
+
+			for settingNumber, setting := range channel.Settings {
+
+				if setting.Name != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Name {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Name is different\n", fixtureNumber+1)
+				}
+
+				if setting.Label != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Label {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Label is different\n", fixtureNumber+1)
+				}
+
+				if setting.Number != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Number {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Number is different\n", fixtureNumber+1)
+				}
+
+				if setting.Channel != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Channel {
+					return false, fmt.Sprintf("Fixture:%d Channel Channel Number is different\n", fixtureNumber+1)
+				}
+
+				if setting.Value != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Value {
+					return false, fmt.Sprintf("Fixture:%d Channel Value Number is different\n", fixtureNumber+1)
+				}
+			}
+
+			for stateNumber, state := range fixture.States {
+
+				if state.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Number {
+					return false, fmt.Sprintf("Fixture:%d State Number is different\n", fixtureNumber+1)
+				}
+
+				if state.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Name {
+					return false, fmt.Sprintf("Fixture:%d State Name is different\n", fixtureNumber+1)
+				}
+
+				if state.Label != startConfig.Fixtures[fixtureNumber].States[stateNumber].Label {
+					return false, fmt.Sprintf("Fixture:%d State Label is different\n", fixtureNumber+1)
+				}
+
+				if state.ButtonColor != startConfig.Fixtures[fixtureNumber].States[stateNumber].ButtonColor {
+					return false, fmt.Sprintf("Fixture:%d State ButtonColor is different\n", fixtureNumber+1)
+				}
+
+				if state.Master != startConfig.Fixtures[fixtureNumber].States[stateNumber].Master {
+					return false, fmt.Sprintf("Fixture:%d State Master is different\n", fixtureNumber+1)
+				}
+
+				for actionNumber, action := range state.Actions {
+
+					if action.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Name {
+						return false, fmt.Sprintf("Fixture:%d State Action Name is different\n", fixtureNumber+1)
+					}
+
+					if action.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Number {
+						return false, fmt.Sprintf("Fixture:%d State Action Number is different\n", fixtureNumber+1)
+					}
+
+					for colorNumber, color := range action.Colors {
+						if color != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Colors[colorNumber] {
+
+							return false, fmt.Sprintf("Fixture:%d State Action Color Number is different\n", fixtureNumber+1)
+						}
+					}
+
+					if action.Mode != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Mode {
+						return false, fmt.Sprintf("Fixture:%d State Action Mode is different\n", fixtureNumber+1)
+					}
+
+					if action.Fade != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Fade {
+						return false, fmt.Sprintf("Fixture:%d State Action Fade is different\n", fixtureNumber+1)
+					}
+
+					if action.Size != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Size {
+						return false, fmt.Sprintf("Fixture:%d State Action Size is different\n", fixtureNumber+1)
+					}
+
+					if action.Speed != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Speed {
+						return false, fmt.Sprintf("Fixture:%d State Action Speed is different\n", fixtureNumber+1)
+					}
+
+					if action.Rotate != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Rotate {
+						return false, fmt.Sprintf("Fixture:%d State Action Rotate is different\n", fixtureNumber+1)
+					}
+
+					if action.RotateSpeed != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].RotateSpeed {
+						return false, fmt.Sprintf("Fixture:%d State Action RotateSpeed is different\n", fixtureNumber+1)
+					}
+
+					if action.Program != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Program {
+						return false, fmt.Sprintf("Fixture:%d State Action Program is different\n", fixtureNumber+1)
+					}
+
+					if action.Strobe != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Strobe {
+						return false, fmt.Sprintf("Fixture:%d State Action Strobe is different\n", fixtureNumber+1)
+					}
+
+				}
+
+				for settingNumber, setting := range state.Settings {
+
+					if setting.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Name {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Strobe is different\n", fixtureNumber+1)
+					}
+
+					if setting.Label != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Label {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Label is different\n", fixtureNumber+1)
+					}
+
+					if setting.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Number {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Number is different\n", fixtureNumber+1)
+					}
+
+					if setting.Channel != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Channel {
+						return false, fmt.Sprintf("Fixture:%d Channel Channel Number is different\n", fixtureNumber+1)
+					}
+
+					if setting.Value != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Value {
+						return false, fmt.Sprintf("Fixture:%d Channel Value Number is different\n", fixtureNumber+1)
+					}
+				}
+
+				if state.Flash != startConfig.Fixtures[fixtureNumber].States[stateNumber].Flash {
+					return false, fmt.Sprintf("Fixture:%d State Flash is different\n", fixtureNumber+1)
+				}
+
+			}
+
+			if fixture.MultiFixtureDevice != startConfig.Fixtures[fixtureNumber].MultiFixtureDevice {
+				return false, fmt.Sprintf("Fixture:%d MultiFixtureDevice is different\n", fixtureNumber+1)
+			}
+
+			if fixture.NumberSubFixtures != startConfig.Fixtures[fixtureNumber].NumberSubFixtures {
+				return false, fmt.Sprintf("Fixture:%d NumberSubFixtures is different\n", fixtureNumber+1)
+			}
+
+			if fixture.UseFixture != startConfig.Fixtures[fixtureNumber].UseFixture {
+				return false, fmt.Sprintf("Fixture: %d UseFixture is different\n", fixtureNumber+1)
+			}
+
 		}
 	}
-	return true
+
+	return true, ""
 }
