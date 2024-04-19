@@ -733,9 +733,7 @@ func getGroupName(groupConfig *fixture.Groups, groupNumber string) string {
 		fmt.Printf("getGroupName %s\n", groupNumber)
 	}
 	for _, group := range groupConfig.Groups {
-		fmt.Printf("group.Name %s group.Number %s\n", group.Name, group.Number)
 		if group.Number == groupNumber {
-			fmt.Printf("FOUND group.Name %s\n", group.Name)
 			return group.Name
 		}
 	}
