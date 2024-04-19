@@ -140,7 +140,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
@@ -150,7 +150,8 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 	fp.Fixtures = fixtures
 	fp.FixtureList = []fixture.Fixture{}
 
-	fp.GroupOptions = []string{"1", "2", "3", "4", "5", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
+	// Populate group options from the available sequence labels.
+	fp.GroupOptions = getGroupOptions(groupConfig)
 	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
@@ -323,14 +324,13 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 			if i.Col == FIXTURE_GROUP {
 				showField(FIXTURE_GROUP, o)
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = nil
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).SetSelected(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).SetSelected(getGroupName(groupConfig, data[i.Row][i.Col]))
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).Options = fp.GroupOptions
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(value string) {
-					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
+				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(groupName string) {
+					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, getGroupFromName(groupConfig, groupName), fp.FixtureList)
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 					data = updateArray(fp.FixtureList)
 				}
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).PlaceHolder = "XXX"
 			}
 
 			// Fixture Number.
@@ -602,7 +602,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 
 	fp.FixturePanel.SetColumnWidth(0, 40)  // Id
 	fp.FixturePanel.SetColumnWidth(1, 100) // Type
-	fp.FixturePanel.SetColumnWidth(2, 61)  // Sequence Number
+	fp.FixturePanel.SetColumnWidth(2, 100) // Sequence Number
 	fp.FixturePanel.SetColumnWidth(3, 59)  // Fixture Number
 	fp.FixturePanel.SetColumnWidth(4, 80)  // Name
 	fp.FixturePanel.SetColumnWidth(5, 80)  // Label
@@ -703,6 +703,43 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, fixtures *fixt
 		w.Canvas(),
 	)
 	return popupFixturePanel, nil
+}
+
+func getGroupOptions(groupConfig *fixture.Groups) []string {
+	if debug {
+		fmt.Printf("getGroupOptions\n")
+	}
+	var groupOptions []string
+	for _, group := range groupConfig.Groups {
+		groupOptions = append(groupOptions, group.Name)
+	}
+	return groupOptions
+}
+
+func getGroupFromName(groupConfig *fixture.Groups, groupName string) string {
+	if debug {
+		fmt.Printf("getGroupFromName %s\n", groupName)
+	}
+	for _, group := range groupConfig.Groups {
+		if group.Name == groupName {
+			return group.Number
+		}
+	}
+	return groupName
+}
+
+func getGroupName(groupConfig *fixture.Groups, groupNumber string) string {
+	if debug {
+		fmt.Printf("getGroupName %s\n", groupNumber)
+	}
+	for _, group := range groupConfig.Groups {
+		fmt.Printf("group.Name %s group.Number %s\n", group.Name, group.Number)
+		if group.Number == groupNumber {
+			fmt.Printf("FOUND group.Name %s\n", group.Name)
+			return group.Name
+		}
+	}
+	return groupNumber
 }
 
 func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {

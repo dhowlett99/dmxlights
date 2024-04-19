@@ -24,9 +24,11 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Slow
       number: 2
       value: "16"
+      selectedvalue: ""
   - number: 6
     name: Programs
     comment: Automatic Programs/ Sound-Active Mode
@@ -550,42 +552,54 @@ fixtures:
     - name: Open
       number: 1
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Yellow Cluster
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Red Swirl
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Green Strips
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Blue Star
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Multi Color Coma
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Purple Bub
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Cyan World
       number: 8
       value: "50"
+      selectedvalue: ""
     - name: Blue Circle
       number: 9
       value: "57"
+      selectedvalue: ""
   - number: 5
     name: Master
 - id: 16
@@ -607,42 +621,54 @@ fixtures:
     - name: Open
       number: 1
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Yellow Cluster
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Red Swirl
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Green Strips
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Blue Star
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Multi Color Coma
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Purple Bub
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Cyan World
       number: 8
       value: "50"
+      selectedvalue: ""
     - name: Blue Circle
       number: 9
       value: "57"
+      selectedvalue: ""
   - number: 5
     name: Master
 - id: 17
@@ -664,42 +690,54 @@ fixtures:
     - name: Open
       number: 1
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Yellow Cluster
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Red Swirl
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Green Strips
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Blue Star
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: MultiColor Coma
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Purple Bub
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Cyan World
       number: 8
       value: "50"
+      selectedvalue: ""
     - name: Blue Circle
       number: 9
       value: "57"
+      selectedvalue: ""
   - number: 5
     name: Master
 - id: 18
@@ -721,42 +759,54 @@ fixtures:
     - name: Open
       number: 1
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Yellow Cluster
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Red Swirl
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Green Strips
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Blue Star
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Multi Color Coma
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Purple Bub
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Cyan World
       number: 8
       value: "50"
+      selectedvalue: ""
     - name: Blue Circle
       number: 9
       value: "57"
+      selectedvalue: ""
   - number: 5
     name: Master
 - id: 19
@@ -778,42 +828,54 @@ fixtures:
     - name: Open
       number: 1
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 4
     name: Gobo
     settings:
     - name: White Circle
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Yellow Cluster
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Red Swirl
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Green Strips
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Blue Star
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Multi Color Coma
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Purple Bub
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Cyan World
       number: 8
       value: "50"
+      selectedvalue: ""
     - name: Blue Circle
       number: 9
       value: "57"
+      selectedvalue: ""
   - number: 5
     name: Master
 - id: 20
@@ -833,6 +895,7 @@ fixtures:
       labe: MaxDegrees
       number: 1
       value: "540"
+      selectedvalue: ""
   - number: 2
     name: FinePan
   - number: 3
@@ -843,6 +906,7 @@ fixtures:
       labe: MaxDegrees
       number: 1
       value: "230"
+      selectedvalue: ""
   - number: 4
     name: FineTilt
   - number: 5
@@ -851,66 +915,85 @@ fixtures:
     - name: White
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Red
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Orange
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Yellow
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Green
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Blue
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Light Blue
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Pink
       number: 8
       value: "50"
+      selectedvalue: ""
   - number: 6
     name: Gobo
     settings:
     - name: Open
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Gobo 1
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Gobo 2
       number: 3
       value: "16"
+      selectedvalue: ""
     - name: Gobo 3
       number: 4
       value: "24"
+      selectedvalue: ""
     - name: Gobo 4
       number: 5
       value: "32"
+      selectedvalue: ""
     - name: Gobo 5
       number: 6
       value: "40"
+      selectedvalue: ""
     - name: Gobo 6
       number: 7
       value: "48"
+      selectedvalue: ""
     - name: Gobo 7
       number: 8
       value: "56"
+      selectedvalue: ""
   - number: 7
     name: Shutter
     settings:
     - name: Open
       number: 0
       value: "255"
+      selectedvalue: ""
     - name: Closed
       number: 0
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 0
       value: 16-131
+      selectedvalue: ""
   - number: 8
     name: Master
   - number: 9
@@ -919,18 +1002,21 @@ fixtures:
     - name: Fast
       number: 1
       value: "255"
+      selectedvalue: ""
   - number: 10
     name: SoundActive
     settings:
     - name: "Off"
       number: 1
       value: "1"
+      selectedvalue: ""
   - number: 11
     name: DimmerCurve
     settings:
     - name: DefaultCurve
       number: 1
       value: "255"
+      selectedvalue: ""
 - id: 21
   name: Scanner 7
   label: ADJ.Inno.Spot2
@@ -948,6 +1034,7 @@ fixtures:
       labe: MaxDegrees
       number: 1
       value: "540"
+      selectedvalue: ""
   - number: 2
     name: FinePan
   - number: 3
@@ -958,6 +1045,7 @@ fixtures:
       labe: MaxDegrees
       number: 1
       value: "230"
+      selectedvalue: ""
   - number: 4
     name: FineTilt
   - number: 5
@@ -966,66 +1054,85 @@ fixtures:
     - name: White
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Red
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Orange
       number: 3
       value: "15"
+      selectedvalue: ""
     - name: Yellow
       number: 4
       value: "22"
+      selectedvalue: ""
     - name: Green
       number: 5
       value: "29"
+      selectedvalue: ""
     - name: Blue
       number: 6
       value: "36"
+      selectedvalue: ""
     - name: Light Blue
       number: 7
       value: "43"
+      selectedvalue: ""
     - name: Pink
       number: 8
       value: "50"
+      selectedvalue: ""
   - number: 6
     name: Gobo
     settings:
     - name: Open
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Gobo 1
       number: 2
       value: "8"
+      selectedvalue: ""
     - name: Gobo 2
       number: 3
       value: "16"
+      selectedvalue: ""
     - name: Gobo 3
       number: 4
       value: "24"
+      selectedvalue: ""
     - name: Gobo 4
       number: 5
       value: "32"
+      selectedvalue: ""
     - name: Gobo 5
       number: 6
       value: "40"
+      selectedvalue: ""
     - name: Gobo 6
       number: 7
       value: "48"
+      selectedvalue: ""
     - name: Gobo 7
       number: 8
       value: "56"
+      selectedvalue: ""
   - number: 7
     name: Shutter
     settings:
     - name: Open
       number: 1
       value: 248-255
+      selectedvalue: ""
     - name: Closed
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Strobe
       number: 3
       value: 16-131
+      selectedvalue: ""
   - number: 8
     name: Master
   - number: 9
@@ -1034,25 +1141,28 @@ fixtures:
     - name: Fast
       number: 1
       value: "255"
+      selectedvalue: ""
   - number: 10
     name: SoundActive
     settings:
     - name: "Off"
       number: 1
       value: "1"
+      selectedvalue: ""
   - number: 11
     name: DimmerCurves
     settings:
     - name: Default Curve
       number: 1
       value: "255"
+      selectedvalue: ""
 - id: 22
   name: ADJ QA PAR 38
   label: par38
   number: 1
   description: American DJ SPOT
   type: rgb
-  group: 101
+  group: 100
   address: 150
   channels:
   - number: 1
@@ -1072,18 +1182,23 @@ fixtures:
       labe: New
       number: 1
       value: 0-15
+      selectedvalue: ""
     - name: Strobe
       number: 2
       value: 16-255
+      selectedvalue: ""
     - name: Program Speed
       number: 3
       value: 0-255
+      selectedvalue: ""
     - name: Sound Off
       number: 4
       value: 0-31
+      selectedvalue: ""
     - name: Sound Sensitivity
       number: 5
       value: 205-255
+      selectedvalue: ""
   - number: 7
     name: Static
     settings:
@@ -1091,18 +1206,23 @@ fixtures:
       labe: New
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Color Macro Mode
       number: 2
       value: "52"
+      selectedvalue: ""
     - name: Color Change Mode
       number: 3
       value: "103"
+      selectedvalue: ""
     - name: Color Fade Mode
       number: 4
       value: "154"
+      selectedvalue: ""
     - name: Sound Active Mode
       number: 5
       value: "205"
+      selectedvalue: ""
   - number: 8
     name: Color
     settings:
@@ -1110,18 +1230,23 @@ fixtures:
       labe: New
       number: 1
       value: 1-255
+      selectedvalue: ""
     - name: Color Change 1
       number: 2
       value: "0"
+      selectedvalue: ""
     - name: Color Change 2
       number: 3
       value: "16"
+      selectedvalue: ""
     - name: Color Change 3
       number: 4
       value: "32"
+      selectedvalue: ""
     - name: Color Change 4
       number: 5
       value: "48"
+      selectedvalue: ""
 - id: 23
   name: ADJ Dekker1
   label: dekker1
@@ -1137,24 +1262,31 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Rotate Clockwise Slow
       number: 1
       value: "1"
+      selectedvalue: ""
     - name: Rotate Clockwise Medium
       number: 2
       value: "63"
+      selectedvalue: ""
     - name: Rotate Clockwise Fast
       number: 3
       value: "127"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Slow
       number: 4
       value: "255"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
       number: 4
       value: "191"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Fast
       number: 5
       value: "128"
+      selectedvalue: ""
   - number: 2
     name: Red1
   - number: 3
@@ -1171,51 +1303,66 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: 4 Color Loop Change
       number: 2
       value: "1"
+      selectedvalue: ""
     - name: 9 Color Fade Change
       number: 3
       value: "27"
+      selectedvalue: ""
     - name: 4 Color Loop Change
       number: 4
       value: "52"
+      selectedvalue: ""
     - name: 9 Color Fade Change
       number: 5
       value: "77"
+      selectedvalue: ""
     - name: Strobe 1 Dim - Bright
       number: 6
       value: "102"
+      selectedvalue: ""
     - name: Strobe 2 Bright - Dim
       number: 7
       value: "127"
+      selectedvalue: ""
     - name: Strobe 3 Dim - Bright - Dim
       number: 8
       value: "152"
+      selectedvalue: ""
     - name: Strobe 4 W/O Dim Effect
       number: 9
       value: "177"
+      selectedvalue: ""
     - name: Strobe 5 with 9 Color
       number: 10
       value: "202"
+      selectedvalue: ""
     - name: Strobe 6 with Gradual Dim
       number: 11
       value: "227"
+      selectedvalue: ""
     - name: All Programs will Cycle
       number: 12
       value: "255"
+      selectedvalue: ""
   - number: 8
     name: ProgramSpeed
     settings:
     - name: Slow
       number: 1
       value: "1"
+      selectedvalue: ""
     - name: Fast
       number: 2
       value: "254"
+      selectedvalue: ""
     - name: Sound Active
       number: 3
       value: "255"
+      selectedvalue: ""
 - id: 24
   name: ADJ Dekker2
   label: dekker2
@@ -1231,24 +1378,31 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: Rotate Clockwise Slow
       number: 1
       value: "1"
+      selectedvalue: ""
     - name: Rotate Clockwise Medium
       number: 2
       value: "63"
+      selectedvalue: ""
     - name: Rotate Clockwise Fast
       number: 3
       value: "127"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Slow
       number: 4
       value: "255"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
       number: 4
       value: "191"
+      selectedvalue: ""
     - name: Rotate Anti Clockwise Fast
       number: 5
       value: "128"
+      selectedvalue: ""
   - number: 2
     name: Red1
   - number: 3
@@ -1265,51 +1419,66 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: 4 Color Loop Change
       number: 2
       value: "1"
+      selectedvalue: ""
     - name: 9 Color Fade Change
       number: 3
       value: "27"
+      selectedvalue: ""
     - name: 4 Color Loop Change
       number: 4
       value: "52"
+      selectedvalue: ""
     - name: 9 Color Fade Change
       number: 5
       value: "77"
+      selectedvalue: ""
     - name: Strobe 1 Dim - Bright
       number: 6
       value: "102"
+      selectedvalue: ""
     - name: Strobe 2 Bright - Dim
       number: 7
       value: "127"
+      selectedvalue: ""
     - name: Strobe 3 Dim - Bright - Dim
       number: 8
       value: "152"
+      selectedvalue: ""
     - name: Strobe 4 W/O Dim Effect
       number: 9
       value: "177"
+      selectedvalue: ""
     - name: Strobe 5 with 9 Color
       number: 10
       value: "202"
+      selectedvalue: ""
     - name: Strobe 6 with Gradual Dim
       number: 11
       value: "227"
+      selectedvalue: ""
     - name: All Programs will Cycle
       number: 12
       value: "255"
+      selectedvalue: ""
   - number: 8
     name: ProgramSpeed
     settings:
     - name: Slow
       number: 1
       value: "1"
+      selectedvalue: ""
     - name: Fast
       number: 2
       value: "254"
+      selectedvalue: ""
     - name: Sound Active
       number: 3
       value: "255"
+      selectedvalue: ""
 - id: 25
   name: Oil
   label: Oil1
@@ -1325,9 +1494,11 @@ fixtures:
     - name: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: "On"
       number: 2
       value: "255"
+      selectedvalue: ""
 - id: 26
   name: Vue1.1
   label: vue
@@ -1344,36 +1515,47 @@ fixtures:
       labe: New
       number: 1
       value: 0-24
+      selectedvalue: ""
     - name: Mode1
       number: 2
       value: 25-49
+      selectedvalue: ""
     - name: Mode2
       number: 3
       value: 50-74
+      selectedvalue: ""
     - name: Mode3
       number: 4
       value: 75-99
+      selectedvalue: ""
     - name: Mode4
       number: 5
       value: 100-124
+      selectedvalue: ""
     - name: Mode5
       number: 6
       value: 125-149
+      selectedvalue: ""
     - name: Mode6
       number: 7
       value: 150-174
+      selectedvalue: ""
     - name: Mode7
       number: 8
       value: 175-199
+      selectedvalue: ""
     - name: Mode8
       number: 9
       value: 200-224
+      selectedvalue: ""
     - name: Mode9
       number: 10
       value: 225-249
+      selectedvalue: ""
     - name: Mode10
       number: 11
       value: Sound
+      selectedvalue: ""
   - number: 2
     name: Red1
   - number: 3
@@ -1406,6 +1588,7 @@ fixtures:
       labe: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
   - number: 5
     name: Strobe
   - number: 6
@@ -1414,10 +1597,12 @@ fixtures:
     - name: New
       number: 1
       value: 0-15
+      selectedvalue: ""
     - name: Strobe
       labe: Strobe
       number: 2
       value: 16-255
+      selectedvalue: ""
   - number: 7
     name: Master
 - id: 28
@@ -1426,7 +1611,7 @@ fixtures:
   number: 1
   description: Acme Deluge
   type: projector
-  group: 109
+  group: 101
   address: 145
   channels:
   - number: 1
@@ -1438,61 +1623,87 @@ fixtures:
       labe: "Off"
       number: 1
       value: "0"
-    - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+      selectedvalue: ""
+    - name: Rotate Clockwise Slow
+      labe: Rotate Clockwise Slow
       number: 2
-      value: 10-120
-    - name: "Off"
-      labe: "Off"
+      value: "120"
+      selectedvalue: ""
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
       number: 3
-      value: 121-131
-    - name: AntiClockwise Slow to FastNew
-      labe: AntiClockwise Slow to FastNew
+      value: "65"
+      selectedvalue: ""
+    - name: Rotate Clockwise Fast
+      labe: Rotate Clockwise Fast
       number: 4
-      value: 187-196
-    - name: "Off"
-      labe: "Off"
+      value: "10"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
       number: 5
-      value: 246-255
+      value: "135"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Medium
+      labe: Rotate Anti Clockwise Medium
+      number: 6
+      channel: (Select one)
+      value: "190"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
+      number: 7
+      channel: (Select one)
+      value: "245"
+      selectedvalue: ""
   - number: 3
-    name: Color
+    name: Gobo
     settings:
     - name: White
       labe: White
       number: 1
-      value: 0-7
+      value: "0"
+      selectedvalue: ""
     - name: Color1
       labe: Color1
       number: 2
-      value: 8-32
+      value: "8"
+      selectedvalue: ""
     - name: Color2
       labe: Color2
       number: 3
-      value: 33-56
+      value: "33"
+      selectedvalue: ""
     - name: Color3
       labe: Color3
       number: 4
-      value: 57-80
+      value: "57"
+      selectedvalue: ""
     - name: Color4
       labe: Color4
       number: 5
-      value: 81-104
+      value: "81"
+      selectedvalue: ""
     - name: Color5
       labe: Color5
       number: 6
-      value: 105-127
-    - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+      value: "105"
+      selectedvalue: ""
+    - name: Rotate Clockwise Fast to Slow
+      labe: Rotate Clockwise Fast to Slow
       number: 7
-      value: 128-186
+      value: "128"
+      selectedvalue: ""
     - name: "Off"
       labe: "Off"
       number: 8
-      value: 187-196
-    - name: Antilockwise  Slow to Fast
-      labe: Antilockwise  Slow to Fast
+      value: "187"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise  Slow to Fast
+      labe: Rotate Anti Clockwise  Slow to Fast
       number: 9
-      value: 197-255
+      value: "197"
+      selectedvalue: ""
 - id: 29
   name: 'Flames '
   label: flames
@@ -1509,11 +1720,231 @@ fixtures:
       labe: "Off"
       number: 1
       value: "0"
+      selectedvalue: ""
     - name: "On"
       labe: "On"
       number: 2
       value: "255"
+      selectedvalue: ""
 - id: 30
+  name: Equinox
+  label: graphix
+  number: 1
+  description: Equinox Graphix
+  type: projector
+  group: 106
+  address: 185
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Shutter
+    value: 0
+    settings:
+    - name: Blackout
+      labe: Blackout
+      number: 1
+      value: 0-31
+      selectedvalue: ""
+    - name: Open
+      labe: Open
+      number: 2
+      value: 32-63
+      selectedvalue: ""
+    - name: Strobe
+      labe: Strobe
+      number: 3
+      value: 64-95
+      selectedvalue: ""
+    - name: Open
+      labe: Open
+      number: 4
+      value: 96-127
+      selectedvalue: ""
+    - name: Pulse
+      labe: Pulse
+      number: 5
+      value: 129-159
+      selectedvalue: ""
+    - name: Open
+      labe: Open
+      number: 6
+      value: 160-191
+      selectedvalue: ""
+    - name: Random
+      labe: Random
+      number: 7
+      value: 192-223
+      selectedvalue: ""
+    - name: Open
+      labe: Open
+      number: 8
+      value: 224-255
+      selectedvalue: ""
+  - number: 3
+    name: Gobo
+    value: 0
+    settings:
+    - name: ZigZag
+      labe: ZigZag
+      number: 1
+      value: "0"
+      selectedvalue: ""
+    - name: Horiz Waves
+      labe: Horiz Waves
+      number: 2
+      value: "18"
+      selectedvalue: ""
+    - name: Croc Petals
+      labe: Croc Petals
+      number: 3
+      value: "28"
+      selectedvalue: ""
+    - name: Rose Flowers
+      labe: Rose Flowers
+      number: 4
+      value: "44"
+      selectedvalue: ""
+    - name: Triangles
+      labe: Triangles
+      number: 5
+      value: "50"
+      selectedvalue: ""
+    - name: Vert Waves
+      labe: Vert Waves
+      number: 6
+      value: "58"
+      selectedvalue: ""
+    - name: Star Rings
+      labe: Star Rings
+      number: 7
+      value: "94"
+      selectedvalue: ""
+    - name: Circles And Squares
+      labe: Circles And Squares
+      number: 8
+      value: "110"
+      selectedvalue: ""
+    - name: Horiz Lines
+      labe: Horiz Lines
+      number: 9
+      value: "117"
+      selectedvalue: ""
+  - number: 4
+    name: Rotate
+    value: 0
+    settings:
+    - name: Mirror Index
+      labe: Mirror Index
+      number: 1
+      value: 0-127
+      selectedvalue: ""
+    - name: Rotate Clockwise Slow
+      labe: Rotate Clockwise Slow
+      number: 2
+      value: "192"
+      selectedvalue: ""
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
+      number: 2
+      value: "223"
+      selectedvalue: ""
+    - name: Rotate Clockwise Fast
+      labe: Rotate Clockwise Fast
+      number: 2
+      value: "255"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
+      number: 3
+      value: "191"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Medium
+      labe: Rotate Anti Clockwise Medium
+      number: 3
+      value: "160"
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
+      number: 3
+      value: "128"
+      selectedvalue: ""
+  - number: 5
+    name: Program
+    settings:
+    - name: Blackout
+      labe: Blackout
+      number: 1
+      value: 0-3
+      selectedvalue: ""
+    - name: Show0
+      labe: Show0
+      number: 2
+      value: 4-31
+      selectedvalue: ""
+    - name: Show1
+      labe: Show1
+      number: 3
+      value: 32-59
+      selectedvalue: ""
+    - name: Show2
+      labe: Show2
+      number: 4
+      value: 60-87
+      selectedvalue: ""
+    - name: Show3
+      labe: Show3
+      number: 5
+      value: 88-115
+      selectedvalue: ""
+    - name: Show4
+      labe: Show4
+      number: 6
+      value: 116-143
+      selectedvalue: ""
+    - name: Show5
+      labe: Show5
+      number: 7
+      value: 144-171
+      selectedvalue: ""
+    - name: Show6
+      labe: Show6
+      number: 8
+      value: 172-199
+      selectedvalue: ""
+    - name: Show7
+      labe: Show7
+      number: 9
+      value: 200-227
+      selectedvalue: ""
+    - name: Show8
+      labe: Show8
+      number: 10
+      value: 228-255
+      selectedvalue: ""
+  - number: 6
+    name: ProgramSpeed
+    value: 0
+    settings:
+    - name: Slow
+      labe: Slow
+      number: 1
+      channel: New
+      value: "10"
+      selectedvalue: "10"
+    - name: Medium
+      labe: Medium
+      number: 2
+      channel: New
+      value: "100"
+      selectedvalue: "100"
+    - name: Fast
+      labe: Fast
+      number: 3
+      channel: New
+      value: "200"
+      selectedvalue: "200"
+- id: 31
   name: switch1
   label: SW1.Oil
   number: 1
@@ -1532,6 +1963,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
+      map: ""
       mode: Control
       fade: ""
       size: ""
@@ -1539,7 +1971,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: "Off"
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: "On"
     number: 2
@@ -1550,6 +1985,7 @@ fixtures:
     - name: "On"
       number: 1
       colors: []
+      map: ""
       mode: Control
       fade: ""
       size: ""
@@ -1557,10 +1993,13 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: "On"
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   use_fixture: Oil1
-- id: 31
+- id: 32
   name: switch2
   label: SW2.Flame
   number: 2
@@ -1581,6 +2020,7 @@ fixtures:
       number: 0
       channel: Program
       value: "Off"
+      selectedvalue: ""
     flash: false
   - name: "On"
     number: 2
@@ -1593,9 +2033,10 @@ fixtures:
       number: 0
       channel: Program
       value: "On"
+      selectedvalue: ""
     flash: false
   use_fixture: flames
-- id: 32
+- id: 33
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -1616,21 +2057,24 @@ fixtures:
       number: 1
       channel: Master
       value: "0"
+      selectedvalue: ""
     - name: "Off"
       labe: "Off"
       number: 2
       channel: Rotate
       value: "0"
+      selectedvalue: ""
     - name: "Off"
       labe: "Off"
       number: 3
       channel: Color
       value: "0"
+      selectedvalue: ""
     flash: false
   - name: Color1
     number: 2
     label: Color1
-    buttoncolor: Orange
+    buttoncolor: White
     master: 0
     settings:
     - name: Master
@@ -1638,16 +2082,19 @@ fixtures:
       number: 1
       channel: Master
       value: "255"
-    - name: Rotate
-      labe: Rotate
+      selectedvalue: ""
+    - name: Rotate Anti Clockwise Fast
+      labe: Rotate Anti Clockwise Fast
       number: 2
       channel: Rotate
-      value: "12"
-    - name: Color
-      labe: Color
+      value: "245"
+      selectedvalue: Rotate Anti Clockwise Fast
+    - name: Color1
+      labe: Color1
       number: 3
-      channel: Color
-      value: "10"
+      channel: Gobo
+      value: "0"
+      selectedvalue: Color1
     flash: false
   - name: Color2
     number: 3
@@ -1660,16 +2107,19 @@ fixtures:
       number: 1
       channel: Master
       value: "255"
+      selectedvalue: ""
     - name: Rotate
       labe: Rotate
       number: 2
       channel: Rotate
       value: "12"
-    - name: Color
-      labe: Color
+      selectedvalue: ""
+    - name: Color2
+      labe: Color2
       number: 3
-      channel: Color
-      value: "30"
+      channel: Gobo
+      value: "33"
+      selectedvalue: Color2
     flash: false
   - name: Color3
     number: 4
@@ -1682,19 +2132,72 @@ fixtures:
       number: 1
       channel: Master
       value: "255"
+      selectedvalue: ""
     - name: Rotate
       labe: Rotate
       number: 2
       channel: Rotate
       value: "12"
-    - name: Color
-      labe: Color
+      selectedvalue: ""
+    - name: Color3
+      labe: Color3
       number: 3
-      channel: Color
-      value: "75"
+      channel: Gobo
+      value: "60"
+      selectedvalue: Color3
+    flash: false
+  - name: Color4
+    number: 5
+    label: Color4
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: Master
+      labe: Master
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: ""
+    - name: Rotatae Clockwise Fast
+      labe: Rotatae Clockwise Fast
+      number: 2
+      channel: Rotate
+      value: "12"
+      selectedvalue: Rotatae Clockwise Fast
+    - name: Color4
+      labe: Color4
+      number: 3
+      channel: Gobo
+      value: "81"
+      selectedvalue: Color4
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 1
+      colors:
+      - Red
+      - Green
+      - Blue
+      map: "On"
+      mode: Chase
+      fade: Soft
+      size: Long
+      speed: Music
+      rotate: Auto
+      rotatespeed: Fast
+      program: ""
+      programspeed: ""
+      strobe: ""
+      gobo: Auto
+      gobospeed: Fast
     flash: false
   use_fixture: deluge
-- id: 33
+- id: 34
   name: switch4
   label: SW4.Vue
   number: 4
@@ -1714,26 +2217,32 @@ fixtures:
       number: 1
       channel: Program
       value: "0"
+      selectedvalue: ""
     - name: red
       number: 2
       channel: Red1
       value: "0"
+      selectedvalue: ""
     - name: green
       number: 3
       channel: "3"
       value: "0"
+      selectedvalue: ""
     - name: blue
       number: 4
       channel: "4"
       value: "0"
+      selectedvalue: ""
     - name: strobe
       number: 5
       channel: "5"
       value: "0"
+      selectedvalue: ""
     - name: master reverse dimmer
       number: 6
       channel: "6"
       value: "0"
+      selectedvalue: ""
     flash: false
   - name: Red
     number: 2
@@ -1745,26 +2254,32 @@ fixtures:
       number: 1
       channel: "1"
       value: "0"
+      selectedvalue: ""
     - name: red
       number: 2
       channel: "2"
       value: "255"
+      selectedvalue: ""
     - name: green
       number: 3
       channel: "3"
       value: "0"
+      selectedvalue: ""
     - name: blue
       number: 4
       channel: "4"
       value: "0"
+      selectedvalue: ""
     - name: strobe
       number: 5
       channel: "5"
       value: "0"
+      selectedvalue: ""
     - name: master reverse dimmer
       number: 6
       channel: "6"
       value: "255"
+      selectedvalue: ""
     flash: false
   - name: Slow Color Change
     number: 3
@@ -1776,26 +2291,32 @@ fixtures:
       number: 1
       channel: "1"
       value: "25"
+      selectedvalue: ""
     - name: red
       number: 2
       channel: "2"
       value: "0"
+      selectedvalue: ""
     - name: green
       number: 3
       channel: "3"
       value: "0"
+      selectedvalue: ""
     - name: blue
       number: 4
       channel: "4"
       value: "0"
+      selectedvalue: ""
     - name: speed
       number: 5
       channel: "5"
       value: "0"
+      selectedvalue: ""
     - name: master reverse dimmer
       number: 6
       channel: "6"
       value: "255"
+      selectedvalue: ""
     flash: false
   - name: Meduim Color Change
     number: 4
@@ -1807,26 +2328,32 @@ fixtures:
       number: 1
       channel: "1"
       value: "25"
+      selectedvalue: ""
     - name: red
       number: 2
       channel: "2"
       value: "0"
+      selectedvalue: ""
     - name: green
       number: 3
       channel: "3"
       value: "0"
+      selectedvalue: ""
     - name: blue
       number: 4
       channel: "4"
       value: "0"
+      selectedvalue: ""
     - name: speed
       number: 5
       channel: "5"
       value: "100"
+      selectedvalue: ""
     - name: master reverse dimmer
       number: 6
       channel: "6"
       value: "255"
+      selectedvalue: ""
     flash: false
   - name: Sound Triggered Color Change
     number: 5
@@ -1838,26 +2365,32 @@ fixtures:
       number: 1
       channel: "1"
       value: "255"
+      selectedvalue: ""
     - name: red
       number: 2
       channel: "2"
       value: "0"
+      selectedvalue: ""
     - name: green
       number: 3
       channel: "3"
       value: "0"
+      selectedvalue: ""
     - name: blue
       number: 4
       channel: "4"
       value: "0"
+      selectedvalue: ""
     - name: speed
       number: 5
       channel: "5"
       value: "100"
+      selectedvalue: ""
     - name: master reverse dimmer
       number: 6
       channel: "6"
       value: "255"
+      selectedvalue: ""
     flash: false
   - name: Mini
     number: 6
@@ -1871,6 +2404,7 @@ fixtures:
       - Green
       - Red
       - Blue
+      map: ""
       mode: Chase
       fade: Soft
       size: "Off"
@@ -1878,7 +2412,10 @@ fixtures:
       rotate: "Off"
       rotatespeed: "Off"
       program: "Off"
+      programspeed: ""
       strobe: "Off"
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Reddy
     number: 7
@@ -1890,6 +2427,7 @@ fixtures:
       number: 1
       colors:
       - Red
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -1897,10 +2435,13 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   use_fixture: vue
-- id: 34
+- id: 35
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -1919,6 +2460,7 @@ fixtures:
     - name: "Off"
       number: 0
       colors: []
+      map: ""
       mode: "Off"
       fade: ""
       size: ""
@@ -1926,40 +2468,51 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     settings:
     - name: mode
       number: 1
       channel: "150"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 2
       channel: "151"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 3
       channel: "152"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 4
       channel: "153"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 5
       channel: "154"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 6
       channel: "155"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 7
       channel: "156"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 8
       channel: "157"
       value: "0"
+      selectedvalue: ""
     flash: false
   - name: Red
     number: 2
@@ -1971,6 +2524,7 @@ fixtures:
       number: 0
       colors:
       - Red
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -1978,7 +2532,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Green
     number: 3
@@ -1990,6 +2547,7 @@ fixtures:
       number: 0
       colors:
       - Green
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -1997,7 +2555,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Blue
     number: 4
@@ -2009,6 +2570,7 @@ fixtures:
       number: 0
       colors:
       - Blue
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -2016,7 +2578,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: "On"
     number: 5
@@ -2034,6 +2599,7 @@ fixtures:
       - Blue
       - Purple
       - Pink
+      map: ""
       mode: Chase
       fade: Soft
       size: Long
@@ -2041,7 +2607,10 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Sound
     number: 6
@@ -2059,6 +2628,7 @@ fixtures:
       - Blue
       - Purple
       - Pink
+      map: ""
       mode: Chase
       fade: Soft
       size: ""
@@ -2066,19 +2636,24 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     settings:
     - name: mode
       number: 0
       channel: "150"
       value: "0"
+      selectedvalue: ""
     - name: mode
       number: 0
       channel: "157"
       value: "0"
+      selectedvalue: ""
     flash: false
   use_fixture: par38
-- id: 35
+- id: 36
   name: switch6
   label: SW6.DERBY
   number: 6
@@ -2093,51 +2668,47 @@ fixtures:
     label: "Off"
     buttoncolor: Green
     master: 0
-    actions:
-    - name: "Off"
-      number: 0
-      colors: []
-      mode: "Off"
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
     settings:
     - name: Rotate
       number: 1
       channel: Rotate
       value: "off"
+      selectedvalue: ""
     - name: Red1
       number: 2
       channel: Red1
       value: "0"
+      selectedvalue: ""
     - name: Green1
       number: 3
       channel: Green1
       value: "0"
+      selectedvalue: ""
     - name: Blue1
       number: 4
       channel: Blue1
       value: "0"
+      selectedvalue: ""
     - name: White1
       number: 5
       channel: White1
       value: "0"
+      selectedvalue: ""
     - name: Master
       number: 6
       channel: Master
       value: "0"
+      selectedvalue: ""
     - name: Program
       number: 7
       channel: Program
       value: "0"
+      selectedvalue: ""
     - name: ProgramSpeed
       number: 8
       channel: ProgramSpeed
       value: "0"
+      selectedvalue: ""
     flash: false
   - name: Red
     number: 2
@@ -2149,6 +2720,7 @@ fixtures:
       number: 0
       colors:
       - Red
+      map: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -2156,7 +2728,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Green
     number: 3
@@ -2168,6 +2743,7 @@ fixtures:
       number: 0
       colors:
       - Green
+      map: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -2175,7 +2751,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Blue
     number: 4
@@ -2187,6 +2766,7 @@ fixtures:
       number: 0
       colors:
       - Blue
+      map: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -2194,7 +2774,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Soft
     number: 5
@@ -2212,14 +2795,18 @@ fixtures:
       - Blue
       - Purple
       - Pink
+      map: ""
       mode: Chase
       fade: Soft
       size: Short
       speed: Fast
-      rotate: Anti Clockwise
+      rotate: Rotate Anti Clockwise
       rotatespeed: Slow
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Sound
     number: 6
@@ -2240,6 +2827,7 @@ fixtures:
       - Cyan
       - Blue
       - Purple
+      map: ""
       mode: Chase
       fade: Soft
       size: "Off"
@@ -2247,17 +2835,20 @@ fixtures:
       rotate: Auto
       rotatespeed: Fast
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   use_fixture: dekker1
-- id: 36
+- id: 37
   name: switch7
-  label: SW7.DERBY
+  label: SW7.FLOOR
   number: 7
-  description: ADJ DEKKER 2
+  description: Equinox Graphix
   type: switch
   group: 4
-  address: 330
+  address: 185
   channels: []
   states:
   - name: "Off"
@@ -2269,160 +2860,377 @@ fixtures:
     - name: "Off"
       number: 0
       colors: []
-      mode: "Off"
+      map: ""
+      mode: Control
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: ""
+      program: Blackout
+      programspeed: Slow
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     settings:
-    - name: Rotate
+    - name: New Setting
       number: 1
-      channel: Rotate
-      value: "off"
-    - name: Red1
-      number: 2
-      channel: Red1
-      value: "0"
-    - name: Green1
-      number: 3
-      channel: Green1
-      value: "0"
-    - name: Blue1
-      number: 4
-      channel: Blue1
-      value: "0"
-    - name: White1
-      number: 5
-      channel: White1
-      value: "0"
-    - name: Master
-      number: 6
       channel: Master
       value: "0"
-    - name: Program
-      number: 7
-      channel: Program
-      value: "0"
-    - name: ProgramSpeed
-      number: 8
-      channel: ProgramSpeed
-      value: "0"
+      selectedvalue: ""
     flash: false
-  - name: Red
+  - name: ZigZag
     number: 2
-    label: Red
+    label: ZigZag
     buttoncolor: Red
     master: 0
-    actions:
-    - name: Red
-      number: 0
-      colors:
-      - Red
-      mode: Static
-      fade: Sharp
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
+    settings:
+    - name: "255"
+      labe: "255"
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: Open
+      labe: Open
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: ZigZag
+      labe: ZigZag
+      number: 3
+      channel: Gobo
+      value: "0"
+      selectedvalue: ZigZag
+    - name: Rotate Clockwise Medium
+      labe: Rotate Clockwise Medium
+      number: 4
+      channel: Rotate
+      value: "255"
+      selectedvalue: Rotate Clockwise Medium
+    - name: Blackout
+      labe: Blackout
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: Fast
+      labe: Fast
+      number: 6
+      channel: ProgramSpeed
+      value: "200"
+      selectedvalue: Fast
     flash: false
-  - name: Green
+  - name: Waves
     number: 3
-    label: Green
-    buttoncolor: Green
+    label: Waves
+    buttoncolor: Cyan
     master: 0
-    actions:
-    - name: Green
-      number: 0
-      colors:
-      - Green
-      mode: Static
-      fade: Sharp
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      strobe: ""
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: New
+      labe: New
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: New
+      labe: New
+      number: 3
+      channel: Gobo
+      value: "18"
+      selectedvalue: Horiz Waves
+    - name: New
+      labe: New
+      number: 4
+      channel: Rotate
+      value: "192"
+      selectedvalue: Rotate ClockWise
+    - name: New
+      labe: New
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: New
+      labe: New
+      number: 6
+      channel: ProgramSpeed
+      value: "0"
+      selectedvalue: "0"
     flash: false
-  - name: Blue
+  - name: Petals
     number: 4
-    label: Blue
-    buttoncolor: Blue
+    label: Petals
+    buttoncolor: Cyan
+    master: 0
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: New
+      labe: New
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: New
+      labe: New
+      number: 3
+      channel: Gobo
+      value: "28"
+      selectedvalue: Croc Petals
+    - name: Rotate Anti Clockwise Slow
+      labe: Rotate Anti Clockwise Slow
+      number: 4
+      channel: Rotate
+      value: "191"
+      selectedvalue: Rotate Anti Clockwise Slow
+    - name: New
+      labe: New
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: New
+      labe: New
+      number: 6
+      channel: ProgramSpeed
+      value: "0"
+      selectedvalue: Slow
+    flash: false
+  - name: Show0
+    number: 5
+    label: Show0
+    buttoncolor: Orange
     master: 0
     actions:
-    - name: Blue
-      number: 0
-      colors:
-      - Blue
-      mode: Static
-      fade: Sharp
+    - name: Show0
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: ""
+      program: Show0
+      programspeed: Slow
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
-  - name: Soft
-    number: 5
-    label: Soft
-    buttoncolor: Yellow
+  - name: Show1
+    number: 6
+    label: Show1
+    buttoncolor: Orange
     master: 0
     actions:
-    - name: Soft
-      number: 0
-      colors:
-      - Orange
-      - Yellow
-      - Green
-      - Cyan
-      - Blue
-      - Purple
-      - Pink
-      mode: Chase
-      fade: Soft
-      size: Short
-      speed: VeryFast
-      rotate: Anti Clockwise
-      rotatespeed: Slow
-      program: ""
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show1
+      programspeed: Medium
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
-  - name: Sound
-    number: 6
-    label: Sound
+  - name: Show2
+    number: 7
+    label: Show2
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show2
+      programspeed: Medium
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show3
+    number: 8
+    label: Show3
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show3
+      programspeed: Medium
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show4
+    number: 9
+    label: Show4
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show4
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show4
+      programspeed: Medium
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show5
+    number: 10
+    label: Show5
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show5
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show5
+      programspeed: ""
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show6
+    number: 11
+    label: Show6
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show6
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show6
+      programspeed: Medium
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show7
+    number: 12
+    label: Show7
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show7
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: ""
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show8
+    number: 13
+    label: Show8
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show8
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: Fast
+      strobe: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Auto
+    number: 14
+    label: Auto
     buttoncolor: White
     master: 0
     actions:
-    - name: Sound
-      number: 0
+    - name: Auto
+      number: 1
       colors:
-      - Yellow
-      - White
-      - Pink
-      - Black
-      - Red
-      - Orange
       - Green
       - Cyan
       - Blue
-      - Purple
+      map: "On"
       mode: Chase
       fade: Soft
-      size: "Off"
+      size: Short
       speed: Music
       rotate: Auto
       rotatespeed: Fast
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: Auto
+      gobospeed: Fast
     flash: false
-  use_fixture: dekker2
-- id: 37
+  use_fixture: graphix
+- id: 38
   name: switch8
   label: SW8.Booth
   number: 8
@@ -2441,6 +3249,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
+      map: ""
       mode: "Off"
       fade: ""
       size: ""
@@ -2448,7 +3257,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Red
     number: 2
@@ -2460,6 +3272,7 @@ fixtures:
       number: 1
       colors:
       - Red
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -2467,7 +3280,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Green
     number: 3
@@ -2479,6 +3295,7 @@ fixtures:
       number: 1
       colors:
       - Green
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -2486,7 +3303,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Blue
     number: 4
@@ -2498,6 +3318,7 @@ fixtures:
       number: 1
       colors:
       - Blue
+      map: ""
       mode: Static
       fade: ""
       size: ""
@@ -2505,7 +3326,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Fade
     number: 5
@@ -2519,6 +3343,7 @@ fixtures:
       - Red
       - Green
       - Blue
+      map: ""
       mode: Chase
       fade: Soft
       size: Medium
@@ -2526,7 +3351,10 @@ fixtures:
       rotate: ""
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
   - name: Sound
     number: 6
@@ -2540,6 +3368,7 @@ fixtures:
       - Green
       - Red
       - Blue
+      map: ""
       mode: Chase
       fade: Sharp
       size: "Off"
@@ -2547,11 +3376,15 @@ fixtures:
       rotate: "Off"
       rotatespeed: ""
       program: ""
+      programspeed: ""
       strobe: ""
+      gobo: ""
+      gobospeed: ""
     settings:
     - name: mode
       number: 1
       channel: "1"
       value: "255"
+      selectedvalue: ""
     flash: false
   use_fixture: megabar

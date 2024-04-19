@@ -50,7 +50,7 @@ const NumberOfSequences = 5
 const NumberOfFixtures = 8
 const NumberOfSwitches = 8
 
-const DEFAULT_PROJECT = "Default_Project.yaml"
+const DEFAULT_PROJECT = "Default.yaml"
 
 func main() {
 
@@ -214,6 +214,13 @@ func main() {
 	fixturesConfig, err := fixture.LoadFixtures(DEFAULT_PROJECT)
 	if err != nil {
 		fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
+		os.Exit(1)
+	}
+
+	// Load groups.
+	groupConfig, err := fixture.LoadFixtureGroups("groups.yaml")
+	if err != nil {
+		fmt.Printf("dmxlights: error failed to load groups: %s\n", err.Error())
 		os.Exit(1)
 	}
 
@@ -463,15 +470,15 @@ func main() {
 	launchpad.ListenAndSendToLaunchPad(eventsForLaunchpad, this.Pad, this.LaunchPadConnected)
 
 	// Add buttons to the main panel.
-	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
-	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row0 := panel.GenerateRow(myWindow, 0, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row1 := panel.GenerateRow(myWindow, 1, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row2 := panel.GenerateRow(myWindow, 2, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row3 := panel.GenerateRow(myWindow, 3, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row4 := panel.GenerateRow(myWindow, 4, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row5 := panel.GenerateRow(myWindow, 5, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row6 := panel.GenerateRow(myWindow, 6, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row7 := panel.GenerateRow(myWindow, 7, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
+	row8 := panel.GenerateRow(myWindow, 8, sequences, &this, eventsForLaunchpad, guiButtons, dmxController, groupConfig, fixturesConfig, commandChannels, replyChannels, updateChannels, this.DmxInterfacePresent)
 
 	// Gather all the rows into a container called squares.
 	squares := container.New(layout.NewGridLayoutWithRows(gui.ColumnWidth), row0, row1, row2, row3, row4, row5, row6, row7, row8)
@@ -560,7 +567,7 @@ func main() {
 		modal.Show()
 	})
 	editFixtures := fyne.NewMenuItem("Edit", func() {
-		gui.NewFixtureEditor(sequences, myWindow, fixturesConfig, commandChannels)
+		gui.NewFixtureEditor(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
 	})
 	projectMenu := fyne.NewMenu("Project", openProject, saveProject)
 	settingsMenu := fyne.NewMenu("Settings", editSettings)

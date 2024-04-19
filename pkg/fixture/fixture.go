@@ -42,6 +42,10 @@ type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
 }
 
+type Groups struct {
+	Groups []Group `yaml:"groups"`
+}
+
 type Color struct {
 	R int `yaml:"red"`
 	G int `yaml:"green"`
@@ -120,6 +124,11 @@ type Fixture struct {
 	MultiFixtureDevice bool      `yaml:"-"` // Calulated internally.
 	NumberSubFixtures  int       `yaml:"-"` // Calulated internally.
 	UseFixture         string    `yaml:"use_fixture,omitempty"`
+}
+
+type Group struct {
+	Name   string `yaml:"name"`
+	Number string `yaml:"number"`
 }
 
 type FixtureInfo struct {
@@ -204,6 +213,41 @@ func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
 func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
 	if debug {
+		fmt.Printf("LoadFixtures from file %s\n", "projects/"+filename)
+	}
+
+	// Open the fixtures yaml file.
+	_, err = os.OpenFile("projects/"+filename, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reads the fixtures yaml file.
+	data, err := os.ReadFile("projects/" + filename)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshals the fixtures.yaml file into a data struct
+	fixtures = &Fixtures{}
+	err = yaml.Unmarshal(data, fixtures)
+	if err != nil {
+		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + err.Error())
+	}
+
+	if len(fixtures.Fixtures) == 0 {
+		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + " error: fixtures are empty")
+	}
+
+	return fixtures, nil
+}
+
+// LoadFixtureGroups opens the fixtures group config file using the filename passed.
+// Returns a pointer to the fixtures group config.
+// Returns an error.
+func LoadFixtureGroups(filename string) (groups *Groups, err error) {
+
+	if debug {
 		fmt.Printf("LoadFixtures from file %s\n", filename)
 	}
 
@@ -219,18 +263,18 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 		return nil, err
 	}
 
-	// Unmarshals the fixtures.yaml file into a data struct
-	fixtures = &Fixtures{}
-	err = yaml.Unmarshal(data, fixtures)
+	// Unmarshals the fixtures group file into a data struct.
+	groups = &Groups{}
+	err = yaml.Unmarshal(data, groups)
 	if err != nil {
 		return nil, errors.New("error: unmarshalling file: " + filename + err.Error())
 	}
 
-	if len(fixtures.Fixtures) == 0 {
-		return nil, errors.New("error: unmarshalling file: " + filename + " error: fixtures are empty")
+	if len(groups.Groups) == 0 {
+		return nil, errors.New("error: unmarshalling file: " + filename + " error: groups are empty")
 	}
 
-	return fixtures, nil
+	return groups, nil
 }
 
 // SaveFixtures - saves a complete list of fixtures to filename.
@@ -244,13 +288,13 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	// Marshal the fixtures data into a yaml data structure.
 	data, err := yaml.Marshal(fixtures)
 	if err != nil {
-		return errors.New("error: marshalling file: " + filename + err.Error())
+		return errors.New("error: marshalling file: " + "projects/" + filename + err.Error())
 	}
 
 	// Write the fixtures.yaml file.
 	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
-		return errors.New("error: writing file: " + filename + err.Error())
+		return errors.New("error: writing file: " + "projects/" + filename + err.Error())
 	}
 
 	// Fixtures file saved, no errors.

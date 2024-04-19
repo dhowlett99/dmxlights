@@ -340,6 +340,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
+	groupConfig *fixture.Groups,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
@@ -421,7 +422,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("DMXLIGI", func() {
-				modal, err := editor.NewFixturePanel(sequences, myWindow, fixturesConfig, commandChannels)
+				modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
@@ -459,9 +460,9 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	return row0
 }
 
-func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) error {
+func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) error {
 
-	modal, err := editor.NewFixturePanel(sequences, myWindow, fixturesConfig, commandChannels)
+	modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
@@ -583,7 +584,7 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 		}
 	}, myWindow)
 	pwd, _ := os.Getwd()
-	currentmfolder, _ := filepath.Abs(pwd)
+	currentmfolder, _ := filepath.Abs(pwd + "/projects")
 	if currentmfolder != "" {
 		mfileURI := storage.NewFileURI(currentmfolder)
 		mfileLister, _ := storage.ListerForURI(mfileURI)
@@ -610,7 +611,7 @@ func FileSave(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 		}
 	}, myWindow)
 	pwd, _ := os.Getwd()
-	currentmfolder, _ := filepath.Abs(pwd)
+	currentmfolder, _ := filepath.Abs(pwd + "/projects")
 	if currentmfolder != "" {
 		mfileURI := storage.NewFileURI(currentmfolder)
 		mfileLister, _ := storage.ListerForURI(mfileURI)
