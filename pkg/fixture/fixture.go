@@ -90,6 +90,7 @@ type ActionConfig struct {
 	NumberSteps       int
 	Size              int
 	Speed             time.Duration
+	Shift             int
 	TriggerState      bool
 	RotateSpeed       int
 	Rotatable         bool

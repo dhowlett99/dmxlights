@@ -78,7 +78,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.CurrentColors = []common.Color{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
-		sequence.CurrentSpeed = SetSpeed(common.DEFAULT_SPEED)
+		sequence.CurrentSpeed = common.SetSpeed(common.DEFAULT_SPEED)
 		// Stop the strobe mode.
 		sequence.Strobe = false
 		sequence.StrobeSpeed = common.DEFAULT_STROBE_SPEED
@@ -191,7 +191,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update %s to %d\n", mySequenceNumber, command.Args[SPEED].Name, command.Args[SPEED].Value)
 		}
 		sequence.Speed = command.Args[SPEED].Value.(int)
-		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
+		sequence.CurrentSpeed = common.SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
 	case common.UpdatePattern:
@@ -249,11 +249,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.UpdateRGBSize:
-		const START = 0
+		const SIZE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
+			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[SIZE].Value)
 		}
-		sequence.RGBSize = getSize(command.Args[START].Value.(int))
+		sequence.RGBSize = common.GetSize(command.Args[SIZE].Value.(int))
 		return sequence
 
 	case common.UpdateScannerSize:
@@ -849,50 +849,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	return sequence
 }
 
-// Used to convert a speed to a millisecond time.
-func SetSpeed(commandSpeed int) (Speed time.Duration) {
-	if commandSpeed == 0 {
-		Speed = 3500
-	}
-	if commandSpeed == 1 {
-		Speed = 3000
-	}
-	if commandSpeed == 2 {
-		Speed = 2500
-	}
-	if commandSpeed == 3 {
-		Speed = 1800
-	}
-	if commandSpeed == 4 {
-		Speed = 1500
-	}
-	if commandSpeed == 5 {
-		Speed = 1000
-	}
-	if commandSpeed == 6 {
-		Speed = 750
-	}
-	if commandSpeed == 7 {
-		Speed = 500
-	}
-	if commandSpeed == 8 {
-		Speed = 250
-	}
-	if commandSpeed == 9 {
-		Speed = 150
-	}
-	if commandSpeed == 10 {
-		Speed = 125
-	}
-	if commandSpeed == 11 {
-		Speed = 100
-	}
-	if commandSpeed == 12 {
-		Speed = 75
-	}
-	return Speed * time.Millisecond
-}
-
 func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) map[int]common.Switch {
 
 	if debug {
@@ -974,33 +930,6 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 	}
 
 	return newSwitchList
-}
-
-func getSize(size int) int {
-
-	switch size {
-	case 1:
-		return 1
-	case 2:
-		return 5
-	case 3:
-		return 15
-	case 4:
-		return 25
-	case 5:
-		return 35
-	case 6:
-		return 45
-	case 7:
-		return 55
-	case 8:
-		return 65
-	case 9:
-		return 75
-	case 10:
-		return 85
-	}
-	return 0
 }
 
 func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {

@@ -462,6 +462,7 @@ type SwitchChannel struct {
 	StopFadeDown    chan bool
 	StopFadeUp      chan bool
 	KeepRotateAlive chan bool
+	CommandChannel  chan Command
 }
 
 type Hit struct {
@@ -1505,6 +1506,77 @@ func FindSensitivity(soundGain float32) int {
 	}
 
 	return 99
+}
+
+// Used to convert a speed to a millisecond time.
+func SetSpeed(commandSpeed int) (Speed time.Duration) {
+	if commandSpeed == 0 {
+		Speed = 3500
+	}
+	if commandSpeed == 1 {
+		Speed = 3000
+	}
+	if commandSpeed == 2 {
+		Speed = 2500
+	}
+	if commandSpeed == 3 {
+		Speed = 1800
+	}
+	if commandSpeed == 4 {
+		Speed = 1500
+	}
+	if commandSpeed == 5 {
+		Speed = 1000
+	}
+	if commandSpeed == 6 {
+		Speed = 750
+	}
+	if commandSpeed == 7 {
+		Speed = 500
+	}
+	if commandSpeed == 8 {
+		Speed = 250
+	}
+	if commandSpeed == 9 {
+		Speed = 150
+	}
+	if commandSpeed == 10 {
+		Speed = 125
+	}
+	if commandSpeed == 11 {
+		Speed = 100
+	}
+	if commandSpeed == 12 {
+		Speed = 75
+	}
+	return Speed * time.Millisecond
+}
+
+func GetSize(size int) int {
+
+	switch size {
+	case 1:
+		return 1
+	case 2:
+		return 5
+	case 3:
+		return 15
+	case 4:
+		return 25
+	case 5:
+		return 35
+	case 6:
+		return 45
+	case 7:
+		return 55
+	case 8:
+		return 65
+	case 9:
+		return 75
+	case 10:
+		return 85
+	}
+	return 0
 }
 
 func FormatLabel(label string) string {

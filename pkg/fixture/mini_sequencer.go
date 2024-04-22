@@ -566,6 +566,35 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 			for {
 
+				// Wait for updates to sequence config from user buttons.
+				select {
+				case cmd := <-switchChannels[swiTch.Number].CommandChannel:
+					// Update Speed.
+					if cmd.Action == common.UpdateSpeed {
+						const SPEED = 0
+						cfg.Speed = common.SetSpeed(cmd.Args[SPEED].Value.(int))
+					}
+					// Update Shift.
+					if cmd.Action == common.UpdateRGBShift {
+						const SHIFT = 0
+						cfg.Shift = cmd.Args[SHIFT].Value.(int)
+					}
+					// Update Size.
+					if cmd.Action == common.UpdateRGBSize {
+						const SIZE = 0
+						cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
+					}
+					// Update Fade
+					if cmd.Action == common.UpdateRGBFadeSpeed {
+						const FADE_SPEED = 0
+						sequence.RGBFade = cmd.Args[FADE_SPEED].Value.(int)
+					}
+					// Recreate the sequence and recalculate steps.
+					sequence, RGBPositions, numberSteps = createSequence(cfg)
+
+				case <-time.After(10 * time.Millisecond):
+				}
+
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < numberSteps; step++ {
@@ -666,7 +695,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 		RGBInvert:            false,
 		Bounce:               false,
 		ScannerChaser:        true,
-		RGBShift:             1,
+		RGBShift:             cfg.Shift,
 		RGBNumberStepsInFade: cfg.NumberSteps,
 		RGBFade:              cfg.Fade,
 		RGBSize:              cfg.Size,
@@ -835,6 +864,11 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	default:
 		config.Size = SIZE_MEDIUM
 	}
+
+	// Shift - with only four fixture in the mini sequencer
+	// no more of a shift of 1 makes sense.
+	// TODO work out how to make shift work correctly for 4 fixtures.
+	config.Shift = 1
 
 	switch action.Rotate {
 	case "Off":
