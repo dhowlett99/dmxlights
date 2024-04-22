@@ -408,7 +408,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			fmt.Printf("Chase mini sequence for switch number %d\n", swiTch.Number)
 		}
 
-		// Stop any running fades.
+		// Stop any running fade ups.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
 			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
@@ -493,42 +493,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		sequence := common.Sequence{
-			ScannerReverse:       false,
-			RGBInvert:            false,
-			Bounce:               false,
-			ScannerChaser:        true,
-			RGBShift:             1,
-			RGBNumberStepsInFade: cfg.NumberSteps,
-			RGBFade:              cfg.Fade,
-			RGBSize:              cfg.Size,
-		}
-		sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
-		steps := sequence.Pattern.Steps
-		sequence.NumberFixtures = 1
-		// Calculate fade curve values.
-		common.CalculateFadeValues(&sequence)
-		// Calulate positions for each RGB fixture.
-		sequence.Optimisation = false
-		sequence.FixtureState = map[int]common.FixtureState{
-			0: {
-				Enabled: true,
-			},
-			1: {
-				Enabled: true,
-			},
-			2: {
-				Enabled: true,
-			},
-			3: {
-				Enabled: true,
-			},
-			4: {
-				Enabled: true,
-			},
-		}
-		fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
-		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
+		// Create a sequence and calculate steps.
+		sequence, RGBPositions, numberSteps := createSequence(cfg)
 
 		var rotateCounter int
 		var goboChangeFrequency int
@@ -552,6 +518,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			}
 		}
 
+		// Main chaser thread.
 		go func() {
 
 			if cfg.Rotatable {
@@ -691,6 +658,47 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			}
 		}()
 	}
+}
+
+func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position, int) {
+	sequence := common.Sequence{
+		ScannerReverse:       false,
+		RGBInvert:            false,
+		Bounce:               false,
+		ScannerChaser:        true,
+		RGBShift:             1,
+		RGBNumberStepsInFade: cfg.NumberSteps,
+		RGBFade:              cfg.Fade,
+		RGBSize:              cfg.Size,
+	}
+	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
+	steps := sequence.Pattern.Steps
+	sequence.NumberFixtures = 1
+	// Calculate fade curve values.
+	common.CalculateFadeValues(&sequence)
+	// Calulate positions for each RGB fixture.
+	sequence.Optimisation = false
+	sequence.FixtureState = map[int]common.FixtureState{
+		0: {
+			Enabled: true,
+		},
+		1: {
+			Enabled: true,
+		},
+		2: {
+			Enabled: true,
+		},
+		3: {
+			Enabled: true,
+		},
+		4: {
+			Enabled: true,
+		},
+	}
+	fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
+	RGBPositions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
+
+	return sequence, RGBPositions, numberSteps
 }
 
 func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) ActionConfig {
