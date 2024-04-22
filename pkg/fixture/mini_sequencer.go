@@ -566,35 +566,6 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 
 			for {
 
-				// Wait for updates to sequence config from user buttons.
-				select {
-				case cmd := <-switchChannels[swiTch.Number].CommandChannel:
-					// Update Speed.
-					if cmd.Action == common.UpdateSpeed {
-						const SPEED = 0
-						cfg.Speed = common.SetSpeed(cmd.Args[SPEED].Value.(int))
-					}
-					// Update Shift.
-					if cmd.Action == common.UpdateRGBShift {
-						const SHIFT = 0
-						cfg.Shift = cmd.Args[SHIFT].Value.(int)
-					}
-					// Update Size.
-					if cmd.Action == common.UpdateRGBSize {
-						const SIZE = 0
-						cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
-					}
-					// Update Fade
-					if cmd.Action == common.UpdateRGBFadeSpeed {
-						const FADE_SPEED = 0
-						sequence.RGBFade = cmd.Args[FADE_SPEED].Value.(int)
-					}
-					// Recreate the sequence and recalculate steps.
-					sequence, RGBPositions, numberSteps = createSequence(cfg)
-
-				case <-time.After(10 * time.Millisecond):
-				}
-
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.
 				for step := 0; step < numberSteps; step++ {
@@ -652,6 +623,30 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 					select {
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
+					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
+						// Update Speed.
+						if cmd.Action == common.UpdateSpeed {
+							const SPEED = 0
+							cfg.Speed = common.SetSpeed(cmd.Args[SPEED].Value.(int))
+						}
+						// Update Shift.
+						if cmd.Action == common.UpdateRGBShift {
+							const SHIFT = 0
+							cfg.Shift = cmd.Args[SHIFT].Value.(int)
+						}
+						// Update Size.
+						if cmd.Action == common.UpdateRGBSize {
+							const SIZE = 0
+							cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
+						}
+						// Update Fade
+						if cmd.Action == common.UpdateRGBFadeSpeed {
+							const FADE_SPEED = 0
+							sequence.RGBFade = cmd.Args[FADE_SPEED].Value.(int)
+						}
+						// Recreate the sequence and recalculate steps.
+						sequence, RGBPositions, numberSteps = createSequence(cfg)
+
 					case <-soundConfig.SoundTriggers[swiTch.Number+4].Channel:
 					case <-switchChannels[swiTch.Number].Stop:
 						// Stop.
@@ -661,7 +656,7 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 						// And turn the fixture off.
 						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 						return
-					case <-time.After(cfg.Speed):
+					case <-time.After(cfg.Speed / 10):
 					}
 
 					// Play out fixture to DMX channels.

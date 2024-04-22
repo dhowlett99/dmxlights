@@ -828,6 +828,18 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 		}
 
+		// Send a message to the selected switch device.
+		cmd := common.Command{
+			Action: common.UpdateSpeed,
+			Args: []common.Arg{
+				{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+			},
+		}
+		select {
+		case this.SwitchChannels[8].CommandChannel <- cmd:
+		case <-time.After(10 * time.Millisecond):
+		}
+
 		// Update the status bar
 		UpdateSpeed(this, guiButtons)
 
@@ -908,6 +920,18 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
 			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+		}
+
+		// Send a message to the selected switch device.
+		cmd := common.Command{
+			Action: common.UpdateSpeed,
+			Args: []common.Arg{
+				{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+			},
+		}
+		select {
+		case this.SwitchChannels[8].CommandChannel <- cmd:
+		case <-time.After(10 * time.Millisecond):
 		}
 
 		// Update the status bar
