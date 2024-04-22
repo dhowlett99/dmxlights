@@ -124,6 +124,7 @@ func main() {
 		newSwitch.StopRotate = make(chan bool)
 		newSwitch.StopFadeUp = make(chan bool)
 		newSwitch.StopFadeDown = make(chan bool)
+		newSwitch.CommandChannel = make(chan common.Command)
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
 	// Initialize eight fixture states for the four sequences.

@@ -552,7 +552,7 @@ func PlaySequence(sequence common.Sequence,
 					if debug {
 						fmt.Printf("Sound trigger %s disabled\n", sequence.Name)
 					}
-					sequence.CurrentSpeed = commands.SetSpeed(sequence.Speed)
+					sequence.CurrentSpeed = common.SetSpeed(sequence.Speed)
 					sequence.ChangeMusicTrigger = false
 				}
 
