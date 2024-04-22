@@ -175,3 +175,160 @@ func TestFindGobo(t *testing.T) {
 		})
 	}
 }
+
+func TestCheckFixturesAreTheSame(t *testing.T) {
+
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Name:   "fixture1",
+				Group:  1,
+				Number: 1,
+				Channels: []Channel{
+					{
+						Name: "Red",
+					},
+					{
+						Name: "Green",
+					},
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+						},
+					},
+				},
+			},
+			{
+				Name:   "fixture2",
+				Group:  2,
+				Number: 2,
+				Channels: []Channel{
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+							{
+								Name:   "White Circle",
+								Number: 2,
+							},
+						},
+					},
+					{
+						Name: "Shutter",
+					},
+				},
+			},
+			{
+				Name:   "fixture3",
+				Group:  3,
+				Number: 3,
+				Channels: []Channel{
+					{
+						Name: "ProgramSpeed",
+					},
+				},
+			},
+		},
+	}
+
+	differentConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Name:   "fixture1",
+				Group:  1,
+				Number: 1,
+				Channels: []Channel{
+					{
+						Name: "DIFFERENT Red",
+					},
+					{
+						Name: "Green",
+					},
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+						},
+					},
+				},
+			},
+			{
+				Name:   "fixture2",
+				Group:  2,
+				Number: 2,
+				Channels: []Channel{
+					{
+						Name: "Gobo",
+						Settings: []Setting{
+							{
+								Name:   "Yellow Circle",
+								Number: 1,
+							},
+							{
+								Name:   "White Circle",
+								Number: 2,
+							},
+						},
+					},
+					{
+						Name: "Shutter",
+					},
+				},
+			},
+			{
+				Name:   "fixture3",
+				Group:  3,
+				Number: 3,
+				Channels: []Channel{
+					{
+						Name: "ProgramSpeed",
+					},
+				},
+			},
+		},
+	}
+
+	type args struct {
+		fixtures    *Fixtures
+		startConfig *Fixtures
+	}
+	tests := []struct {
+		name string
+		args args
+		want bool
+	}{
+		{
+			name: "same configs",
+			args: args{
+				fixtures:    fixturesConfig,
+				startConfig: fixturesConfig,
+			},
+			want: true,
+		},
+		{
+			name: "different configs",
+			args: args{
+				fixtures:    fixturesConfig,
+				startConfig: differentConfig,
+			},
+			want: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got, _ := CheckFixturesAreTheSame(tt.args.fixtures, tt.args.startConfig); got != tt.want {
+				t.Errorf("CheckFixturesAreTheSame() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

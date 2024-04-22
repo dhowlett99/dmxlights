@@ -21,12 +21,14 @@ package fixture
 import (
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"os"
 	"strconv"
 	"strings"
 	"time"
 
+	"fyne.io/fyne/v2"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/go-yaml/yaml"
@@ -38,6 +40,10 @@ const dmxDebug = false
 
 type Fixtures struct {
 	Fixtures []Fixture `yaml:"fixtures"`
+}
+
+type Groups struct {
+	Groups []Group `yaml:"groups"`
 }
 
 type Color struct {
@@ -120,6 +126,11 @@ type Fixture struct {
 	UseFixture         string    `yaml:"use_fixture,omitempty"`
 }
 
+type Group struct {
+	Name   string `yaml:"name"`
+	Number string `yaml:"number"`
+}
+
 type FixtureInfo struct {
 	HasRotate     bool
 	HasGobo       bool
@@ -146,37 +157,127 @@ type Channel struct {
 	Settings   []Setting `yaml:"settings,omitempty"`
 }
 
-// LoadFixtures opens the fixtures config file.
+// LoadFixturesReader opens the fixtures config file using the io reader passed.
+// Returns a pointer to the fixtures config.
+// Returns an error.
+func LoadFixturesReader(reader fyne.URIReadCloser) (fixtures *Fixtures, err error) {
+
+	if debug {
+		fmt.Printf("LoadFixturesReader\n")
+	}
+
+	data, err := io.ReadAll(reader)
+	if err != nil {
+		return nil, fmt.Errorf("dmxlights: error failed to load fixtures: %s", err.Error())
+	}
+
+	// Unmarshals the fixtures yaml file into a data struct
+	fixtures = &Fixtures{}
+	err = yaml.Unmarshal(data, fixtures)
+	if err != nil {
+		return nil, errors.New("error: unmarshalling file: " + reader.URI().Name() + err.Error())
+	}
+
+	if len(fixtures.Fixtures) == 0 {
+		return nil, errors.New("error: unmarshalling file: " + reader.URI().Name() + " error: fixtures are empty")
+	}
+
+	return fixtures, nil
+}
+
+func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
+
+	if debug {
+		fmt.Printf("SaveFixturesWriter\n")
+	}
+
+	// Marshal the fixtures data into a yaml data structure.
+	data, err := yaml.Marshal(fixtures)
+	if err != nil {
+		return errors.New("error: marshalling file: " + writer.URI().Name() + err.Error())
+	}
+
+	// Write the fixtures.yaml file.
+	_, err = io.WriteString(writer, string(data))
+	if err != nil {
+		return errors.New("error: writing file: " + writer.URI().Name() + err.Error())
+	}
+
+	// Fixtures file saved, no errors.
+	return nil
+}
+
+// LoadFixtures opens the fixtures config file using the filename passed.
 // Returns a pointer to the fixtures config.
 // Returns an error.
 func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 
 	if debug {
-		fmt.Printf("LoadFixtures\n")
+		fmt.Printf("LoadFixtures from file %s\n", "projects/"+filename)
 	}
 
-	// Open the fixtures.yaml file.
-	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
+	// Open the fixtures yaml file.
+	_, err = os.OpenFile("projects/"+filename, os.O_RDONLY, 0644)
 	if err != nil {
-		return nil, errors.New("error: loading fixtures.yaml file: " + err.Error())
+		return nil, err
 	}
 
-	// Reads the fixtures.yaml file.
-	data, err := os.ReadFile(filename)
+	// Reads the fixtures yaml file.
+	data, err := os.ReadFile("projects/" + filename)
 	if err != nil {
-		return nil, errors.New("error: reading fixtures.yaml file: " + err.Error())
+		return nil, err
 	}
 
 	// Unmarshals the fixtures.yaml file into a data struct
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		return nil, errors.New("error: unmarshalling fixtures.yaml file: " + err.Error())
+		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + err.Error())
 	}
+
+	if len(fixtures.Fixtures) == 0 {
+		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + " error: fixtures are empty")
+	}
+
 	return fixtures, nil
 }
 
-// SaveFixtures - saves a complete list of fixtures to fixtures.yaml
+// LoadFixtureGroups opens the fixtures group config file using the filename passed.
+// Returns a pointer to the fixtures group config.
+// Returns an error.
+func LoadFixtureGroups(filename string) (groups *Groups, err error) {
+
+	if debug {
+		fmt.Printf("LoadFixtures from file %s\n", filename)
+	}
+
+	// Open the fixtures yaml file.
+	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
+	if err != nil {
+		return nil, err
+	}
+
+	// Reads the fixtures yaml file.
+	data, err := os.ReadFile(filename)
+	if err != nil {
+		return nil, err
+	}
+
+	// Unmarshals the fixtures group file into a data struct.
+	groups = &Groups{}
+	err = yaml.Unmarshal(data, groups)
+	if err != nil {
+		return nil, errors.New("error: unmarshalling file: " + filename + err.Error())
+	}
+
+	if len(groups.Groups) == 0 {
+		return nil, errors.New("error: unmarshalling file: " + filename + " error: groups are empty")
+	}
+
+	return groups, nil
+}
+
+// SaveFixtures - saves a complete list of fixtures to filename.
 // Returns an error.
 func SaveFixtures(filename string, fixtures *Fixtures) error {
 
@@ -187,19 +288,13 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 	// Marshal the fixtures data into a yaml data structure.
 	data, err := yaml.Marshal(fixtures)
 	if err != nil {
-		return errors.New("error: marshalling fixtures.yaml file: " + err.Error())
-	}
-
-	// Open the fixtures.yaml file.
-	_, err = os.Open(filename)
-	if err != nil {
-		return errors.New("error: opening fixtures.yaml file: " + err.Error())
+		return errors.New("error: marshalling file: " + "projects/" + filename + err.Error())
 	}
 
 	// Write the fixtures.yaml file.
 	err = os.WriteFile(filename, data, 0644)
 	if err != nil {
-		return errors.New("error: writing fixtures.yaml file: " + err.Error())
+		return errors.New("error: writing file: " + "projects/" + filename + err.Error())
 	}
 
 	// Fixtures file saved, no errors.
@@ -303,6 +398,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
 			}
 			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
+			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
@@ -346,6 +442,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
 			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
 
@@ -354,6 +451,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 
 			}
+			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 
 			continue
@@ -376,6 +474,7 @@ func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool,
 
 	// Send stop any running fade downs.
 	select {
+	case stopFadeDown <- true:
 	case stopFadeDown <- true:
 	case <-time.After(100 * time.Millisecond):
 	}
@@ -404,6 +503,7 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 
 	if !cmd.Hidden {
 		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.White, cmd.Master, eventsForLaunchpad, guiButtons)
+		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 
 	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.White, pan, tilt, shutter, rotate, program, gobo, scannerColor, fixtures, false, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
@@ -424,6 +524,7 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 	if !cmd.Hidden {
 		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.Black, 0, eventsForLaunchpad, guiButtons)
+		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
@@ -1591,4 +1692,218 @@ func isThisAChannel(thisFixture Fixture, channelName string) bool {
 		}
 	}
 	return false
+}
+
+// returns true is they are the same.
+func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, string) {
+
+	if len(fixtures.Fixtures) != len(startConfig.Fixtures) {
+		return false, "Number of fixtures are different"
+	}
+
+	for fixtureNumber, fixture := range fixtures.Fixtures {
+
+		if debug {
+			fmt.Printf("Checking Fixture %s against %s\n", fixture.Name, startConfig.Fixtures[fixtureNumber].Name)
+		}
+
+		if fixture.Name != startConfig.Fixtures[fixtureNumber].Name {
+			return false, fmt.Sprintf("Fixture:%d Name is different\n", fixtureNumber+1)
+		}
+
+		if fixture.ID != startConfig.Fixtures[fixtureNumber].ID {
+			return false, fmt.Sprintf("Fixture:%d ID is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Label != startConfig.Fixtures[fixtureNumber].Label {
+			return false, fmt.Sprintf("Fixture:%d Label is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Number != startConfig.Fixtures[fixtureNumber].Number {
+			return false, fmt.Sprintf("Fixture:%d Number is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Description != startConfig.Fixtures[fixtureNumber].Description {
+			return false, fmt.Sprintf("Fixture:%d Description is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Type != startConfig.Fixtures[fixtureNumber].Type {
+			return false, fmt.Sprintf("Fixture:%d Type is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Group != startConfig.Fixtures[fixtureNumber].Group {
+			return false, fmt.Sprintf("Fixture:%d Group is different\n", fixtureNumber+1)
+		}
+
+		if fixture.Address != startConfig.Fixtures[fixtureNumber].Address {
+			return false, fmt.Sprintf("Fixture:%d Address is different\n", fixtureNumber+1)
+		}
+
+		for channelNumber, channel := range fixture.Channels {
+
+			if channel.Number != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Number {
+				return false, fmt.Sprintf("Fixture:%d Channel Number is different\n", fixtureNumber+1)
+			}
+
+			if channel.Name != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Name {
+				return false, fmt.Sprintf("Fixture:%d Channel Name is different\n", fixtureNumber+1)
+			}
+
+			if channel.Value != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Value {
+				return false, fmt.Sprintf("Fixture:%d Channel Value is different\n", fixtureNumber+1)
+			}
+
+			if channel.MaxDegrees != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].MaxDegrees {
+				return false, fmt.Sprintf("Fixture:%d Channel MaxDegrees is different\n", fixtureNumber+1)
+			}
+
+			if channel.Offset != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Offset {
+				return false, fmt.Sprintf("Fixture:%d Channel Offset is different\n", fixtureNumber+1)
+			}
+
+			if channel.Comment != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Comment {
+				return false, fmt.Sprintf("Fixture:%d Channel Comment is different\n", fixtureNumber+1)
+			}
+
+			for settingNumber, setting := range channel.Settings {
+
+				if setting.Name != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Name {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Name is different\n", fixtureNumber+1)
+				}
+
+				if setting.Label != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Label {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Label is different\n", fixtureNumber+1)
+				}
+
+				if setting.Number != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Number {
+					return false, fmt.Sprintf("Fixture:%d Channel Settings Number is different\n", fixtureNumber+1)
+				}
+
+				if setting.Channel != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Channel {
+					return false, fmt.Sprintf("Fixture:%d Channel Channel Number is different\n", fixtureNumber+1)
+				}
+
+				if setting.Value != startConfig.Fixtures[fixtureNumber].Channels[channelNumber].Settings[settingNumber].Value {
+					return false, fmt.Sprintf("Fixture:%d Channel Value Number is different\n", fixtureNumber+1)
+				}
+			}
+
+			for stateNumber, state := range fixture.States {
+
+				if state.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Number {
+					return false, fmt.Sprintf("Fixture:%d State Number is different\n", fixtureNumber+1)
+				}
+
+				if state.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Name {
+					return false, fmt.Sprintf("Fixture:%d State Name is different\n", fixtureNumber+1)
+				}
+
+				if state.Label != startConfig.Fixtures[fixtureNumber].States[stateNumber].Label {
+					return false, fmt.Sprintf("Fixture:%d State Label is different\n", fixtureNumber+1)
+				}
+
+				if state.ButtonColor != startConfig.Fixtures[fixtureNumber].States[stateNumber].ButtonColor {
+					return false, fmt.Sprintf("Fixture:%d State ButtonColor is different\n", fixtureNumber+1)
+				}
+
+				if state.Master != startConfig.Fixtures[fixtureNumber].States[stateNumber].Master {
+					return false, fmt.Sprintf("Fixture:%d State Master is different\n", fixtureNumber+1)
+				}
+
+				for actionNumber, action := range state.Actions {
+
+					if action.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Name {
+						return false, fmt.Sprintf("Fixture:%d State Action Name is different\n", fixtureNumber+1)
+					}
+
+					if action.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Number {
+						return false, fmt.Sprintf("Fixture:%d State Action Number is different\n", fixtureNumber+1)
+					}
+
+					for colorNumber, color := range action.Colors {
+						if color != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Colors[colorNumber] {
+
+							return false, fmt.Sprintf("Fixture:%d State Action Color Number is different\n", fixtureNumber+1)
+						}
+					}
+
+					if action.Mode != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Mode {
+						return false, fmt.Sprintf("Fixture:%d State Action Mode is different\n", fixtureNumber+1)
+					}
+
+					if action.Fade != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Fade {
+						return false, fmt.Sprintf("Fixture:%d State Action Fade is different\n", fixtureNumber+1)
+					}
+
+					if action.Size != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Size {
+						return false, fmt.Sprintf("Fixture:%d State Action Size is different\n", fixtureNumber+1)
+					}
+
+					if action.Speed != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Speed {
+						return false, fmt.Sprintf("Fixture:%d State Action Speed is different\n", fixtureNumber+1)
+					}
+
+					if action.Rotate != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Rotate {
+						return false, fmt.Sprintf("Fixture:%d State Action Rotate is different\n", fixtureNumber+1)
+					}
+
+					if action.RotateSpeed != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].RotateSpeed {
+						return false, fmt.Sprintf("Fixture:%d State Action RotateSpeed is different\n", fixtureNumber+1)
+					}
+
+					if action.Program != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Program {
+						return false, fmt.Sprintf("Fixture:%d State Action Program is different\n", fixtureNumber+1)
+					}
+
+					if action.Strobe != startConfig.Fixtures[fixtureNumber].States[stateNumber].Actions[actionNumber].Strobe {
+						return false, fmt.Sprintf("Fixture:%d State Action Strobe is different\n", fixtureNumber+1)
+					}
+
+				}
+
+				for settingNumber, setting := range state.Settings {
+
+					if setting.Name != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Name {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Strobe is different\n", fixtureNumber+1)
+					}
+
+					if setting.Label != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Label {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Label is different\n", fixtureNumber+1)
+					}
+
+					if setting.Number != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Number {
+						return false, fmt.Sprintf("Fixture:%d Channel Settings Number is different\n", fixtureNumber+1)
+					}
+
+					if setting.Channel != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Channel {
+						return false, fmt.Sprintf("Fixture:%d Channel Channel Number is different\n", fixtureNumber+1)
+					}
+
+					if setting.Value != startConfig.Fixtures[fixtureNumber].States[stateNumber].Settings[settingNumber].Value {
+						return false, fmt.Sprintf("Fixture:%d Channel Value Number is different\n", fixtureNumber+1)
+					}
+				}
+
+				if state.Flash != startConfig.Fixtures[fixtureNumber].States[stateNumber].Flash {
+					return false, fmt.Sprintf("Fixture:%d State Flash is different\n", fixtureNumber+1)
+				}
+
+			}
+
+			if fixture.MultiFixtureDevice != startConfig.Fixtures[fixtureNumber].MultiFixtureDevice {
+				return false, fmt.Sprintf("Fixture:%d MultiFixtureDevice is different\n", fixtureNumber+1)
+			}
+
+			if fixture.NumberSubFixtures != startConfig.Fixtures[fixtureNumber].NumberSubFixtures {
+				return false, fmt.Sprintf("Fixture:%d NumberSubFixtures is different\n", fixtureNumber+1)
+			}
+
+			if fixture.UseFixture != startConfig.Fixtures[fixtureNumber].UseFixture {
+				return false, fmt.Sprintf("Fixture: %d UseFixture is different\n", fixtureNumber+1)
+			}
+
+		}
+	}
+
+	return true, ""
 }

@@ -20,7 +20,6 @@ package editor
 import (
 	"fmt"
 	"image/color"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -141,7 +140,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, number int, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
@@ -151,7 +150,8 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 	fp.Fixtures = fixtures
 	fp.FixtureList = []fixture.Fixture{}
 
-	fp.GroupOptions = []string{"1", "2", "3", "4", "5", "100", "101", "102", "103", "104", "105", "106", "107", "108", "109", "110"}
+	// Populate group options from the available sequence labels.
+	fp.GroupOptions = getGroupOptions(groupConfig)
 	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
@@ -218,6 +218,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 		newItem.Channels = f.Channels
 		newItem.States = f.States
 		newItem.MultiFixtureDevice = f.MultiFixtureDevice
+		newItem.NumberSubFixtures = f.NumberSubFixtures
 		newItem.UseFixture = f.UseFixture
 		fp.FixtureList = append(fp.FixtureList, newItem)
 	}
@@ -323,14 +324,13 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 			if i.Col == FIXTURE_GROUP {
 				showField(FIXTURE_GROUP, o)
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = nil
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).SetSelected(data[i.Row][i.Col])
+				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).SetSelected(getGroupName(groupConfig, data[i.Row][i.Col]))
 				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).Options = fp.GroupOptions
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(value string) {
-					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, value, fp.FixtureList)
+				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).OnChanged = func(groupName string) {
+					newFixture := makeNewFixture(data, i, FIXTURE_GROUP, getGroupFromName(groupConfig, groupName), fp.FixtureList)
 					fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 					data = updateArray(fp.FixtureList)
 				}
-				o.(*fyne.Container).Objects[FIXTURE_GROUP].(*widget.Select).PlaceHolder = "XXX"
 			}
 
 			// Fixture Number.
@@ -602,7 +602,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 
 	fp.FixturePanel.SetColumnWidth(0, 40)  // Id
 	fp.FixturePanel.SetColumnWidth(1, 100) // Type
-	fp.FixturePanel.SetColumnWidth(2, 61)  // Sequence Number
+	fp.FixturePanel.SetColumnWidth(2, 100) // Sequence Number
 	fp.FixturePanel.SetColumnWidth(3, 59)  // Fixture Number
 	fp.FixturePanel.SetColumnWidth(4, 80)  // Name
 	fp.FixturePanel.SetColumnWidth(5, 80)  // Label
@@ -613,7 +613,7 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 	fp.FixturePanel.SetColumnWidth(10, 40) // Channels Button
 
 	// Save button.
-	buttonSave = widget.NewButton("Save", func() {
+	buttonSave = widget.NewButton("OK", func() {
 
 		// Remove any empty "None" actions from fixture list.
 		fp.FixtureList = removeEmptyActions(fp.FixtureList)
@@ -680,14 +680,6 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 				} else {
 					// Enable the save button.
 					buttonSave.Enable()
-
-					// OK to save.
-					// Save the new fixtures file.
-					err := fixture.SaveFixtures("fixtures.yaml", fixtures)
-					if err != nil {
-						fmt.Printf("error saving fixtures %s\n", err.Error())
-						os.Exit(1)
-					}
 					popupFixturePanel.Hide()
 				}
 			}
@@ -711,6 +703,41 @@ func NewFixturesPanel(sequences []*common.Sequence, w fyne.Window, group int, nu
 		w.Canvas(),
 	)
 	return popupFixturePanel, nil
+}
+
+func getGroupOptions(groupConfig *fixture.Groups) []string {
+	if debug {
+		fmt.Printf("getGroupOptions\n")
+	}
+	var groupOptions []string
+	for _, group := range groupConfig.Groups {
+		groupOptions = append(groupOptions, group.Name)
+	}
+	return groupOptions
+}
+
+func getGroupFromName(groupConfig *fixture.Groups, groupName string) string {
+	if debug {
+		fmt.Printf("getGroupFromName %s\n", groupName)
+	}
+	for _, group := range groupConfig.Groups {
+		if group.Name == groupName {
+			return group.Number
+		}
+	}
+	return groupName
+}
+
+func getGroupName(groupConfig *fixture.Groups, groupNumber string) string {
+	if debug {
+		fmt.Printf("getGroupName %s\n", groupNumber)
+	}
+	for _, group := range groupConfig.Groups {
+		if group.Number == groupNumber {
+			return group.Name
+		}
+	}
+	return groupNumber
 }
 
 func checkForDuplicateName(fixtures *fixture.Fixtures, fp FixturesPanel) ([]string, error) {
@@ -1132,6 +1159,7 @@ func makeNewFixture(data [][]string, i widget.TableCellID, field int, value stri
 	newFixture.Channels = fixtureList[i.Row].Channels
 	newFixture.States = fixtureList[i.Row].States
 	newFixture.MultiFixtureDevice = fixtureList[i.Row].MultiFixtureDevice
+	newFixture.NumberSubFixtures = fixtureList[i.Row].NumberSubFixtures
 	newFixture.UseFixture = fixtureList[i.Row].UseFixture
 
 	// Now setup the new selected value.
@@ -1226,7 +1254,6 @@ func (h *ActiveHeader) TappedSecondary(_ *fyne.PointEvent) {
 
 func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 
-	var outActions []fixture.Action
 	var newFixtureList []fixture.Fixture
 
 	for _, f := range fixtureList {
@@ -1253,11 +1280,9 @@ func removeEmptyActions(fixtureList []fixture.Fixture) []fixture.Fixture {
 
 			newState := fixture.State{}
 			newActions := []fixture.Action{}
-
 			for _, action := range state.Actions {
 				if action.Mode != "None" {
-					newAction := action
-					newActions = append(outActions, newAction)
+					newActions = append(newActions, action)
 				}
 			}
 

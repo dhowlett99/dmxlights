@@ -22,13 +22,16 @@ import (
 	"image/color"
 	"log"
 	"os"
+	"path/filepath"
 	"strings"
 	"time"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/dialog"
 	"fyne.io/fyne/v2/layout"
+	"fyne.io/fyne/v2/storage"
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
@@ -337,6 +340,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
+	groupConfig *fixture.Groups,
 	fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
@@ -418,7 +422,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("DMXLIGI", func() {
-				modal, err := editor.NewFixturesPanel(sequences, myWindow, Y, X, fixturesConfig, commandChannels)
+				modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
@@ -456,12 +460,88 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	return row0
 }
 
+func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) error {
+
+	modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
+	if err != nil {
+		fmt.Println(err.Error())
+		return err
+	}
+	modal.Resize(fyne.NewSize(800, 600))
+	modal.Show()
+	return nil
+}
+
+func PopupErrorMessage(myWindow fyne.Window, errorMessage string) {
+	// Create a dialog for error messages.
+	popupErrorPanel := &widget.PopUp{}
+	// Ok button.
+	button := widget.NewButton("OK", func() {
+		popupErrorPanel.Hide()
+	})
+
+	popupErrorPanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Title"),
+			widget.NewLabel("Error Message"),
+			container.NewHBox(layout.NewSpacer(), button),
+		),
+		myWindow.Canvas(),
+	)
+
+	popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Erorr Message"
+	popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = errorMessage
+	popupErrorPanel.Show()
+}
+
+func AreYouSureDialog(myWindow fyne.Window, message string) *widget.PopUp {
+
+	// Create a dialog for error messages.
+	popupAreYouSurePanel := &widget.PopUp{}
+
+	// Ok button.
+	buttonOK := widget.NewButton("Quit Without Saving Project", func() {
+		popupAreYouSurePanel.Hide()
+		os.Exit(0)
+	})
+
+	buttonCancel := widget.NewButton("Cancel", func() {
+		popupAreYouSurePanel.Hide()
+	})
+
+	popupAreYouSurePanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Project Has Changed"),
+			widget.NewLabel("If you quit with out saving"),
+			widget.NewLabel("your changes will be lost"),
+			widget.NewLabel(message),
+			container.NewHBox(buttonCancel, buttonOK),
+		),
+		myWindow.Canvas(),
+	)
+
+	return popupAreYouSurePanel
+}
+
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) *widget.Toolbar {
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
+	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures) *widget.Toolbar {
+
+	// Project open.
 	toolbar := widget.NewToolbar(
+		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
+			FileOpen(myWindow, startConfig, fixturesConfig, commandChannels)
+		}),
+
+		// Project save.
+		widget.NewToolbarAction(theme.FileIcon(), func() {
+			FileSave(myWindow, startConfig, fixturesConfig, commandChannels)
+		}),
+
+		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := runSettingsPopUp(myWindow, soundConfig, guiButtons, eventsForLaunchPad, config, launchPadName)
+			modal := RunSettingsPopUp(myWindow, soundConfig, guiButtons, eventsForLaunchPad, config, launchPadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -469,7 +549,87 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	return toolbar
 }
 
-func runSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
+func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) {
+	fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
+		if err == nil && reader != nil {
+			newFixturesConfig, err := fixture.LoadFixturesReader(reader)
+			if err != nil {
+				fmt.Printf("dmxlights: error failed to load fixtures: %s\n", err.Error())
+				PopupErrorMessage(myWindow, err.Error())
+				return
+			} else {
+				// Reset the startConfig.
+				startConfig.Fixtures = []fixture.Fixture{}
+				startConfig.Fixtures = append(startConfig.Fixtures, newFixturesConfig.Fixtures...)
+				filename := filepath.Base(reader.URI().String())
+				myWindow.SetTitle("DMX Lights:" + filename)
+
+				// Copy the newFixtures into the old pointer to the fixtures config.
+				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
+
+				// Stop all the sequences.
+				cmd := common.Command{
+					Action: common.Reset,
+				}
+				common.SendCommandToAllSequence(cmd, commandChannels)
+				// Update the fixtures config in all the sequences.
+				cmd = common.Command{
+					Action: common.UpdateFixturesConfig,
+					Args: []common.Arg{
+						{Name: "FixturesConfig", Value: fixturesConfig},
+					},
+				}
+				common.SendCommandToAllSequence(cmd, commandChannels)
+			}
+		}
+	}, myWindow)
+	pwd, _ := os.Getwd()
+	currentmfolder, _ := filepath.Abs(pwd + "/projects")
+	if currentmfolder != "" {
+		mfileURI := storage.NewFileURI(currentmfolder)
+		mfileLister, _ := storage.ListerForURI(mfileURI)
+		fileOpener.SetLocation(mfileLister)
+		fileOpener.SetFilter(&storage.ExtensionFileFilter{
+			Extensions: []string{
+				".yaml",
+			},
+		})
+	}
+	fileOpener.Show()
+}
+
+func FileSave(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) {
+	fileSaver := dialog.NewFileSave(func(writer fyne.URIWriteCloser, err error) {
+		if err == nil && writer != nil {
+			err = fixture.SaveFixturesWriter(writer, fixturesConfig)
+			if err != nil {
+				fmt.Printf("dmxlights: error failed to save fixtures: %s\n", err.Error())
+			}
+			// Reset the startConfig.
+			startConfig.Fixtures = []fixture.Fixture{}
+			startConfig.Fixtures = append(startConfig.Fixtures, fixturesConfig.Fixtures...)
+		}
+	}, myWindow)
+	pwd, _ := os.Getwd()
+	currentmfolder, _ := filepath.Abs(pwd + "/projects")
+	if currentmfolder != "" {
+		mfileURI := storage.NewFileURI(currentmfolder)
+		mfileLister, _ := storage.ListerForURI(mfileURI)
+
+		fileSaver.SetLocation(mfileLister)
+		fileSaver.SetFilter(&storage.ExtensionFileFilter{
+			Extensions: []string{
+				".yaml",
+			},
+		})
+		filename := strings.Split(myWindow.Title(), ":")
+		fileSaver.SetFileName(filename[1])
+	}
+	fileSaver.Show()
+
+}
+
+func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, config *usbdmx.ControllerConfig, launchPadName string) (modal *widget.PopUp) {
 
 	selectedInput := soundConfig.GetDeviceName()

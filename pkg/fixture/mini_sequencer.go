@@ -527,8 +527,8 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 				Enabled: true,
 			},
 		}
-		fadeColors, numberFixtures, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
-		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, numberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
+		fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
+		RGBPositions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 		var rotateCounter int
 		var goboChangeFrequency int

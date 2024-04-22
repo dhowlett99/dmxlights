@@ -10,7 +10,7 @@ sequences:
   group: 2
   type: rgb
 - name: sequence2
-  label: Scanners
+  label: scanners
   description: Scanners
   group: 3
   type: scanner
