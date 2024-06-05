@@ -86,7 +86,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectedMode[this.SelectedSequence] = NORMAL
 	}
 
-	// Clear  olor picker.
+	// Clear color picker.
 	if this.ShowRGBColorPicker || this.ShowStaticColorPicker {
 		if debug {
 			fmt.Printf("Turn off the edit sequence colors button. \n")
