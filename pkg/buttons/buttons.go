@@ -62,6 +62,7 @@ type CurrentState struct {
 	StaticFlashing              []bool                                // Static buttons are flashing, indexed by sequence.
 	SavedSequenceColors         map[int][]common.Color                // Local storage for sequence colors.
 	SelectedType                string                                // The currently selected sequenece type.
+	LastSelectedSwitch          int                                   // The last selected switch.
 	LastSelectedSequence        int                                   // Store fof the last selected squence.
 	Speed                       map[int]int                           // Local copy of sequence speed. Indexed by sequence.
 	RGBShift                    map[int]int                           // Current rgb fixture shift. Indexed by sequence.
@@ -836,7 +837,7 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		select {
-		case this.SwitchChannels[8].CommandChannel <- cmd:
+		case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 		case <-time.After(10 * time.Millisecond):
 		}
 
@@ -930,7 +931,7 @@ func ProcessButtons(X int, Y int,
 			},
 		}
 		select {
-		case this.SwitchChannels[8].CommandChannel <- cmd:
+		case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 		case <-time.After(10 * time.Millisecond):
 		}
 
@@ -1412,6 +1413,8 @@ func ProcessButtons(X int, Y int,
 			// Send a message to the switch sequence.
 			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		}
+
+		this.LastSelectedSwitch = X
 	}
 
 	// D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S - Used to toggle the scanner state from on, inverted or off.
