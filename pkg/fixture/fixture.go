@@ -607,7 +607,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 			fadeUpValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, false)
 			fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
 
-			var master int
+			master := cmd.Master
 
 			if lastColor.RGBColor != common.EmptyColor {
 				for _, fade := range fadeDownValues {
