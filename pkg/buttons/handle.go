@@ -57,7 +57,21 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		printHandleDebug(this)
 	}
 
-	// Clear gobo selection mode.
+	// Clear scannr color selection mode.
+	if this.EditScannerColorsMode {
+
+		if debug {
+			fmt.Printf("%d: If we're in color selection mode. turn off color func key\n", this.ChaserSequenceNumber)
+		}
+
+		// Reset the gobo function key.
+		this.Functions[this.TargetSequence][common.Function5_Color].State = false
+
+		// Editing gobo is over for this sequence.
+		this.EditScannerColorsMode = false
+	}
+
+	// Clear scanner gobo selection mode.
 	if this.EditGoboSelectionMode {
 		if debug {
 			fmt.Printf("%d: If we're in gobo selection mode. turn off gobo func key\n", this.ChaserSequenceNumber)
@@ -86,7 +100,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.SelectedMode[this.SelectedSequence] = NORMAL
 	}
 
-	// Clear  olor picker.
+	// Clear color picker.
 	if this.ShowRGBColorPicker || this.ShowStaticColorPicker {
 		if debug {
 			fmt.Printf("Turn off the edit sequence colors button. \n")
