@@ -442,8 +442,6 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
 			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
-			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
-
 			continue
 
 		case cmd.Type == "rgb":
@@ -452,8 +450,6 @@ func FixtureReceiver(
 
 			}
 			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
-			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
-
 			continue
 		}
 	}

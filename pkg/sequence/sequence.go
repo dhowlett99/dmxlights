@@ -144,7 +144,7 @@ func CreateSequence(
 		newScanner.ScannerPatternReversed = false
 		FixtureState[x] = newScanner
 		// Set the first gobo for every fixture.
-		scannerGobos[x] = 1
+		scannerGobos[x] = common.DEFAULT_SCANNER_GOBO
 	}
 
 	disabledOnce := make(map[int]bool, 8)
