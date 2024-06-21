@@ -54,6 +54,7 @@ type CurrentState struct {
 	Crash1                      bool                                  // Flags to detect launchpad crash.
 	Crash2                      bool                                  // Flags to detect launchpad crash.
 	SelectedSequence            int                                   // The currently selected sequence.
+	SelectedSwitch              int                                   // The currently selected switch.
 	TargetSequence              int                                   // The current target sequence.
 	DisplaySequence             int                                   // The current display sequence.
 	SequenceType                []string                              // The type, indexed by sequence.
@@ -1373,14 +1374,17 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// S W I T C H   B U T T O N's Toggle State of switches for this sequence.
+	// S E L E C T  S W I T C H   B U T T O N's Toggle State of switches for this sequence.
 	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
 		sequences[Y].Type == "switch" {
 
+		this.SelectedSequence = Y
+		this.SelectedSwitch = X
+
 		if debug {
-			fmt.Printf("Switch Key X:%d Y:%d\n", X, Y)
+			fmt.Printf("Switch Key X:%d Y:%d\n", this.SelectedSwitch, this.SelectedSequence)
 		}
 
 		if this.ShowRGBColorPicker {
@@ -1392,29 +1396,44 @@ func ProcessButtons(X int, Y int,
 		sequences[Y] = common.RefreshSequence(Y, commandChannels, updateChannels)
 
 		// We have a valid switch.
-		if X < len(sequences[Y].Switches) {
-			this.SwitchPositions[Y][X] = this.SwitchPositions[Y][X] + 1
-			valuesLength := len(sequences[Y].Switches[X].States)
-			if this.SwitchPositions[Y][X] == valuesLength {
-				this.SwitchPositions[Y][X] = 0
+		if this.SelectedSwitch < len(sequences[this.SelectedSequence].Switches) {
+
+			// Second time we've pressed this switch button, actually step the state.
+			if this.SelectedSwitch == this.LastSelectedSwitch {
+				this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] = this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] + 1
+				valuesLength := len(sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States)
+				if this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] == valuesLength {
+					this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] = 0
+				}
+				// Send a message to the sequence for it to step to the next state the selected switch.
+				cmd := common.Command{
+					Action: common.UpdateSwitch,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: this.SelectedSwitch},
+						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
+						{Name: "Step", Value: true},
+					},
+				}
+				// Send a message to the switch sequence.
+				common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+			} else {
+				// Just send a message to focus the switch button.
+				cmd := common.Command{
+					Action: common.UpdateSwitch,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: this.SelectedSwitch},
+						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
+						{Name: "Step", Value: false}, // Focus the lamp.
+					},
+				}
+				// Send a message to the switch sequence.
+				common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
 			}
 
-			// Send a message to the sequence for it to toggle the selected switch.
-			// Y is the sequence.
-			// X is the switch.
-			cmd := common.Command{
-				Action: common.UpdateSwitch,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: X},
-					{Name: "SwitchPosition", Value: this.SwitchPositions[Y][X]},
-				},
-			}
-
-			// Send a message to the switch sequence.
-			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		}
 
-		this.LastSelectedSwitch = X
+		this.LastSelectedSwitch = this.SelectedSwitch
 	}
 
 	// D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S - Used to toggle the scanner state from on, inverted or off.
@@ -1948,7 +1967,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   P A T T E N
+	// S E L E C T   P A T T E R N
 	if X >= 0 && X < 8 && Y != -1 &&
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode {

@@ -295,7 +295,6 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Sequence in Switch Mode.
 		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
 			if debug {
@@ -303,37 +302,8 @@ func PlaySequence(sequence common.Sequence,
 			}
 			// Show initial state of switches
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
-
-				switchData := sequence.Switches[switchNumber]
-
-				if debug {
-					fmt.Printf("switchNumber %d state %d\n", switchData.Number, switchData.CurrentPosition)
-				}
-
-				state := switchData.States[switchData.CurrentPosition]
-
-				color, _ := common.GetRGBColorByName(state.ButtonColor)
-				common.LightLamp(common.Button{X: switchNumber, Y: mySequenceNumber}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-
-				// Label the switch.
-				common.LabelButton(switchNumber, mySequenceNumber, switchData.Label+"\n"+state.Label, guiButtons)
-
-				// Now send a message to the fixture to play all the values for this state.
-				command := common.FixtureCommand{
-					Master:             sequence.Master,
-					Blackout:           sequence.Blackout,
-					Type:               sequence.Type,
-					Label:              sequence.Label,
-					SequenceNumber:     sequence.Number,
-					SwitchData:         switchData,
-					State:              state,
-					CurrentSwitchState: switchData.CurrentPosition,
-					MasterChanging:     sequence.MasterChanging,
-					RGBFade:            sequence.RGBFade,
-				}
-
-				// Send a message to the fixture to operate the switch.
-				fixtureStepChannels[switchNumber] <- command
+				SetSwitchLamp(sequence, switchNumber, eventsForLauchpad, guiButtons)
+				SetSwitchDMX(sequence, switchNumber, fixtureStepChannels)
 			}
 			sequence.PlaySwitchOnce = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
@@ -343,36 +313,31 @@ func PlaySequence(sequence common.Sequence,
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
 			if debug {
-				fmt.Printf("sequence %d Play single switch mode\n", mySequenceNumber)
+				fmt.Printf("sequence %d Play single switch number %d\n", mySequenceNumber, sequence.CurrentSwitch)
 			}
 
-			swiTch := sequence.Switches[sequence.CurrentSwitch]
-
-			state := sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition]
-
-			// Use the button color for this state to light the correct color on the launchpad.
-			color, _ := common.GetRGBColorByName(state.ButtonColor)
-			common.LightLamp(common.Button{X: sequence.CurrentSwitch, Y: mySequenceNumber}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-
-			// Label the switch.
-			common.LabelButton(sequence.CurrentSwitch, mySequenceNumber, swiTch.Label+"\n"+state.Label, guiButtons)
-
-			// Now send a message to the fixture to play all the values for this state.
-			command := common.FixtureCommand{
-				Master:             sequence.Master,
-				Blackout:           sequence.Blackout,
-				Type:               sequence.Type,
-				Label:              sequence.Label,
-				SequenceNumber:     sequence.Number,
-				SwitchData:         sequence.Switches[sequence.CurrentSwitch],
-				State:              sequence.Switches[sequence.CurrentSwitch].States[swiTch.CurrentPosition],
-				CurrentSwitchState: swiTch.CurrentPosition,
-				MasterChanging:     sequence.MasterChanging,
-				RGBFade:            sequence.RGBFade,
+			// Dim the last lamp.
+			if sequence.CurrentSwitch != sequence.LastSwitchSelected {
+				// Clear the last selected switch.
+				newSwitch := sequence.Switches[sequence.LastSwitchSelected]
+				newSwitch.Selected = false
+				sequence.Switches[sequence.LastSwitchSelected] = newSwitch
+				SetSwitchLamp(sequence, sequence.LastSwitchSelected, eventsForLauchpad, guiButtons)
 			}
 
-			// Send a message to the fixture to operate the switch.
-			fixtureStepChannels[sequence.CurrentSwitch] <- command
+			// Now show the current switch state.
+			if sequence.StepSwitch {
+				// This is the second press so actually switch and send the DMX command.
+				SetSwitchLamp(sequence, sequence.CurrentSwitch, eventsForLauchpad, guiButtons)
+				SetSwitchDMX(sequence, sequence.CurrentSwitch, fixtureStepChannels)
+			} else {
+				// first time we presses this switch button just move the focus here and use full brightness to indicate we
+				// are the selected sequence and selected switch.
+				SetSwitchLamp(sequence, sequence.CurrentSwitch, eventsForLauchpad, guiButtons)
+			}
+
+			sequence.LastSwitchSelected = sequence.CurrentSwitch
+
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
@@ -822,6 +787,64 @@ func PlaySequence(sequence common.Sequence,
 			}
 		}
 	}
+}
+
+// Set the button color for the selected switch.
+// Will also change the brightness to highlight the last selected switch.
+func SetSwitchLamp(sequence common.Sequence, switchNumber int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	swiTch := sequence.Switches[switchNumber]
+
+	if debug {
+		fmt.Printf("switchNumber %d current %d selected %t\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
+	}
+
+	state := swiTch.States[swiTch.CurrentPosition]
+
+	// Use the button color for this state to light the correct color on the launchpad.
+	color, _ := common.GetRGBColorByName(state.ButtonColor)
+	var brightness int
+	if swiTch.Selected {
+		brightness = common.MAX_DMX_BRIGHTNESS
+	} else {
+		brightness = common.MAX_DMX_BRIGHTNESS / 8
+	}
+
+	common.LightLamp(common.Button{X: switchNumber, Y: sequence.Number}, color, brightness, eventsForLauchpad, guiButtons)
+
+	// Label the switch.
+	common.LabelButton(switchNumber, sequence.Number, swiTch.Label+"\n"+state.Label, guiButtons)
+
+}
+
+// Set the DMX parameters for the selected switch.
+func SetSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannels []chan common.FixtureCommand) {
+
+	swiTch := sequence.Switches[switchNumber]
+
+	if debug {
+		fmt.Printf("switchNumber %d current %d selected %t\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
+	}
+
+	state := swiTch.States[swiTch.CurrentPosition]
+
+	// Now send a message to the fixture to play all the values for this state.
+	command := common.FixtureCommand{
+		Master:             sequence.Master,
+		Blackout:           sequence.Blackout,
+		Type:               sequence.Type,
+		Label:              sequence.Label,
+		SequenceNumber:     sequence.Number,
+		SwiTch:             swiTch,
+		State:              state,
+		CurrentSwitchState: swiTch.CurrentPosition,
+		MasterChanging:     sequence.MasterChanging,
+		RGBFade:            sequence.RGBFade,
+	}
+
+	// Send a message to the fixture to operate the switch.
+	fixtureStepChannels[switchNumber] <- command
+
 }
 
 // Send a command to all the fixtures.

@@ -617,8 +617,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer
 		const SWITCH_POSITION = 1 // Integer
+		const STEP = 2            // Boolean
 		if debug {
-			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
+			fmt.Printf("%d: Command Update Switch %d to Position %d Step %t\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value, command.Args[STEP].Value)
 		}
 
 		// Loop through all the switchies. and reset their current state back to 0.
@@ -634,10 +635,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		newSwitch.Number = sequence.Switches[switchNumber].Number
 		newSwitch.States = sequence.Switches[switchNumber].States
 		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+		newSwitch.Selected = true
 		sequence.Switches[switchNumber] = newSwitch
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = true
+		sequence.StepSwitch = command.Args[STEP].Value.(bool)
 		sequence.Run = false
 		sequence.Type = "switch"
 		sequence.MasterChanging = false

@@ -196,6 +196,7 @@ type Switch struct {
 	MiniSequencerRunning bool
 	Blackout             bool
 	Master               int
+	Selected             bool
 }
 
 type StaticColorButton struct {
@@ -402,6 +403,7 @@ type Sequence struct {
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
+	StepSwitch                  bool                        // Step the switch if true. focus the switch if false.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
 	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
@@ -438,6 +440,7 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
+	LastSwitchSelected          int                         // Storage for the last selected switch.
 }
 
 type Function struct {
@@ -525,7 +528,7 @@ type FixtureCommand struct {
 	Program int
 
 	// Switch Commands
-	SwitchData         Switch
+	SwiTch             Switch
 	State              State
 	CurrentSwitchState int
 }
