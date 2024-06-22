@@ -241,6 +241,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
 
+	deFocusSwitches(this, sequences, commandChannels)
+
 	// Clear the presets and display them.
 	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)

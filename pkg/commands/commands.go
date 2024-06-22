@@ -150,6 +150,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 				newSwitch := common.Switch{}
 				newSwitch.CurrentPosition = 0
+				newSwitch.Selected = false
 				newSwitch.Description = sequence.Switches[switchNumber].Description
 				newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
 				newSwitch.Label = sequence.Switches[switchNumber].Label
@@ -159,7 +160,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
 				sequence.Switches[switchNumber] = newSwitch
 			}
+			sequence.PlaySingleSwitch = false
 			sequence.PlaySwitchOnce = true
+			sequence.StepSwitch = true
+			sequence.FocusSwitch = false
 		}
 		return sequence
 

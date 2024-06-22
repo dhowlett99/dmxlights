@@ -952,6 +952,7 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
+		deFocusSwitches(this, sequences, commandChannels)
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
@@ -973,6 +974,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
+		deFocusSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.ShowRGBColorPicker = false
@@ -993,6 +995,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
+		deFocusSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.ShowRGBColorPicker = false
@@ -1411,7 +1414,7 @@ func ProcessButtons(X int, Y int,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
-						{Name: "Step", Value: true},
+						{Name: "Step", Value: true},  // Step the switch state.
 						{Name: "Focus", Value: true}, // Focus the switch lamp.
 					},
 				}
@@ -1424,7 +1427,7 @@ func ProcessButtons(X int, Y int,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
-						{Name: "Step", Value: false}, // Focus the lamp.
+						{Name: "Step", Value: false}, // Don't step the switch state.
 						{Name: "Focus", Value: true}, // Focus the switch lamp.
 					},
 				}
