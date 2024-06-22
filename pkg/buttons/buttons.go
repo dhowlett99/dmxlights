@@ -2525,13 +2525,16 @@ func printMode(mode int) string {
 
 func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
 
-	NumberOfSelectableSequences := 3
+	NumberOfSelectableSequences := 4
+	// 2 x RGB (FOH & Uplighters) sequences,
+	// 1 x scanner sequence (chaser sequence shares its button with the scanner sequence),
+	// 1 x switch sequence.
 
 	if debug {
 		fmt.Printf("SequenceSelect\n")
 	}
 
-	if this.SelectedSequence > NumberOfSelectableSequences {
+	if this.SelectedSequence > NumberOfSelectableSequences-1 {
 		return
 	}
 
@@ -2540,15 +2543,18 @@ func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan c
 		common.LightLamp(common.Button{X: 8, Y: seq}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 	}
 
-	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
-		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
-		// If we are in shutter chaser mode, light the lamp yellow.
-		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-	} else {
-		// Now turn pink the selected sequence select light.
-		common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+	// Provided we're not the switch sequence number turn on the selected lamp.
+	if this.SelectedSequence != this.SwitchSequenceNumber {
+		// Turn on the correct sequence select number.
+		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+			(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
+			// If we are in shutter chaser mode, light the lamp yellow.
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		} else {
+			// Now turn pink the selected sequence select light.
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		}
 	}
-
 }
 
 func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
