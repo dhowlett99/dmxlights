@@ -24,7 +24,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 	showStatusBar(this, sequences, guiButtons)
 
 	// Light the sequence selector button.
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
+	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 	switch {
 

@@ -38,7 +38,7 @@ import (
 //	 +-------------------+
 //
 
-// HandleSelect - Runs when you press a select button to select a sequence.
+// HandleSelect - Runs when you press a sequence select button to select a sequence.
 func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight,
 	commandChannels []chan common.Command, guiButtons chan common.ALight) {
 
@@ -136,17 +136,7 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	}
 
 	// Decide if we're on the first press of the select button.
-	if this.SelectButtonPressed[this.SelectedSequence] {
-		// Calculate the next mode.
-		this.SelectedMode[this.SelectedSequence] = getNextMenuItem(this.SelectedMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], getStatic(this))
-	}
-	if !this.SelectButtonPressed[this.SelectedSequence] {
-		this.SelectButtonPressed[0] = false
-		this.SelectButtonPressed[1] = false
-		this.SelectButtonPressed[2] = false
-		this.SelectButtonPressed[3] = false
-		this.SelectButtonPressed[this.SelectedSequence] = true
-	}
+	SelectSequence(this)
 
 	// Jump straight to chaser display.
 	if this.DisplayChaserShortCut {
@@ -172,6 +162,23 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Now display the selected mode.
 	displayMode(this.SelectedSequence, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
+}
+
+func SelectSequence(this *CurrentState) {
+
+	// Decide if we're on the first press of the select button.
+	if this.SelectedType != "switch" && this.SelectButtonPressed[this.SelectedSequence] {
+		// Calculate the next mode.
+		this.SelectedMode[this.SelectedSequence] = getNextMenuItem(this.SelectedMode[this.SelectedSequence], this.ScannerChaser[this.SelectedSequence], getStatic(this))
+	}
+	if !this.SelectButtonPressed[this.SelectedSequence] {
+		this.SelectButtonPressed[0] = false
+		this.SelectButtonPressed[1] = false
+		this.SelectButtonPressed[2] = false
+		this.SelectButtonPressed[3] = false
+		this.SelectButtonPressed[4] = false // Switch Sequence.
+		this.SelectButtonPressed[this.SelectedSequence] = true
+	}
 }
 
 func getStatic(this *CurrentState) bool {

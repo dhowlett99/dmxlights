@@ -180,7 +180,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	showStatusBar(this, sequences, guiButtons)
 
 	// Light the sequence selector button.
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
+	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 }
 

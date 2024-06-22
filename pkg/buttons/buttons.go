@@ -1073,7 +1073,7 @@ func ProcessButtons(X int, Y int,
 			common.LightLamp(common.Button{X: X, Y: Y}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 			// Set the correct color for the select button.
-			SequenceSelect(eventsForLaunchpad, guiButtons, this)
+			lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 			return
 
@@ -1113,7 +1113,7 @@ func ProcessButtons(X int, Y int,
 			common.RevealSequence(this.SelectedSequence, commandChannels)
 
 			// Set the correct color for the select button.
-			SequenceSelect(eventsForLaunchpad, guiButtons, this)
+			lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 			return
 		}
@@ -1433,7 +1433,15 @@ func ProcessButtons(X int, Y int,
 
 		}
 
+		// Light the correct selected switch.
+		this.SelectedSequence = this.SwitchSequenceNumber
 		this.LastSelectedSwitch = this.SelectedSwitch
+
+		// Use the default behaviour of SelectSequence to turn of the other sequence select buttons.
+		SelectSequence(this)
+
+		// Light the sequence selector button.
+		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 	}
 
 	// D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S - Used to toggle the scanner state from on, inverted or off.
@@ -2378,7 +2386,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
+	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 }
 
@@ -2515,7 +2523,7 @@ func printMode(mode int) string {
 	return "UNKNOWN"
 }
 
-func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
+func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, this *CurrentState) {
 
 	NumberOfSelectableSequences := 3
 
@@ -2523,7 +2531,7 @@ func SequenceSelect(eventsForLauchpad chan common.ALight, guiButtons chan common
 		fmt.Printf("SequenceSelect\n")
 	}
 
-	if this.SelectedSequence > NumberOfSelectableSequences-1 {
+	if this.SelectedSequence > NumberOfSelectableSequences {
 		return
 	}
 
