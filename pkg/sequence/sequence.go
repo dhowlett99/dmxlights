@@ -317,7 +317,7 @@ func PlaySequence(sequence common.Sequence,
 			}
 
 			// Dim the last lamp.
-			if sequence.CurrentSwitch != sequence.LastSwitchSelected {
+			if sequence.CurrentSwitch != sequence.LastSwitchSelected || !sequence.FocusSwitch {
 				// Clear the last selected switch.
 				newSwitch := sequence.Switches[sequence.LastSwitchSelected]
 				newSwitch.Selected = false

@@ -617,9 +617,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer
 		const SWITCH_POSITION = 1 // Integer
-		const STEP = 2            // Boolean
+		const SWITCH_STEP = 2     // Boolean,
+		const SWITCH_FOCUS = 3    // Boolean, true to focus switch, full brighness. false to defocue dim button.
 		if debug {
-			fmt.Printf("%d: Command Update Switch %d to Position %d Step %t\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value, command.Args[STEP].Value)
+			fmt.Printf("%d: Command Update Switch %d to Position %d Step %t Focus %t\n",
+				mySequenceNumber,
+				command.Args[SWITCH_NUMBER].Value,
+				command.Args[SWITCH_POSITION].Value,
+				command.Args[SWITCH_STEP].Value, command.Args[SWITCH_FOCUS].Value)
 		}
 
 		// Loop through all the switchies. and reset their current state back to 0.
@@ -640,7 +645,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = true
-		sequence.StepSwitch = command.Args[STEP].Value.(bool)
+		sequence.StepSwitch = command.Args[SWITCH_STEP].Value.(bool)
+		sequence.FocusSwitch = command.Args[SWITCH_FOCUS].Value.(bool)
 		sequence.Run = false
 		sequence.Type = "switch"
 		sequence.MasterChanging = false

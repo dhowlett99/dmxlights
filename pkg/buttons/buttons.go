@@ -1412,6 +1412,7 @@ func ProcessButtons(X int, Y int,
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
 						{Name: "Step", Value: true},
+						{Name: "Focus", Value: true}, // Focus the switch lamp.
 					},
 				}
 				// Send a message to the switch sequence.
@@ -1424,6 +1425,7 @@ func ProcessButtons(X int, Y int,
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
 						{Name: "Step", Value: false}, // Focus the lamp.
+						{Name: "Focus", Value: true}, // Focus the switch lamp.
 					},
 				}
 				// Send a message to the switch sequence.

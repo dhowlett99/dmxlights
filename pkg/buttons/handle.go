@@ -138,6 +138,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 	// Decide if we're on the first press of the select button.
 	SelectSequence(this)
 
+	// Just send a message to defocus the last selected switch button.
+	cmd := common.Command{
+		Action: common.UpdateSwitch,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPositions[this.SwitchSequenceNumber][this.LastSelectedSwitch]},
+			{Name: "Step", Value: false},  // Don't step the switch state.
+			{Name: "Focus", Value: false}, // Focus the switch lamp.
+		},
+	}
+	// Send a message to the switch sequence.
+	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
 	// Jump straight to chaser display.
 	if this.DisplayChaserShortCut {
 		this.SelectedMode[this.SelectedSequence] = CHASER_DISPLAY

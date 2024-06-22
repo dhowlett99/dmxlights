@@ -403,7 +403,8 @@ type Sequence struct {
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	PlaySingleSwitch            bool                        // Play a single switch.
-	StepSwitch                  bool                        // Step the switch if true. focus the switch if false.
+	StepSwitch                  bool                        // Step the switch if true.
+	FocusSwitch                 bool                        // Focus the switch.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
 	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
