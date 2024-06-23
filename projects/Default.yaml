@@ -2583,9 +2583,9 @@ fixtures:
       gobo: ""
       gobospeed: ""
     flash: false
-  - name: "On"
+  - name: Fade
     number: 5
-    label: "On"
+    label: Fade
     buttoncolor: Red
     master: 0
     actions:

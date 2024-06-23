@@ -819,27 +819,29 @@ func ProcessButtons(X int, Y int,
 				}
 			}
 
-			cmd := common.Command{
-				Action: common.UpdateSpeed,
-				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-				},
+			if this.SelectedType == "switch" {
+				// Send a message to the selected switch device.
+				cmd := common.Command{
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+					},
+				}
+				select {
+				case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+				case <-time.After(10 * time.Millisecond):
+				}
+			} else {
+				cmd := common.Command{
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+					},
+				}
+				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+				// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
+				common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
-			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
-		}
-
-		// Send a message to the selected switch device.
-		cmd := common.Command{
-			Action: common.UpdateSpeed,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-			},
-		}
-		select {
-		case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-		case <-time.After(10 * time.Millisecond):
 		}
 
 		// Update the status bar
@@ -912,28 +914,29 @@ func ProcessButtons(X int, Y int,
 					common.LightLamp(common.Button{X: X - 1, Y: Y}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 				}
 			}
-
-			cmd := common.Command{
-				Action: common.UpdateSpeed,
-				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-				},
+			if this.SelectedType == "switch" {
+				// Send a message to the selected switch device.
+				cmd := common.Command{
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+					},
+				}
+				select {
+				case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+				case <-time.After(10 * time.Millisecond):
+				}
+			} else {
+				cmd := common.Command{
+					Action: common.UpdateSpeed,
+					Args: []common.Arg{
+						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+					},
+				}
+				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+				// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
+				common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
-			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
-		}
-
-		// Send a message to the selected switch device.
-		cmd := common.Command{
-			Action: common.UpdateSpeed,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-			},
-		}
-		select {
-		case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-		case <-time.After(10 * time.Millisecond):
 		}
 
 		// Update the status bar
@@ -2573,7 +2576,7 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	} else {
 
 		if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-			if tYpe == "rgb" {
+			if tYpe == "rgb" || tYpe == "switch" {
 				if !this.Strobe[this.TargetSequence] {
 					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
 				} else {
