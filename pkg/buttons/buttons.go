@@ -700,6 +700,30 @@ func ProcessButtons(X int, Y int,
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %0s", label), "shift", false, guiButtons)
 			return
 		}
+
+		if this.SelectedType == "switch" {
+
+			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
+			if this.RGBShift[this.TargetSequence] < 0 {
+				this.RGBShift[this.TargetSequence] = 0
+			}
+
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBShift,
+				Args: []common.Arg{
+					{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
+				},
+			}
+			select {
+			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+
+			// Update the status bar
+			UpdateShift(this, guiButtons)
+			return
+		}
 	}
 
 	// Increase Shift.
@@ -752,6 +776,30 @@ func ProcessButtons(X int, Y int,
 			// Update the status bar
 			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
+			return
+		}
+
+		if this.SelectedType == "switch" {
+
+			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
+			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
+				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
+			}
+
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBShift,
+				Args: []common.Arg{
+					{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
+				},
+			}
+			select {
+			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+
+			// Update the status bar
+			UpdateShift(this, guiButtons)
 			return
 		}
 	}
@@ -2669,7 +2717,7 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	shift := this.RGBShift[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" {
+		if tYpe == "rgb" || tYpe == "switch" {
 			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButttons)
 		}
 		if tYpe == "scanner" {

@@ -697,7 +697,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	}
 	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
 	steps := sequence.Pattern.Steps
-	sequence.NumberFixtures = 1
+	sequence.NumberFixtures = 4
 	// Calculate fade curve values.
 	common.CalculateFadeValues(&sequence)
 	// Calulate positions for each RGB fixture.
@@ -713,9 +713,6 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 			Enabled: true,
 		},
 		3: {
-			Enabled: true,
-		},
-		4: {
 			Enabled: true,
 		},
 	}
