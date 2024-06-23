@@ -1210,6 +1210,29 @@ func ProcessButtons(X int, Y int,
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
 			return
 		}
+
+		if sequences[this.TargetSequence].Type == "switch" {
+
+			this.RGBSize[this.TargetSequence]--
+			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
+				this.RGBSize[this.TargetSequence] = common.MIN_RGB_SIZE
+			}
+
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBSize,
+				Args: []common.Arg{
+					{Name: "Size", Value: this.Speed[this.TargetSequence]},
+				},
+			}
+			select {
+			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+
+			UpdateSize(this, guiButtons)
+			return
+		}
 	}
 
 	// Increase Size.
@@ -1228,6 +1251,7 @@ func ProcessButtons(X int, Y int,
 		} else {
 			this.TargetSequence = this.SelectedSequence
 		}
+
 		if sequences[this.TargetSequence].Type == "rgb" {
 
 			// Send Update RGB Size.
@@ -1263,6 +1287,28 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			return
+		}
+
+		if sequences[this.TargetSequence].Type == "switch" {
+
+			this.RGBSize[this.TargetSequence]++
+			if this.RGBSize[this.TargetSequence] > common.MAX_RGB_SIZE {
+				this.RGBSize[this.TargetSequence] = common.MAX_RGB_SIZE
+			}
+			// Send Update RGB Size.
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBSize,
+				Args: []common.Arg{
+					{Name: "Size", Value: this.RGBSize[this.TargetSequence]},
+				},
+			}
+			select {
+			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+			UpdateSize(this, guiButtons)
 			return
 		}
 	}
@@ -2604,7 +2650,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	size := this.RGBSize[this.TargetSequence]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" {
+		if tYpe == "rgb" || tYpe == "switch" {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", size), "size", false, guiButttons)
 		}
 		if tYpe == "scanner" {
