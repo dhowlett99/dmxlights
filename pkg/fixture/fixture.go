@@ -391,7 +391,7 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d Activate switch %s Postition %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwiTch.Name, cmd.SwiTch.CurrentPosition)
 			}
-			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 
 		case cmd.Clear || cmd.Blackout:
@@ -1343,6 +1343,7 @@ func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxI
 // The switch is idendifed by the sequence and switch number.
 func MapSwitchFixture(swiTch common.Switch,
 	state common.State,
+	override common.Override,
 	RGBFade int,
 	dmxController *ft232.DMXController,
 	fixturesConfig *Fixtures, blackout bool,
@@ -1422,7 +1423,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Map = action.Map
 			newAction.Gobo = action.Gobo
 			newAction.GoboSpeed = action.GoboSpeed
-			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			newMiniSequencer(thisFixture, swiTch, override, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
 				lastColor.RGBColor = common.EmptyColor
 			}
@@ -1435,7 +1436,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Number = 1
 			newAction.Mode = "Off"
 			lastColor := common.LastColor{}
-			newMiniSequencer(thisFixture, swiTch, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			newMiniSequencer(thisFixture, swiTch, override, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 		}
 
 		// Now play any preset DMX values directly to the universe.

@@ -197,6 +197,15 @@ type Switch struct {
 	Blackout             bool
 	Master               int
 	Selected             bool
+	Override             Override
+}
+
+type Override struct {
+	Override bool
+	Speed    int
+	Shift    int
+	Size     int
+	Fade     int
 }
 
 type StaticColorButton struct {
@@ -275,6 +284,7 @@ const (
 	GetUpdatedSequence
 	ResetAllSwitchPositions
 	UpdateSwitch
+	OverrideSwitch
 	Inverted
 	UpdateGobo
 	Flood
@@ -402,6 +412,7 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
+	Override                    bool                        // Override a switch.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StepSwitch                  bool                        // Step the switch if true.
 	FocusSwitch                 bool                        // Focus the switch.
@@ -532,6 +543,7 @@ type FixtureCommand struct {
 	SwiTch             Switch
 	State              State
 	CurrentSwitchState int
+	Override           Override
 }
 
 type Position struct {

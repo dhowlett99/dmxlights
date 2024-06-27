@@ -57,7 +57,10 @@ const STROBE_SPEED_SLOW int = 0
 // The miniSequenceer implements the actions attaced to a switch state.
 // Currently we support 1. Off 2. Control, ability to set programs 3. Static colors 4. Chase. soft, hard and timed or music triggered.
 // Long term objective of actions is to replace the direct value settings.
-func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
+func newMiniSequencer(fixture *Fixture,
+	swiTch common.Switch,
+	override common.Override,
+	action Action,
 	dmxController *ft232.DMXController, fixturesConfig *Fixtures,
 	switchChannels []common.SwitchChannel, soundConfig *sound.SoundConfig,
 	blackout bool, brightness int, master int, masterChanging bool, lastColor common.LastColor,
@@ -565,6 +568,11 @@ func newMiniSequencer(fixture *Fixture, swiTch common.Switch, action Action,
 			time.Sleep(100 * time.Millisecond)
 
 			for {
+
+				// Apply the overrides.
+				if override.Speed != 0 {
+					cfg.Speed = time.Duration(override.Speed)
+				}
 
 				// Run through the steps in the sequence.
 				// Remember every step contains infomation for all the fixtures in this group.

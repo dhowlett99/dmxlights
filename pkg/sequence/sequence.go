@@ -263,7 +263,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Check for any waiting commands.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 5*time.Second, sequence, channels, fixturesConfig)
 
 		// Soft fade downs should be disabled for blackout.
 		if sequence.Blackout {
@@ -296,7 +296,10 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Show all switches.
-		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce &&
+			!sequence.PlaySingleSwitch &&
+			!sequence.Override &&
+			sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
 			}
@@ -311,9 +314,13 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Show the selected switch.
-		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce &&
+			sequence.PlaySingleSwitch &&
+			!sequence.Override &&
+			sequence.Type == "switch" {
+
 			if debug {
-				fmt.Printf("sequence %d Play single switch number %d\n", mySequenceNumber, sequence.CurrentSwitch)
+				fmt.Printf("%d: Play single switch number %d\n", mySequenceNumber, sequence.CurrentSwitch)
 			}
 
 			// Dim the last lamp.
@@ -340,7 +347,20 @@ func PlaySequence(sequence common.Sequence,
 
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
+			sequence.Override = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
+			continue
+		}
+
+		// Override the selected switch.
+		if sequence.PlaySwitchOnce &&
+			sequence.Override &&
+			sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Override switch number %d\n", mySequenceNumber, sequence.CurrentSwitch)
+			}
+			setOverrideSpeed(switchChannels[sequence.CurrentSwitch], sequence.Switches[sequence.CurrentSwitch].Override)
+			sequence.PlaySwitchOnce = false
 			continue
 		}
 
@@ -796,7 +816,7 @@ func SetSwitchLamp(sequence common.Sequence, switchNumber int, eventsForLauchpad
 	swiTch := sequence.Switches[switchNumber]
 
 	if debug {
-		fmt.Printf("switchNumber %d current %d selected %t\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
+		fmt.Printf("%d: switchNumber %d current %d selected %t\n", sequence.Number, swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
 	}
 
 	state := swiTch.States[swiTch.CurrentPosition]
@@ -840,10 +860,26 @@ func SetSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 		CurrentSwitchState: swiTch.CurrentPosition,
 		MasterChanging:     sequence.MasterChanging,
 		RGBFade:            sequence.RGBFade,
+		Override:           sequence.Switches[swiTch.CurrentPosition].Override,
 	}
 
 	// Send a message to the fixture to operate the switch.
 	fixtureStepChannels[switchNumber] <- command
+
+}
+
+func setOverrideSpeed(switchChannels common.SwitchChannel, override common.Override) {
+	// Send a message to the selected switch device.
+	cmd := common.Command{
+		Action: common.UpdateSpeed,
+		Args: []common.Arg{
+			{Name: "Speed", Value: override.Speed},
+		},
+	}
+	select {
+	case switchChannels.CommandChannel <- cmd:
+	case <-time.After(10 * time.Millisecond):
+	}
 
 }
 

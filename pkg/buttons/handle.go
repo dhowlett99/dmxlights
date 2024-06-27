@@ -166,6 +166,10 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 // Just send a message to defocus the last selected switch button.
 func deFocusSwitches(this *CurrentState, sequences []*common.Sequence, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("%d: deFocusSwitches switch number %d\n", this.SwitchSequenceNumber, this.LastSelectedSwitch)
+	}
 	cmd := common.Command{
 		Action: common.UpdateSwitch,
 		Args: []common.Arg{
