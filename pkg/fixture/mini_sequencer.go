@@ -570,8 +570,8 @@ func newMiniSequencer(fixture *Fixture,
 			for {
 
 				// Apply the overrides.
-				if override.Speed != 0 {
-					cfg.Speed = time.Duration(override.Speed)
+				if !cfg.MusicTrigger && override.Speed != 0 {
+					cfg.Speed = common.SetSpeed(override.Speed)
 				}
 
 				// Run through the steps in the sequence.

@@ -263,7 +263,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Check for any waiting commands.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 5*time.Second, sequence, channels, fixturesConfig)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Millisecond, sequence, channels, fixturesConfig)
 
 		// Soft fade downs should be disabled for blackout.
 		if sequence.Blackout {
@@ -356,11 +356,23 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.PlaySwitchOnce &&
 			sequence.Override &&
 			sequence.Type == "switch" {
-			if debug {
-				fmt.Printf("sequence %d Override switch number %d\n", mySequenceNumber, sequence.CurrentSwitch)
+			//if debug {
+			fmt.Printf("sequence %d Override switch number %d Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Speed)
+			//}
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateSpeed,
+				Args: []common.Arg{
+					// Add one since we count from 0
+					{Name: "Speed", Value: sequence.Switches[sequence.CurrentSwitch].Override.Speed},
+				},
 			}
-			setOverrideSpeed(switchChannels[sequence.CurrentSwitch], sequence.Switches[sequence.CurrentSwitch].Override)
+			select {
+			case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
 			sequence.PlaySwitchOnce = false
+			sequence.Override = false
 			continue
 		}
 
@@ -843,7 +855,7 @@ func SetSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 	swiTch := sequence.Switches[switchNumber]
 
 	if debug {
-		fmt.Printf("switchNumber %d current %d selected %t\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
+		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number].Override.Speed)
 	}
 
 	state := swiTch.States[swiTch.CurrentPosition]
@@ -865,21 +877,6 @@ func SetSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 
 	// Send a message to the fixture to operate the switch.
 	fixtureStepChannels[switchNumber] <- command
-
-}
-
-func setOverrideSpeed(switchChannels common.SwitchChannel, override common.Override) {
-	// Send a message to the selected switch device.
-	cmd := common.Command{
-		Action: common.UpdateSpeed,
-		Args: []common.Arg{
-			{Name: "Speed", Value: override.Speed},
-		},
-	}
-	select {
-	case switchChannels.CommandChannel <- cmd:
-	case <-time.After(10 * time.Millisecond):
-	}
 
 }
 

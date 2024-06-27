@@ -717,7 +717,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			select {
-			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 			case <-time.After(10 * time.Millisecond):
 			}
 
@@ -795,7 +795,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			select {
-			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 			case <-time.After(10 * time.Millisecond):
 			}
 
@@ -873,7 +873,7 @@ func ProcessButtons(X int, Y int,
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch + 1},
+						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
 						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
 					},
@@ -967,7 +967,7 @@ func ProcessButtons(X int, Y int,
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch + 1},
+						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
 						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
 					},
@@ -1273,7 +1273,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			select {
-			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 			case <-time.After(10 * time.Millisecond):
 			}
 
@@ -1352,7 +1352,7 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			select {
-			case this.SwitchChannels[this.LastSelectedSwitch+1].CommandChannel <- cmd:
+			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
 			case <-time.After(10 * time.Millisecond):
 			}
 			UpdateSize(this, guiButtons)
