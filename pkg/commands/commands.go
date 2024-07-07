@@ -1016,7 +1016,9 @@ func GetNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 		if fixture.Group-1 == sequenceNumber {
 			// config has use_channels set.
 			if fixture.MultiFixtureDevice {
-				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				if debug {
+					fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				}
 				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
 				// we always return the max channels in a sequence, currently 8
 				return common.MAX_NUMBER_OF_CHANNELS

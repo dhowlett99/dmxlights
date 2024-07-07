@@ -91,7 +91,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		// Remember that we have stopped this mini sequencer.
-		setSwitchState(swiTch, false, blackout, master)
+		setSwitchState(&swiTch, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
 		if soundConfig.GetSoundTriggerState(switchName) {
@@ -167,7 +167,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		// Remember that we have stopped this mini sequencer.
-		setSwitchState(swiTch, false, blackout, master)
+		setSwitchState(&swiTch, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
 		// Use the switch name as the unique sequence name.
@@ -297,7 +297,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		// Remember that we have stopped this mini sequencer.
-		setSwitchState(swiTch, false, blackout, master)
+		setSwitchState(&swiTch, false, blackout, master)
 
 		// Disable this mini sequencer with the sound service.
 		// Use the switch name as the unique sequence name.
@@ -428,7 +428,7 @@ func newMiniSequencer(fixture *Fixture,
 		// Don't stop this mini sequencer if there's one running already.
 		// Unless we are changing switch positions.
 		if getSwitchState(swiTch) { //&& SwitchPosition == swiTch.CurrentPosition {
-			setSwitchState(swiTch, true, blackout, master)
+			setSwitchState(&swiTch, true, blackout, master)
 			return
 		}
 
@@ -456,7 +456,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		// Remember that we have started this mini sequencer.
-		setSwitchState(swiTch, true, blackout, master)
+		setSwitchState(&swiTch, true, blackout, master)
 
 		// DeRegister this mini sequencer with the sound service.
 		// Use the switch name as the unique sequence name.
@@ -1012,7 +1012,7 @@ func getSwitchState(swiTch common.Switch) bool {
 	return swiTch.MiniSequencerRunning
 }
 
-func setSwitchState(swiTch common.Switch, state bool, blackout bool, master int) {
+func setSwitchState(swiTch *common.Switch, state bool, blackout bool, master int) {
 	swiTch.MiniSequencerRunning = state
 	swiTch.Blackout = blackout
 	swiTch.Master = master

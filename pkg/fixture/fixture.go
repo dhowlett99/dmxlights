@@ -575,9 +575,6 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 		fmt.Printf("%d: fadeUpStaticFixture: Fixture No %d LastColor %+v\n", cmd.SequenceNumber, fixtureNumber, lastColor)
 	}
 
-	sequence := common.Sequence{}
-	sequence.Type = cmd.Type
-
 	if cmd.SequenceNumber == 4 {
 		cmd.SequenceNumber = 2
 	}
