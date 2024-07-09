@@ -392,7 +392,7 @@ func TestGetSwitchSpeeds(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want [8]int
+		want map[int]int
 	}{
 		{
 			name: "gold path",
@@ -400,7 +400,9 @@ func TestGetSwitchSpeeds(t *testing.T) {
 				fixturesConfig: fixturesConfig,
 			},
 
-			want: [8]int{0, 0, 0, 8, 0, 0, 0, 0},
+			want: map[int]int{
+				2: 8,
+			},
 		},
 	}
 	for _, tt := range tests {

@@ -67,6 +67,7 @@ type CurrentState struct {
 	LastSelectedSwitch          int                                    // The last selected switch.
 	LastSelectedSequence        int                                    // Store fof the last selected squence.
 	Speed                       map[int]int                            // Local copy of sequence speed. Indexed by sequence.
+	SwitchSpeeds                map[int]int                            // Local copy of switch speeds. Indexed by sequence.
 	RGBShift                    map[int]int                            // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                            // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                            // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -869,13 +870,16 @@ func ProcessButtons(X int, Y int,
 			}
 
 			if this.SelectedType == "switch" {
+				// Copy the updated speed setting into the local switch speed storage
+				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.SelectedSequence]
+
 				// Send a message to the selected switch device.
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
-						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+						{Name: "SwitchNumber", Value: this.TargetSequence},
+						{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+						{Name: "Speed", Value: this.SwitchSpeeds[this.SelectedSwitch]},
 					},
 				}
 				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -963,13 +967,15 @@ func ProcessButtons(X int, Y int,
 				}
 			}
 			if this.SelectedType == "switch" {
+				// Copy the speed setting into the local switch speed storage
+				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
 				// Send a message to the selected switch device.
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch]},
-						{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+						{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+						{Name: "Speed", Value: this.SwitchSpeeds[this.SelectedSwitch]},
 					},
 				}
 				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1540,6 +1546,8 @@ func ProcessButtons(X int, Y int,
 
 		// Use the default behaviour of SelectSequence to turn of the other sequence select buttons.
 		SelectSequence(this)
+
+		UpdateSpeed(this, guiButtons)
 
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
@@ -2663,13 +2671,16 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
+	switchSpeed := this.SwitchSpeeds[this.SelectedSwitch]
+
+	fmt.Printf("UpdateSpeed Type=%s Switch %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, this.SwitchSpeeds[this.SelectedSwitch])
 
 	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
 		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
 	} else {
 
 		if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-			if tYpe == "rgb" || tYpe == "switch" {
+			if tYpe == "rgb" {
 				if !this.Strobe[this.TargetSequence] {
 					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
 				} else {
@@ -2678,6 +2689,9 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 			}
 			if tYpe == "scanner" {
 				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButtons)
+			}
+			if tYpe == "switch" {
+				common.UpdateStatusBar(fmt.Sprintf("Switch %d Speed %02d", this.SelectedSwitch, switchSpeed), "speed", false, guiButtons)
 			}
 		}
 		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {

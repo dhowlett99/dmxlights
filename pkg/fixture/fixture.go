@@ -1904,9 +1904,9 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, s
 	return true, ""
 }
 
-func GetSwitchSpeeds(fixturesConfig *Fixtures) [8]int {
+func GetSwitchSpeeds(fixturesConfig *Fixtures) map[int]int {
 
-	speeds := [8]int{}
+	speeds := make(map[int]int, 8)
 	for _, swiTch := range fixturesConfig.Fixtures {
 		if swiTch.Type == "switch" {
 			for stateNumber, state := range swiTch.States {
@@ -1920,10 +1920,10 @@ func GetSwitchSpeeds(fixturesConfig *Fixtures) [8]int {
 						}
 						if action.Mode == "Chase" && action.Speed != "Music" {
 							cfg := getConfig(action, &swiTch, fixturesConfig)
-							//if debug {
-							fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
-							//}
-							speeds[swiTch.Number] = cfg.Speed
+							if debug {
+								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
+							}
+							speeds[swiTch.Number-1] = cfg.Speed
 						}
 					}
 				}

@@ -231,6 +231,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
 				}
 			}
+			// Reset the speeds of switch sequences.
+			this.SwitchSpeeds = fixture.GetSwitchSpeeds(fixturesConfig)
 		}
 
 		// Set the colors.

@@ -569,9 +569,11 @@ func newMiniSequencer(fixture *Fixture,
 			time.Sleep(100 * time.Millisecond)
 
 			for {
-
 				// Apply the overrides.
 				if !cfg.MusicTrigger && override.Speed != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
+					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
 				if debug_mini {
@@ -639,7 +641,8 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Speed.
 						if cmd.Action == common.UpdateSpeed {
 							const SPEED = 0
-							cfg.SpeedDuration = common.SetSpeed(cmd.Args[SPEED].Value.(int))
+							override.Speed = cmd.Args[SPEED].Value.(int)
+							cfg.SpeedDuration = common.SetSpeed(override.Speed)
 							if debug_mini {
 								fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
 							}
