@@ -17,6 +17,7 @@
 package fixture
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -328,6 +329,84 @@ func TestCheckFixturesAreTheSame(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got, _ := CheckFixturesAreTheSame(tt.args.fixtures, tt.args.startConfig); got != tt.want {
 				t.Errorf("CheckFixturesAreTheSame() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetSwitchSpeeds(t *testing.T) {
+	type args struct {
+		fixturesConfig *Fixtures
+	}
+
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 1,
+				States: []State{
+					{
+						Name: "On",
+					},
+					{
+						Name: "Off",
+					},
+				},
+			},
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 2,
+				States: []State{
+					{
+						Name: "On",
+					},
+					{
+						Name: "Off",
+					},
+				},
+			},
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 3,
+				States: []State{
+					{
+						Name: "Off",
+					},
+					{
+						Name: "Fade",
+						Actions: []Action{
+							{
+								Mode:  "Chase",
+								Speed: "Fast",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want [NUMBER_OF_SWITCHES]int
+	}{
+		{
+			name: "gold path",
+			args: args{
+				fixturesConfig: fixturesConfig,
+			},
+
+			want: [NUMBER_OF_SWITCHES]int{0, 0, 0, 8, 0, 0, 0, 0},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetSwitchSpeeds(tt.args.fixturesConfig); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetSwitchSpeeds() = %v, want %v", got, tt.want)
 			}
 		})
 	}

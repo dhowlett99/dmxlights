@@ -1563,7 +1563,7 @@ func SetSpeed(commandSpeed int) (Speed time.Duration) {
 		Speed = 100
 	}
 	if commandSpeed == 12 {
-		Speed = 75
+		Speed = 50
 	}
 	return Speed * time.Millisecond
 }

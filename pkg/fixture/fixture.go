@@ -89,7 +89,8 @@ type ActionConfig struct {
 	Fade              int
 	NumberSteps       int
 	Size              int
-	Speed             time.Duration
+	SpeedDuration     time.Duration
+	Speed             int
 	Shift             int
 	TriggerState      bool
 	RotateSpeed       int
@@ -1901,4 +1902,39 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, s
 	}
 
 	return true, ""
+}
+
+func GetSwitchSpeeds(fixturesConfig *Fixtures) [8]int {
+
+	speeds := [8]int{}
+	for _, swiTch := range fixturesConfig.Fixtures {
+		if swiTch.Type == "switch" {
+			for stateNumber, state := range swiTch.States {
+				if debug {
+					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+				}
+				if state.Actions != nil {
+					for actionNumber, action := range state.Actions {
+						if debug {
+							fmt.Printf("action number %d\n", actionNumber)
+						}
+						if action.Mode == "Chase" && action.Speed != "Music" {
+							cfg := getConfig(action, &swiTch, fixturesConfig)
+							//if debug {
+							fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
+							//}
+							speeds[swiTch.Number] = cfg.Speed
+						}
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		for index, speed := range speeds {
+			fmt.Printf("Switch Number %d speed %d\n", index, speed)
+		}
+	}
+
+	return speeds
 }

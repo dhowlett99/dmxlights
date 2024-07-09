@@ -80,6 +80,7 @@ func newMiniSequencer(fixture *Fixture,
 
 	// Setup the configuration.
 	cfg := getConfig(action, fixture, fixturesConfig)
+	cfg.SpeedDuration = common.SetSpeed(cfg.Speed)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -571,7 +572,10 @@ func newMiniSequencer(fixture *Fixture,
 
 				// Apply the overrides.
 				if !cfg.MusicTrigger && override.Speed != 0 {
-					cfg.Speed = common.SetSpeed(override.Speed)
+					cfg.SpeedDuration = common.SetSpeed(override.Speed)
+				}
+				if debug_mini {
+					fmt.Printf("Speed %d Duration %d\n", cfg.Speed, cfg.SpeedDuration)
 				}
 
 				// Run through the steps in the sequence.
@@ -623,8 +627,8 @@ func newMiniSequencer(fixture *Fixture,
 					if debug_mini {
 						fmt.Printf("Rotate Value %d Counter %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, rotateCounter, clockwiseSpeed, antiClockwiseSpeed)
 						fmt.Printf("Gobo %d goboChangeFrequency %d\n", cfg.Gobo, goboChangeFrequency)
-						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.Speed)
-						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.Speed)
+						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.SpeedDuration)
+						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.SpeedDuration)
 					}
 
 					// This is were we wait for a beat or a time out equivalent to the speed.
@@ -635,7 +639,10 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Speed.
 						if cmd.Action == common.UpdateSpeed {
 							const SPEED = 0
-							cfg.Speed = common.SetSpeed(cmd.Args[SPEED].Value.(int))
+							cfg.SpeedDuration = common.SetSpeed(cmd.Args[SPEED].Value.(int))
+							if debug_mini {
+								fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
+							}
 						}
 						// Update Shift.
 						if cmd.Action == common.UpdateRGBShift {
@@ -664,7 +671,7 @@ func newMiniSequencer(fixture *Fixture,
 						// And turn the fixture off.
 						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 						return
-					case <-time.After(cfg.Speed / 10):
+					case <-time.After(cfg.SpeedDuration / 50):
 					}
 
 					// Play out fixture to DMX channels.
@@ -901,37 +908,37 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	switch action.Speed {
 	case "Slow":
 		config.TriggerState = false
-		config.Speed = 1 * time.Second
+		config.Speed = 2
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Medium":
 		config.TriggerState = false
-		config.Speed = 500 * time.Millisecond
+		config.Speed = 4
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Fast":
 		config.TriggerState = false
-		config.Speed = 250 * time.Millisecond
+		config.Speed = 8
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "VeryFast":
 		config.TriggerState = false
-		config.Speed = 50 * time.Millisecond
+		config.Speed = 12
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Music":
 		config.TriggerState = true
-		config.Speed = time.Duration(12 * time.Hour)
+		config.SpeedDuration = time.Duration(12 * time.Hour)
 		config.MusicTrigger = true
 		config.NumberSteps = MEDIUM_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_LONG
 	default:
 		config.TriggerState = false
-		config.Speed = time.Duration(12 * time.Hour)
+		config.SpeedDuration = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
 		config.NumberSteps = MEDIUM_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT

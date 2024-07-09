@@ -356,9 +356,9 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.PlaySwitchOnce &&
 			sequence.Override &&
 			sequence.Type == "switch" {
-			//if debug {
-			fmt.Printf("sequence %d Override switch number %d Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Speed)
-			//}
+			if debug {
+				fmt.Printf("sequence %d Override switch number %d Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Speed)
+			}
 			// Send a message to the selected switch device.
 			cmd := common.Command{
 				Action: common.UpdateSpeed,
