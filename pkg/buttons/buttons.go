@@ -1513,6 +1513,8 @@ func ProcessButtons(X int, Y int,
 		// We have a valid switch.
 		if this.SelectedSwitch < len(sequences[this.SelectedSequence].Switches) {
 
+			this.SelectedType = "switch"
+
 			// Second time we've pressed this switch button, actually step the state.
 			if this.SelectedSwitch == this.LastSelectedSwitch {
 				this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] = this.SwitchPositions[this.SelectedSequence][this.SelectedSwitch] + 1
