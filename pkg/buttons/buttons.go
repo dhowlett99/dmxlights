@@ -849,6 +849,11 @@ func ProcessButtons(X int, Y int,
 		// Get an upto date copy of the target sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
+		if this.SelectedType == "switch" {
+			// Copy the updated speed setting into the local switch speed storage
+			this.Speed[this.TargetSequence] = this.SwitchSpeeds[this.SelectedSwitch]
+		}
+
 		// Decrease Speed.
 		if !sequences[this.TargetSequence].MusicTrigger {
 			this.Speed[this.TargetSequence]--
@@ -947,6 +952,11 @@ func ProcessButtons(X int, Y int,
 
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+
+		if this.SelectedType == "switch" {
+			// Copy the updated speed setting into the local switch speed storage
+			this.Speed[this.TargetSequence] = this.SwitchSpeeds[this.SelectedSwitch]
+		}
 
 		if !sequences[this.TargetSequence].MusicTrigger {
 			this.Speed[this.TargetSequence]++
