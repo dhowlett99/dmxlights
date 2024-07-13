@@ -285,7 +285,7 @@ If you'd like to set all fixtures to the same color press the select button befo
 
 ## Switch Sequence
 
-Notice that all switch indicators will be show dimmed, only when you select a switch will it brighten up and become focused. Tapping further will change the state (switch position).
+Notice that all switch indicators will be shown dimmed, only when you select a switch will it brighten up and become focused. Tapping further will change the state (switch position).
 You can also override switch parameters like speed when a swicth is selected. The status bar at the bottom will also show switch parameters.
 
 ![SwitchSelect](SelectSwitch.png)
