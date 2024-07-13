@@ -99,7 +99,8 @@ func main() {
 	this.StaticButtons = makeStaticButtonsStorage()                       // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                             // Load the presets from their json files.
 	this.Speed = make(map[int]int, NumberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
-	this.SwitchSpeeds = make(map[int]int, NumberOfSwitches)               // Initialise local storage for eight switches.
+	this.SwitchSpeeds = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches.
+	this.SwitchShifts = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches.
 	this.RGBSize = make(map[int]int, NumberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
 	this.ScannerSize = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
 	this.RGBShift = make(map[int]int, NumberOfSequences+NumberOfSwitches) // Initialise storage for four sequences and eight switches..
@@ -302,10 +303,18 @@ func main() {
 
 		if newSequence.Label == "switch" {
 			this.SwitchSequenceNumber = sequenceNumber
+
+			// Setup defaults for overrides.
 			this.SwitchSpeeds = fixture.GetSwitchSpeeds(fixturesConfig)
 			if debug {
 				for index, speed := range this.SwitchSpeeds {
 					fmt.Printf("Switch Number %d speed %d\n", index, speed)
+				}
+			}
+			this.SwitchShifts = fixture.GetSwitchShifts(fixturesConfig)
+			if debug {
+				for index, shift := range this.SwitchShifts {
+					fmt.Printf("Switch Number %d shift %d\n", index, shift)
 				}
 			}
 		}

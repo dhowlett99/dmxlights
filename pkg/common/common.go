@@ -284,7 +284,8 @@ const (
 	GetUpdatedSequence
 	ResetAllSwitchPositions
 	UpdateSwitch
-	OverrideSwitch
+	OverrideSwitchSpeed
+	OverrideSwitchShift
 	Inverted
 	UpdateGobo
 	Flood

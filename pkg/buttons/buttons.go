@@ -67,7 +67,8 @@ type CurrentState struct {
 	LastSelectedSwitch          int                                    // The last selected switch.
 	LastSelectedSequence        int                                    // Store fof the last selected squence.
 	Speed                       map[int]int                            // Local copy of sequence speed. Indexed by sequence.
-	SwitchSpeeds                map[int]int                            // Local copy of switch speeds. Indexed by sequence.
+	SwitchSpeeds                map[int]int                            // Local copy of overriden switch speeds. Indexed by sequence.
+	SwitchShifts                map[int]int                            // Local copy of overriden switch shifts. Indexed by sequence.
 	RGBShift                    map[int]int                            // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                            // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                            // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -650,7 +651,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// Decrease Shift.
+	// S E L E C T   S H I F T - Decrease Shift.
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -666,11 +667,16 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
+		// Deal with an RGB sequence.
 		if sequences[this.TargetSequence].Type == "rgb" {
+
+			// Decrement the RGB Shift.
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
 			if this.RGBShift[this.TargetSequence] < 0 {
 				this.RGBShift[this.TargetSequence] = 0
 			}
+
+			// Send a message to the RGB sequence.
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
@@ -681,14 +687,20 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			UpdateShift(this, guiButtons)
+
 			return
 		}
 
+		// Deal with an Scanner sequence.
 		if sequences[this.TargetSequence].Type == "scanner" {
+
+			// Decrement the Scanner Shift.
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
 			if this.ScannerShift[this.TargetSequence] < common.MIN_SCANNER_SHIFT {
 				this.ScannerShift[this.TargetSequence] = common.MIN_SCANNER_SHIFT
 			}
+
+			// Send a message to the Scanner sequence.
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
@@ -698,37 +710,39 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %0s", label), "shift", false, guiButtons)
+			UpdateShift(this, guiButtons)
+
 			return
 		}
 
+		// Deal with an Switch sequence.
 		if this.SelectedType == "switch" {
 
-			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
-			if this.RGBShift[this.TargetSequence] < 0 {
-				this.RGBShift[this.TargetSequence] = 0
+			// Decrement the Switch Shift.
+			this.SwitchShifts[this.SelectedSwitch] = this.SwitchShifts[this.SelectedSwitch] - 1
+			if this.SwitchShifts[this.SelectedSwitch] < 0 {
+				this.SwitchShifts[this.SelectedSwitch] = 0
 			}
 
-			// Send a message to the selected switch device.
+			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.UpdateRGBShift,
+				Action: common.OverrideSwitchShift,
 				Args: []common.Arg{
-					{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchShifts[this.SelectedSwitch]},
 				},
 			}
-			select {
-			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-			case <-time.After(10 * time.Millisecond):
-			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
 			UpdateShift(this, guiButtons)
+
 			return
 		}
 	}
 
-	// Increase Shift.
+	// S E L E C T   S H I F T - Increase Shift.
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -744,11 +758,16 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
+		// Deal with an RGB sequence.
 		if sequences[this.TargetSequence].Type == "rgb" {
+
+			// Increment the RGB Shift.
 			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
 			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
 				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
 			}
+
+			// Send a message to the RGB sequence.
 			cmd := common.Command{
 				Action: common.UpdateRGBShift,
 				Args: []common.Arg{
@@ -759,14 +778,20 @@ func ProcessButtons(X int, Y int,
 
 			// Update the status bar
 			UpdateShift(this, guiButtons)
+
 			return
 		}
 
+		// Deal with an Scanner sequence.
 		if sequences[this.TargetSequence].Type == "scanner" {
+
+			// Increment the Scanner Shift.
 			this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] + 1
 			if this.ScannerShift[this.TargetSequence] > common.MAX_SCANNER_SHIFT {
 				this.ScannerShift[this.TargetSequence] = common.MAX_SCANNER_SHIFT
 			}
+
+			// Send a message to the Scanner sequence.
 			cmd := common.Command{
 				Action: common.UpdateScannerShift,
 				Args: []common.Arg{
@@ -776,32 +801,33 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			label := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", label), "shift", false, guiButtons)
+			UpdateShift(this, guiButtons)
+
 			return
 		}
 
+		// Deal with an Switch sequence.
 		if this.SelectedType == "switch" {
 
-			this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
-			if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
-				this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
+			this.SwitchShifts[this.SelectedSwitch] = this.SwitchShifts[this.SelectedSwitch] + 1
+			if this.SwitchShifts[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
+				this.SwitchShifts[this.SelectedSwitch] = common.MAX_RGB_SHIFT
 			}
 
-			// Send a message to the selected switch device.
+			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.UpdateRGBShift,
+				Action: common.OverrideSwitchShift,
 				Args: []common.Arg{
-					{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchShifts[this.SelectedSwitch]},
 				},
 			}
-			select {
-			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-			case <-time.After(10 * time.Millisecond):
-			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
 			UpdateShift(this, guiButtons)
+
 			return
 		}
 	}
@@ -879,7 +905,7 @@ func ProcessButtons(X int, Y int,
 				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
 				// Send a message to override / decrease the selected switch speed.
 				cmd := common.Command{
-					Action: common.OverrideSwitch,
+					Action: common.OverrideSwitchSpeed,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
@@ -930,9 +956,6 @@ func ProcessButtons(X int, Y int,
 				this.StrobeSpeed[this.SelectedSequence] = 255
 			}
 
-			// Store the last strobe speed.
-			//this.LastStrobeSpeed[this.SelectedSequence] = this.StrobeSpeed[this.SelectedSequence]
-
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
@@ -980,7 +1003,7 @@ func ProcessButtons(X int, Y int,
 				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
 				// Send a message to override / increase the selected switch speed.
 				cmd := common.Command{
-					Action: common.OverrideSwitch,
+					Action: common.OverrideSwitchSpeed,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
@@ -1558,7 +1581,9 @@ func ProcessButtons(X int, Y int,
 		// Use the default behaviour of SelectSequence to turn of the other sequence select buttons.
 		SelectSequence(this)
 
+		// Switch overrides will get displayed here as well.
 		UpdateSpeed(this, guiButtons)
+		UpdateShift(this, guiButtons)
 
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
@@ -2741,13 +2766,17 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	shift := this.RGBShift[this.TargetSequence]
+	switchShift := this.SwitchShifts[this.SelectedSwitch]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" || tYpe == "switch" {
+		if tYpe == "rgb" {
 			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButttons)
 		}
 		if tYpe == "scanner" {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %02d", shift), "shift", false, guiButttons)
+		}
+		if tYpe == "switch" {
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchShift), "shift", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {

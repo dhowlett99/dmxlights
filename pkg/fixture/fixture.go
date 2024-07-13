@@ -390,7 +390,7 @@ func FixtureReceiver(
 
 		case cmd.Type == "switch":
 			if debug {
-				fmt.Printf("%d:%d Activate switch number %d name %s Postition %d Speed %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwiTch.Number, cmd.SwiTch.Name, cmd.SwiTch.CurrentPosition, cmd.Override.Speed)
+				fmt.Printf("%d:%d Activate switch number %d name %s Postition %d Speed %d Shift %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwiTch.Number, cmd.SwiTch.Name, cmd.SwiTch.CurrentPosition, cmd.Override.Speed, cmd.Override.Shift)
 			}
 			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
@@ -1937,4 +1937,39 @@ func GetSwitchSpeeds(fixturesConfig *Fixtures) map[int]int {
 	}
 
 	return speeds
+}
+
+func GetSwitchShifts(fixturesConfig *Fixtures) map[int]int {
+
+	shifts := make(map[int]int, 8)
+	for _, swiTch := range fixturesConfig.Fixtures {
+		if swiTch.Type == "switch" {
+			for stateNumber, state := range swiTch.States {
+				if debug {
+					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+				}
+				if state.Actions != nil {
+					for actionNumber, action := range state.Actions {
+						if debug {
+							fmt.Printf("action number %d\n", actionNumber)
+						}
+						if action.Mode == "Chase" && action.Speed != "Music" {
+							cfg := getConfig(action, &swiTch, fixturesConfig)
+							if debug {
+								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
+							}
+							shifts[swiTch.Number-1] = cfg.Shift
+						}
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		for index, shift := range shifts {
+			fmt.Printf("Switch Number %d shift %d\n", index, shift)
+		}
+	}
+
+	return shifts
 }

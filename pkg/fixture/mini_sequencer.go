@@ -576,8 +576,15 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
+				if !cfg.MusicTrigger && override.Speed != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Shift is %d\n", override.Shift)
+					}
+					cfg.Shift = override.Shift
+				}
+
 				if debug_mini {
-					fmt.Printf("Speed %d Duration %d\n", cfg.Speed, cfg.SpeedDuration)
+					fmt.Printf("Speed %d Duration %d Shift %d \n", cfg.Speed, cfg.SpeedDuration, cfg.Shift)
 				}
 
 				// Run through the steps in the sequence.
@@ -650,7 +657,11 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Shift.
 						if cmd.Action == common.UpdateRGBShift {
 							const SHIFT = 0
+							override.Shift = cmd.Args[SHIFT].Value.(int)
 							cfg.Shift = cmd.Args[SHIFT].Value.(int)
+							if debug_mini {
+								fmt.Printf("Shift %d\n", cmd.Args[SHIFT].Value.(int))
+							}
 						}
 						// Update Size.
 						if cmd.Action == common.UpdateRGBSize {
