@@ -34,13 +34,14 @@ const DEFAULT_SCANNER_SIZE = 60
 const MAX_SCANNER_SIZE = 127
 const MIN_SPEED = 0
 const MAX_SPEED = 12
-const MIN_RGB_SIZE = 0
-const MAX_RGB_SIZE = 10
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
+const MIN_RGB_SIZE = 0
+const MAX_RGB_SIZE = 10
+const MIN_RGB_FADE = 1
+const MAX_RGB_FADE = 10
 const MAX_SCANNER_SHIFT = 3
 const MIN_SCANNER_SHIFT = 0
-const MAX_RGB_FADE = 10
 const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
 const MIN_DMX_BRIGHTNESS = 0
 const CENTER_DMX_BRIGHTNESS = 127
@@ -286,6 +287,8 @@ const (
 	UpdateSwitch
 	OverrideSwitchSpeed
 	OverrideSwitchShift
+	OverrideSwitchSize
+	OverrideSwitchFade
 	Inverted
 	UpdateGobo
 	Flood
@@ -413,7 +416,10 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
-	Override                    bool                        // Override a switch.
+	OverrideSpeed               bool                        // Override a switch speed.
+	OverrideShift               bool                        // Override a switch shift.
+	OverrideSize                bool                        // Override a switch size.
+	OverrideFade                bool                        // Override a switch fade.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StepSwitch                  bool                        // Step the switch if true.
 	FocusSwitch                 bool                        // Focus the switch.

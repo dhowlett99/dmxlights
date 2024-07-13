@@ -1973,3 +1973,73 @@ func GetSwitchShifts(fixturesConfig *Fixtures) map[int]int {
 
 	return shifts
 }
+
+func GetSwitchSizes(fixturesConfig *Fixtures) map[int]int {
+
+	sizes := make(map[int]int, 8)
+	for _, swiTch := range fixturesConfig.Fixtures {
+		if swiTch.Type == "switch" {
+			for stateNumber, state := range swiTch.States {
+				if debug {
+					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+				}
+				if state.Actions != nil {
+					for actionNumber, action := range state.Actions {
+						if debug {
+							fmt.Printf("action number %d\n", actionNumber)
+						}
+						if action.Mode == "Chase" && action.Speed != "Music" {
+							cfg := getConfig(action, &swiTch, fixturesConfig)
+							if debug {
+								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Size %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Size)
+							}
+							sizes[swiTch.Number-1] = cfg.Size
+						}
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		for index, size := range sizes {
+			fmt.Printf("Switch Number %d size %d\n", index, size)
+		}
+	}
+
+	return sizes
+}
+
+func GetSwitchFades(fixturesConfig *Fixtures) map[int]int {
+
+	fades := make(map[int]int, 8)
+	for _, swiTch := range fixturesConfig.Fixtures {
+		if swiTch.Type == "switch" {
+			for stateNumber, state := range swiTch.States {
+				if debug {
+					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+				}
+				if state.Actions != nil {
+					for actionNumber, action := range state.Actions {
+						if debug {
+							fmt.Printf("action number %d\n", actionNumber)
+						}
+						if action.Mode == "Chase" && action.Speed != "Music" {
+							cfg := getConfig(action, &swiTch, fixturesConfig)
+							if debug {
+								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Fade %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Fade)
+							}
+							fades[swiTch.Number-1] = cfg.Fade
+						}
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		for index, fade := range fades {
+			fmt.Printf("Switch Number %d fade %d\n", index, fade)
+		}
+	}
+
+	return fades
+}

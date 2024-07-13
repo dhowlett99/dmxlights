@@ -233,6 +233,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			}
 			// Reset the speeds of switch sequences.
 			this.SwitchSpeeds = fixture.GetSwitchSpeeds(fixturesConfig)
+			this.SwitchShifts = fixture.GetSwitchShifts(fixturesConfig)
+			this.SwitchSizes = fixture.GetSwitchSizes(fixturesConfig)
+			this.SwitchFades = fixture.GetSwitchFades(fixturesConfig)
 		}
 
 		// Set the colors.

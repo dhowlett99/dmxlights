@@ -133,6 +133,21 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			// Now set our local representation of switches
 			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
 				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentPosition
+
+				//  Restore any switch Overrides.
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
+					this.SwitchSpeeds[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift != 0 {
+					this.SwitchShifts[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Size != 0 {
+					this.SwitchSizes[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade != 0 {
+					this.SwitchFades[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
+				}
+
 				if debug {
 					var stateNames []string
 					for _, state := range swiTch.States {

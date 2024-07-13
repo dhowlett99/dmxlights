@@ -576,11 +576,23 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
-				if !cfg.MusicTrigger && override.Speed != 0 {
+				if !cfg.MusicTrigger && override.Shift != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Shift is %d\n", override.Shift)
 					}
 					cfg.Shift = override.Shift
+				}
+				if !cfg.MusicTrigger && override.Size != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Size is %d\n", override.Size)
+					}
+					cfg.Size = override.Size
+				}
+				if !cfg.MusicTrigger && override.Fade != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Fade is %d\n", override.Fade)
+					}
+					cfg.Fade = override.Fade
 				}
 
 				if debug_mini {
@@ -666,12 +678,20 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Size.
 						if cmd.Action == common.UpdateRGBSize {
 							const SIZE = 0
+							override.Size = cmd.Args[SIZE].Value.(int)
 							cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
+							if debug_mini {
+								fmt.Printf("Size %d\n", cmd.Args[SIZE].Value.(int))
+							}
 						}
 						// Update Fade
 						if cmd.Action == common.UpdateRGBFadeSpeed {
-							const FADE_SPEED = 0
-							sequence.RGBFade = cmd.Args[FADE_SPEED].Value.(int)
+							const FADE = 0
+							override.Fade = cmd.Args[FADE].Value.(int)
+							cfg.Fade = cmd.Args[FADE].Value.(int)
+							if debug_mini {
+								fmt.Printf("Fade %d\n", cmd.Args[FADE].Value.(int))
+							}
 						}
 						// Recreate the sequence and recalculate steps.
 						sequence, RGBPositions, numberSteps = createSequence(cfg)

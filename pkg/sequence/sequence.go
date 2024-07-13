@@ -298,7 +298,10 @@ func PlaySequence(sequence common.Sequence,
 		// Show all switches.
 		if sequence.PlaySwitchOnce &&
 			!sequence.PlaySingleSwitch &&
-			!sequence.Override &&
+			!sequence.OverrideSpeed &&
+			!sequence.OverrideShift &&
+			!sequence.OverrideSize &&
+			!sequence.OverrideFade &&
 			sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("sequence %d Play all switches mode\n", mySequenceNumber)
@@ -316,7 +319,7 @@ func PlaySequence(sequence common.Sequence,
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce &&
 			sequence.PlaySingleSwitch &&
-			!sequence.Override &&
+			!sequence.OverrideSpeed &&
 			sequence.Type == "switch" {
 
 			if debug {
@@ -347,14 +350,14 @@ func PlaySequence(sequence common.Sequence,
 
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
-			sequence.Override = false
+			sequence.OverrideSpeed = false
 			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 1*time.Microsecond, sequence, channels, fixturesConfig)
 			continue
 		}
 
-		// Override the selected switch.
+		// Override the selected switch speed.
 		if sequence.PlaySwitchOnce &&
-			sequence.Override &&
+			sequence.OverrideSpeed &&
 			sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("sequence %d Override switch number %d Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Speed)
@@ -372,7 +375,79 @@ func PlaySequence(sequence common.Sequence,
 			case <-time.After(10 * time.Millisecond):
 			}
 			sequence.PlaySwitchOnce = false
-			sequence.Override = false
+			sequence.OverrideSpeed = false
+			continue
+		}
+
+		// Override the selected switch shift.
+		if sequence.PlaySwitchOnce &&
+			sequence.OverrideShift &&
+			sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Override switch number %d Shift %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Shift)
+			}
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBShift,
+				Args: []common.Arg{
+					// Add one since we count from 0
+					{Name: "Shift", Value: sequence.Switches[sequence.CurrentSwitch].Override.Shift},
+				},
+			}
+			select {
+			case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+			sequence.PlaySwitchOnce = false
+			sequence.OverrideShift = false
+			continue
+		}
+
+		// Override the selected switch size.
+		if sequence.PlaySwitchOnce &&
+			sequence.OverrideSize &&
+			sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Override switch number %d Size %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Size)
+			}
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBSize,
+				Args: []common.Arg{
+					// Add one since we count from 0
+					{Name: "Size", Value: sequence.Switches[sequence.CurrentSwitch].Override.Size},
+				},
+			}
+			select {
+			case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+			sequence.PlaySwitchOnce = false
+			sequence.OverrideSize = false
+			continue
+		}
+
+		// Override the selected switch fade size.
+		if sequence.PlaySwitchOnce &&
+			sequence.OverrideFade &&
+			sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("sequence %d Override switch number %d Fade %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Fade)
+			}
+			// Send a message to the selected switch device.
+			cmd := common.Command{
+				Action: common.UpdateRGBFadeSpeed,
+				Args: []common.Arg{
+					// Add one since we count from 0
+					{Name: "Fade", Value: sequence.Switches[sequence.CurrentSwitch].Override.Fade},
+				},
+			}
+			select {
+			case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+			case <-time.After(10 * time.Millisecond):
+			}
+			sequence.PlaySwitchOnce = false
+			sequence.OverrideFade = false
 			continue
 		}
 

@@ -69,6 +69,8 @@ type CurrentState struct {
 	Speed                       map[int]int                            // Local copy of sequence speed. Indexed by sequence.
 	SwitchSpeeds                map[int]int                            // Local copy of overriden switch speeds. Indexed by sequence.
 	SwitchShifts                map[int]int                            // Local copy of overriden switch shifts. Indexed by sequence.
+	SwitchSizes                 map[int]int                            // Local copy of overriden switch sizes. Indexed by sequence.
+	SwitchFades                 map[int]int                            // Local copy of overriden switch fades. Indexed by sequence.
 	RGBShift                    map[int]int                            // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                            // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                            // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -1259,12 +1261,16 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
+		// Deal with the RGB sequence.
 		if sequences[this.TargetSequence].Type == "rgb" {
-			// Send Update RGB Size.
+
+			// Decrement RGB Size.
 			this.RGBSize[this.TargetSequence]--
 			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
 				this.RGBSize[this.TargetSequence] = common.MIN_RGB_SIZE
 			}
+
+			// Send Update RGB Size.
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
@@ -1272,17 +1278,23 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
 			UpdateSize(this, guiButtons)
+
 			return
 		}
 
+		// Deal with Scanner sequence.
 		if sequences[this.TargetSequence].Type == "scanner" {
+
 			// Send Update Scanner Size.
 			this.ScannerSize[this.TargetSequence] = this.ScannerSize[this.TargetSequence] - 10
 			if this.ScannerSize[this.TargetSequence] < 0 {
 				this.ScannerSize[this.TargetSequence] = 0
 			}
+
+			// Send Update Scanner Size.
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
@@ -1292,30 +1304,34 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this, guiButtons)
+
 			return
 		}
 
+		// Deal with the switch sequence.
 		if sequences[this.TargetSequence].Type == "switch" {
 
-			this.RGBSize[this.TargetSequence]--
-			if this.RGBSize[this.TargetSequence] < common.MIN_RGB_SIZE {
-				this.RGBSize[this.TargetSequence] = common.MIN_RGB_SIZE
+			// Decrement the switch size.
+			this.SwitchSizes[this.SelectedSwitch]--
+			if this.SwitchSizes[this.SelectedSwitch] < common.MIN_RGB_SIZE {
+				this.SwitchSizes[this.SelectedSwitch] = common.MIN_RGB_SIZE
 			}
 
-			// Send a message to the selected switch device.
+			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.UpdateRGBSize,
+				Action: common.OverrideSwitchSize,
 				Args: []common.Arg{
-					{Name: "Size", Value: this.Speed[this.TargetSequence]},
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchSizes[this.SelectedSwitch]},
 				},
 			}
-			select {
-			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-			case <-time.After(10 * time.Millisecond):
-			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
+			// Update the status bar.
 			UpdateSize(this, guiButtons)
+
 			return
 		}
 	}
@@ -1337,6 +1353,7 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
+		// Deal with the RGB sequence.
 		if sequences[this.TargetSequence].Type == "rgb" {
 
 			// Send Update RGB Size.
@@ -1344,6 +1361,8 @@ func ProcessButtons(X int, Y int,
 			if this.RGBSize[this.TargetSequence] > common.MAX_RGB_SIZE {
 				this.RGBSize[this.TargetSequence] = common.MAX_RGB_SIZE
 			}
+
+			// Send a message to the RGB sequence.
 			cmd := common.Command{
 				Action: common.UpdateRGBSize,
 				Args: []common.Arg{
@@ -1351,17 +1370,23 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
 			UpdateSize(this, guiButtons)
+
 			return
 		}
 
+		// Deal with the Scanner size.
 		if sequences[this.TargetSequence].Type == "scanner" {
-			// Send Update Scanner Size.
+
+			// Increment the scanner size.
 			this.ScannerSize[this.TargetSequence] = this.ScannerSize[this.TargetSequence] + 10
 			if this.ScannerSize[this.TargetSequence] > common.MAX_SCANNER_SIZE {
 				this.ScannerSize[this.TargetSequence] = common.MAX_SCANNER_SIZE
 			}
+
+			// Send Update Scanner Size.
 			cmd := common.Command{
 				Action: common.UpdateScannerSize,
 				Args: []common.Arg{
@@ -1371,29 +1396,34 @@ func ProcessButtons(X int, Y int,
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 			// Update the status bar
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+			UpdateSize(this, guiButtons)
+
 			return
 		}
 
-		if sequences[this.TargetSequence].Type == "switch" {
+		// Deal with an Switch sequence.
+		if this.SelectedType == "switch" {
 
-			this.RGBSize[this.TargetSequence]++
-			if this.RGBSize[this.TargetSequence] > common.MAX_RGB_SIZE {
-				this.RGBSize[this.TargetSequence] = common.MAX_RGB_SIZE
+			// Increase the switch size.
+			this.SwitchSizes[this.SelectedSwitch] = this.SwitchSizes[this.SelectedSwitch] + 1
+			if this.SwitchSizes[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
+				this.SwitchSizes[this.SelectedSwitch] = common.MAX_RGB_SHIFT
 			}
-			// Send Update RGB Size.
-			// Send a message to the selected switch device.
+
+			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.UpdateRGBSize,
+				Action: common.OverrideSwitchSize,
 				Args: []common.Arg{
-					{Name: "Size", Value: this.RGBSize[this.TargetSequence]},
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchSizes[this.SelectedSwitch]},
 				},
 			}
-			select {
-			case this.SwitchChannels[this.LastSelectedSwitch].CommandChannel <- cmd:
-			case <-time.After(10 * time.Millisecond):
-			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			// Update the status bar
 			UpdateSize(this, guiButtons)
+
 			return
 		}
 	}
@@ -1402,13 +1432,14 @@ func ProcessButtons(X int, Y int,
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
-			fmt.Printf("Decrease Fade Time\n")
+			fmt.Printf("Decrease Fade Time Type=%s Sequence=%d Type=%s\n", this.SelectedType, this.TargetSequence, sequences[this.TargetSequence].Type)
 		}
 
 		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Cyan, eventsForLaunchpad, guiButtons)
 
 		// If we're a scanner and we're in shutter chase mode.
-		if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+		if sequences[this.SelectedSequence].Type == "scanner" &&
+			this.ScannerChaser[this.SelectedSequence] &&
 			(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
 			this.TargetSequence = this.ChaserSequenceNumber
 		} else {
@@ -1416,11 +1447,14 @@ func ProcessButtons(X int, Y int,
 		}
 
 		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Label == "chaser" {
+
+			// Decrement the RGB Fade size.
 			this.RGBFade[this.TargetSequence]--
 			if this.RGBFade[this.TargetSequence] < 1 {
 				this.RGBFade[this.TargetSequence] = 1
 			}
-			// Send fade update command.
+
+			// Send fade update command to sequence.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
 				Args: []common.Arg{
@@ -1428,18 +1462,23 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
 			UpdateFade(this, guiButtons)
+
 			return
 		}
 
 		// Update Coordinates.
-		if sequences[this.TargetSequence].Type == "scanner" || sequences[this.TargetSequence].Label != "chaser" {
+		if sequences[this.TargetSequence].Type == "scanner" && sequences[this.TargetSequence].Label != "chaser" {
+
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.TargetSequence]--
 			if this.ScannerCoordinates[this.TargetSequence] < 0 {
 				this.ScannerCoordinates[this.TargetSequence] = 0
 			}
+
+			// Send a messages to the scanner sequence.
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
@@ -1447,9 +1486,36 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
+			UpdateFade(this, guiButtons)
+
+			return
+		}
+
+		// Deal with an Switch sequence.
+		if this.SelectedType == "switch" {
+
+			// Decrease the fade size.
+			this.SwitchFades[this.SelectedSwitch]--
+			if this.SwitchFades[this.SelectedSwitch] < common.MIN_RGB_FADE {
+				this.SwitchFades[this.SelectedSwitch] = common.MIN_RGB_FADE
+			}
+
+			// Send a message to override / increase the selected switch shift.
+			cmd := common.Command{
+				Action: common.OverrideSwitchFade,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchFades[this.SelectedSwitch]},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			// Update the status bar
+			UpdateFade(this, guiButtons)
+
 			return
 		}
 
@@ -1472,11 +1538,15 @@ func ProcessButtons(X int, Y int,
 			this.TargetSequence = this.SelectedSequence
 		}
 
+		// Deal with the RGB sequence.
 		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Label == "chaser" {
+
+			// Increase fade time.
 			this.RGBFade[this.TargetSequence]++
 			if this.RGBFade[this.TargetSequence] > common.MAX_RGB_FADE {
 				this.RGBFade[this.TargetSequence] = common.MAX_RGB_FADE
 			}
+
 			// Send fade update command.
 			cmd := common.Command{
 				Action: common.UpdateRGBFadeSpeed,
@@ -1485,18 +1555,23 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
 			UpdateFade(this, guiButtons)
+
 			return
 		}
 
-		// Update Coordinates.
-		if sequences[this.TargetSequence].Type == "scanner" || sequences[this.TargetSequence].Label != "chaser" {
+		// Deal wth scanner coordinates.
+		if sequences[this.TargetSequence].Type == "scanner" && sequences[this.TargetSequence].Label != "chaser" {
+
 			// Fade also send more or less coordinates for the scanner patterns.
 			this.ScannerCoordinates[this.TargetSequence]++
 			if this.ScannerCoordinates[this.TargetSequence] > 4 {
 				this.ScannerCoordinates[this.TargetSequence] = 4
 			}
+
+			// Send a message to scanner seqiemce.
 			cmd := common.Command{
 				Action: common.UpdateNumberCoordinates,
 				Args: []common.Arg{
@@ -1504,11 +1579,39 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 			// Update the status bar
-			label := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", label), "fade", false, guiButtons)
+			UpdateFade(this, guiButtons)
+
 			return
 		}
+
+		// Deal with an Switch sequence.
+		if this.SelectedType == "switch" {
+
+			// Increase the switch size.
+			this.SwitchFades[this.SelectedSwitch] = this.SwitchFades[this.SelectedSwitch] + 1
+			if this.SwitchFades[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
+				this.SwitchFades[this.SelectedSwitch] = common.MAX_RGB_SHIFT
+			}
+
+			// Send a message to override / increase the selected switch shift.
+			cmd := common.Command{
+				Action: common.OverrideSwitchFade,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPositions[this.TargetSequence][this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchFades[this.SelectedSwitch]},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			// Update the status bar
+			UpdateFade(this, guiButtons)
+
+			return
+		}
+
 	}
 
 	// S E L E C T  S W I T C H   B U T T O N's Toggle State of switches for this sequence.
@@ -1584,6 +1687,8 @@ func ProcessButtons(X int, Y int,
 		// Switch overrides will get displayed here as well.
 		UpdateSpeed(this, guiButtons)
 		UpdateShift(this, guiButtons)
+		UpdateSize(this, guiButtons)
+		UpdateFade(this, guiButtons)
 
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
@@ -2747,6 +2852,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	size := this.RGBSize[this.TargetSequence]
+	switchSize := this.SwitchSizes[this.SelectedSwitch]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" || tYpe == "switch" {
@@ -2754,6 +2860,9 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 		}
 		if tYpe == "scanner" {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", size), "size", false, guiButttons)
+		}
+		if tYpe == "switch" {
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
@@ -2789,6 +2898,7 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	fade := this.RGBFade[this.TargetSequence]
+	switchFade := this.SwitchFades[this.SelectedSwitch]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -2796,6 +2906,9 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 		}
 		if tYpe == "scanner" {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Fade %02d", fade), "fade", false, guiButttons)
+		}
+		if tYpe == "switch" {
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchFade), "fade", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
@@ -2840,4 +2953,20 @@ func StartStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	// Update the strobe button and status bar.
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+}
+
+// SetTarget - If we're a scanner and we're in shutter chase mode and if we're in either CHASER_DISPLAY or CHASER_FUNCTION mode then
+// set the target sequence to the chaser sequence number.
+// Else the target is just this sequence number.
+// Returns the target sequence number.
+func SetTarget(this *CurrentState) {
+	if this.SelectedType == "scanner" &&
+		this.ScannerChaser[this.SelectedSequence] &&
+		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
+		this.TargetSequence = this.ChaserSequenceNumber
+		this.DisplaySequence = this.SelectedSequence
+	} else {
+		this.TargetSequence = this.SelectedSequence
+		this.DisplaySequence = this.SelectedSequence
+	}
 }

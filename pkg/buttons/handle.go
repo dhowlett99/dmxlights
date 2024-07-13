@@ -267,8 +267,11 @@ func showStatusBar(this *CurrentState, sequences []*common.Sequence, guiButtons 
 		fmt.Printf("Display Sequence %d Mode %s Type %s\n", this.DisplaySequence, printMode(this.SelectedMode[this.DisplaySequence]), sequences[this.DisplaySequence].Type)
 	}
 
-	// Speed is common to all selectable sequences.
+	// Update status bar.
 	UpdateSpeed(this, guiButtons)
+	UpdateShift(this, guiButtons)
+	UpdateSize(this, guiButtons)
+	UpdateFade(this, guiButtons)
 
 	// RGB
 	if sequences[this.DisplaySequence].Type == "rgb" &&

@@ -101,6 +101,8 @@ func main() {
 	this.Speed = make(map[int]int, NumberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
 	this.SwitchSpeeds = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches.
 	this.SwitchShifts = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches.
+	this.SwitchSizes = make(map[int]int, NumberOfSwitches)                // Initialise local override storage for eight switches.
+	this.SwitchFades = make(map[int]int, NumberOfSwitches)                // Initialise local override storage for eight switches.
 	this.RGBSize = make(map[int]int, NumberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
 	this.ScannerSize = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
 	this.RGBShift = make(map[int]int, NumberOfSequences+NumberOfSwitches) // Initialise storage for four sequences and eight switches..
@@ -315,6 +317,18 @@ func main() {
 			if debug {
 				for index, shift := range this.SwitchShifts {
 					fmt.Printf("Switch Number %d shift %d\n", index, shift)
+				}
+			}
+			this.SwitchSizes = fixture.GetSwitchSizes(fixturesConfig)
+			if debug {
+				for index, size := range this.SwitchSizes {
+					fmt.Printf("Switch Number %d size %d\n", index, size)
+				}
+			}
+			this.SwitchFades = fixture.GetSwitchFades(fixturesConfig)
+			if debug {
+				for index, fade := range this.SwitchFades {
+					fmt.Printf("Switch Number %d fade %d\n", index, fade)
 				}
 			}
 		}
