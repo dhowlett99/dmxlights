@@ -877,8 +877,7 @@ func ProcessButtons(X int, Y int,
 			if this.SelectedType == "switch" {
 				// Copy the updated speed setting into the local switch speed storage
 				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
-
-				// Send a message to the selected switch device.
+				// Send a message to override / decrease the selected switch speed.
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
@@ -979,7 +978,7 @@ func ProcessButtons(X int, Y int,
 			if this.SelectedType == "switch" {
 				// Copy the speed setting into the local switch speed storage
 				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
-				// Send a message to the selected switch device.
+				// Send a message to override / increase the selected switch speed.
 				cmd := common.Command{
 					Action: common.OverrideSwitch,
 					Args: []common.Arg{
