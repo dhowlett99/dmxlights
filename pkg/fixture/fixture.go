@@ -134,10 +134,11 @@ type Group struct {
 }
 
 type FixtureInfo struct {
-	HasRotate     bool
-	HasGobo       bool
-	HasColorWheel bool
-	HasProgram    bool
+	HasRotate       bool
+	HasGobo         bool
+	HasColorWheel   bool
+	HasProgram      bool
+	HasProgramSpeed bool
 }
 
 type Setting struct {
@@ -1673,6 +1674,7 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 	fixtureInfo.HasColorWheel = isThisAChannel(*thisFixture, "Color")
 	fixtureInfo.HasGobo = isThisAChannel(*thisFixture, "Gobo")
 	fixtureInfo.HasProgram = isThisAChannel(*thisFixture, "Program")
+	fixtureInfo.HasProgramSpeed = isThisAChannel(*thisFixture, "ProgramSpeed")
 	return fixtureInfo
 }
 
