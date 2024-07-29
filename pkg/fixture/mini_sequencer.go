@@ -80,7 +80,6 @@ func newMiniSequencer(fixture *Fixture,
 
 	// Setup the configuration.
 	cfg := getConfig(action, fixture, fixturesConfig)
-	cfg.SpeedDuration = common.SetSpeed(cfg.Speed)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -943,24 +942,28 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	case "Slow":
 		config.TriggerState = false
 		config.Speed = 2
+		config.SpeedDuration = common.SetSpeed(config.Speed)
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Medium":
 		config.TriggerState = false
 		config.Speed = 4
+		config.SpeedDuration = common.SetSpeed(config.Speed)
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "Fast":
 		config.TriggerState = false
 		config.Speed = 8
+		config.SpeedDuration = common.SetSpeed(config.Speed)
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT
 	case "VeryFast":
 		config.TriggerState = false
 		config.Speed = 12
+		config.SpeedDuration = common.SetSpeed(config.Speed)
 		config.MusicTrigger = false
 		config.NumberSteps = LARGE_NUMBER_STEPS
 		config.RotateSensitivity = SENSITIVITY_SHORT

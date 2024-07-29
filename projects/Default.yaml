@@ -2631,7 +2631,7 @@ fixtures:
       map: ""
       mode: Chase
       fade: Soft
-      size: ""
+      size: Medium
       speed: Music
       rotate: "Off"
       rotatespeed: ""
