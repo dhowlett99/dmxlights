@@ -600,7 +600,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Update the labels.
-		showStatusBar(this, sequences, guiButtons)
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
@@ -642,7 +642,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Update the labels.
-		showStatusBar(this, sequences, guiButtons)
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return

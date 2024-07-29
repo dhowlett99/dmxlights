@@ -1690,6 +1690,9 @@ func ProcessButtons(X int, Y int,
 		UpdateSize(this, guiButtons)
 		UpdateFade(this, guiButtons)
 
+		// Update the labels.
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
+
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 	}
@@ -2628,11 +2631,11 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	// Light up any existing presets.
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
-	// Light the buttons at the bottom.
-	common.ShowBottomButtons("rgb", eventsForLaunchpad, guiButtons)
+	// Show the correct labels at the bottom.
+	showBottomLabels(this, eventsForLaunchpad, guiButtons)
 
-	// Light the top buttons.
-	common.ShowTopButtons("rgb", eventsForLaunchpad, guiButtons)
+	// Light the top labels.
+	showTopLabels(this, eventsForLaunchpad, guiButtons)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
@@ -2852,6 +2855,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	size := this.RGBSize[this.TargetSequence]
+	scannerFade := this.ScannerSize[this.TargetSequence]
 	switchSize := this.SwitchSizes[this.SelectedSwitch]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
@@ -2859,7 +2863,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", size), "size", false, guiButttons)
 		}
 		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", size), "size", false, guiButttons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", scannerFade), "size", false, guiButttons)
 		}
 		if tYpe == "switch" {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButttons)
@@ -2875,14 +2879,19 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	shift := this.RGBShift[this.TargetSequence]
+	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 	switchShift := this.SwitchShifts[this.SelectedSwitch]
+
+	if debug {
+		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d\n", shift, scannerShift, switchShift)
+	}
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
 			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButttons)
 		}
 		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %02d", shift), "shift", false, guiButttons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", scannerShift), "shift", false, guiButttons)
 		}
 		if tYpe == "switch" {
 			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchShift), "shift", false, guiButttons)
@@ -2898,6 +2907,7 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	fade := this.RGBFade[this.TargetSequence]
+	scannerCoordinates := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 	switchFade := this.SwitchFades[this.SelectedSwitch]
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
@@ -2905,7 +2915,7 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", fade), "fade", false, guiButttons)
 		}
 		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Fade %02d", fade), "fade", false, guiButttons)
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", scannerCoordinates), "fade", false, guiButttons)
 		}
 		if tYpe == "switch" {
 			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchFade), "fade", false, guiButttons)
