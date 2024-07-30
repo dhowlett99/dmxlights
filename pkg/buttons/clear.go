@@ -254,6 +254,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Set the first sequnence.
 	this.SelectedSequence = 0
+	this.LastSelectedSwitch = common.NOT_SELECTED
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 }

@@ -118,6 +118,7 @@ func main() {
 	this.LaunchpadName = "Novation Launchpad Mk3 Mini"                    // Name of launchpad.
 	this.Functions = make(map[int][]common.Function)                      // Array holding functions for each sequence.
 	this.SavedSequenceColors = make(map[int][]common.Color)               // Array holding saved sequence colors for each sequence. Used by the color picker.
+	this.LastSelectedSwitch = common.NOT_SELECTED                         // Set the last selected switch to not selected.
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = []common.SwitchChannel{}

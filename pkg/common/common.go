@@ -26,6 +26,7 @@ import (
 )
 
 const debug = false
+const NOT_SELECTED = -1
 
 const MAX_NUMBER_OF_CHANNELS = 8
 const MAX_DMX_ADDRESS = 512

@@ -170,17 +170,19 @@ func deFocusSwitches(this *CurrentState, sequences []*common.Sequence, commandCh
 	if debug {
 		fmt.Printf("%d: deFocusSwitches switch number %d\n", this.SwitchSequenceNumber, this.LastSelectedSwitch)
 	}
-	cmd := common.Command{
-		Action: common.UpdateSwitch,
-		Args: []common.Arg{
-			{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
-			{Name: "SwitchPosition", Value: this.SwitchPositions[this.SwitchSequenceNumber][this.LastSelectedSwitch]},
-			{Name: "Step", Value: false},  // Don't step the switch state.
-			{Name: "Focus", Value: false}, // Focus the switch lamp.
-		},
+	if this.LastSelectedSwitch != common.NOT_SELECTED {
+		cmd := common.Command{
+			Action: common.UpdateSwitch,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPositions[this.SwitchSequenceNumber][this.LastSelectedSwitch]},
+				{Name: "Step", Value: false},  // Don't step the switch state.
+				{Name: "Focus", Value: false}, // Focus the switch lamp.
+			},
+		}
+		// Send a message to the switch sequence.
+		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 	}
-	// Send a message to the switch sequence.
-	common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 }
 
 func SelectSequence(this *CurrentState) {
