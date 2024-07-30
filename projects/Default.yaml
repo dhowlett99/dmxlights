@@ -2843,7 +2843,7 @@ fixtures:
   use_fixture: dekker1
 - id: 37
   name: switch7
-  label: SW7.FLOOR
+  label: SW7.GRAPHIX
   number: 7
   description: Equinox Graphix
   type: switch
