@@ -1906,6 +1906,34 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, s
 	return true, ""
 }
 
+func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixturesConfig *Fixtures) bool {
+
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "switch" {
+			if fixture.Number == switchNumber+1 {
+				if debug {
+					fmt.Printf("fixture number %d %s\n", fixture.Number, fixture.Name)
+				}
+				for _, state := range fixture.States {
+					if state.Number == stateNumber {
+						if debug {
+							fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+						}
+						if state.Actions != nil {
+							for _, action := range state.Actions {
+								if action.Mode == "Chase" && action.Speed != "Music" {
+									return true
+								}
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return false
+}
+
 func GetSwitchSpeeds(fixturesConfig *Fixtures) map[int]int {
 
 	speeds := make(map[int]int, 8)

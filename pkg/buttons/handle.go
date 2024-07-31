@@ -165,17 +165,19 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 }
 
 // Just send a message to defocus the last selected switch button.
-func deFocusSwitches(this *CurrentState, sequences []*common.Sequence, commandChannels []chan common.Command) {
+func deFocusSingleSwitch(this *CurrentState, sequences []*common.Sequence, commandChannels []chan common.Command) {
 
-	if debug {
-		fmt.Printf("%d: deFocusSwitches switch number %d\n", this.SwitchSequenceNumber, this.LastSelectedSwitch)
-	}
 	if this.LastSelectedSwitch != common.NOT_SELECTED {
+
+		if debug {
+			fmt.Printf("%d: deFocusSwitch single switch number %d\n", this.SwitchSequenceNumber, this.LastSelectedSwitch)
+		}
+
 		cmd := common.Command{
 			Action: common.UpdateSwitch,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
-				{Name: "SwitchPosition", Value: this.SwitchPositions[this.SwitchSequenceNumber][this.LastSelectedSwitch]},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.LastSelectedSwitch]},
 				{Name: "Step", Value: false},  // Don't step the switch state.
 				{Name: "Focus", Value: false}, // Focus the switch lamp.
 			},

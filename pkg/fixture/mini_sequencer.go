@@ -656,8 +656,8 @@ func newMiniSequencer(fixture *Fixture,
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
-						// Update Speed.
-						if cmd.Action == common.UpdateSpeed {
+						// Update Speed but not in music trigger mode.
+						if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
 							const SPEED = 0
 							override.Speed = cmd.Args[SPEED].Value.(int)
 							cfg.SpeedDuration = common.SetSpeed(override.Speed)

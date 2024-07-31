@@ -808,7 +808,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		newSwitch.States = sequence.Switches[switchNumber].States
 		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
 		newSwitch.Override = sequence.Switches[switchNumber].Override
-		newSwitch.Selected = true
+		newSwitch.Selected = command.Args[SWITCH_FOCUS].Value.(bool)
 		sequence.Switches[switchNumber] = newSwitch
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true

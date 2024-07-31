@@ -125,6 +125,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		}
 
 		// If we are loading a switch sequence, update our local copy of the switch settings.
+		// and defocus each switch in turn.
 		if sequence.Type == "switch" {
 
 			// Get an upto date copy of the switch sequence.
@@ -132,7 +133,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 			// Now set our local representation of switches
 			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
-				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentPosition
+				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
 
 				//  Restore any switch Overrides.
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
@@ -148,12 +149,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					this.SwitchFades[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
 				}
 
+				// Defocus this switch.
+				this.LastSelectedSwitch = swiTchNumber
+				deFocusSingleSwitch(this, sequences, commandChannels)
+
 				if debug {
 					var stateNames []string
 					for _, state := range swiTch.States {
 						stateNames = append(stateNames, state.Name)
 					}
-					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
+					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
 				}
 			}
 		}
