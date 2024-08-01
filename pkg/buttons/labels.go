@@ -6,7 +6,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func showStatusBars(selectedType string, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	debug := false
 
@@ -19,7 +19,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
 	// Make sure modes are setup.
-	if sequences[this.SelectedSequence].Type == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+	if selectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
@@ -40,7 +40,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	UpdateFade(this, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
-	showBottomLabels(this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(selectedType, this, eventsForLaunchpad, guiButtons)
 
 	// Hide the color editing buttons.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -126,10 +126,10 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	}
 }
 
-func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("showBottomLabels type=%s\n", this.SelectedType)
+		fmt.Printf("showBottomLabels type=%s\n", selectedType)
 	}
 
 	type bottonButton struct {
@@ -181,11 +181,22 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 	guiBottomSwitchButtons[6] = bottonButton{Label: "Fade\nSoft", Color: common.Cyan}
 	guiBottomSwitchButtons[7] = bottonButton{Label: "Fade\nSharp", Color: common.Cyan}
 
+	// Storage for the rgb labels on the bottom row.
+	var guiBottomProjectorButtons [8]bottonButton
+	guiBottomProjectorButtons[0] = bottonButton{Label: "Shutter\nSpeed\nDown", Color: common.Cyan}
+	guiBottomProjectorButtons[1] = bottonButton{Label: "Shutter\nSpeed\nUp", Color: common.Cyan}
+	guiBottomProjectorButtons[2] = bottonButton{Label: "Rotate\nSpeed\nDown", Color: common.Cyan}
+	guiBottomProjectorButtons[3] = bottonButton{Label: "Rotate\nSpeed\nUp", Color: common.Cyan}
+	guiBottomProjectorButtons[4] = bottonButton{Label: "Color\nDown", Color: common.Cyan}
+	guiBottomProjectorButtons[5] = bottonButton{Label: "Color\nUp", Color: common.Cyan}
+	guiBottomProjectorButtons[6] = bottonButton{Label: "Gobo\nDown", Color: common.Cyan}
+	guiBottomProjectorButtons[7] = bottonButton{Label: "Gobo\nUp", Color: common.Cyan}
+
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
 
 	// RGB Front of house or uplighters.
-	if this.SelectedType == "rgb" {
+	if selectedType == "rgb" {
 
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
@@ -198,7 +209,7 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 		// Loop through the available button names this sequence
 		for index, button := range guiBottomRGBButtons {
 			if debug {
-				fmt.Printf("button %+v\n", button)
+				fmt.Printf("rgb button %+v\n", button)
 			}
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
@@ -206,7 +217,7 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 	}
 
 	// Scanner showing rotate functions.
-	if this.SelectedType == "scanner" &&
+	if selectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == NORMAL || this.SelectedMode[this.DisplaySequence] == FUNCTION || this.SelectedMode[this.DisplaySequence] == STATUS) {
 
 		common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", getScannerShiftLabel(this.ScannerShift[this.TargetSequence])), "shift", false, guiButtons)
@@ -216,7 +227,7 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomScannerButtons {
 			if debug {
-				fmt.Printf("button %+v\n", button)
+				fmt.Printf("scanner button %+v\n", button)
 			}
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
@@ -224,7 +235,7 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 	}
 
 	// Shutter chaser showing RGB chase functions.
-	if this.SelectedType == "scanner" &&
+	if selectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY || this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION) {
 
 		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
@@ -234,7 +245,7 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomChaserButtons {
 			if debug {
-				fmt.Printf("button %+v\n", button)
+				fmt.Printf("chaser button %+v\n", button)
 			}
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
@@ -242,11 +253,29 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 	}
 
 	// Switch functions.
-	if this.SelectedType == "switch" {
+	if selectedType == "switch" {
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomSwitchButtons {
 			if debug {
-				fmt.Printf("button %+v\n", button)
+				fmt.Printf("switch button %+v\n", button)
+			}
+			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LabelButton(index, bottomRow, button.Label, guiButtons)
+		}
+	}
+
+	// Projector functions.
+	if selectedType == "projector" {
+
+		common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d", this.ShutterSpeed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.RotateSpeed[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d", this.Color[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d", this.Gobo[this.TargetSequence]), "fade", false, guiButtons)
+
+		// Loop through the available functions for this sequence
+		for index, button := range guiBottomProjectorButtons {
+			if debug {
+				fmt.Printf("projector button %+v\n", button)
 			}
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)

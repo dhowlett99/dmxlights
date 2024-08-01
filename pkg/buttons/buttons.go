@@ -68,10 +68,14 @@ type CurrentState struct {
 	LastSelectedSequence        int                        // Store fof the last selected squence.
 	MusicTrigger                bool                       // Does this seleted switch have a music trigger.
 	Speed                       map[int]int                // Local copy of sequence speed. Indexed by sequence.
-	SwitchSpeeds                map[int]int                // Local copy of overriden switch speeds. Indexed by sequence.
-	SwitchShifts                map[int]int                // Local copy of overriden switch shifts. Indexed by sequence.
-	SwitchSizes                 map[int]int                // Local copy of overriden switch sizes. Indexed by sequence.
-	SwitchFades                 map[int]int                // Local copy of overriden switch fades. Indexed by sequence.
+	SwitchSpeeds                map[int]int                // Local copy of overriden switch fixture speeds. Indexed by sequence.
+	SwitchShifts                map[int]int                // Local copy of overriden switch fixture shifts. Indexed by sequence.
+	SwitchSizes                 map[int]int                // Local copy of overriden switch fixture sizes. Indexed by sequence.
+	SwitchFades                 map[int]int                // Local copy of overriden switch fixture fades. Indexed by sequence.
+	ShutterSpeed                map[int]int                // Local copy of overriden switch fixture shutter speed. Indexed by sequence.
+	RotateSpeed                 map[int]int                // Local copy of overriden switch fixture rotate speed. Indexed by sequence.
+	Color                       map[int]int                // Local copy of overriden switch fixture color. Indexed by sequence.
+	Gobo                        map[int]int                // Local copy of overriden switch fixture gobo. Indexed by sequence.
 	RGBShift                    map[int]int                // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -1695,7 +1699,8 @@ func ProcessButtons(X int, Y int,
 		UpdateFade(this, guiButtons)
 
 		// Update the labels.
-		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
+		selectedType := fixture.GetSwitchFixtureType(this.SelectedSwitch, int16(this.SwitchPosition[this.SelectedSwitch]), fixturesConfig)
+		showStatusBars(selectedType, this, sequences, eventsForLaunchpad, guiButtons)
 
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
@@ -2636,7 +2641,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	showBottomLabels(this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this.SelectedType, this, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
