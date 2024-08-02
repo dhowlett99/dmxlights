@@ -33,6 +33,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
+	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -99,14 +100,7 @@ func main() {
 	this.StaticButtons = makeStaticButtonsStorage()                       // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                             // Load the presets from their json files.
 	this.Speed = make(map[int]int, NumberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
-	this.SwitchSpeeds = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches. Indexed by switch number.
-	this.SwitchShifts = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches. Indexed by switch number.
-	this.SwitchSizes = make(map[int]int, NumberOfSwitches)                // Initialise local override storage for eight switches. Indexed by switch number.
-	this.SwitchFades = make(map[int]int, NumberOfSwitches)                // Initialise local override storage for eight switches. Indexed by switch number.
-	this.ShutterSpeed = make(map[int]int, NumberOfSwitches)               // Initialise local override storage for eight switches. Indexed by switch number.
-	this.RotateSpeed = make(map[int]int, NumberOfSwitches)                // Initialise local override storage for eight switches. Indexed by switch number.
-	this.Color = make(map[int]int, NumberOfSwitches)                      // Initialise local override storage for eight switches. Indexed by switch number.
-	this.Gobo = make(map[int]int, NumberOfSwitches)                       // Initialise local override storage for eight switches. Indexed by switch number.
+	this.SwitchOverrides = make([][]common.Override, NumberOfSwitches)    // Initialise local override storage for eight switches. Indexed by switch number.
 	this.RGBSize = make(map[int]int, NumberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
 	this.ScannerSize = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
 	this.RGBShift = make(map[int]int, NumberOfSequences+NumberOfSwitches) // Initialise storage for four sequences and eight switches..
@@ -311,29 +305,37 @@ func main() {
 		if newSequence.Label == "switch" {
 			this.SwitchSequenceNumber = sequenceNumber
 
-			// Setup defaults for overrides.
-			this.SwitchSpeeds = fixture.GetSwitchSpeeds(fixturesConfig)
-			if debug {
-				for index, speed := range this.SwitchSpeeds {
-					fmt.Printf("Switch Number %d speed %d\n", index, speed)
-				}
-			}
-			this.SwitchShifts = fixture.GetSwitchShifts(fixturesConfig)
-			if debug {
-				for index, shift := range this.SwitchShifts {
-					fmt.Printf("Switch Number %d shift %d\n", index, shift)
-				}
-			}
-			this.SwitchSizes = fixture.GetSwitchSizes(fixturesConfig)
-			if debug {
-				for index, size := range this.SwitchSizes {
-					fmt.Printf("Switch Number %d size %d\n", index, size)
-				}
-			}
-			this.SwitchFades = fixture.GetSwitchFades(fixturesConfig)
-			if debug {
-				for index, fade := range this.SwitchFades {
-					fmt.Printf("Switch Number %d fade %d\n", index, fade)
+			// Store the switch Config locally.
+			switchConfig := commands.LoadSwitchConfiguration(this.SwitchSequenceNumber, fixturesConfig)
+
+			// Populate each switch with a number of states based on their config.
+
+			for switchNumber := 0; switchNumber < len(switchConfig); switchNumber++ {
+
+				// assign the switch.
+				swiTch := switchConfig[switchNumber]
+
+				// Now populate the states.
+				for stateNumber := 0; stateNumber < len(swiTch.States); stateNumber++ {
+
+					// Assign state.
+					state := swiTch.States[stateNumber]
+
+					// Load the config for this state of of this switch
+					cfg := fixture.GetSwitchConfig(swiTch.Number, int16(state.Number), fixturesConfig)
+					newOverride := common.Override{}
+					newOverride.Speed = cfg.Speed
+					newOverride.Shift = cfg.Shift
+					newOverride.Size = cfg.Size
+					newOverride.Fade = cfg.Fade
+					newOverride.ShutterSpeed = cfg.Speed
+					newOverride.RotateSpeed = cfg.RotateSpeed
+					newOverride.Colors = cfg.Colors
+					newOverride.Gobo = cfg.Gobo
+					this.SwitchOverrides[switchNumber] = append(this.SwitchOverrides[switchNumber], newOverride)
+					if debug {
+						fmt.Printf("Switch Number %d State Number %d config %d\n", swiTch.Number, state.Number, newOverride.Speed)
+					}
 				}
 			}
 		}

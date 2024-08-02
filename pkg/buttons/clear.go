@@ -225,17 +225,24 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
 				if debug {
 					var stateNames []string
-					for _, state := range swiTch.States {
+					for stateNumber, state := range swiTch.States {
 						stateNames = append(stateNames, state.Name)
+						// Reset the speeds of switch sequences.
+						cfg := fixture.GetSwitchConfig(swiTchNumber, int16(stateNumber), fixturesConfig)
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = cfg.Speed
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = cfg.Shift
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = cfg.Size
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = cfg.Fade
+
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ShutterSpeed = cfg.Speed
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = cfg.RotateSpeed
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = cfg.Colors
+						this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = cfg.Gobo
 					}
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
 				}
+
 			}
-			// Reset the speeds of switch sequences.
-			this.SwitchSpeeds = fixture.GetSwitchSpeeds(fixturesConfig)
-			this.SwitchShifts = fixture.GetSwitchShifts(fixturesConfig)
-			this.SwitchSizes = fixture.GetSwitchSizes(fixturesConfig)
-			this.SwitchFades = fixture.GetSwitchFades(fixturesConfig)
 		}
 
 		// Set the colors.

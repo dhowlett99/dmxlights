@@ -1002,7 +1002,7 @@ func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	return config
 }
 
-func GetChannelSettinsByName(fixture *Fixture, channelName string, fixtures *Fixtures) ([]common.Setting, error) {
+func GetChannelSettinsByName(fixture *Fixture, channelName string, fixturesConfig *Fixtures) ([]common.Setting, error) {
 	if debug_mini {
 		fmt.Printf("GetChannelSettinsByName: Looking for program settings for fixture %s\n", fixture.Name)
 	}

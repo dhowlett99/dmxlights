@@ -1950,142 +1950,40 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 	return false
 }
 
-func GetSwitchSpeeds(fixturesConfig *Fixtures) map[int]int {
+func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtures) ActionConfig {
 
-	speeds := make(map[int]int, 8)
-	for _, swiTch := range fixturesConfig.Fixtures {
-		if swiTch.Type == "switch" {
-			for stateNumber, state := range swiTch.States {
+	for _, fixture := range fixturesConfig.Fixtures {
+		if debug {
+			fmt.Printf("fixture number %d name %s type %s\n", fixture.Number, fixture.Name, fixture.Type)
+		}
+		if fixture.Type == "switch" {
+			if fixture.Number == switchNumber {
 				if debug {
-					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
+					fmt.Printf("found switch %d \n", fixture.Number)
 				}
-				if state.Actions != nil {
-					for actionNumber, action := range state.Actions {
+				for stateNumber, state := range fixture.States {
+					if debug {
+						fmt.Printf("looking for state %d have state number %d Actions %+v\n", stateNumber+1, state.Number, state.Actions)
+					}
+					if state.Number == switchState {
 						if debug {
-							fmt.Printf("action number %d\n", actionNumber)
+							fmt.Printf("found state %d with Actions %+v\n", state.Number, state.Actions)
 						}
-						if action.Mode == "Chase" && action.Speed != "Music" {
-							cfg := getConfig(action, &swiTch, fixturesConfig)
-							if debug {
-								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
+						if state.Actions != nil {
+							for actionNumber, action := range state.Actions {
+								if debug {
+									fmt.Printf("action number %d\n", actionNumber)
+								}
+								if action.Mode == "Chase" && action.Speed != "Music" {
+									cfg := getConfig(action, &fixture, fixturesConfig)
+									return cfg
+								}
 							}
-							speeds[swiTch.Number-1] = cfg.Speed
 						}
 					}
 				}
 			}
 		}
 	}
-	if debug {
-		for index, speed := range speeds {
-			fmt.Printf("Switch Number %d speed %d\n", index, speed)
-		}
-	}
-
-	return speeds
-}
-
-func GetSwitchShifts(fixturesConfig *Fixtures) map[int]int {
-
-	shifts := make(map[int]int, 8)
-	for _, swiTch := range fixturesConfig.Fixtures {
-		if swiTch.Type == "switch" {
-			for stateNumber, state := range swiTch.States {
-				if debug {
-					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
-				}
-				if state.Actions != nil {
-					for actionNumber, action := range state.Actions {
-						if debug {
-							fmt.Printf("action number %d\n", actionNumber)
-						}
-						if action.Mode == "Chase" && action.Speed != "Music" {
-							cfg := getConfig(action, &swiTch, fixturesConfig)
-							if debug {
-								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Speed %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Speed)
-							}
-							shifts[swiTch.Number-1] = cfg.Shift
-						}
-					}
-				}
-			}
-		}
-	}
-	if debug {
-		for index, shift := range shifts {
-			fmt.Printf("Switch Number %d shift %d\n", index, shift)
-		}
-	}
-
-	return shifts
-}
-
-func GetSwitchSizes(fixturesConfig *Fixtures) map[int]int {
-
-	sizes := make(map[int]int, 8)
-	for _, swiTch := range fixturesConfig.Fixtures {
-		if swiTch.Type == "switch" {
-			for stateNumber, state := range swiTch.States {
-				if debug {
-					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
-				}
-				if state.Actions != nil {
-					for actionNumber, action := range state.Actions {
-						if debug {
-							fmt.Printf("action number %d\n", actionNumber)
-						}
-						if action.Mode == "Chase" && action.Speed != "Music" {
-							cfg := getConfig(action, &swiTch, fixturesConfig)
-							if debug {
-								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Size %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Size)
-							}
-							sizes[swiTch.Number-1] = cfg.Size
-						}
-					}
-				}
-			}
-		}
-	}
-	if debug {
-		for index, size := range sizes {
-			fmt.Printf("Switch Number %d size %d\n", index, size)
-		}
-	}
-
-	return sizes
-}
-
-func GetSwitchFades(fixturesConfig *Fixtures) map[int]int {
-
-	fades := make(map[int]int, 8)
-	for _, swiTch := range fixturesConfig.Fixtures {
-		if swiTch.Type == "switch" {
-			for stateNumber, state := range swiTch.States {
-				if debug {
-					fmt.Printf("state number %d %+v\n", stateNumber, state.Actions)
-				}
-				if state.Actions != nil {
-					for actionNumber, action := range state.Actions {
-						if debug {
-							fmt.Printf("action number %d\n", actionNumber)
-						}
-						if action.Mode == "Chase" && action.Speed != "Music" {
-							cfg := getConfig(action, &swiTch, fixturesConfig)
-							if debug {
-								fmt.Printf("Found Chase %d Mode %s Switch %s:%d Fade %d \n", actionNumber, action.Mode, swiTch.Name, swiTch.Number, cfg.Fade)
-							}
-							fades[swiTch.Number-1] = cfg.Fade
-						}
-					}
-				}
-			}
-		}
-	}
-	if debug {
-		for index, fade := range fades {
-			fmt.Printf("Switch Number %d fade %d\n", index, fade)
-		}
-	}
-
-	return fades
+	return ActionConfig{Name: "Error"}
 }

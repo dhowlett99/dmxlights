@@ -19,6 +19,7 @@ package fixture
 import (
 	"reflect"
 	"testing"
+	"time"
 )
 
 func Test_calculateMaxDMX(t *testing.T) {
@@ -337,6 +338,8 @@ func TestCheckFixturesAreTheSame(t *testing.T) {
 func TestGetSwitchSpeeds(t *testing.T) {
 	type args struct {
 		fixturesConfig *Fixtures
+		swiTchNumber   int
+		stateNumber    int16
 	}
 
 	fixturesConfig := &Fixtures{
@@ -347,10 +350,19 @@ func TestGetSwitchSpeeds(t *testing.T) {
 				Number: 1,
 				States: []State{
 					{
-						Name: "On",
+						Name:   "On",
+						Number: 1,
+						Actions: []Action{
+							{
+								Name:  "Fade",
+								Mode:  "Chase",
+								Speed: "Fast",
+							},
+						},
 					},
 					{
-						Name: "Off",
+						Name:   "Off",
+						Number: 2,
 					},
 				},
 			},
@@ -360,10 +372,12 @@ func TestGetSwitchSpeeds(t *testing.T) {
 				Number: 2,
 				States: []State{
 					{
-						Name: "On",
+						Name:   "On",
+						Number: 1,
 					},
 					{
-						Name: "Off",
+						Name:   "Off",
+						Number: 2,
 					},
 				},
 			},
@@ -373,10 +387,12 @@ func TestGetSwitchSpeeds(t *testing.T) {
 				Number: 3,
 				States: []State{
 					{
-						Name: "Off",
+						Name:   "Off",
+						Number: 1,
 					},
 					{
-						Name: "Fade",
+						Name:   "Fade",
+						Number: 2,
 						Actions: []Action{
 							{
 								Mode:  "Chase",
@@ -392,23 +408,51 @@ func TestGetSwitchSpeeds(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want map[int]int
+		want ActionConfig
 	}{
 		{
 			name: "gold path",
 			args: args{
 				fixturesConfig: fixturesConfig,
+				swiTchNumber:   1,
+				stateNumber:    1,
 			},
 
-			want: map[int]int{
-				2: 8,
+			want: ActionConfig{
+				Name:              "",
+				Map:               false,
+				Fade:              10,
+				NumberSteps:       64,
+				Size:              3,
+				SpeedDuration:     time.Duration(250 * time.Millisecond),
+				Speed:             8,
+				Shift:             1,
+				TriggerState:      false,
+				RotateSpeed:       0,
+				Rotatable:         false,
+				Clockwise:         false,
+				AntiClockwise:     false,
+				AutoRotate:        false,
+				Program:           0,
+				ProgramOptions:    []string{},
+				ProgramSpeed:      0,
+				Music:             0,
+				MusicTrigger:      false,
+				Strobe:            false,
+				StrobeSpeed:       0,
+				Gobo:              0,
+				GoboSpeed:         0,
+				AutoGobo:          false,
+				GoboOptions:       []string{},
+				RotateSensitivity: 10,
 			},
 		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GetSwitchSpeeds(tt.args.fixturesConfig); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("GetSwitchSpeeds() = %v, want %v", got, tt.want)
+			if got := GetSwitchConfig(tt.args.swiTchNumber, tt.args.stateNumber, tt.args.fixturesConfig); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetSwitchSpeeds() got = %+v\n", got)
+				t.Errorf("GetSwitchSpeeds() want= %+v\n", tt.want)
 			}
 		})
 	}

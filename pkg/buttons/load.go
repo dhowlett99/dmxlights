@@ -137,16 +137,29 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 				//  Restore any switch Overrides.
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
-					this.SwitchSpeeds[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift != 0 {
-					this.SwitchShifts[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Size != 0 {
-					this.SwitchSizes[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade != 0 {
-					this.SwitchFades[swiTchNumber] = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
+				}
+
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.ShutterSpeed != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ShutterSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.ShutterSpeed
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors != nil {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo
 				}
 
 				// Defocus this switch.

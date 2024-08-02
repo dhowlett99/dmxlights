@@ -68,14 +68,7 @@ type CurrentState struct {
 	LastSelectedSequence        int                        // Store fof the last selected squence.
 	MusicTrigger                bool                       // Does this seleted switch have a music trigger.
 	Speed                       map[int]int                // Local copy of sequence speed. Indexed by sequence.
-	SwitchSpeeds                map[int]int                // Local copy of overriden switch fixture speeds. Indexed by sequence.
-	SwitchShifts                map[int]int                // Local copy of overriden switch fixture shifts. Indexed by sequence.
-	SwitchSizes                 map[int]int                // Local copy of overriden switch fixture sizes. Indexed by sequence.
-	SwitchFades                 map[int]int                // Local copy of overriden switch fixture fades. Indexed by sequence.
-	ShutterSpeed                map[int]int                // Local copy of overriden switch fixture shutter speed. Indexed by sequence.
-	RotateSpeed                 map[int]int                // Local copy of overriden switch fixture rotate speed. Indexed by sequence.
-	Color                       map[int]int                // Local copy of overriden switch fixture color. Indexed by sequence.
-	Gobo                        map[int]int                // Local copy of overriden switch fixture gobo. Indexed by sequence.
+	SwitchOverrides             [][]common.Override        // Local copy of overriden switch fixture speeds. Indexed by switch number and state.
 	RGBShift                    map[int]int                // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -726,9 +719,9 @@ func ProcessButtons(X int, Y int,
 		if this.SelectedType == "switch" {
 
 			// Decrement the Switch Shift.
-			this.SwitchShifts[this.SelectedSwitch] = this.SwitchShifts[this.SelectedSwitch] - 1
-			if this.SwitchShifts[this.SelectedSwitch] < 0 {
-				this.SwitchShifts[this.SelectedSwitch] = 0
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift - 1
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift < 0 {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = 0
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -737,7 +730,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchShifts[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -816,9 +809,9 @@ func ProcessButtons(X int, Y int,
 		// Deal with an Switch sequence.
 		if this.SelectedType == "switch" {
 
-			this.SwitchShifts[this.SelectedSwitch] = this.SwitchShifts[this.SelectedSwitch] + 1
-			if this.SwitchShifts[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
-				this.SwitchShifts[this.SelectedSwitch] = common.MAX_RGB_SHIFT
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -827,7 +820,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchShifts[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -884,7 +877,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.SelectedType == "switch" {
 			// Copy the updated speed setting into the local switch speed storage
-			this.Speed[this.TargetSequence] = this.SwitchSpeeds[this.SelectedSwitch]
+			this.Speed[this.TargetSequence] = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 		}
 
 		// Decrease Speed.
@@ -909,14 +902,14 @@ func ProcessButtons(X int, Y int,
 
 			if this.SelectedType == "switch" {
 				// Copy the updated speed setting into the local switch speed storage
-				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
 				// Send a message to override / decrease the selected switch speed.
 				cmd := common.Command{
 					Action: common.OverrideSwitchSpeed,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "Speed", Value: this.SwitchSpeeds[this.SelectedSwitch]},
+						{Name: "Speed", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 					},
 				}
 				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -984,7 +977,7 @@ func ProcessButtons(X int, Y int,
 
 		if this.SelectedType == "switch" {
 			// Copy the updated speed setting into the local switch speed storage
-			this.Speed[this.TargetSequence] = this.SwitchSpeeds[this.SelectedSwitch]
+			this.Speed[this.TargetSequence] = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 		}
 
 		if !sequences[this.TargetSequence].MusicTrigger {
@@ -1007,14 +1000,14 @@ func ProcessButtons(X int, Y int,
 			}
 			if this.SelectedType == "switch" {
 				// Copy the speed setting into the local switch speed storage
-				this.SwitchSpeeds[this.SelectedSwitch] = this.Speed[this.TargetSequence]
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
 				// Send a message to override / increase the selected switch speed.
 				cmd := common.Command{
 					Action: common.OverrideSwitchSpeed,
 					Args: []common.Arg{
 						{Name: "SwitchNumber", Value: this.SelectedSwitch},
 						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "Speed", Value: this.SwitchSpeeds[this.SelectedSwitch]},
+						{Name: "Speed", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 					},
 				}
 				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1318,9 +1311,9 @@ func ProcessButtons(X int, Y int,
 		if sequences[this.TargetSequence].Type == "switch" {
 
 			// Decrement the switch size.
-			this.SwitchSizes[this.SelectedSwitch]--
-			if this.SwitchSizes[this.SelectedSwitch] < common.MIN_RGB_SIZE {
-				this.SwitchSizes[this.SelectedSwitch] = common.MIN_RGB_SIZE
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size--
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size < common.MIN_RGB_SIZE {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MIN_RGB_SIZE
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -1329,7 +1322,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchSizes[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1410,9 +1403,9 @@ func ProcessButtons(X int, Y int,
 		if this.SelectedType == "switch" {
 
 			// Increase the switch size.
-			this.SwitchSizes[this.SelectedSwitch] = this.SwitchSizes[this.SelectedSwitch] + 1
-			if this.SwitchSizes[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
-				this.SwitchSizes[this.SelectedSwitch] = common.MAX_RGB_SHIFT
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size + 1
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size > common.MAX_RGB_SHIFT {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MAX_RGB_SHIFT
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -1421,7 +1414,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchSizes[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1502,9 +1495,9 @@ func ProcessButtons(X int, Y int,
 		if this.SelectedType == "switch" {
 
 			// Decrease the fade size.
-			this.SwitchFades[this.SelectedSwitch]--
-			if this.SwitchFades[this.SelectedSwitch] < common.MIN_RGB_FADE {
-				this.SwitchFades[this.SelectedSwitch] = common.MIN_RGB_FADE
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade--
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade < common.MIN_RGB_FADE {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MIN_RGB_FADE
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -1513,7 +1506,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchFades[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -1595,9 +1588,9 @@ func ProcessButtons(X int, Y int,
 		if this.SelectedType == "switch" {
 
 			// Increase the switch size.
-			this.SwitchFades[this.SelectedSwitch] = this.SwitchFades[this.SelectedSwitch] + 1
-			if this.SwitchFades[this.SelectedSwitch] > common.MAX_RGB_SHIFT {
-				this.SwitchFades[this.SelectedSwitch] = common.MAX_RGB_SHIFT
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade + 1
+			if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade > common.MAX_RGB_SHIFT {
+				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MAX_RGB_SHIFT
 			}
 
 			// Send a message to override / increase the selected switch shift.
@@ -1606,7 +1599,7 @@ func ProcessButtons(X int, Y int,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: this.SwitchFades[this.SelectedSwitch]},
+					{Name: "Shift", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -2824,10 +2817,10 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
-	switchSpeed := this.SwitchSpeeds[this.SelectedSwitch]
+	switchSpeed := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 
 	if debug {
-		fmt.Printf("UpdateSpeed Type=%s Switch %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, this.SwitchSpeeds[this.SelectedSwitch])
+		fmt.Printf("UpdateSpeed Type=%s Switch %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed)
 	}
 
 	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
@@ -2870,7 +2863,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	tYpe := this.SelectedType
 	size := this.RGBSize[this.TargetSequence]
 	scannerFade := this.ScannerSize[this.TargetSequence]
-	switchSize := this.SwitchSizes[this.SelectedSwitch]
+	switchSize := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" || tYpe == "switch" {
@@ -2894,7 +2887,7 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	tYpe := this.SelectedType
 	shift := this.RGBShift[this.TargetSequence]
 	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-	switchShift := this.SwitchShifts[this.SelectedSwitch]
+	switchShift := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
 
 	if debug {
 		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d\n", shift, scannerShift, switchShift)
@@ -2922,7 +2915,7 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	tYpe := this.SelectedType
 	fade := this.RGBFade[this.TargetSequence]
 	scannerCoordinates := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-	switchFade := this.SwitchFades[this.SelectedSwitch]
+	switchFade := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {

@@ -203,11 +203,15 @@ type Switch struct {
 }
 
 type Override struct {
-	Override bool
-	Speed    int
-	Shift    int
-	Size     int
-	Fade     int
+	Override     bool
+	Speed        int
+	Shift        int
+	Size         int
+	Fade         int
+	ShutterSpeed int
+	RotateSpeed  int
+	Colors       []Color
+	Gobo         int
 }
 
 type StaticColorButton struct {
@@ -1554,4 +1558,11 @@ func GetColor(X int, Y int) ColorPicker {
 		}
 	}
 	return ColorPicker{}
+}
+
+func makeIntMatrix(NumberOfSwitches, NumberOfPositions int) {
+	matrix := make([][]int, NumberOfSwitches)
+	for i := 0; i < NumberOfSwitches; i++ {
+		matrix[i] = make([]int, NumberOfPositions)
+	}
 }
