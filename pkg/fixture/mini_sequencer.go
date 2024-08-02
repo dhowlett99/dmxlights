@@ -575,19 +575,19 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
-				if !cfg.MusicTrigger && override.Shift != 0 {
+				if override.Shift != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Shift is %d\n", override.Shift)
 					}
 					cfg.Shift = override.Shift
 				}
-				if !cfg.MusicTrigger && override.Size != 0 {
+				if override.Size != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Size is %d\n", override.Size)
 					}
 					cfg.Size = override.Size
 				}
-				if !cfg.MusicTrigger && override.Fade != 0 {
+				if override.Fade != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Fade is %d\n", override.Fade)
 					}
