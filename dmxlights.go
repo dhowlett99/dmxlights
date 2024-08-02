@@ -321,8 +321,15 @@ func main() {
 					// Assign state.
 					state := swiTch.States[stateNumber]
 
+					// Find the details of the fixture for this switch.
+					thisFixture, err := fixture.FindFixtureByLabel(swiTch.UseFixture, fixturesConfig)
+					if err != nil {
+						fmt.Printf("error %s\n", err.Error())
+					}
+
 					// Load the config for this state of of this switch
-					cfg := fixture.GetSwitchConfig(swiTch.Number, int16(state.Number), fixturesConfig)
+					action := fixture.GetSwitchConfig(swiTch.Number, int16(state.Number), fixturesConfig)
+					cfg := fixture.GetConfig(action, thisFixture, fixturesConfig)
 					newOverride := common.Override{}
 					newOverride.Speed = cfg.Speed
 					newOverride.Shift = cfg.Shift

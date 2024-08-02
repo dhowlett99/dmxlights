@@ -1374,7 +1374,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		}
 
 		// Find the details of the fixture for this switch.
-		thisFixture, err := findFixtureByLabel(useFixtureLabel, fixturesConfig)
+		thisFixture, err := FindFixtureByLabel(useFixtureLabel, fixturesConfig)
 		if err != nil {
 			fmt.Printf("error %s\n", err.Error())
 			return lastColor
@@ -1482,7 +1482,7 @@ func FindFixtureAddressByGroupAndNumber(sequenceNumber int, fixtureNumber int, f
 	return 0, fmt.Errorf("findFixtureByName: failed to find address for sequence %d fixture %d", sequenceNumber, fixtureNumber)
 }
 
-func findFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
+func FindFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
 
 	if debug {
 		fmt.Printf("findFixtureByLabel: Look for fixture by Label %s\n", label)
@@ -1950,7 +1950,7 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 	return false
 }
 
-func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtures) ActionConfig {
+func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
 
 	for _, fixture := range fixturesConfig.Fixtures {
 		if debug {
@@ -1975,8 +1975,7 @@ func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtur
 									fmt.Printf("action number %d\n", actionNumber)
 								}
 								if action.Mode == "Chase" && action.Speed != "Music" {
-									cfg := getConfig(action, &fixture, fixturesConfig)
-									return cfg
+									return action
 								}
 							}
 						}
@@ -1985,5 +1984,5 @@ func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtur
 			}
 		}
 	}
-	return ActionConfig{Name: "Error"}
+	return Action{Name: "Error"}
 }

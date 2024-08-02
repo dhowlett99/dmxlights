@@ -79,7 +79,7 @@ func newMiniSequencer(fixture *Fixture,
 	myFixtureNumber := fixture.Number - 1
 
 	// Setup the configuration.
-	cfg := getConfig(action, fixture, fixturesConfig)
+	cfg := GetConfig(action, fixture, fixturesConfig)
 
 	if debug_mini {
 		fmt.Printf("Action %+v\n", action)
@@ -770,7 +770,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	return sequence, RGBPositions, numberSteps
 }
 
-func getConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) ActionConfig {
+func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) ActionConfig {
 
 	config := ActionConfig{}
 

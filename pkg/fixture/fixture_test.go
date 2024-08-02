@@ -19,7 +19,6 @@ package fixture
 import (
 	"reflect"
 	"testing"
-	"time"
 )
 
 func Test_calculateMaxDMX(t *testing.T) {
@@ -408,43 +407,20 @@ func TestGetSwitchSpeeds(t *testing.T) {
 	tests := []struct {
 		name string
 		args args
-		want ActionConfig
+		want Action
 	}{
 		{
-			name: "gold path",
+			name: "find the right action based on switch and state number",
 			args: args{
 				fixturesConfig: fixturesConfig,
 				swiTchNumber:   1,
 				stateNumber:    1,
 			},
 
-			want: ActionConfig{
-				Name:              "",
-				Map:               false,
-				Fade:              10,
-				NumberSteps:       64,
-				Size:              3,
-				SpeedDuration:     time.Duration(250 * time.Millisecond),
-				Speed:             8,
-				Shift:             1,
-				TriggerState:      false,
-				RotateSpeed:       0,
-				Rotatable:         false,
-				Clockwise:         false,
-				AntiClockwise:     false,
-				AutoRotate:        false,
-				Program:           0,
-				ProgramOptions:    []string{},
-				ProgramSpeed:      0,
-				Music:             0,
-				MusicTrigger:      false,
-				Strobe:            false,
-				StrobeSpeed:       0,
-				Gobo:              0,
-				GoboSpeed:         0,
-				AutoGobo:          false,
-				GoboOptions:       []string{},
-				RotateSensitivity: 10,
+			want: Action{
+				Name:  "Fade",
+				Mode:  "Chase",
+				Speed: "Fast",
 			},
 		},
 	}
