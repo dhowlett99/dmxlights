@@ -594,6 +594,27 @@ func newMiniSequencer(fixture *Fixture,
 					cfg.Fade = override.Fade
 				}
 
+				if override.RotateSpeed != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Rotate Speed is %d\n", override.RotateSpeed)
+					}
+					cfg.RotateSpeed = override.RotateSpeed
+				}
+
+				if override.Colors != nil {
+					if debug_mini {
+						fmt.Printf("Override is set so Colors is %+v\n", override.Colors)
+					}
+					cfg.Colors = override.Colors
+				}
+
+				if override.Gobo != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Gobo is %+v\n", override.Gobo)
+					}
+					cfg.Gobo = override.Gobo
+				}
+
 				if debug_mini {
 					fmt.Printf("Speed %d Duration %d Shift %d \n", cfg.Speed, cfg.SpeedDuration, cfg.Shift)
 				}
@@ -656,7 +677,7 @@ func newMiniSequencer(fixture *Fixture,
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
-						// Update Speed but not in music trigger mode.
+						// Update RGB Speed or Scanner Shutter Speed but not in music trigger mode.
 						if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
 							const SPEED = 0
 							override.Speed = cmd.Args[SPEED].Value.(int)
@@ -692,6 +713,37 @@ func newMiniSequencer(fixture *Fixture,
 								fmt.Printf("Fade %d\n", cmd.Args[FADE].Value.(int))
 							}
 						}
+
+						// Update Rotate Speed
+						if cmd.Action == common.UpdateRotateSpeed {
+							const ROTATE_SPEED = 0
+							override.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
+							cfg.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
+							if debug_mini {
+								fmt.Printf("Rotate Speed %d\n", cmd.Args[ROTATE_SPEED].Value.(int))
+							}
+						}
+
+						// Update Colors
+						if cmd.Action == common.UpdateColors {
+							const COLORS = 0
+							override.Colors = cmd.Args[COLORS].Value.([]common.Color)
+							cfg.Colors = cmd.Args[COLORS].Value.([]common.Color)
+							if debug_mini {
+								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]common.Color))
+							}
+						}
+
+						// Update Gobos
+						if cmd.Action == common.UpdateColors {
+							const GOBO = 0
+							override.Gobo = cmd.Args[GOBO].Value.(int)
+							cfg.Gobo = cmd.Args[GOBO].Value.(int)
+							if debug_mini {
+								fmt.Printf("Gobo %d\n", cmd.Args[GOBO].Value.(int))
+							}
+						}
+
 						// Recreate the sequence and recalculate steps.
 						sequence, RGBPositions, numberSteps = createSequence(cfg)
 

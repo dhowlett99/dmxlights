@@ -335,7 +335,6 @@ func main() {
 					newOverride.Shift = cfg.Shift
 					newOverride.Size = cfg.Size
 					newOverride.Fade = cfg.Fade
-					newOverride.ShutterSpeed = cfg.Speed
 					newOverride.RotateSpeed = cfg.RotateSpeed
 					newOverride.Colors = cfg.Colors
 					newOverride.Gobo = cfg.Gobo

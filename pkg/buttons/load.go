@@ -149,9 +149,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
 				}
 
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.ShutterSpeed != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ShutterSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.ShutterSpeed
-				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed != 0 {
 					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
 				}

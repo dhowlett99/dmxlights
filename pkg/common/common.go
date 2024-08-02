@@ -203,15 +203,14 @@ type Switch struct {
 }
 
 type Override struct {
-	Override     bool
-	Speed        int
-	Shift        int
-	Size         int
-	Fade         int
-	ShutterSpeed int
-	RotateSpeed  int
-	Colors       []Color
-	Gobo         int
+	Override    bool
+	Speed       int
+	Shift       int
+	Size        int
+	Fade        int
+	RotateSpeed int
+	Colors      []Color
+	Gobo        int
 }
 
 type StaticColorButton struct {
@@ -282,6 +281,9 @@ const (
 	UpdatePattern
 	UpdateRGBFadeSpeed
 	UpdateRGBSize
+	UpdateRotateSpeed
+	UpdateColors
+	UpdateGobos
 	UpdateScannerSize
 	Blackout
 	Normal
