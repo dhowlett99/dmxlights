@@ -211,6 +211,7 @@ type Override struct {
 	RotateSpeed int
 	Colors      []Color
 	Gobo        int
+	GoboName    string
 }
 
 type StaticColorButton struct {

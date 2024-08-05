@@ -1601,6 +1601,26 @@ func FindShutter(myFixtureNumber int, mySequenceNumber int, shutterName string, 
 	return 255
 }
 
+// findGobo takes the number and returns the gobo name  for this type of scanner.
+func FindGoboByDMXValue(fixture *Fixture, dmxValue string) string {
+
+	if debug {
+		fmt.Printf("FindGoboByName\n")
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Gobo") {
+			for _, setting := range channel.Settings {
+				if setting.Value == dmxValue {
+					return setting.Name
+				}
+			}
+		}
+	}
+
+	return "Not Found"
+}
+
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
 func FindGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
 

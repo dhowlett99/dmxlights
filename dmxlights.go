@@ -339,6 +339,7 @@ func main() {
 					if action.Mode == "Setting" {
 						newOverride.Colors = cfg.Colors
 						newOverride.Gobo, _ = strconv.Atoi(action.Gobo)
+						newOverride.GoboName = fixture.FindGoboByDMXValue(thisFixture, action.Gobo)
 					} else {
 						newOverride.Colors = cfg.Colors
 						newOverride.Gobo = cfg.Gobo
