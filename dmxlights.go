@@ -497,6 +497,7 @@ func main() {
 	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
 	panel.VersionLabel = widget.NewButton("Version 2.1", func() {})
 	panel.VersionLabel.Hidden = false
+	panel.ColorDisplay.Hidden = false
 
 	// Create objects for top status bar.
 	upLabel := widget.NewLabel("       ")
@@ -540,6 +541,7 @@ func main() {
 
 	// Create top status bar.
 	topStatusBar := container.New(layout.NewHBoxLayout(),
+		panel.ColorDisplay,
 		layout.NewSpacer(),
 		upLabel,
 		redLabel,

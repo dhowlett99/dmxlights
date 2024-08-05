@@ -59,6 +59,7 @@ type MyPanel struct {
 	SizeLabel        *widget.Label
 	FadeLabel        *widget.Label
 	VersionLabel     *widget.Button
+	ColorDisplay     *fyne.Container
 	TiltLabel        *widget.Label
 	RedLabel         *widget.Label
 	GreenLabel       *widget.Label
@@ -84,6 +85,8 @@ func NewPanel() MyPanel {
 		{empty, empty, empty, empty, empty, empty, empty, empty, empty},
 		{empty, empty, empty, empty, empty, empty, empty, empty, empty},
 	}
+
+	panel.ColorDisplay = NewColorDisplay()
 
 	return panel
 }
@@ -688,4 +691,163 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 		w.Canvas(),
 	)
 	return modal
+}
+
+func NewColorDisplay() *fyne.Container {
+
+	red := Button{}
+	red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	red.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	red.container = container.NewStack(red.rectangle)
+
+	orange := Button{}
+	orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
+	orange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	orange.container = container.NewStack(orange.rectangle)
+
+	yellow := Button{}
+	yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
+	yellow.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	yellow.container = container.NewStack(yellow.rectangle)
+
+	green := Button{}
+	green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	green.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	green.container = container.NewStack(green.rectangle)
+
+	cyan := Button{}
+	cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
+	cyan.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	cyan.container = container.NewStack(cyan.rectangle)
+
+	blue := Button{}
+	blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	blue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	blue.container = container.NewStack(blue.rectangle)
+
+	purple := Button{}
+	purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
+	purple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	purple.container = container.NewStack(purple.rectangle)
+
+	pink := Button{}
+	pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	pink.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	pink.container = container.NewStack(pink.rectangle)
+
+	crimsom := Button{}
+	crimsom.rectangle = canvas.NewRectangle(color.RGBA{R: 220, G: 20, B: 60, A: 255})
+	crimsom.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	crimsom.container = container.NewStack(crimsom.rectangle)
+
+	darkOrange := Button{}
+	darkOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 215, G: 50, B: 0, A: 255})
+	darkOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	darkOrange.container = container.NewStack(darkOrange.rectangle)
+
+	gold := Button{}
+	gold.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 215, B: 0, A: 255})
+	gold.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	gold.container = container.NewStack(gold.rectangle)
+
+	forestGreen := Button{}
+	forestGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 100, B: 0, A: 255})
+	forestGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	forestGreen.container = container.NewStack(forestGreen.rectangle)
+
+	aqua := Button{}
+	aqua.rectangle = canvas.NewRectangle(color.RGBA{R: 127, G: 255, B: 212, A: 255})
+	aqua.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	aqua.container = container.NewStack(aqua.rectangle)
+
+	skyBlue := Button{}
+	skyBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 191, B: 255, A: 255})
+	skyBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	skyBlue.container = container.NewStack(skyBlue.rectangle)
+
+	darkPurple := Button{}
+	darkPurple.rectangle = canvas.NewRectangle(color.RGBA{R: 50, G: 0, B: 255, A: 255})
+	darkPurple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	darkPurple.container = container.NewStack(darkPurple.rectangle)
+
+	salmon := Button{}
+	salmon.rectangle = canvas.NewRectangle(color.RGBA{R: 250, G: 128, B: 114, A: 255})
+	salmon.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	salmon.container = container.NewStack(salmon.rectangle)
+
+	lightOrange := Button{}
+	lightOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 175, B: 0, A: 255})
+	lightOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	lightOrange.container = container.NewStack(lightOrange.rectangle)
+
+	olive := Button{}
+	olive.rectangle = canvas.NewRectangle(color.RGBA{R: 150, G: 150, B: 0, A: 255})
+	olive.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	olive.container = container.NewStack(olive.rectangle)
+
+	lawnGreen := Button{}
+	lawnGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 124, G: 252, B: 0, A: 255})
+	lawnGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	lawnGreen.container = container.NewStack(lawnGreen.rectangle)
+
+	teal := Button{}
+	teal.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 128, B: 128, A: 255})
+	teal.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	teal.container = container.NewStack(teal.rectangle)
+
+	lightBlue := Button{}
+	lightBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 100, G: 185, B: 255, A: 255})
+	lightBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	lightBlue.container = container.NewStack(lightBlue.rectangle)
+
+	violet := Button{}
+	violet.rectangle = canvas.NewRectangle(color.RGBA{R: 199, G: 21, B: 133, A: 255})
+	violet.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	violet.container = container.NewStack(violet.rectangle)
+
+	white := Button{}
+	white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
+	white.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	white.rectangle.StrokeColor = color.Black
+	white.rectangle.StrokeWidth = 1
+	white.container = container.NewStack(white.rectangle)
+
+	magenta := Button{}
+	magenta.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	magenta.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
+	magenta.container = container.NewStack(magenta.rectangle)
+
+	return container.New(
+		layout.NewGridLayoutWithRows(3),
+
+		// Top row.
+		red.container,
+		orange.container,
+		yellow.container,
+		green.container,
+		cyan.container,
+		blue.container,
+		purple.container,
+		magenta.container,
+
+		// Middle row.
+		crimsom.container,
+		darkOrange.container,
+		gold.container,
+		forestGreen.container,
+		aqua.container,
+		skyBlue.container,
+		darkPurple.container,
+		pink.container,
+
+		// Bottom row.
+		salmon.container,
+		lightOrange.container,
+		olive.container,
+		lawnGreen.container,
+		teal.container,
+		lightBlue.container,
+		violet.container,
+		white.container,
+	)
 }
