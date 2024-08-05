@@ -1108,7 +1108,7 @@ fixtures:
     name: Program
     settings:
     - name: Strobe Off
-      labe: New
+      label: New
       number: 1
       value: 0-15
       selectedvalue: ""
@@ -1132,7 +1132,7 @@ fixtures:
     name: Static
     settings:
     - name: Dimmer Mode
-      labe: New
+      label: New
       number: 1
       value: "0"
       selectedvalue: ""
@@ -1156,7 +1156,7 @@ fixtures:
     name: Color
     settings:
     - name: Color Macros
-      labe: New
+      label: New
       number: 1
       value: 1-255
       selectedvalue: ""
@@ -1425,7 +1425,7 @@ fixtures:
     name: Program
     settings:
     - name: RGB Mode
-      labe: New
+      label: New
       number: 1
       value: 0-24
       selectedvalue: ""
@@ -1498,7 +1498,7 @@ fixtures:
     name: Macro
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
@@ -1512,7 +1512,7 @@ fixtures:
       value: 0-15
       selectedvalue: ""
     - name: Strobe
-      labe: Strobe
+      label: Strobe
       number: 2
       value: 16-255
       selectedvalue: ""
@@ -1533,27 +1533,27 @@ fixtures:
     name: Rotate
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
     - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+      label: Clockwise Fast to Slow
       number: 2
       value: 10-120
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 3
       value: 121-131
       selectedvalue: ""
     - name: AntiClockwise Slow to FastNew
-      labe: AntiClockwise Slow to FastNew
+      label: AntiClockwise Slow to FastNew
       number: 4
       value: 187-196
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 5
       value: 246-255
       selectedvalue: ""
@@ -1561,47 +1561,47 @@ fixtures:
     name: Color
     settings:
     - name: White
-      labe: White
+      label: White
       number: 1
       value: 0-7
       selectedvalue: ""
     - name: Color1
-      labe: Color1
+      label: Color1
       number: 2
       value: 8-32
       selectedvalue: ""
     - name: Color2
-      labe: Color2
+      label: Color2
       number: 3
       value: 33-56
       selectedvalue: ""
     - name: Color3
-      labe: Color3
+      label: Color3
       number: 4
       value: 57-80
       selectedvalue: ""
     - name: Color4
-      labe: Color4
+      label: Color4
       number: 5
       value: 81-104
       selectedvalue: ""
     - name: Color5
-      labe: Color5
+      label: Color5
       number: 6
       value: 105-127
       selectedvalue: ""
     - name: Clockwise Fast to Slow
-      labe: Clockwise Fast to Slow
+      label: Clockwise Fast to Slow
       number: 7
       value: 128-186
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 8
       value: 187-196
       selectedvalue: ""
     - name: Antilockwise  Slow to Fast
-      labe: Antilockwise  Slow to Fast
+      label: Antilockwise  Slow to Fast
       number: 9
       value: 197-255
       selectedvalue: ""
@@ -1618,12 +1618,12 @@ fixtures:
     name: Program
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
     - name: "On"
-      labe: "On"
+      label: "On"
       number: 2
       value: "255"
       selectedvalue: ""
@@ -1699,7 +1699,7 @@ fixtures:
     master: 0
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 0
       channel: Program
       value: "Off"
@@ -1712,7 +1712,7 @@ fixtures:
     master: 0
     settings:
     - name: "On"
-      labe: "On"
+      label: "On"
       number: 0
       channel: Program
       value: "On"
@@ -1736,19 +1736,19 @@ fixtures:
     master: 0
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       channel: Master
       value: "0"
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 2
       channel: Rotate
       value: "0"
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 3
       channel: Color
       value: "0"
@@ -1761,19 +1761,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate
-      labe: Rotate
+      label: Rotate
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: ""
     - name: Color
-      labe: Color
+      label: Color
       number: 3
       channel: Color
       value: "10"
@@ -1786,19 +1786,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate
-      labe: Rotate
+      label: Rotate
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: ""
     - name: Color
-      labe: Color
+      label: Color
       number: 3
       channel: Color
       value: "30"
@@ -1811,19 +1811,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate
-      labe: Rotate
+      label: Rotate
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: ""
     - name: Color
-      labe: Color
+      label: Color
       number: 3
       channel: Color
       value: "75"

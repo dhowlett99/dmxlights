@@ -863,6 +863,11 @@ func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
 }
 
 func GetRGBColorByName(color string) (Color, error) {
+
+	if debug {
+		fmt.Printf("Looking for color %s\n", color)
+	}
+
 	switch color {
 	case "Red":
 		return Red, nil

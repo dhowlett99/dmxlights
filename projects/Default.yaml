@@ -892,7 +892,7 @@ fixtures:
     maxdegrees: 540
     settings:
     - name: MaxDegrees
-      labe: MaxDegrees
+      label: MaxDegrees
       number: 1
       value: "540"
       selectedvalue: ""
@@ -903,7 +903,7 @@ fixtures:
     maxdegrees: 230
     settings:
     - name: MaxDegrees
-      labe: MaxDegrees
+      label: MaxDegrees
       number: 1
       value: "230"
       selectedvalue: ""
@@ -1031,7 +1031,7 @@ fixtures:
     maxdegrees: 540
     settings:
     - name: MaxDegrees
-      labe: MaxDegrees
+      label: MaxDegrees
       number: 1
       value: "540"
       selectedvalue: ""
@@ -1042,7 +1042,7 @@ fixtures:
     maxdegrees: 230
     settings:
     - name: MaxDegrees
-      labe: MaxDegrees
+      label: MaxDegrees
       number: 1
       value: "230"
       selectedvalue: ""
@@ -1179,7 +1179,7 @@ fixtures:
     name: Program
     settings:
     - name: Strobe Off
-      labe: New
+      label: New
       number: 1
       value: 0-15
       selectedvalue: ""
@@ -1203,7 +1203,7 @@ fixtures:
     name: Static
     settings:
     - name: Dimmer Mode
-      labe: New
+      label: New
       number: 1
       value: "0"
       selectedvalue: ""
@@ -1227,7 +1227,7 @@ fixtures:
     name: Color
     settings:
     - name: Color Macros
-      labe: New
+      label: New
       number: 1
       value: 1-255
       selectedvalue: ""
@@ -1512,7 +1512,7 @@ fixtures:
     name: Program
     settings:
     - name: RGB Mode
-      labe: New
+      label: New
       number: 1
       value: 0-24
       selectedvalue: ""
@@ -1585,7 +1585,7 @@ fixtures:
     name: Macro
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
@@ -1599,7 +1599,7 @@ fixtures:
       value: 0-15
       selectedvalue: ""
     - name: Strobe
-      labe: Strobe
+      label: Strobe
       number: 2
       value: 16-255
       selectedvalue: ""
@@ -1620,38 +1620,38 @@ fixtures:
     name: Rotate
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
     - name: Rotate Clockwise Slow
-      labe: Rotate Clockwise Slow
+      label: Rotate Clockwise Slow
       number: 2
       value: "120"
       selectedvalue: ""
     - name: Rotate Clockwise Medium
-      labe: Rotate Clockwise Medium
+      label: Rotate Clockwise Medium
       number: 3
       value: "65"
       selectedvalue: ""
     - name: Rotate Clockwise Fast
-      labe: Rotate Clockwise Fast
+      label: Rotate Clockwise Fast
       number: 4
       value: "10"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Slow
-      labe: Rotate Anti Clockwise Slow
+      label: Rotate Anti Clockwise Slow
       number: 5
       value: "135"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
-      labe: Rotate Anti Clockwise Medium
+      label: Rotate Anti Clockwise Medium
       number: 6
       channel: (Select one)
       value: "190"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Fast
-      labe: Rotate Anti Clockwise Fast
+      label: Rotate Anti Clockwise Fast
       number: 7
       channel: (Select one)
       value: "245"
@@ -1660,47 +1660,47 @@ fixtures:
     name: Gobo
     settings:
     - name: White
-      labe: White
+      label: White
       number: 1
       value: "0"
       selectedvalue: ""
     - name: Color1
-      labe: Color1
+      label: Color1
       number: 2
       value: "8"
       selectedvalue: ""
     - name: Color2
-      labe: Color2
+      label: Color2
       number: 3
       value: "33"
       selectedvalue: ""
     - name: Color3
-      labe: Color3
+      label: Color3
       number: 4
       value: "57"
       selectedvalue: ""
     - name: Color4
-      labe: Color4
+      label: Color4
       number: 5
       value: "81"
       selectedvalue: ""
     - name: Color5
-      labe: Color5
+      label: Color5
       number: 6
       value: "105"
       selectedvalue: ""
     - name: Rotate Clockwise Fast to Slow
-      labe: Rotate Clockwise Fast to Slow
+      label: Rotate Clockwise Fast to Slow
       number: 7
       value: "128"
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 8
       value: "187"
       selectedvalue: ""
     - name: Rotate Anti Clockwise  Slow to Fast
-      labe: Rotate Anti Clockwise  Slow to Fast
+      label: Rotate Anti Clockwise  Slow to Fast
       number: 9
       value: "197"
       selectedvalue: ""
@@ -1717,12 +1717,12 @@ fixtures:
     name: Program
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       value: "0"
       selectedvalue: ""
     - name: "On"
-      labe: "On"
+      label: "On"
       number: 2
       value: "255"
       selectedvalue: ""
@@ -1742,42 +1742,42 @@ fixtures:
     value: 0
     settings:
     - name: Blackout
-      labe: Blackout
+      label: Blackout
       number: 1
       value: 0-31
       selectedvalue: ""
     - name: Open
-      labe: Open
+      label: Open
       number: 2
       value: 32-63
       selectedvalue: ""
     - name: Strobe
-      labe: Strobe
+      label: Strobe
       number: 3
       value: 64-95
       selectedvalue: ""
     - name: Open
-      labe: Open
+      label: Open
       number: 4
       value: 96-127
       selectedvalue: ""
     - name: Pulse
-      labe: Pulse
+      label: Pulse
       number: 5
       value: 129-159
       selectedvalue: ""
     - name: Open
-      labe: Open
+      label: Open
       number: 6
       value: 160-191
       selectedvalue: ""
     - name: Random
-      labe: Random
+      label: Random
       number: 7
       value: 192-223
       selectedvalue: ""
     - name: Open
-      labe: Open
+      label: Open
       number: 8
       value: 224-255
       selectedvalue: ""
@@ -1786,47 +1786,47 @@ fixtures:
     value: 0
     settings:
     - name: ZigZag
-      labe: ZigZag
+      label: ZigZag
       number: 1
       value: "0"
       selectedvalue: ""
     - name: Horiz Waves
-      labe: Horiz Waves
+      label: Horiz Waves
       number: 2
       value: "18"
       selectedvalue: ""
     - name: Croc Petals
-      labe: Croc Petals
+      label: Croc Petals
       number: 3
       value: "28"
       selectedvalue: ""
     - name: Rose Flowers
-      labe: Rose Flowers
+      label: Rose Flowers
       number: 4
       value: "44"
       selectedvalue: ""
     - name: Triangles
-      labe: Triangles
+      label: Triangles
       number: 5
       value: "50"
       selectedvalue: ""
     - name: Vert Waves
-      labe: Vert Waves
+      label: Vert Waves
       number: 6
       value: "58"
       selectedvalue: ""
     - name: Star Rings
-      labe: Star Rings
+      label: Star Rings
       number: 7
       value: "94"
       selectedvalue: ""
     - name: Circles And Squares
-      labe: Circles And Squares
+      label: Circles And Squares
       number: 8
       value: "110"
       selectedvalue: ""
     - name: Horiz Lines
-      labe: Horiz Lines
+      label: Horiz Lines
       number: 9
       value: "117"
       selectedvalue: ""
@@ -1835,37 +1835,37 @@ fixtures:
     value: 0
     settings:
     - name: Mirror Index
-      labe: Mirror Index
+      label: Mirror Index
       number: 1
       value: 0-127
       selectedvalue: ""
     - name: Rotate Clockwise Slow
-      labe: Rotate Clockwise Slow
+      label: Rotate Clockwise Slow
       number: 2
       value: "192"
       selectedvalue: ""
     - name: Rotate Clockwise Medium
-      labe: Rotate Clockwise Medium
+      label: Rotate Clockwise Medium
       number: 2
       value: "223"
       selectedvalue: ""
     - name: Rotate Clockwise Fast
-      labe: Rotate Clockwise Fast
+      label: Rotate Clockwise Fast
       number: 2
       value: "255"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Slow
-      labe: Rotate Anti Clockwise Slow
+      label: Rotate Anti Clockwise Slow
       number: 3
       value: "191"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Medium
-      labe: Rotate Anti Clockwise Medium
+      label: Rotate Anti Clockwise Medium
       number: 3
       value: "160"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Fast
-      labe: Rotate Anti Clockwise Fast
+      label: Rotate Anti Clockwise Fast
       number: 3
       value: "128"
       selectedvalue: ""
@@ -1873,52 +1873,52 @@ fixtures:
     name: Program
     settings:
     - name: Blackout
-      labe: Blackout
+      label: Blackout
       number: 1
       value: 0-3
       selectedvalue: ""
     - name: Show0
-      labe: Show0
+      label: Show0
       number: 2
       value: 4-31
       selectedvalue: ""
     - name: Show1
-      labe: Show1
+      label: Show1
       number: 3
       value: 32-59
       selectedvalue: ""
     - name: Show2
-      labe: Show2
+      label: Show2
       number: 4
       value: 60-87
       selectedvalue: ""
     - name: Show3
-      labe: Show3
+      label: Show3
       number: 5
       value: 88-115
       selectedvalue: ""
     - name: Show4
-      labe: Show4
+      label: Show4
       number: 6
       value: 116-143
       selectedvalue: ""
     - name: Show5
-      labe: Show5
+      label: Show5
       number: 7
       value: 144-171
       selectedvalue: ""
     - name: Show6
-      labe: Show6
+      label: Show6
       number: 8
       value: 172-199
       selectedvalue: ""
     - name: Show7
-      labe: Show7
+      label: Show7
       number: 9
       value: 200-227
       selectedvalue: ""
     - name: Show8
-      labe: Show8
+      label: Show8
       number: 10
       value: 228-255
       selectedvalue: ""
@@ -1927,19 +1927,19 @@ fixtures:
     value: 0
     settings:
     - name: Slow
-      labe: Slow
+      label: Slow
       number: 1
       channel: New
       value: "10"
       selectedvalue: "10"
     - name: Medium
-      labe: Medium
+      label: Medium
       number: 2
       channel: New
       value: "100"
       selectedvalue: "100"
     - name: Fast
-      labe: Fast
+      label: Fast
       number: 3
       channel: New
       value: "200"
@@ -2016,7 +2016,7 @@ fixtures:
     master: 0
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 0
       channel: Program
       value: "Off"
@@ -2029,7 +2029,7 @@ fixtures:
     master: 0
     settings:
     - name: "On"
-      labe: "On"
+      label: "On"
       number: 0
       channel: Program
       value: "On"
@@ -2053,19 +2053,19 @@ fixtures:
     master: 0
     settings:
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 1
       channel: Master
       value: "0"
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 2
       channel: Rotate
       value: "0"
       selectedvalue: ""
     - name: "Off"
-      labe: "Off"
+      label: "Off"
       number: 3
       channel: Color
       value: "0"
@@ -2078,19 +2078,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate Anti Clockwise Fast
-      labe: Rotate Anti Clockwise Fast
+      label: Rotate Anti Clockwise Fast
       number: 2
       channel: Rotate
       value: "245"
       selectedvalue: Rotate Anti Clockwise Fast
     - name: Color1
-      labe: Color1
+      label: Color1
       number: 3
       channel: Gobo
       value: "0"
@@ -2103,19 +2103,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate
-      labe: Rotate
+      label: Rotate
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: ""
     - name: Color2
-      labe: Color2
+      label: Color2
       number: 3
       channel: Gobo
       value: "33"
@@ -2128,19 +2128,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotate
-      labe: Rotate
+      label: Rotate
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: ""
     - name: Color3
-      labe: Color3
+      label: Color3
       number: 3
       channel: Gobo
       value: "60"
@@ -2153,19 +2153,19 @@ fixtures:
     master: 0
     settings:
     - name: Master
-      labe: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: ""
     - name: Rotatae Clockwise Fast
-      labe: Rotatae Clockwise Fast
+      label: Rotatae Clockwise Fast
       number: 2
       channel: Rotate
       value: "12"
       selectedvalue: Rotatae Clockwise Fast
     - name: Color4
-      labe: Color4
+      label: Color4
       number: 3
       channel: Gobo
       value: "81"
@@ -2886,37 +2886,37 @@ fixtures:
     master: 0
     settings:
     - name: "255"
-      labe: "255"
+      label: "255"
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
     - name: Open
-      labe: Open
+      label: Open
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
     - name: ZigZag
-      labe: ZigZag
+      label: ZigZag
       number: 3
       channel: Gobo
       value: "0"
       selectedvalue: ZigZag
     - name: Rotate Clockwise Medium
-      labe: Rotate Clockwise Medium
+      label: Rotate Clockwise Medium
       number: 4
       channel: Rotate
       value: "255"
       selectedvalue: Rotate Clockwise Medium
     - name: Blackout
-      labe: Blackout
+      label: Blackout
       number: 5
       channel: Program
       value: "0"
       selectedvalue: Blackout
     - name: Fast
-      labe: Fast
+      label: Fast
       number: 6
       channel: ProgramSpeed
       value: "200"
@@ -2934,31 +2934,31 @@ fixtures:
       value: "255"
       selectedvalue: "255"
     - name: New
-      labe: New
+      label: New
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
     - name: New
-      labe: New
+      label: New
       number: 3
       channel: Gobo
       value: "18"
       selectedvalue: Horiz Waves
     - name: New
-      labe: New
+      label: New
       number: 4
       channel: Rotate
       value: "192"
       selectedvalue: Rotate ClockWise
     - name: New
-      labe: New
+      label: New
       number: 5
       channel: Program
       value: "0"
       selectedvalue: Blackout
     - name: New
-      labe: New
+      label: New
       number: 6
       channel: ProgramSpeed
       value: "0"
@@ -2976,31 +2976,31 @@ fixtures:
       value: "255"
       selectedvalue: "255"
     - name: New
-      labe: New
+      label: New
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
     - name: New
-      labe: New
+      label: New
       number: 3
       channel: Gobo
       value: "28"
       selectedvalue: Croc Petals
     - name: Rotate Anti Clockwise Slow
-      labe: Rotate Anti Clockwise Slow
+      label: Rotate Anti Clockwise Slow
       number: 4
       channel: Rotate
       value: "191"
       selectedvalue: Rotate Anti Clockwise Slow
     - name: New
-      labe: New
+      label: New
       number: 5
       channel: Program
       value: "0"
       selectedvalue: Blackout
     - name: New
-      labe: New
+      label: New
       number: 6
       channel: ProgramSpeed
       value: "0"

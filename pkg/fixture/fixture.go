@@ -78,6 +78,7 @@ type Action struct {
 	Program      string   `yaml:"program"`
 	ProgramSpeed string   `yaml:"programspeed"`
 	Strobe       string   `yaml:"strobe"`
+	StrobeSpeed  string   `yaml:"strobespeed"`
 	Gobo         string   `yaml:"gobo"`
 	GoboSpeed    string   `yaml:"gobospeed"`
 }
@@ -143,7 +144,7 @@ type FixtureInfo struct {
 
 type Setting struct {
 	Name          string `yaml:"name"`
-	Label         string `yaml:"labe,omitempty"`
+	Label         string `yaml:"label,omitempty"`
 	Number        int    `yaml:"number"`
 	Channel       string `yaml:"channel,omitempty"`
 	Value         string `yaml:"value"`
@@ -1974,15 +1975,83 @@ func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtur
 								if debug {
 									fmt.Printf("action number %d\n", actionNumber)
 								}
-								if action.Mode == "Chase" && action.Speed != "Music" {
-									return action
-								}
+								return action
 							}
+						}
+
+						if state.Settings != nil {
+							return convertSettingToAction(state.Settings)
 						}
 					}
 				}
 			}
 		}
 	}
-	return Action{Name: "Error"}
+	return Action{Name: "Not Found"}
+}
+
+// Given the fixture and the list of settings for this state
+// buill a new action that represents the set of settings.
+func convertSettingToAction(settings []Setting) Action {
+
+	newAction := Action{}
+
+	newAction.Mode = "Setting"
+	newAction.Name = "Setting"
+	newAction.Number = 1
+
+	// Look through settings and buuld up the new action.
+	for _, setting := range settings {
+
+		if setting.Channel == "Speed" {
+			newAction.RotateSpeed = setting.Value
+		}
+		if setting.Channel == "Fade" {
+			newAction.Fade = setting.Value
+		}
+
+		if setting.Channel == "Size" {
+			newAction.Fade = setting.Value
+		}
+
+		if setting.Channel == "Rotate" {
+			newAction.Rotate = setting.Value
+		}
+
+		if setting.Channel == "RotateSpeed" {
+			newAction.RotateSpeed = setting.Value
+		}
+
+		if setting.Channel == "Program" {
+			newAction.Program = setting.Value
+		}
+
+		if setting.Channel == "ProgramSpeed" {
+			newAction.ProgramSpeed = setting.Value
+		}
+
+		// A channel setting can only contain one value
+		// so only one color.
+		if setting.Channel == "Color" {
+			newAction.Colors = append(newAction.Colors, setting.Value)
+		}
+
+		if setting.Channel == "Strobe" {
+			newAction.Strobe = setting.Value
+		}
+
+		if setting.Channel == "StrobeSpeed" {
+			newAction.StrobeSpeed = setting.Value
+		}
+
+		if setting.Channel == "Gobo" {
+			newAction.Gobo = setting.Value
+		}
+
+		if setting.Channel == "GoboSpeed" {
+			newAction.GoboSpeed = setting.Value
+		}
+
+	}
+	return newAction
 }

@@ -336,11 +336,21 @@ func main() {
 					newOverride.Size = cfg.Size
 					newOverride.Fade = cfg.Fade
 					newOverride.RotateSpeed = cfg.RotateSpeed
-					newOverride.Colors = cfg.Colors
-					newOverride.Gobo = cfg.Gobo
+					if action.Mode == "Setting" {
+						newOverride.Colors = cfg.Colors
+						newOverride.Gobo, _ = strconv.Atoi(action.Gobo)
+					} else {
+						newOverride.Colors = cfg.Colors
+						newOverride.Gobo = cfg.Gobo
+					}
+
 					this.SwitchOverrides[switchNumber] = append(this.SwitchOverrides[switchNumber], newOverride)
 					if debug {
-						fmt.Printf("Switch Number %d State Number %d config %d\n", swiTch.Number, state.Number, newOverride.Speed)
+						fmt.Printf("Action Name %s\n", action.Name)
+						fmt.Printf("\tSwitch Number %d State Number %d\n", swiTch.Number, state.Number)
+						fmt.Printf("\t\t Rotate Speed %d\n", newOverride.RotateSpeed)
+						fmt.Printf("\t\t Colors %+v\n", newOverride.Colors)
+						fmt.Printf("\t\t Gobo action %s newOverride Gobo %d\n", action.Gobo, newOverride.Gobo)
 					}
 				}
 			}
