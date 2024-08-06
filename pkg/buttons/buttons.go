@@ -1099,7 +1099,7 @@ func ProcessButtons(X int, Y int,
 			this.EditWhichStaticSequence = 4
 		}
 
-		control := getColorList(sequences[this.SelectedSequence].SequenceColors)
+		control := getColorList(sequences[this.ChaserSequenceNumber].SequenceColors)
 		common.UpdateColorDisplay(control, guiButtons)
 
 		return
