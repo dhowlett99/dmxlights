@@ -201,7 +201,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
-	showStatusBars(this.SelectedType, this, sequences, eventsForLaunchpad, guiButtons)
+	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 	// Light the sequence selector button.
 	lightSelectedButton(eventsForLaunchpad, guiButtons, this)

@@ -6,7 +6,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func showStatusBars(selectedType string, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	debug := false
 
@@ -19,7 +19,7 @@ func showStatusBars(selectedType string, this *CurrentState, sequences []*common
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
 	// Make sure modes are setup.
-	if selectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
+	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
 		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
@@ -40,7 +40,7 @@ func showStatusBars(selectedType string, this *CurrentState, sequences []*common
 	UpdateFade(this, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
-	showBottomLabels(selectedType, this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this, eventsForLaunchpad, guiButtons)
 
 	// Hide the color editing buttons.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -126,10 +126,10 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	}
 }
 
-func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("showBottomLabels type=%s\n", selectedType)
+		fmt.Printf("showBottomLabels type=%s fixture type=%s\n", this.SelectedType, this.SelectedFixtureType)
 	}
 
 	type bottonButton struct {
@@ -196,7 +196,7 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 	bottomRow := 7
 
 	// RGB Front of house or uplighters.
-	if selectedType == "rgb" {
+	if this.SelectedType == "rgb" {
 
 		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
@@ -217,7 +217,7 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 	}
 
 	// Scanner showing rotate functions.
-	if selectedType == "scanner" &&
+	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == NORMAL || this.SelectedMode[this.DisplaySequence] == FUNCTION || this.SelectedMode[this.DisplaySequence] == STATUS) {
 
 		common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", getScannerShiftLabel(this.ScannerShift[this.TargetSequence])), "shift", false, guiButtons)
@@ -235,7 +235,7 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 	}
 
 	// Shutter chaser showing RGB chase functions.
-	if selectedType == "scanner" &&
+	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY || this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION) {
 
 		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
@@ -253,7 +253,7 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 	}
 
 	// Switch functions.
-	if selectedType == "switch" {
+	if this.SelectedType == "switch" && this.SelectedFixtureType != "projector" {
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomSwitchButtons {
 			if debug {
@@ -262,17 +262,17 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
+		showSwitchColorDisplay(this, guiButtons)
 	}
 
 	// Projector functions.
-	if selectedType == "projector" {
+	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 		common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed), "speed", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Gobo %s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName), "fade", false, guiButtons)
 		common.UpdateStatusBar("Colors", "size", false, guiButtons)
-		control := getColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
-		common.UpdateColorDisplay(control, guiButtons)
+		showSwitchColorDisplay(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomProjectorButtons {
@@ -283,6 +283,17 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
+}
+
+func showSwitchColorDisplay(this *CurrentState, guiButtons chan common.ALight) {
+	if debug {
+		fmt.Printf("Get color list for switch %d state %d\n", this.SelectedSwitch, this.SwitchPosition[this.SelectedSwitch])
+	}
+	control := getColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
+	if debug {
+		fmt.Printf("Control %+v\n", control)
+	}
+	common.UpdateColorDisplay(control, guiButtons)
 }
 
 func getColorList(colors []common.Color) common.ColorDisplayControl {

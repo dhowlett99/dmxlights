@@ -110,11 +110,12 @@ func (panel *MyPanel) ListenAndSendToGUI(guiButtons chan common.ALight, GuiFlash
 	go func() {
 		for {
 			alight := <-guiButtons
-			panel.UpdateButtonColor(alight, GuiFlashButtons)
+			if !alight.ColorDisplay {
+				panel.UpdateButtonColor(alight, GuiFlashButtons)
+			}
 
-			emptyColorDisplay := common.ColorDisplayControl{}
-			if alight.ColorDisplay != emptyColorDisplay {
-				panel.UpdateColorDisplay(alight.ColorDisplay)
+			if alight.ColorDisplay {
+				panel.UpdateColorDisplay(alight.ColorDisplayControl)
 			}
 		}
 	}()

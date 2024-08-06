@@ -309,16 +309,14 @@ func main() {
 			switchConfig := commands.LoadSwitchConfiguration(this.SwitchSequenceNumber, fixturesConfig)
 
 			// Populate each switch with a number of states based on their config.
-
-			for switchNumber := 0; switchNumber < len(switchConfig); switchNumber++ {
+			for swiTchNumber := 0; swiTchNumber < len(switchConfig); swiTchNumber++ {
 
 				// assign the switch.
-				swiTch := switchConfig[switchNumber]
+				swiTch := switchConfig[swiTchNumber]
 
 				// Now populate the states.
 				for stateNumber := 0; stateNumber < len(swiTch.States); stateNumber++ {
 
-					// Assign state.
 					state := swiTch.States[stateNumber]
 
 					// Find the details of the fixture for this switch.
@@ -328,30 +326,15 @@ func main() {
 					}
 
 					// Load the config for this state of of this switch
-					action := fixture.GetSwitchConfig(swiTch.Number, int16(state.Number), fixturesConfig)
-					cfg := fixture.GetConfig(action, thisFixture, fixturesConfig)
-					newOverride := common.Override{}
-					newOverride.Speed = cfg.Speed
-					newOverride.Shift = cfg.Shift
-					newOverride.Size = cfg.Size
-					newOverride.Fade = cfg.Fade
-					newOverride.RotateSpeed = cfg.RotateSpeed
-					if action.Mode == "Setting" {
-						newOverride.Colors = cfg.Colors
-						newOverride.Gobo, _ = strconv.Atoi(action.Gobo)
-						newOverride.GoboName = fixture.FindGoboByDMXValue(thisFixture, action.Gobo)
-					} else {
-						newOverride.Colors = cfg.Colors
-						newOverride.Gobo = cfg.Gobo
-					}
+					override := fixture.DiscoverSwitchOveride(thisFixture, swiTch.Number, int(state.Number), fixturesConfig)
 
-					this.SwitchOverrides[switchNumber] = append(this.SwitchOverrides[switchNumber], newOverride)
+					// Assign this discovered override to the current switch state.
+					this.SwitchOverrides[swiTchNumber] = append(this.SwitchOverrides[swiTchNumber], override)
+
 					if debug {
-						fmt.Printf("Action Name %s\n", action.Name)
-						fmt.Printf("\tSwitch Number %d State Number %d\n", swiTch.Number, state.Number)
-						fmt.Printf("\t\t Rotate Speed %d\n", newOverride.RotateSpeed)
-						fmt.Printf("\t\t Colors %+v\n", newOverride.Colors)
-						fmt.Printf("\t\t Gobo action %s newOverride Gobo %d\n", action.Gobo, newOverride.Gobo)
+						fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
+						fmt.Printf("\t Override Colors %+v\n", override.Colors)
+
 					}
 				}
 			}

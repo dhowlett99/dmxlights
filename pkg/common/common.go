@@ -112,22 +112,23 @@ type ColorDisplayControl struct {
 }
 
 type ALight struct {
-	Button           Button
-	Brightness       int
-	Red              int
-	Green            int
-	Blue             int
-	Flash            bool
-	OnColor          Color
-	OffColor         Color
-	UpdateLabel      bool
-	Label            string
-	UpdateStatus     bool
-	Status           string
-	Which            string
-	FlashStopChannel chan bool
-	Hidden           bool
-	ColorDisplay     ColorDisplayControl
+	Button              Button
+	Brightness          int
+	Red                 int
+	Green               int
+	Blue                int
+	Flash               bool
+	OnColor             Color
+	OffColor            Color
+	UpdateLabel         bool
+	Label               string
+	UpdateStatus        bool
+	Status              string
+	Which               string
+	FlashStopChannel    chan bool
+	Hidden              bool
+	ColorDisplay        bool
+	ColorDisplayControl ColorDisplayControl
 }
 
 type Color struct {
@@ -1180,7 +1181,8 @@ func LightLamp(button Button, color Color, master int, eventsForLauchpad chan AL
 
 func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	event := ALight{
-		ColorDisplay: control,
+		ColorDisplay:        true,
+		ColorDisplayControl: control,
 	}
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }

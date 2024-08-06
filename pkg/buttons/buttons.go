@@ -64,6 +64,7 @@ type CurrentState struct {
 	StaticFlashing              []bool                     // Static buttons are flashing, indexed by sequence.
 	SavedSequenceColors         map[int][]common.Color     // Local storage for sequence colors.
 	SelectedType                string                     // The currently selected sequenece type.
+	SelectedFixtureType         string                     // The use fixture type for a switch.
 	LastSelectedSwitch          int                        // The last selected switch.
 	LastSelectedSequence        int                        // Store fof the last selected squence.
 	MusicTrigger                bool                       // Does this seleted switch have a music trigger.
@@ -1629,6 +1630,8 @@ func ProcessButtons(X int, Y int,
 
 		this.SelectedSequence = Y
 		this.SelectedSwitch = X
+		this.SelectedType = "switch"
+		this.SelectedFixtureType = fixture.GetSwitchFixtureType(this.SelectedSwitch, int16(this.SwitchPosition[this.SelectedSwitch]), fixturesConfig)
 
 		if debug {
 			fmt.Printf("Switch Key X:%d Y:%d\n", this.SelectedSwitch, this.SelectedSequence)
@@ -1644,8 +1647,6 @@ func ProcessButtons(X int, Y int,
 
 		// We have a valid switch.
 		if this.SelectedSwitch < len(sequences[this.SelectedSequence].Switches) {
-
-			this.SelectedType = "switch"
 
 			// Second time we've pressed this switch button, actually step the state.
 			if this.SelectedSwitch == this.LastSelectedSwitch {
@@ -1701,8 +1702,7 @@ func ProcessButtons(X int, Y int,
 		UpdateFade(this, guiButtons)
 
 		// Update the labels.
-		selectedType := fixture.GetSwitchFixtureType(this.SelectedSwitch, int16(this.SwitchPosition[this.SelectedSwitch]), fixturesConfig)
-		showStatusBars(selectedType, this, sequences, eventsForLaunchpad, guiButtons)
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		// Light the sequence selector button.
 		lightSelectedButton(eventsForLaunchpad, guiButtons, this)
@@ -2643,7 +2643,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	showBottomLabels(this.SelectedType, this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
