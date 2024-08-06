@@ -131,6 +131,11 @@ const Magenta = 7
 
 func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
 
+	// Clear all colors.
+	for _, button := range panel.ColorDisplay.Objects {
+		button.(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = true
+	}
+
 	if control.Red {
 		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}

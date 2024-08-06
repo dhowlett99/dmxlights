@@ -1049,6 +1049,9 @@ func ProcessButtons(X int, Y int,
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 0
 
+		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
+
 		return
 	}
 
@@ -1069,6 +1072,9 @@ func ProcessButtons(X int, Y int,
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 1
+
+		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
 
 		return
 	}
@@ -1091,6 +1097,9 @@ func ProcessButtons(X int, Y int,
 		if this.ScannerChaser[this.SelectedSequence] {
 			this.EditWhichStaticSequence = 4
 		}
+
+		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
 
 		return
 	}
