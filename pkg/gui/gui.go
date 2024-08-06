@@ -936,7 +936,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	magenta.container = container.NewStack(magenta.rectangle)
 
 	return container.New(
-		layout.NewGridLayoutWithRows(3),
+		layout.NewHBoxLayout(),
 
 		// Top row.
 		red.container,
