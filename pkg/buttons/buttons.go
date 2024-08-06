@@ -1040,7 +1040,7 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
-		deFocusSingleSwitch(this, sequences, commandChannels)
+		deFocusAllSwitches(this, sequences, commandChannels)
 
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
@@ -1065,7 +1065,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
-		deFocusSingleSwitch(this, sequences, commandChannels)
+		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.ShowRGBColorPicker = false
@@ -1089,7 +1089,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
-		deFocusSingleSwitch(this, sequences, commandChannels)
+		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 		this.ShowRGBColorPicker = false
