@@ -1180,6 +1180,11 @@ func LightLamp(button Button, color Color, master int, eventsForLauchpad chan AL
 }
 
 func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
+
+	if debug {
+		fmt.Printf("UpdateColorDisplay: control %+v\n", control)
+	}
+
 	event := ALight{
 		ColorDisplay:        true,
 		ColorDisplayControl: control,

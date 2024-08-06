@@ -1050,7 +1050,7 @@ func ProcessButtons(X int, Y int,
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 0
 
-		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		control := getColorList(sequences[this.SelectedSequence].SequenceColors)
 		common.UpdateColorDisplay(control, guiButtons)
 
 		return
@@ -1074,7 +1074,7 @@ func ProcessButtons(X int, Y int,
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 1
 
-		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		control := getColorList(sequences[this.SelectedSequence].SequenceColors)
 		common.UpdateColorDisplay(control, guiButtons)
 
 		return
@@ -1099,7 +1099,7 @@ func ProcessButtons(X int, Y int,
 			this.EditWhichStaticSequence = 4
 		}
 
-		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		control := getColorList(sequences[this.SelectedSequence].SequenceColors)
 		common.UpdateColorDisplay(control, guiButtons)
 
 		return
