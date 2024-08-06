@@ -269,8 +269,10 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 
 		common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed), "speed", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Color %+v", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors), "size", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Gobo %s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName), "fade", false, guiButtons)
+		common.UpdateStatusBar("Colors", "size", false, guiButtons)
+		control := getColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
+		common.UpdateColorDisplay(control, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomProjectorButtons {
@@ -281,4 +283,67 @@ func showBottomLabels(selectedType string, this *CurrentState, eventsForLauchpad
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 	}
+}
+
+func getColorList(colors []common.Color) common.ColorDisplayControl {
+
+	control := common.ColorDisplayControl{}
+
+	for _, color := range colors {
+		found := common.GetColorNameByRGB(color)
+		switch {
+		case found == "Red":
+			control.Red = true
+		case found == "Yellow":
+			control.Yellow = true
+		case found == "Green":
+			control.Green = true
+		case found == "Cyan":
+			control.Cyan = true
+		case found == "Blue":
+			control.Blue = true
+		case found == "Purple":
+			control.Purple = true
+		case found == "Magenta":
+			control.Magenta = true
+
+		case found == "Crimson":
+			control.Crimson = true
+		case found == "DarkOrange":
+			control.DarkOrange = true
+		case found == "Gold":
+			control.Gold = true
+		case found == "ForestGreen":
+			control.ForestGreen = true
+		case found == "Aqua":
+			control.Aqua = true
+		case found == "SkyBlue":
+			control.SkyBlue = true
+		case found == "DarkPurple":
+			control.DarkPurple = true
+		case found == "Pink":
+			control.Pink = true
+
+		case found == "Salmon":
+			control.Salmon = true
+		case found == "LightOrange":
+			control.LightOrange = true
+		case found == "Olive":
+			control.Olive = true
+		case found == "LawnGreen":
+			control.LawnGreen = true
+		case found == "Teal":
+			control.Teal = true
+
+		case found == "LightBlue":
+			control.LightBlue = true
+		case found == "Violet":
+			control.Violet = true
+		case found == "White":
+			control.White = true
+		}
+
+	}
+	return control
+
 }

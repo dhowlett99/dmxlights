@@ -81,6 +81,36 @@ type Button struct {
 	X int
 	Y int
 }
+
+type ColorDisplayControl struct {
+	Red     bool
+	Orange  bool
+	Yellow  bool
+	Green   bool
+	Cyan    bool
+	Blue    bool
+	Purple  bool
+	Magenta bool
+
+	Crimson     bool
+	DarkOrange  bool
+	Gold        bool
+	ForestGreen bool
+	Aqua        bool
+	SkyBlue     bool
+	DarkPurple  bool
+	Pink        bool
+
+	Salmon      bool
+	LightOrange bool
+	Olive       bool
+	LawnGreen   bool
+	Teal        bool
+	LightBlue   bool
+	Violet      bool
+	White       bool
+}
+
 type ALight struct {
 	Button           Button
 	Brightness       int
@@ -97,6 +127,7 @@ type ALight struct {
 	Which            string
 	FlashStopChannel chan bool
 	Hidden           bool
+	ColorDisplay     ColorDisplayControl
 }
 
 type Color struct {
@@ -1147,6 +1178,13 @@ func LightLamp(button Button, color Color, master int, eventsForLauchpad chan AL
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
+func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
+	event := ALight{
+		ColorDisplay: control,
+	}
+	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
+}
+
 func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALight) {
 	// Send message to fyne.io GUI.
 	event := ALight{
@@ -1566,11 +1604,4 @@ func GetColor(X int, Y int) ColorPicker {
 		}
 	}
 	return ColorPicker{}
-}
-
-func makeIntMatrix(NumberOfSwitches, NumberOfPositions int) {
-	matrix := make([][]int, NumberOfSwitches)
-	for i := 0; i < NumberOfSwitches; i++ {
-		matrix[i] = make([]int, NumberOfPositions)
-	}
 }

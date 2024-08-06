@@ -68,35 +68,6 @@ type MyPanel struct {
 	MasterLabel      *widget.Label
 }
 
-type ColorDisplayControl struct {
-	Red     bool
-	Orange  bool
-	Yellow  bool
-	Green   bool
-	Cyan    bool
-	Blue    bool
-	Purple  bool
-	Magenta bool
-
-	Crimson     bool
-	DarkOrange  bool
-	Gold        bool
-	ForestGreen bool
-	Aqua        bool
-	SkyBlue     bool
-	DarkPurple  bool
-	Pink        bool
-
-	Salmon      bool
-	LightOrange bool
-	Olive       bool
-	LawnGreen   bool
-	Teal        bool
-	LightBlue   bool
-	Violet      bool
-	White       bool
-}
-
 func NewPanel() MyPanel {
 
 	panel := MyPanel{}
@@ -116,7 +87,7 @@ func NewPanel() MyPanel {
 	}
 
 	// Create an empty color display.
-	emptyColorDisplay := ColorDisplayControl{}
+	emptyColorDisplay := common.ColorDisplayControl{}
 	panel.ColorDisplay = ShowColorDisplay(emptyColorDisplay)
 
 	return panel
@@ -140,8 +111,53 @@ func (panel *MyPanel) ListenAndSendToGUI(guiButtons chan common.ALight, GuiFlash
 		for {
 			alight := <-guiButtons
 			panel.UpdateButtonColor(alight, GuiFlashButtons)
+
+			emptyColorDisplay := common.ColorDisplayControl{}
+			if alight.ColorDisplay != emptyColorDisplay {
+				panel.UpdateColorDisplay(alight.ColorDisplay)
+			}
 		}
 	}()
+}
+
+const Red = 0
+const Orange = 1
+const Yellow = 2
+const Green = 3
+const Cyan = 4
+const Blue = 5
+const Purple = 6
+const Magenta = 7
+
+func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
+
+	if control.Red {
+		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Orange {
+		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Yellow {
+		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Green {
+		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Cyan {
+		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Blue {
+		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Purple {
+		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Magenta {
+		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+
+	panel.ColorDisplay.Hidden = false
+	panel.ColorDisplay.Refresh()
 }
 
 func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons [][]common.ALight) {
@@ -724,270 +740,199 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	return modal
 }
 
-func ShowColorDisplay(control ColorDisplayControl) *fyne.Container {
+func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 
 	red := Button{}
-	if control.Red {
-		red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
-	} else {
-		red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 0})
-	}
+	red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
 	red.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	red.rectangle.StrokeColor = color.Black
 	red.rectangle.StrokeWidth = 1
+	red.rectangle.Hidden = true
 	red.container = container.NewStack(red.rectangle)
 
 	orange := Button{}
-	if control.Orange {
-		orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
-	} else {
-		orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 0})
-	}
+	orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
 	orange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	orange.rectangle.StrokeColor = color.Black
 	orange.rectangle.StrokeWidth = 1
+	orange.rectangle.Hidden = true
 	orange.container = container.NewStack(orange.rectangle)
 
 	yellow := Button{}
-	if control.Yellow {
-		yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
-	} else {
-		yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 0})
-	}
+	yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
 	yellow.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	yellow.rectangle.StrokeColor = color.Black
 	yellow.rectangle.StrokeWidth = 1
+	yellow.rectangle.Hidden = true
 	yellow.container = container.NewStack(yellow.rectangle)
 
 	green := Button{}
-	if control.Green {
-		green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
-	} else {
-		green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 0})
-	}
+	green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	green.rectangle.Hidden = true
 	green.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	green.rectangle.StrokeColor = color.Black
 	green.rectangle.StrokeWidth = 1
+	green.rectangle.Hidden = true
 	green.container = container.NewStack(green.rectangle)
 
 	cyan := Button{}
-	if control.Cyan {
-		cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
-	} else {
-		cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 0})
-	}
+	cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
 	cyan.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	cyan.rectangle.StrokeColor = color.Black
 	cyan.rectangle.StrokeWidth = 1
+	cyan.rectangle.Hidden = true
 	cyan.container = container.NewStack(cyan.rectangle)
 
 	blue := Button{}
-	if control.Blue {
-		blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
-	} else {
-		blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 0})
-	}
+	blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
 	blue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	blue.rectangle.StrokeColor = color.Black
 	blue.rectangle.StrokeWidth = 1
+	blue.rectangle.Hidden = true
 	blue.container = container.NewStack(blue.rectangle)
 
 	purple := Button{}
-	if control.Purple {
-		purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
-	} else {
-		purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 0})
-	}
+	purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
 	purple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	purple.rectangle.StrokeColor = color.Black
 	purple.rectangle.StrokeWidth = 1
+	purple.rectangle.Hidden = true
 	purple.container = container.NewStack(purple.rectangle)
 
 	pink := Button{}
-	if control.Pink {
-		pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
-	} else {
-		pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 0})
-	}
+	pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
 	pink.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	pink.rectangle.StrokeColor = color.Black
 	pink.rectangle.StrokeWidth = 1
+	pink.rectangle.Hidden = true
 	pink.container = container.NewStack(pink.rectangle)
 
 	crimsom := Button{}
-	if control.Crimson {
-		crimsom.rectangle = canvas.NewRectangle(color.RGBA{R: 220, G: 20, B: 60, A: 255})
-	} else {
-		crimsom.rectangle = canvas.NewRectangle(color.RGBA{R: 220, G: 20, B: 60, A: 0})
-	}
+	crimsom.rectangle = canvas.NewRectangle(color.RGBA{R: 220, G: 20, B: 60, A: 255})
 	crimsom.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	crimsom.rectangle.StrokeColor = color.Black
 	crimsom.rectangle.StrokeWidth = 1
+	crimsom.rectangle.Hidden = true
 	crimsom.container = container.NewStack(crimsom.rectangle)
 
 	darkOrange := Button{}
-	if control.DarkOrange {
-		darkOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 215, G: 50, B: 0, A: 255})
-	} else {
-		darkOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 215, G: 50, B: 0, A: 0})
-	}
+	darkOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 215, G: 50, B: 0, A: 255})
 	darkOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkOrange.rectangle.StrokeColor = color.Black
 	darkOrange.rectangle.StrokeWidth = 1
+	darkOrange.rectangle.Hidden = true
 	darkOrange.container = container.NewStack(darkOrange.rectangle)
 
 	gold := Button{}
-	if control.Gold {
-		gold.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 215, B: 0, A: 255})
-	} else {
-		gold.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 215, B: 0, A: 0})
-	}
+	gold.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 215, B: 0, A: 255})
 	gold.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	gold.rectangle.StrokeColor = color.Black
 	gold.rectangle.StrokeWidth = 1
+	gold.rectangle.Hidden = true
 	gold.container = container.NewStack(gold.rectangle)
 
 	forestGreen := Button{}
-	if control.ForestGreen {
-		forestGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 100, B: 0, A: 255})
-	} else {
-		forestGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 100, B: 0, A: 0})
-	}
+	forestGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 100, B: 0, A: 255})
 	forestGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	forestGreen.rectangle.StrokeColor = color.Black
 	forestGreen.rectangle.StrokeWidth = 1
+	forestGreen.rectangle.Hidden = true
 	forestGreen.container = container.NewStack(forestGreen.rectangle)
 
 	aqua := Button{}
-	if control.Aqua {
-		aqua.rectangle = canvas.NewRectangle(color.RGBA{R: 127, G: 255, B: 212, A: 255})
-	} else {
-		aqua.rectangle = canvas.NewRectangle(color.RGBA{R: 127, G: 255, B: 212, A: 0})
-	}
+	aqua.rectangle = canvas.NewRectangle(color.RGBA{R: 127, G: 255, B: 212, A: 255})
 	aqua.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	aqua.rectangle.StrokeColor = color.Black
 	aqua.rectangle.StrokeWidth = 1
+	aqua.rectangle.Hidden = true
 	aqua.container = container.NewStack(aqua.rectangle)
 
 	skyBlue := Button{}
-	if control.SkyBlue {
-		skyBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 191, B: 255, A: 255})
-	} else {
-		skyBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 191, B: 255, A: 0})
-	}
+	skyBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 191, B: 255, A: 255})
 	skyBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	skyBlue.rectangle.StrokeColor = color.Black
 	skyBlue.rectangle.StrokeWidth = 1
+	skyBlue.rectangle.Hidden = true
 	skyBlue.container = container.NewStack(skyBlue.rectangle)
 
 	darkPurple := Button{}
-	if control.DarkPurple {
-		darkPurple.rectangle = canvas.NewRectangle(color.RGBA{R: 50, G: 0, B: 255, A: 255})
-	} else {
-		darkPurple.rectangle = canvas.NewRectangle(color.RGBA{R: 50, G: 0, B: 255, A: 0})
-	}
+	darkPurple.rectangle = canvas.NewRectangle(color.RGBA{R: 50, G: 0, B: 255, A: 255})
 	darkPurple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkPurple.rectangle.StrokeColor = color.Black
 	darkPurple.rectangle.StrokeWidth = 1
+	darkPurple.rectangle.Hidden = true
 	darkPurple.container = container.NewStack(darkPurple.rectangle)
 
 	salmon := Button{}
-	if control.Salmon {
-		salmon.rectangle = canvas.NewRectangle(color.RGBA{R: 250, G: 128, B: 114, A: 255})
-	} else {
-		salmon.rectangle = canvas.NewRectangle(color.RGBA{R: 250, G: 128, B: 114, A: 0})
-	}
+	salmon.rectangle = canvas.NewRectangle(color.RGBA{R: 250, G: 128, B: 114, A: 255})
 	salmon.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	salmon.rectangle.StrokeColor = color.Black
 	salmon.rectangle.StrokeWidth = 1
+	salmon.rectangle.Hidden = true
 	salmon.container = container.NewStack(salmon.rectangle)
 
 	lightOrange := Button{}
-	if control.LightOrange {
-		lightOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 175, B: 0, A: 255})
-	} else {
-		lightOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 175, B: 0, A: 0})
-	}
+	lightOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 175, B: 0, A: 255})
 	lightOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightOrange.rectangle.StrokeColor = color.Black
 	lightOrange.rectangle.StrokeWidth = 1
+	lightOrange.rectangle.Hidden = true
 	lightOrange.container = container.NewStack(lightOrange.rectangle)
 
 	olive := Button{}
-	if control.Olive {
-		olive.rectangle = canvas.NewRectangle(color.RGBA{R: 150, G: 150, B: 0, A: 255})
-	} else {
-		olive.rectangle = canvas.NewRectangle(color.RGBA{R: 150, G: 150, B: 0, A: 0})
-	}
+	olive.rectangle = canvas.NewRectangle(color.RGBA{R: 150, G: 150, B: 0, A: 255})
 	olive.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	olive.rectangle.StrokeColor = color.Black
 	olive.rectangle.StrokeWidth = 1
+	olive.rectangle.Hidden = true
 	olive.container = container.NewStack(olive.rectangle)
 
 	lawnGreen := Button{}
-	if control.LawnGreen {
-		lawnGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 124, G: 252, B: 0, A: 255})
-	} else {
-		lawnGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 124, G: 252, B: 0, A: 0})
-	}
+	lawnGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 124, G: 252, B: 0, A: 255})
 	lawnGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lawnGreen.rectangle.StrokeColor = color.Black
 	lawnGreen.rectangle.StrokeWidth = 1
+	lawnGreen.rectangle.Hidden = true
 	lawnGreen.container = container.NewStack(lawnGreen.rectangle)
 
 	teal := Button{}
-	if control.Teal {
-		teal.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 128, B: 128, A: 255})
-	} else {
-		teal.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 128, B: 128, A: 0})
-	}
+	teal.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 128, B: 128, A: 255})
 	teal.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	teal.rectangle.StrokeColor = color.Black
 	teal.rectangle.StrokeWidth = 1
+	teal.rectangle.Hidden = true
 	teal.container = container.NewStack(teal.rectangle)
 
 	lightBlue := Button{}
-	if control.LightBlue {
-		lightBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 100, G: 185, B: 255, A: 255})
-	} else {
-		lightBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 100, G: 185, B: 255, A: 0})
-	}
+	lightBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 100, G: 185, B: 255, A: 255})
 	lightBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightBlue.rectangle.StrokeColor = color.Black
 	lightBlue.rectangle.StrokeWidth = 1
+	lightBlue.rectangle.Hidden = true
 	lightBlue.container = container.NewStack(lightBlue.rectangle)
 
 	violet := Button{}
-	if control.Violet {
-		violet.rectangle = canvas.NewRectangle(color.RGBA{R: 199, G: 21, B: 133, A: 255})
-	} else {
-		violet.rectangle = canvas.NewRectangle(color.RGBA{R: 199, G: 21, B: 133, A: 0})
-	}
+	violet.rectangle = canvas.NewRectangle(color.RGBA{R: 199, G: 21, B: 133, A: 255})
 	violet.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	violet.rectangle.StrokeColor = color.Black
 	violet.rectangle.StrokeWidth = 1
+	violet.rectangle.Hidden = true
 	violet.container = container.NewStack(violet.rectangle)
 
 	white := Button{}
-	if control.White {
-		white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
-	} else {
-		white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 0})
-	}
+	white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
 	white.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	white.rectangle.StrokeColor = color.Black
 	white.rectangle.StrokeWidth = 1
+	white.rectangle.Hidden = true
 	white.container = container.NewStack(white.rectangle)
 
 	magenta := Button{}
-	if control.Magenta {
-		magenta.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
-	} else {
-		magenta.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 0})
-	}
+	magenta.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
 	magenta.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	magenta.rectangle.StrokeColor = color.Black
 	magenta.rectangle.StrokeWidth = 1
+	magenta.rectangle.Hidden = true
 	magenta.container = container.NewStack(magenta.rectangle)
 
 	return container.New(
