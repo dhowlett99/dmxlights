@@ -140,9 +140,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 	common.SendCommandToAllSequence(cmd, commandChannels)
 
-	// Update the color display.
-	control := getColorList(sequences[this.SelectedSequence].SequenceColors)
-	common.UpdateColorDisplay(control, guiButtons)
+	// Update the color display for the sequence.
+	common.UpdateSequenceColorDisplay(sequences[this.TargetSequence], guiButtons)
 
 	// Turn off the flashing save button.
 	this.SavePreset = false

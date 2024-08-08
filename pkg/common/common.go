@@ -1179,17 +1179,87 @@ func LightLamp(button Button, color Color, master int, eventsForLauchpad chan AL
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
-func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
+func UpdateSequenceColorDisplay(sequence *Sequence, guiButtons chan ALight) {
+	if debug {
+		fmt.Printf("UpdateColorDisplay: for sequence %d\n", sequence.Number)
+	}
+	control := GetColorList(sequence.SequenceColors)
+	UpdateColorDisplay(control, guiButtons)
+}
 
+func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	if debug {
 		fmt.Printf("UpdateColorDisplay: control %+v\n", control)
 	}
-
 	event := ALight{
 		ColorDisplay:        true,
 		ColorDisplayControl: control,
 	}
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
+}
+
+func GetColorList(colors []Color) ColorDisplayControl {
+
+	control := ColorDisplayControl{}
+
+	for _, color := range colors {
+		found := GetColorNameByRGB(color)
+		switch {
+		case found == "Red":
+			control.Red = true
+		case found == "Orange":
+			control.Orange = true
+		case found == "Yellow":
+			control.Yellow = true
+		case found == "Green":
+			control.Green = true
+		case found == "Cyan":
+			control.Cyan = true
+		case found == "Blue":
+			control.Blue = true
+		case found == "Purple":
+			control.Purple = true
+		case found == "Magenta":
+			control.Magenta = true
+
+		case found == "Crimson":
+			control.Crimson = true
+		case found == "DarkOrange":
+			control.DarkOrange = true
+		case found == "Gold":
+			control.Gold = true
+		case found == "ForestGreen":
+			control.ForestGreen = true
+		case found == "Aqua":
+			control.Aqua = true
+		case found == "SkyBlue":
+			control.SkyBlue = true
+		case found == "DarkPurple":
+			control.DarkPurple = true
+		case found == "Pink":
+			control.Pink = true
+
+		case found == "Salmon":
+			control.Salmon = true
+		case found == "LightOrange":
+			control.LightOrange = true
+		case found == "Olive":
+			control.Olive = true
+		case found == "LawnGreen":
+			control.LawnGreen = true
+		case found == "Teal":
+			control.Teal = true
+		case found == "LightBlue":
+			control.LightBlue = true
+		case found == "Violet":
+			control.Violet = true
+		case found == "White":
+			control.White = true
+		}
+
+	}
+	return control
+
 }
 
 func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALight) {

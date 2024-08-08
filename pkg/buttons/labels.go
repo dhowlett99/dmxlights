@@ -289,72 +289,9 @@ func showSwitchColorDisplay(this *CurrentState, guiButtons chan common.ALight) {
 	if debug {
 		fmt.Printf("Get color list for switch %d state %d\n", this.SelectedSwitch, this.SwitchPosition[this.SelectedSwitch])
 	}
-	control := getColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
+	control := common.GetColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
 	if debug {
 		fmt.Printf("Control %+v\n", control)
 	}
 	common.UpdateColorDisplay(control, guiButtons)
-}
-
-func getColorList(colors []common.Color) common.ColorDisplayControl {
-
-	control := common.ColorDisplayControl{}
-
-	for _, color := range colors {
-		found := common.GetColorNameByRGB(color)
-		switch {
-		case found == "Red":
-			control.Red = true
-		case found == "Yellow":
-			control.Yellow = true
-		case found == "Green":
-			control.Green = true
-		case found == "Cyan":
-			control.Cyan = true
-		case found == "Blue":
-			control.Blue = true
-		case found == "Purple":
-			control.Purple = true
-		case found == "Magenta":
-			control.Magenta = true
-
-		case found == "Crimson":
-			control.Crimson = true
-		case found == "DarkOrange":
-			control.DarkOrange = true
-		case found == "Gold":
-			control.Gold = true
-		case found == "ForestGreen":
-			control.ForestGreen = true
-		case found == "Aqua":
-			control.Aqua = true
-		case found == "SkyBlue":
-			control.SkyBlue = true
-		case found == "DarkPurple":
-			control.DarkPurple = true
-		case found == "Pink":
-			control.Pink = true
-
-		case found == "Salmon":
-			control.Salmon = true
-		case found == "LightOrange":
-			control.LightOrange = true
-		case found == "Olive":
-			control.Olive = true
-		case found == "LawnGreen":
-			control.LawnGreen = true
-		case found == "Teal":
-			control.Teal = true
-
-		case found == "LightBlue":
-			control.LightBlue = true
-		case found == "Violet":
-			control.Violet = true
-		case found == "White":
-			control.White = true
-		}
-
-	}
-	return control
-
 }
