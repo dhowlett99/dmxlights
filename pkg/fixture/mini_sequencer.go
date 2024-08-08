@@ -20,6 +20,7 @@ package fixture
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 	"strconv"
 	"time"
@@ -727,10 +728,10 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Colors
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
-							override.Colors = cmd.Args[COLORS].Value.([]common.Color)
-							cfg.Colors = cmd.Args[COLORS].Value.([]common.Color)
+							override.Colors = cmd.Args[COLORS].Value.([]color.NRGBA)
+							cfg.Colors = cmd.Args[COLORS].Value.([]color.NRGBA)
 							if debug_mini {
-								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]common.Color))
+								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]color.NRGBA))
 							}
 						}
 

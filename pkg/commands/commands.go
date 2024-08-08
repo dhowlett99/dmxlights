@@ -19,6 +19,7 @@ package commands
 
 import (
 	"fmt"
+	"image/color"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -75,7 +76,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = common.DefaultSequenceColors
-		sequence.CurrentColors = []common.Color{}
+		sequence.CurrentColors = []color.NRGBA{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
 		sequence.CurrentSpeed = common.SetSpeed(common.DEFAULT_SPEED)
@@ -468,13 +469,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update All Static Colors\n", mySequenceNumber)
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
-			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(color.NRGBA))
 			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(bool))
 		}
 		// Set fixtures.
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			sequence.StaticColors[fixture].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
-			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(color.NRGBA)
 			sequence.StaticColors[fixture].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
@@ -492,7 +493,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const STATIC_COLOR = 4          // Color
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
-			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(color.NRGBA))
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
@@ -504,7 +505,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StaticColors[fixture].Flash = false
 		}
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
-		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(color.NRGBA)
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		return sequence
 
@@ -532,7 +533,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update Sequence Color to %+v\n", mySequenceNumber, command.Args[COLORS].Value)
 		}
 
-		sequence.SequenceColors = command.Args[COLORS].Value.([]common.Color)
+		sequence.SequenceColors = command.Args[COLORS].Value.([]color.NRGBA)
 		sequence.UpdateSequenceColor = true
 		sequence.SaveColors = true
 
@@ -553,8 +554,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
 		}
 		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = []common.Color{}
-		sequence.CurrentColors = []common.Color{}
+		sequence.SequenceColors = []color.NRGBA{}
+		sequence.CurrentColors = []color.NRGBA{}
 		return sequence
 
 	case common.ClearStaticColor:
@@ -1121,7 +1122,7 @@ func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorB
 			newFixture.Label = fixture.Label
 			newFixture.Number = fixture.Number
 			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			newFixture.Color = color.NRGBA{R: 255, G: 0, B: 0}
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}

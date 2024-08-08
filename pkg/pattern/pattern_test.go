@@ -18,6 +18,7 @@ package pattern
 
 import (
 	"fmt"
+	"image/color"
 	"reflect"
 	"testing"
 
@@ -175,42 +176,42 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 32, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 32, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 232, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 232, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 232, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 232, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 255, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 255, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 232, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 232, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 32, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 32, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 32, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 32, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -259,50 +260,50 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -351,50 +352,50 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -444,66 +445,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -552,42 +553,42 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -616,20 +617,20 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -678,66 +679,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},
@@ -786,66 +787,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 100, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 255}, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 0}, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Color{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.Color{R: 255, G: 255, B: 255, W: 0, A: 0, UV: 0}},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 0, B: 255}, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 0, G: 255, B: 0}, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: color.NRGBA{R: 255, G: 111, B: 0}, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: color.NRGBA{R: 255, G: 255, B: 255}},
 						},
 					},
 				},

@@ -64,7 +64,7 @@ const DEFAULT_STROBE_SPEED = 255
 const IS_SCANNER = true
 const IS_RGB = false
 
-var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
+var DefaultSequenceColors = []color.NRGBA{{R: 0, G: 255, B: 0}}
 var GlobalScannerSequenceNumber int
 
 var FLOOD_BUTTON = Button{X: 8, Y: 3}
@@ -114,12 +114,12 @@ type ColorDisplayControl struct {
 type ALight struct {
 	Button              Button
 	Brightness          int
-	Red                 int
-	Green               int
-	Blue                int
+	Red                 uint8
+	Green               uint8
+	Blue                uint8
 	Flash               bool
-	OnColor             Color
-	OffColor            Color
+	OnColor             color.NRGBA
+	OffColor            color.NRGBA
 	UpdateLabel         bool
 	Label               string
 	UpdateStatus        bool
@@ -131,19 +131,14 @@ type ALight struct {
 	ColorDisplayControl ColorDisplayControl
 }
 
-type Color struct {
-	R     int
-	G     int
-	B     int
-	W     int
-	A     int
-	UV    int
-	Flash bool
-}
+// type Color struct {
+// 	Color color.NRGBA
+// 	Flash bool
+// }
 
 // Used for static fades, remember the last color.
 type LastColor struct {
-	RGBColor     Color
+	RGBColor     color.NRGBA
 	ScannerColor int
 }
 
@@ -151,15 +146,15 @@ type ColorPicker struct {
 	Name  string
 	ID    int
 	Code  byte // Launchpad hex code for this color
-	Color Color
+	Color color.NRGBA
 	X     int
 	Y     int
 }
 
 // Used in calculating Positions.
 type FixtureBuffer struct {
-	BaseColor    Color
-	Color        Color
+	BaseColor    color.NRGBA
+	Color        color.NRGBA
 	MasterDimmer int
 	Brightness   int
 	Gobo         int
@@ -241,7 +236,7 @@ type Override struct {
 	Size        int
 	Fade        int
 	RotateSpeed int
-	Colors      []Color
+	Colors      []color.NRGBA
 	Gobo        int
 	GoboName    string
 }
@@ -253,7 +248,7 @@ type StaticColorButton struct {
 	X                int
 	Y                int
 	SelectedSequence int
-	Color            Color
+	Color            color.NRGBA
 	SelectedColor    int
 	Flash            bool
 	Setting          int
@@ -361,39 +356,39 @@ const (
 // 13 fade up values, 13 on values and 13 off values.
 const StepSize = 39
 
-var Black = Color{R: 0, G: 0, B: 0}
-var Red = Color{R: 255, G: 0, B: 0}
-var QuarterRed = Color{R: 50, G: 0, B: 0}
-var Green = Color{R: 0, G: 255, B: 0}
-var QuarterGreen = Color{R: 0, G: 50, B: 0}
-var Blue = Color{R: 0, G: 0, B: 255}
-var QuarterBlue = Color{R: 0, G: 0, B: 50}
-var PresetYellow = Color{R: 150, G: 150, B: 0}
-var Cyan = Color{R: 0, G: 255, B: 255}
-var Yellow = Color{R: 255, G: 255, B: 0}
-var QuarterYellow = Color{R: 50, G: 50, B: 0}
-var Orange = Color{R: 255, G: 111, B: 0}
-var Magenta = Color{R: 255, G: 0, B: 255}
+var Black = color.NRGBA{R: 0, G: 0, B: 0}
+var Red = color.NRGBA{R: 255, G: 0, B: 0}
+var QuarterRed = color.NRGBA{R: 50, G: 0, B: 0}
+var Green = color.NRGBA{R: 0, G: 255, B: 0}
+var QuarterGreen = color.NRGBA{R: 0, G: 50, B: 0}
+var Blue = color.NRGBA{R: 0, G: 0, B: 255}
+var QuarterBlue = color.NRGBA{R: 0, G: 0, B: 50}
+var PresetYellow = color.NRGBA{R: 150, G: 150, B: 0}
+var Cyan = color.NRGBA{R: 0, G: 255, B: 255}
+var Yellow = color.NRGBA{R: 255, G: 255, B: 0}
+var QuarterYellow = color.NRGBA{R: 50, G: 50, B: 0}
+var Orange = color.NRGBA{R: 255, G: 111, B: 0}
+var Magenta = color.NRGBA{R: 255, G: 0, B: 255}
 
-var Crimson = Color{R: 220, G: 20, B: 60}
-var DarkOrange = Color{R: 215, G: 50, B: 0}
-var Gold = Color{R: 255, G: 215, B: 0}
-var ForestGreen = Color{R: 0, G: 100, B: 0}
-var Aqua = Color{R: 127, G: 255, B: 212}
-var SkyBlue = Color{R: 0, G: 191, B: 255}
-var Purple = Color{R: 100, G: 0, B: 255}
-var DarkPurple = Color{R: 50, G: 0, B: 255}
+var Crimson = color.NRGBA{R: 220, G: 20, B: 60}
+var DarkOrange = color.NRGBA{R: 215, G: 50, B: 0}
+var Gold = color.NRGBA{R: 255, G: 215, B: 0}
+var ForestGreen = color.NRGBA{R: 0, G: 100, B: 0}
+var Aqua = color.NRGBA{R: 127, G: 255, B: 212}
+var SkyBlue = color.NRGBA{R: 0, G: 191, B: 255}
+var Purple = color.NRGBA{R: 100, G: 0, B: 255}
+var DarkPurple = color.NRGBA{R: 50, G: 0, B: 255}
 
-var Pink = Color{R: 255, G: 192, B: 203}
-var Salmon = Color{R: 250, G: 128, B: 114}
-var LightOrange = Color{R: 255, G: 175, B: 0}
-var Olive = Color{R: 150, G: 150, B: 0}
-var LawnGreen = Color{R: 124, G: 252, B: 0}
-var Teal = Color{R: 0, G: 128, B: 128}
-var LightBlue = Color{R: 100, G: 185, B: 255}
-var Violet = Color{R: 199, G: 21, B: 133}
-var White = Color{R: 255, G: 255, B: 255}
-var EmptyColor = Color{}
+var Pink = color.NRGBA{R: 255, G: 192, B: 203}
+var Salmon = color.NRGBA{R: 250, G: 128, B: 114}
+var LightOrange = color.NRGBA{R: 255, G: 175, B: 0}
+var Olive = color.NRGBA{R: 150, G: 150, B: 0}
+var LawnGreen = color.NRGBA{R: 124, G: 252, B: 0}
+var Teal = color.NRGBA{R: 0, G: 128, B: 128}
+var LightBlue = color.NRGBA{R: 100, G: 185, B: 255}
+var Violet = color.NRGBA{R: 199, G: 21, B: 133}
+var White = color.NRGBA{R: 255, G: 255, B: 255}
+var EmptyColor = color.NRGBA{}
 
 type Gobo struct {
 	Name    string
@@ -401,7 +396,7 @@ type Gobo struct {
 	Number  int
 	Setting int
 	Flash   bool
-	Color   Color
+	Color   color.NRGBA
 }
 
 // Sequence describes sequences.
@@ -427,8 +422,8 @@ type Sequence struct {
 	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
-	CurrentColors               []Color                     // Storage for the colors in a sequence.
-	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
+	CurrentColors               []color.NRGBA               // Storage for the colors in a sequence.
+	SequenceColors              []color.NRGBA               // Temporay storage for changing sequence colors.
 	Color                       int                         // Index into current sequnece colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
@@ -446,7 +441,7 @@ type Sequence struct {
 	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
-	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
+	SavedSequenceColors         []color.NRGBA               // Used for updating the color in a sequence.
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
 	Mode                        string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
@@ -545,7 +540,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      Color
+	LastColor      color.NRGBA
 
 	// Common commands.
 	Hidden         bool
@@ -608,9 +603,9 @@ type Fixture struct {
 	Label        string
 	MasterDimmer int
 	Brightness   int
-	ScannerColor Color
-	BaseColor    Color
-	Color        Color
+	ScannerColor color.NRGBA
+	BaseColor    color.NRGBA
+	Color        color.NRGBA
 	Pan          int
 	Tilt         int
 	Shutter      int
@@ -637,8 +632,8 @@ type Event struct {
 	Fadedown  bool
 	Shift     int
 	FadeTime  time.Duration
-	LastColor Color
-	Color     Color
+	LastColor color.NRGBA
+	Color     color.NRGBA
 }
 
 type Trigger struct {
@@ -721,9 +716,9 @@ func StartStaticSequences(sequences []*Sequence, commandChannels []chan Command)
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
 // returns the color array
-func GetColorButtonsArray(color int) Color {
+func GetColorButtonsArray(colorIn int) color.NRGBA {
 
-	switch color {
+	switch colorIn {
 	case 0:
 		return Red
 	case 1:
@@ -865,12 +860,13 @@ func GetColorButtonsArray(color int) Color {
 	case 69:
 		return Black
 	}
-	return Color{}
+
+	return color.NRGBA{}
 }
 
-func GetColorArrayByNames(names []string) ([]Color, error) {
+func GetColorArrayByNames(names []string) ([]color.NRGBA, error) {
 
-	colors := []Color{}
+	colors := []color.NRGBA{}
 	for _, color := range names {
 		// Find the color by name from the library of supported colors.
 		colorLibrary, err := GetRGBColorByName(color)
@@ -886,7 +882,7 @@ func GetColorArrayByNames(names []string) ([]Color, error) {
 }
 
 // Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
-func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
+func ConvertRGBtoNRGBA(alight color.NRGBA) color.NRGBA {
 	NRGBAcolor := color.NRGBA{}
 	NRGBAcolor.R = uint8(alight.R)
 	NRGBAcolor.G = uint8(alight.G)
@@ -895,13 +891,13 @@ func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
 	return NRGBAcolor
 }
 
-func GetRGBColorByName(color string) (Color, error) {
+func GetRGBColorByName(colorIn string) (color.NRGBA, error) {
 
 	if debug {
-		fmt.Printf("Looking for color %s\n", color)
+		fmt.Printf("Looking for color %s\n", colorIn)
 	}
 
-	switch color {
+	switch colorIn {
 	case "Red":
 		return Red, nil
 
@@ -936,11 +932,11 @@ func GetRGBColorByName(color string) (Color, error) {
 		return Black, nil
 
 	}
-	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
+	return color.NRGBA{}, fmt.Errorf("GetRGBColorByName: color not found: %s", colorIn)
 }
 
-func GetColorNameByRGB(color Color) string {
-	switch color {
+func GetColorNameByRGB(colorIn color.NRGBA) string {
+	switch colorIn {
 	case LightBlue:
 		return "Light Blue"
 	case Red:
@@ -968,12 +964,12 @@ func GetColorNameByRGB(color Color) string {
 	return "White"
 }
 
-func HowManyColorsInSteps(steps []Step) (colors []Color) {
+func HowManyColorsInSteps(steps []Step) (colors []color.NRGBA) {
 
 	if debug {
 		fmt.Printf("HowManyColorsInSteps \n")
 	}
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.NRGBA]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -992,9 +988,9 @@ func HowManyColorsInSteps(steps []Step) (colors []Color) {
 	return colors
 }
 
-func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
+func HowManyColorsInPositions(positionsMap map[int]Position) (colors []color.NRGBA) {
 
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.NRGBA]bool)
 	for _, position := range positionsMap {
 		for _, fixture := range position.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -1010,9 +1006,9 @@ func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
 	return colors
 }
 
-func HowManyStepColors(steps []Step) (colors []Color) {
+func HowManyStepColors(steps []Step) (colors []color.NRGBA) {
 
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.NRGBA]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -1032,9 +1028,9 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 	return colors
 }
 
-func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
+func HowManyScannerColors(positionsMap map[int]Position) (colors []color.NRGBA) {
 
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.NRGBA]bool)
 	for _, positionMap := range positionsMap {
 		fixtureLen := len(positionMap.Fixtures)
 		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
@@ -1084,7 +1080,7 @@ func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchp
 
 		if staticColorButton.Enabled {
 			if staticColorButton.Flash || staticFlashing {
-				onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+				onColor := color.NRGBA{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
 				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
 			} else {
 				LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
@@ -1149,7 +1145,7 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 }
 
 // LightOn Turn on a Light.
-func LightLamp(button Button, color Color, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func LightLamp(button Button, color color.NRGBA, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
 		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", button.X, button.Y, color.R, color.G, color.B, master)
 	}
@@ -1198,7 +1194,7 @@ func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
-func GetColorList(colors []Color) ColorDisplayControl {
+func GetColorList(colors []color.NRGBA) ColorDisplayControl {
 
 	control := ColorDisplayControl{}
 
@@ -1273,7 +1269,7 @@ func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALi
 	guiButtons <- event
 }
 
-func FlashLight(button Button, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func FlashLight(button Button, onColor color.NRGBA, offColor color.NRGBA, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{
@@ -1298,21 +1294,22 @@ func FlashLight(button Button, onColor Color, offColor Color, eventsForLauchpad 
 }
 
 // InvertColor just reverses the DMX values.
-func InvertColor(color Color) (out Color) {
+func InvertColor(colorIn color.NRGBA) (out color.NRGBA) {
 
-	out.R = ReverseDmx(color.R)
-	out.G = ReverseDmx(color.G)
-	out.B = ReverseDmx(color.B)
+	out.R = ReverseDmx(colorIn.R)
+	out.G = ReverseDmx(colorIn.G)
+	out.B = ReverseDmx(colorIn.B)
 
 	return out
 }
 
 // Takes a DMX value 1-255 and reverses the value.
-func ReverseDmx(n int) int {
-	in := make(map[int]int, 255)
-	var y = 255
+func ReverseDmx(n uint8) uint8 {
+	in := make(map[uint8]uint8, 255)
+	var y uint8 = 255
+	var x uint8
 
-	for x := 0; x <= 255; x++ {
+	for x = 0; x <= 255; x++ {
 
 		in[x] = y
 		y--
@@ -1638,7 +1635,7 @@ func newColorPicker() []ColorPicker {
 	return colors
 }
 
-func GetLaunchPadCodeByRGBColor(selectedColor Color) byte {
+func GetLaunchPadCodeByRGBColor(selectedColor color.NRGBA) byte {
 
 	colors := newColorPicker()
 	if debug {

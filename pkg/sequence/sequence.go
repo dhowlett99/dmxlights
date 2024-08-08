@@ -22,6 +22,7 @@ import (
 	"encoding/gob"
 	"errors"
 	"fmt"
+	"image/color"
 	"os"
 	"strconv"
 	"strings"
@@ -615,7 +616,7 @@ func PlaySequence(sequence common.Sequence,
 				// Set the chase RGB steps used to chase the shutter.
 				sequence.ScannerChaser = true
 				// Chaser start with a standard chase pattern in white.
-				steps = replaceRGBcolorsInSteps(steps, []common.Color{{R: 255, G: 255, B: 255}})
+				steps = replaceRGBcolorsInSteps(steps, []color.NRGBA{{R: 255, G: 255, B: 255}})
 			}
 		}
 
@@ -778,7 +779,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Label != "Color.Chase" {
 
 					// Find a new color.
-					newColors := []common.Color{}
+					newColors := []color.NRGBA{}
 					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
 					sequence.SequenceColors = newColors
 
@@ -970,7 +971,7 @@ func MakeACopy(src, dist interface{}) (err error) {
 	return gob.NewDecoder(&buf).Decode(dist)
 }
 
-func replaceRGBcolorsInSteps(steps []common.Step, colors []common.Color) []common.Step {
+func replaceRGBcolorsInSteps(steps []common.Step, colors []color.NRGBA) []common.Step {
 	stepsOut := []common.Step{}
 	err := MakeACopy(steps, &stepsOut)
 	if err != nil {
@@ -1066,7 +1067,7 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 						newGobo.Number = setting.Number
 						v, _ := strconv.Atoi(setting.Value)
 						newGobo.Setting = v
-						newGobo.Color = common.Color{R: 255, G: 255, B: 0} // Yellow.
+						newGobo.Color = color.NRGBA{R: 255, G: 255, B: 0} // Yellow.
 						gobos[f.Number] = append(gobos[f.Number], newGobo)
 						if debug {
 							fmt.Printf("\tGobo: %s Setting: %s\n", setting.Name, setting.Value)

@@ -19,6 +19,7 @@ package position
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/process"
@@ -284,17 +285,16 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 			}
 
 			newFixture := common.Fixture{}
-			newColor := common.Color{}
+			newColor := color.NRGBA{}
 			lenghtOfSteps := len(fadeColors[fixtureNumber])
 			if step < lenghtOfSteps {
 
 				// We've found a color.
-				if fadeColors[fixtureNumber][step].Color.R > 0 || fadeColors[fixtureNumber][step].Color.G > 0 || fadeColors[fixtureNumber][step].Color.B > 0 || fadeColors[fixtureNumber][step].Color.W > 0 {
+				if fadeColors[fixtureNumber][step].Color.R > 0 || fadeColors[fixtureNumber][step].Color.G > 0 || fadeColors[fixtureNumber][step].Color.B > 0 {
 
 					newColor.R = fadeColors[fixtureNumber][step].Color.R
 					newColor.G = fadeColors[fixtureNumber][step].Color.G
 					newColor.B = fadeColors[fixtureNumber][step].Color.B
-					newColor.W = fadeColors[fixtureNumber][step].Color.W
 					newFixture.Color = newColor
 					newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
@@ -310,7 +310,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 				} else {
 					// turn the lamp off, but only if its already on.
 					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
-						newFixture.Color = common.Color{}
+						newFixture.Color = color.NRGBA{}
 						newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
@@ -347,7 +347,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []common.Color, fixtureState map[int]common.FixtureState) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []color.NRGBA, fixtureState map[int]common.FixtureState) []common.Step {
 
 	var insertColor int
 	numberColors := len(colors)
@@ -376,7 +376,7 @@ func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []co
 			if fixtureState[fixtureNumber].RGBInverted {
 				if hasColor(fixture.Color) {
 					// insert a black.
-					newFixture.Color = common.Color{}
+					newFixture.Color = color.NRGBA{}
 				} else {
 					// its a blank space so insert first color.
 					newFixture.MasterDimmer = fixture.MasterDimmer
@@ -401,7 +401,7 @@ func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []co
 	return stepsOut
 }
 
-func hasColor(color common.Color) bool {
+func hasColor(color color.NRGBA) bool {
 
 	if color.R > 0 || color.G > 0 || color.B > 0 {
 		return true

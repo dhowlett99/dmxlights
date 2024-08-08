@@ -21,6 +21,7 @@ package fixture
 import (
 	"errors"
 	"fmt"
+	"image/color"
 	"io"
 	"math"
 	"os"
@@ -85,7 +86,7 @@ type Action struct {
 
 type ActionConfig struct {
 	Name              string
-	Colors            []common.Color
+	Colors            []color.NRGBA
 	Map               bool
 	Fade              int
 	NumberSteps       int
@@ -551,7 +552,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
 		if !cmd.Hidden {
 			if lamp.Flash {
-				onColor := common.Color{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+				onColor := color.NRGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
 				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, common.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
@@ -1089,7 +1090,7 @@ func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixt
 func MapFixtures(chaser bool, hadShutterChase bool,
 	mySequenceNumber int,
 	displayFixture int,
-	color common.Color,
+	color color.NRGBA,
 	pan int, tilt int, shutter int, rotate int, program int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
 	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
@@ -1103,9 +1104,6 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 	Red := (float64(color.R) / 100) * (float64(brightness) / 2.55)
 	Green := (float64(color.G) / 100) * (float64(brightness) / 2.55)
 	Blue := (float64(color.B) / 100) * (float64(brightness) / 2.55)
-	White := (float64(color.W) / 100) * (float64(brightness) / 2.55)
-	Amber := (float64(color.A) / 100) * (float64(brightness) / 2.55)
-	UV := (float64(color.UV) / 100) * (float64(brightness) / 2.55)
 
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group == mySequenceNumber+1 {
@@ -1279,15 +1277,6 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 					}
 					if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
 						SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
-					}
-					if strings.Contains(channel.Name, "White"+strconv.Itoa(displayFixture+1)) {
-						SetChannel(fixture.Address+int16(channelNumber), byte(int(White)), dmxController, dmxInterfacePresent)
-					}
-					if strings.Contains(channel.Name, "Amber"+strconv.Itoa(displayFixture+1)) {
-						SetChannel(fixture.Address+int16(channelNumber), byte(int(Amber)), dmxController, dmxInterfacePresent)
-					}
-					if strings.Contains(channel.Name, "UV"+strconv.Itoa(displayFixture+1)) {
-						SetChannel(fixture.Address+int16(channelNumber), byte(int(UV)), dmxController, dmxInterfacePresent)
 					}
 				}
 			}
@@ -1980,7 +1969,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 	newOverride := common.Override{}
 
 	if action.Mode == "Off" {
-		newOverride.Colors = []common.Color{}
+		newOverride.Colors = []color.NRGBA{}
 	}
 
 	if action.Mode == "Static" {

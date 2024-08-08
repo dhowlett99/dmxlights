@@ -124,7 +124,7 @@ func (pad *Pad) Listen(buttonchannel chan Hit) error {
 }
 
 // Light lights the button at x,y with the given red, green, and blue values.
-func (pad *Pad) Light(x, y, red int, green int, blue int) error {
+func (pad *Pad) Light(x int, y int, red uint8, green uint8, blue uint8) error {
 	led := int64((8-y)*10 + x + 1)
 
 	_, err := pad.Write([]byte{0xF0, 0x00, 0x20})
