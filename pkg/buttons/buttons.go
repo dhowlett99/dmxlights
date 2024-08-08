@@ -172,7 +172,7 @@ func ProcessButtons(X int, Y int,
 		if this.LaunchPadConnected {
 			this.Pad.Program()
 		}
-		InitButtons(this, eventsForLaunchpad, guiButtons)
+		InitButtons(this, sequences[0].SequenceColors, eventsForLaunchpad, guiButtons)
 
 		// Show the static and switch settings.
 		cmd := common.Command{
@@ -1050,9 +1050,6 @@ func ProcessButtons(X int, Y int,
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 0
 
-		// Update the color display for the sequence.
-		common.UpdateSequenceColorDisplay(sequences[this.TargetSequence], guiButtons)
-
 		return
 	}
 
@@ -1073,9 +1070,6 @@ func ProcessButtons(X int, Y int,
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
 		this.EditWhichStaticSequence = 1
-
-		// Update the color display for the sequence.
-		common.UpdateSequenceColorDisplay(sequences[this.TargetSequence], guiButtons)
 
 		return
 	}
@@ -1098,9 +1092,6 @@ func ProcessButtons(X int, Y int,
 		if this.ScannerChaser[this.SelectedSequence] {
 			this.EditWhichStaticSequence = 4
 		}
-
-		// Update the color display for the sequence.
-		common.UpdateSequenceColorDisplay(sequences[this.TargetSequence], guiButtons)
 
 		return
 	}
@@ -2276,10 +2267,8 @@ func ProcessButtons(X int, Y int,
 		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
 		ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
-
-		// Update the color display for the sequence.
-		common.UpdateSequenceColorDisplay(sequences[this.TargetSequence], guiButtons)
-
+		// Update the labels.
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -2628,7 +2617,7 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 	}
 }
 
-func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func InitButtons(this *CurrentState, sequenceColors []common.Color, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Light the logo blue.
 	if this.LaunchPadConnected {
@@ -2646,7 +2635,7 @@ func InitButtons(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	showBottomLabels(this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this, sequenceColors, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)

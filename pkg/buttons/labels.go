@@ -40,7 +40,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	UpdateFade(this, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
-	showBottomLabels(this, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this, sequences[this.TargetSequence].SequenceColors, eventsForLaunchpad, guiButtons)
 
 	// Hide the color editing buttons.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -126,7 +126,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	}
 }
 
-func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func showBottomLabels(this *CurrentState, sequenceColors []common.Color, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("showBottomLabels type=%s fixture type=%s\n", this.SelectedType, this.SelectedFixtureType)
@@ -214,6 +214,10 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
+
+		// Update the color display for the sequence.
+		control := common.GetColorList(sequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
 	}
 
 	// Scanner showing rotate functions.
@@ -232,6 +236,9 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
+		// Update the color display for the sequence.
+		control := common.GetColorList(sequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
 	}
 
 	// Shutter chaser showing RGB chase functions.
@@ -250,6 +257,10 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
+		// Update the color display for the sequence.
+		control := common.GetColorList(sequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
+
 	}
 
 	// Switch functions.
@@ -262,7 +273,8 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
-		showSwitchColorDisplay(this, guiButtons)
+		control := common.GetColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
+		common.UpdateColorDisplay(control, guiButtons)
 	}
 
 	// Projector functions.
@@ -272,7 +284,6 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Gobo %s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName), "fade", false, guiButtons)
 		common.UpdateStatusBar("Colors", "size", false, guiButtons)
-		showSwitchColorDisplay(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomProjectorButtons {
@@ -282,16 +293,10 @@ func showBottomLabels(this *CurrentState, eventsForLauchpad chan common.ALight, 
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
+		control := common.GetColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
+		if debug {
+			fmt.Printf("Control %+v\n", control)
+		}
+		common.UpdateColorDisplay(control, guiButtons)
 	}
-}
-
-func showSwitchColorDisplay(this *CurrentState, guiButtons chan common.ALight) {
-	if debug {
-		fmt.Printf("Get color list for switch %d state %d\n", this.SelectedSwitch, this.SwitchPosition[this.SelectedSwitch])
-	}
-	control := common.GetColorList(this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors)
-	if debug {
-		fmt.Printf("Control %+v\n", control)
-	}
-	common.UpdateColorDisplay(control, guiButtons)
 }
