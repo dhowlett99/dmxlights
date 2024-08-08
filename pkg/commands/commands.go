@@ -212,7 +212,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdatePattern:
 		const PATTEN_NUMBER = 0
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Patten to %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
+			fmt.Printf("%d: Command Update Pattern to number %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.RecoverSequenceColors = false

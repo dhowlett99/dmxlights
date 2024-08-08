@@ -1031,7 +1031,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T    S E Q U E N C E.
+	// S E L E C T   S E Q U E N C E.
 	// Select sequence 1.
 	if X == 8 && Y == 0 {
 
@@ -2276,6 +2276,10 @@ func ProcessButtons(X int, Y int,
 		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
 		ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+
+		// Update the color display for the sequence.
+		control := getColorList(sequences[this.TargetSequence].SequenceColors)
+		common.UpdateColorDisplay(control, guiButtons)
 
 		return
 	}
