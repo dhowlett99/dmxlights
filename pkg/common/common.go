@@ -131,11 +131,6 @@ type ALight struct {
 	ColorDisplayControl ColorDisplayControl
 }
 
-// type Color struct {
-// 	Color color.NRGBA
-// 	Flash bool
-// }
-
 // Used for static fades, remember the last color.
 type LastColor struct {
 	RGBColor     color.NRGBA
