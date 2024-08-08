@@ -177,6 +177,9 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
 
+		// Clear any left over labels.
+		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
+
 		// Play out this sequence.
 		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}

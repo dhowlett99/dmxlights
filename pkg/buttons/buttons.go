@@ -1824,11 +1824,11 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 			this.StaticButtons[this.SelectedSequence].Color.R = this.StaticButtons[this.SelectedSequence].Color.R - 10
-			if this.StaticButtons[this.SelectedSequence].Color.R > 255 {
+			if this.StaticButtons[this.SelectedSequence].Color.R == 254 {
 				this.StaticButtons[this.SelectedSequence].Color.R = 0
 			}
-			if this.StaticButtons[this.SelectedSequence].Color.R < 0 {
-				this.StaticButtons[this.SelectedSequence].Color.R = 255
+			if this.StaticButtons[this.SelectedSequence].Color.R == 0 {
+				this.StaticButtons[this.SelectedSequence].Color.R = 254
 			}
 
 			redColor := color.NRGBA{R: this.StaticButtons[this.SelectedSequence].Color.R, G: 0, B: 0}
@@ -1855,11 +1855,11 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 			this.StaticButtons[this.SelectedSequence].Color.G = this.StaticButtons[this.SelectedSequence].Color.G - 10
-			if this.StaticButtons[this.SelectedSequence].Color.G > 255 {
+			if this.StaticButtons[this.SelectedSequence].Color.G == 254 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 0
 			}
-			if this.StaticButtons[this.SelectedSequence].Color.G < 0 {
-				this.StaticButtons[this.SelectedSequence].Color.G = 255
+			if this.StaticButtons[this.SelectedSequence].Color.G == 0 {
+				this.StaticButtons[this.SelectedSequence].Color.G = 254
 			}
 			greenColor := color.NRGBA{R: 0, G: this.StaticButtons[this.SelectedSequence].Color.G, B: 0}
 			common.LightLamp(common.Button{X: X, Y: Y}, greenColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
@@ -1885,11 +1885,11 @@ func ProcessButtons(X int, Y int,
 			this.StaticButtons[this.SelectedSequence].X = this.LastStaticColorButtonX
 			this.StaticButtons[this.SelectedSequence].Y = this.LastStaticColorButtonY
 			this.StaticButtons[this.SelectedSequence].Color.B = this.StaticButtons[this.SelectedSequence].Color.B - 10
-			if this.StaticButtons[this.SelectedSequence].Color.B > 255 {
+			if this.StaticButtons[this.SelectedSequence].Color.B > 254 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 0
 			}
-			if this.StaticButtons[this.SelectedSequence].Color.B < 0 {
-				this.StaticButtons[this.SelectedSequence].Color.B = 255
+			if this.StaticButtons[this.SelectedSequence].Color.B == 0 {
+				this.StaticButtons[this.SelectedSequence].Color.B = 254
 			}
 			blueColor := color.NRGBA{R: 0, G: 0, B: this.StaticButtons[this.SelectedSequence].Color.B}
 			common.LightLamp(common.Button{X: X, Y: Y}, blueColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
