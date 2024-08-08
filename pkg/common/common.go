@@ -1304,7 +1304,7 @@ func ReverseDmx(n uint8) uint8 {
 	var y uint8 = 255
 	var x uint8
 
-	for x = 0; x <= 255; x++ {
+	for x = 0; x <= 254; x++ {
 
 		in[x] = y
 		y--
