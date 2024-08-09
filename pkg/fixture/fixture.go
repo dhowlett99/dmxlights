@@ -2129,3 +2129,72 @@ func convertSettingToAction(settings []Setting) Action {
 	}
 	return newAction
 }
+
+func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]common.StaticColorButton {
+	if debug {
+		fmt.Printf("getAvailableScannerGobos\n")
+	}
+
+	gobos := make(map[int][]common.StaticColorButton)
+
+	for _, f := range fixtures.Fixtures {
+		if debug {
+			fmt.Printf("Fixture Name:%s\n", f.Name)
+		}
+		if f.Type == "scanner" {
+
+			if debug {
+				fmt.Printf("Sequence: %d - Scanner Name: %s Description: %s\n", sequenceNumber, f.Name, f.Description)
+			}
+			for _, channel := range f.Channels {
+				if channel.Name == "Gobo" {
+					newGobo := common.StaticColorButton{}
+					for _, setting := range channel.Settings {
+						newGobo.Name = setting.Name
+						newGobo.Label = setting.Label
+						newGobo.Number = setting.Number
+						v, _ := strconv.Atoi(setting.Value)
+						newGobo.Setting = v
+						newGobo.Color = common.Yellow
+						gobos[f.Number] = append(gobos[f.Number], newGobo)
+						if debug {
+							fmt.Printf("\tGobo: %s Setting: %s\n", setting.Name, setting.Value)
+						}
+					}
+				}
+			}
+		}
+	}
+	return gobos
+}
+
+// getAvailableScannerColors looks through the fixtures list and finds scanners that
+// have colors defined in their config. It then returns an array of these available colors.
+// Also returns a map of the default values for each scanner that has colors.
+func GetAvailableScannerColors(fixtures *Fixtures) (map[int][]common.StaticColorButton, map[int]int) {
+
+	scannerColors := make(map[int]int)
+
+	availableScannerColors := make(map[int][]common.StaticColorButton)
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Type == "scanner" {
+			for _, channel := range fixture.Channels {
+				if strings.Contains(channel.Name, "Color") {
+					for _, setting := range channel.Settings {
+						newStaticColorButton := common.StaticColorButton{}
+						newStaticColorButton.SelectedColor = setting.Number
+						settingColor, err := common.GetRGBColorByName(setting.Name)
+						if err != nil {
+							fmt.Printf("error: %s\n", err)
+							continue
+						}
+						newStaticColorButton.Color = settingColor
+						availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
+						scannerColors[fixture.Number-1] = 0
+					}
+				}
+			}
+		}
+	}
+	return availableScannerColors, scannerColors
+}
