@@ -285,7 +285,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 			}
 
 			newFixture := common.Fixture{}
-			newColor := color.NRGBA{}
+			newColor := color.RGBA{}
 			lenghtOfSteps := len(fadeColors[fixtureNumber])
 			if step < lenghtOfSteps {
 
@@ -299,7 +299,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newFixture.Color = newColor
 					newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 					newFixture.BaseColor.A = 255
-					newFixture.ScannerColor = color.NRGBA{}
+					newFixture.ScannerColor = color.RGBA{}
 					newFixture.ScannerColor.A = 255
 					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 					newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
@@ -314,11 +314,11 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 				} else {
 					// turn the lamp off, but only if its already on.
 					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
-						newFixture.Color = color.NRGBA{}
+						newFixture.Color = color.RGBA{}
 						newFixture.Color.A = 255
 						newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
 						newFixture.BaseColor.A = 255
-						newFixture.ScannerColor = color.NRGBA{}
+						newFixture.ScannerColor = color.RGBA{}
 						newFixture.ScannerColor.A = 255
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
@@ -355,7 +355,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []color.NRGBA, fixtureState map[int]common.FixtureState) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []color.RGBA, fixtureState map[int]common.FixtureState) []common.Step {
 
 	var insertColor int
 	numberColors := len(colors)
@@ -415,7 +415,7 @@ func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []co
 	return stepsOut
 }
 
-func hasColor(color color.NRGBA) bool {
+func hasColor(color color.RGBA) bool {
 
 	if color.R > 0 || color.G > 0 || color.B > 0 {
 		return true

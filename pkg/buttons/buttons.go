@@ -63,7 +63,7 @@ type CurrentState struct {
 	SelectedStaticFixtureNumber int                        // Temporary storage for the selected fixture number, used by color picker.
 	SelectAllStaticFixtures     bool                       // Flag that indicate that all static fixtures have been selected.
 	StaticFlashing              []bool                     // Static buttons are flashing, indexed by sequence.
-	SavedSequenceColors         map[int][]color.NRGBA      // Local storage for sequence colors.
+	SavedSequenceColors         map[int][]color.RGBA       // Local storage for sequence colors.
 	SelectedType                string                     // The currently selected sequenece type.
 	SelectedFixtureType         string                     // The use fixture type for a switch.
 	LastSelectedSwitch          int                        // The last selected switch.
@@ -1831,7 +1831,7 @@ func ProcessButtons(X int, Y int,
 				this.StaticButtons[this.SelectedSequence].Color.R = 254
 			}
 
-			redColor := color.NRGBA{R: this.StaticButtons[this.SelectedSequence].Color.R, G: 0, B: 0}
+			redColor := color.RGBA{R: this.StaticButtons[this.SelectedSequence].Color.R, G: 0, B: 0}
 			common.LightLamp(common.RED_BUTTON, redColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
@@ -1861,7 +1861,7 @@ func ProcessButtons(X int, Y int,
 			if this.StaticButtons[this.SelectedSequence].Color.G == 0 {
 				this.StaticButtons[this.SelectedSequence].Color.G = 254
 			}
-			greenColor := color.NRGBA{R: 0, G: this.StaticButtons[this.SelectedSequence].Color.G, B: 0}
+			greenColor := color.RGBA{R: 0, G: this.StaticButtons[this.SelectedSequence].Color.G, B: 0}
 			common.LightLamp(common.Button{X: X, Y: Y}, greenColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
@@ -1891,7 +1891,7 @@ func ProcessButtons(X int, Y int,
 			if this.StaticButtons[this.SelectedSequence].Color.B == 0 {
 				this.StaticButtons[this.SelectedSequence].Color.B = 254
 			}
-			blueColor := color.NRGBA{R: 0, G: 0, B: this.StaticButtons[this.SelectedSequence].Color.B}
+			blueColor := color.RGBA{R: 0, G: 0, B: this.StaticButtons[this.SelectedSequence].Color.B}
 			common.LightLamp(common.Button{X: X, Y: Y}, blueColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			updateStaticLamp(this.SelectedSequence, this.StaticButtons[this.SelectedSequence], commandChannels)
 
@@ -2323,7 +2323,7 @@ func updateStaticLamp(selectedSequence int, staticColorButtons common.StaticColo
 			{Name: "StaticLamp", Value: staticColorButtons.X},
 			{Name: "StaticLampFlash", Value: false},
 			{Name: "SelectedColor", Value: staticColorButtons.SelectedColor},
-			{Name: "StaticColor", Value: color.NRGBA{R: staticColorButtons.Color.R, G: staticColorButtons.Color.G, B: staticColorButtons.Color.B}},
+			{Name: "StaticColor", Value: color.RGBA{R: staticColorButtons.Color.R, G: staticColorButtons.Color.G, B: staticColorButtons.Color.B}},
 		},
 	}
 	common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
@@ -2347,14 +2347,14 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 	}
 }
 
-func SetRGBColorPicker(selectedColor color.NRGBA, targetSequence common.Sequence) []color.NRGBA {
+func SetRGBColorPicker(selectedColor color.RGBA, targetSequence common.Sequence) []color.RGBA {
 
 	if debug {
 		fmt.Printf("SetRGBColorPicker\n")
 	}
 
 	// Clear out exiting colors.
-	targetSequence.CurrentColors = []color.NRGBA{}
+	targetSequence.CurrentColors = []color.RGBA{}
 
 	for _, availableColor := range targetSequence.RGBAvailableColors {
 		if availableColor.Color == selectedColor {
@@ -2367,7 +2367,7 @@ func SetRGBColorPicker(selectedColor color.NRGBA, targetSequence common.Sequence
 	return targetSequence.CurrentColors
 }
 
-func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.NRGBA {
+func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
 
 	if debug {
 		fmt.Printf("FindCurrentColor\n")
@@ -2379,7 +2379,7 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.NRGBA 
 		}
 	}
 
-	return color.NRGBA{}
+	return color.RGBA{}
 }
 
 // For the given sequence show the available sequence colors on the relevant buttons.
@@ -2618,7 +2618,7 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 	}
 }
 
-func InitButtons(this *CurrentState, sequenceColors []color.NRGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func InitButtons(this *CurrentState, sequenceColors []color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Light the logo blue.
 	if this.LaunchPadConnected {
@@ -2692,7 +2692,7 @@ func floodOn(this *CurrentState, commandChannels []chan common.Command, eventsFo
 	this.Flood = true
 }
 
-func buttonTouched(button common.Button, onColor color.NRGBA, offColor color.NRGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func buttonTouched(button common.Button, onColor color.RGBA, offColor color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 	common.LightLamp(button, onColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	time.Sleep(200 * time.Millisecond)
 	common.LightLamp(button, offColor, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)

@@ -733,7 +733,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.Pattern.Label != "Color.Chase" {
 
 					// Find a new color.
-					newColors := []color.NRGBA{}
+					newColors := []color.RGBA{}
 					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
 					sequence.SequenceColors = newColors
 
@@ -869,7 +869,7 @@ func setupRGBPatterns(sequence *common.Sequence, availablePatterns map[int]commo
 		// Set the chase RGB steps used to chase the shutter.
 		sequence.ScannerChaser = true
 		// Chaser start with a standard chase pattern in white.
-		steps = replaceRGBcolorsInSteps(steps, []color.NRGBA{{R: 255, G: 255, B: 255}})
+		steps = replaceRGBcolorsInSteps(steps, []color.RGBA{{R: 255, G: 255, B: 255}})
 	}
 
 	return steps
@@ -992,7 +992,7 @@ func MakeACopy(src, dist interface{}) (err error) {
 	return gob.NewDecoder(&buf).Decode(dist)
 }
 
-func replaceRGBcolorsInSteps(steps []common.Step, colors []color.NRGBA) []common.Step {
+func replaceRGBcolorsInSteps(steps []common.Step, colors []color.RGBA) []common.Step {
 	stepsOut := []common.Step{}
 	err := MakeACopy(steps, &stepsOut)
 	if err != nil {

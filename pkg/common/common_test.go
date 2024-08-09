@@ -24,24 +24,24 @@ import (
 
 func Test_invertColor(t *testing.T) {
 	type args struct {
-		color color.NRGBA
+		color color.RGBA
 	}
 	tests := []struct {
 		name    string
 		args    args
-		wantOut color.NRGBA
+		wantOut color.RGBA
 	}{
 		{
 			name: "invert white",
 			args: args{
-				color: color.NRGBA{
+				color: color.RGBA{
 					R: 255,
 					G: 255,
 					B: 255,
 					A: 255,
 				},
 			},
-			wantOut: color.NRGBA{
+			wantOut: color.RGBA{
 				R: 0,
 				G: 0,
 				B: 0,
@@ -51,14 +51,14 @@ func Test_invertColor(t *testing.T) {
 		{
 			name: "invert black",
 			args: args{
-				color: color.NRGBA{
+				color: color.RGBA{
 					R: 0,
 					G: 0,
 					B: 0,
 					A: 255,
 				},
 			},
-			wantOut: color.NRGBA{
+			wantOut: color.RGBA{
 				R: 255,
 				G: 255,
 				B: 255,

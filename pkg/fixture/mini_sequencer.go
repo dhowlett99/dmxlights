@@ -728,10 +728,10 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Colors
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
-							override.Colors = cmd.Args[COLORS].Value.([]color.NRGBA)
-							cfg.Colors = cmd.Args[COLORS].Value.([]color.NRGBA)
+							override.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
+							cfg.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
 							if debug_mini {
-								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]color.NRGBA))
+								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]color.RGBA))
 							}
 						}
 

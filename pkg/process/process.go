@@ -168,7 +168,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 }
 
 // fadeDownColor fades down the given color using the sequences fade down and fade off values.
-func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.NRGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d fadeDownColor color %+v\n", thisFixture.Number, color)
@@ -201,7 +201,7 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 }
 
 // fadeUpColor fades up the given color using the sequences fade up and fade on values.
-func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.NRGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d fadeUpColor color %+v\n", thisFixture.Number, color)
@@ -234,7 +234,7 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 }
 
 // makeAColor is used to add a color to the fixture buffer map of size fadeUp, fadeOn, FadeDown and fadeOff, which is the width of one cycle.
-func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.NRGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d makeAColor color %+v\n", thisFixture.Number, color)
@@ -271,7 +271,7 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 }
 
 // addColor adds a color to the fixtures buffer array, which is used later for assembling the positions.
-func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fixture, colorIn color.NRGBA, insertValue int, chase bool) common.FixtureBuffer {
+func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fixture, colorIn color.RGBA, insertValue int, chase bool) common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\t\tStep %d func=%s addColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, thisFixture.Number, colorIn, insertValue)
@@ -293,7 +293,7 @@ func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fix
 	newColor.Tilt = thisFixture.Tilt
 	newColor.Shutter = thisFixture.Shutter
 
-	newColor.Color = color.NRGBA{}
+	newColor.Color = color.RGBA{}
 	newColor.Color.R = uint8(math.Round((float64(colorIn.R) / 100) * (float64(insertValue) / 2.55)))
 	newColor.Color.G = uint8(math.Round((float64(colorIn.G) / 100) * (float64(insertValue) / 2.55)))
 	newColor.Color.B = uint8(math.Round((float64(colorIn.B) / 100) * (float64(insertValue) / 2.55)))

@@ -21,7 +21,7 @@ func Test_processDifferentColor(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         color.NRGBA
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -47,7 +47,7 @@ func Test_processDifferentColor(t *testing.T) {
 					FadeDown: []int{255, 50, 0},
 				},
 				fixture: common.Fixture{
-					Color: color.NRGBA{
+					Color: color.RGBA{
 						R: 255,
 						G: 0,
 						B: 0,
@@ -55,7 +55,7 @@ func Test_processDifferentColor(t *testing.T) {
 					},
 				},
 				colorNumber: 0,
-				color: color.NRGBA{
+				color: color.RGBA{
 					R: 255,
 					G: 0,
 					B: 0,
@@ -64,7 +64,7 @@ func Test_processDifferentColor(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 0,
 								G: 255,
 								B: 0,
@@ -76,7 +76,7 @@ func Test_processDifferentColor(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,
@@ -142,7 +142,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         color.NRGBA
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -170,7 +170,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Red.
 				fixture: common.Fixture{
-					Color: color.NRGBA{
+					Color: color.RGBA{
 						R: 255,
 						G: 0,
 						B: 0,
@@ -179,7 +179,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				},
 				colorNumber: 0,
 				// Color is therefor Red.
-				color: color.NRGBA{
+				color: color.RGBA{
 					R: 255,
 					G: 0,
 					B: 0,
@@ -189,7 +189,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 255,
 								G: 0,
 								B: 0,
@@ -201,7 +201,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,
@@ -267,7 +267,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         color.NRGBA
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -296,7 +296,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Black.
 				fixture: common.Fixture{
-					Color: color.NRGBA{
+					Color: color.RGBA{
 						R: 0,
 						G: 0,
 						B: 0,
@@ -305,7 +305,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 				},
 				colorNumber: 0,
 				// Color is therefor Black.
-				color: color.NRGBA{
+				color: color.RGBA{
 					R: 0,
 					G: 0,
 					B: 0,
@@ -315,7 +315,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 255,
 								G: 0,
 								B: 0,
@@ -327,7 +327,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: color.NRGBA{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,

@@ -304,8 +304,8 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 		go func() {
 			for {
 				// Turn on.
-				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OnColor)
+				// Convert the  RGB color into RGBA for the fyne.io GUI.
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OnColor)
 				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.
@@ -316,8 +316,8 @@ func (panel *MyPanel) UpdateButtonColor(alight common.ALight, GuiFlashButtons []
 				}
 
 				// Turn off.
-				// Convert the  RGB color into NRGBA for the fyne.io GUI.
-				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoNRGBA(alight.OffColor)
+				// Convert the  RGB color into RGBA for the fyne.io GUI.
+				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.FillColor = common.ConvertRGBtoRGBA(alight.OffColor)
 				panel.Buttons[alight.Button.X][alight.Button.Y].rectangle.Refresh()
 
 				// We wait for a stop message or 250ms which ever comes first.

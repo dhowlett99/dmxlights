@@ -29,7 +29,7 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 	full := 255
 	type args struct {
 		steps  []common.Step
-		colors []color.NRGBA
+		colors []color.RGBA
 	}
 	tests := []struct {
 		name string
@@ -69,7 +69,7 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 						},
 					},
 				},
-				colors: []color.NRGBA{
+				colors: []color.RGBA{
 					common.Red,
 					common.Green,
 					common.Blue,
@@ -132,7 +132,7 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 						},
 					},
 				},
-				colors: []color.NRGBA{
+				colors: []color.RGBA{
 					common.Green,
 				},
 			},

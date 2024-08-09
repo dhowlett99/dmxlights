@@ -4099,7 +4099,7 @@ func TestCalculatePositionsOnlyFourEnabledBounceAndShiftOfFive(t *testing.T) {
 
 						fixture := position.Fixtures[fixtureNumber]
 
-						fmt.Printf("\t\t%d: {MasterDimmer: %d, Brightness: %d, Color: color.NRGBA{R: %d, G: %d, B: %d},Pan: %d, Tilt: %d, Shutter: %d, Rotate: %d, Music: %d, Gobo: %d, Program: %d ,Enabled: %t},\n",
+						fmt.Printf("\t\t%d: {MasterDimmer: %d, Brightness: %d, Color: color.RGBA{R: %d, G: %d, B: %d},Pan: %d, Tilt: %d, Shutter: %d, Rotate: %d, Music: %d, Gobo: %d, Program: %d ,Enabled: %t},\n",
 							fixtureNumber,
 							fixture.MasterDimmer,
 							fixture.Brightness,
@@ -6745,7 +6745,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 	full := 255
 	type args struct {
 		steps          []common.Step
-		colors         []color.NRGBA
+		colors         []color.RGBA
 		numberFixtures int
 		fixtureState   map[int]common.FixtureState
 	}
@@ -6782,7 +6782,7 @@ func Test_invertRGBColorsInSteps(t *testing.T) {
 						},
 					},
 				},
-				colors: []color.NRGBA{
+				colors: []color.RGBA{
 					{R: 0, G: 255, B: 0},
 				},
 			},

@@ -57,7 +57,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 
 	type topButton struct {
 		Label string
-		Color color.NRGBA
+		Color color.RGBA
 	}
 	// Storage for the rgb labels on the top row.
 	var guiTopRGBButtons [8]topButton
@@ -127,7 +127,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	}
 }
 
-func showBottomLabels(this *CurrentState, sequenceColors []color.NRGBA, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("showBottomLabels type=%s fixture type=%s\n", this.SelectedType, this.SelectedFixtureType)
@@ -135,7 +135,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.NRGBA, eventsFo
 
 	type bottonButton struct {
 		Label string
-		Color color.NRGBA
+		Color color.RGBA
 	}
 
 	// Storage for the rgb labels on the bottom row.

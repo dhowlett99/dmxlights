@@ -179,7 +179,7 @@ func SetFromCheckState(cp *ColorPanel) {
 		button := cp.Buttons[labels[key]]
 		if button.check.Checked {
 			currentColor, _ := common.GetRGBColorByName(labels[key])
-			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(currentColor)
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoRGBA(currentColor)
 			cp.Rectanges[count].StrokeColor = color.Black
 			cp.Rectanges[count].StrokeWidth = 1
 			colorSelection = append(colorSelection, labels[key])
@@ -218,7 +218,7 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 	for _, c := range colors {
 		if c != "" && c != "Off" {
 			RGBcolor, _ := common.GetRGBColorByName(c)
-			cp.Rectanges[count].FillColor = common.ConvertRGBtoNRGBA(RGBcolor)
+			cp.Rectanges[count].FillColor = common.ConvertRGBtoRGBA(RGBcolor)
 			cp.Rectanges[count].StrokeColor = color.Black
 			cp.Rectanges[count].StrokeWidth = 1
 			cp.Buttons[c].check.Checked = true

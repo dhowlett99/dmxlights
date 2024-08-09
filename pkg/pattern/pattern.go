@@ -31,7 +31,7 @@ const (
 	full = 255
 )
 
-func MakeSingleFixtureChase(colors []color.NRGBA) common.Pattern {
+func MakeSingleFixtureChase(colors []color.RGBA) common.Pattern {
 
 	steps := []common.Step{}
 	for _, color := range colors {

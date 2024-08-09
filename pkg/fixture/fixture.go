@@ -86,7 +86,7 @@ type Action struct {
 
 type ActionConfig struct {
 	Name              string
-	Colors            []color.NRGBA
+	Colors            []color.RGBA
 	Map               bool
 	Fade              int
 	NumberSteps       int
@@ -552,7 +552,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
 		if !cmd.Hidden {
 			if lamp.Flash {
-				onColor := color.NRGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+				onColor := color.RGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
 				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, common.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
@@ -1090,7 +1090,7 @@ func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixt
 func MapFixtures(chaser bool, hadShutterChase bool,
 	mySequenceNumber int,
 	displayFixture int,
-	color color.NRGBA,
+	color color.RGBA,
 	pan int, tilt int, shutter int, rotate int, program int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
 	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
@@ -1969,7 +1969,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 	newOverride := common.Override{}
 
 	if action.Mode == "Off" {
-		newOverride.Colors = []color.NRGBA{}
+		newOverride.Colors = []color.RGBA{}
 	}
 
 	if action.Mode == "Static" {
