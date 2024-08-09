@@ -35,7 +35,6 @@ const FADEDOWN = 3
 // processScannerColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
 func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
-
 	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 	return fadeColors
 
@@ -287,15 +286,18 @@ func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fix
 	}
 
 	newColor.BaseColor = colorIn
-	newColor.Color = color.NRGBA{}
+	newColor.BaseColor.A = 255
+
 	newColor.Gobo = thisFixture.Gobo
 	newColor.Pan = thisFixture.Pan
 	newColor.Tilt = thisFixture.Tilt
 	newColor.Shutter = thisFixture.Shutter
 
+	newColor.Color = color.NRGBA{}
 	newColor.Color.R = uint8(math.Round((float64(colorIn.R) / 100) * (float64(insertValue) / 2.55)))
 	newColor.Color.G = uint8(math.Round((float64(colorIn.G) / 100) * (float64(insertValue) / 2.55)))
 	newColor.Color.B = uint8(math.Round((float64(colorIn.B) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.A = 255
 
 	if !chase {
 		newColor.Brightness = 255

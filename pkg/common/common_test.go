@@ -38,12 +38,14 @@ func Test_invertColor(t *testing.T) {
 					R: 255,
 					G: 255,
 					B: 255,
+					A: 255,
 				},
 			},
 			wantOut: color.NRGBA{
 				R: 0,
 				G: 0,
 				B: 0,
+				A: 255,
 			},
 		},
 		{
@@ -53,12 +55,14 @@ func Test_invertColor(t *testing.T) {
 					R: 0,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 			},
 			wantOut: color.NRGBA{
 				R: 255,
 				G: 255,
 				B: 255,
+				A: 255,
 			},
 		},
 	}

@@ -51,6 +51,7 @@ func Test_processDifferentColor(t *testing.T) {
 						R: 255,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
@@ -58,6 +59,7 @@ func Test_processDifferentColor(t *testing.T) {
 					R: 255,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
@@ -66,6 +68,7 @@ func Test_processDifferentColor(t *testing.T) {
 								R: 0,
 								G: 255,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -77,6 +80,7 @@ func Test_processDifferentColor(t *testing.T) {
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -87,15 +91,15 @@ func Test_processDifferentColor(t *testing.T) {
 
 				0: {
 					// Fade Down Green.
-					{BaseColor: common.Green, Color: color.NRGBA{R: 0, G: 255, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Green, Color: color.NRGBA{R: 0, G: 50, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Green, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Green, Color: common.Green, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Green, Color: common.Green50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Green, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Fade Up Red.
-					{BaseColor: common.Red, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 50, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for on time.
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
@@ -170,6 +174,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 						R: 255,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
@@ -178,6 +183,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 					R: 255,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				// Last step was also red.
 				lastStep: common.Step{
@@ -187,6 +193,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 								R: 255,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -198,6 +205,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -208,15 +216,15 @@ func Test_processSameColorNotBlack(t *testing.T) {
 
 				0: {
 					// Play out the existing Red
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for the on time.
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for the down time.
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
@@ -292,6 +300,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 						R: 0,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
@@ -300,6 +309,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 					R: 0,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				// Last step was also red.
 				lastStep: common.Step{
@@ -309,6 +319,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 								R: 255,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -320,6 +331,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -330,21 +342,21 @@ func Test_processDiffColorBlack(t *testing.T) {
 
 				0: {
 					// Fade Down Red to Black.
-					{BaseColor: common.Red, Color: color.NRGBA{R: 255, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 50, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Red50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Red, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the off time, same as on time.
-					//{Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					//{Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade up time.
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade on time.
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade down time.
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: color.NRGBA{R: 0, G: 0, B: 0}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: common.Black, Color: common.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},

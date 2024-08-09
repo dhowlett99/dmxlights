@@ -295,8 +295,12 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					newColor.R = fadeColors[fixtureNumber][step].Color.R
 					newColor.G = fadeColors[fixtureNumber][step].Color.G
 					newColor.B = fadeColors[fixtureNumber][step].Color.B
+					newColor.A = 255
 					newFixture.Color = newColor
 					newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
+					newFixture.BaseColor.A = 255
+					newFixture.ScannerColor = color.NRGBA{}
+					newFixture.ScannerColor.A = 255
 					newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 					newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 					newFixture.Pan = fadeColors[fixtureNumber][step].Pan
@@ -311,7 +315,11 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 					// turn the lamp off, but only if its already on.
 					if lampOn[fixtureNumber] || !lampOff[fixtureNumber] || !optimisation {
 						newFixture.Color = color.NRGBA{}
+						newFixture.Color.A = 255
 						newFixture.BaseColor = fadeColors[fixtureNumber][step].BaseColor
+						newFixture.BaseColor.A = 255
+						newFixture.ScannerColor = color.NRGBA{}
+						newFixture.ScannerColor.A = 255
 						newFixture.Enabled = fadeColors[fixtureNumber][step].Enabled
 						newFixture.Gobo = fadeColors[fixtureNumber][step].Gobo
 						newFixture.Pan = fadeColors[fixtureNumber][step].Pan
@@ -339,7 +347,7 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 			position := positionsOut[positionNumber]
 			fmt.Printf("Position %d\n", positionNumber)
 			for fixtureNumber := 0; fixtureNumber < len(position.Fixtures); fixtureNumber++ {
-				fmt.Printf("\tFixture %d Enabled %t Values %+v Brightness %d \n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Color, position.Fixtures[fixtureNumber].Brightness)
+				fmt.Printf("\tFixture %d Enabled %t Color Values %+v Brightness %d \n", fixtureNumber, position.Fixtures[fixtureNumber].Enabled, position.Fixtures[fixtureNumber].Color, position.Fixtures[fixtureNumber].Brightness)
 			}
 		}
 	}
@@ -376,11 +384,17 @@ func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []co
 			if fixtureState[fixtureNumber].RGBInverted {
 				if hasColor(fixture.Color) {
 					// insert a black.
-					newFixture.Color = color.NRGBA{}
+					newFixture.Color = common.Black
+					newFixture.BaseColor = common.Black
+					newFixture.ScannerColor = common.Black
 				} else {
 					// its a blank space so insert first color.
 					newFixture.MasterDimmer = fixture.MasterDimmer
 					newFixture.Color = colors[insertColor]
+					newFixture.Color.A = 255
+					newFixture.BaseColor = common.Black
+					newFixture.ScannerColor = common.Black
+
 					insertColor--
 					if insertColor < 0 {
 						insertColor = numberColors - 1

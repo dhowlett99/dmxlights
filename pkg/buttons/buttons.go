@@ -2415,7 +2415,7 @@ func ShowRGBColorPicker(targetSequence common.Sequence, displaySequence int, eve
 			}
 		}
 		if lamp.Flash {
-			Black := color.NRGBA{R: 0, G: 0, B: 0}
+			Black := common.Black
 			if debug {
 				fmt.Printf("FLASH myFixtureNumber X:%d Y:%d Color %+v \n", lamp.X, lamp.Y, lamp.Color)
 			}
@@ -2446,7 +2446,7 @@ func ShowSelectFixtureButtons(targetSequence common.Sequence, displaySequence in
 			this.SelectedFixture = fixtureNumber
 		}
 		if fixture.Flash {
-			White := color.NRGBA{R: 255, G: 255, B: 255}
+			White := common.White
 			common.FlashLight(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, White, eventsForLaunchpad, guiButtons)
 		} else {
 			common.LightLamp(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, targetSequence.Master, eventsForLaunchpad, guiButtons)
@@ -2478,7 +2478,7 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 			fmt.Printf("goboNumber %d   current gobo %d  flash gobo %t\n", goboNumber, sequence.ScannerGobo, gobo.Flash)
 		}
 		if gobo.Flash {
-			Black := color.NRGBA{R: 0, G: 0, B: 0}
+			Black := common.Black
 			common.FlashLight(common.Button{X: goboNumber, Y: this.SelectedSequence}, gobo.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
 			common.LightLamp(common.Button{X: goboNumber, Y: this.SelectedSequence}, gobo.Color, sequence.Master, eventsForLaunchpad, guiButtons)
@@ -2526,7 +2526,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 		}
 
 		if lamp.Flash {
-			Black := color.NRGBA{R: 0, G: 0, B: 0}
+			Black := common.Black
 			common.FlashLight(common.Button{X: fixtureNumber, Y: this.SelectedSequence}, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
 			common.LightLamp(common.Button{X: fixtureNumber, Y: this.SelectedSequence}, lamp.Color, sequence.Master, eventsForLaunchpad, guiButtons)

@@ -351,38 +351,47 @@ const (
 // 13 fade up values, 13 on values and 13 off values.
 const StepSize = 39
 
-var Black = color.NRGBA{R: 0, G: 0, B: 0}
-var Red = color.NRGBA{R: 255, G: 0, B: 0}
-var QuarterRed = color.NRGBA{R: 50, G: 0, B: 0}
-var Green = color.NRGBA{R: 0, G: 255, B: 0}
-var QuarterGreen = color.NRGBA{R: 0, G: 50, B: 0}
-var Blue = color.NRGBA{R: 0, G: 0, B: 255}
-var QuarterBlue = color.NRGBA{R: 0, G: 0, B: 50}
-var PresetYellow = color.NRGBA{R: 150, G: 150, B: 0}
-var Cyan = color.NRGBA{R: 0, G: 255, B: 255}
-var Yellow = color.NRGBA{R: 255, G: 255, B: 0}
-var QuarterYellow = color.NRGBA{R: 50, G: 50, B: 0}
-var Orange = color.NRGBA{R: 255, G: 111, B: 0}
-var Magenta = color.NRGBA{R: 255, G: 0, B: 255}
+var Black = color.NRGBA{R: 0, G: 0, B: 0, A: 255}
+var Red = color.NRGBA{R: 255, G: 0, B: 0, A: 255}
+var Red5 = color.NRGBA{R: 5, G: 0, B: 0, A: 255}
+var Red25 = color.NRGBA{R: 25, G: 0, B: 0, A: 255}
+var Red50 = color.NRGBA{R: 50, G: 0, B: 0, A: 255}
+var Red75 = color.NRGBA{R: 75, G: 0, B: 0, A: 255}
+var Red100 = color.NRGBA{R: 100, G: 0, B: 0, A: 255}
+var Red125 = color.NRGBA{R: 125, G: 0, B: 0, A: 255}
+var Red150 = color.NRGBA{R: 150, G: 0, B: 0, A: 255}
+var Red175 = color.NRGBA{R: 175, G: 0, B: 0, A: 255}
+var Green = color.NRGBA{R: 0, G: 255, B: 0, A: 255}
+var Green1 = color.NRGBA{R: 0, G: 1, B: 0, A: 255}
+var Green50 = color.NRGBA{R: 0, G: 50, B: 0, A: 255}
+var QuarterGreen = color.NRGBA{R: 0, G: 50, B: 0, A: 255}
+var Blue = color.NRGBA{R: 0, G: 0, B: 255, A: 255}
+var QuarterBlue = color.NRGBA{R: 0, G: 0, B: 50, A: 255}
+var PresetYellow = color.NRGBA{R: 150, G: 150, B: 0, A: 255}
+var Cyan = color.NRGBA{R: 0, G: 255, B: 255, A: 255}
+var Yellow = color.NRGBA{R: 255, G: 255, B: 0, A: 255}
+var QuarterYellow = color.NRGBA{R: 50, G: 50, B: 0, A: 255}
+var Orange = color.NRGBA{R: 255, G: 111, B: 0, A: 255}
+var Magenta = color.NRGBA{R: 255, G: 0, B: 255, A: 255}
 
-var Crimson = color.NRGBA{R: 220, G: 20, B: 60}
-var DarkOrange = color.NRGBA{R: 215, G: 50, B: 0}
-var Gold = color.NRGBA{R: 255, G: 215, B: 0}
-var ForestGreen = color.NRGBA{R: 0, G: 100, B: 0}
-var Aqua = color.NRGBA{R: 127, G: 255, B: 212}
-var SkyBlue = color.NRGBA{R: 0, G: 191, B: 255}
-var Purple = color.NRGBA{R: 100, G: 0, B: 255}
-var DarkPurple = color.NRGBA{R: 50, G: 0, B: 255}
+var Crimson = color.NRGBA{R: 220, G: 20, B: 60, A: 255}
+var DarkOrange = color.NRGBA{R: 215, G: 50, B: 0, A: 255}
+var Gold = color.NRGBA{R: 255, G: 215, B: 0, A: 255}
+var ForestGreen = color.NRGBA{R: 0, G: 100, B: 0, A: 255}
+var Aqua = color.NRGBA{R: 127, G: 255, B: 212, A: 255}
+var SkyBlue = color.NRGBA{R: 0, G: 191, B: 255, A: 255}
+var Purple = color.NRGBA{R: 100, G: 0, B: 255, A: 255}
+var DarkPurple = color.NRGBA{R: 50, G: 0, B: 255, A: 255}
 
-var Pink = color.NRGBA{R: 255, G: 192, B: 203}
-var Salmon = color.NRGBA{R: 250, G: 128, B: 114}
-var LightOrange = color.NRGBA{R: 255, G: 175, B: 0}
-var Olive = color.NRGBA{R: 150, G: 150, B: 0}
-var LawnGreen = color.NRGBA{R: 124, G: 252, B: 0}
-var Teal = color.NRGBA{R: 0, G: 128, B: 128}
-var LightBlue = color.NRGBA{R: 100, G: 185, B: 255}
-var Violet = color.NRGBA{R: 199, G: 21, B: 133}
-var White = color.NRGBA{R: 255, G: 255, B: 255}
+var Pink = color.NRGBA{R: 255, G: 192, B: 203, A: 255}
+var Salmon = color.NRGBA{R: 250, G: 128, B: 114, A: 255}
+var LightOrange = color.NRGBA{R: 255, G: 175, B: 0, A: 255}
+var Olive = color.NRGBA{R: 150, G: 150, B: 0, A: 255}
+var LawnGreen = color.NRGBA{R: 124, G: 252, B: 0, A: 255}
+var Teal = color.NRGBA{R: 0, G: 128, B: 128, A: 255}
+var LightBlue = color.NRGBA{R: 100, G: 185, B: 255, A: 255}
+var Violet = color.NRGBA{R: 199, G: 21, B: 133, A: 255}
+var White = color.NRGBA{R: 255, G: 255, B: 255, A: 255}
 var EmptyColor = color.NRGBA{}
 
 type Gobo struct {
@@ -954,6 +963,40 @@ func GetColorNameByRGB(colorIn color.NRGBA) string {
 		return "White"
 	case Black:
 		return "Black"
+
+	case Crimson:
+		return "Crimson"
+	case DarkOrange:
+		return "DarkOrange"
+	case Gold:
+		return "Gold"
+	case ForestGreen:
+		return "ForestGreen"
+	case Aqua:
+		return "Aqua"
+	case SkyBlue:
+		return "SkyBlue"
+	case DarkPurple:
+		return "DarkPurple"
+	case Pink:
+		return "Pink"
+
+	case Salmon:
+		return "Salmon"
+	case LightOrange:
+		return "LightOrange"
+	case Olive:
+		return "Olive"
+	case LawnGreen:
+		return "LawnGreen"
+	case Teal:
+		return "Teal"
+	case LightBlue:
+		return "LightBlue"
+	case Violet:
+		return "Violet"
+	case White:
+		return "White"
 	}
 
 	return "White"
@@ -1294,6 +1337,7 @@ func InvertColor(colorIn color.NRGBA) (out color.NRGBA) {
 	out.R = ReverseDmx(colorIn.R)
 	out.G = ReverseDmx(colorIn.G)
 	out.B = ReverseDmx(colorIn.B)
+	out.A = 255
 
 	return out
 }
@@ -1304,7 +1348,7 @@ func ReverseDmx(n uint8) uint8 {
 	var y uint8 = 255
 	var x uint8
 
-	for x = 0; x <= 254; x++ {
+	for x = 0; x < 255; x++ {
 
 		in[x] = y
 		y--

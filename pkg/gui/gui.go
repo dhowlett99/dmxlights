@@ -87,8 +87,7 @@ func NewPanel() MyPanel {
 	}
 
 	// Create an empty color display.
-	emptyColorDisplay := common.ColorDisplayControl{}
-	panel.ColorDisplay = ShowColorDisplay(emptyColorDisplay)
+	panel.ColorDisplay = ShowColorDisplay()
 
 	return panel
 }
@@ -130,6 +129,24 @@ const Blue = 5
 const Purple = 6
 const Magenta = 7
 
+const Crimson = 8
+const DarkOrange = 9
+const Gold = 10
+const ForestGreen = 11
+const Aqua = 12
+const SkyBlue = 13
+const DarkPurple = 14
+const Pink = 15
+
+const Salmon = 16
+const LightOrange = 17
+const Olive = 18
+const LawnGreen = 19
+const Teal = 20
+const LightBlue = 21
+const Violet = 22
+const White = 23
+
 func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
 
 	// Clear all colors.
@@ -160,6 +177,56 @@ func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
 	}
 	if control.Magenta {
 		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+
+	if control.Crimson {
+		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.DarkOrange {
+		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Gold {
+		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.ForestGreen {
+		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Aqua {
+		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.SkyBlue {
+		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.DarkPurple {
+		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Pink {
+		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+
+	if control.Salmon {
+		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.LightOrange {
+		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Olive {
+		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.LawnGreen {
+		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Teal {
+		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.LightBlue {
+		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.Violet {
+		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
+	}
+	if control.White {
+		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	panel.ColorDisplay.Hidden = false
@@ -746,10 +813,10 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 	return modal
 }
 
-func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
+func ShowColorDisplay() *fyne.Container {
 
 	red := Button{}
-	red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	red.rectangle = canvas.NewRectangle(common.Red)
 	red.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	red.rectangle.StrokeColor = color.Black
 	red.rectangle.StrokeWidth = 1
@@ -757,7 +824,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	red.container = container.NewStack(red.rectangle)
 
 	orange := Button{}
-	orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
+	orange.rectangle = canvas.NewRectangle(common.Orange)
 	orange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	orange.rectangle.StrokeColor = color.Black
 	orange.rectangle.StrokeWidth = 1
@@ -765,7 +832,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	orange.container = container.NewStack(orange.rectangle)
 
 	yellow := Button{}
-	yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
+	yellow.rectangle = canvas.NewRectangle(common.Yellow)
 	yellow.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	yellow.rectangle.StrokeColor = color.Black
 	yellow.rectangle.StrokeWidth = 1
@@ -773,7 +840,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	yellow.container = container.NewStack(yellow.rectangle)
 
 	green := Button{}
-	green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	green.rectangle = canvas.NewRectangle(common.Green)
 	green.rectangle.Hidden = true
 	green.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	green.rectangle.StrokeColor = color.Black
@@ -782,7 +849,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	green.container = container.NewStack(green.rectangle)
 
 	cyan := Button{}
-	cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
+	cyan.rectangle = canvas.NewRectangle(common.Cyan)
 	cyan.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	cyan.rectangle.StrokeColor = color.Black
 	cyan.rectangle.StrokeWidth = 1
@@ -790,7 +857,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	cyan.container = container.NewStack(cyan.rectangle)
 
 	blue := Button{}
-	blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	blue.rectangle = canvas.NewRectangle(common.Blue)
 	blue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	blue.rectangle.StrokeColor = color.Black
 	blue.rectangle.StrokeWidth = 1
@@ -798,7 +865,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	blue.container = container.NewStack(blue.rectangle)
 
 	purple := Button{}
-	purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
+	purple.rectangle = canvas.NewRectangle(common.Purple)
 	purple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	purple.rectangle.StrokeColor = color.Black
 	purple.rectangle.StrokeWidth = 1
@@ -806,7 +873,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	purple.container = container.NewStack(purple.rectangle)
 
 	pink := Button{}
-	pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	pink.rectangle = canvas.NewRectangle(common.Pink)
 	pink.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	pink.rectangle.StrokeColor = color.Black
 	pink.rectangle.StrokeWidth = 1
@@ -814,7 +881,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	pink.container = container.NewStack(pink.rectangle)
 
 	crimsom := Button{}
-	crimsom.rectangle = canvas.NewRectangle(color.RGBA{R: 220, G: 20, B: 60, A: 255})
+	crimsom.rectangle = canvas.NewRectangle(common.Crimson)
 	crimsom.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	crimsom.rectangle.StrokeColor = color.Black
 	crimsom.rectangle.StrokeWidth = 1
@@ -822,7 +889,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	crimsom.container = container.NewStack(crimsom.rectangle)
 
 	darkOrange := Button{}
-	darkOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 215, G: 50, B: 0, A: 255})
+	darkOrange.rectangle = canvas.NewRectangle(common.DarkOrange)
 	darkOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkOrange.rectangle.StrokeColor = color.Black
 	darkOrange.rectangle.StrokeWidth = 1
@@ -830,7 +897,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	darkOrange.container = container.NewStack(darkOrange.rectangle)
 
 	gold := Button{}
-	gold.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 215, B: 0, A: 255})
+	gold.rectangle = canvas.NewRectangle(common.Gold)
 	gold.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	gold.rectangle.StrokeColor = color.Black
 	gold.rectangle.StrokeWidth = 1
@@ -838,7 +905,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	gold.container = container.NewStack(gold.rectangle)
 
 	forestGreen := Button{}
-	forestGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 100, B: 0, A: 255})
+	forestGreen.rectangle = canvas.NewRectangle(common.ForestGreen)
 	forestGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	forestGreen.rectangle.StrokeColor = color.Black
 	forestGreen.rectangle.StrokeWidth = 1
@@ -846,7 +913,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	forestGreen.container = container.NewStack(forestGreen.rectangle)
 
 	aqua := Button{}
-	aqua.rectangle = canvas.NewRectangle(color.RGBA{R: 127, G: 255, B: 212, A: 255})
+	aqua.rectangle = canvas.NewRectangle(common.Aqua)
 	aqua.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	aqua.rectangle.StrokeColor = color.Black
 	aqua.rectangle.StrokeWidth = 1
@@ -854,7 +921,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	aqua.container = container.NewStack(aqua.rectangle)
 
 	skyBlue := Button{}
-	skyBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 191, B: 255, A: 255})
+	skyBlue.rectangle = canvas.NewRectangle(common.SkyBlue)
 	skyBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	skyBlue.rectangle.StrokeColor = color.Black
 	skyBlue.rectangle.StrokeWidth = 1
@@ -862,7 +929,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	skyBlue.container = container.NewStack(skyBlue.rectangle)
 
 	darkPurple := Button{}
-	darkPurple.rectangle = canvas.NewRectangle(color.RGBA{R: 50, G: 0, B: 255, A: 255})
+	darkPurple.rectangle = canvas.NewRectangle(common.DarkPurple)
 	darkPurple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkPurple.rectangle.StrokeColor = color.Black
 	darkPurple.rectangle.StrokeWidth = 1
@@ -870,7 +937,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	darkPurple.container = container.NewStack(darkPurple.rectangle)
 
 	salmon := Button{}
-	salmon.rectangle = canvas.NewRectangle(color.RGBA{R: 250, G: 128, B: 114, A: 255})
+	salmon.rectangle = canvas.NewRectangle(common.Salmon)
 	salmon.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	salmon.rectangle.StrokeColor = color.Black
 	salmon.rectangle.StrokeWidth = 1
@@ -878,7 +945,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	salmon.container = container.NewStack(salmon.rectangle)
 
 	lightOrange := Button{}
-	lightOrange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 175, B: 0, A: 255})
+	lightOrange.rectangle = canvas.NewRectangle(common.LightOrange)
 	lightOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightOrange.rectangle.StrokeColor = color.Black
 	lightOrange.rectangle.StrokeWidth = 1
@@ -886,7 +953,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	lightOrange.container = container.NewStack(lightOrange.rectangle)
 
 	olive := Button{}
-	olive.rectangle = canvas.NewRectangle(color.RGBA{R: 150, G: 150, B: 0, A: 255})
+	olive.rectangle = canvas.NewRectangle(common.Olive)
 	olive.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	olive.rectangle.StrokeColor = color.Black
 	olive.rectangle.StrokeWidth = 1
@@ -894,7 +961,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	olive.container = container.NewStack(olive.rectangle)
 
 	lawnGreen := Button{}
-	lawnGreen.rectangle = canvas.NewRectangle(color.RGBA{R: 124, G: 252, B: 0, A: 255})
+	lawnGreen.rectangle = canvas.NewRectangle(common.LawnGreen)
 	lawnGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lawnGreen.rectangle.StrokeColor = color.Black
 	lawnGreen.rectangle.StrokeWidth = 1
@@ -902,7 +969,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	lawnGreen.container = container.NewStack(lawnGreen.rectangle)
 
 	teal := Button{}
-	teal.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 128, B: 128, A: 255})
+	teal.rectangle = canvas.NewRectangle(common.Teal)
 	teal.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	teal.rectangle.StrokeColor = color.Black
 	teal.rectangle.StrokeWidth = 1
@@ -910,7 +977,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	teal.container = container.NewStack(teal.rectangle)
 
 	lightBlue := Button{}
-	lightBlue.rectangle = canvas.NewRectangle(color.RGBA{R: 100, G: 185, B: 255, A: 255})
+	lightBlue.rectangle = canvas.NewRectangle(common.LightBlue)
 	lightBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightBlue.rectangle.StrokeColor = color.Black
 	lightBlue.rectangle.StrokeWidth = 1
@@ -918,7 +985,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	lightBlue.container = container.NewStack(lightBlue.rectangle)
 
 	violet := Button{}
-	violet.rectangle = canvas.NewRectangle(color.RGBA{R: 199, G: 21, B: 133, A: 255})
+	violet.rectangle = canvas.NewRectangle(common.Violet)
 	violet.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	violet.rectangle.StrokeColor = color.Black
 	violet.rectangle.StrokeWidth = 1
@@ -926,7 +993,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	violet.container = container.NewStack(violet.rectangle)
 
 	white := Button{}
-	white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
+	white.rectangle = canvas.NewRectangle(common.White)
 	white.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	white.rectangle.StrokeColor = color.Black
 	white.rectangle.StrokeWidth = 1
@@ -934,7 +1001,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	white.container = container.NewStack(white.rectangle)
 
 	magenta := Button{}
-	magenta.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	magenta.rectangle = canvas.NewRectangle(common.Magenta)
 	magenta.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	magenta.rectangle.StrokeColor = color.Black
 	magenta.rectangle.StrokeWidth = 1
@@ -942,7 +1009,7 @@ func ShowColorDisplay(control common.ColorDisplayControl) *fyne.Container {
 	magenta.container = container.NewStack(magenta.rectangle)
 
 	return container.New(
-		layout.NewHBoxLayout(),
+		layout.NewAdaptiveGridLayout(8),
 
 		// Top row.
 		red.container,

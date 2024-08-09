@@ -1067,7 +1067,7 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 						newGobo.Number = setting.Number
 						v, _ := strconv.Atoi(setting.Value)
 						newGobo.Setting = v
-						newGobo.Color = color.NRGBA{R: 255, G: 255, B: 0} // Yellow.
+						newGobo.Color = common.Yellow
 						gobos[f.Number] = append(gobos[f.Number], newGobo)
 						if debug {
 							fmt.Printf("\tGobo: %s Setting: %s\n", setting.Name, setting.Value)

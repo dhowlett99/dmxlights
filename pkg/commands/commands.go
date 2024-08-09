@@ -1122,7 +1122,7 @@ func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorB
 			newFixture.Label = fixture.Label
 			newFixture.Number = fixture.Number
 			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = color.NRGBA{R: 255, G: 0, B: 0}
+			newFixture.Color = common.Red
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}
