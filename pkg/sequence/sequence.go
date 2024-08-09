@@ -200,7 +200,7 @@ func CreateSequence(
 
 	if sequenceType == "scanner" {
 		// Get available scanner patterns.
-		sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+		sequence.ScannerAvailablePatterns = getAvailableScannerPattens(&sequence)
 		sequence.UpdatePattern = false
 	}
 
@@ -599,93 +599,12 @@ func PlaySequence(sequence common.Sequence,
 
 		// Setup rgb patterns.
 		if sequence.Type == "rgb" {
-			RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
-			sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
-			steps = RGBPattern.Steps
-			sequence.Pattern.Name = RGBPattern.Name
-			sequence.Pattern.Label = RGBPattern.Label
-
-			// If we are updating the pattern, we also set the represention of the sequence colors.
-			if sequence.UpdatePattern {
-				sequence.SequenceColors = common.HowManyColorsInSteps(steps)
-			}
-			sequence.UpdatePattern = false
-
-			// Initialise chaser.
-			if sequence.Label == "chaser" {
-				// Set the chase RGB steps used to chase the shutter.
-				sequence.ScannerChaser = true
-				// Chaser start with a standard chase pattern in white.
-				steps = replaceRGBcolorsInSteps(steps, []color.NRGBA{{R: 255, G: 255, B: 255}})
-			}
+			steps = setupRGBPatterns(&sequence, availablePatterns)
 		}
 
 		// Setup scanner patterns.
 		if sequence.Type == "scanner" {
-			// Get available scanner patterns.
-			sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
-			sequence.UpdatePattern = false
-			sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
-			// Set the scanner steps used to send out pan and tilt values.
-			sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
-			steps = sequence.Pattern.Steps
-
-			if sequence.AutoColor {
-				// Change all the fixtures to the next gobo.
-				for fixtureNumber := range sequence.ScannersAvailable {
-					sequence.ScannerGobo[fixtureNumber]++
-					if sequence.ScannerGobo[fixtureNumber] > 7 {
-						sequence.ScannerGobo[fixtureNumber] = 0
-					}
-				}
-				scannerLastColor := 0
-
-				// AvailableFixtures gives the real number of configured scanners.
-				for _, fixture := range sequence.ScannersAvailable {
-
-					// First check that this fixture has some configured colors.
-					colors, ok := sequence.ScannerAvailableColors[fixture.Number]
-					if ok {
-						// Found a scanner with some colors.
-						totalColorForThisFixture := len(colors)
-
-						// Now can mess with the scanner color map.
-						sequence.ScannerColor[fixture.Number-1]++
-						if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
-							if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
-								sequence.ScannerColor[fixture.Number-1] = 0
-							}
-							scannerLastColor++
-							continue
-						}
-					}
-				}
-			}
-		}
-
-		// If the music trigger is being used then the timer is disabled.
-		if sequence.MusicTrigger {
-			sequence.CurrentSpeed = time.Duration(12 * time.Hour)
-			err := soundConfig.EnableSoundTrigger(sequence.Name)
-			if err != nil {
-				fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
-				os.Exit(1)
-			}
-			if debug {
-				fmt.Printf("Sound trigger %s enabled \n", sequence.Name)
-			}
-			sequence.ChangeMusicTrigger = false
-		} else {
-			err := soundConfig.DisableSoundTrigger(sequence.Name)
-			if err != nil {
-				fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
-				os.Exit(1)
-			}
-			if debug {
-				fmt.Printf("Sound trigger %s disabled\n", sequence.Name)
-			}
-			sequence.CurrentSpeed = common.SetSpeed(sequence.Speed)
-			sequence.ChangeMusicTrigger = false
+			steps = setupScannerPatterns(&sequence)
 		}
 
 		// Sequence in Normal Running Mode.
@@ -693,6 +612,41 @@ func PlaySequence(sequence common.Sequence,
 			for sequence.Run && !sequence.Static {
 				if debug {
 					fmt.Printf("%d: Sequence type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
+				}
+
+				// If the music trigger is being used then the timer is disabled.
+				if sequence.MusicTrigger {
+					sequence.CurrentSpeed = time.Duration(12 * time.Hour)
+					err := soundConfig.EnableSoundTrigger(sequence.Name)
+					if err != nil {
+						fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
+						os.Exit(1)
+					}
+					if debug {
+						fmt.Printf("Sound trigger %s enabled \n", sequence.Name)
+					}
+					sequence.ChangeMusicTrigger = false
+				} else {
+					err := soundConfig.DisableSoundTrigger(sequence.Name)
+					if err != nil {
+						fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+						os.Exit(1)
+					}
+					if debug {
+						fmt.Printf("Sound trigger %s disabled\n", sequence.Name)
+					}
+					sequence.CurrentSpeed = common.SetSpeed(sequence.Speed)
+					sequence.ChangeMusicTrigger = false
+				}
+
+				// Setup rgb patterns.
+				if sequence.Type == "rgb" {
+					steps = setupRGBPatterns(&sequence, availablePatterns)
+				}
+
+				// Setup scanner patterns.
+				if sequence.Type == "scanner" {
+					steps = setupScannerPatterns(&sequence)
 				}
 
 				// Check is any commands are waiting.
@@ -897,6 +851,73 @@ func PlaySequence(sequence common.Sequence,
 	}
 }
 
+func setupRGBPatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+	RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
+	steps := RGBPattern.Steps
+	sequence.Pattern.Name = RGBPattern.Name
+	sequence.Pattern.Label = RGBPattern.Label
+
+	// If we are updating the pattern, we also set the represention of the sequence colors.
+	if sequence.UpdatePattern {
+		sequence.SequenceColors = common.HowManyColorsInSteps(steps)
+	}
+	sequence.UpdatePattern = false
+
+	// Initialise chaser.
+	if sequence.Label == "chaser" {
+		// Set the chase RGB steps used to chase the shutter.
+		sequence.ScannerChaser = true
+		// Chaser start with a standard chase pattern in white.
+		steps = replaceRGBcolorsInSteps(steps, []color.NRGBA{{R: 255, G: 255, B: 255}})
+	}
+
+	return steps
+}
+
+func setupScannerPatterns(sequence *common.Sequence) []common.Step {
+	// Get available scanner patterns.
+	sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
+	sequence.UpdatePattern = false
+	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
+	// Set the scanner steps used to send out pan and tilt values.
+	sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
+	steps := sequence.Pattern.Steps
+
+	if sequence.AutoColor {
+		// Change all the fixtures to the next gobo.
+		for fixtureNumber := range sequence.ScannersAvailable {
+			sequence.ScannerGobo[fixtureNumber]++
+			if sequence.ScannerGobo[fixtureNumber] > 7 {
+				sequence.ScannerGobo[fixtureNumber] = 0
+			}
+		}
+		scannerLastColor := 0
+
+		// AvailableFixtures gives the real number of configured scanners.
+		for _, fixture := range sequence.ScannersAvailable {
+
+			// First check that this fixture has some configured colors.
+			colors, ok := sequence.ScannerAvailableColors[fixture.Number]
+			if ok {
+				// Found a scanner with some colors.
+				totalColorForThisFixture := len(colors)
+
+				// Now can mess with the scanner color map.
+				sequence.ScannerColor[fixture.Number-1]++
+				if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
+					if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
+						sequence.ScannerColor[fixture.Number-1] = 0
+					}
+					scannerLastColor++
+					continue
+				}
+			}
+		}
+	}
+	return steps
+}
+
 // Set the button color for the selected switch.
 // Will also change the brightness to highlight the last selected switch.
 func SetSwitchLamp(sequence common.Sequence, switchNumber int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
@@ -1083,7 +1104,7 @@ func getAvailableScannerGobos(sequenceNumber int, fixtures *fixture.Fixtures) ma
 // getAvailableScannerPattens generates scanner patterns and stores them in the sequence.
 // Each scanner can then select which pattern to use.
 // All scanner patterns have the same number of steps defined by NumberCoordinates.
-func getAvailableScannerPattens(sequence common.Sequence) map[int]common.Pattern {
+func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Pattern {
 
 	if debug {
 		fmt.Printf("getAvailableScannerPattens\n")
