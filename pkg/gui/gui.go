@@ -150,82 +150,107 @@ const White = 23
 func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
 
 	// Clear all colors.
-	for _, button := range panel.ColorDisplay.Objects {
-		button.(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = true
+	for box := range panel.ColorDisplay.Objects {
+		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.White
+		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Red {
+		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Red
 		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Orange {
+		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Orange
 		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Yellow {
+		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Yellow
 		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Green {
+		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Green
 		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Cyan {
+		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Cyan
 		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Blue {
+		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Blue
 		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Purple {
+		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Purple
 		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Magenta {
+		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Magenta
 		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Crimson {
+		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Crimson
 		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.DarkOrange {
+		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.DarkOrange
 		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Gold {
+		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Gold
 		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.ForestGreen {
+		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.ForestGreen
 		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Aqua {
+		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Aqua
 		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.SkyBlue {
+		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.SkyBlue
 		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.DarkPurple {
+		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.DarkPurple
 		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Pink {
+		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Pink
 		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Salmon {
+		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Salmon
 		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LightOrange {
+		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LightOrange
 		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Olive {
+		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Olive
 		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LawnGreen {
+		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LawnGreen
 		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Teal {
+		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Teal
 		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LightBlue {
+		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LightBlue
 		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Violet {
+		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Violet
 		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.White {
+		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.White
 		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
