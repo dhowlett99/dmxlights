@@ -1947,7 +1947,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T    S C A N N E R   C O L O R
+	// S E L E C T   S C A N N E R   C O L O R
 	if X >= 0 && X < 8 && Y != -1 &&
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		!this.EditFixtureSelectionMode &&

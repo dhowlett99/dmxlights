@@ -526,7 +526,6 @@ func main() {
 	// Create top status bar.
 	topStatusBar := container.New(layout.NewHBoxLayout(),
 		panel.ColorDisplay,
-		layout.NewSpacer(),
 		upLabel,
 		redLabel,
 		greenLabel,
