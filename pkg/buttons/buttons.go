@@ -2187,11 +2187,6 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-			// Save the color to all static fixtures in our local copy.
-			for buttonNumber, button := range this.StaticButtons {
-				this.StaticButtons[buttonNumber].Color = button.Color
-			}
-
 			this.SelectAllStaticFixtures = false
 
 		} else {
@@ -2208,8 +2203,6 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-			// Save the color in local copy of the static color button
-			this.StaticButtons[this.SelectedStaticFixtureNumber].Color = sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color
 		}
 
 		this.LastStaticColorButtonX = this.SelectedStaticFixtureNumber
@@ -2239,6 +2232,9 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		common.RevealSequence(this.TargetSequence, commandChannels)
+
+		// Update the labels.
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		// Switch off the color picker.
 		this.ShowStaticColorPicker = false
