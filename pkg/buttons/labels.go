@@ -41,7 +41,14 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	UpdateFade(this, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
-	showBottomLabels(this, sequences[this.TargetSequence].SequenceColors, eventsForLaunchpad, guiButtons)
+	staticColors := []color.RGBA{}
+	for buttonNumber, button := range sequences[this.TargetSequence].StaticColors {
+		if buttonNumber > 7 { // Only copy the first eight fixtures.
+			break
+		}
+		staticColors = append(staticColors, button.Color)
+	}
+	showBottomLabels(this, sequences[this.TargetSequence].SequenceColors, staticColors, eventsForLaunchpad, guiButtons)
 
 	// Hide the color editing buttons.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -127,7 +134,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	}
 }
 
-func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticColors []color.RGBA, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("showBottomLabels type=%s fixture type=%s\n", this.SelectedType, this.SelectedFixtureType)
@@ -216,9 +223,16 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, eventsFor
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
 
-		// Update the color display for the sequence.
-		control := common.GetColorList(sequenceColors)
+		var control common.ColorDisplayControl
+		if !this.Static[this.TargetSequence] {
+			// Update the color display for the sequence.
+			control = common.GetColorList(sequenceColors)
+		} else {
+			// Use static colors for color display.
+			control = common.GetColorList(staticColors)
+		}
 		common.UpdateColorDisplay(control, guiButtons)
+
 	}
 
 	// Scanner showing rotate functions.

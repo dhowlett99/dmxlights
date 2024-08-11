@@ -173,7 +173,11 @@ func ProcessButtons(X int, Y int,
 		if this.LaunchPadConnected {
 			this.Pad.Program()
 		}
-		InitButtons(this, sequences[0].SequenceColors, eventsForLaunchpad, guiButtons)
+		staticColors := []color.RGBA{}
+		for _, button := range sequences[0].StaticColors {
+			staticColors = append(staticColors, button.Color)
+		}
+		InitButtons(this, sequences[0].SequenceColors, staticColors, eventsForLaunchpad, guiButtons)
 
 		// Show the static and switch settings.
 		cmd := common.Command{
@@ -1614,7 +1618,7 @@ func ProcessButtons(X int, Y int,
 
 	}
 
-	// S E L E C T  S W I T C H   B U T T O N's Toggle State of switches for this sequence.
+	// S E L E C T   S W I T C H   B U T T O N's Toggle State of switches for this sequence.
 	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
@@ -1809,7 +1813,7 @@ func ProcessButtons(X int, Y int,
 
 	}
 
-	// S E L E C T   S T A T I C   C O L O R
+	// S E L E C T   E D I T  S T A T I C   C O L O R
 	// Red
 	if X == 1 && Y == -1 && this.Static[this.TargetSequence] {
 
@@ -2134,7 +2138,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E T   S T A T I C   C O L O R
+	// S E L E C T   S T A T I C   C O L O R
 	if X >= 0 && X < 8 && Y != -1 &&
 		Y < 3 && // Make sure the buttons pressed inside the color picker.
 		this.ShowStaticColorPicker && // Now We Are In Static Color Picker Mode.
@@ -2164,6 +2168,9 @@ func ProcessButtons(X int, Y int,
 		// Set our local copy of the color.
 		sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color = color
 
+		// Save the color in local copy of the static color button
+		this.StaticButtons[this.SelectedStaticFixtureNumber].Color = color
+
 		// Tell the sequence about the new color and where we are in the
 		// color cycle.
 
@@ -2180,6 +2187,11 @@ func ProcessButtons(X int, Y int,
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
+			// Save the color to all static fixtures in our local copy.
+			for buttonNumber, button := range this.StaticButtons {
+				this.StaticButtons[buttonNumber].Color = button.Color
+			}
+
 			this.SelectAllStaticFixtures = false
 
 		} else {
@@ -2195,6 +2207,9 @@ func ProcessButtons(X int, Y int,
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+			// Save the color in local copy of the static color button
+			this.StaticButtons[this.SelectedStaticFixtureNumber].Color = sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color
 		}
 
 		this.LastStaticColorButtonX = this.SelectedStaticFixtureNumber
@@ -2618,7 +2633,7 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 	}
 }
 
-func InitButtons(this *CurrentState, sequenceColors []color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func InitButtons(this *CurrentState, sequenceColors []color.RGBA, staticColors []color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Light the logo blue.
 	if this.LaunchPadConnected {
@@ -2636,7 +2651,7 @@ func InitButtons(this *CurrentState, sequenceColors []color.RGBA, eventsForLaunc
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	showBottomLabels(this, sequenceColors, eventsForLaunchpad, guiButtons)
+	showBottomLabels(this, sequenceColors, staticColors, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
