@@ -959,10 +959,8 @@ func GetColorNameByRGB(colorIn color.RGBA) string {
 		return "Purple"
 	case Pink:
 		return "Pink"
-	case White:
-		return "White"
-	case Black:
-		return "Black"
+	case Magenta:
+		return "Magenta"
 
 	case Crimson:
 		return "Crimson"
@@ -997,6 +995,9 @@ func GetColorNameByRGB(colorIn color.RGBA) string {
 		return "Violet"
 	case White:
 		return "White"
+
+	case Black:
+		return "Black"
 	}
 
 	return "White"
@@ -1233,6 +1234,10 @@ func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 }
 
 func GetColorList(colors []color.RGBA) ColorDisplayControl {
+
+	if debug {
+		fmt.Printf("GetColorList Colors=%+v\n", colors)
+	}
 
 	control := ColorDisplayControl{}
 
