@@ -288,14 +288,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.RGBFade = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
-	case common.UpdateColor:
-		const COLOR = 0
-		if debug {
-			fmt.Printf("%d: Command Update Color to %d\n", mySequenceNumber, command.Args[COLOR].Value)
-		}
-		sequence.Color = command.Args[COLOR].Value.(int)
-		return sequence
-
 	case common.Start:
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)

@@ -311,7 +311,6 @@ const (
 	UpdateScannerSize
 	Blackout
 	Normal
-	UpdateColor
 	UpdateFunctions
 	GetUpdatedSequence
 	ResetAllSwitchPositions
@@ -386,7 +385,6 @@ type Sequence struct {
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	CurrentColors               []color.RGBA                // Storage for the colors in a sequence.
 	SequenceColors              []color.RGBA                // Temporay storage for changing sequence colors.
-	Color                       int                         // Index into current sequnece colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures              int                         // Total Number of fixtures for this sequence.
