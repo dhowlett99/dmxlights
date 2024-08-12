@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -175,42 +176,42 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 32, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 32, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 232, Tilt: 128, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 232, Tilt: 128, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 232, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 192, Tilt: 232, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 255, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 255, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 232, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 232, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 32, Tilt: 128, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 32, Tilt: 128, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 32, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 64, Tilt: 32, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -259,50 +260,50 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -351,50 +352,50 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -444,66 +445,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -552,42 +553,42 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -616,20 +617,20 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 128, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 255, Tilt: 128, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 128, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -678,66 +679,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 				},
@@ -786,66 +787,66 @@ func Test_generatePattern(t *testing.T) {
 				Steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Purple, Gobo: 0, Shutter: 255, Pan: 6, Tilt: 6, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Cyan, Gobo: 0, Shutter: 255, Pan: 4, Tilt: 4, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Yellow, Gobo: 0, Shutter: 255, Pan: 2, Tilt: 2, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Red, Gobo: 0, Shutter: 255, Pan: 0, Tilt: 0, ScannerColor: colors.White},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: common.White},
-							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: common.White},
-							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: common.White},
-							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: common.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: common.White},
+							0: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Magenta, Gobo: 0, Shutter: 255, Pan: 7, Tilt: 7, ScannerColor: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Blue, Gobo: 0, Shutter: 255, Pan: 5, Tilt: 5, ScannerColor: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Green, Gobo: 0, Shutter: 255, Pan: 3, Tilt: 3, ScannerColor: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Brightness: full, Color: colors.Orange, Gobo: 0, Shutter: 255, Pan: 1, Tilt: 1, ScannerColor: colors.White},
 						},
 					},
 				},

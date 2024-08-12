@@ -19,9 +19,11 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
+
 	"github.com/oliread/usbdmx/ft232"
 )
 
@@ -123,9 +125,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Start full clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
-		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, colors.Cyan, colors.White, eventsForLaunchpad, guiButtons)
 	} else {
-		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Magenta, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Magenta, eventsForLaunchpad, guiButtons)
 	}
 
 	// Reset the launchpad.
@@ -142,20 +144,20 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Turn off the flashing save button.
 	this.SavePreset = false
-	common.LightLamp(common.SAVE_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Turn off the Running light.
-	common.LightLamp(common.RUNNING_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.RUNNING_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Turn off the this.Flood
 	if this.Flood {
 		this.Flood = false
 		// Turn the flood button back to white.
-		common.LightLamp(common.FLOOD_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	}
 
 	// Turn off the strobe light.
-	common.LightLamp(common.STROBE_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.STROBE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Clear out soundtriggers
 	for _, trigger := range this.SoundTriggers {

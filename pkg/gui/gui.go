@@ -35,6 +35,7 @@ import (
 	"fyne.io/fyne/v2/theme"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/editor"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -151,106 +152,106 @@ func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
 
 	// Clear all colors.
 	for box := range panel.ColorDisplay.Objects {
-		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.White
+		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.White
 		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Red {
-		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Red
+		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Red
 		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Orange {
-		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Orange
+		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Orange
 		panel.ColorDisplay.Objects[Orange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Yellow {
-		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Yellow
+		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Yellow
 		panel.ColorDisplay.Objects[Yellow].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Green {
-		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Green
+		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Green
 		panel.ColorDisplay.Objects[Green].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Cyan {
-		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Cyan
+		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Cyan
 		panel.ColorDisplay.Objects[Cyan].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Blue {
-		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Blue
+		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Blue
 		panel.ColorDisplay.Objects[Blue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Purple {
-		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Purple
+		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Purple
 		panel.ColorDisplay.Objects[Purple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Magenta {
-		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Magenta
+		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Magenta
 		panel.ColorDisplay.Objects[Magenta].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Crimson {
-		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Crimson
+		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Crimson
 		panel.ColorDisplay.Objects[Crimson].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.DarkOrange {
-		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.DarkOrange
+		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.DarkOrange
 		panel.ColorDisplay.Objects[DarkOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Gold {
-		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Gold
+		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Gold
 		panel.ColorDisplay.Objects[Gold].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.ForestGreen {
-		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.ForestGreen
+		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.ForestGreen
 		panel.ColorDisplay.Objects[ForestGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Aqua {
-		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Aqua
+		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Aqua
 		panel.ColorDisplay.Objects[Aqua].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.SkyBlue {
-		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.SkyBlue
+		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.SkyBlue
 		panel.ColorDisplay.Objects[SkyBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.DarkPurple {
-		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.DarkPurple
+		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.DarkPurple
 		panel.ColorDisplay.Objects[DarkPurple].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Pink {
-		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Pink
+		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Pink
 		panel.ColorDisplay.Objects[Pink].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
 	if control.Salmon {
-		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Salmon
+		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Salmon
 		panel.ColorDisplay.Objects[Salmon].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LightOrange {
-		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LightOrange
+		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.LightOrange
 		panel.ColorDisplay.Objects[LightOrange].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Olive {
-		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Olive
+		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Olive
 		panel.ColorDisplay.Objects[Olive].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LawnGreen {
-		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LawnGreen
+		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.LawnGreen
 		panel.ColorDisplay.Objects[LawnGreen].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Teal {
-		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Teal
+		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Teal
 		panel.ColorDisplay.Objects[Teal].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.LightBlue {
-		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.LightBlue
+		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.LightBlue
 		panel.ColorDisplay.Objects[LightBlue].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.Violet {
-		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.Violet
+		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Violet
 		panel.ColorDisplay.Objects[Violet].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	if control.White {
-		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = common.White
+		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.White
 		panel.ColorDisplay.Objects[White].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 
@@ -586,7 +587,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			)
 			containers = append(containers, container1)
 		} else {
-			button.rectangle = canvas.NewRectangle(common.White)
+			button.rectangle = canvas.NewRectangle(colors.White)
 			size := fyne.Size{}
 			size.Height = 80
 			size.Width = 80
@@ -841,7 +842,7 @@ func RunSettingsPopUp(w fyne.Window, soundConfig *sound.SoundConfig,
 func ShowColorDisplay() *fyne.Container {
 
 	red := Button{}
-	red.rectangle = canvas.NewRectangle(common.Red)
+	red.rectangle = canvas.NewRectangle(colors.Red)
 	red.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	red.rectangle.StrokeColor = color.Black
 	red.rectangle.StrokeWidth = 1
@@ -849,7 +850,7 @@ func ShowColorDisplay() *fyne.Container {
 	red.container = container.NewStack(red.rectangle)
 
 	orange := Button{}
-	orange.rectangle = canvas.NewRectangle(common.Orange)
+	orange.rectangle = canvas.NewRectangle(colors.Orange)
 	orange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	orange.rectangle.StrokeColor = color.Black
 	orange.rectangle.StrokeWidth = 1
@@ -857,7 +858,7 @@ func ShowColorDisplay() *fyne.Container {
 	orange.container = container.NewStack(orange.rectangle)
 
 	yellow := Button{}
-	yellow.rectangle = canvas.NewRectangle(common.Yellow)
+	yellow.rectangle = canvas.NewRectangle(colors.Yellow)
 	yellow.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	yellow.rectangle.StrokeColor = color.Black
 	yellow.rectangle.StrokeWidth = 1
@@ -865,7 +866,7 @@ func ShowColorDisplay() *fyne.Container {
 	yellow.container = container.NewStack(yellow.rectangle)
 
 	green := Button{}
-	green.rectangle = canvas.NewRectangle(common.Green)
+	green.rectangle = canvas.NewRectangle(colors.Green)
 	green.rectangle.Hidden = true
 	green.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	green.rectangle.StrokeColor = color.Black
@@ -874,7 +875,7 @@ func ShowColorDisplay() *fyne.Container {
 	green.container = container.NewStack(green.rectangle)
 
 	cyan := Button{}
-	cyan.rectangle = canvas.NewRectangle(common.Cyan)
+	cyan.rectangle = canvas.NewRectangle(colors.Cyan)
 	cyan.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	cyan.rectangle.StrokeColor = color.Black
 	cyan.rectangle.StrokeWidth = 1
@@ -882,7 +883,7 @@ func ShowColorDisplay() *fyne.Container {
 	cyan.container = container.NewStack(cyan.rectangle)
 
 	blue := Button{}
-	blue.rectangle = canvas.NewRectangle(common.Blue)
+	blue.rectangle = canvas.NewRectangle(colors.Blue)
 	blue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	blue.rectangle.StrokeColor = color.Black
 	blue.rectangle.StrokeWidth = 1
@@ -890,7 +891,7 @@ func ShowColorDisplay() *fyne.Container {
 	blue.container = container.NewStack(blue.rectangle)
 
 	purple := Button{}
-	purple.rectangle = canvas.NewRectangle(common.Purple)
+	purple.rectangle = canvas.NewRectangle(colors.Purple)
 	purple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	purple.rectangle.StrokeColor = color.Black
 	purple.rectangle.StrokeWidth = 1
@@ -898,7 +899,7 @@ func ShowColorDisplay() *fyne.Container {
 	purple.container = container.NewStack(purple.rectangle)
 
 	pink := Button{}
-	pink.rectangle = canvas.NewRectangle(common.Pink)
+	pink.rectangle = canvas.NewRectangle(colors.Pink)
 	pink.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	pink.rectangle.StrokeColor = color.Black
 	pink.rectangle.StrokeWidth = 1
@@ -906,7 +907,7 @@ func ShowColorDisplay() *fyne.Container {
 	pink.container = container.NewStack(pink.rectangle)
 
 	crimsom := Button{}
-	crimsom.rectangle = canvas.NewRectangle(common.Crimson)
+	crimsom.rectangle = canvas.NewRectangle(colors.Crimson)
 	crimsom.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	crimsom.rectangle.StrokeColor = color.Black
 	crimsom.rectangle.StrokeWidth = 1
@@ -914,7 +915,7 @@ func ShowColorDisplay() *fyne.Container {
 	crimsom.container = container.NewStack(crimsom.rectangle)
 
 	darkOrange := Button{}
-	darkOrange.rectangle = canvas.NewRectangle(common.DarkOrange)
+	darkOrange.rectangle = canvas.NewRectangle(colors.DarkOrange)
 	darkOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkOrange.rectangle.StrokeColor = color.Black
 	darkOrange.rectangle.StrokeWidth = 1
@@ -922,7 +923,7 @@ func ShowColorDisplay() *fyne.Container {
 	darkOrange.container = container.NewStack(darkOrange.rectangle)
 
 	gold := Button{}
-	gold.rectangle = canvas.NewRectangle(common.Gold)
+	gold.rectangle = canvas.NewRectangle(colors.Gold)
 	gold.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	gold.rectangle.StrokeColor = color.Black
 	gold.rectangle.StrokeWidth = 1
@@ -930,7 +931,7 @@ func ShowColorDisplay() *fyne.Container {
 	gold.container = container.NewStack(gold.rectangle)
 
 	forestGreen := Button{}
-	forestGreen.rectangle = canvas.NewRectangle(common.ForestGreen)
+	forestGreen.rectangle = canvas.NewRectangle(colors.ForestGreen)
 	forestGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	forestGreen.rectangle.StrokeColor = color.Black
 	forestGreen.rectangle.StrokeWidth = 1
@@ -938,7 +939,7 @@ func ShowColorDisplay() *fyne.Container {
 	forestGreen.container = container.NewStack(forestGreen.rectangle)
 
 	aqua := Button{}
-	aqua.rectangle = canvas.NewRectangle(common.Aqua)
+	aqua.rectangle = canvas.NewRectangle(colors.Aqua)
 	aqua.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	aqua.rectangle.StrokeColor = color.Black
 	aqua.rectangle.StrokeWidth = 1
@@ -946,7 +947,7 @@ func ShowColorDisplay() *fyne.Container {
 	aqua.container = container.NewStack(aqua.rectangle)
 
 	skyBlue := Button{}
-	skyBlue.rectangle = canvas.NewRectangle(common.SkyBlue)
+	skyBlue.rectangle = canvas.NewRectangle(colors.SkyBlue)
 	skyBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	skyBlue.rectangle.StrokeColor = color.Black
 	skyBlue.rectangle.StrokeWidth = 1
@@ -954,7 +955,7 @@ func ShowColorDisplay() *fyne.Container {
 	skyBlue.container = container.NewStack(skyBlue.rectangle)
 
 	darkPurple := Button{}
-	darkPurple.rectangle = canvas.NewRectangle(common.DarkPurple)
+	darkPurple.rectangle = canvas.NewRectangle(colors.DarkPurple)
 	darkPurple.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	darkPurple.rectangle.StrokeColor = color.Black
 	darkPurple.rectangle.StrokeWidth = 1
@@ -962,7 +963,7 @@ func ShowColorDisplay() *fyne.Container {
 	darkPurple.container = container.NewStack(darkPurple.rectangle)
 
 	salmon := Button{}
-	salmon.rectangle = canvas.NewRectangle(common.Salmon)
+	salmon.rectangle = canvas.NewRectangle(colors.Salmon)
 	salmon.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	salmon.rectangle.StrokeColor = color.Black
 	salmon.rectangle.StrokeWidth = 1
@@ -970,7 +971,7 @@ func ShowColorDisplay() *fyne.Container {
 	salmon.container = container.NewStack(salmon.rectangle)
 
 	lightOrange := Button{}
-	lightOrange.rectangle = canvas.NewRectangle(common.LightOrange)
+	lightOrange.rectangle = canvas.NewRectangle(colors.LightOrange)
 	lightOrange.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightOrange.rectangle.StrokeColor = color.Black
 	lightOrange.rectangle.StrokeWidth = 1
@@ -978,7 +979,7 @@ func ShowColorDisplay() *fyne.Container {
 	lightOrange.container = container.NewStack(lightOrange.rectangle)
 
 	olive := Button{}
-	olive.rectangle = canvas.NewRectangle(common.Olive)
+	olive.rectangle = canvas.NewRectangle(colors.Olive)
 	olive.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	olive.rectangle.StrokeColor = color.Black
 	olive.rectangle.StrokeWidth = 1
@@ -986,7 +987,7 @@ func ShowColorDisplay() *fyne.Container {
 	olive.container = container.NewStack(olive.rectangle)
 
 	lawnGreen := Button{}
-	lawnGreen.rectangle = canvas.NewRectangle(common.LawnGreen)
+	lawnGreen.rectangle = canvas.NewRectangle(colors.LawnGreen)
 	lawnGreen.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lawnGreen.rectangle.StrokeColor = color.Black
 	lawnGreen.rectangle.StrokeWidth = 1
@@ -994,7 +995,7 @@ func ShowColorDisplay() *fyne.Container {
 	lawnGreen.container = container.NewStack(lawnGreen.rectangle)
 
 	teal := Button{}
-	teal.rectangle = canvas.NewRectangle(common.Teal)
+	teal.rectangle = canvas.NewRectangle(colors.Teal)
 	teal.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	teal.rectangle.StrokeColor = color.Black
 	teal.rectangle.StrokeWidth = 1
@@ -1002,7 +1003,7 @@ func ShowColorDisplay() *fyne.Container {
 	teal.container = container.NewStack(teal.rectangle)
 
 	lightBlue := Button{}
-	lightBlue.rectangle = canvas.NewRectangle(common.LightBlue)
+	lightBlue.rectangle = canvas.NewRectangle(colors.LightBlue)
 	lightBlue.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	lightBlue.rectangle.StrokeColor = color.Black
 	lightBlue.rectangle.StrokeWidth = 1
@@ -1010,7 +1011,7 @@ func ShowColorDisplay() *fyne.Container {
 	lightBlue.container = container.NewStack(lightBlue.rectangle)
 
 	violet := Button{}
-	violet.rectangle = canvas.NewRectangle(common.Violet)
+	violet.rectangle = canvas.NewRectangle(colors.Violet)
 	violet.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	violet.rectangle.StrokeColor = color.Black
 	violet.rectangle.StrokeWidth = 1
@@ -1018,7 +1019,7 @@ func ShowColorDisplay() *fyne.Container {
 	violet.container = container.NewStack(violet.rectangle)
 
 	white := Button{}
-	white.rectangle = canvas.NewRectangle(common.White)
+	white.rectangle = canvas.NewRectangle(colors.White)
 	white.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	white.rectangle.StrokeColor = color.Black
 	white.rectangle.StrokeWidth = 1
@@ -1026,7 +1027,7 @@ func ShowColorDisplay() *fyne.Container {
 	white.container = container.NewStack(white.rectangle)
 
 	magenta := Button{}
-	magenta.rectangle = canvas.NewRectangle(common.Magenta)
+	magenta.rectangle = canvas.NewRectangle(colors.Magenta)
 	magenta.rectangle.SetMinSize(fyne.Size{Height: 5, Width: 5})
 	magenta.rectangle.StrokeColor = color.Black
 	magenta.rectangle.StrokeWidth = 1

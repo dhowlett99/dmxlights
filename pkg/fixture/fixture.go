@@ -30,6 +30,7 @@ import (
 	"time"
 
 	"fyne.io/fyne/v2"
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/go-yaml/yaml"
@@ -480,7 +481,7 @@ func clear(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown chan bool,
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
 
 // Start Flood.
@@ -503,11 +504,11 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 	program := 0
 
 	if !cmd.Hidden {
-		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.White, cmd.Master, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, colors.White, cmd.Master, eventsForLaunchpad, guiButtons)
 		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 
-	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.White, pan, tilt, shutter, rotate, program, gobo, scannerColor, fixtures, false, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.White, pan, tilt, shutter, rotate, program, gobo, scannerColor, fixtures, false, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 }
 
@@ -524,10 +525,10 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 	}
 
 	if !cmd.Hidden {
-		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, common.Black, 0, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, colors.Black, 0, eventsForLaunchpad, guiButtons)
 		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
-	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
 
 // Switch On Static Scene.
@@ -553,7 +554,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		if !cmd.Hidden {
 			if lamp.Flash {
 				onColor := color.RGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
-				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, common.Black, eventsForLaunchpad, guiButtons)
+				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, colors.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
 			}
@@ -607,7 +608,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 
 			master := cmd.Master
 
-			if lastColor.RGBColor != common.EmptyColor {
+			if lastColor.RGBColor != colors.EmptyColor {
 				for _, fade := range fadeDownValues {
 
 					// Look for a matching color
@@ -639,7 +640,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 				// Fade down complete, set lastColor to empty in the fixture.
 				command := common.FixtureCommand{
 					Type:      "lastColor",
-					LastColor: common.EmptyColor,
+					LastColor: colors.EmptyColor,
 				}
 				select {
 				case fixtureStepChannel <- command:
@@ -661,7 +662,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					// Listen for stop command.
 					select {
 					case <-stopFadeUp:
-						lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+						lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 						return
 					case <-time.After(10 * time.Millisecond):
 					}
@@ -703,7 +704,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 	go func() {
 		var master int
 		fadeDownValues := common.GetFadeValues(64, float64(common.MAX_DMX_BRIGHTNESS), 1, true)
-		if lastColor.RGBColor != common.Black {
+		if lastColor.RGBColor != colors.Black {
 
 			if debug {
 				fmt.Printf("Fixture:%d =====>   RGB Static OFF -> Fade Down from LastColor %+v\n", fixtureNumber, lastColor)
@@ -747,7 +748,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 			// Fade down complete, set lastColor to empty in the fixture.
 			command := common.FixtureCommand{
 				Type:      "lastColor",
-				LastColor: common.EmptyColor,
+				LastColor: colors.EmptyColor,
 			}
 			select {
 			case fixtureStepChannel <- command:
@@ -850,7 +851,7 @@ func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		}
 	} else {
 		// This scanner is disabled, shut it off.
-		lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, common.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+		lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 	}
 
 	return lastColor
@@ -1414,7 +1415,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.GoboSpeed = action.GoboSpeed
 			newMiniSequencer(thisFixture, swiTch, override, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			if action.Mode != "Static" {
-				lastColor.RGBColor = common.EmptyColor
+				lastColor.RGBColor = colors.EmptyColor
 			}
 		}
 
@@ -2155,7 +2156,7 @@ func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]
 						newGobo.Number = setting.Number
 						v, _ := strconv.Atoi(setting.Value)
 						newGobo.Setting = v
-						newGobo.Color = common.Yellow
+						newGobo.Color = colors.Yellow
 						gobos[f.Number] = append(gobos[f.Number], newGobo)
 						if debug {
 							fmt.Printf("\tGobo: %s Setting: %s\n", setting.Name, setting.Value)

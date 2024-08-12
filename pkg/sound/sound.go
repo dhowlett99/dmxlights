@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/gordonklaus/portaudio"
 )
@@ -162,7 +163,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 								fmt.Printf("SOUND Trying to send to %s %d\n", trigger.Name, triggerNumber)
 							}
 							// Update status bar.
-							common.LightLamp(common.Button{X: 0, Y: -1}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+							common.LightLamp(common.Button{X: 0, Y: -1}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 							select {
 							case soundConfig.SoundTriggers[triggerNumber].Channel <- cmd:
@@ -175,7 +176,7 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 					}
 					// A short delay stop a sequnece being overwhelmed by trigger events.
 					time.Sleep(time.Millisecond * 10)
-					common.LightLamp(common.Button{X: 0, Y: -1}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+					common.LightLamp(common.Button{X: 0, Y: -1}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 				}
 			}
 		}

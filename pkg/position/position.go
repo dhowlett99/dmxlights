@@ -21,6 +21,7 @@ import (
 	"fmt"
 	"image/color"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/process"
 )
@@ -355,10 +356,10 @@ func AssemblePositions(fadeColors map[int][]common.FixtureBuffer, numberFixtures
 	return positionsOut, len(positionsOut)
 }
 
-func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []color.RGBA, fixtureState map[int]common.FixtureState) []common.Step {
+func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colorsIn []color.RGBA, fixtureState map[int]common.FixtureState) []common.Step {
 
 	var insertColor int
-	numberColors := len(colors)
+	numberColors := len(colorsIn)
 	var stepsOut []common.Step
 
 	for _, step := range steps {
@@ -384,16 +385,16 @@ func invertRGBColorsInSteps(steps []common.Step, numberFixtures int, colors []co
 			if fixtureState[fixtureNumber].RGBInverted {
 				if hasColor(fixture.Color) {
 					// insert a black.
-					newFixture.Color = common.Black
-					newFixture.BaseColor = common.Black
-					newFixture.ScannerColor = common.Black
+					newFixture.Color = colors.Black
+					newFixture.BaseColor = colors.Black
+					newFixture.ScannerColor = colors.Black
 				} else {
 					// its a blank space so insert first color.
 					newFixture.MasterDimmer = fixture.MasterDimmer
-					newFixture.Color = colors[insertColor]
+					newFixture.Color = colorsIn[insertColor]
 					newFixture.Color.A = 255
-					newFixture.BaseColor = common.Black
-					newFixture.ScannerColor = common.Black
+					newFixture.BaseColor = colors.Black
+					newFixture.ScannerColor = colors.Black
 
 					insertColor--
 					if insertColor < 0 {

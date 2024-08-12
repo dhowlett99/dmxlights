@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -36,13 +37,13 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
 		}
 		if !function.State && this.SelectedMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		if !function.State && this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		if function.State { // Magenta
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
 	}
@@ -369,7 +370,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.SelectAllStaticFixtures = false
 
 		// Starting a static sequence will turn off any running sequence, so turn off the start lamp
-		common.LightLamp(common.Button{X: X, Y: this.DisplaySequence}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: X, Y: this.DisplaySequence}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
 		this.Running[this.TargetSequence] = false
 

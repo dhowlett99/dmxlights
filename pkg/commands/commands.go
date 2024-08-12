@@ -22,6 +22,7 @@ import (
 	"image/color"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -1121,7 +1122,7 @@ func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorB
 			newFixture.Label = fixture.Label
 			newFixture.Number = fixture.Number
 			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = common.Red
+			newFixture.Color = colors.Red
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}

@@ -21,6 +21,7 @@ import (
 	"reflect"
 	"testing"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -42,66 +43,66 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Green},
-							1: {MasterDimmer: full, Color: common.Black},
-							2: {MasterDimmer: full, Color: common.Black},
+							0: {MasterDimmer: full, Color: colors.Green},
+							1: {MasterDimmer: full, Color: colors.Black},
+							2: {MasterDimmer: full, Color: colors.Black},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Black},
-							1: {MasterDimmer: full, Color: common.Green},
-							2: {MasterDimmer: full, Color: common.Black},
+							0: {MasterDimmer: full, Color: colors.Black},
+							1: {MasterDimmer: full, Color: colors.Green},
+							2: {MasterDimmer: full, Color: colors.Black},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Black},
-							1: {MasterDimmer: full, Color: common.Black},
-							2: {MasterDimmer: full, Color: common.Green},
+							0: {MasterDimmer: full, Color: colors.Black},
+							1: {MasterDimmer: full, Color: colors.Black},
+							2: {MasterDimmer: full, Color: colors.Green},
 						},
 					},
 					{ // Only black.
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Black},
-							1: {MasterDimmer: full, Color: common.Black},
-							2: {MasterDimmer: full, Color: common.Black},
+							0: {MasterDimmer: full, Color: colors.Black},
+							1: {MasterDimmer: full, Color: colors.Black},
+							2: {MasterDimmer: full, Color: colors.Black},
 						},
 					},
 				},
 				colors: []color.RGBA{
-					common.Red,
-					common.Green,
-					common.Blue,
+					colors.Red,
+					colors.Green,
+					colors.Blue,
 				},
 			},
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Red},
-						1: {MasterDimmer: full, Color: common.Black},
-						2: {MasterDimmer: full, Color: common.Black},
+						0: {MasterDimmer: full, Color: colors.Red},
+						1: {MasterDimmer: full, Color: colors.Black},
+						2: {MasterDimmer: full, Color: colors.Black},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Black},
-						1: {MasterDimmer: full, Color: common.Green},
-						2: {MasterDimmer: full, Color: common.Black},
+						0: {MasterDimmer: full, Color: colors.Black},
+						1: {MasterDimmer: full, Color: colors.Green},
+						2: {MasterDimmer: full, Color: colors.Black},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Black},
-						1: {MasterDimmer: full, Color: common.Black},
-						2: {MasterDimmer: full, Color: common.Blue},
+						0: {MasterDimmer: full, Color: colors.Black},
+						1: {MasterDimmer: full, Color: colors.Black},
+						2: {MasterDimmer: full, Color: colors.Blue},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Black},
-						1: {MasterDimmer: full, Color: common.Black},
-						2: {MasterDimmer: full, Color: common.Black},
+						0: {MasterDimmer: full, Color: colors.Black},
+						1: {MasterDimmer: full, Color: colors.Black},
+						2: {MasterDimmer: full, Color: colors.Black},
 					},
 				},
 			},
@@ -112,50 +113,50 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 				steps: []common.Step{
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Red},
-							1: {MasterDimmer: full, Color: common.Black},
-							2: {MasterDimmer: full, Color: common.Black},
+							0: {MasterDimmer: full, Color: colors.Red},
+							1: {MasterDimmer: full, Color: colors.Black},
+							2: {MasterDimmer: full, Color: colors.Black},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Black},
-							1: {MasterDimmer: full, Color: common.Green},
-							2: {MasterDimmer: full, Color: common.Black},
+							0: {MasterDimmer: full, Color: colors.Black},
+							1: {MasterDimmer: full, Color: colors.Green},
+							2: {MasterDimmer: full, Color: colors.Black},
 						},
 					},
 					{
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Color: common.Black},
-							1: {MasterDimmer: full, Color: common.Black},
-							2: {MasterDimmer: full, Color: common.Blue},
+							0: {MasterDimmer: full, Color: colors.Black},
+							1: {MasterDimmer: full, Color: colors.Black},
+							2: {MasterDimmer: full, Color: colors.Blue},
 						},
 					},
 				},
 				colors: []color.RGBA{
-					common.Green,
+					colors.Green,
 				},
 			},
 			want: []common.Step{
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Green},
-						1: {MasterDimmer: full, Color: common.Black},
-						2: {MasterDimmer: full, Color: common.Black},
+						0: {MasterDimmer: full, Color: colors.Green},
+						1: {MasterDimmer: full, Color: colors.Black},
+						2: {MasterDimmer: full, Color: colors.Black},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Black},
-						1: {MasterDimmer: full, Color: common.Green},
-						2: {MasterDimmer: full, Color: common.Black},
+						0: {MasterDimmer: full, Color: colors.Black},
+						1: {MasterDimmer: full, Color: colors.Green},
+						2: {MasterDimmer: full, Color: colors.Black},
 					},
 				},
 				{
 					Fixtures: map[int]common.Fixture{
-						0: {MasterDimmer: full, Color: common.Black},
-						1: {MasterDimmer: full, Color: common.Black},
-						2: {MasterDimmer: full, Color: common.Green},
+						0: {MasterDimmer: full, Color: colors.Black},
+						1: {MasterDimmer: full, Color: colors.Black},
+						2: {MasterDimmer: full, Color: colors.Green},
 					},
 				},
 			},

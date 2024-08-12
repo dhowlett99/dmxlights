@@ -23,6 +23,7 @@ import (
 	"image/color"
 	"math"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -79,14 +80,14 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 	}
 
 	// RULE 2 - If color is different from last color and not black.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color != common.Black {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color != colors.Black {
 
 		if debug {
 			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
 		}
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
-		if lastFixture.Color != common.Black && !start && !end && lastFixture.State != FADEDOWN {
+		if lastFixture.Color != colors.Black && !start && !end && lastFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn1 this state %d last state %d", thisFixture.State, lastFixture.State), shift, fadeColors, lastFixture.Color, sequence, thisFixture)
 		}
 
@@ -105,24 +106,24 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		}
 
 		// If the next color is black. Fade dowm this color down ready.
-		if nextFixture.Color == common.Black && !start && end && thisFixture.State != FADEDOWN {
+		if nextFixture.Color == colors.Black && !start && end && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn3", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If the next color is another color but not black. Fade dowm this color down ready.
-		if lastFixture.Color != common.Black && nextFixture.Color != common.Black && thisFixture.Color != nextFixture.Color && !start && thisFixture.State != FADEDOWN {
+		if lastFixture.Color != colors.Black && nextFixture.Color != colors.Black && thisFixture.Color != nextFixture.Color && !start && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn4 state %d", thisFixture.State), shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If next color is not black and we're at the end or bouncing and we're the first fixture.
-		if nextFixture.Color != common.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
+		if nextFixture.Color != colors.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn5", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 		return fadeColors
 	}
 
 	// RULE #3 - If this color is different from last color and is a black and at the start.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == colors.Black && start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#3 -fixture %d If this color is different from last colar and a is a black and at the start.. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
@@ -138,7 +139,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 	}
 
 	// RULE #4 - If color is different from last color and color is a black.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && !start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == colors.Black && !start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#4 fixture %d If color is different from last color and color is a black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
@@ -153,7 +154,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		}
 
 		// If the next color is color fade back up.
-		if nextFixture.Color != common.Black && end && invert {
+		if nextFixture.Color != colors.Black && end && invert {
 			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_3", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 
