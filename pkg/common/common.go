@@ -64,7 +64,6 @@ const DEFAULT_STROBE_SPEED = 255
 const IS_SCANNER = true
 const IS_RGB = false
 
-var DefaultSequenceColors = []color.RGBA{Green}
 var GlobalScannerSequenceNumber int
 
 var FLOOD_BUTTON = Button{X: 8, Y: 3}

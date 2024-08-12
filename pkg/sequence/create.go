@@ -95,7 +95,6 @@ func CreateSequence(
 		Run:                    false,
 		Bounce:                 false,
 		ScannerSize:            common.DEFAULT_SCANNER_SIZE,
-		SequenceColors:         common.DefaultSequenceColors,
 		RGBSize:                common.DEFAULT_RGB_SIZE,
 		Speed:                  common.DEFAULT_SPEED,
 		ScannerShift:           common.DEFAULT_SCANNER_SHIFT,
