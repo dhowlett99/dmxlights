@@ -586,7 +586,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 			)
 			containers = append(containers, container1)
 		} else {
-			button.rectangle = canvas.NewRectangle(color.White)
+			button.rectangle = canvas.NewRectangle(common.White)
 			size := fyne.Size{}
 			size.Height = 80
 			size.Width = 80

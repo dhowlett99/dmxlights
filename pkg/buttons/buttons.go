@@ -1946,7 +1946,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
-		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -2129,7 +2129,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
-		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Switch the mode so we know we are picking a static color from the color picker.
 		this.ShowStaticColorPicker = true
@@ -2212,7 +2212,7 @@ func ProcessButtons(X int, Y int,
 		common.HideSequence(this.TargetSequence, commandChannels)
 
 		// We call ShowRGBColorPicker so you can see which static color has been selected for this fixture.
-		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Set the first pressed for only this fixture and cancel any others
 		for x := 0; x < 8; x++ {
@@ -2398,7 +2398,7 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
 // ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
 // the targetSequence .CurrentColors selects which colors are selected.
 // Returns the RGBAvailableColors []common.StaticColorButton
-func ShowRGBColorPicker(targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
@@ -2457,8 +2457,7 @@ func ShowSelectFixtureButtons(targetSequence common.Sequence, displaySequence in
 			this.SelectedFixture = fixtureNumber
 		}
 		if fixture.Flash {
-			White := common.White
-			common.FlashLight(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, White, eventsForLaunchpad, guiButtons)
+			common.FlashLight(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, common.White, eventsForLaunchpad, guiButtons)
 		} else {
 			common.LightLamp(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, targetSequence.Master, eventsForLaunchpad, guiButtons)
 		}

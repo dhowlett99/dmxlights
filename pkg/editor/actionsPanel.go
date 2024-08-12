@@ -19,13 +19,13 @@ package editor
 
 import (
 	"fmt"
-	"image/color"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
@@ -150,16 +150,16 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					widget.NewButton("Select", func() {}),
 
 					container.NewHBox(
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
+						canvas.NewRectangle(common.White),
 					),
 
 					widget.NewRadioGroup(ap.ActionMapOptions, nil),

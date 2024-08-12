@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"image/color"
 	"regexp"
 	"strconv"
 	"strings"
@@ -161,14 +160,6 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 	fp.LabelEntryError = make(map[int]bool, len(fp.FixtureList))
 	fp.DescriptionEntryError = make(map[int]bool, len(fp.FixtureList))
 
-	Red := color.RGBA{}
-	Red.R = uint8(255)
-	Red.G = uint8(0)
-	Red.B = uint8(0)
-	Red.A = 255
-
-	White := color.White
-
 	// Create the save widget.
 	var buttonSave *widget.Button
 
@@ -260,19 +251,19 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 				widget.NewSelect(fp.GroupOptions, func(value string) {}),  // Group Number.
 				widget.NewSelect(fp.NumberOptions, func(value string) {}), // Fixture Number.
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(), // Name.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(), // Label.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(), // DMX Address.
 				),
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(), // Description.
 				),
 				widget.NewButton("-", func() {}),        // Fixture delete button.
@@ -350,9 +341,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_NAME {
 				showField(FIXTURE_NAME, o)
 				if fp.NameEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -399,9 +390,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_LABEL {
 				showField(FIXTURE_LABEL, o)
 				if fp.LabelEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_LABEL].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -444,16 +435,16 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_ADDRESS {
 				showField(FIXTURE_ADDRESS, o)
 				if fp.DMXAddressEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
 				o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = func(value string) {
 					if value != "" {
 						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[TEXT].(*widget.Entry).FocusGained()
-						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = color.White
+						o.(*fyne.Container).Objects[FIXTURE_ADDRESS].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 						newFixture := makeNewFixture(data, i, FIXTURE_ADDRESS, value, fp.FixtureList)
 						fp.FixtureList = UpdateFixture(fp.FixtureList, fp.FixtureList[i.Row].ID, newFixture)
 						data = updateArray(fp.FixtureList)
@@ -502,9 +493,9 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 			if i.Col == FIXTURE_DESCRIPTION {
 				showField(FIXTURE_DESCRIPTION, o)
 				if fp.DescriptionEntryError[fp.FixtureList[i.Row].ID] {
-					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[FIXTURE_DESCRIPTION].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])

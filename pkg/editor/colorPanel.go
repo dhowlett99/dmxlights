@@ -57,69 +57,69 @@ func NewColorPickerPanel() *ColorPanel {
 	cp.Buttons = make(map[string]Button, 10)
 
 	red := Button{}
-	red.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 0, A: 255})
+	red.rectangle = canvas.NewRectangle(common.Red)
 	red.check = widget.NewCheck("", func(value bool) {})
 	red.container = container.NewStack(red.rectangle, red.check)
 	cp.Buttons["Red"] = red
 
 	orange := Button{}
-	orange.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 111, B: 0, A: 255})
+	orange.rectangle = canvas.NewRectangle(common.Orange)
 	orange.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	orange.check = widget.NewCheck("", func(value bool) {})
 	orange.container = container.NewStack(orange.rectangle, orange.check)
 	cp.Buttons["Orange"] = orange
 
 	yellow := Button{}
-	yellow.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 0, A: 255})
+	yellow.rectangle = canvas.NewRectangle(common.Yellow)
 	yellow.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	yellow.check = widget.NewCheck("", func(value bool) {})
 	yellow.container = container.NewStack(yellow.rectangle, yellow.check)
 	cp.Buttons["Yellow"] = yellow
 
 	green := Button{}
-	green.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 0, A: 255})
+	green.rectangle = canvas.NewRectangle(common.Green)
 	green.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	green.check = widget.NewCheck("", func(value bool) {})
 	green.container = container.NewStack(green.rectangle, green.check)
 	cp.Buttons["Green"] = green
 
 	cyan := Button{}
-	cyan.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 255, B: 255, A: 255})
+	cyan.rectangle = canvas.NewRectangle(common.Cyan)
 	cyan.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	cyan.check = widget.NewCheck("", func(value bool) {})
 	cyan.container = container.NewStack(cyan.rectangle, cyan.check)
 	cp.Buttons["Cyan"] = cyan
 
 	blue := Button{}
-	blue.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 255, A: 255})
+	blue.rectangle = canvas.NewRectangle(common.Blue)
 	blue.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	blue.check = widget.NewCheck("", func(value bool) {})
 	blue.container = container.NewStack(blue.rectangle, blue.check)
 	cp.Buttons["Blue"] = blue
 
 	purple := Button{}
-	purple.rectangle = canvas.NewRectangle(color.RGBA{R: 171, G: 0, B: 255, A: 255})
+	purple.rectangle = canvas.NewRectangle(common.Purple)
 	purple.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	purple.check = widget.NewCheck("", func(value bool) {})
 	purple.container = container.NewStack(purple.rectangle, purple.check)
 	cp.Buttons["Purple"] = purple
 
 	pink := Button{}
-	pink.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 0, B: 255, A: 255})
+	pink.rectangle = canvas.NewRectangle(common.Pink)
 	pink.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	pink.check = widget.NewCheck("", func(value bool) {})
 	pink.container = container.NewStack(pink.rectangle, pink.check)
 	cp.Buttons["Pink"] = pink
 
 	white := Button{}
-	white.rectangle = canvas.NewRectangle(color.RGBA{R: 255, G: 255, B: 255, A: 255})
+	white.rectangle = canvas.NewRectangle(common.White)
 	white.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	white.check = widget.NewCheck("", func(value bool) {})
 	white.container = container.NewStack(white.rectangle, white.check)
 	cp.Buttons["White"] = white
 
 	black := Button{}
-	black.rectangle = canvas.NewRectangle(color.RGBA{R: 0, G: 0, B: 0, A: 255})
+	black.rectangle = canvas.NewRectangle(common.Black)
 	black.rectangle.SetMinSize(fyne.Size{Height: 20, Width: 20})
 	black.check = widget.NewCheck("", func(value bool) {})
 	black.container = container.NewStack(black.rectangle, black.check)
@@ -165,8 +165,8 @@ func SetFromCheckState(cp *ColorPanel) {
 
 	// Clear Rectangles
 	for x := 0; x < 10; x++ {
-		cp.Rectanges[x].FillColor = color.White
-		cp.Rectanges[x].StrokeColor = color.White
+		cp.Rectanges[x].FillColor = common.White
+		cp.Rectanges[x].StrokeColor = common.White
 		cp.Rectanges[x].StrokeWidth = 1
 	}
 
@@ -209,8 +209,8 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 
 	// Clear Rectangles
 	for x := 0; x < 10; x++ {
-		cp.Rectanges[x].FillColor = color.White
-		cp.Rectanges[x].StrokeColor = color.White
+		cp.Rectanges[x].FillColor = common.White
+		cp.Rectanges[x].StrokeColor = common.White
 		cp.Rectanges[x].StrokeWidth = 1
 	}
 
@@ -223,8 +223,8 @@ func SetRectangleColorsFromString(cp *ColorPanel, colors []string) {
 			cp.Rectanges[count].StrokeWidth = 1
 			cp.Buttons[c].check.Checked = true
 		} else {
-			cp.Rectanges[count].FillColor = color.White
-			cp.Rectanges[count].StrokeColor = color.White
+			cp.Rectanges[count].FillColor = common.White
+			cp.Rectanges[count].StrokeColor = common.White
 			cp.Rectanges[count].StrokeWidth = 1
 		}
 		count++

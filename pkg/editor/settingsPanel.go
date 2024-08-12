@@ -19,7 +19,6 @@ package editor
 
 import (
 	"fmt"
-	"image/color"
 	"strconv"
 	"strings"
 
@@ -28,6 +27,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
@@ -153,14 +153,6 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 	st.ChannelOptions = []string{"None"}
 	st.SelectedValueOptions = makeDMXoptions()
 
-	Red := color.RGBA{}
-	Red.R = uint8(255)
-	Red.G = uint8(0)
-	Red.B = uint8(0)
-	Red.A = 255
-
-	White := color.White
-
 	// Storage for error flags for each fixture.
 	st.NameEntryError = make(map[int]bool, len(st.SettingsList))
 	st.DMXValueEntryError = make(map[int]bool, len(st.SettingsList))
@@ -205,7 +197,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				// SETTING_NAME
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(),
 				),
 
@@ -214,7 +206,7 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				// SETTING_VALUE
 				container.NewStack(
-					canvas.NewRectangle(color.White),
+					canvas.NewRectangle(common.White),
 					widget.NewEntry(),
 				),
 				// SETTING_SELECT_VALUE
@@ -245,9 +237,9 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 				showSettingsField(SETTING_NAME, channelPanel, o)
 
 				if st.NameEntryError[st.SettingsList[i.Row].Number] {
-					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil
 				o.(*fyne.Container).Objects[SETTING_NAME].(*fyne.Container).Objects[TEXT].(*widget.Entry).SetText(data[i.Row][i.Col])
@@ -332,9 +324,9 @@ func NewSettingsPanel(w fyne.Window, channelPanel bool, SettingsList []fixture.S
 
 				// Change the color of the value box if there's a DMX value error.
 				if st.DMXValueEntryError[st.SettingsList[i.Row].Number] {
-					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = Red
+					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.Red
 				} else {
-					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = White
+					o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[RECTANGLE].(*canvas.Rectangle).FillColor = common.White
 				}
 
 				o.(*fyne.Container).Objects[SETTING_VALUE].(*fyne.Container).Objects[TEXT].(*widget.Entry).OnChanged = nil

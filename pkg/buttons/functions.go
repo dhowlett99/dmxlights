@@ -279,7 +279,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		sequences[this.TargetSequence].Type == "rgb" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+			fmt.Printf("Target Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
 		}
 
 		this.ShowRGBColorPicker = true
@@ -319,7 +319,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.HideAllSequences(commandChannels)
 
 		// Show the colors
-		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
