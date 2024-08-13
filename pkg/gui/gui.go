@@ -115,7 +115,7 @@ func (panel *MyPanel) ListenAndSendToGUI(guiButtons chan common.ALight, GuiFlash
 			}
 
 			if alight.ColorDisplay {
-				panel.UpdateColorDisplay(alight.ColorDisplayControl)
+				panel.UpdateColorDisplayWidget(alight.ColorDisplayControl)
 			}
 		}
 	}()
@@ -148,7 +148,7 @@ const LightBlue = 21
 const Violet = 22
 const White = 23
 
-func (panel *MyPanel) UpdateColorDisplay(control common.ColorDisplayControl) {
+func (panel *MyPanel) UpdateColorDisplayWidget(control common.ColorDisplayControl) {
 
 	// Clear all colors.
 	for box := range panel.ColorDisplay.Objects {

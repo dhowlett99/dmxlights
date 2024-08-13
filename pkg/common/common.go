@@ -1170,14 +1170,6 @@ func LightLamp(button Button, color color.RGBA, master int, eventsForLauchpad ch
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
-func UpdateSequenceColorDisplay(sequence *Sequence, guiButtons chan ALight) {
-	if debug {
-		fmt.Printf("UpdateColorDisplay: for sequence %d\n", sequence.Number)
-	}
-	control := GetColorList(sequence.SequenceColors)
-	UpdateColorDisplay(control, guiButtons)
-}
-
 func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	if debug {
 		fmt.Printf("UpdateColorDisplay: control %+v\n", control)
