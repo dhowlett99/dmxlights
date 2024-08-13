@@ -389,7 +389,7 @@ func ProcessButtons(X int, Y int,
 			Clear(X, Y, this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		} else {
 
-			// S E L E C T   P O S I T I O N
+			// S E L E C T   S C A N N E R  P O S I T I O N
 			// UP ARROW
 			if sequences[this.SelectedSequence].Type == "scanner" {
 
@@ -658,7 +658,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   S H I F T - Decrease Shift.
+	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -749,7 +749,7 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// S E L E C T   S H I F T - Increase Shift.
+	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -839,7 +839,7 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// S E L E C T   S P E E D - Decrease speed of selected sequence.
+	// S E L E C T   D E C R E A S E  S P E E D
 	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -939,7 +939,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   S P E E D - Increase speed of selected sequence.
+	// S E L E C T   I N C R E A S E   S P E E D
 	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
 
 		if debug {
@@ -1037,67 +1037,21 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   S E Q U E N C E.
-	// Select sequence 1.
-	if X == 8 && Y == 0 {
+	// S E L E C T   S E Q U E N C E
+	if X == 8 && (Y == 0 || Y == 1 || Y == 2) {
 
-		this.SelectedSequence = 0
+		this.SelectedSequence = Y
 		this.SelectedType = sequences[this.SelectedSequence].Type
-
-		if debug {
-			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
-		}
-		deFocusAllSwitches(this, sequences, commandChannels)
-
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
+		this.EditWhichStaticSequence = this.SelectedSequence
 		this.ShowRGBColorPicker = false
 		this.EditGoboSelectionMode = false
 		this.DisplayChaserShortCut = false
-		this.EditWhichStaticSequence = 0
-
-		return
-	}
-
-	// Select sequence 2.
-	if X == 8 && Y == 1 {
-
-		this.SelectedSequence = 1
-		this.SelectedType = sequences[this.SelectedSequence].Type
 
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
-
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		this.ShowRGBColorPicker = false
-		this.EditGoboSelectionMode = false
-		this.DisplayChaserShortCut = false
-		this.EditWhichStaticSequence = 1
-
-		return
-	}
-
-	// Select sequence 3.
-	if X == 8 && Y == 2 {
-
-		this.SelectedSequence = 2
-		this.SelectedType = sequences[this.SelectedSequence].Type
-
-		if debug {
-			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
-		}
-
-		deFocusAllSwitches(this, sequences, commandChannels)
-		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
-
-		this.ShowRGBColorPicker = false
-		this.EditGoboSelectionMode = false
-		if this.ScannerChaser[this.SelectedSequence] {
-			this.EditWhichStaticSequence = 4
-		}
 
 		return
 	}
@@ -1619,7 +1573,7 @@ func ProcessButtons(X int, Y int,
 
 	}
 
-	// S E L E C T   S W I T C H   B U T T O N's Toggle State of switches for this sequence.
+	// S E L E C T   S W I T C H   B U T T O N
 	if X >= 0 && X < 8 &&
 		Y >= 0 &&
 		Y < 4 &&
@@ -1906,7 +1860,7 @@ func ProcessButtons(X int, Y int,
 		}
 	}
 
-	// S E L E C T   R G B   S E Q U E N C E  C H A S E  C O L O R's
+	// S E L E C T   R G B  C H A S E  C O L O R S
 	if X >= 0 && X < 8 &&
 		Y != -1 && Y < 3 &&
 		!this.EditFixtureSelectionMode &&
