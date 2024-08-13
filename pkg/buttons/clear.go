@@ -58,9 +58,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		// Get an upto date copy of the sequence.
 		sequences[this.EditWhichStaticSequence] = common.RefreshSequence(this.EditWhichStaticSequence, commandChannels, updateChannels)
 
-		// Set the colors.
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
-
 		// Flash the correct color buttons
 		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -258,7 +255,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// Set the colors.
-		sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
+		//sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
 
 		// Handle the display for this sequence.
 		this.SelectedSequence = sequenceNumber

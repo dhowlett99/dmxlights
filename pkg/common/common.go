@@ -383,7 +383,6 @@ type Sequence struct {
 	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
-	CurrentColors               []color.RGBA                // Storage for the colors in a sequence.
 	SequenceColors              []color.RGBA                // Temporay storage for changing sequence colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
@@ -404,7 +403,7 @@ type Sequence struct {
 	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
-	Mode                        string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	Chase                       bool                        // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
 	StaticColors                []StaticColorButton         // Used in static color editing
 	Clear                       bool                        // Clear all fixtures in this sequence.
 	Static                      bool                        // We're a static sequence.

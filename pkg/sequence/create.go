@@ -101,7 +101,7 @@ func CreateSequence(
 		NumberFixtures:         numberFixtures,
 		Type:                   sequenceType,
 		Hidden:                 false,
-		Mode:                   "Sequence",
+		Chase:                  true,
 		StaticColors:           staticColorsButtons,
 		RGBAvailableColors:     sequenceColorButtons,
 		ScannerAvailableGobos:  availableScannerGobos,

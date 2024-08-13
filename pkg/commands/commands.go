@@ -76,7 +76,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Hidden = false
 		// Clear the sequence colors.
 		sequence.UpdateSequenceColor = false
-		sequence.CurrentColors = []color.RGBA{}
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
 		sequence.CurrentSpeed = common.SetSpeed(common.DEFAULT_SPEED)
@@ -292,7 +291,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.Static = false
 		sequence.Run = true
 		return sequence
@@ -302,7 +301,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command StartChase\n", mySequenceNumber)
 		}
 		sequence.ScannerChaser = true
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.Static = false
 		sequence.Run = true
 		return sequence
@@ -312,7 +311,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Stop Chase\n", mySequenceNumber)
 		}
 		sequence.ScannerChaser = false
-		sequence.Mode = "Sequence"
+		sequence.Chase = false
 		sequence.Static = false
 		sequence.Run = false
 		return sequence
@@ -547,7 +546,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.UpdateSequenceColor = false
 		sequence.SequenceColors = []color.RGBA{}
-		sequence.CurrentColors = []color.RGBA{}
 		return sequence
 
 	case common.ClearStaticColor:
@@ -934,7 +932,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.MusicTrigger = command.Args[STATE].Value.(bool)
 		sequence.Run = true
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.ScannerChaser = false
 		if sequence.Label == "chaser" && sequence.Run {
 			sequence.ScannerChaser = true

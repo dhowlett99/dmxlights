@@ -51,7 +51,7 @@ func setupRGBPatterns(sequence *common.Sequence, availablePatterns map[int]commo
 		sequence.ScannerChaser = true
 		// Chaser start with a standard chase pattern in white.
 		sequence.Pattern.Steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, []color.RGBA{colors.White})
-		sequence.CurrentColors = []color.RGBA{colors.White}
+		sequence.SequenceColors = []color.RGBA{colors.White}
 	}
 
 	return sequence.Pattern.Steps

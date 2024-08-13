@@ -1943,9 +1943,6 @@ func ProcessButtons(X int, Y int,
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		// Set the colors.
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
-
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
 		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -1991,9 +1988,6 @@ func ProcessButtons(X int, Y int,
 
 		// Get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
-		// Set the colors.
-		sequences[this.SelectedSequence].CurrentColors = sequences[this.SelectedSequence].SequenceColors
 
 		// If the sequence isn't running this will force a single color DMX message.
 		fixture.MapFixturesColorOnly(this.SelectedSequence, this.SelectedFixture, this.ScannerColor, dmxController, fixturesConfig, this.DmxInterfacePresent)
@@ -2126,9 +2120,6 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Sequence %d Fixture %d Setting Current Color as %+v\n", this.SelectedSequence, this.SelectedStaticFixtureNumber, color)
 		}
 
-		// Set the fixture color so that it flashs in the color picker.
-		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
-
 		// We call ShowRGBColorPicker so you can choose the static color for this fixture.
 		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -2162,9 +2153,6 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Selected Static Color for X %d  Y %d to Color %+v\n", this.SelectedStaticFixtureNumber, Y, color)
 		}
-
-		// Set the fixture color so that it flashs in the color picker.
-		sequences[this.TargetSequence].CurrentColors = SetRGBColorPicker(color, *sequences[this.TargetSequence])
 
 		// Set our local copy of the color.
 		sequences[this.TargetSequence].StaticColors[this.SelectedStaticFixtureNumber].Color = color
@@ -2366,17 +2354,17 @@ func SetRGBColorPicker(selectedColor color.RGBA, targetSequence common.Sequence)
 	}
 
 	// Clear out exiting colors.
-	targetSequence.CurrentColors = []color.RGBA{}
+	targetSequence.SequenceColors = []color.RGBA{}
 
 	for _, availableColor := range targetSequence.RGBAvailableColors {
 		if availableColor.Color == selectedColor {
 			if debug {
 				fmt.Printf("Adding color %+v\n", selectedColor)
 			}
-			targetSequence.CurrentColors = append(targetSequence.CurrentColors, selectedColor)
+			targetSequence.SequenceColors = append(targetSequence.SequenceColors, selectedColor)
 		}
 	}
-	return targetSequence.CurrentColors
+	return targetSequence.SequenceColors
 }
 
 func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
@@ -2415,7 +2403,7 @@ func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan 
 
 		// Check if we need to flash this button.
 		for index, availableColor := range targetSequence.RGBAvailableColors {
-			for _, sequenceColor := range targetSequence.CurrentColors {
+			for _, sequenceColor := range targetSequence.SequenceColors {
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
 						if debug {

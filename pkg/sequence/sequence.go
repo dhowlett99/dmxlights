@@ -167,8 +167,9 @@ func PlaySequence(sequence common.Sequence,
 			steps = setupScannerPatterns(&sequence)
 		}
 
-		// Sequence in Normal Running Mode.
-		if sequence.Mode == "Sequence" {
+		// Sequence in Normal Running Chase Mode.
+		if sequence.Chase {
+
 			for sequence.Run && !sequence.Static {
 				if debug {
 					fmt.Printf("%d: Sequence type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
@@ -323,10 +324,12 @@ func PlaySequence(sequence common.Sequence,
 					}
 				}
 
-				// Now that the pattern colors have been decided and the positions calculated, set the CurrentSequenceColors
+				// Now that the scanner pattern colors have been decided and the positions calculated, set the cCurrent SequenceColors
 				// with the colors from that pattern.
-				for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-					sequence.CurrentColors = common.HowManyScannerColors(scannerPositions[fixture])
+				if sequence.Type == "scanner" {
+					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
+						sequence.SequenceColors = common.HowManyScannerColors(scannerPositions[fixture])
+					}
 				}
 
 				// This is the inner loop where the sequence runs.

@@ -293,22 +293,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		// If we have colors already set use them.
-		if len(sequences[this.TargetSequence].CurrentColors) > 0 {
-			sequences[this.TargetSequence].SequenceColors = sequences[this.TargetSequence].CurrentColors
-		} else {
-			// Otherwise use the default colors for this pattern.
+		// If sequence colors are empty use the colors from the patterm.
+		if len(sequences[this.TargetSequence].SequenceColors) == 0 {
 			// Make sure the sequence colors holds the correct colors from the pattern steps.
 			sequences[this.TargetSequence].SequenceColors = common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps)
 		}
 
 		if debug {
 			fmt.Printf("Default Colos %+v\n", common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps))
-			fmt.Printf("Current Colors %+v\n", sequences[this.TargetSequence].CurrentColors)
 			fmt.Printf("Sequence Colors %+v\n", sequences[this.TargetSequence].SequenceColors)
 			fmt.Printf("Map Function 5 RGB ====> sequences[%d].SequenceColors %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 		}
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Also save the sequence colors in local represention, so if the user doesn't select any colors we can restore the existing colors.
 		this.SavedSequenceColors[this.SelectedSequence] = sequences[this.SelectedSequence].SequenceColors
