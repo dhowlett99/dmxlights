@@ -104,16 +104,17 @@ func PlaySequence(sequence common.Sequence,
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Hour, sequence, channels, fixturesConfig)
 
 		// Soft fade downs should be disabled for blackout.
+		// Send blackout messages to all fixtures.
+		// And then continue on to process further commands.
 		if sequence.Blackout {
 			if debug {
 				fmt.Printf("%d: Blackout\n", mySequenceNumber)
 			}
 			blackout(fixtureStepChannels)
 			sequence.Blackout = false
-			continue
 		}
 
-		// Clear all fixtures.
+		// Clear all fixtures and go wait for another command.
 		if sequence.Clear {
 			if debug {
 				fmt.Printf("%d: Clear\n", mySequenceNumber)
@@ -123,7 +124,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Show all switches.
+		// Show all switches and go wait for another command.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.OverrideSpeed && !sequence.OverrideShift && !sequence.OverrideSize && !sequence.OverrideFade && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show All Switches\n", mySequenceNumber)
@@ -133,7 +134,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Show the selected switch.
+		// Show the selected switch and go wait for another command.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.OverrideSpeed && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show Single Switch\n", mySequenceNumber)
@@ -144,6 +145,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
+		// Override the selected switch and go wait for another command.
 		if sequence.PlaySwitchOnce && sequence.OverrideSpeed && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Override Single Switch\n", mySequenceNumber)
@@ -154,7 +156,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Start flood mode.
+		// Start flood and go wait for another command.
 		if sequence.StartFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("%d: Start Flood\n", mySequenceNumber)
@@ -165,7 +167,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Stop flood mode.
+		// Stop flood and go wait for another command.
 		if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("%d: Stop Flood\n", mySequenceNumber)
@@ -176,7 +178,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Sequence in Static Mode.
+		// Sequence in Static Mode. Start static colors and go wait for another command.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Start Static\n", mySequenceNumber)
@@ -186,7 +188,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Turn Static Off Mode
+		// Turn Static Off Mode. Stop static colors and go wait for another command.
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Stop Static\n", mySequenceNumber)
@@ -196,7 +198,7 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Setup rgb patterns.
+		// Setup rgb patterns and go wait for another command.
 		if sequence.UpdatePattern && sequence.Type == "rgb" {
 			if debug {
 				fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
@@ -206,17 +208,18 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Setup scanner patterns.
-		if sequence.UpdatePattern && sequence.Type == "scanner" {
+		// Setup scanner patterns and go wait for another command.
+		if (sequence.UpdatePattern || sequence.UpdateShift) && sequence.Type == "scanner" {
 			if debug {
-				fmt.Printf("%d: Setup Scanner Patterns\n", mySequenceNumber)
+				fmt.Printf("%d: Setup Scanner Patterns 1\n", mySequenceNumber)
 			}
 			sequence.Pattern.Steps = setupScannerPatterns(&sequence)
 			sequence.UpdatePattern = false
+			sequence.UpdateShift = false
 			continue
 		}
 
-		// If we are updating the color in a sequence.
+		// Setup colors in a sequence and go wait for another command.
 		if sequence.UpdateColors && sequence.Type == "rgb" {
 			if debug {
 				fmt.Printf("%d: Update RGB Sequence Colors to %+v\n", mySequenceNumber, sequence.SequenceColors)
@@ -241,10 +244,38 @@ func PlaySequence(sequence common.Sequence,
 					disableMusicTrigger(&sequence, soundConfig)
 				}
 
+				// Setup rgb patterns.
+				if sequence.UpdatePattern && sequence.Type == "rgb" {
+					if debug {
+						fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
+					}
+					sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
+					sequence.UpdatePattern = false
+				}
+
+				// Setup scanner patterns.
+				if (sequence.UpdatePattern || sequence.UpdateShift) && sequence.Type == "scanner" {
+					//if debug {
+					fmt.Printf("%d: Setup Scanner Patterns 2\n", mySequenceNumber)
+					//}
+					sequence.Pattern.Steps = setupScannerPatterns(&sequence)
+					sequence.UpdatePattern = false
+					sequence.UpdateShift = false
+				}
+
+				// Setup colors in a sequence.
+				if sequence.UpdateColors && sequence.Type == "rgb" {
+					if debug {
+						fmt.Printf("%d: Update RGB Sequence Colors to %+v\n", mySequenceNumber, sequence.SequenceColors)
+					}
+					sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
+					sequence.UpdateColors = false
+				}
+
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
-					sequence.Static || sequence.UpdateShift || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateSize {
+					sequence.Static || sequence.UpdatePattern || sequence.UpdateSize {
 					break
 				}
 
@@ -375,6 +406,9 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.Type == "scanner" {
 						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
 					}
+
+					// Listen for any commands inside sequence steps, time out for the next step at the speed of the chase.
+					// or additionally timeout when get a beat that also triggers the next step.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
 					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
 						sequence.Static || sequence.UpdateShift || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateSize {
