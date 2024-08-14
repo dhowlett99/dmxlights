@@ -500,24 +500,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		return sequence
 
-	// case common.UpdateASingeSequenceColor:
-	// 	const SELECTED_X = 0
-	// 	const SELECTED_Y = 1
-
-	// 	X := command.Args[SELECTED_X].Value.(int)
-	// 	Y := command.Args[SELECTED_Y].Value.(int)
-
-	// 	newColor := common.GetColor(X, Y)
-	// 	if debug {
-	// 		fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
-	// 	}
-
-	// 	sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
-	// 	sequence.UpdateColor = true
-	// 	sequence.SaveColors = true
-
-	// 	return sequence
-
 	case common.UpdateSequenceColors:
 		const COLORS = 0
 		if debug {
