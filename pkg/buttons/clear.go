@@ -18,6 +18,7 @@ package buttons
 
 import (
 	"fmt"
+	"image/color"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -49,14 +50,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			fmt.Printf("Shortcut to clear rgb chase colors\n")
 		}
 
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.ClearSequenceColor,
-		}
-		common.SendCommandToSequence(this.EditWhichStaticSequence, cmd, commandChannels)
-
-		// Get an upto date copy of the sequence.
-		sequences[this.EditWhichStaticSequence] = common.RefreshSequence(this.EditWhichStaticSequence, commandChannels, updateChannels)
+		// Clear the local copy of colors.
+		sequences[this.EditWhichStaticSequence].SequenceColors = []color.RGBA{}
 
 		// Flash the correct color buttons
 		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], eventsForLaunchpad, guiButtons, commandChannels)

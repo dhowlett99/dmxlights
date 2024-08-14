@@ -41,7 +41,6 @@ func startFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChan
 
 	// Now tell all the fixtures what they need to do.
 	sendToAllFixtures(fixtureStepChannels, command)
-	sequence.FloodPlayOnce = false
 }
 
 func stopFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
@@ -62,8 +61,4 @@ func stopFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChann
 	}
 	// Now tell all the fixtures what they need to do.
 	sendToAllFixtures(fixtureStepChannels, command)
-	sequence.StartFlood = false
-	sequence.StopFlood = false
-	sequence.FloodPlayOnce = false
-
 }

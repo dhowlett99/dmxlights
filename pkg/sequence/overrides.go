@@ -43,8 +43,6 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 		case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
 		case <-time.After(10 * time.Millisecond):
 		}
-		sequence.PlaySwitchOnce = false
-		sequence.OverrideSpeed = false
 		return
 	}
 

@@ -85,7 +85,6 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 		// Now tell all the fixtures what they need to do.
 		sendToAllFixtures(fixtureStepChannels, command)
 	}
-	sequence.PlayStaticOnce = false
 }
 
 func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand) {
@@ -113,5 +112,4 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 
 	// Now tell all the fixtures what they need to do.
 	sendToAllFixtures(fixtureStepChannels, command)
-	sequence.PlayStaticOnce = false
 }

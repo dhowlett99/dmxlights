@@ -1043,15 +1043,16 @@ func ProcessButtons(X int, Y int,
 		this.SelectedSequence = Y
 		this.SelectedType = sequences[this.SelectedSequence].Type
 		this.EditWhichStaticSequence = this.SelectedSequence
-		this.ShowRGBColorPicker = false
-		this.EditGoboSelectionMode = false
-		this.DisplayChaserShortCut = false
 
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
+
+		this.ShowRGBColorPicker = false
+		this.EditGoboSelectionMode = false
+		this.DisplayChaserShortCut = false
 
 		return
 	}
@@ -1883,19 +1884,12 @@ func ProcessButtons(X int, Y int,
 		this.ClearPressed[this.TargetSequence] = false
 
 		// Add the selected color to the sequence.
-		cmd := common.Command{
-			Action: common.UpdateASingeSequenceColor,
-			Args: []common.Arg{
-				{Name: "SelectedX", Value: X},
-				{Name: "SelectedY", Value: Y},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		newColor := common.GetColor(X, Y)
+		sequences[this.TargetSequence].SequenceColors = append(sequences[this.TargetSequence].SequenceColors, newColor.Color)
+
+		fmt.Printf("Adding colors are now %+v\n", sequences[this.TargetSequence].SequenceColors)
 
 		this.ShowRGBColorPicker = true
-
-		// Get an upto date copy of the sequence.
-		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		// We call ShowRGBColorPicker here so the selections will flash as you press them.
 		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
@@ -2299,26 +2293,6 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 			}
 		}
 	}
-}
-
-func SetRGBColorPicker(selectedColor color.RGBA, targetSequence common.Sequence) []color.RGBA {
-
-	if debug {
-		fmt.Printf("SetRGBColorPicker\n")
-	}
-
-	// Clear out exiting colors.
-	targetSequence.SequenceColors = []color.RGBA{}
-
-	for _, availableColor := range targetSequence.RGBAvailableColors {
-		if availableColor.Color == selectedColor {
-			if debug {
-				fmt.Printf("Adding color %+v\n", selectedColor)
-			}
-			targetSequence.SequenceColors = append(targetSequence.SequenceColors, selectedColor)
-		}
-	}
-	return targetSequence.SequenceColors
 }
 
 func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {

@@ -58,7 +58,6 @@ func PlaySequence(sequence common.Sequence,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
-	var steps []common.Step
 	RGBPositions := make(map[int]common.Position)
 	scannerPositions := make(map[int]map[int]common.Position, sequence.NumberFixtures)
 
@@ -106,65 +105,125 @@ func PlaySequence(sequence common.Sequence,
 
 		// Soft fade downs should be disabled for blackout.
 		if sequence.Blackout {
+			if debug {
+				fmt.Printf("%d: Blackout\n", mySequenceNumber)
+			}
 			blackout(fixtureStepChannels)
+			sequence.Blackout = false
 			continue
 		}
 
 		// Clear all fixtures.
 		if sequence.Clear {
+			if debug {
+				fmt.Printf("%d: Clear\n", mySequenceNumber)
+			}
 			clearSequence(mySequenceNumber, &sequence, fixtureStepChannels)
+			sequence.Clear = false
 			continue
 		}
 
 		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.OverrideSpeed && !sequence.OverrideShift && !sequence.OverrideSize && !sequence.OverrideFade && sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("%d: Show All Switches\n", mySequenceNumber)
+			}
 			showAllSwitches(mySequenceNumber, &sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
+			sequence.PlaySwitchOnce = false
 			continue
 		}
 
 		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.OverrideSpeed && sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("%d: Show Single Switch\n", mySequenceNumber)
+			}
 			showSelectedSwitch(mySequenceNumber, &sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
+			sequence.PlaySwitchOnce = false
+			sequence.PlaySingleSwitch = false
 			continue
 		}
 
 		if sequence.PlaySwitchOnce && sequence.OverrideSpeed && sequence.Type == "switch" {
+			if debug {
+				fmt.Printf("%d: Override Single Switch\n", mySequenceNumber)
+			}
 			overrideSwitch(mySequenceNumber, &sequence, switchChannels)
+			sequence.PlaySwitchOnce = false
+			sequence.OverrideSpeed = false
 			continue
 		}
 
 		// Start flood mode.
 		if sequence.StartFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
+			if debug {
+				fmt.Printf("%d: Start Flood\n", mySequenceNumber)
+			}
 			startFlood(mySequenceNumber, &sequence, fixtureStepChannels)
+			sequence.StartFlood = false
+			sequence.FloodPlayOnce = false
 			continue
 		}
 
 		// Stop flood mode.
 		if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
+			if debug {
+				fmt.Printf("%d: Stop Flood\n", mySequenceNumber)
+			}
 			stopFlood(mySequenceNumber, &sequence, fixtureStepChannels)
+			sequence.StopFlood = false
+			sequence.FloodPlayOnce = false
 			continue
 		}
 
 		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
+			if debug {
+				fmt.Printf("%d: Start Static\n", mySequenceNumber)
+			}
 			startStatic(mySequenceNumber, &sequence, channels, fixtureStepChannels)
+			sequence.PlayStaticOnce = false
 			continue
 		}
 
 		// Turn Static Off Mode
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
+			if debug {
+				fmt.Printf("%d: Stop Static\n", mySequenceNumber)
+			}
 			stopStatic(mySequenceNumber, &sequence, channels, fixtureStepChannels)
+			sequence.PlayStaticOnce = false
 			continue
 		}
 
 		// Setup rgb patterns.
-		if sequence.Type == "rgb" {
-			steps = setupRGBPatterns(&sequence, availablePatterns)
+		if sequence.UpdatePattern && sequence.Type == "rgb" {
+			if debug {
+				fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
+			}
+			sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
+			sequence.UpdatePattern = false
+			continue
 		}
 
 		// Setup scanner patterns.
-		if sequence.Type == "scanner" {
-			steps = setupScannerPatterns(&sequence)
+		if sequence.UpdatePattern && sequence.Type == "scanner" {
+			if debug {
+				fmt.Printf("%d: Setup Scanner Patterns\n", mySequenceNumber)
+			}
+			sequence.Pattern.Steps = setupScannerPatterns(&sequence)
+			sequence.UpdatePattern = false
+			continue
+		}
+
+		// If we are updating the color in a sequence.
+		if sequence.UpdateColors && sequence.Type == "rgb" {
+			if debug {
+				fmt.Printf("%d: Update RGB Sequence Colors to %+v\n", mySequenceNumber, sequence.SequenceColors)
+			}
+			sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
+			sequence.UpdateColors = false
+			continue
 		}
 
 		// Sequence in Normal Running Chase Mode.
@@ -182,19 +241,10 @@ func PlaySequence(sequence common.Sequence,
 					disableMusicTrigger(&sequence, soundConfig)
 				}
 
-				// Setup rgb patterns.
-				if sequence.Type == "rgb" {
-					steps = setupRGBPatterns(&sequence, availablePatterns)
-				}
-
-				// Setup scanner patterns.
-				if sequence.Type == "scanner" {
-					steps = setupScannerPatterns(&sequence)
-				}
-
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
-				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
+					sequence.Static || sequence.UpdateShift || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateSize {
 					break
 				}
 
@@ -220,7 +270,7 @@ func PlaySequence(sequence common.Sequence,
 						// Pass through the inverted / reverse flag.
 						sequence.ScannerReverse = sequence.FixtureState[fixture].ScannerPatternReversed
 						// Calulate positions for each scanner fixture.
-						fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_SCANNER)
+						fadeColors, totalNumberOfSteps := position.CalculatePositions(sequence.Pattern.Steps, sequence, common.IS_SCANNER)
 						positions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 						sequence.NumberSteps = numberSteps
 
@@ -235,27 +285,9 @@ func PlaySequence(sequence common.Sequence,
 				// At this point colors are solid colors from the patten and not faded yet.
 				// an ideal point to replace colors in a sequence.
 				// If we are updating the color in a sequence.
-				if sequence.UpdateSequenceColor && sequence.Type == "rgb" {
-					if sequence.RecoverSequenceColors {
-						if sequence.SavedSequenceColors != nil {
-							// Recover origial colors after auto color is switched off.
-							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-							sequence.AutoColor = false
-						}
-					} else {
-						// We are updating color in sequence and sequence colors are set.
-						if len(sequence.SequenceColors) > 0 {
-							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-							// Save the current color selection.
-							if sequence.SaveColors {
-								sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
-								sequence.SaveColors = false
-							}
-						}
-					}
+				if sequence.UpdateColors && sequence.Type == "rgb" {
+					sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
 				}
-				// Save the steps temporarily
-				sequence.Pattern.Steps = steps
 
 				if sequence.Label == "chaser" {
 					if sequence.AutoColor {
@@ -285,7 +317,7 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.RGBColor > 7 {
 						sequence.RGBColor = 0
 					}
-					steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+					sequence.Pattern.Steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
 				}
 
 				if sequence.Type == "rgb" {
@@ -294,7 +326,7 @@ func PlaySequence(sequence common.Sequence,
 					// Calulate positions for each RGB fixture.
 					sequence.Optimisation = true
 					var numberSteps int
-					fadeColors, totalNumberOfSteps := position.CalculatePositions(steps, sequence, common.IS_RGB)
+					fadeColors, totalNumberOfSteps := position.CalculatePositions(sequence.Pattern.Steps, sequence, common.IS_RGB)
 					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 					sequence.NumberSteps = numberSteps
 				}
@@ -314,6 +346,7 @@ func PlaySequence(sequence common.Sequence,
 					if sequence.SelectedPattern > len(availablePatterns) {
 						sequence.SelectedPattern = 0
 					}
+					sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
 				}
 
 				// If we are setting the pattern automatically for scanner fixtures.
@@ -343,7 +376,8 @@ func PlaySequence(sequence common.Sequence,
 						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
 					}
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
-					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
+						sequence.Static || sequence.UpdateShift || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateSize {
 						break
 					}
 

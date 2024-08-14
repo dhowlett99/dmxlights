@@ -138,7 +138,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticColors []color.RGBA, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
-		fmt.Printf("showBottomLabels type=%s fixture type=%s\n", this.SelectedType, this.SelectedFixtureType)
+		fmt.Printf("showBottomLabels type=%s  static=%t fixture type=%s \n", this.SelectedType, this.Static[this.TargetSequence], this.SelectedFixtureType)
 	}
 
 	type bottonButton struct {

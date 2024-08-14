@@ -61,8 +61,4 @@ func showSelectedSwitch(mySequenceNumber int, sequence *common.Sequence, fixture
 	}
 
 	sequence.LastSwitchSelected = sequence.CurrentSwitch
-
-	sequence.PlaySwitchOnce = false
-	sequence.PlaySingleSwitch = false
-	sequence.OverrideSpeed = false
 }

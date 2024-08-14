@@ -448,7 +448,7 @@ type Sequence struct {
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
-	UpdateSequenceColor         bool                        // Command to update the sequence colors.
+	UpdateColors                bool                        // Command to update the sequence colors.
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
@@ -1244,6 +1244,11 @@ func GetColorList(colors []color.RGBA) ColorDisplayControl {
 		}
 
 	}
+
+	if debug {
+		fmt.Printf("GetColorList Control=%+v\n", control)
+	}
+
 	return control
 
 }

@@ -75,7 +75,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Remove the hidden flag.
 		sequence.Hidden = false
 		// Clear the sequence colors.
-		sequence.UpdateSequenceColor = false
+		sequence.UpdateColors = false
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
 		sequence.CurrentSpeed = common.SetSpeed(common.DEFAULT_SPEED)
@@ -124,7 +124,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.ScannerSize = common.DEFAULT_SCANNER_SIZE
 			sequence.ScannerShift = common.DEFAULT_SCANNER_SHIFT
 			// Reset the scanner pattern back to default.
-			sequence.UpdateSequenceColor = false
+			sequence.UpdateColors = false
 			sequence.RecoverSequenceColors = false
 			sequence.UpdatePattern = true
 			sequence.SelectedPattern = common.DEFAULT_PATTERN
@@ -214,7 +214,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Pattern to number %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
-		sequence.UpdateSequenceColor = false
+		sequence.UpdateColors = false
 		sequence.RecoverSequenceColors = false
 		sequence.UpdatePattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
@@ -500,32 +500,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		return sequence
 
-	case common.UpdateASingeSequenceColor:
-		const SELECTED_X = 0
-		const SELECTED_Y = 1
+	// case common.UpdateASingeSequenceColor:
+	// 	const SELECTED_X = 0
+	// 	const SELECTED_Y = 1
 
-		X := command.Args[SELECTED_X].Value.(int)
-		Y := command.Args[SELECTED_Y].Value.(int)
+	// 	X := command.Args[SELECTED_X].Value.(int)
+	// 	Y := command.Args[SELECTED_Y].Value.(int)
 
-		newColor := common.GetColor(X, Y)
-		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
-		}
+	// 	newColor := common.GetColor(X, Y)
+	// 	if debug {
+	// 		fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
+	// 	}
 
-		sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
-		sequence.UpdateSequenceColor = true
-		sequence.SaveColors = true
+	// 	sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
+	// 	sequence.UpdateColor = true
+	// 	sequence.SaveColors = true
 
-		return sequence
+	// 	return sequence
 
 	case common.UpdateSequenceColors:
 		const COLORS = 0
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %+v\n", mySequenceNumber, command.Args[COLORS].Value)
+			fmt.Printf("%d: Command Update Sequence Color Type %s to %+v\n", mySequenceNumber, sequence.Type, command.Args[COLORS].Value)
 		}
 
 		sequence.SequenceColors = command.Args[COLORS].Value.([]color.RGBA)
-		sequence.UpdateSequenceColor = true
+		sequence.UpdateColors = true
 		sequence.SaveColors = true
 
 		return sequence
@@ -538,14 +538,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.SaveColors = true
 		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
-		return sequence
-
-	case common.ClearSequenceColor:
-		if debug {
-			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
-		}
-		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = []color.RGBA{}
 		return sequence
 
 	case common.ClearStaticColor:

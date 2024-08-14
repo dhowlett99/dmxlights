@@ -40,6 +40,4 @@ func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepC
 
 	// Now tell all the fixtures what they need to do.
 	sendToAllFixtures(fixtureStepChannels, command)
-	sequence.Clear = false
-
 }

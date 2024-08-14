@@ -155,6 +155,8 @@ func (panel *MyPanel) UpdateColorDisplayWidget(control common.ColorDisplayContro
 		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.White
 		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
+	panel.ColorDisplay.Hidden = false
+	panel.ColorDisplay.Refresh()
 
 	if control.Red {
 		panel.ColorDisplay.Objects[Red].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Red

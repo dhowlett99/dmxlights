@@ -39,11 +39,17 @@ func setupRGBPatterns(sequence *common.Sequence, availablePatterns map[int]commo
 	sequence.Pattern.Label = RGBPattern.Label
 	sequence.Pattern.Steps = RGBPattern.Steps
 
+	// If this is the start and the pattern is empty, populate it from the pattern.
+	if len(sequence.SequenceColors) == 0 {
+		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
+	}
+
 	// If we are updating the pattern, we also set the represention of the sequence colors.
 	if sequence.UpdatePattern {
 		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
 	}
 	sequence.UpdatePattern = false
+	sequence.UpdateColors = false
 
 	// Initialise chaser.
 	if sequence.Label == "chaser" {
@@ -99,6 +105,35 @@ func setupScannerPatterns(sequence *common.Sequence) []common.Step {
 		}
 	}
 	return sequence.Pattern.Steps
+}
+
+func setupColors(sequence *common.Sequence, RGBPositions map[int]common.Position) []common.Step {
+
+	var steps []common.Step
+
+	if debug {
+		fmt.Printf("Update sequence colors to %+v\n", sequence.SequenceColors)
+	}
+
+	if sequence.RecoverSequenceColors {
+		if sequence.SavedSequenceColors != nil {
+			// Recover origial colors after auto color is switched off.
+			steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
+			sequence.AutoColor = false
+		}
+	} else {
+		// We are updating color in sequence and sequence colors are set.
+		if len(sequence.SequenceColors) > 0 {
+			steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
+			// Save the current color selection.
+			if sequence.SaveColors {
+				sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
+				sequence.SaveColors = false
+			}
+		}
+	}
+
+	return steps
 }
 
 // Set the button color for the selected switch.

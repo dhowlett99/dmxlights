@@ -132,7 +132,20 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 				},
 			}
 			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+		} else {
+			if debug {
+				fmt.Printf("handle(): Set Sequence Colors %+v\n", sequences[this.SelectedSequence].SequenceColors)
+			}
+			// Tell the sequence the colors we have selected.
+			cmd := common.Command{
+				Action: common.UpdateSequenceColors,
+				Args: []common.Arg{
+					{Name: "Colors", Value: sequences[this.SelectedSequence].SequenceColors},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		}
+
 	}
 
 	// Decide if we're on the first press of the select button.
