@@ -232,6 +232,11 @@ func SelectSequence(this *CurrentState) {
 
 func getStatic(this *CurrentState) bool {
 
+	if debug {
+		fmt.Printf("Static SelectedSequence %t\n", this.Static[this.SelectedSequence])
+		fmt.Printf("Static ChaserSequenceNumber %t\n\n", this.Static[this.ChaserSequenceNumber])
+	}
+
 	// If we're a scanner static can be from either the scanner or shutter chaser static value.
 	if this.SelectedSequence == this.ScannerSequenceNumber {
 		return this.Static[this.SelectedSequence] || this.Static[this.ChaserSequenceNumber]

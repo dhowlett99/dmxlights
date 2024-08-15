@@ -649,6 +649,9 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+		// Make sure any left over static scene is turned off.
+		this.Static[this.ChaserSequenceNumber] = false
+
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
