@@ -114,14 +114,13 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Blackout = false
 		}
 
-		// Clear all fixtures and go wait for another command.
+		// Clear all fixtures.
 		if sequence.Clear {
 			if debug {
 				fmt.Printf("%d: Clear\n", mySequenceNumber)
 			}
 			clearSequence(mySequenceNumber, &sequence, fixtureStepChannels)
 			sequence.Clear = false
-			continue
 		}
 
 		// Show all switches and go wait for another command.

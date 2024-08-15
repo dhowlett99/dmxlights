@@ -25,7 +25,9 @@ import (
 
 func setupChase(mySequenceNumber int, sequence *common.Sequence, availablePatterns map[int]common.Pattern, RGBPositions map[int]common.Position) {
 
-	debug := true
+	if debug {
+		fmt.Printf("%d: setupChase UpdatePattern %t Type %s\n", mySequenceNumber, sequence.UpdatePattern, sequence.Type)
+	}
 
 	// Setup rgb patterns.
 	if sequence.UpdatePattern && sequence.Type == "rgb" {

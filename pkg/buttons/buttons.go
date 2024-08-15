@@ -1047,6 +1047,16 @@ func ProcessButtons(X int, Y int,
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
+
+		// If we're in shutter chase mode
+		if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
+			this.TargetSequence = this.ChaserSequenceNumber
+		} else {
+			this.TargetSequence = this.SelectedSequence
+		}
+		// Get an upto date copy of the sequence.
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
