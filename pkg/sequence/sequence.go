@@ -123,17 +123,16 @@ func PlaySequence(sequence common.Sequence,
 			sequence.Clear = false
 		}
 
-		// Show all switches and go wait for another command.
+		// Show all switches.
 		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.OverrideSpeed && !sequence.OverrideShift && !sequence.OverrideSize && !sequence.OverrideFade && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show All Switches\n", mySequenceNumber)
 			}
 			showAllSwitches(mySequenceNumber, &sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
 			sequence.PlaySwitchOnce = false
-			continue
 		}
 
-		// Show the selected switch and go wait for another command.
+		// Show the selected switch.
 		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.OverrideSpeed && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show Single Switch\n", mySequenceNumber)
@@ -141,10 +140,9 @@ func PlaySequence(sequence common.Sequence,
 			showSelectedSwitch(mySequenceNumber, &sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
 			sequence.PlaySwitchOnce = false
 			sequence.PlaySingleSwitch = false
-			continue
 		}
 
-		// Override the selected switch and go wait for another command.
+		// Override the selected switch.
 		if sequence.PlaySwitchOnce && sequence.OverrideSpeed && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Override Single Switch\n", mySequenceNumber)
@@ -152,10 +150,9 @@ func PlaySequence(sequence common.Sequence,
 			overrideSwitch(mySequenceNumber, &sequence, switchChannels)
 			sequence.PlaySwitchOnce = false
 			sequence.OverrideSpeed = false
-			continue
 		}
 
-		// Start flood and go wait for another command.
+		// Start flood.
 		if sequence.StartFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("%d: Start Flood\n", mySequenceNumber)
@@ -163,10 +160,9 @@ func PlaySequence(sequence common.Sequence,
 			startFlood(mySequenceNumber, &sequence, fixtureStepChannels)
 			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
-			continue
 		}
 
-		// Stop flood and go wait for another command.
+		// Stop flood.
 		if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("%d: Stop Flood\n", mySequenceNumber)
@@ -174,27 +170,24 @@ func PlaySequence(sequence common.Sequence,
 			stopFlood(mySequenceNumber, &sequence, fixtureStepChannels)
 			sequence.StopFlood = false
 			sequence.FloodPlayOnce = false
-			continue
 		}
 
-		// Sequence in Static Mode. Start static colors and go wait for another command.
+		// Sequence in Static Mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Start Static\n", mySequenceNumber)
 			}
 			startStatic(mySequenceNumber, &sequence, channels, fixtureStepChannels)
 			sequence.PlayStaticOnce = false
-			continue
 		}
 
-		// Turn Static Off Mode. Stop static colors and go wait for another command.
+		// Turn Static Off Mode.
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Stop Static\n", mySequenceNumber)
 			}
 			stopStatic(mySequenceNumber, &sequence, channels, fixtureStepChannels)
 			sequence.PlayStaticOnce = false
-			continue
 		}
 
 		// Sequence in Normal Running Chase Mode.
@@ -204,7 +197,7 @@ func PlaySequence(sequence common.Sequence,
 
 			for sequence.Run && !sequence.Static {
 				if debug {
-					fmt.Printf("%d: Sequence type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
+					fmt.Printf("%d: Sequence type %s label %s Chase %t Running %t NumberSteps %d\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Chase, sequence.Run, sequence.NumberSteps)
 				}
 
 				// If the music trigger is being used then the timer is disabled.

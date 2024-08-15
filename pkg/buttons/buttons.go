@@ -1048,14 +1048,14 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 		}
 
-		// If we're in shutter chase mode
-		if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
-			this.TargetSequence = this.ChaserSequenceNumber
-		} else {
-			this.TargetSequence = this.SelectedSequence
-		}
-		// Get an upto date copy of the sequence.
-		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+		// // If we're in shutter chase mode
+		// if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
+		// 	this.TargetSequence = this.ChaserSequenceNumber
+		// } else {
+		// 	this.TargetSequence = this.SelectedSequence
+		// }
+		// // Get an upto date copy of the sequence.
+		// sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -1169,14 +1169,10 @@ func ProcessButtons(X int, Y int,
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.Functions[this.SelectedSequence][common.Function8_Music_Trigger].State = false
 
-			// Clear the pattern function keys
-			common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+			this.Static[this.SelectedSequence] = false
+			this.SelectedMode[this.SelectedSequence] = NORMAL
 
-			// Reveal the now running sequence
-			common.RevealSequence(this.SelectedSequence, commandChannels)
-
-			// Set the correct color for the select button.
-			lightSelectedButton(eventsForLaunchpad, guiButtons, this)
+			HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 			return
 		}
@@ -1897,7 +1893,9 @@ func ProcessButtons(X int, Y int,
 		newColor := common.GetColor(X, Y)
 		sequences[this.TargetSequence].SequenceColors = append(sequences[this.TargetSequence].SequenceColors, newColor.Color)
 
-		fmt.Printf("Adding colors are now %+v\n", sequences[this.TargetSequence].SequenceColors)
+		// if debug{
+		fmt.Printf("%d: Adding colors are now %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
+		//}
 
 		this.ShowRGBColorPicker = true
 

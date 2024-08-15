@@ -31,11 +31,11 @@ func enableMusicTrigger(sequence *common.Sequence, soundConfig *sound.SoundConfi
 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 	err := soundConfig.EnableSoundTrigger(sequence.Name)
 	if err != nil {
-		fmt.Printf("Error while trying to enable sound trigger %s\n", err.Error())
+		fmt.Printf("%d: Error while trying to enable sound trigger %s\n", sequence.Number, err.Error())
 		os.Exit(1)
 	}
 	if debug {
-		fmt.Printf("Sound trigger %s enabled \n", sequence.Name)
+		fmt.Printf("%d: Sound trigger %s enabled \n", sequence.Number, sequence.Name)
 	}
 	sequence.ChangeMusicTrigger = false
 }
@@ -44,11 +44,11 @@ func disableMusicTrigger(sequence *common.Sequence, soundConfig *sound.SoundConf
 
 	err := soundConfig.DisableSoundTrigger(sequence.Name)
 	if err != nil {
-		fmt.Printf("Error while trying to disable sound trigger %s\n", err.Error())
+		fmt.Printf("%d: Error while trying to disable sound trigger %s\n", sequence.Number, err.Error())
 		os.Exit(1)
 	}
 	if debug {
-		fmt.Printf("Sound trigger %s disabled\n", sequence.Name)
+		fmt.Printf("%d: Sound trigger %s disabled\n", sequence.Number, sequence.Name)
 	}
 	sequence.CurrentSpeed = common.SetSpeed(sequence.Speed)
 	sequence.ChangeMusicTrigger = false

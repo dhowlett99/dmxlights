@@ -481,6 +481,8 @@ func main() {
 	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
 	panel.VersionLabel = widget.NewButton("Version 2.1", func() {})
 	panel.VersionLabel.Hidden = false
+	panel.DisplayMode = widget.NewButton("NORMAL", func() {})
+	panel.DisplayMode.Hidden = false
 	panel.ColorDisplay.Hidden = false
 
 	// Create objects for top status bar.
@@ -546,7 +548,7 @@ func main() {
 
 	// Create bottom status bar.
 	bottonStatusBar := container.New(
-		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+		layout.NewHBoxLayout(), panel.DisplayMode, layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
 
 	// Now configure the panel content to contain the top toolbar and the squares.
 	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)

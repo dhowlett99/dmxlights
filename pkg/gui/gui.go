@@ -60,6 +60,7 @@ type MyPanel struct {
 	SizeLabel        *widget.Label
 	FadeLabel        *widget.Label
 	VersionLabel     *widget.Button
+	DisplayMode      *widget.Button
 	ColorDisplay     *fyne.Container
 	TiltLabel        *widget.Label
 	RedLabel         *widget.Label
@@ -381,9 +382,6 @@ func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {
 	if which == "fade" {
 		panel.FadeLabel.SetText(label)
 	}
-	if which == "version" {
-		panel.VersionLabel.Hidden = hide
-	}
 	if which == "tilt" {
 		panel.TiltLabel.SetText(label)
 	}
@@ -401,6 +399,12 @@ func (panel *MyPanel) UpdateStatusBar(label string, hide bool, which string) {
 	}
 	if which == "master" {
 		panel.MasterLabel.SetText(label)
+	}
+	if which == "displaymode" {
+		panel.DisplayMode.SetText(label)
+	}
+	if which == "version" {
+		panel.VersionLabel.SetText(label)
 	}
 }
 

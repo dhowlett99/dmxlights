@@ -108,42 +108,44 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 		this.ShowRGBColorPicker = false
 		this.ShowStaticColorPicker = false
 
-		this.Functions[this.EditWhichStaticSequence][common.Function5_Color].State = false
+		this.Functions[this.DisplaySequence][common.Function5_Color].State = false
+		this.Functions[this.ChaserSequenceNumber][common.Function5_Color].State = false
+
 		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// If the Selected Color has come back as empty this means we didn't select any colors.
 		// So restore the colors that were already there.
 		if debug {
-			fmt.Printf("sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+			fmt.Printf("sequences[%d].SequenceColors %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 		}
-		if len(sequences[this.SelectedSequence].SequenceColors) == 0 {
+		if len(sequences[this.TargetSequence].SequenceColors) == 0 {
 			if debug {
 				fmt.Printf("Restore Sequence Colors\n")
 			}
-			sequences[this.SelectedSequence].SequenceColors = this.SavedSequenceColors[this.SelectedSequence]
+			sequences[this.TargetSequence].SequenceColors = this.SavedSequenceColors[this.TargetSequence]
 			if debug {
-				fmt.Printf("Now set to sequences[%d].SequenceColors %+v\n", this.SelectedSequence, sequences[this.SelectedSequence].SequenceColors)
+				fmt.Printf("Now set to sequences[%d].SequenceColors %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 			}
 			// Tell the sequence that we have restored the colors.
 			cmd := common.Command{
 				Action: common.UpdateSequenceColors,
 				Args: []common.Arg{
-					{Name: "Colors", Value: sequences[this.SelectedSequence].SequenceColors},
+					{Name: "Colors", Value: sequences[this.TargetSequence].SequenceColors},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		} else {
-			if debug {
-				fmt.Printf("handle(): Set Sequence Colors %+v\n", sequences[this.SelectedSequence].SequenceColors)
-			}
+			//if debug {
+			fmt.Printf("%d: handle(): Set Sequence Colors %+v\n", sequences[this.TargetSequence].Number, sequences[this.TargetSequence].SequenceColors)
+			//}
 			// Tell the sequence the colors we have selected.
 			cmd := common.Command{
 				Action: common.UpdateSequenceColors,
 				Args: []common.Arg{
-					{Name: "Colors", Value: sequences[this.SelectedSequence].SequenceColors},
+					{Name: "Colors", Value: sequences[this.TargetSequence].SequenceColors},
 				},
 			}
-			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
 
 	}
@@ -174,6 +176,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 
 	// Now display the selected mode.
 	displayMode(this.SelectedSequence, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
+
+	// Show the mode in the status bar.
+	common.UpdateStatusBar(printMode(this.SelectedMode[this.SelectedSequence]), "displaymode", false, guiButtons)
 
 }
 
