@@ -651,6 +651,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		// Make sure any left over static scene is turned off.
 		this.Static[this.ChaserSequenceNumber] = false
+		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
 
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)

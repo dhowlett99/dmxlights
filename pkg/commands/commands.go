@@ -293,6 +293,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Chase = true
 		sequence.Static = false
+		sequence.UpdatePattern = true
 		sequence.Run = true
 		return sequence
 
@@ -303,6 +304,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerChaser = true
 		sequence.Chase = true
 		sequence.Static = false
+		sequence.UpdatePattern = true
 		sequence.Run = true
 		return sequence
 
