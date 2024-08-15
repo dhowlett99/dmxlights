@@ -97,6 +97,7 @@ func CreateSequence(
 	sequence := common.Sequence{
 		Label:                  sequenceLabel,
 		UpdatePattern:          true, // Start by setting up the pattern
+		UpdateColors:           true, // And the colors
 		ScannerAvailableColors: availableScannerColors,
 		ScannersAvailable:      availableFixtures,
 		NumberFixtures:         numberFixtures,

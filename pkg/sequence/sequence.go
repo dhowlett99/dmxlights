@@ -198,39 +198,10 @@ func PlaySequence(sequence common.Sequence,
 			continue
 		}
 
-		// Setup rgb patterns and go wait for another command.
-		if sequence.UpdatePattern && sequence.Type == "rgb" {
-			if debug {
-				fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
-			}
-			sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
-			sequence.UpdatePattern = false
-			continue
-		}
-
-		// Setup scanner patterns and go wait for another command.
-		if (sequence.UpdatePattern || sequence.UpdateShift) && sequence.Type == "scanner" {
-			if debug {
-				fmt.Printf("%d: Setup Scanner Patterns 1\n", mySequenceNumber)
-			}
-			sequence.Pattern.Steps = setupScannerPatterns(&sequence)
-			sequence.UpdatePattern = false
-			sequence.UpdateShift = false
-			continue
-		}
-
-		// Setup colors in a sequence and go wait for another command.
-		if sequence.UpdateColors && sequence.Type == "rgb" {
-			if debug {
-				fmt.Printf("%d: Update RGB Sequence Colors to %+v\n", mySequenceNumber, sequence.SequenceColors)
-			}
-			sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
-			sequence.UpdateColors = false
-			continue
-		}
-
 		// Sequence in Normal Running Chase Mode.
 		if sequence.Chase {
+
+			setupChase(mySequenceNumber, &sequence, availablePatterns, RGBPositions)
 
 			for sequence.Run && !sequence.Static {
 				if debug {
@@ -244,33 +215,7 @@ func PlaySequence(sequence common.Sequence,
 					disableMusicTrigger(&sequence, soundConfig)
 				}
 
-				// Setup rgb patterns.
-				if sequence.UpdatePattern && sequence.Type == "rgb" {
-					if debug {
-						fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
-					}
-					sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
-					sequence.UpdatePattern = false
-				}
-
-				// Setup scanner patterns.
-				if (sequence.UpdatePattern || sequence.UpdateShift) && sequence.Type == "scanner" {
-					//if debug {
-					fmt.Printf("%d: Setup Scanner Patterns 2\n", mySequenceNumber)
-					//}
-					sequence.Pattern.Steps = setupScannerPatterns(&sequence)
-					sequence.UpdatePattern = false
-					sequence.UpdateShift = false
-				}
-
-				// Setup colors in a sequence.
-				if sequence.UpdateColors && sequence.Type == "rgb" {
-					if debug {
-						fmt.Printf("%d: Update RGB Sequence Colors to %+v\n", mySequenceNumber, sequence.SequenceColors)
-					}
-					sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
-					sequence.UpdateColors = false
-				}
+				setupChase(mySequenceNumber, &sequence, availablePatterns, RGBPositions)
 
 				// Check is any commands are waiting.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
