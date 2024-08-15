@@ -1042,7 +1042,12 @@ func ProcessButtons(X int, Y int,
 
 		this.SelectedSequence = Y
 		this.SelectedType = sequences[this.SelectedSequence].Type
-		this.EditWhichStaticSequence = this.SelectedSequence
+
+		if this.ScannerChaser[this.SelectedSequence] {
+			this.EditWhichStaticSequence = this.ChaserSequenceNumber
+		} else {
+			this.EditWhichStaticSequence = this.SelectedSequence
+		}
 
 		if debug {
 			fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
@@ -2097,6 +2102,7 @@ func ProcessButtons(X int, Y int,
 		this.DisplaySequence = this.SelectedSequence
 
 		if debug {
+			fmt.Printf("Selected Mode is %s\n", printMode(this.SelectedMode[this.TargetSequence]))
 			fmt.Printf("EditWhichStaticSequence %d\n", this.EditWhichStaticSequence)
 			fmt.Printf("ShowStaticColorPicker %t\n", this.ShowStaticColorPicker)
 			fmt.Printf("TargetSequence %d\n", this.TargetSequence)
