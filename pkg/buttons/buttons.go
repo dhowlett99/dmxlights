@@ -1898,9 +1898,9 @@ func ProcessButtons(X int, Y int,
 		newColor := common.GetColor(X, Y)
 		sequences[this.TargetSequence].SequenceColors = append(sequences[this.TargetSequence].SequenceColors, newColor.Color)
 
-		// if debug{
-		fmt.Printf("%d: Adding colors are now %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
-		//}
+		if debug {
+			fmt.Printf("%d: Adding colors are now %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
+		}
 
 		this.ShowRGBColorPicker = true
 

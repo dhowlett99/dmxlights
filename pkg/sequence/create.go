@@ -18,6 +18,9 @@
 package sequence
 
 import (
+	"image/color"
+
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -91,6 +94,16 @@ func CreateSequence(
 		scannerGobos[x] = common.DEFAULT_SCANNER_GOBO
 	}
 
+	// Set default sequence colors.
+	var defaultSequenceColors []color.RGBA
+	if sequenceLabel == "chaser" {
+		defaultSequenceColors = []color.RGBA{colors.White}
+	}
+
+	if sequenceType == "rgb" && sequenceLabel != "chaser" {
+		defaultSequenceColors = []color.RGBA{colors.Green}
+	}
+
 	disabledOnce := make(map[int]bool, 8)
 
 	// The actual sequence definition.
@@ -98,6 +111,7 @@ func CreateSequence(
 		Label:                  sequenceLabel,
 		UpdatePattern:          true, // Start by setting up the pattern
 		UpdateColors:           true, // And the colors
+		SequenceColors:         defaultSequenceColors,
 		ScannerAvailableColors: availableScannerColors,
 		ScannersAvailable:      availableFixtures,
 		NumberFixtures:         numberFixtures,

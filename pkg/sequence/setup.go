@@ -35,7 +35,6 @@ func setupChase(mySequenceNumber int, sequence *common.Sequence, availablePatter
 			fmt.Printf("%d: Setup RGB Patterns\n", mySequenceNumber)
 		}
 		sequence.Pattern.Steps = setupRGBPatterns(sequence, availablePatterns)
-		fmt.Printf("%d:\t\t Sequence Colors are %+v\n", mySequenceNumber, sequence.SequenceColors)
 		sequence.UpdatePattern = false
 	}
 
