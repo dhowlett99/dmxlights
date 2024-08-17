@@ -897,7 +897,7 @@ func GetRGBColorByName(colorIn string) (color.RGBA, error) {
 func GetColorNameByRGB(colorIn color.RGBA) string {
 	switch colorIn {
 	case colors.LightBlue:
-		return "Light Blue"
+		return "LightBlue"
 	case colors.Red:
 		return "Red"
 	case colors.Orange:
@@ -1017,24 +1017,6 @@ func HowManyStepColors(steps []Step) (colors []color.RGBA) {
 
 	if debug {
 		fmt.Printf("HowManyStepColors %d\n", len(colors))
-	}
-
-	return colors
-}
-
-func HowManyScannerColors(positionsMap map[int]Position) (colors []color.RGBA) {
-
-	colorMap := make(map[color.RGBA]bool)
-	for _, positionMap := range positionsMap {
-		fixtureLen := len(positionMap.Fixtures)
-		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
-			fixture := positionMap.Fixtures[fixtureNumber]
-			colorMap[fixture.Color] = true
-		}
-	}
-
-	for color := range colorMap {
-		colors = append(colors, color)
 	}
 
 	return colors

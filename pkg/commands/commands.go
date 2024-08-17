@@ -517,11 +517,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateScannerColor:
 		const SELECTED_COLOR = 0
 		const FIXTURE_NUMBER = 1
-		if debug {
-			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
-		}
 		sequence.SaveColors = true
-		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
+		selectedColor := command.Args[SELECTED_COLOR].Value.(int)
+		selectedScanner := command.Args[FIXTURE_NUMBER].Value.(int)
+
+		// Update Color for this scanner.
+		sequence.ScannerColor[selectedScanner] = selectedColor
+
+		// Clear out existing sequemce colors.
+		sequence.SequenceColors = []color.RGBA{}
+
+		// Look through the scanners and find their current color.
+		// We set sequence colors so the color display shows the correct colors for the scanners.
+		sequence.SequenceColors = fixture.HowManyScannerColors(&sequence, fixturesConfig)
+
+		if debug {
+			fmt.Printf("%d: Command Update Scanner Colors for fixture %d to %d final colors %+v\n", mySequenceNumber, selectedScanner, selectedColor, sequence.SequenceColors)
+		}
 		return sequence
 
 	case common.ClearStaticColor:

@@ -328,9 +328,7 @@ func PlaySequence(sequence common.Sequence,
 				// Now that the scanner pattern colors have been decided and the positions calculated, set the cCurrent SequenceColors
 				// with the colors from that pattern.
 				if sequence.Type == "scanner" {
-					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						sequence.SequenceColors = common.HowManyScannerColors(scannerPositions[fixture])
-					}
+					sequence.SequenceColors = fixture.HowManyScannerColors(&sequence, fixturesConfig)
 				}
 
 				// This is the inner loop where the sequence runs.

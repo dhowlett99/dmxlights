@@ -2199,3 +2199,54 @@ func GetAvailableScannerColors(fixtures *Fixtures) (map[int][]common.StaticColor
 	}
 	return availableScannerColors, scannerColors
 }
+
+// GetScannerColorName finds the color for given scanner and color number.
+func GetScannerColorName(scannerNumber int, colorNumber int, fixtures *Fixtures) (color.RGBA, error) {
+
+	if debug {
+		fmt.Printf("GetScannerColorName() Looking for Color Number %d\n", colorNumber)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Type == "scanner" {
+			if fixture.Number == scannerNumber+1 {
+				for _, channel := range fixture.Channels {
+					if strings.Contains(channel.Name, "Color") {
+						for _, setting := range channel.Settings {
+							if setting.Number == colorNumber+1 {
+								settingColor, err := common.GetRGBColorByName(setting.Name)
+								if err != nil {
+									fmt.Printf("error: %s\n", err)
+									continue
+								}
+								return settingColor, nil
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	return color.RGBA{}, fmt.Errorf("color not found")
+}
+
+func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) (colors []color.RGBA) {
+
+	// Clear out sequemce colors.
+	sequence.SequenceColors = []color.RGBA{}
+
+	for scannerNumber := 0; scannerNumber < sequence.NumberFixtures; scannerNumber++ {
+		// Look at all the scannes and add their selected color to the color display.
+		colorNumber := sequence.ScannerColor[scannerNumber]
+		// Get the color name from the fixture config, ignore scanner that don't have a color set.
+		color, err := GetScannerColorName(scannerNumber, colorNumber, fixturesConfig)
+		if err == nil {
+			sequence.SequenceColors = append(sequence.SequenceColors, color)
+		}
+	}
+	if debug {
+		fmt.Printf("HowManyScannerColors() colors %+v\n", sequence.SequenceColors)
+	}
+
+	return sequence.SequenceColors
+}

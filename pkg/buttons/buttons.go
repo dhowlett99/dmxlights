@@ -1054,13 +1054,14 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// // If we're in shutter chase mode
-		// if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
-		// 	this.TargetSequence = this.ChaserSequenceNumber
-		// } else {
-		// 	this.TargetSequence = this.SelectedSequence
-		// }
-		// // Get an upto date copy of the sequence.
-		// sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+		if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
+			this.TargetSequence = this.ChaserSequenceNumber
+		} else {
+			this.TargetSequence = this.SelectedSequence
+		}
+
+		// Get an upto date copy of the sequence.
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -1899,7 +1900,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.TargetSequence].SequenceColors = append(sequences[this.TargetSequence].SequenceColors, newColor.Color)
 
 		if debug {
-			fmt.Printf("%d: Adding colors are now %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
+			fmt.Printf("%d: RGB Adding colors are now %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 		}
 
 		this.ShowRGBColorPicker = true
@@ -1933,7 +1934,7 @@ func ProcessButtons(X int, Y int,
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 
-		// If configured set scanner color in chaser.
+		// Add the selected color to the sequence.
 		if this.ScannerChaser[this.SelectedSequence] && this.SelectedType == "scanner" {
 			cmd := common.Command{
 				Action: common.UpdateScannerColor,
@@ -1947,7 +1948,7 @@ func ProcessButtons(X int, Y int,
 
 		this.EditScannerColorsMode = true
 
-		// Get an upto date copy of the sequence.
+		// Sequence colors are calculated in the sequence thread so get an upto date copy of the sequence.
 		sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 
 		// If the sequence isn't running this will force a single color DMX message.
@@ -1955,6 +1956,9 @@ func ProcessButtons(X int, Y int,
 
 		// Clear the pattern function keys
 		common.ClearSelectedRowOfButtons(this.SelectedSequence, eventsForLaunchpad, guiButtons)
+
+		// Update the new scanner colors in the labels.
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		// We call ShowScannerColorSelectionButtons here so the selections will flash as you press them.
 		ShowScannerColorSelectionButtons(*sequences[this.SelectedSequence], this, eventsForLaunchpad, fixturesConfig, guiButtons)
