@@ -1061,7 +1061,7 @@ func ProcessButtons(X int, Y int,
 		}
 
 		// Get an upto date copy of the sequence.
-		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+		//sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
 		deFocusAllSwitches(this, sequences, commandChannels)
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
@@ -2234,6 +2234,10 @@ func ProcessButtons(X int, Y int,
 		// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 		this.EditFixtureSelectionMode = false
 		ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+
+		// Get an upto date copy of the sequence.
+		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
+
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 		return

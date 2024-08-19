@@ -135,9 +135,9 @@ func HandleSelect(sequences []*common.Sequence, this *CurrentState, eventsForLau
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		} else {
-			//if debug {
-			fmt.Printf("%d: handle(): Set Sequence Colors %+v\n", sequences[this.TargetSequence].Number, sequences[this.TargetSequence].SequenceColors)
-			//}
+			if debug {
+				fmt.Printf("%d: handle(): Set Sequence Colors %+v\n", sequences[this.TargetSequence].Number, sequences[this.TargetSequence].SequenceColors)
+			}
 			// Tell the sequence the colors we have selected.
 			cmd := common.Command{
 				Action: common.UpdateSequenceColors,

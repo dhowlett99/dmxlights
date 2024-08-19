@@ -2241,6 +2241,9 @@ func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) (
 		// Get the color name from the fixture config, ignore scanner that don't have a color set.
 		color, err := GetScannerColorName(scannerNumber, colorNumber, fixturesConfig)
 		if err == nil {
+			if debug {
+				fmt.Printf("HowManyScannerColors()Scanner %d is Color %s\n", scannerNumber, common.GetColorNameByRGB(color))
+			}
 			sequence.SequenceColors = append(sequence.SequenceColors, color)
 		}
 	}

@@ -17,6 +17,7 @@ package colors
 
 import "image/color"
 
+var Grey = color.RGBA{R: 229, G: 228, B: 226, A: 255}
 var Black = color.RGBA{R: 0, G: 0, B: 0, A: 255}
 var Red = color.RGBA{R: 255, G: 0, B: 0, A: 255}
 var Red5 = color.RGBA{R: 5, G: 0, B: 0, A: 255}

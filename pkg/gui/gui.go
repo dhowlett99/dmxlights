@@ -153,7 +153,7 @@ func (panel *MyPanel) UpdateColorDisplayWidget(control common.ColorDisplayContro
 
 	// Clear all colors.
 	for box := range panel.ColorDisplay.Objects {
-		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.White
+		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).FillColor = colors.Grey
 		panel.ColorDisplay.Objects[box].(*fyne.Container).Objects[0].(*canvas.Rectangle).Hidden = false
 	}
 	panel.ColorDisplay.Hidden = false
