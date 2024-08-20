@@ -92,7 +92,6 @@ func PlaySequence(sequence common.Sequence,
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
 	for {
-		sequence.UpdateShift = false
 
 		// Copy in the fixture status into the static color buffer.
 		for fixtureNumber := range sequence.StaticColors {
@@ -204,8 +203,16 @@ func PlaySequence(sequence common.Sequence,
 					disableMusicTrigger(&sequence, soundConfig)
 				}
 
-				// Set the pattern. steps are generated from patterns.
-				steps = updatePatterns(&sequence, availablePatterns)
+				// Set the pattern. steps are generated from patterns. the sequence.SelectedPattern will be used to create steps.
+				if sequence.UpdatePattern {
+					steps = updatePatterns(&sequence, availablePatterns)
+					sequence.UpdatePattern = false
+				}
+
+				if sequence.UpdateShift && sequence.Type == "scanner" {
+					steps = updateScannerPatterns(&sequence)
+					sequence.UpdateShift = false
+				}
 
 				// Auto RGB colors.
 				if sequence.AutoColor && sequence.Type == "rgb" && sequence.Pattern.Label != "Multi.Color" && sequence.Pattern.Label != "Color.Chase" {
@@ -217,9 +224,28 @@ func PlaySequence(sequence common.Sequence,
 					rgbPositions = calculateRGBPositions(&sequence, steps)
 				}
 
-				// If we updating colors.
+				// At this point colors are solid colors from the patten and not faded yet.
+				// an ideal point to replace colors in a sequence.
+				// If we are updating the color in a sequence.
 				if sequence.UpdateColors && sequence.Type == "rgb" {
-					steps = updateRGBColorsInPositions(&sequence, rgbPositions)
+					if sequence.RecoverSequenceColors {
+						if sequence.SavedSequenceColors != nil {
+							// Recover origial colors after auto color is switched off.
+							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+							sequence.AutoColor = false
+						}
+					} else {
+						// We are updating color in sequence and sequence colors are set.
+						if len(sequence.SequenceColors) > 0 {
+							fmt.Printf("sequenc() 236: We are updating color in sequence to. %+v\n", sequence.SequenceColors)
+							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+							// Save the current color selection.
+							if sequence.SaveColors {
+								sequence.SavedSequenceColors = common.HowManyColorsInPositions(rgbPositions)
+								sequence.SaveColors = false
+							}
+						}
+					}
 					sequence.UpdateColors = false
 				}
 
@@ -256,7 +282,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Check for command.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
-				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateShift || sequence.UpdateSize {
 					break
 				}
 

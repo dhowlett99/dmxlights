@@ -2230,7 +2230,7 @@ func GetScannerColorName(scannerNumber int, colorNumber int, fixtures *Fixtures)
 	return color.RGBA{}, fmt.Errorf("color not found")
 }
 
-func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) (colors []color.RGBA) {
+func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) []color.RGBA {
 
 	if debug {
 		fmt.Printf("HowManyScannerColors: \n")

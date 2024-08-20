@@ -58,12 +58,6 @@ func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]comm
 	sequence.Pattern.Name = RGBPattern.Name
 	sequence.Pattern.Label = RGBPattern.Label
 
-	// If we are updating the pattern, we also set the represention of the sequence colors.
-	if sequence.UpdatePattern {
-		sequence.SequenceColors = common.HowManyColorsInSteps(steps)
-	}
-	sequence.UpdatePattern = false
-
 	// Initialise chaser.
 	if sequence.Label == "chaser" {
 		// Set the chase RGB steps used to chase the shutter.
@@ -88,36 +82,6 @@ func updateScannerPatterns(sequence *common.Sequence) []common.Step {
 	// Set the scanner steps used to send out pan and tilt values.
 	sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
 	steps := sequence.Pattern.Steps
-
-	return steps
-}
-
-func updateRGBColorsInPositions(sequence *common.Sequence, RGBPositions map[int]common.Position) []common.Step {
-
-	if debug {
-		fmt.Printf("updateRGBColorsInPositions: Update sequence colors to %+v\n", sequence.SequenceColors)
-		fmt.Printf("\tPositions are length %d\n", len(RGBPositions))
-	}
-
-	var steps []common.Step
-
-	if sequence.RecoverSequenceColors {
-		if sequence.SavedSequenceColors != nil {
-			// Recover origial colors after auto color is switched off.
-			steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-			sequence.AutoColor = false
-		}
-	} else {
-		// We are updating color in sequence and sequence colors are set.
-		if len(sequence.SequenceColors) > 0 {
-			steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
-			// Save the current color selection.
-			if sequence.SaveColors {
-				sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)
-				sequence.SaveColors = false
-			}
-		}
-	}
 
 	return steps
 }
@@ -197,6 +161,11 @@ func makeACopy(src, dist interface{}) (err error) {
 }
 
 func replaceRGBcolorsInSteps(steps []common.Step, colors []color.RGBA) []common.Step {
+
+	if debug {
+		fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colors)
+	}
+
 	stepsOut := []common.Step{}
 	err := makeACopy(steps, &stepsOut)
 	if err != nil {

@@ -37,7 +37,10 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 	if sequence.RGBColor > 7 {
 		sequence.RGBColor = 0
 	}
-	fmt.Printf("sequence.RGBColor: %d Color %+v\n", sequence.RGBColor, sequence.SequenceColors)
+
+	if debug {
+		fmt.Printf("sequence.RGBColor: %d Color %+v\n", sequence.RGBColor, sequence.SequenceColors)
+	}
 
 	// Now replace the color in the steps.
 	steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
