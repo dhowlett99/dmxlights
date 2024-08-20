@@ -960,6 +960,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.StaticFadeUpOnce = true
 				// Because steps are not stored in the config file. UpdatePattern generates the steps.
 				sequence.UpdatePattern = true
+				// Restore any sequenceColors.
+				sequence.UpdateColors = true
 				return sequence
 			}
 		}

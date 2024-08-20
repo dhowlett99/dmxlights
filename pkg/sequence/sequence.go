@@ -275,8 +275,9 @@ func PlaySequence(sequence common.Sequence,
 				}
 
 				// Update scanner colors.
-				if sequence.Type == "scanner" {
+				if sequence.UpdateColors && sequence.Type == "scanner" {
 					sequence.SequenceColors = fixture.HowManyScannerColors(&sequence, fixturesConfig)
+					sequence.UpdateColors = false
 				}
 
 				// Check for command.
