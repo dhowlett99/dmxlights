@@ -23,6 +23,10 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+// rgbAutoColors - when called sets the sequence colors to the selected color indicated by the variable sequence.RGBColor
+// and then increments the sequence.RGBColor so the next time around the sequence steps loop the color automatically changes.
+// Currently supports only eight colors.
+// Returns - A set of steps with the pattern color set to the selected color.
 func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step {
 
 	if debug {
@@ -48,6 +52,10 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 	return steps
 }
 
+// rgbAutoPattern - when called sets the sequence pattern to the selected color indicated by the variable sequence.SelectedPattern
+// and then increments the sequence.SelectedPattern so the next time around the sequence steps loop the pattern automatically changes.
+// Currently supports as many patterns as defined in availablePatterns as passed in.
+// Returns - Nothing, pattern is determined by sequence.Pattern.Number.
 func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) {
 
 	if debug {
@@ -69,6 +77,9 @@ func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.
 	}
 }
 
+// chaserAutoGobo - when called sets increments the sequences scanner gobo indicated by the variable sequence.ScannerGobo
+// Currently supports as many Gobos only 8 gobos.
+// Returns - Nothing, pattern is determined by sequence.ScannerGobo.
 func chaserAutoGobo(sequence *common.Sequence) {
 
 	if debug {
@@ -86,6 +97,9 @@ func chaserAutoGobo(sequence *common.Sequence) {
 	}
 }
 
+// scannerAutoPattern - when called sets increments the sequences scanner pattern indicated by the variable sequence.SelectedPattern
+// Currently supports 4 scanner patterns.
+// Returns - Nothing, pattern is determined by sequence.SelectedPattern.
 func scannerAutoPattern(sequence *common.Sequence) {
 
 	if debug {
@@ -98,6 +112,10 @@ func scannerAutoPattern(sequence *common.Sequence) {
 	}
 }
 
+// scannerAutoColor - when called change all the fixtures to the next gobo and changes all the fixtures to the next color.
+// sequence fixtures scanner gobo and scanner color are indicated by the variables sequence.ScannerGobo and sequence.ScannerColor.
+// Currently supports 8 scanner gobos and as many colors defined by sequence.ScannerAvailableColors
+// Returns - Nothing, gobo is determined by sequence.ScannerGobo. Color is determined by sequence.ScannerColor
 func scannerAutoColor(sequence *common.Sequence) {
 
 	if debug {
