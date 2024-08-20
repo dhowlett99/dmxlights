@@ -13,7 +13,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	debug := false
 
 	if debug {
-		fmt.Printf("showStatusBar for sequence %d\n", this.SelectedSequence)
+		fmt.Printf("showStatusBar for sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 	}
 
 	sensitivity := common.FindSensitivity(this.SoundGain)

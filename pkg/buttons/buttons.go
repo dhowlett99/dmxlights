@@ -283,7 +283,8 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// P R E S E T S - recall (short press) or delete (long press) the preset.
+	// S E L E C T   P R E S E T S
+	// recall (short press) or delete (long press) the preset.
 	if X >= 100 && X < 108 &&
 		(Y > 3 && Y < 7) {
 

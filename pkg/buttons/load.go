@@ -201,6 +201,8 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 	// Auto select the last running or static sequence which lights it's select lamp.
 	this.SelectedSequence = autoSelect(this)
+	// And set its type.
+	this.SelectedType = this.SequenceType[this.SelectedSequence]
 
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[this.SelectedSequence], eventsForLaunchpad, guiButtons)
