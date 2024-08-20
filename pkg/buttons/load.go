@@ -178,6 +178,11 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
 
+		// If we're a scanner sequence and not in static mode clear the buttom
+		if this.SequenceType[sequenceNumber] == "scanner" && !this.Static[sequenceNumber] {
+			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
+		}
+
 		// Clear any left over labels.
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
 

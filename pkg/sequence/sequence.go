@@ -237,7 +237,6 @@ func PlaySequence(sequence common.Sequence,
 					} else {
 						// We are updating color in sequence and sequence colors are set.
 						if len(sequence.SequenceColors) > 0 {
-							fmt.Printf("sequenc() 236: We are updating color in sequence to. %+v\n", sequence.SequenceColors)
 							steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 							// Save the current color selection.
 							if sequence.SaveColors {

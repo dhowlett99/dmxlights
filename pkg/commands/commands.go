@@ -958,6 +958,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				// Don't assume we're blacked out.
 				sequence.Blackout = false
 				sequence.StaticFadeUpOnce = true
+				// Because steps are not stored in the config file. UpdatePattern generates the steps.
+				sequence.UpdatePattern = true
 				return sequence
 			}
 		}
