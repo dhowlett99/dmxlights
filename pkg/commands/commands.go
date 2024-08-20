@@ -974,7 +974,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		fixturesConfig = command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures)
 
 		// Find the fixtures.
-		sequence.ScannersAvailable = SetAvalableFixtures(fixturesConfig)
+		sequence.ScannersAvailable = SetAvalableFixtures(mySequenceNumber, fixturesConfig)
 
 		// Find the number of fixtures for this sequence.
 		if sequence.Label == "chaser" {
@@ -1092,19 +1092,20 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 	return newSwitchList
 }
 
-func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
+func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
 
 	// You need to select a fixture before you can choose a color or gobo.
 	// availableFixtures holds a set of red buttons, one for every available fixture.
 	availableFixtures := []common.StaticColorButton{}
-	for _, fixture := range fixturesConfig.Fixtures {
-		if fixture.Type == "scanner" {
+	for _, f := range fixturesConfig.Fixtures {
+		if f.Type == "scanner" {
 			newFixture := common.StaticColorButton{}
-			newFixture.Name = fixture.Name
-			newFixture.Label = fixture.Label
-			newFixture.Number = fixture.Number
+			newFixture.Name = f.Name
+			newFixture.Label = f.Label
+			newFixture.Number = f.Number
 			newFixture.SelectedColor = 1 // Red
 			newFixture.Color = colors.Red
+			newFixture.NumberOfGobos = fixture.HowManyGobosForThisFixture(f.Number, sequenceNumber, fixturesConfig)
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}

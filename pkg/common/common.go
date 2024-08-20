@@ -250,6 +250,7 @@ type StaticColorButton struct {
 	Setting          int
 	FirstPress       bool
 	Enabled          bool
+	NumberOfGobos    int
 }
 
 type FixtureState struct {

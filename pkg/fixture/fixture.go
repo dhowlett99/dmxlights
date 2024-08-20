@@ -1636,6 +1636,28 @@ func FindGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fi
 	return 0
 }
 
+// HowManyGobosForThisFixture takes the fixture number, sequence number and the fixturesConfig
+// Returns returns the number of gobos this fixture has.
+func HowManyGobosForThisFixture(myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) int {
+
+	if debug {
+		fmt.Printf("HowManyGobosForThisFixture\n")
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == mySequenceNumber+1 {
+			if fixture.Number == myFixtureNumber+1 {
+				for _, channel := range fixture.Channels {
+					if strings.Contains(channel.Name, "Gobo") {
+						return len(channel.Settings)
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
 // FindColor takes the name of a color channel setting like "White" and returns the color number for this type of scanner.
 func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures) int {
 

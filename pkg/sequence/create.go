@@ -45,7 +45,7 @@ func CreateSequence(
 	availableScannerColors := make(map[int][]common.StaticColorButton)
 
 	// Find the fixtures.
-	availableFixtures := commands.SetAvalableFixtures(fixturesConfig)
+	availableFixtures := commands.SetAvalableFixtures(mySequenceNumber, fixturesConfig)
 
 	// Setup fixtures labels.
 	fixtureLabels := []string{}

@@ -88,10 +88,9 @@ func chaserAutoGobo(sequence *common.Sequence) {
 
 	if sequence.AutoColor {
 		// Change all the fixtures to the next gobo.
-		for fixtureNumber := range sequence.ScannersAvailable {
+		for fixtureNumber, scanner := range sequence.ScannersAvailable {
 			sequence.ScannerGobo[fixtureNumber]++
-			// TODO find the correct number of gobos defined in the config.
-			if sequence.ScannerGobo[fixtureNumber] > 8 {
+			if sequence.ScannerGobo[fixtureNumber] > scanner.NumberOfGobos {
 				sequence.ScannerGobo[fixtureNumber] = 1
 			}
 		}
@@ -108,8 +107,7 @@ func scannerAutoPattern(sequence *common.Sequence) {
 	}
 
 	sequence.SelectedPattern++
-	// TODO find the correct number of pattern defined in the config.
-	if sequence.SelectedPattern > 3 {
+	if sequence.SelectedPattern > len(sequence.ScannerAvailablePatterns) {
 		sequence.SelectedPattern = 0
 	}
 }
@@ -126,10 +124,9 @@ func scannerAutoColor(sequence *common.Sequence) {
 
 	if sequence.AutoColor {
 		// Change all the fixtures to the next gobo.
-		for fixtureNumber := range sequence.ScannersAvailable {
+		for fixtureNumber, scanner := range sequence.ScannersAvailable {
 			sequence.ScannerGobo[fixtureNumber]++
-			// TODO find the correct number of gobos as defined in the config for this fixture.
-			if sequence.ScannerGobo[fixtureNumber] > 7 {
+			if sequence.ScannerGobo[fixtureNumber] > scanner.NumberOfGobos {
 				sequence.ScannerGobo[fixtureNumber] = 0
 			}
 		}
