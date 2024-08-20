@@ -2232,6 +2232,10 @@ func GetScannerColorName(scannerNumber int, colorNumber int, fixtures *Fixtures)
 
 func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) (colors []color.RGBA) {
 
+	if debug {
+		fmt.Printf("HowManyScannerColors: \n")
+	}
+
 	// Clear out sequemce colors.
 	sequence.SequenceColors = []color.RGBA{}
 

@@ -1,6 +1,5 @@
 // Copyright (C) 2022,2023 dhowlett99.
-// This is the dmxlights main sequencer responsible for controlling all
-// of the fixtures in a group.
+// This is the dmxlights main sequencers supporting functions.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -29,102 +28,89 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/position"
 )
 
-func setupRGBPatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+func updatePatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+
+	if debug {
+		fmt.Printf("updatePatterns: \n")
+	}
+
+	var steps []common.Step
+
+	if sequence.Type == "rgb" {
+		steps = updateRGBPatterns(sequence, availablePatterns)
+	}
+	if sequence.Type == "scanner" {
+		steps = updateScannerPatterns(sequence)
+	}
+
+	return steps
+}
+
+func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+
+	if debug {
+		fmt.Printf("updateRGBPatterns: \n")
+	}
 
 	RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
-
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
-
+	steps := RGBPattern.Steps
 	sequence.Pattern.Name = RGBPattern.Name
 	sequence.Pattern.Label = RGBPattern.Label
-	sequence.Pattern.Steps = RGBPattern.Steps
-
-	// If this is the start and the pattern is empty, populate it from the pattern.
-	if len(sequence.SequenceColors) == 0 {
-		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
-	}
 
 	// If we are updating the pattern, we also set the represention of the sequence colors.
 	if sequence.UpdatePattern {
-		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
+		sequence.SequenceColors = common.HowManyColorsInSteps(steps)
 	}
 	sequence.UpdatePattern = false
-	sequence.UpdateColors = false
 
 	// Initialise chaser.
 	if sequence.Label == "chaser" {
 		// Set the chase RGB steps used to chase the shutter.
 		sequence.ScannerChaser = true
 		// Chaser start with a standard chase pattern in white.
-		sequence.Pattern.Steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, []color.RGBA{colors.White})
-		sequence.SequenceColors = []color.RGBA{colors.White}
+		steps = replaceRGBcolorsInSteps(steps, []color.RGBA{colors.White})
 	}
 
-	return sequence.Pattern.Steps
+	return steps
 }
 
-func setupScannerPatterns(sequence *common.Sequence) []common.Step {
+func updateScannerPatterns(sequence *common.Sequence) []common.Step {
+
+	if debug {
+		fmt.Printf("setupScannerPatterns: \n")
+	}
 
 	// Get available scanner patterns.
 	sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
 	sequence.UpdatePattern = false
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
-
 	// Set the scanner steps used to send out pan and tilt values.
 	sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
+	steps := sequence.Pattern.Steps
 
-	if sequence.AutoColor {
-		// Change all the fixtures to the next gobo.
-		for fixtureNumber := range sequence.ScannersAvailable {
-			sequence.ScannerGobo[fixtureNumber]++
-			if sequence.ScannerGobo[fixtureNumber] > 7 {
-				sequence.ScannerGobo[fixtureNumber] = 0
-			}
-		}
-		scannerLastColor := 0
-
-		// AvailableFixtures gives the real number of configured scanners.
-		for _, fixture := range sequence.ScannersAvailable {
-
-			// First check that this fixture has some configured colors.
-			colors, ok := sequence.ScannerAvailableColors[fixture.Number]
-			if ok {
-				// Found a scanner with some colors.
-				totalColorForThisFixture := len(colors)
-
-				// Now can mess with the scanner color map.
-				sequence.ScannerColor[fixture.Number-1]++
-				if sequence.ScannerColor[fixture.Number-1] > scannerLastColor {
-					if sequence.ScannerColor[fixture.Number-1] >= totalColorForThisFixture {
-						sequence.ScannerColor[fixture.Number-1] = 0
-					}
-					scannerLastColor++
-					continue
-				}
-			}
-		}
-	}
-	return sequence.Pattern.Steps
+	return steps
 }
 
-func setupColors(sequence *common.Sequence, RGBPositions map[int]common.Position) []common.Step {
-
-	var steps []common.Step
+func updateRGBColorsInPositions(sequence *common.Sequence, RGBPositions map[int]common.Position) []common.Step {
 
 	if debug {
-		fmt.Printf("Update sequence colors to %+v\n", sequence.SequenceColors)
+		fmt.Printf("updateRGBColorsInPositions: Update sequence colors to %+v\n", sequence.SequenceColors)
+		fmt.Printf("\tPositions are length %d\n", len(RGBPositions))
 	}
+
+	var steps []common.Step
 
 	if sequence.RecoverSequenceColors {
 		if sequence.SavedSequenceColors != nil {
 			// Recover origial colors after auto color is switched off.
-			steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
+			steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 			sequence.AutoColor = false
 		}
 	} else {
 		// We are updating color in sequence and sequence colors are set.
 		if len(sequence.SequenceColors) > 0 {
-			steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
+			steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 			// Save the current color selection.
 			if sequence.SaveColors {
 				sequence.SavedSequenceColors = common.HowManyColorsInPositions(RGBPositions)

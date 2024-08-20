@@ -1,6 +1,5 @@
-// Copyright (C) 2022,2023 dhowlett99.
-// This is the dmxlights main sequencer responsible for controlling all
-// of the fixtures in a group.
+// Copyright (C) 2022,2023,2024 dhowlett99.
+// This is the dmxlights main sequencer music trigger front end functions.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,6 +27,10 @@ import (
 
 func enableMusicTrigger(sequence *common.Sequence, soundConfig *sound.SoundConfig) {
 
+	if debug {
+		fmt.Printf("enableMusicTrigger: \n")
+	}
+
 	sequence.CurrentSpeed = time.Duration(12 * time.Hour)
 	err := soundConfig.EnableSoundTrigger(sequence.Name)
 	if err != nil {
@@ -41,6 +44,10 @@ func enableMusicTrigger(sequence *common.Sequence, soundConfig *sound.SoundConfi
 }
 
 func disableMusicTrigger(sequence *common.Sequence, soundConfig *sound.SoundConfig) {
+
+	if debug {
+		fmt.Printf("disableMusicTrigger: \n")
+	}
 
 	err := soundConfig.DisableSoundTrigger(sequence.Name)
 	if err != nil {

@@ -19,13 +19,11 @@ package sequence
 
 import (
 	"fmt"
-	"image/color"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/position"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 
 	"github.com/oliread/usbdmx/ft232"
@@ -58,7 +56,8 @@ func PlaySequence(sequence common.Sequence,
 	soundConfig *sound.SoundConfig,
 	dmxInterfacePresent bool) {
 
-	RGBPositions := make(map[int]common.Position)
+	var steps []common.Step
+	rgbPositions := make(map[int]common.Position)
 	scannerPositions := make(map[int]map[int]common.Position, sequence.NumberFixtures)
 
 	// Create channels used for stepping the fixture threads for this sequnece.
@@ -172,7 +171,7 @@ func PlaySequence(sequence common.Sequence,
 			sequence.FloodPlayOnce = false
 		}
 
-		// Sequence in Static Mode.
+		// Sequence in static mode.
 		if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Start Static\n", mySequenceNumber)
@@ -181,7 +180,7 @@ func PlaySequence(sequence common.Sequence,
 			sequence.PlayStaticOnce = false
 		}
 
-		// Turn Static Off Mode.
+		// Turn static mode off.
 		if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
 			if debug {
 				fmt.Printf("%d: Stop Static\n", mySequenceNumber)
@@ -190,150 +189,80 @@ func PlaySequence(sequence common.Sequence,
 			sequence.PlayStaticOnce = false
 		}
 
-		// Sequence in Normal Running Chase Mode.
+		// Sequence in normal running chase mode.
 		if sequence.Chase {
-
-			setupChase(mySequenceNumber, &sequence, availablePatterns, RGBPositions)
-
 			for sequence.Run && !sequence.Static {
+
 				if debug {
-					fmt.Printf("%d: Sequence type %s label %s Chase %t Running %t NumberSteps %d\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Chase, sequence.Run, sequence.NumberSteps)
+					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
 				}
 
-				// If the music trigger is being used then the timer is disabled.
+				// Setup music trigger.
 				if sequence.MusicTrigger {
 					enableMusicTrigger(&sequence, soundConfig)
 				} else {
 					disableMusicTrigger(&sequence, soundConfig)
 				}
 
-				setupChase(mySequenceNumber, &sequence, availablePatterns, RGBPositions)
+				// Set the pattern. steps are generated from patterns.
+				steps = updatePatterns(&sequence, availablePatterns)
 
-				// Check is any commands are waiting.
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
-				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
-					sequence.Static || sequence.UpdatePattern || sequence.UpdateSize {
-					break
+				// Auto RGB colors.
+				if sequence.AutoColor && sequence.Type == "rgb" && sequence.Pattern.Label != "Multi.Color" && sequence.Pattern.Label != "Color.Chase" {
+					steps = rgbAutoColors(&sequence, steps)
 				}
 
-				// Calculate positions for each scanner based on the steps in the pattern.
-				if sequence.Type == "scanner" {
-					if debug {
-						fmt.Printf("Scanner Steps\n")
-						for stepNumber, step := range sequence.ScannerSteps {
-							fmt.Printf("Scanner Steps %+v\n", stepNumber)
-							for _, fixture := range step.Fixtures {
-								fmt.Printf("Fixture %+v\n", fixture)
-							}
-						}
-					}
-					for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-						var positions map[int]common.Position
-						// We're playing out the scanner positions, so we won't need curve values.
-						sequence.FadeUp = []int{255}
-						sequence.FadeDown = []int{0}
-						// Turn on optimasation.
-						sequence.Optimisation = true
-
-						// Pass through the inverted / reverse flag.
-						sequence.ScannerReverse = sequence.FixtureState[fixture].ScannerPatternReversed
-						// Calulate positions for each scanner fixture.
-						fadeColors, totalNumberOfSteps := position.CalculatePositions(sequence.Pattern.Steps, sequence, common.IS_SCANNER)
-						positions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
-						sequence.NumberSteps = numberSteps
-
-						// Setup positions for each scanner. This is so we can shift the patterns on each scannner.
-						scannerPositions[fixture] = make(map[int]common.Position, 9)
-						for positionNumber, position := range positions {
-							scannerPositions[fixture][positionNumber] = position
-						}
-					}
-				}
-
-				// At this point colors are solid colors from the patten and not faded yet.
-				// an ideal point to replace colors in a sequence.
-				// If we are updating the color in a sequence.
-				if sequence.UpdateColors && sequence.Type == "rgb" {
-					sequence.Pattern.Steps = setupColors(&sequence, RGBPositions)
-				}
-
-				if sequence.Label == "chaser" {
-					if sequence.AutoColor {
-						// Change all the fixtures to the next gobo.
-						for fixtureNumber := range sequence.ScannersAvailable {
-							sequence.ScannerGobo[fixtureNumber]++
-							if sequence.ScannerGobo[fixtureNumber] > 8 {
-								sequence.ScannerGobo[fixtureNumber] = 1
-							}
-						}
-					}
-				}
-
-				// If we are setting the current colors in a rgb sequence.
-				if sequence.AutoColor &&
-					sequence.Type == "rgb" &&
-					sequence.Pattern.Label != "Multi.Color" &&
-					sequence.Pattern.Label != "Color.Chase" {
-
-					// Find a new color.
-					newColors := []color.RGBA{}
-					newColors = append(newColors, sequence.RGBAvailableColors[sequence.RGBColor].Color)
-					sequence.SequenceColors = newColors
-
-					// Step through the available colors.
-					sequence.RGBColor++
-					if sequence.RGBColor > 7 {
-						sequence.RGBColor = 0
-					}
-					sequence.Pattern.Steps = replaceRGBcolorsInSteps(sequence.Pattern.Steps, sequence.SequenceColors)
-				}
-
+				// Calculate RGB positions.
 				if sequence.Type == "rgb" {
-					// Calculate fade curve values.
-					common.CalculateFadeValues(&sequence)
-					// Calulate positions for each RGB fixture.
-					sequence.Optimisation = true
-					var numberSteps int
-					fadeColors, totalNumberOfSteps := position.CalculatePositions(sequence.Pattern.Steps, sequence, common.IS_RGB)
-					RGBPositions, numberSteps = position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
-					sequence.NumberSteps = numberSteps
+					rgbPositions = calculateRGBPositions(&sequence, steps)
 				}
 
-				// If we are setting the pattern automatically for rgb fixtures.
+				// If we updating colors.
+				if sequence.UpdateColors && sequence.Type == "rgb" {
+					steps = updateRGBColorsInPositions(&sequence, rgbPositions)
+					sequence.UpdateColors = false
+				}
+
+				// Save the steps temporarily
+				sequence.Pattern.Steps = steps
+
+				// Auto Gobo Change for Chaser.
+				if sequence.Label == "chaser" {
+					chaserAutoGobo(&sequence)
+				}
+
+				// Calculate positions from steps.
+				if sequence.Type == "scanner" {
+					scannerPositions = calculateScannerPositions(&sequence, steps)
+				}
+
+				// Auto pattern change.
 				if sequence.AutoPattern && sequence.Type == "rgb" {
-					for patternNumber, pattern := range availablePatterns {
-						if pattern.Number == sequence.SelectedPattern {
-							sequence.Pattern.Number = patternNumber
-							if debug {
-								fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
-							}
-							break
-						}
-					}
-					sequence.SelectedPattern++
-					if sequence.SelectedPattern > len(availablePatterns) {
-						sequence.SelectedPattern = 0
-					}
-					sequence.Pattern.Steps = setupRGBPatterns(&sequence, availablePatterns)
+					rgbAutoPattern(&sequence, availablePatterns)
 				}
-
-				// If we are setting the pattern automatically for scanner fixtures.
 				if sequence.AutoPattern && sequence.Type == "scanner" {
-					sequence.SelectedPattern++
-					if sequence.SelectedPattern > 3 {
-						sequence.SelectedPattern = 0
-					}
+					scannerAutoPattern(&sequence)
 				}
 
-				// Now that the scanner pattern colors have been decided and the positions calculated, set the cCurrent SequenceColors
-				// with the colors from that pattern.
+				// Auto color change.
+				if sequence.AutoColor && sequence.Type == "scanner" {
+					scannerAutoColor(&sequence)
+				}
+
+				// Update scanner colors.
 				if sequence.Type == "scanner" {
 					sequence.SequenceColors = fixture.HowManyScannerColors(&sequence, fixturesConfig)
 				}
 
+				// Check for command.
+				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
+				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateShift || sequence.UpdateSize {
+					break
+				}
+
 				// This is the inner loop where the sequence runs.
 				// Run through the steps in the sequence.
-				// Remember every step contains infomation for all the fixtures in this group.
+				// Remember every step contains infomation for all the fixtures in this sequence group.
 				for step := 0; step < sequence.NumberSteps; step++ {
 
 					// This is were we set the speed of the sequence to current speed.
@@ -348,13 +277,6 @@ func PlaySequence(sequence common.Sequence,
 					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
 						sequence.Static || sequence.UpdateShift || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateSize {
 						break
-					}
-
-					if debug {
-						fmt.Printf("Step %d This many Fixtures %d\n", step, len(RGBPositions[step].Fixtures))
-						for _, fixture := range RGBPositions[step].Fixtures {
-							fmt.Printf("\t Fixture: %+v\n", fixture)
-						}
 					}
 
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
@@ -374,7 +296,7 @@ func PlaySequence(sequence common.Sequence,
 							Strobe:                   sequence.Strobe,
 							RGBFade:                  sequence.RGBFade,
 							Hidden:                   sequence.Hidden,
-							RGBPosition:              RGBPositions[step],
+							RGBPosition:              rgbPositions[step],
 							StartFlood:               sequence.StartFlood,
 							StopFlood:                sequence.StopFlood,
 							ScannerPosition:          scannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.

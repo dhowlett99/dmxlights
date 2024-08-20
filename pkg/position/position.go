@@ -45,7 +45,7 @@ func CalculatePositions(stepsIn []common.Step, sequence common.Sequence, scanner
 		fmt.Printf("CalculatePositions Number Steps %d\n", len(stepsIn))
 	}
 
-	// Apply inverted selection from fixtureState to the RGB sequence.
+	// Apply any inverted selections from fixtureState to the RGB sequence.
 	if sequence.Type == "rgb" {
 		sequence.SequenceColors = common.HowManyColorsInSteps(stepsIn)
 		steps = invertRGBColorsInSteps(stepsIn, sequence.NumberFixtures, sequence.SequenceColors, sequence.FixtureState)
