@@ -56,13 +56,13 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 // and then increments the sequence.SelectedPattern so the next time around the sequence steps loop the pattern automatically changes.
 // Currently supports as many patterns as defined in availablePatterns as passed in.
 // Returns - Nothing, pattern is determined by sequence.Pattern.Number.
-func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) {
+func rgbAutoPattern(sequence *common.Sequence, rgbAvailablePatterns map[int]common.Pattern) {
 
 	if debug {
 		fmt.Printf("rgbAutoPattern: \n")
 	}
 
-	for patternNumber, pattern := range availablePatterns {
+	for patternNumber, pattern := range rgbAvailablePatterns {
 		if pattern.Number == sequence.SelectedPattern {
 			sequence.Pattern.Number = patternNumber
 			if debug {
@@ -72,7 +72,7 @@ func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.
 		}
 	}
 	sequence.SelectedPattern++
-	if sequence.SelectedPattern > len(availablePatterns) {
+	if sequence.SelectedPattern > len(rgbAvailablePatterns) {
 		sequence.SelectedPattern = 0
 	}
 }
@@ -90,6 +90,7 @@ func chaserAutoGobo(sequence *common.Sequence) {
 		// Change all the fixtures to the next gobo.
 		for fixtureNumber := range sequence.ScannersAvailable {
 			sequence.ScannerGobo[fixtureNumber]++
+			// TODO find the correct number of gobos defined in the config.
 			if sequence.ScannerGobo[fixtureNumber] > 8 {
 				sequence.ScannerGobo[fixtureNumber] = 1
 			}
@@ -107,14 +108,15 @@ func scannerAutoPattern(sequence *common.Sequence) {
 	}
 
 	sequence.SelectedPattern++
+	// TODO find the correct number of pattern defined in the config.
 	if sequence.SelectedPattern > 3 {
 		sequence.SelectedPattern = 0
 	}
 }
 
-// scannerAutoColor - when called change all the fixtures to the next gobo and changes all the fixtures to the next color.
-// sequence fixtures scanner gobo and scanner color are indicated by the variables sequence.ScannerGobo and sequence.ScannerColor.
-// Currently supports 8 scanner gobos and as many colors defined by sequence.ScannerAvailableColors
+// scannerAutoColor - when called changes all the fixtures to the next gobo and changes all the fixtures to the next color.
+// Fixtures / scanners gobos and colors are indicated by the variables sequence.ScannerGobo and sequence.ScannerColor.
+// Currently supports up to 8 scanner gobos and as many colors defined by sequence.ScannerAvailableColors
 // Returns - Nothing, gobo is determined by sequence.ScannerGobo. Color is determined by sequence.ScannerColor
 func scannerAutoColor(sequence *common.Sequence) {
 
@@ -126,6 +128,7 @@ func scannerAutoColor(sequence *common.Sequence) {
 		// Change all the fixtures to the next gobo.
 		for fixtureNumber := range sequence.ScannersAvailable {
 			sequence.ScannerGobo[fixtureNumber]++
+			// TODO find the correct number of gobos as defined in the config for this fixture.
 			if sequence.ScannerGobo[fixtureNumber] > 7 {
 				sequence.ScannerGobo[fixtureNumber] = 0
 			}

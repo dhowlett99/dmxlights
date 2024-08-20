@@ -46,7 +46,7 @@ type SequenceConfig struct {
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
-	availablePatterns map[int]common.Pattern,
+	rgbAvailablePatterns map[int]common.Pattern,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
@@ -205,7 +205,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Set the pattern. steps are generated from patterns. the sequence.SelectedPattern will be used to create steps.
 				if sequence.UpdatePattern {
-					steps = updatePatterns(&sequence, availablePatterns)
+					steps = updatePatterns(&sequence, rgbAvailablePatterns)
 					sequence.UpdatePattern = false
 				}
 
@@ -263,7 +263,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Auto pattern change.
 				if sequence.AutoPattern && sequence.Type == "rgb" {
-					rgbAutoPattern(&sequence, availablePatterns)
+					rgbAutoPattern(&sequence, rgbAvailablePatterns)
 				}
 				if sequence.AutoPattern && sequence.Type == "scanner" {
 					scannerAutoPattern(&sequence)
