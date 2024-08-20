@@ -104,8 +104,6 @@ func CreateSequence(
 		defaultSequenceColors = []color.RGBA{colors.Green}
 	}
 
-	disabledOnce := make(map[int]bool, 8)
-
 	// The actual sequence definition.
 	sequence := common.Sequence{
 		Label:                  sequenceLabel,
@@ -142,7 +140,6 @@ func CreateSequence(
 		AutoPattern:            false,
 		SelectedPattern:        common.DEFAULT_PATTERN,
 		FixtureState:           FixtureState,
-		DisableOnce:            disabledOnce,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
