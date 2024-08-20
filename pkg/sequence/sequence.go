@@ -193,7 +193,7 @@ func PlaySequence(sequence common.Sequence,
 			for sequence.Run && !sequence.Static {
 
 				if debug {
-					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run)
+					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t Colors %+v\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors)
 				}
 
 				// Setup music trigger.
@@ -219,11 +219,6 @@ func PlaySequence(sequence common.Sequence,
 					steps = rgbAutoColors(&sequence, steps)
 				}
 
-				// Calculate RGB positions.
-				if sequence.Type == "rgb" {
-					rgbPositions = calculateRGBPositions(&sequence, steps)
-				}
-
 				// At this point colors are solid colors from the patten and not faded yet.
 				// an ideal point to replace colors in a sequence.
 				// If we are updating the color in a sequence.
@@ -246,6 +241,11 @@ func PlaySequence(sequence common.Sequence,
 						}
 					}
 					sequence.UpdateColors = false
+				}
+
+				// Calculate RGB positions.
+				if sequence.Type == "rgb" {
+					rgbPositions = calculateRGBPositions(&sequence, steps)
 				}
 
 				// Save the steps temporarily
