@@ -1632,14 +1632,16 @@ func FindGoboByDMXValue(fixture *Fixture, dmxValue string) string {
 // FindGoboNameByNumber takes the gobo number and returns the gobo name for this fixture.
 func FindGoboNameByNumber(fixture *Fixture, number int) string {
 
-	//if debug {
-	fmt.Printf("FindGoboByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
-	//}
+	if debug {
+		fmt.Printf("FindGoboByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
+	}
 
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Gobo") {
 			for _, setting := range channel.Settings {
-				fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
+				if debug {
+					fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
+				}
 				if setting.Number == number {
 					return setting.Name
 				}
