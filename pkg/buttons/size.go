@@ -119,8 +119,8 @@ func decreaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		// Decrement the switch color.
 		this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color--
-		if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size < common.MIN_PROJECTOR_COLOR {
-			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MAX_PROJECTOR_COLOR
+		if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color < common.MIN_PROJECTOR_COLOR {
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = common.MIN_PROJECTOR_COLOR
 		}
 
 		// Send a message to override / increase the selected switch shift.
@@ -235,9 +235,9 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 		// Increase the switch size.
-		this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color + 1
-		if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size > common.MAX_PROJECTOR_COLOR {
-			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MAX_PROJECTOR_COLOR
+		this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color + 1
+		if this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > common.MAX_PROJECTOR_COLOR {
+			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = common.MAX_PROJECTOR_COLOR
 		}
 
 		// Send a message to override / increase the selected switch shift.

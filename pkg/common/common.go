@@ -39,11 +39,11 @@ const MIN_SPEED = 0
 const MAX_SPEED = 12
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
-const MIN_PROJECTOR_ROTATE_SPEED = 0
+const MIN_PROJECTOR_ROTATE_SPEED = 1
 const MAX_PROJECTOR_ROTATE_SPEED = 10
-const MIN_PROJECTOR_COLOR = 0
+const MIN_PROJECTOR_COLOR = 1
 const MAX_PROJECTOR_COLOR = 10
-const MIN_PROJECTOR_GOBO = 0
+const MIN_PROJECTOR_GOBO = 1
 const MAX_PROJECTOR_GOBO = 10
 const MIN_RGB_SIZE = 0
 const MAX_RGB_SIZE = 10
@@ -240,6 +240,7 @@ type Override struct {
 	RotateSpeed int
 	Colors      []color.RGBA
 	Color       int
+	ColorName   string
 	Gobo        int
 	GoboName    string
 }

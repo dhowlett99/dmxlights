@@ -953,6 +953,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	scannerFade := this.ScannerSize[this.TargetSequence]
 	switchSize := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
 	switchColor := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
+	switchColorName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" || tYpe == "switch" {
@@ -965,7 +966,7 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButttons)
 		}
 		if tYpe == "switch" && this.SelectedFixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Color %02d", switchColor), "size", false, guiButttons)
+			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColor, switchColorName), "size", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
@@ -1015,6 +1016,8 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	fade := this.RGBFade[this.TargetSequence]
 	scannerCoordinates := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 	switchFade := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
+	switchGobo := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
+	switchGoboName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -1027,7 +1030,7 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchFade), "fade", false, guiButttons)
 		}
 		if tYpe == "switch" && fixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d", switchFade), "fade", false, guiButttons)
+			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
