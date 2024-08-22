@@ -2945,37 +2945,38 @@ fixtures:
     buttoncolor: Cyan
     master: 0
     settings:
-    - name: New Setting
+    - name: "255"
+      label: "255"
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: New
-      label: New
+    - name: Open
+      label: Open
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: New
-      label: New
+    - name: Horiz Waves
+      label: Horiz Waves
       number: 3
       channel: Gobo
       value: "18"
       selectedvalue: Horiz Waves
-    - name: New
-      label: New
+    - name: Rotate Clockwise Medium
+      label: Rotate Clockwise Medium
       number: 4
       channel: Rotate
       value: "192"
       selectedvalue: Rotate ClockWise
-    - name: New
-      label: New
+    - name: Blackout
+      label: Blackout
       number: 5
       channel: Program
       value: "0"
       selectedvalue: Blackout
-    - name: New
-      label: New
+    - name: Fast
+      label: Fast
       number: 6
       channel: ProgramSpeed
       value: "0"
@@ -2987,19 +2988,20 @@ fixtures:
     buttoncolor: Cyan
     master: 0
     settings:
-    - name: New Setting
+    - name: "255"
+      label: "255"
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: New
-      label: New
+    - name: Open
+      label: Open
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: New
-      label: New
+    - name: Croc Petals
+      label: Croc Petals
       number: 3
       channel: Gobo
       value: "28"
@@ -3010,14 +3012,14 @@ fixtures:
       channel: Rotate
       value: "191"
       selectedvalue: Rotate Anti Clockwise Slow
-    - name: New
-      label: New
+    - name: Blackout
+      label: Blackout
       number: 5
       channel: Program
       value: "0"
       selectedvalue: Blackout
-    - name: New
-      label: New
+    - name: Fast
+      label: Fast
       number: 6
       channel: ProgramSpeed
       value: "0"
