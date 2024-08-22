@@ -60,3 +60,8 @@ var LightBlue = color.RGBA{R: 100, G: 185, B: 255, A: 255}
 var Violet = color.RGBA{R: 199, G: 21, B: 133, A: 255}
 var White = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 var EmptyColor = color.RGBA{}
+
+func getColorFromIndexNumberFromColorsLibrary(selectedColor int, colorLibrary []color.RGBA) color.RGBA {
+
+	return colorLibrary[selectedColor]
+}

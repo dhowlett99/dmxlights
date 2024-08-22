@@ -39,6 +39,12 @@ const MIN_SPEED = 0
 const MAX_SPEED = 12
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
+const MIN_PROJECTOR_ROTATE_SPEED = 0
+const MAX_PROJECTOR_ROTATE_SPEED = 10
+const MIN_PROJECTOR_COLOR = 0
+const MAX_PROJECTOR_COLOR = 10
+const MIN_PROJECTOR_GOBO = 0
+const MAX_PROJECTOR_GOBO = 10
 const MIN_RGB_SIZE = 0
 const MAX_RGB_SIZE = 10
 const MIN_RGB_FADE = 1
@@ -233,6 +239,7 @@ type Override struct {
 	Fade        int
 	RotateSpeed int
 	Colors      []color.RGBA
+	Color       int
 	Gobo        int
 	GoboName    string
 }
@@ -316,10 +323,13 @@ const (
 	GetUpdatedSequence
 	ResetAllSwitchPositions
 	UpdateSwitch
-	OverrideSwitchSpeed
-	OverrideSwitchShift
-	OverrideSwitchSize
-	OverrideSwitchFade
+	OverrideSpeed
+	OverrideShift
+	OverrideSize
+	OverrideFade
+	OverrideRotateSpeed
+	OverrideColor
+	OverrideGobo
 	Inverted
 	UpdateGobo
 	Flood
@@ -411,10 +421,14 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
+	Override                    bool                        // Override a switch.
 	OverrideSpeed               bool                        // Override a switch speed.
 	OverrideShift               bool                        // Override a switch shift.
 	OverrideSize                bool                        // Override a switch size.
 	OverrideFade                bool                        // Override a switch fade.
+	OverrideRotateSpeed         bool                        // Override a switchs projector rotate speed.
+	OverrideColor               bool                        // Override a switchs projector color.
+	OverrideGobo                bool                        // Override a switchs projector gobo.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StepSwitch                  bool                        // Step the switch if true.
 	FocusSwitch                 bool                        // Focus the switch.
@@ -1163,6 +1177,7 @@ func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
+// GetColorList takes an array of colors and creates a ControlDisplayControl object which has the colors selected inside it.
 func GetColorList(colors []color.RGBA) ColorDisplayControl {
 
 	if debug {

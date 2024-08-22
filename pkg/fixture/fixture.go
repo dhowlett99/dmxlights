@@ -87,7 +87,8 @@ type Action struct {
 
 type ActionConfig struct {
 	Name              string
-	Colors            []color.RGBA
+	Colors            []color.RGBA // Colos available for this fixture.
+	Color             int          // The selected color index for this fixture.
 	Map               bool
 	Fade              int
 	NumberSteps       int
@@ -305,6 +306,23 @@ func SaveFixtures(filename string, fixtures *Fixtures) error {
 
 	// Fixtures file saved, no errors.
 	return nil
+}
+
+func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, fixturesConfig *Fixtures, dmxInterfacePresent bool) {
+
+	if debug {
+		fmt.Printf("AllFixturesOff\n")
+	}
+
+	for y := 0; y < len(sequences); y++ {
+		if sequences[y].Type != "switch" && sequences[y].Label != "chaser" {
+			for x := 0; x < 8; x++ {
+				common.LightLamp(common.Button{X: x, Y: y}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+				MapFixtures(false, false, y, x, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+				common.LabelButton(x, y, "", guiButtons)
+			}
+		}
+	}
 }
 
 // GetFixtureDetailsById - find a fixture in the fixtures config.

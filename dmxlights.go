@@ -334,8 +334,7 @@ func main() {
 
 					if debug {
 						fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
-						fmt.Printf("\t Override Colors %+v\n", override.Colors)
-
+						fmt.Printf("\t Override Colors %d\n", override.Color)
 					}
 				}
 			}
@@ -570,7 +569,7 @@ func main() {
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
+	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 	buttons.Clear(0, 0, &this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
 	// If present create a thread to listen to launchpad button events.

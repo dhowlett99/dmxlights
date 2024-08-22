@@ -24,6 +24,20 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+func toggleFixtureStatus(sequences []*common.Sequence, Y int, X int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)
+		fmt.Printf("Fixture State Enabled %t  Inverted %t Reversed %t\n", this.FixtureState[Y][X].Enabled, this.FixtureState[Y][X].RGBInverted, this.FixtureState[Y][X].RGBInverted)
+	}
+
+	// Rotate the  fixture state based on last fixture state.
+	setFixtureStatus(this, Y, X, commandChannels, sequences[Y])
+
+	// Show the status.
+	showFixtureStatus(Y, sequences[Y].Number, sequences[Y].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+}
+
 func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan common.Command, sequence *common.Sequence) {
 
 	// There are three possiblities OFF, ON and INVERTED.

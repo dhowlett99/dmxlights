@@ -1,5 +1,5 @@
 // Copyright (C) 2022, 2023 dhowlett99.
-// This implements the load preset feature, used by the buttons package.
+// This decides on what options you see when pressing the select button.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by

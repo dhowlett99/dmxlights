@@ -34,6 +34,7 @@ import (
 )
 
 const debug_mini bool = false
+const debug_override bool = false
 
 const FADE_SHARP int = 10
 const FADE_NORMAL int = 5
@@ -603,11 +604,13 @@ func newMiniSequencer(fixture *Fixture,
 					cfg.RotateSpeed = override.RotateSpeed
 				}
 
-				if override.Colors != nil {
+				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors is %+v\n", override.Colors)
+						fmt.Printf("Override is set so Colors is %+v\n", override.Color)
 					}
-					cfg.Colors = override.Colors
+					// You can only override a single color.
+					cfg.Color = override.Color
+					cfg.Colors = []color.RGBA{cfg.Colors[override.Color]}
 				}
 
 				if override.Gobo != 0 {
@@ -684,7 +687,7 @@ func newMiniSequencer(fixture *Fixture,
 							const SPEED = 0
 							override.Speed = cmd.Args[SPEED].Value.(int)
 							cfg.SpeedDuration = common.SetSpeed(override.Speed)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
 							}
 						}
@@ -693,7 +696,7 @@ func newMiniSequencer(fixture *Fixture,
 							const SHIFT = 0
 							override.Shift = cmd.Args[SHIFT].Value.(int)
 							cfg.Shift = cmd.Args[SHIFT].Value.(int)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Shift %d\n", cmd.Args[SHIFT].Value.(int))
 							}
 						}
@@ -702,7 +705,7 @@ func newMiniSequencer(fixture *Fixture,
 							const SIZE = 0
 							override.Size = cmd.Args[SIZE].Value.(int)
 							cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Size %d\n", cmd.Args[SIZE].Value.(int))
 							}
 						}
@@ -711,7 +714,7 @@ func newMiniSequencer(fixture *Fixture,
 							const FADE = 0
 							override.Fade = cmd.Args[FADE].Value.(int)
 							cfg.Fade = cmd.Args[FADE].Value.(int)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Fade %d\n", cmd.Args[FADE].Value.(int))
 							}
 						}
@@ -721,7 +724,7 @@ func newMiniSequencer(fixture *Fixture,
 							const ROTATE_SPEED = 0
 							override.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
 							cfg.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Rotate Speed %d\n", cmd.Args[ROTATE_SPEED].Value.(int))
 							}
 						}
@@ -731,17 +734,17 @@ func newMiniSequencer(fixture *Fixture,
 							const COLORS = 0
 							override.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
 							cfg.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]color.RGBA))
 							}
 						}
 
 						// Update Gobos
-						if cmd.Action == common.UpdateColors {
+						if cmd.Action == common.UpdateGobo {
 							const GOBO = 0
 							override.Gobo = cmd.Args[GOBO].Value.(int)
 							cfg.Gobo = cmd.Args[GOBO].Value.(int)
-							if debug_mini {
+							if debug_override {
 								fmt.Printf("Gobo %d\n", cmd.Args[GOBO].Value.(int))
 							}
 						}

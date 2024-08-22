@@ -28,6 +28,9 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 
 	// Override the selected switch speed.
 	if sequence.OverrideSpeed {
+
+		sequence.OverrideSpeed = false
+
 		if debug {
 			fmt.Printf("sequence %d Override switch number %d Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Speed)
 		}
@@ -47,6 +50,8 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 	}
 
 	if sequence.OverrideShift {
+
+		sequence.OverrideShift = false
 
 		if debug {
 			fmt.Printf("sequence %d Override switch number %d Shift %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Shift)
@@ -71,6 +76,8 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 	// Override the selected switch size.
 	if sequence.OverrideSize {
 
+		sequence.OverrideSize = false
+
 		if debug {
 			fmt.Printf("sequence %d Override switch number %d Size %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Size)
 		}
@@ -94,6 +101,8 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 	// Override the selected switch fade size.
 	if sequence.OverrideFade {
 
+		sequence.OverrideFade = false
+
 		if debug {
 			fmt.Printf("sequence %d Override switch number %d Fade %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Fade)
 		}
@@ -111,6 +120,78 @@ func overrideSwitch(mySequenceNumber int, sequence *common.Sequence, switchChann
 		}
 		sequence.PlaySwitchOnce = false
 		sequence.OverrideFade = false
+		return
+	}
+
+	if sequence.OverrideRotateSpeed {
+
+		sequence.OverrideRotateSpeed = false
+
+		if debug {
+			fmt.Printf("sequence %d Override switch number %d Rotate Speed %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Shift)
+		}
+		// Send a message to the selected switch device.
+		cmd := common.Command{
+			Action: common.UpdateRotateSpeed,
+			Args: []common.Arg{
+				// Add one since we count from 0
+				{Name: "RotateSpeed", Value: sequence.Switches[sequence.CurrentSwitch].Override.RotateSpeed},
+			},
+		}
+		select {
+		case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+		case <-time.After(10 * time.Millisecond):
+		}
+		sequence.PlaySwitchOnce = false
+		sequence.OverrideRotateSpeed = false
+		return
+	}
+
+	if sequence.OverrideColor {
+
+		sequence.OverrideColor = false
+
+		if debug {
+			fmt.Printf("sequence %d Override switch number %d Color %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Color)
+		}
+		// Send a message to the selected switch device.
+		cmd := common.Command{
+			Action: common.UpdateRotateSpeed,
+			Args: []common.Arg{
+				// Add one since we count from 0
+				{Name: "Color", Value: sequence.Switches[sequence.CurrentSwitch].Override.Color},
+			},
+		}
+		select {
+		case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+		case <-time.After(10 * time.Millisecond):
+		}
+		sequence.PlaySwitchOnce = false
+		sequence.OverrideColor = false
+		return
+	}
+
+	if sequence.OverrideGobo {
+
+		sequence.OverrideGobo = false
+
+		if debug {
+			fmt.Printf("sequence %d Override switch number %d Gobo %d \n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override.Gobo)
+		}
+		// Send a message to the selected switch device.
+		cmd := common.Command{
+			Action: common.UpdateRotateSpeed,
+			Args: []common.Arg{
+				// Add one since we count from 0
+				{Name: "Gobo", Value: sequence.Switches[sequence.CurrentSwitch].Override.Gobo},
+			},
+		}
+		select {
+		case switchChannels[sequence.CurrentSwitch+1].CommandChannel <- cmd:
+		case <-time.After(10 * time.Millisecond):
+		}
+		sequence.PlaySwitchOnce = false
+		sequence.OverrideGobo = false
 		return
 	}
 }

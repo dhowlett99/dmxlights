@@ -122,7 +122,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Show all switches.
-		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.OverrideSpeed && !sequence.OverrideShift && !sequence.OverrideSize && !sequence.OverrideFade && sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.Override && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show All Switches\n", mySequenceNumber)
 			}
@@ -131,7 +131,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Show the selected switch.
-		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.OverrideSpeed && sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.Override && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Show Single Switch\n", mySequenceNumber)
 			}
@@ -141,13 +141,13 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Override the selected switch.
-		if sequence.PlaySwitchOnce && sequence.OverrideSpeed && sequence.Type == "switch" {
+		if sequence.PlaySwitchOnce && sequence.Override && sequence.Type == "switch" {
 			if debug {
 				fmt.Printf("%d: Override Single Switch\n", mySequenceNumber)
 			}
 			overrideSwitch(mySequenceNumber, &sequence, switchChannels)
 			sequence.PlaySwitchOnce = false
-			sequence.OverrideSpeed = false
+			sequence.Override = false
 		}
 
 		// Start flood.

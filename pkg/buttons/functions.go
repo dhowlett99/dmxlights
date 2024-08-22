@@ -49,7 +49,7 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 	}
 }
 
-func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
+func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	debug := false
 
