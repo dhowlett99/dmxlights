@@ -1609,11 +1609,11 @@ func FindShutter(myFixtureNumber int, mySequenceNumber int, shutterName string, 
 	return 255
 }
 
-// findGobo takes the number and returns the gobo name  for this type of scanner.
+// findGobo takes the gobo dmx value and returns the gobo name for this fixture.
 func FindGoboByDMXValue(fixture *Fixture, dmxValue string) string {
 
 	if debug {
-		fmt.Printf("FindGoboByName\n")
+		fmt.Printf("FindGoboByDMXValue\n")
 	}
 
 	for _, channel := range fixture.Channels {
@@ -1626,7 +1626,48 @@ func FindGoboByDMXValue(fixture *Fixture, dmxValue string) string {
 		}
 	}
 
-	return "Not Found"
+	return "Unknown"
+}
+
+// FindGoboNameByNumber takes the gobo number and returns the gobo name for this fixture.
+func FindGoboNameByNumber(fixture *Fixture, number int) string {
+
+	//if debug {
+	fmt.Printf("FindGoboByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
+	//}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Gobo") {
+			for _, setting := range channel.Settings {
+				fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
+				if setting.Number == number {
+					return setting.Name
+				}
+			}
+		}
+	}
+
+	return "Unknown"
+}
+
+// FindGoboNameByNumber takes the gobo number and returns the gobo name for this fixture.
+func FindColorNameByNumber(fixture *Fixture, number int) string {
+
+	if debug {
+		fmt.Printf("FindGoboByNumber\n")
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Color") {
+			for _, setting := range channel.Settings {
+				if setting.Number == number {
+					return setting.Name
+				}
+			}
+		}
+	}
+
+	return "Unknown"
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
@@ -2003,6 +2044,7 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 
 func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, fixturesConfig *Fixtures) common.Override {
 
+	// Convert this switches action into a config we can query.
 	action := GetSwitchConfig(switchNumber, int16(stateNumber), fixturesConfig)
 	cfg := GetConfig(action, fixture, fixturesConfig)
 
@@ -2019,8 +2061,12 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+
+		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
+		newOverride.ColorName = FindColorNameByNumber(fixture, cfg.Color)
 		newOverride.Gobo = cfg.Gobo
+		newOverride.GoboName = FindGoboNameByNumber(fixture, cfg.Gobo)
 	}
 
 	if action.Mode == "Control" {
@@ -2029,8 +2075,12 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+
+		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
+		newOverride.ColorName = FindColorNameByNumber(fixture, cfg.Color)
 		newOverride.Gobo = cfg.Gobo
+		newOverride.GoboName = FindGoboNameByNumber(fixture, cfg.Gobo)
 	}
 
 	if action.Mode == "Chase" {
@@ -2039,8 +2089,12 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+
+		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
+		newOverride.ColorName = FindColorNameByNumber(fixture, cfg.Color)
 		newOverride.Gobo = cfg.Gobo
+		newOverride.GoboName = FindGoboNameByNumber(fixture, cfg.Gobo)
 	}
 
 	if action.Mode == "Setting" {
@@ -2049,11 +2103,12 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+
+		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
+		newOverride.ColorName = FindColorNameByNumber(fixture, cfg.Color)
 		newOverride.Gobo = cfg.Gobo
-		newOverride.Colors = cfg.Colors
-		newOverride.Gobo, _ = strconv.Atoi(action.Gobo)
-		newOverride.GoboName = FindGoboByDMXValue(fixture, action.Gobo)
+		newOverride.GoboName = FindGoboNameByNumber(fixture, cfg.Gobo)
 	}
 
 	if debug {
@@ -2171,6 +2226,9 @@ func convertSettingToAction(settings []Setting) Action {
 	return newAction
 }
 
+// GetAvailableScannerGobos - populates a map indexed by fixture number for the sequenceNumber provided.
+// Each fixture contains an array of StaticColorButtons, essentially info representing each gobo in this fixture.
+// Gobo details provided are - Name, label, number. DMX value and color.
 func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]common.StaticColorButton {
 	if debug {
 		fmt.Printf("getAvailableScannerGobos\n")

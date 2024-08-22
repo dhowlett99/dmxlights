@@ -920,6 +920,8 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 			fmt.Printf("error: %s\n", err.Error())
 		}
 		config.Colors = colorLibrary
+		// TODO take the first color in the library.
+		config.Color = 0
 	}
 
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
