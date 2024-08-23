@@ -885,6 +885,9 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		}
 
 		switch action.Gobo {
+		case "":
+			config.Gobo = -1
+			config.AutoGobo = false
 		case "Default":
 			config.Gobo = 0
 			config.AutoGobo = false
