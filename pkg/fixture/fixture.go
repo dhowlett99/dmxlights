@@ -1636,13 +1636,20 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 		fmt.Printf("FindGoboByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
 	}
 
+	if number == -1 {
+		if debug {
+			fmt.Printf("Gobo %d Name Auto\n", number)
+		}
+		return "Auto"
+	}
+
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Gobo") {
 			for _, setting := range channel.Settings {
-				if debug {
-					fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
-				}
 				if setting.Number == number {
+					if debug {
+						fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
+					}
 					return setting.Name
 				}
 			}
@@ -1652,7 +1659,7 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 	return "Unknown"
 }
 
-// FindGoboNameByNumber takes the gobo number and returns the gobo name for this fixture.
+// FindColorNameByNumber takes the color number and returns the color name for this fixture.
 func FindColorNameByNumber(fixture *Fixture, number int) string {
 
 	if debug {
@@ -2118,7 +2125,9 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		fmt.Printf("\tSwitch Number %d State Number %d\n", switchNumber, stateNumber)
 		fmt.Printf("\t\t Rotate Speed %d\n", newOverride.RotateSpeed)
 		fmt.Printf("\t\t Colors %+v\n", newOverride.Colors)
-		fmt.Printf("\t\t Gobo action %s newOverride Gobo %d\n", action.Gobo, newOverride.Gobo)
+		fmt.Printf("\t\t Color %+v\n", newOverride.Color)
+		fmt.Printf("\t\t Color Name %s\n", newOverride.ColorName)
+		fmt.Printf("\t\t Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
 	}
 	return newOverride
 }
@@ -2217,7 +2226,7 @@ func convertSettingToAction(settings []Setting) Action {
 		}
 
 		if setting.Channel == "Gobo" {
-			newAction.Gobo = setting.Value
+			newAction.Gobo = setting.Name
 		}
 
 		if setting.Channel == "GoboSpeed" {
