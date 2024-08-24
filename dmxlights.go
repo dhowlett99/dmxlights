@@ -546,8 +546,15 @@ func main() {
 	)
 
 	// Create bottom status bar.
-	bottonStatusBar := container.New(
-		layout.NewHBoxLayout(), panel.DisplayMode, layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	var bottonStatusBar *fyne.Container
+	if debug {
+		bottonStatusBar = container.New(
+			layout.NewHBoxLayout(), panel.DisplayMode, layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	} else {
+		// Only display the mode in debug mode.
+		bottonStatusBar = container.New(
+			layout.NewHBoxLayout(), layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	}
 
 	// Now configure the panel content to contain the top toolbar and the squares.
 	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)
