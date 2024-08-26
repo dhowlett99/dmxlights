@@ -1115,7 +1115,7 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
 	if debug {
-		fmt.Printf("MapFixtures Fixture No %d Sequence No %d\n", displayFixture, mySequenceNumber)
+		fmt.Printf("MapFixtures Fixture No %d Sequence No %d Color %+v\n", displayFixture, mySequenceNumber, color)
 	}
 
 	// We control the brightness of each color with the brightness value.
