@@ -98,8 +98,7 @@ func PlaySequence(sequence common.Sequence,
 			sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
 		}
 
-		// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Millisecond, sequence, channels, fixturesConfig)
+		// Process any commands.
 
 		// Soft fade downs should be disabled for blackout.
 		// Send blackout messages to all fixtures.
@@ -195,6 +194,9 @@ func PlaySequence(sequence common.Sequence,
 			stopStatic(mySequenceNumber, &sequence, channels, fixtureStepChannels)
 			sequence.PlayStaticOnce = false
 		}
+
+		// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Hour, sequence, channels, fixturesConfig)
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase {
