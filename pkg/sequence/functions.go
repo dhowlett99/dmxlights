@@ -57,6 +57,10 @@ func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]comm
 	steps := RGBPattern.Steps
 	sequence.Pattern.Name = RGBPattern.Name
 	sequence.Pattern.Label = RGBPattern.Label
+	if sequence.NewPattern {
+		sequence.SequenceColors = common.HowManyColorsInSteps(steps)
+		sequence.NewPattern = false
+	}
 
 	// Initialise chaser.
 	if sequence.Label == "chaser" {

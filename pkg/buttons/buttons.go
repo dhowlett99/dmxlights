@@ -222,7 +222,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   C L E A R - clear all if we're not in the scanner mode.
+	// S E L E C T   C L E A R -  Clear all if we're not in the scanner mode.
 	if X == 0 && Y == -1 && !this.GUI && sequences[this.SelectedSequence].Type != "scanner" {
 		if debug {
 			fmt.Printf("Clear All If We're Not in Scanner Mode X:%d Y:%d\n", X, Y)
@@ -281,7 +281,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	//  S E L E C T  M A S T E R  D O W N
+	// S E L E C T   M A S T E R  D O W N
 	if X == 6 && Y == -1 {
 		decraseBrightness(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
@@ -407,13 +407,13 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	//  S E L E C T   E D I T  G R E E N  S T A T I C   C O L O R
+	// S E L E C T   E D I T  G R E E N  S T A T I C   C O L O R
 	if X == 2 && Y == -1 && this.Static[this.TargetSequence] {
 		greenButton(this, X, Y, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
-	//  S E L E C T   E D I T  B L U E  S T A T I C   C O L O R
+	// S E L E C T   E D I T  B L U E  S T A T I C   C O L O R
 	if X == 3 && Y == -1 && this.Static[this.TargetSequence] {
 		blueButton(this, X, Y, eventsForLaunchpad, guiButtons, commandChannels)
 		return

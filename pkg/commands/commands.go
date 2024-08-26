@@ -217,6 +217,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.UpdateColors = false
 		sequence.RecoverSequenceColors = false
 		sequence.UpdatePattern = true
+		sequence.NewPattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
 

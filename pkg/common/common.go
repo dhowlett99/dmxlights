@@ -465,6 +465,7 @@ type Sequence struct {
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
 	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
+	NewPattern                  bool                        // Flag to indicate we are selecting a new pattern.
 	UpdateColors                bool                        // Command to update the sequence colors.
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.
 	CurrentSwitch               int                         // Play this current switch position.
