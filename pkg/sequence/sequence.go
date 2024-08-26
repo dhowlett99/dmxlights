@@ -195,6 +195,12 @@ func PlaySequence(sequence common.Sequence,
 			sequence.PlayStaticOnce = false
 		}
 
+		// Set the pattern. steps are generated from patterns. the sequence.SelectedPattern will be used to create steps.
+		if sequence.UpdatePattern {
+			steps = updatePatterns(&sequence, rgbAvailablePatterns)
+			sequence.UpdatePattern = false
+		}
+
 		// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
 		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Hour, sequence, channels, fixturesConfig)
 

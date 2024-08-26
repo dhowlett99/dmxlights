@@ -60,9 +60,6 @@ func selectPattern(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	this.EditFixtureSelectionMode = false
 	ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
-	// Get an upto date copy of the sequence.
-	sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
-
 	// Update the labels.
 	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 }
