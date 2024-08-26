@@ -99,7 +99,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Hour, sequence, channels, fixturesConfig)
+		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 100*time.Millisecond, sequence, channels, fixturesConfig)
 
 		// Soft fade downs should be disabled for blackout.
 		// Send blackout messages to all fixtures.
@@ -156,6 +156,10 @@ func PlaySequence(sequence common.Sequence,
 				fmt.Printf("%d: Start Flood\n", mySequenceNumber)
 			}
 			startFlood(mySequenceNumber, &sequence, fixtureStepChannels)
+			if sequence.Chase {
+				sequence.SaveChase = true
+			}
+			sequence.Chase = false
 			sequence.StartFlood = false
 			sequence.FloodPlayOnce = false
 		}
@@ -164,6 +168,10 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 			if debug {
 				fmt.Printf("%d: Stop Flood\n", mySequenceNumber)
+			}
+			if sequence.SaveChase {
+				sequence.SaveChase = false
+				sequence.Chase = true
 			}
 			stopFlood(mySequenceNumber, &sequence, fixtureStepChannels)
 			sequence.StopFlood = false
@@ -190,7 +198,7 @@ func PlaySequence(sequence common.Sequence,
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase {
-			for sequence.Run && !sequence.Static {
+			for sequence.Run && !sequence.Static && !sequence.StartFlood {
 
 				if debug {
 					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t Colors %+v\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors)

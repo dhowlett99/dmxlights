@@ -296,7 +296,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		// If sequence colors are empty use the colors from the patterm.
+		// If sequence colors are empty use the colors from the pattern.
 		if len(sequences[this.TargetSequence].SequenceColors) == 0 {
 			// Make sure the sequence colors holds the correct colors from the pattern steps.
 			sequences[this.TargetSequence].SequenceColors = common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps)

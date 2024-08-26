@@ -416,6 +416,7 @@ type Sequence struct {
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
 	Chase                       bool                        // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	SaveChase                   bool                        // Save the state of chase in flood.
 	StaticColors                []StaticColorButton         // Used in static color editing
 	Clear                       bool                        // Clear all fixtures in this sequence.
 	Static                      bool                        // We're a static sequence.
