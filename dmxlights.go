@@ -1,4 +1,5 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022, 2023, 2024 dhowlett99.
+// dmxlights is a DMX lighting controller.
 // This is the dmxlights main program and calls all others.
 //
 // This program is free software: you can redistribute it and/or modify
