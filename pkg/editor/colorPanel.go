@@ -194,7 +194,7 @@ func SetFromCheckState(cp *ColorPanel) {
 func SetRectangleColorsFromString(cp *ColorPanel, colorsIn []string) {
 
 	if debug {
-		fmt.Printf("SetRectangleColorsFromString\n")
+		fmt.Printf("SetRectangleColorsFromString colors %+v\n", colorsIn)
 	}
 
 	cp.Buttons["Red"].check.Checked = false
