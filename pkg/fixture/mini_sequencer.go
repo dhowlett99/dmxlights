@@ -837,7 +837,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	fixtureInfo := FindFixtureInfo(fixture)
 	if debug {
-		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
+		fmt.Printf("GetConfig() This fixture %s has Rotate Feature %+v\n", fixture.Name, fixtureInfo)
 	}
 
 	// Find all the specified settings for the program channel

@@ -1663,13 +1663,16 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 func FindColorNameByNumber(fixture *Fixture, number int) string {
 
 	if debug {
-		fmt.Printf("FindGoboByNumber\n")
+		fmt.Printf("FindColorNameByNumber looking for color number %d inside fixture %s\n", number, fixture.Name)
 	}
 
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Color") {
 			for _, setting := range channel.Settings {
 				if setting.Number == number {
+					if debug {
+						fmt.Printf("Found name %s\n", setting.Name)
+					}
 					return setting.Name
 				}
 			}
@@ -2057,12 +2060,16 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 	action := GetSwitchConfig(switchNumber, int16(stateNumber), fixturesConfig)
 	cfg := GetConfig(action, fixture, fixturesConfig)
 
+	if debug {
+		fmt.Printf("---> Discover Action Name %s Color %+v Cfg.Colors %+v\n", action.Name, action.Colors, cfg.Colors)
+	}
+
 	// Create a new override for this action.
 	newOverride := common.Override{}
 
-	if action.Mode == "Off" {
-		newOverride.Colors = []color.RGBA{}
-	}
+	// if action.Mode == "Off" {
+	// 	newOverride.Colors = []color.RGBA{}
+	// }
 
 	if action.Mode == "Static" {
 		newOverride.Speed = cfg.Speed
@@ -2135,33 +2142,41 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
 
 	for _, fixture := range fixturesConfig.Fixtures {
-		if debug {
-			fmt.Printf("fixture number %d name %s type %s\n", fixture.Number, fixture.Name, fixture.Type)
-		}
 		if fixture.Type == "switch" {
 			if fixture.Number == switchNumber {
 				if debug {
-					fmt.Printf("found switch %d \n", fixture.Number)
+					fmt.Printf("found fixture number %d name %s type %s\n", fixture.Number, fixture.Name, fixture.Type)
 				}
-				for stateNumber, state := range fixture.States {
-					if debug {
-						fmt.Printf("looking for state %d have state number %d Actions %+v\n", stateNumber+1, state.Number, state.Actions)
-					}
+				for _, state := range fixture.States {
 					if state.Number == switchState {
 						if debug {
-							fmt.Printf("found state %d with Actions %+v\n", state.Number, state.Actions)
+							fmt.Printf("looking for state %d have state number %d Actions %+v\n", state.Number, state.Number, state.Actions)
 						}
+						var action Action
+						var actionNumber int
 						if state.Actions != nil {
-							for actionNumber, action := range state.Actions {
-								if debug {
-									fmt.Printf("action number %d\n", actionNumber)
+							for actionNumber, action = range state.Actions {
+								if action.Mode == "Control" {
+									if action.Name == "Off" {
+										action.Colors = []string{"Green"}
+									}
+									if action.Name == "On" {
+										action.Colors = []string{"Red"}
+									}
 								}
-								return action
 							}
+							if debug {
+								fmt.Printf("Actions:- Mode %s action number %d name %s colors %+v\n", action.Mode, actionNumber, action.Name, action.Colors)
+							}
+							return action
 						}
 
 						if state.Settings != nil {
-							return convertSettingToAction(state.Settings)
+							action := convertSettingToAction(fixture, state.Settings)
+							if debug {
+								fmt.Printf("Settings:- action number %d colors %+v\n", action.Number, action.Colors)
+							}
+							return action
 						}
 					}
 				}
@@ -2173,7 +2188,7 @@ func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtur
 
 // Given the fixture and the list of settings for this state
 // buill a new action that represents the set of settings.
-func convertSettingToAction(settings []Setting) Action {
+func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 
 	newAction := Action{}
 
@@ -2213,8 +2228,26 @@ func convertSettingToAction(settings []Setting) Action {
 
 		// A channel setting can only contain one value
 		// so only one color.
+		if debug {
+			fmt.Printf("setting name %s label %s Channel %s value %s\n", setting.Name, setting.Label, setting.Channel, setting.Value)
+		}
+
 		if setting.Channel == "Color" {
-			newAction.Colors = append(newAction.Colors, setting.Value)
+			// If a setting has a channel name which is a number we lookup that color name.
+			if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
+				// Lookup color number in list of available colors.
+				colorName := FindColorNameByNumber(&fixture, colorNumber)
+				newAction.Colors = []string{colorName}
+			} else {
+				// we use that name as the color.
+				newAction.Colors = []string{setting.Value}
+			}
+			if setting.Name == "Off" {
+				newAction.Colors = []string{"Green"}
+			}
+			if setting.Name == "On" {
+				newAction.Colors = []string{"Red"}
+			}
 		}
 
 		if setting.Channel == "Strobe" {
@@ -2283,6 +2316,9 @@ func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]
 // Also returns a map of the default values for each scanner that has colors.
 func GetAvailableScannerColors(fixtures *Fixtures) (map[int][]common.StaticColorButton, map[int]int) {
 
+	if debug {
+		fmt.Printf("GetAvailableScannerColors for fixture\n")
+	}
 	scannerColors := make(map[int]int)
 
 	availableScannerColors := make(map[int][]common.StaticColorButton)

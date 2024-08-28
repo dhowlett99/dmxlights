@@ -335,7 +335,7 @@ func main() {
 
 					if debug {
 						fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
-						fmt.Printf("\t Override Colors %d\n", override.Color)
+						fmt.Printf("\t Override Colors %+v\n", override.Colors)
 					}
 				}
 			}

@@ -843,6 +843,10 @@ func GetColorButtonsArray(colorIn int) color.RGBA {
 
 func GetColorArrayByNames(names []string) ([]color.RGBA, error) {
 
+	if debug {
+		fmt.Printf("GetColorArrayByNames: names are %+v\n", names)
+	}
+
 	colors := []color.RGBA{}
 	for _, color := range names {
 		// Find the color by name from the library of supported colors.
@@ -854,6 +858,10 @@ func GetColorArrayByNames(names []string) ([]color.RGBA, error) {
 
 		// Add the color to the chase colors.
 		colors = append(colors, newColor)
+	}
+
+	if debug {
+		fmt.Printf("GetColorArrayByNames: colors are %+v\n", colors)
 	}
 	return colors, nil
 }
@@ -875,6 +883,10 @@ func GetRGBColorByName(colorIn string) (color.RGBA, error) {
 	}
 
 	switch colorIn {
+
+	case "Unknown":
+		return colors.White, nil
+
 	case "Red":
 		return colors.Red, nil
 
