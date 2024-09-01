@@ -76,7 +76,7 @@ func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]comm
 func updateScannerPatterns(sequence *common.Sequence) []common.Step {
 
 	if debug {
-		fmt.Printf("setupScannerPatterns: \n")
+		fmt.Printf("updateScannerPatterns: \n")
 	}
 
 	// Get available scanner patterns.

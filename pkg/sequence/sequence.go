@@ -273,7 +273,7 @@ func PlaySequence(sequence common.Sequence,
 
 				// Auto Gobo Change for Chaser.
 				if sequence.Label == "chaser" {
-					steps = chaserAutoGobo(&sequence)
+					steps = chaserAutoGobo(&sequence, rgbAvailablePatterns)
 				}
 
 				// Auto pattern change.
