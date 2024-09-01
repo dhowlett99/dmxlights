@@ -90,65 +90,6 @@ func updateScannerPatterns(sequence *common.Sequence) []common.Step {
 	return steps
 }
 
-// Set the button color for the selected switch.
-// Will also change the brightness to highlight the last selected switch.
-func setSwitchLamp(sequence common.Sequence, switchNumber int, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
-
-	swiTch := sequence.Switches[switchNumber]
-
-	if debug {
-		fmt.Printf("%d: switchNumber %d current %d selected %t\n", sequence.Number, swiTch.Number, swiTch.CurrentPosition, swiTch.Selected)
-	}
-
-	state := swiTch.States[swiTch.CurrentPosition]
-
-	// Use the button color for this state to light the correct color on the launchpad.
-	color, _ := common.GetRGBColorByName(state.ButtonColor)
-	var brightness int
-	if swiTch.Selected {
-		brightness = common.MAX_DMX_BRIGHTNESS
-	} else {
-		brightness = common.MAX_DMX_BRIGHTNESS / 8
-	}
-
-	common.LightLamp(common.Button{X: switchNumber, Y: sequence.Number}, color, brightness, eventsForLauchpad, guiButtons)
-
-	// Label the switch.
-	common.LabelButton(switchNumber, sequence.Number, swiTch.Label+"\n"+state.Label, guiButtons)
-
-}
-
-// Set the DMX parameters for the selected switch.
-func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannels []chan common.FixtureCommand) {
-
-	swiTch := sequence.Switches[switchNumber]
-
-	if debug {
-		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number].Override.Speed)
-	}
-
-	state := swiTch.States[swiTch.CurrentPosition]
-
-	// Now send a message to the fixture to play all the values for this state.
-	command := common.FixtureCommand{
-		Master:             sequence.Master,
-		Blackout:           sequence.Blackout,
-		Type:               sequence.Type,
-		Label:              sequence.Label,
-		SequenceNumber:     sequence.Number,
-		SwiTch:             swiTch,
-		State:              state,
-		CurrentSwitchState: swiTch.CurrentPosition,
-		MasterChanging:     sequence.MasterChanging,
-		RGBFade:            sequence.RGBFade,
-		Override:           sequence.Switches[swiTch.CurrentPosition].Override,
-	}
-
-	// Send a message to the fixture to operate the switch.
-	fixtureStepChannels[switchNumber] <- command
-
-}
-
 // Send a command to all the fixtures.
 func sendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command common.FixtureCommand) {
 	for _, fixture := range fixtureChannels {

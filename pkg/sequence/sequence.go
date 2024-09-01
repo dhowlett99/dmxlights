@@ -201,15 +201,18 @@ func PlaySequence(sequence common.Sequence,
 			sequence.UpdatePattern = false
 		}
 
+		// This is where we wait for command when the sequence isn't running.
 		// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
-		sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 500*time.Hour, sequence, channels, fixturesConfig)
+		if !sequence.Run {
+			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 50*time.Hour, sequence, channels, fixturesConfig)
+		}
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase {
 			for sequence.Run && !sequence.Static && !sequence.StartFlood {
 
 				if debug {
-					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t Colors %+v\n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors)
+					fmt.Printf("%d: Start CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
 				}
 
 				// Setup music trigger.
@@ -225,6 +228,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.UpdatePattern = false
 				}
 
+				// Uodate the scanner shift.
 				if sequence.UpdateShift && sequence.Type == "scanner" {
 					steps = updateScannerPatterns(&sequence)
 					sequence.UpdateShift = false
@@ -269,25 +273,25 @@ func PlaySequence(sequence common.Sequence,
 
 				// Auto Gobo Change for Chaser.
 				if sequence.Label == "chaser" {
-					chaserAutoGobo(&sequence)
+					steps = chaserAutoGobo(&sequence)
+				}
+
+				// Auto pattern change.
+				if sequence.AutoPattern && sequence.Type == "rgb" {
+					steps = rgbAutoPattern(&sequence, rgbAvailablePatterns)
+				}
+				if sequence.AutoPattern && sequence.Type == "scanner" {
+					steps = scannerAutoPattern(&sequence)
+				}
+
+				// Auto color change.
+				if sequence.AutoColor && sequence.Type == "scanner" {
+					steps = scannerAutoColor(&sequence)
 				}
 
 				// Calculate positions from steps.
 				if sequence.Type == "scanner" {
 					scannerPositions = calculateScannerPositions(&sequence, steps)
-				}
-
-				// Auto pattern change.
-				if sequence.AutoPattern && sequence.Type == "rgb" {
-					rgbAutoPattern(&sequence, rgbAvailablePatterns)
-				}
-				if sequence.AutoPattern && sequence.Type == "scanner" {
-					scannerAutoPattern(&sequence)
-				}
-
-				// Auto color change.
-				if sequence.AutoColor && sequence.Type == "scanner" {
-					scannerAutoColor(&sequence)
 				}
 
 				// Update scanner colors.
@@ -296,7 +300,7 @@ func PlaySequence(sequence common.Sequence,
 					sequence.UpdateColors = false
 				}
 
-				// Check for command.
+				// Check for commands before we start the chase.
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 10*time.Millisecond, sequence, channels, fixturesConfig)
 				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood || sequence.Static || sequence.UpdatePattern || sequence.UpdateColors || sequence.UpdateShift || sequence.UpdateSize {
 					break
@@ -313,7 +317,7 @@ func PlaySequence(sequence common.Sequence,
 						speed = sequence.CurrentSpeed / 5 // Slow the scanners down.
 					}
 
-					// Listen for any commands inside sequence steps, time out for the next step at the speed of the chase.
+					// Listen for any commands during chase so inside sequence steps loop, time out for the next step at the speed of the chase.
 					// or additionally timeout when get a beat that also triggers the next step.
 					sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
 					if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
@@ -344,7 +348,6 @@ func PlaySequence(sequence common.Sequence,
 							ScannerPosition:          scannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
 							ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
 							FixtureState:             sequence.FixtureState[fixtureNumber],
-							ScannerDisableOnce:       sequence.DisableOnce[fixtureNumber],
 							ScannerChaser:            sequence.ScannerChaser,
 							ScannerColor:             sequence.ScannerColor[fixtureNumber],
 							ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],

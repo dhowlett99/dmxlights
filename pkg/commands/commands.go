@@ -906,13 +906,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 		}
 
-		// When we disable a fixture we send a off command to the shutter to make it go off.
-		// We only want to do this once to avoid flooding the universe with DMX commands.
-		sequence.DisableOnceMutex.Lock()
-		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
-		sequence.DisableOnceMutex.Unlock()
-		// it will be the fixtures resposiblity to unset this when it's played the stop command.
-
 		return sequence
 
 	case common.UpdateGobo:

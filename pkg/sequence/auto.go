@@ -55,8 +55,8 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 // rgbAutoPattern - when called sets the sequence pattern to the selected color indicated by the variable sequence.SelectedPattern
 // and then increments the sequence.SelectedPattern so the next time around the sequence steps loop the pattern automatically changes.
 // Currently supports as many patterns as defined in availablePatterns as passed in.
-// Returns - Nothing, pattern is determined by sequence.Pattern.Number.
-func rgbAutoPattern(sequence *common.Sequence, rgbAvailablePatterns map[int]common.Pattern) {
+// Returns - A set of steps with the pattern selected.
+func rgbAutoPattern(sequence *common.Sequence, rgbAvailablePatterns map[int]common.Pattern) []common.Step {
 
 	if debug {
 		fmt.Printf("rgbAutoPattern: \n")
@@ -75,12 +75,14 @@ func rgbAutoPattern(sequence *common.Sequence, rgbAvailablePatterns map[int]comm
 	if sequence.SelectedPattern > len(rgbAvailablePatterns) {
 		sequence.SelectedPattern = 0
 	}
+
+	return updateRGBPatterns(sequence, rgbAvailablePatterns)
 }
 
 // chaserAutoGobo - when called sets increments the sequences scanner gobo indicated by the variable sequence.ScannerGobo
 // Currently supports as many Gobos only 8 gobos.
-// Returns - Nothing, pattern is determined by sequence.ScannerGobo.
-func chaserAutoGobo(sequence *common.Sequence) {
+// Returns - A set of steps with the selected gobo in the pattern.
+func chaserAutoGobo(sequence *common.Sequence) []common.Step {
 
 	if debug {
 		fmt.Printf("chaserAutoGobo: \n")
@@ -95,12 +97,14 @@ func chaserAutoGobo(sequence *common.Sequence) {
 			}
 		}
 	}
+
+	return updateScannerPatterns(sequence)
 }
 
 // scannerAutoPattern - when called sets increments the sequences scanner pattern indicated by the variable sequence.SelectedPattern
 // Currently supports 4 scanner patterns.
 // Returns - Nothing, pattern is determined by sequence.SelectedPattern.
-func scannerAutoPattern(sequence *common.Sequence) {
+func scannerAutoPattern(sequence *common.Sequence) []common.Step {
 
 	if debug {
 		fmt.Printf("scannerAutoPattern: \n")
@@ -110,14 +114,19 @@ func scannerAutoPattern(sequence *common.Sequence) {
 	if sequence.SelectedPattern > len(sequence.ScannerAvailablePatterns) {
 		sequence.SelectedPattern = 0
 	}
+
+	if debug {
+		fmt.Printf("SelectedPattern: %d\n", sequence.SelectedPattern)
+	}
+
+	return updateScannerPatterns(sequence)
 }
 
 // scannerAutoColor - when called changes all the fixtures to the next gobo and changes all the fixtures to the next color.
 // Fixtures / scanners gobos and colors are indicated by the variables sequence.ScannerGobo and sequence.ScannerColor.
 // Currently supports up to 8 scanner gobos and as many colors defined by sequence.ScannerAvailableColors
 // Returns - Nothing, gobo is determined by sequence.ScannerGobo. Color is determined by sequence.ScannerColor
-func scannerAutoColor(sequence *common.Sequence) {
-
+func scannerAutoColor(sequence *common.Sequence) []common.Step {
 	if debug {
 		fmt.Printf("scannerAutoColor: \n")
 	}
@@ -153,4 +162,6 @@ func scannerAutoColor(sequence *common.Sequence) {
 			}
 		}
 	}
+
+	return updateScannerPatterns(sequence)
 }
