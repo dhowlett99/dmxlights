@@ -512,7 +512,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 		var skipPopup bool
 		button.button = newNoHoverButton("     ", func() {
-			if X == 8 && Y == 5 || X > 7 || Y < 5 {
+			if X == 8 && Y == 5 || X > 7 || Y < 5 || Y > 7 {
 				skipPopup = true
 			}
 			if this.SavePreset {
@@ -543,6 +543,10 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 					// Cancel button.
 					buttonCancel := widget.NewButton("Cancel", func() {
+						presets.RemovePreset(this.PresetsStore, X, Y)
+						// Unused preset is set to yellow.
+						common.LightLamp(common.Button{X: X, Y: Y - 1}, colors.PresetYellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+						buttons.SavePresetOff(this, eventsForLauchpad, guiButtons)
 						popup.Hide()
 					})
 

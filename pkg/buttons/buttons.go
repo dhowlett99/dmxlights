@@ -168,6 +168,7 @@ func ProcessButtons(X int, Y int,
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		(this.SelectedMode[Y] == NORMAL || this.SelectedMode[Y] == CHASER_DISPLAY) { // As long as we're in normal or shutter chaser mode for this sequence.
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		flashOn(sequences, X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
 		return
 	}
@@ -185,6 +186,7 @@ func ProcessButtons(X int, Y int,
 		sequences[Y].Type != "switch" && // As long as we're not a switch sequence.
 		this.SelectedMode[Y] == NORMAL { // As long as we're in normal mode for this sequence.
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		flashOff(X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController)
 		return
 	}
@@ -265,30 +267,35 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   F L O O D
 	if X == 8 && Y == 3 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		toggleFlood(sequences, X, Y, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   S O U N D  U P
 	if X == 4 && Y == -1 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseSensitivity(this, X, Y, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   S O U N D  D O W N
 	if X == 5 && Y == -1 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decreaseSensitivity(this, X, Y, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   M A S T E R  D O W N
 	if X == 6 && Y == -1 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decraseBrightness(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   M A S T E R  U P
 	if X == 7 && Y == -1 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseBrightness(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
@@ -299,7 +306,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T   R E C A L L  P R E S E T S
+	// S E L E C T  S A V E   R E C A L L  P R E S E T S
 	if X < 8 && (Y > 3 && Y < 7) {
 		savePresets(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, replyChannels)
 		return
@@ -307,114 +314,133 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  S P E E D
 	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decreaseSpeed(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S P E E D
 	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseSpeed(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
 
 	// S E L E C T   S E Q U E N C E
 	if X == 8 && (Y == 0 || Y == 1 || Y == 2) {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectSequence(sequences, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		toggleSequence(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S T R O B E - Strobe.
 	if X == 8 && Y == 6 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		toggleStrobe(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  S I Z E
 	if X == 4 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decreaseSize(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  S I Z E
 	if X == 5 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseSize(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  F A D E
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  F A D E
 	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   S W I T C H   B U T T O N
 	if X >= 0 && X < 8 && Y >= 0 && Y < 4 && sequences[Y].Type == "switch" {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectSwitch(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, fixturesConfig)
 		return
 	}
 
 	// S E L E C T   D I S A B L E  / E N A B L E   F I X T U R E  S T A T U S
 	if X >= 0 && X < 8 && Y >= 0 && Y < 4 && this.SelectedMode[this.SelectedSequence] == STATUS {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		toggleFixtureStatus(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   S C A N N E R  P O S I T I O N  D O W N  A R R O W
 	if X == 1 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		downArrow(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   S C A N N E R  P O S I T I O N  L E F T  A R R O W
 	if X == 2 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		leftArrow(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   S C A N N E R  P O S I T I O N  R I G H T  A R R O W
 	if X == 3 && Y == -1 && sequences[this.SelectedSequence].Type == "scanner" {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		rightArrow(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   E D I T  R E D  S T A T I C   C O L O R
 	if X == 1 && Y == -1 && this.Static[this.TargetSequence] {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		redButton(this, X, Y, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   E D I T  G R E E N  S T A T I C   C O L O R
 	if X == 2 && Y == -1 && this.Static[this.TargetSequence] {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		greenButton(this, X, Y, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   E D I T  B L U E  S T A T I C   C O L O R
 	if X == 3 && Y == -1 && this.Static[this.TargetSequence] {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		blueButton(this, X, Y, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
@@ -426,6 +452,7 @@ func ProcessButtons(X int, Y int,
 		!this.EditScannerColorsMode &&
 		this.ShowRGBColorPicker {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectRGBChaseColor(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
@@ -437,6 +464,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].Type == "scanner" &&
 		this.Functions[this.SelectedSequence][common.Function5_Color].State {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectScannerColor(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, dmxController, fixturesConfig)
 		return
 	}
@@ -447,6 +475,7 @@ func ProcessButtons(X int, Y int,
 		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State || this.Functions[this.SelectedSequence][common.Function5_Color].State &&
 		sequences[this.SelectedSequence].Type == "scanner" {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectFixture(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
 		return
 	}
@@ -458,6 +487,7 @@ func ProcessButtons(X int, Y int,
 		sequences[this.SelectedSequence].Type == "scanner" &&
 		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectGobo(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, fixturesConfig, dmxController)
 		return
 	}
@@ -474,6 +504,7 @@ func ProcessButtons(X int, Y int,
 		!this.ShowStaticColorPicker && // Not In Color Picker Mode.
 		getStatic(this) { // Static Function On in any sequence
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectStaticFixture(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
@@ -485,6 +516,7 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode && // Not In Fixture Selection Mode.
 		getStatic(this) { // Static Function On in this or shutter chaser sequence
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectStaticColor(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
@@ -494,6 +526,7 @@ func ProcessButtons(X int, Y int,
 		!this.EditFixtureSelectionMode &&
 		this.EditPatternMode {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectPattern(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
@@ -503,12 +536,14 @@ func ProcessButtons(X int, Y int,
 		this.SelectedSequence == Y && // Make sure the buttons pressed are for this sequence.
 		this.SelectedMode[this.SelectedSequence] == FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
 
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		processFunctions(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}
 
 	// S E L E C T   B L A C K O U T   B U T T O N.
 	if X == 8 && Y == 7 {
+		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		blackout(X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}

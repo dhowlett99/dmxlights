@@ -84,6 +84,12 @@ func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.A
 	}
 }
 
+func RemovePreset(presets map[string]Preset, x int, y int) {
+	newPreset := presets[fmt.Sprint(x)+","+fmt.Sprint(y)]
+	newPreset.Selected = false
+	presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset
+}
+
 func SavePresets(presets map[string]Preset) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")

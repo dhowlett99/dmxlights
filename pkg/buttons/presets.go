@@ -27,6 +27,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
+func SavePresetOff(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+	this.SavePreset = false
+	// turn off the save button from flashing.
+	common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+}
+
 func togglePresetSaveMode(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
@@ -50,7 +56,7 @@ func togglePresetSaveMode(this *CurrentState, eventsForLaunchpad chan common.ALi
 func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	if debug {
-		fmt.Printf("Preset Pressed X:%d Y:%d\n", X, Y)
+		fmt.Printf("recallPreset() Preset Pressed X:%d Y:%d\n", X, Y)
 	}
 
 	// Remove the button off offset.
@@ -105,7 +111,7 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 func savePresets(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence, replyChannels []chan common.Sequence) {
 
 	if debug {
-		fmt.Printf("Ask For Config\n")
+		fmt.Printf("Ask For Config Y=%d X=%d\n", Y, X)
 	}
 
 	if this.ShowRGBColorPicker {
