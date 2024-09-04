@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func startFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
@@ -40,7 +41,7 @@ func startFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChan
 	}
 
 	// Now tell all the fixtures what they need to do.
-	sendToAllFixtures(fixtureStepChannels, command)
+	fixture.SendToAllFixtures(fixtureStepChannels, command)
 }
 
 func stopFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
@@ -60,5 +61,5 @@ func stopFlood(mySequenceNumber int, sequence *common.Sequence, fixtureStepChann
 		Strobe:         sequence.Strobe,
 	}
 	// Now tell all the fixtures what they need to do.
-	sendToAllFixtures(fixtureStepChannels, command)
+	fixture.SendToAllFixtures(fixtureStepChannels, command)
 }

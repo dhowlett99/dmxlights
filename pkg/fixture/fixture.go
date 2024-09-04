@@ -2402,3 +2402,10 @@ func HowManyScannerColors(sequence *common.Sequence, fixturesConfig *Fixtures) [
 
 	return sequence.SequenceColors
 }
+
+// Send a command to all the fixtures.
+func SendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command common.FixtureCommand) {
+	for _, fixture := range fixtureChannels {
+		fixture <- command
+	}
+}

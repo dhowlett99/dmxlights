@@ -258,7 +258,7 @@ type StaticColorButton struct {
 	Setting          int
 	FirstPress       bool
 	Enabled          bool
-	NumberOfGobos    int
+	//NumberOfGobos    int
 }
 
 type FixtureState struct {
@@ -412,6 +412,7 @@ type Sequence struct {
 	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
+	RGBAvailablePatterns        map[int]Pattern             // Available RGB patterns.
 	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
@@ -463,7 +464,7 @@ type Sequence struct {
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
-	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
+	StartPattern                bool                        // Flag to indicate we're going to start the pattern.
 	NewPattern                  bool                        // Flag to indicate we are selecting a new pattern.
 	UpdateColors                bool                        // Command to update the sequence colors.
 	Switches                    map[int]Switch              // A switch sequence stores its data in here.

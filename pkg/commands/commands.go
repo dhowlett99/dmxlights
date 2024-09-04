@@ -126,7 +126,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			// Reset the scanner pattern back to default.
 			sequence.UpdateColors = false
 			sequence.RecoverSequenceColors = false
-			sequence.UpdatePattern = true
+			sequence.StartPattern = true
 			sequence.SelectedPattern = common.DEFAULT_PATTERN
 		}
 		// Clear all the function buttons for this sequence.
@@ -216,7 +216,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.UpdateColors = false
 		sequence.RecoverSequenceColors = false
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
 		sequence.NewPattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
@@ -294,7 +294,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Chase = true
 		sequence.Static = false
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
 		sequence.Run = true
 		return sequence
 
@@ -305,7 +305,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerChaser = true
 		sequence.Chase = true
 		sequence.Static = false
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
 		sequence.Run = true
 		return sequence
 
@@ -921,9 +921,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateAutoColor:
 		const AUTO_COLOR = 0
 		const SELECTED_TYPE = 1
-		if debug {
-			fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
-		}
+		//if debug {
+		fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
+		//}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
 		selectedType := command.Args[SELECTED_TYPE].Value.(string)
 
@@ -1007,7 +1007,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if sequence.Type == "scanner" && sequence.Label != "chaser" && sequence.Run {
 			sequence.ScannerChaser = false
 		}
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
 		sequence.Static = false
 		sequence.PlayStaticOnce = false
 		sequence.ChangeMusicTrigger = true
@@ -1038,7 +1038,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.Blackout = false
 				sequence.StaticFadeUpOnce = true
 				// Because steps are not stored in the config file. UpdatePattern generates the steps.
-				sequence.UpdatePattern = true
+				sequence.StartPattern = true
 				// Restore any sequenceColors.
 				sequence.UpdateColors = true
 				return sequence
@@ -1184,7 +1184,7 @@ func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) [
 			newFixture.Number = f.Number
 			newFixture.SelectedColor = 1 // Red
 			newFixture.Color = colors.Red
-			newFixture.NumberOfGobos = fixture.HowManyGobosForThisFixture(f.Number, sequenceNumber, fixturesConfig)
+			//newFixture.NumberOfGobos = fixture.HowManyGobosForThisFixture(f.Number, sequenceNumber, fixturesConfig)
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}

@@ -20,6 +20,7 @@ package sequence
 import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func blackout(fixtureStepChannels []chan common.FixtureCommand) {
@@ -28,5 +29,5 @@ func blackout(fixtureStepChannels []chan common.FixtureCommand) {
 		Type:      "lastColor",
 		LastColor: colors.Black,
 	}
-	sendToAllFixtures(fixtureStepChannels, command)
+	fixture.SendToAllFixtures(fixtureStepChannels, command)
 }

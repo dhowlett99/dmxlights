@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
@@ -39,5 +40,5 @@ func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepC
 	}
 
 	// Now tell all the fixtures what they need to do.
-	sendToAllFixtures(fixtureStepChannels, command)
+	fixture.SendToAllFixtures(fixtureStepChannels, command)
 }

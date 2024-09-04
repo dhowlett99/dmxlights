@@ -1,5 +1,5 @@
 // Copyright (C) 2022,2023 dhowlett99.
-// This is the dmxlights main sequencers supporting functions.
+// This is the dmxlights main sequencers pattern functions.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -24,35 +24,18 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/position"
 )
 
-func updatePatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+func setupNewRGBPattern(sequence *common.Sequence) []common.Step {
 
-	if debug {
-		fmt.Printf("updatePatterns: \n")
-	}
+	//if debug {
+	fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)
+	//}
 
-	var steps []common.Step
-
-	if sequence.Type == "rgb" {
-		steps = updateRGBPatterns(sequence, availablePatterns)
-	}
-	if sequence.Type == "scanner" {
-		steps = updateScannerPatterns(sequence)
-	}
-
-	return steps
-}
-
-func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
-
-	if debug {
-		fmt.Printf("updateRGBPatterns: \n")
-	}
-
-	RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+	RGBPattern := position.ApplyFixtureState(sequence.RGBAvailablePatterns[sequence.SelectedPattern], sequence.FixtureState)
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 	steps := RGBPattern.Steps
 	sequence.Pattern.Name = RGBPattern.Name
@@ -73,15 +56,15 @@ func updateRGBPatterns(sequence *common.Sequence, availablePatterns map[int]comm
 	return steps
 }
 
-func updateScannerPatterns(sequence *common.Sequence) []common.Step {
+func setupNewScannerPattern(sequence *common.Sequence) []common.Step {
 
-	if debug {
-		fmt.Printf("updateScannerPatterns: \n")
-	}
+	//if debug {
+	fmt.Printf("setupNewScannerPattern: Pattern Number %d\n", sequence.SelectedPattern)
+	//}
 
 	// Get available scanner patterns.
 	sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
-	sequence.UpdatePattern = false
+	sequence.StartPattern = false
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 	// Set the scanner steps used to send out pan and tilt values.
 	sequence.Pattern = sequence.ScannerAvailablePatterns[sequence.SelectedPattern]
@@ -90,11 +73,37 @@ func updateScannerPatterns(sequence *common.Sequence) []common.Step {
 	return steps
 }
 
-// Send a command to all the fixtures.
-func sendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command common.FixtureCommand) {
-	for _, fixture := range fixtureChannels {
-		fixture <- command
+func updateScannerPattern(steps []common.Step, sequence *common.Sequence, fixturesConfig *fixture.Fixtures) []common.Step {
+
+	// Start the scanner pattern.
+	if sequence.StartPattern {
+		steps = setupNewScannerPattern(sequence)
+		sequence.StartPattern = false
+		return steps
 	}
+
+	// Uodate the scanner shift.
+	if sequence.UpdateShift {
+		steps = setupNewScannerPattern(sequence)
+		sequence.UpdateShift = false
+	}
+
+	if sequence.AutoPattern {
+		steps = scannerAutoPattern(sequence)
+	}
+
+	// Auto color change.
+	if sequence.AutoColor {
+		steps = scannerAutoColor(steps, sequence)
+	}
+
+	// Update scanner colors.
+	if sequence.UpdateColors {
+		sequence.SequenceColors = fixture.HowManyScannerColors(sequence, fixturesConfig)
+		sequence.UpdateColors = false
+	}
+
+	return steps
 }
 
 func makeACopy(src, dist interface{}) (err error) {

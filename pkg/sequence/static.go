@@ -21,6 +21,7 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func startStatic(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand) {
@@ -59,7 +60,7 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 		}
 
 		// Now tell all the fixtures what they need to do.
-		sendToAllFixtures(fixtureStepChannels, command)
+		fixture.SendToAllFixtures(fixtureStepChannels, command)
 
 		// Done fading for this static scene only reset when we set a static scene again.
 		sequence.StaticFadeUpOnce = false
@@ -83,7 +84,7 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 		}
 
 		// Now tell all the fixtures what they need to do.
-		sendToAllFixtures(fixtureStepChannels, command)
+		fixture.SendToAllFixtures(fixtureStepChannels, command)
 	}
 }
 
@@ -111,5 +112,5 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 	}
 
 	// Now tell all the fixtures what they need to do.
-	sendToAllFixtures(fixtureStepChannels, command)
+	fixture.SendToAllFixtures(fixtureStepChannels, command)
 }

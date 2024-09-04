@@ -31,14 +31,14 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 
 	this.SelectedType = sequences[Y].Type
 
-	if debug {
-		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d\n", X, Y)
-	}
+	//if debug {
+	fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d\n", X, Y, this.TargetSequence)
+	//}
 	colorPattern := 5
 	flashSequence := common.Sequence{
 		Pattern: common.Pattern{
 			Name:  "colors",
-			Steps: this.RGBPatterns[colorPattern].Steps, // Use the color pattern for flashing.
+			Steps: sequences[this.TargetSequence].RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
 		},
 	}
 

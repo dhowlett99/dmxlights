@@ -23,6 +23,24 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/position"
 )
 
+func calculatePositions(sequence *common.Sequence, steps []common.Step) (map[int]common.Position, map[int]map[int]common.Position) {
+
+	// Setup vars.
+	rgbPositions := make(map[int]common.Position)
+	scannerPositions := make(map[int]map[int]common.Position, sequence.NumberFixtures)
+
+	// Calculate positions from steps.
+	if sequence.Type == "scanner" {
+		scannerPositions = calculateScannerPositions(sequence, steps)
+	}
+	// Calculate RGB positions.
+	if sequence.Type == "rgb" {
+		rgbPositions = calculateRGBPositions(sequence, steps)
+	}
+
+	return rgbPositions, scannerPositions
+}
+
 func calculateRGBPositions(sequence *common.Sequence, steps []common.Step) map[int]common.Position {
 
 	if debug {

@@ -1,0 +1,131 @@
+// Copyright (C) 2022,2023,2024 dhowlett99.
+// This is the dmxlights main sequencers step functions.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
+
+package sequence
+
+import (
+	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
+)
+
+func generateSteps(steps []common.Step, sequence *common.Sequence, soundConfig *sound.SoundConfig, fixturesConfig *fixture.Fixtures) []common.Step {
+
+	// Setup music trigger.
+	if sequence.MusicTrigger {
+		enableMusicTrigger(sequence, soundConfig)
+	} else {
+		disableMusicTrigger(sequence, soundConfig)
+	}
+
+	// Set the pattern. steps are generated from patterns. the sequence.SelectedPattern will be used to create steps.
+	if sequence.Type == "rgb" {
+		steps = updateRGBSteps(steps, sequence)
+		return steps
+	}
+
+	if sequence.Type == "scanner" {
+		steps = updateScannerPattern(steps, sequence, fixturesConfig)
+		return steps
+	}
+
+	return steps
+}
+
+func updateRGBSteps(steps []common.Step, sequence *common.Sequence) []common.Step {
+
+	if sequence.StartPattern {
+		steps = setupNewRGBPattern(sequence)
+		sequence.StartPattern = false
+		return steps
+	}
+
+	// Auto RGB colors.
+	if sequence.AutoColor && sequence.Type == "rgb" && sequence.Pattern.Label != "Multi.Color" && sequence.Pattern.Label != "Color.Chase" {
+		steps = rgbAutoColors(sequence, steps)
+	}
+
+	// Auto Gobo Change for Chaser.
+	if sequence.AutoColor && sequence.Label == "chaser" {
+		steps = chaserAutoGobo(steps, sequence)
+	}
+
+	// Auto pattern change.
+	if sequence.AutoPattern && sequence.Type == "rgb" {
+		steps = rgbAutoPattern(sequence)
+	}
+
+	// At this point colors are solid colors from the patten and not faded yet.
+	// an ideal point to replace colors in a sequence.
+	// If we are updating the color in a sequence.
+	if sequence.UpdateColors && sequence.Type == "rgb" {
+		if sequence.RecoverSequenceColors {
+			if sequence.SavedSequenceColors != nil {
+				// Recover origial colors after auto color is switched off.
+				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+				sequence.AutoColor = false
+			}
+		} else {
+			// We are updating color in sequence and sequence colors are set.
+			if len(sequence.SequenceColors) > 0 {
+				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+				// Save the current color selection.
+				if sequence.SaveColors {
+					sequence.SavedSequenceColors = common.HowManyColorsInSteps(steps)
+					sequence.SaveColors = false
+				}
+			}
+		}
+		sequence.UpdateColors = false
+	}
+
+	return steps
+}
+
+func playStep(sequence *common.Sequence, step int, fixtureNumber int, rgbPositions map[int]common.Position, scannerPositions map[int]map[int]common.Position, fixtureStepChannels []chan common.FixtureCommand) {
+	// Even if the fixture is disabled we still need to send this message to the fixture.
+	// beacuse the fixture is the one who is responsible for turning it off.
+	command := common.FixtureCommand{
+		Master:                   sequence.Master,
+		Blackout:                 sequence.Blackout,
+		Type:                     sequence.Type,
+		Label:                    sequence.Label,
+		SequenceNumber:           sequence.Number,
+		Step:                     step,
+		NumberSteps:              sequence.NumberSteps,
+		Rotate:                   sequence.Rotate,
+		StrobeSpeed:              sequence.StrobeSpeed,
+		Strobe:                   sequence.Strobe,
+		RGBFade:                  sequence.RGBFade,
+		Hidden:                   sequence.Hidden,
+		RGBPosition:              rgbPositions[step],
+		StartFlood:               sequence.StartFlood,
+		StopFlood:                sequence.StopFlood,
+		ScannerPosition:          scannerPositions[fixtureNumber][step], // Scanner positions have an additional index for their fixture number.
+		ScannerGobo:              sequence.ScannerGobo[fixtureNumber],
+		FixtureState:             sequence.FixtureState[fixtureNumber],
+		ScannerChaser:            sequence.ScannerChaser,
+		ScannerColor:             sequence.ScannerColor[fixtureNumber],
+		ScannerAvailableColors:   sequence.ScannerAvailableColors[fixtureNumber],
+		ScannerOffsetPan:         sequence.ScannerOffsetPan,
+		ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
+		ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
+		MasterChanging:           sequence.MasterChanging,
+	}
+
+	// Start the fixture group.
+	fixtureStepChannels[fixtureNumber] <- command
+}

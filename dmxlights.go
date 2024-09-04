@@ -40,7 +40,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
-	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sequence"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
@@ -87,7 +86,6 @@ func main() {
 	this.SoundGain = 0                                                    // Fine gain -0.09 -> 0.09
 	this.OffsetPan = common.SCANNER_MID_POINT                             // Start pan from the center
 	this.OffsetTilt = common.SCANNER_MID_POINT                            // Start tilt from the center.
-	this.RGBPatterns = pattern.MakePatterns()                             // Build the default set of Patterns.
 	this.SelectButtonPressed = make([]bool, NumberOfSequences)            // Initialise four select buttons.
 	this.SelectedMode = make([]int, NumberOfSequences)                    // Initialise four mode variables.
 	this.LastMode = make([]int, NumberOfSequences)                        // Initialise four mode variables.
@@ -560,11 +558,11 @@ func main() {
 	content := container.NewBorder(main, nil, nil, nil, bottonStatusBar)
 
 	// Start threads for each sequence.
-	go sequence.PlaySequence(*sequences[0], 0, this.RGBPatterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[1], 1, this.RGBPatterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[2], 2, this.RGBPatterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[3], 3, this.RGBPatterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
-	go sequence.PlaySequence(*sequences[4], 4, this.RGBPatterns, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[0], 0, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[1], 1, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[2], 2, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[3], 3, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
+	go sequence.PlaySequence(*sequences[4], 4, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.SequenceChannels, this.SwitchChannels, this.SoundConfig, this.DmxInterfacePresent)
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0

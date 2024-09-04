@@ -24,6 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/pattern"
 )
 
 // Before a sequence can run it needs to be created.
@@ -107,7 +108,7 @@ func CreateSequence(
 	// The actual sequence definition.
 	sequence := common.Sequence{
 		Label:                  sequenceLabel,
-		UpdatePattern:          true, // Start by setting up the pattern
+		StartPattern:           true, // Start by setting up the pattern
 		UpdateColors:           true, // And the colors
 		SequenceColors:         defaultSequenceColors,
 		ScannerAvailableColors: availableScannerColors,
@@ -145,6 +146,7 @@ func CreateSequence(
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
 		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
+		RGBAvailablePatterns:   pattern.MakePatterns(), // Build the default set of Patterns.
 	}
 
 	// Load the switch information in from the fixtures config.
@@ -156,7 +158,7 @@ func CreateSequence(
 	if sequenceType == "scanner" {
 		// Get available scanner patterns.
 		sequence.ScannerAvailablePatterns = getAvailableScannerPattens(&sequence)
-		sequence.UpdatePattern = false
+		sequence.StartPattern = false
 	}
 
 	return sequence
