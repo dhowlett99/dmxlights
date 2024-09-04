@@ -466,7 +466,7 @@ type Sequence struct {
 	StartPattern                bool                        // Flag to indicate we're going to start the pattern.
 	NewPattern                  bool                        // Flag to indicate we are selecting a new pattern.
 	UpdateColors                bool                        // Command to update the sequence colors.
-	Switches                    map[int]Switch              // A switch sequence stores its data in here.
+	Switches                    []Switch                    // A switch sequence stores its data in here. Indexed by switch number.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.

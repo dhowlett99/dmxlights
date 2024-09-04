@@ -58,6 +58,9 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 	}
 
 	if sequence.StartPattern {
+		if debug {
+			fmt.Printf("Start Pattern\n")
+		}
 		steps = setupNewRGBPattern(sequence, availablePatterns)
 		sequence.StartPattern = false
 		return steps
@@ -65,16 +68,25 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 
 	// Auto RGB colors.
 	if sequence.AutoColor && sequence.Type == "rgb" && sequence.Pattern.Label != "Multi.Color" && sequence.Pattern.Label != "Color.Chase" {
+		if debug {
+			fmt.Printf("RGB AutoColor\n")
+		}
 		steps = rgbAutoColors(sequence, steps)
 	}
 
 	// Auto Gobo Change for Chaser.
 	if sequence.AutoColor && sequence.Label == "chaser" {
+		if debug {
+			fmt.Printf("RGB AutoColor Chaser\n")
+		}
 		steps = chaserAutoGobo(steps, sequence)
 	}
 
 	// Auto pattern change.
 	if sequence.AutoPattern && sequence.Type == "rgb" {
+		if debug {
+			fmt.Printf("RGB AutoPattern\n")
+		}
 		steps = rgbAutoPattern(sequence, availablePatterns)
 	}
 
@@ -82,8 +94,17 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 	// an ideal point to replace colors in a sequence.
 	// If we are updating the color in a sequence.
 	if sequence.UpdateColors && sequence.Type == "rgb" {
+		if debug {
+			fmt.Printf("RGB UpdateColors\n")
+		}
 		if sequence.RecoverSequenceColors {
+			if debug {
+				fmt.Printf("RGB RecoverSequenceColors\n")
+			}
 			if sequence.SavedSequenceColors != nil {
+				if debug {
+					fmt.Printf("RGB SavedSequenceColors\n")
+				}
 				// Recover origial colors after auto color is switched off.
 				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 				sequence.AutoColor = false
@@ -91,6 +112,9 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 		} else {
 			// We are updating color in sequence and sequence colors are set.
 			if len(sequence.SequenceColors) > 0 {
+				if debug {
+					fmt.Printf("replaceRGBcolorsInSteps\n")
+				}
 				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
 				// Save the current color selection.
 				if sequence.SaveColors {
@@ -103,6 +127,14 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 	}
 
 	return steps
+}
+
+func clearFixture(fixtureNumber int, fixtureStepChannels []chan common.FixtureCommand) {
+	command := common.FixtureCommand{
+		Clear: true,
+	}
+	// Start the fixture group.
+	fixtureStepChannels[fixtureNumber] <- command
 }
 
 func playStep(sequence *common.Sequence, step int, fixtureNumber int, rgbPositions map[int]common.Position, scannerPositions map[int]map[int]common.Position, fixtureStepChannels []chan common.FixtureCommand) {

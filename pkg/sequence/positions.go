@@ -25,6 +25,10 @@ import (
 
 func calculatePositions(sequence *common.Sequence, steps []common.Step) (map[int]common.Position, map[int]map[int]common.Position) {
 
+	if debug {
+		fmt.Printf("calculatePositions() \n")
+	}
+
 	// Setup vars.
 	rgbPositions := make(map[int]common.Position)
 	scannerPositions := make(map[int]map[int]common.Position, sequence.NumberFixtures)

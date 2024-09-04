@@ -128,6 +128,21 @@ func PlaySequence(sequence common.Sequence,
 				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
 				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
 					sequence.Static || sequence.UpdateShift || sequence.StartPattern || sequence.UpdateColors || sequence.UpdateSize {
+					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+						clearFixture(fixtureNumber, fixtureStepChannels)
+					}
+					if debug {
+						fmt.Printf("%d: Break\n", mySequenceNumber)
+						fmt.Printf("%d: Run %t \n", mySequenceNumber, sequence.Run)
+						fmt.Printf("%d: Clear %t \n", mySequenceNumber, sequence.Clear)
+						fmt.Printf("%d: StartFlood %t\n", mySequenceNumber, sequence.StartFlood)
+						fmt.Printf("%d: StopFlood %t\n", mySequenceNumber, sequence.StopFlood)
+						fmt.Printf("%d: Statics %t\n", mySequenceNumber, sequence.Static)
+						fmt.Printf("%d: UpdateShift %t\n", mySequenceNumber, sequence.UpdateShift)
+						fmt.Printf("%d: StartPattern %t\n", mySequenceNumber, sequence.StartPattern)
+						fmt.Printf("%d: UpdateColors %t\n", mySequenceNumber, sequence.UpdateColors)
+						fmt.Printf("%d: UpdateSize %t\n", mySequenceNumber, sequence.UpdateSize)
+					}
 					// Break out of the step loop to process commands.
 					break
 				}

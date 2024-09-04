@@ -1088,14 +1088,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	return sequence
 }
 
-func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) map[int]common.Switch {
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
 
 	if debug {
 		fmt.Printf("Load switch data\n")
 	}
 
 	// A new group of switches.
-	newSwitchList := make(map[int]common.Switch)
+	newSwitchList := make([]common.Switch, 8)
 
 	switchNumber := 0
 
