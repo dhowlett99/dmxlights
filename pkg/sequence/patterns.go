@@ -29,13 +29,13 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/position"
 )
 
-func setupNewRGBPattern(sequence *common.Sequence) []common.Step {
+func setupNewRGBPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
 
-	//if debug {
-	fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)
-	//}
+	if debug {
+		fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)
+	}
 
-	RGBPattern := position.ApplyFixtureState(sequence.RGBAvailablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+	RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 	steps := RGBPattern.Steps
 	sequence.Pattern.Name = RGBPattern.Name
@@ -51,6 +51,10 @@ func setupNewRGBPattern(sequence *common.Sequence) []common.Step {
 		sequence.ScannerChaser = true
 		// Chaser start with a standard chase pattern in white.
 		steps = replaceRGBcolorsInSteps(steps, []color.RGBA{colors.White})
+	}
+
+	if debug {
+		fmt.Printf("Steps are %+v\n", steps)
 	}
 
 	return steps

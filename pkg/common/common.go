@@ -412,7 +412,6 @@ type Sequence struct {
 	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
-	RGBAvailablePatterns        map[int]Pattern             // Available RGB patterns.
 	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.

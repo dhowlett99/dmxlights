@@ -56,13 +56,13 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 // and then increments the sequence.SelectedPattern so the next time around the sequence steps loop the pattern automatically changes.
 // Currently supports as many patterns as defined in availablePatterns as passed in.
 // Returns - A set of steps with the pattern selected.
-func rgbAutoPattern(sequence *common.Sequence) []common.Step {
+func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
 
 	//if debug {
 	fmt.Printf("rgbAutoPattern: \n")
 	//}
 
-	for patternNumber, pattern := range sequence.RGBAvailablePatterns {
+	for patternNumber, pattern := range availablePatterns {
 		if pattern.Number == sequence.SelectedPattern {
 			sequence.Pattern.Number = patternNumber
 			//if debug {
@@ -72,11 +72,11 @@ func rgbAutoPattern(sequence *common.Sequence) []common.Step {
 		}
 	}
 	sequence.SelectedPattern++
-	if sequence.SelectedPattern > len(sequence.RGBAvailablePatterns) {
+	if sequence.SelectedPattern > len(availablePatterns) {
 		sequence.SelectedPattern = 0
 	}
 
-	return setupNewRGBPattern(sequence)
+	return setupNewRGBPattern(sequence, availablePatterns)
 }
 
 // chaserAutoGobo - when called sets increments the sequences scanner gobo indicated by the variable sequence.ScannerGobo

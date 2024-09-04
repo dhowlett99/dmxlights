@@ -24,7 +24,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/pattern"
 )
 
 // Before a sequence can run it needs to be created.
@@ -146,7 +145,6 @@ func CreateSequence(
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
 		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
-		RGBAvailablePatterns:   pattern.MakePatterns(), // Build the default set of Patterns.
 	}
 
 	// Load the switch information in from the fixtures config.

@@ -38,7 +38,7 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 	flashSequence := common.Sequence{
 		Pattern: common.Pattern{
 			Name:  "colors",
-			Steps: sequences[this.TargetSequence].RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
+			Steps: this.RGBPatterns[colorPattern].Steps, // Use the color pattern for flashing.
 		},
 	}
 

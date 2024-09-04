@@ -46,6 +46,7 @@ type SequenceConfig struct {
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
 	mySequenceNumber int,
+	availablePatterns map[int]common.Pattern,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
@@ -102,11 +103,11 @@ func PlaySequence(sequence common.Sequence,
 		if sequence.Chase && sequence.Run && !sequence.Static && !sequence.StartFlood {
 
 			// Update the steps.
-			steps = generateSteps(steps, &sequence, soundConfig, fixturesConfig)
+			steps = generateSteps(steps, availablePatterns, &sequence, soundConfig, fixturesConfig)
 
-			//if debug {
-			fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
-			//}
+			if debug {
+				fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
+			}
 
 			// Calculate positions from steps.  Soeed, shift, size and fade can be addjusted in this loop.
 			rgbPositions, scannerPositions := calculatePositions(&sequence, steps)
@@ -136,9 +137,9 @@ func PlaySequence(sequence common.Sequence,
 				}
 			}
 		} else {
-			//if debug {
-			fmt.Printf("%d: Start Listen for commands\n", mySequenceNumber)
-			//}
+			if debug {
+				fmt.Printf("%d: Start Listen for commands\n", mySequenceNumber)
+			}
 
 			// This is where we wait for command when the sequence isn't running.
 			// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.

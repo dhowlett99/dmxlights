@@ -131,6 +131,7 @@ type CurrentState struct {
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
+	RGBPatterns                 map[int]common.Pattern     // Available RGB Patterns.
 }
 
 func ProcessButtons(X int, Y int,
@@ -750,13 +751,13 @@ func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence 
 
 	if debug {
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", targetSequence.Name, targetSequence.Type, targetSequence.Label)
-		for _, pattern := range targetSequence.RGBAvailablePatterns {
+		for _, pattern := range this.RGBPatterns {
 			fmt.Printf("Found a pattern called %s\n", pattern.Name)
 		}
 	}
 
 	if targetSequence.Type == "rgb" {
-		for _, pattern := range targetSequence.RGBAvailablePatterns {
+		for _, pattern := range this.RGBPatterns {
 			if debug {
 				fmt.Printf("pattern is %s\n", pattern.Name)
 			}

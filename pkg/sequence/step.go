@@ -17,12 +17,18 @@
 package sequence
 
 import (
+	"fmt"
+
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 )
 
-func generateSteps(steps []common.Step, sequence *common.Sequence, soundConfig *sound.SoundConfig, fixturesConfig *fixture.Fixtures) []common.Step {
+func generateSteps(steps []common.Step, availablePatterns map[int]common.Pattern, sequence *common.Sequence, soundConfig *sound.SoundConfig, fixturesConfig *fixture.Fixtures) []common.Step {
+
+	if debug {
+		fmt.Printf("generateSteps\n")
+	}
 
 	// Setup music trigger.
 	if sequence.MusicTrigger {
@@ -33,7 +39,7 @@ func generateSteps(steps []common.Step, sequence *common.Sequence, soundConfig *
 
 	// Set the pattern. steps are generated from patterns. the sequence.SelectedPattern will be used to create steps.
 	if sequence.Type == "rgb" {
-		steps = updateRGBSteps(steps, sequence)
+		steps = updateRGBSteps(steps, availablePatterns, sequence)
 		return steps
 	}
 
@@ -45,10 +51,14 @@ func generateSteps(steps []common.Step, sequence *common.Sequence, soundConfig *
 	return steps
 }
 
-func updateRGBSteps(steps []common.Step, sequence *common.Sequence) []common.Step {
+func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Pattern, sequence *common.Sequence) []common.Step {
+
+	if debug {
+		fmt.Printf("updateRGBSteps\n")
+	}
 
 	if sequence.StartPattern {
-		steps = setupNewRGBPattern(sequence)
+		steps = setupNewRGBPattern(sequence, availablePatterns)
 		sequence.StartPattern = false
 		return steps
 	}
@@ -65,7 +75,7 @@ func updateRGBSteps(steps []common.Step, sequence *common.Sequence) []common.Ste
 
 	// Auto pattern change.
 	if sequence.AutoPattern && sequence.Type == "rgb" {
-		steps = rgbAutoPattern(sequence)
+		steps = rgbAutoPattern(sequence, availablePatterns)
 	}
 
 	// At this point colors are solid colors from the patten and not faded yet.
