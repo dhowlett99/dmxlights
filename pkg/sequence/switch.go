@@ -56,7 +56,7 @@ func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 	swiTch := sequence.Switches[switchNumber]
 
 	if debug {
-		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number].Override.Speed)
+		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number-1].Override.Speed)
 	}
 
 	state := swiTch.States[swiTch.CurrentPosition]
