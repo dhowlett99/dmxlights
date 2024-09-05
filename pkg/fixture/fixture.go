@@ -429,6 +429,16 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d StartFlood\n", cmd.SequenceNumber, myFixtureNumber)
 			}
+			// Stop any running fade ups.
+			select {
+			case stopFadeUp <- true:
+			case <-time.After(100 * time.Millisecond):
+			}
+			// Stop any running fade downs.
+			select {
+			case stopFadeDown <- true:
+			case <-time.After(100 * time.Millisecond):
+			}
 			lastColor = startFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
