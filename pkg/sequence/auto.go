@@ -29,9 +29,9 @@ import (
 // Returns - A set of steps with the pattern color set to the selected color.
 func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step {
 
-	//if debug {
-	fmt.Printf("rgbAutoColors: \n")
-	//}
+	if debug {
+		fmt.Printf("rgbAutoColors: \n")
+	}
 
 	// Set the color.
 	sequence.SequenceColors = []color.RGBA{sequence.RGBAvailableColors[sequence.RGBColor].Color}
@@ -58,16 +58,16 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 // Returns - A set of steps with the pattern selected.
 func rgbAutoPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
 
-	//if debug {
-	fmt.Printf("rgbAutoPattern: \n")
-	//}
+	if debug {
+		fmt.Printf("rgbAutoPattern: \n")
+	}
 
 	for patternNumber, pattern := range availablePatterns {
 		if pattern.Number == sequence.SelectedPattern {
 			sequence.Pattern.Number = patternNumber
-			//if debug {
-			fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
-			//}
+			if debug {
+				fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
+			}
 			break
 		}
 	}
