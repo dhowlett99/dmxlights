@@ -379,6 +379,7 @@ type Sequence struct {
 	Description                 string                      // Sequence description.
 	Number                      int                         // Sequence number.
 	Run                         bool                        // True if this sequence is running.
+	SavedRun                    bool                        // Place to save state when loading.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
 	Hidden                      bool                        // Hidden is used to indicate sequence buttons are not visible.

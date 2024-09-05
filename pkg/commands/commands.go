@@ -1034,6 +1034,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
+				// Save run state.
+				sequence.SavedRun = seq.Run
+				// Don't start until everything is ready.
+				sequence.Run = false
 				// Don't assume we're blacked out.
 				sequence.Blackout = false
 				sequence.StaticFadeUpOnce = true
