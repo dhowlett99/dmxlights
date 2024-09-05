@@ -112,18 +112,18 @@ func chaserAutoGobo(steps []common.Step, sequence *common.Sequence) []common.Ste
 // Returns - Nothing, pattern is determined by sequence.SelectedPattern.
 func scannerAutoPattern(sequence *common.Sequence) []common.Step {
 
-	//if debug {
-	fmt.Printf("scannerAutoPattern: \n")
-	//}
+	if debug {
+		fmt.Printf("scannerAutoPattern: \n")
+	}
 
 	sequence.SelectedPattern++
 	if sequence.SelectedPattern > len(sequence.ScannerAvailablePatterns) {
 		sequence.SelectedPattern = 0
 	}
 
-	//if debug {
-	fmt.Printf("SelectedPattern: %d\n", sequence.SelectedPattern)
-	//}
+	if debug {
+		fmt.Printf("SelectedPattern: %d\n", sequence.SelectedPattern)
+	}
 
 	return setupNewScannerPattern(sequence)
 

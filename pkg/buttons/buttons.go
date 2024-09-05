@@ -302,7 +302,7 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S A V E  P R E S E T  M O D E
 	if X == 8 && Y == 4 {
-		togglePresetSaveMode(this, eventsForLaunchpad, guiButtons, commandChannels)
+		togglePresetSaveMode(len(sequences), this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 

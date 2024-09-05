@@ -25,12 +25,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
-func floodOff(this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func floodOff(numberSequences int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Turn the flood button back to white.
 	common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
-	// Send a message to stop
+	// Send a message to stop flood.
 	cmd := common.Command{
 		Action: common.StopFlood,
 		Args: []common.Arg{
@@ -48,9 +48,22 @@ func floodOff(this *CurrentState, commandChannels []chan common.Command, eventsF
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
 	}
+
+	// ReStart any sequences that were running before the flood.
+	for sequenceNumber := 0; sequenceNumber < numberSequences; sequenceNumber++ {
+		if this.Running[sequenceNumber] {
+			cmd = common.Command{
+				Action: common.Start,
+				Args: []common.Arg{
+					{Name: "Start", Value: true},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+	}
 }
 
-func floodOn(this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func floodOn(numberSequences int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Remember which sequence is currently selected.
 	this.LastSelectedSequence = this.SelectedSequence
@@ -58,8 +71,23 @@ func floodOn(this *CurrentState, commandChannels []chan common.Command, eventsFo
 	// Flash the flood button pink to indicate we're in flood.
 	common.FlashLight(common.FLOOD_BUTTON, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)
 
+	var cmd common.Command
+
+	// Stop running sequences.
+	for sequenceNumber := 0; sequenceNumber < numberSequences; sequenceNumber++ {
+		if this.Running[sequenceNumber] {
+			cmd = common.Command{
+				Action: common.Stop,
+				Args: []common.Arg{
+					{Name: "Stop", Value: true},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+	}
+
 	// Start flood.
-	cmd := common.Command{
+	cmd = common.Command{
 		Action: common.Flood,
 		Args: []common.Arg{
 			{Name: "StartFlood", Value: true},
@@ -97,7 +125,7 @@ func toggleFlood(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 				break
 			}
 		}
-		floodOn(this, commandChannels, eventsForLaunchpad, guiButtons)
+		floodOn(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 	if this.Flood { // If we are flood already then tell the sequence to stop flood.
@@ -110,7 +138,7 @@ func toggleFlood(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 			this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label, ButtonColor: lastPreset.ButtonColor}
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		}
-		floodOff(this, commandChannels, eventsForLaunchpad, guiButtons)
+		floodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 }

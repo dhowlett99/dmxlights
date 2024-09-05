@@ -90,15 +90,112 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		restoreThis(this, sequenceNumber, *sequences[sequenceNumber])
+		// Restore the speed, shift, size, fade, coordinates label data.
+		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
+		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
+		this.ScannerShift[sequenceNumber] = sequences[sequenceNumber].ScannerShift
+		this.RGBSize[sequenceNumber] = sequences[sequenceNumber].RGBSize
+		this.ScannerSize[sequenceNumber] = sequences[sequenceNumber].ScannerSize
+		this.RGBFade[sequenceNumber] = sequences[sequenceNumber].RGBFade
+		this.ScannerCoordinates[sequenceNumber] = sequences[sequenceNumber].ScannerSelectedCoordinates
+		this.Running[sequenceNumber] = sequences[sequenceNumber].SavedRun
+		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
+		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
 
+		// Setup the correct mode for the displays.
+		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
+
+		// Assume we're starting in normal mode.
+		this.SelectedMode[sequenceNumber] = NORMAL
+
+		// Forget we've pressed twice.
+		this.SelectButtonPressed[sequenceNumber] = false
+
+		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
+		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
+		this.StaticFlashing[sequenceNumber] = false
+
+		this.ShowStaticColorPicker = false
+		this.ShowRGBColorPicker = false
+
+		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
+		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
+			// So adjust the mode to be CHASER_DISPLAY
+			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
+		}
+
+		// Reload the fixture state.
+		for fixtureNumber := 0; fixtureNumber < sequences[sequenceNumber].NumberFixtures; fixtureNumber++ {
+			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
+		}
+
+		// Restore the functions states from the sequence.
+		if sequences[sequenceNumber].Type == "rgb" {
+			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
+			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
+			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = sequences[sequenceNumber].Static
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].RGBInvert
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+		}
+		if sequences[sequenceNumber].Type == "scanner" {
+			this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequences[sequenceNumber].AutoColor
+			this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequences[sequenceNumber].AutoPattern
+			this.Functions[sequenceNumber][common.Function4_Bounce].State = sequences[sequenceNumber].Bounce
+			this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequences[sequenceNumber].ScannerChaser
+			this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequences[sequenceNumber].MusicTrigger
+		}
+
+		// If we are loading a switch sequence, update our local copy of the switch settings.
+		// and defocus each switch in turn.
+		if sequences[sequenceNumber].Type == "switch" {
+
+			// Get an upto date copy of the switch sequence.
+			//sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+
+			// Now set our local representation of switches
+			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
+				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
+
+				//  Restore any switch Overrides.
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Size != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
+				}
+
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors != nil {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors
+				}
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo != 0 {
+					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo
+				}
+
+				if debug {
+					var stateNames []string
+					for _, state := range swiTch.States {
+						stateNames = append(stateNames, state.Name)
+					}
+					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
+				}
+			}
+		}
 		if debug {
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
-
-		deFocusAllSwitches(this, sequences, commandChannels)
-
 	}
+
+	deFocusAllSwitches(this, sequences, commandChannels)
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
 	// So the master we retrive from this selected sequence will be the same for all the others.
@@ -150,114 +247,4 @@ func autoSelect(this *CurrentState) (selectedSequence int) {
 
 	// default to first sequnce if nothings running.
 	return selectedSequence
-}
-
-// restoreThis takes a sequence and copy's it contents into the current state represented by
-// a pointer to a var called 'this' also passed in.
-func restoreThis(this *CurrentState, sequenceNumber int, sequence common.Sequence) {
-
-	// Restore the speed, shift, size, fade, coordinates label data.
-	this.Speed[sequenceNumber] = sequence.Speed
-	this.RGBShift[sequenceNumber] = sequence.RGBShift
-	this.ScannerShift[sequenceNumber] = sequence.ScannerShift
-	this.RGBSize[sequenceNumber] = sequence.RGBSize
-	this.ScannerSize[sequenceNumber] = sequence.ScannerSize
-	this.RGBFade[sequenceNumber] = sequence.RGBFade
-	this.ScannerCoordinates[sequenceNumber] = sequence.ScannerSelectedCoordinates
-	this.Running[sequenceNumber] = sequence.Run
-	this.Strobe[sequenceNumber] = sequence.Strobe
-	this.StrobeSpeed[sequenceNumber] = sequence.StrobeSpeed
-
-	// Setup the correct mode for the displays.
-	this.SequenceType[sequenceNumber] = sequence.Type
-
-	// Assume we're starting in normal mode.
-	this.SelectedMode[sequenceNumber] = NORMAL
-
-	// Forget we've pressed twice.
-	this.SelectButtonPressed[sequenceNumber] = false
-
-	this.ScannerChaser[sequenceNumber] = sequence.ScannerChaser
-	this.Static[sequenceNumber] = sequence.Static
-	this.StaticFlashing[sequenceNumber] = false
-
-	this.ShowStaticColorPicker = false
-	this.ShowRGBColorPicker = false
-
-	// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-	if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
-		// So adjust the mode to be CHASER_DISPLAY
-		this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
-	}
-
-	// Reload the fixture state.
-	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-		this.FixtureState[sequenceNumber][fixtureNumber] = sequence.FixtureState[fixtureNumber]
-	}
-
-	// Restore the functions states from the sequence.
-	if sequence.Type == "rgb" {
-		this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequence.AutoColor
-		this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequence.AutoPattern
-		this.Functions[sequenceNumber][common.Function4_Bounce].State = sequence.Bounce
-		this.Functions[sequenceNumber][common.Function6_Static_Gobo].State = sequence.Static
-		this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequence.RGBInvert
-		this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequence.MusicTrigger
-	}
-	if sequence.Type == "scanner" {
-		this.Functions[sequenceNumber][common.Function2_Auto_Color].State = sequence.AutoColor
-		this.Functions[sequenceNumber][common.Function3_Auto_Pattern].State = sequence.AutoPattern
-		this.Functions[sequenceNumber][common.Function4_Bounce].State = sequence.Bounce
-		this.Functions[sequenceNumber][common.Function7_Invert_Chase].State = sequence.ScannerChaser
-		this.Functions[sequenceNumber][common.Function8_Music_Trigger].State = sequence.MusicTrigger
-	}
-
-	// If we are loading a switch sequence, update our local copy of the switch settings.
-	// and defocus each switch in turn.
-	if sequence.Type == "switch" {
-
-		// Get an upto date copy of the switch sequence.
-		//sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
-
-		// Now set our local representation of switches
-		for swiTchNumber, swiTch := range sequence.Switches {
-			this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
-
-			//  Restore any switch Overrides.
-			if sequence.Switches[swiTchNumber].Override.Speed != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequence.Switches[swiTchNumber].Override.Speed
-			}
-			if sequence.Switches[swiTchNumber].Override.Shift != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequence.Switches[swiTchNumber].Override.Shift
-			}
-			if sequence.Switches[swiTchNumber].Override.Size != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequence.Switches[swiTchNumber].Override.Size
-			}
-			if sequence.Switches[swiTchNumber].Override.Fade != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequence.Switches[swiTchNumber].Override.Fade
-			}
-
-			if sequence.Switches[swiTchNumber].Override.RotateSpeed != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequence.Switches[swiTchNumber].Override.RotateSpeed
-			}
-			if sequence.Switches[swiTchNumber].Override.Colors != nil {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequence.Switches[swiTchNumber].Override.Colors
-			}
-			if sequence.Switches[swiTchNumber].Override.Gobo != 0 {
-				this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequence.Switches[swiTchNumber].Override.Gobo
-			}
-
-			// Defocus this switch.
-			//this.LastSelectedSwitch = swiTchNumber
-			//deFocusSingleSwitch(this, sequences, commandChannels)
-
-			if debug {
-				var stateNames []string
-				for _, state := range swiTch.States {
-					stateNames = append(stateNames, state.Name)
-				}
-				fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
-			}
-		}
-	}
 }

@@ -33,7 +33,7 @@ func SavePresetOff(this *CurrentState, eventsForLaunchpad chan common.ALight, gu
 	common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 }
 
-func togglePresetSaveMode(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func togglePresetSaveMode(numberSequences int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Save Mode\n")
@@ -47,7 +47,7 @@ func togglePresetSaveMode(this *CurrentState, eventsForLaunchpad chan common.ALi
 	}
 	this.SavePreset = true
 	if this.Flood { // Turn off flood.
-		floodOff(this, commandChannels, eventsForLaunchpad, guiButtons)
+		floodOff(numberSequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 	}
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	common.FlashLight(common.SAVE_BUTTON, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)

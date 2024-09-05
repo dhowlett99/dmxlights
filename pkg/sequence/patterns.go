@@ -62,9 +62,9 @@ func setupNewRGBPattern(sequence *common.Sequence, availablePatterns map[int]com
 
 func setupNewScannerPattern(sequence *common.Sequence) []common.Step {
 
-	//if debug {
-	fmt.Printf("setupNewScannerPattern: Pattern Number %d\n", sequence.SelectedPattern)
-	//}
+	if debug {
+		fmt.Printf("setupNewScannerPattern: Pattern Number %d\n", sequence.SelectedPattern)
+	}
 
 	// Get available scanner patterns.
 	sequence.ScannerAvailablePatterns = getAvailableScannerPattens(sequence)
