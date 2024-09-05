@@ -632,30 +632,22 @@ const (
 )
 
 func SendCommandToSequence(targetSequence int, command Command, commandChannels []chan Command) {
-	select {
-	case commandChannels[targetSequence] <- command:
-	case <-time.After(100 * time.Millisecond):
-	}
+	commandChannels[targetSequence] <- command
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
-	select {
-	case commandChannels[0] <- command:
-	case commandChannels[1] <- command:
-	case commandChannels[2] <- command:
-	case commandChannels[3] <- command:
-	case commandChannels[4] <- command:
-	case <-time.After(100 * time.Millisecond):
-	}
+	commandChannels[0] <- command
+	commandChannels[1] <- command
+	commandChannels[2] <- command
+	commandChannels[3] <- command
+	commandChannels[4] <- command
+
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
 	for index, s := range sequences {
 		if s.Type == Type {
-			select {
-			case commandChannels[index] <- command:
-			case <-time.After(100 * time.Millisecond):
-			}
+			commandChannels[index] <- command
 		}
 	}
 }
@@ -663,10 +655,7 @@ func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, comm
 func SendCommandToAllSequenceExcept(targetSequence int, command Command, commandChannels []chan Command) {
 	for index := range commandChannels {
 		if index != targetSequence {
-			select {
-			case commandChannels[index] <- command:
-			case <-time.After(100 * time.Millisecond):
-			}
+			commandChannels[index] <- command
 		}
 	}
 }
