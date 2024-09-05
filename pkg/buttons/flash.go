@@ -31,9 +31,10 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 
 	this.SelectedType = sequences[Y].Type
 
-	//if debug {
-	fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d\n", X, Y, this.TargetSequence)
-	//}
+	if debug {
+		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d\n", X, Y, this.TargetSequence)
+	}
+
 	colorPattern := 5
 	flashSequence := common.Sequence{
 		Pattern: common.Pattern{
