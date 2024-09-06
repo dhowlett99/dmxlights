@@ -477,7 +477,7 @@ func main() {
 	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DEFAULT_RGB_SHIFT))
 	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DEFAULT_RGB_SIZE))
 	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
-	panel.VersionLabel = widget.NewButton("Version 2.1", func() {})
+	panel.VersionLabel = widget.NewButton("Version"+" "+common.VERSION, func() {})
 	panel.VersionLabel.Hidden = false
 	panel.DisplayMode = widget.NewButton("NORMAL", func() {})
 	panel.DisplayMode.Hidden = false

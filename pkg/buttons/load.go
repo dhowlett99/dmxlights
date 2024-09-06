@@ -189,13 +189,12 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
 				}
 			}
+			deFocusAllSwitches(this, sequences, commandChannels)
 		}
 		if debug {
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
 	}
-
-	deFocusAllSwitches(this, sequences, commandChannels)
 
 	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
 	// So the master we retrive from this selected sequence will be the same for all the others.
