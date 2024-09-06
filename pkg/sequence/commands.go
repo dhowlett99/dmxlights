@@ -27,12 +27,12 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Soft fade downs should be disabled for blackout.
 	// Send blackout messages to all fixtures.
 	// And then continue on to process further commands.
-	if sequence.Blackout {
+	if sequence.StartBlackout {
 		if debug {
-			fmt.Printf("%d: Blackout\n", mySequenceNumber)
+			fmt.Printf("%d: Start Blackout\n", mySequenceNumber)
 		}
 		blackout(fixtureStepChannels)
-		sequence.Blackout = false
+		sequence.StartBlackout = false
 	}
 
 	// Clear all fixtures.
@@ -102,7 +102,7 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	}
 
 	// Sequence in static mode.
-	if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood {
+	if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood && sequence.Type != "switch" {
 		if debug {
 			fmt.Printf("%d: Start Static\n", mySequenceNumber)
 		}
@@ -111,7 +111,7 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	}
 
 	// Turn static mode off.
-	if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood {
+	if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood && sequence.Type != "switch" {
 		if debug {
 			fmt.Printf("%d: Stop Static\n", mySequenceNumber)
 		}

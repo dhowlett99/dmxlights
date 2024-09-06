@@ -395,6 +395,7 @@ type Sequence struct {
 	MusicTrigger                bool                        // Is this sequence in music trigger mode.
 	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
+	StartBlackout               bool                        // Flag indicates we're processing the blackout command.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	SequenceColors              []color.RGBA                // Temporay storage for changing sequence colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.

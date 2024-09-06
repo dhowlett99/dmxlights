@@ -35,6 +35,9 @@ func blackout(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.A
 	common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	if !this.Blackout {
+		if debug {
+			fmt.Printf("BLACKOUT\n")
+		}
 		this.Blackout = true
 		cmd := common.Command{
 			Action: common.Blackout,
@@ -43,6 +46,9 @@ func blackout(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.A
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		common.FlashLight(common.BLACKOUT_BUTTON, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)
 	} else {
+		if debug {
+			fmt.Printf("NORMAL\n")
+		}
 		this.Blackout = false
 		cmd := common.Command{
 			Action: common.Normal,
