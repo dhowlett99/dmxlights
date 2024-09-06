@@ -1,4 +1,5 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022, 2023, 2024 dhowlett99.
+// dmxlights is a DMX lighting controller.
 // This is the dmxlights main program and calls all others.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -18,11 +19,11 @@ package main
 
 import (
 	"fmt"
+	"image/color"
 	"os"
 	"os/signal"
 	"strconv"
 	"strings"
-	"sync"
 	"syscall"
 	"time"
 
@@ -33,6 +34,7 @@ import (
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/buttons"
+	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -76,44 +78,46 @@ func main() {
 
 	// Setup the current state.
 	this := buttons.CurrentState{}
-	this.MyWindow = myWindow                                       // Pointer to main window.
-	this.Blackout = false                                          // Blackout starts in off.
-	this.Flood = false                                             // Flood starts in off.
-	this.Running = make(map[int]bool, NumberOfSequences)           // Initialise storage for four sequences.
-	this.Strobe = make(map[int]bool, NumberOfSequences)            // Initialise storage for four sequences.
-	this.MasterBrightness = 255                                    // Affects all DMX fixtures and launchpad lamps.
-	this.SoundGain = 0                                             // Fine gain -0.09 -> 0.09
-	this.OffsetPan = common.SCANNER_MID_POINT                      // Start pan from the center
-	this.OffsetTilt = common.SCANNER_MID_POINT                     // Start tilt from the center.
-	this.RGBPatterns = pattern.MakePatterns()                      // Build the default set of Patterns.
-	this.SelectButtonPressed = make([]bool, NumberOfSequences)     // Initialise four select buttons.
-	this.SelectedMode = make([]int, NumberOfSequences)             // Initialise four mode variables.
-	this.LastMode = make([]int, NumberOfSequences)                 // Initialise four mode variables.
-	this.ShowRGBColorPicker = false                                // Remember when we are in editing sequence colors mode.
-	this.EditScannerColorsMode = false                             // Remember when we are in setting scanner color mode.
-	this.EditGoboSelectionMode = false                             // Remember when we are in selecting gobo mode.
-	this.Static = make([]bool, NumberOfSequences)                  // Remember when this sequence is in static mode.
-	this.StaticFlashing = make([]bool, NumberOfSequences)          // Remember when we are in static buttons are flashing.
-	this.SequenceType = make([]string, NumberOfSequences)          // Remember sequence type.
-	this.EditPatternMode = false                                   // Remember when we are in editing pattern mode.
-	this.StaticButtons = makeStaticButtonsStorage()                // Make storgage for color editing button results.
-	this.PresetsStore = presets.LoadPresets()                      // Load the presets from their json files.
-	this.Speed = make(map[int]int, NumberOfSequences)              // Initialise storage for four sequences.
-	this.RGBSize = make(map[int]int, NumberOfSequences)            // Initialise storage for four sequences.
-	this.ScannerSize = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
-	this.RGBShift = make(map[int]int, NumberOfSequences)           // Initialise storage for four sequences.
-	this.ScannerShift = make(map[int]int, NumberOfSequences)       // Initialise storage for four sequences.
-	this.RGBFade = make(map[int]int, NumberOfSequences)            // Initialise storage for four sequences.
-	this.ScannerFade = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
-	this.StrobeSpeed = make(map[int]int, NumberOfSequences)        // Initialise storage for four sequences.
-	this.ClearPressed = make(map[int]bool, NumberOfSequences)      // Initialise storage for four sequences.
-	this.ScannerChaser = make(map[int]bool, NumberOfSequences)     // Initialise storage for four sequences.
-	this.ScannerCoordinates = make(map[int]int, NumberOfSequences) // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
-	this.LaunchPadConnected = true                                 // Assume launchpad is present, until tested.
-	this.DmxInterfacePresent = true                                // Assume DMX interface card is present, until tested.
-	this.LaunchpadName = "Novation Launchpad Mk3 Mini"             // Name of launchpad.
-	this.Functions = make(map[int][]common.Function)               // Array holding functions for each sequence.
-	this.SavedSequenceColors = make(map[int][]common.Color)        // Array holding saved sequence colors for each sequence. Used by the color picker.
+	this.MyWindow = myWindow                                              // Pointer to main window.
+	this.Blackout = false                                                 // Blackout starts in off.
+	this.Flood = false                                                    // Flood starts in off.
+	this.Running = make(map[int]bool, NumberOfSequences)                  // Initialise storage for four sequences.
+	this.Strobe = make(map[int]bool, NumberOfSequences)                   // Initialise storage for four sequences.
+	this.MasterBrightness = 255                                           // Affects all DMX fixtures and launchpad lamps.
+	this.SoundGain = 0                                                    // Fine gain -0.09 -> 0.09
+	this.OffsetPan = common.SCANNER_MID_POINT                             // Start pan from the center
+	this.OffsetTilt = common.SCANNER_MID_POINT                            // Start tilt from the center.
+	this.SelectButtonPressed = make([]bool, NumberOfSequences)            // Initialise four select buttons.
+	this.SelectedMode = make([]int, NumberOfSequences)                    // Initialise four mode variables.
+	this.LastMode = make([]int, NumberOfSequences)                        // Initialise four mode variables.
+	this.ShowRGBColorPicker = false                                       // Remember when we are in editing sequence colors mode.
+	this.EditScannerColorsMode = false                                    // Remember when we are in setting scanner color mode.
+	this.EditGoboSelectionMode = false                                    // Remember when we are in selecting gobo mode.
+	this.Static = make([]bool, NumberOfSequences)                         // Remember when this sequence is in static mode.
+	this.StaticFlashing = make([]bool, NumberOfSequences)                 // Remember when we are in static buttons are flashing.
+	this.SequenceType = make([]string, NumberOfSequences)                 // Remember sequence type.
+	this.EditPatternMode = false                                          // Remember when we are in editing pattern mode.
+	this.StaticButtons = makeStaticButtonsStorage()                       // Make storgage for color editing button results.
+	this.PresetsStore = presets.LoadPresets()                             // Load the presets from their json files.
+	this.Speed = make(map[int]int, NumberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
+	this.SwitchOverrides = make([][]common.Override, NumberOfSwitches)    // Initialise local override storage for eight switches. Indexed by switch number.
+	this.RGBSize = make(map[int]int, NumberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
+	this.RGBPatterns = pattern.MakePatterns()                             // Build the default set of Patterns.
+	this.ScannerSize = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
+	this.RGBShift = make(map[int]int, NumberOfSequences+NumberOfSwitches) // Initialise storage for four sequences and eight switches..
+	this.ScannerShift = make(map[int]int, NumberOfSequences)              // Initialise storage for four sequences.
+	this.RGBFade = make(map[int]int, NumberOfSequences)                   // Initialise storage for four sequences.
+	this.ScannerFade = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
+	this.StrobeSpeed = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
+	this.ClearPressed = make(map[int]bool, NumberOfSequences)             // Initialise storage for four sequences.
+	this.ScannerChaser = make(map[int]bool, NumberOfSequences)            // Initialise storage for four sequences.
+	this.ScannerCoordinates = make(map[int]int, NumberOfSequences)        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
+	this.LaunchPadConnected = true                                        // Assume launchpad is present, until tested.
+	this.DmxInterfacePresent = true                                       // Assume DMX interface card is present, until tested.
+	this.LaunchpadName = "Novation Launchpad Mk3 Mini"                    // Name of launchpad.
+	this.Functions = make(map[int][]common.Function)                      // Array holding functions for each sequence.
+	this.SavedSequenceColors = make(map[int][]color.RGBA)                 // Array holding saved sequence colors for each sequence. Used by the color picker.
+	this.LastSelectedSwitch = common.NOT_SELECTED                         // Set the last selected switch to not selected.
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = []common.SwitchChannel{}
@@ -124,6 +128,7 @@ func main() {
 		newSwitch.StopRotate = make(chan bool)
 		newSwitch.StopFadeUp = make(chan bool)
 		newSwitch.StopFadeDown = make(chan bool)
+		newSwitch.CommandChannel = make(chan common.Command)
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
 	// Initialize eight fixture states for the four sequences.
@@ -277,7 +282,6 @@ func main() {
 
 		// Add the name, label and description to the new sequence.
 		newSequence.Name = sequenceConf.Name
-		newSequence.DisableOnceMutex = &sync.RWMutex{}
 		newSequence.Description = sequenceConf.Description
 		newSequence.Label = sequenceConf.Label
 		newSequence.Type = sequenceConf.Type
@@ -300,6 +304,39 @@ func main() {
 
 		if newSequence.Label == "switch" {
 			this.SwitchSequenceNumber = sequenceNumber
+
+			// Store the switch Config locally.
+			switchConfig := commands.LoadSwitchConfiguration(this.SwitchSequenceNumber, fixturesConfig)
+
+			// Populate each switch with a number of states based on their config.
+			for swiTchNumber := 0; swiTchNumber < len(switchConfig); swiTchNumber++ {
+
+				// assign the switch.
+				swiTch := switchConfig[swiTchNumber]
+
+				// Now populate the states.
+				for stateNumber := 0; stateNumber < len(swiTch.States); stateNumber++ {
+
+					state := swiTch.States[stateNumber]
+
+					// Find the details of the fixture for this switch.
+					thisFixture, err := fixture.FindFixtureByLabel(swiTch.UseFixture, fixturesConfig)
+					if err != nil {
+						fmt.Printf("error %s\n", err.Error())
+					}
+
+					// Load the config for this state of of this switch
+					override := fixture.DiscoverSwitchOveride(thisFixture, swiTch.Number, int(state.Number), fixturesConfig)
+
+					// Assign this discovered override to the current switch state.
+					this.SwitchOverrides[swiTchNumber] = append(this.SwitchOverrides[swiTchNumber], override)
+
+					if debug {
+						fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
+						fmt.Printf("\t Override Colors %+v\n", override.Colors)
+					}
+				}
+			}
 		}
 
 		if newSequence.Label == "chaser" {
@@ -440,8 +477,11 @@ func main() {
 	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DEFAULT_RGB_SHIFT))
 	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DEFAULT_RGB_SIZE))
 	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
-	panel.VersionLabel = widget.NewButton("Version 2.1", func() {})
+	panel.VersionLabel = widget.NewButton("Version"+" "+common.VERSION, func() {})
 	panel.VersionLabel.Hidden = false
+	panel.DisplayMode = widget.NewButton("NORMAL", func() {})
+	panel.DisplayMode.Hidden = false
+	panel.ColorDisplay.Hidden = false
 
 	// Create objects for top status bar.
 	upLabel := widget.NewLabel("       ")
@@ -485,7 +525,7 @@ func main() {
 
 	// Create top status bar.
 	topStatusBar := container.New(layout.NewHBoxLayout(),
-		layout.NewSpacer(),
+		panel.ColorDisplay,
 		upLabel,
 		redLabel,
 		greenLabel,
@@ -505,8 +545,15 @@ func main() {
 	)
 
 	// Create bottom status bar.
-	bottonStatusBar := container.New(
-		layout.NewHBoxLayout(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	var bottonStatusBar *fyne.Container
+	if debug {
+		bottonStatusBar = container.New(
+			layout.NewHBoxLayout(), panel.DisplayMode, layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	} else {
+		// Only display the mode in debug mode.
+		bottonStatusBar = container.New(
+			layout.NewHBoxLayout(), layout.NewSpacer(), panel.SpeedLabel, layout.NewSpacer(), panel.ShiftLabel, layout.NewSpacer(), panel.SizeLabel, layout.NewSpacer(), panel.FadeLabel, layout.NewSpacer(), panel.VersionLabel)
+	}
 
 	// Now configure the panel content to contain the top toolbar and the squares.
 	main := container.NewBorder(topStatusBar, nil, nil, nil, squares)
@@ -521,13 +568,14 @@ func main() {
 
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
-	buttons.InitButtons(&this, eventsForLaunchpad, guiButtons)
+	this.SelectedType = "rgb"
+	buttons.InitButtons(&this, sequences[0].SequenceColors, []color.RGBA{}, eventsForLaunchpad, guiButtons)
 
 	// Label the right hand buttons.
 	panel.LabelRightHandButtons()
 
 	// Clear the pad. Strobe is set to 0.
-	buttons.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
+	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
 	buttons.Clear(0, 0, &this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
 	// If present create a thread to listen to launchpad button events.
