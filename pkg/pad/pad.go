@@ -29,7 +29,8 @@ func Open() (*Pad, error) {
 	}
 	var device *midi.Device
 	for _, d := range devices {
-		if strings.Contains(d.Name, "MIDI") {
+		if strings.Contains(d.Name, "MIDI") || strings.Contains(d.Name, "MI") {
+			fmt.Printf("Selected USB Device: %s Type: %s\n", d.Name, d.Type)
 			device = d
 			break
 		}
