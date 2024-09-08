@@ -4,6 +4,16 @@ Tested on the following plaforms.
 Raspberry Pi 4
 Linux raspberrypi 6.6.31+rpt-rpi-v8 #1 SMP PREEMPT Debian 1:6.6.31-1+rpt1 (2024-05-29) aarch64 GNU/Linux
 
+# Install GIT on Raspberry Pi
+
+sudo apt update
+sudo apt install git
+
+
+# Clone the dmxlights repo
+
+mkdir -p project/src/github.com/dhowlett99
+git clone https://github.com/dhowlett99/dmxlights.git
 
 ## First make sure you have the latest version of golang 
 
@@ -49,6 +59,17 @@ export GOHOSTARCH=arm
 export LDFLAGS="-L /usr/lib/aarch64-linux-gnu"
 
 # Clean up default ALSA configuration file.
+
+
+# Increase swap on Raspberry pi
+
+sudo dphys-swapfile swapoff
+sudo vi /etc/dphys-swapfile
+CONF_SWAPSIZE=1024
+sudo dphys-swapfile setup
+sudo dphys-swapfile swapon
+sudo reboot
+
 
 
 
