@@ -12,6 +12,18 @@ sudo tar -C /usr/local -xzvf go1.23.1.linux-arm64.tar.gz
 go version
 go version go1.23.1 linux/arm64
 
+# Marks Notes 
+
+wget https://go.dev/dl/go1.23.1.linux-arm64.tar.gz
+tar xzf go1.23.1.linux-arm64.tar.gz
+export PATH=$PATH:$PWD/go/bin
+sudo apt-get install libusb-1.0-0-dev libasound2-dev portaudio19-dev libgl1-mesa-dev xorg-dev
+git clone https://github.com/dhowlett99/dmxlights
+cd dmxlights/
+go version
+make 
+./dmxlights
+
 
 ## Install PortAudio
 
