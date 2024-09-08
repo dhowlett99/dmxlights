@@ -44,13 +44,16 @@ go version
 
 # Edit .profile
 
+```
 export PATH=$PATH:/usr/local/go/bin
 GO111MODULE=on
 GOPATH=/Users/<USER>/project
+```
 
+```
 $ ./.profile
 go version go1.23.1 linux/arm64
-
+```
 
 # Install prerequisites 
 
