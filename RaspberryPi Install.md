@@ -13,10 +13,15 @@ arm_boost=0
 # Increase swap on Raspberry pi
 
 sudo dphys-swapfile swapoff
+
 sudo vi /etc/dphys-swapfile
+
 CONF_SWAPSIZE=1024
+
 sudo dphys-swapfile setup
+
 sudo dphys-swapfile swapon
+
 sudo reboot
 
 # Install GIT on Raspberry Pi
@@ -31,49 +36,45 @@ mkdir -p project/src/github.com/dhowlett99
 git clone https://github.com/dhowlett99/dmxlights.git
 
 ## First make sure you have the latest version of golang 
-
+cd ~/Downloads
 wget https://go.dev/dl/go1.23.1.linux-arm64.tar.gz
 sudo tar -C /usr/local -xzvf go1.23.1.linux-arm64.tar.gz 
 go version
+
+
+# Edit .profile
+
+export PATH=$PATH:/usr/local/go/bin
+GO111MODULE=on
+GOPATH=/Users/<USER>/project
+
+$ ./.profile
 go version go1.23.1 linux/arm64
 
-# Marks Notes 
 
-wget https://go.dev/dl/go1.23.1.linux-arm64.tar.gz
-tar xzf go1.23.1.linux-arm64.tar.gz
-export PATH=$PATH:$PWD/go/bin
+# Install prerequisites 
+
 sudo apt-get install libusb-1.0-0-dev libasound2-dev portaudio19-dev libgl1-mesa-dev xorg-dev
-git clone https://github.com/dhowlett99/dmxlights
-cd dmxlights/
-go version
-make 
+
+cd project/src/github.com/dhowlett99/dmxlights
+make build
+
 ./dmxlights
 
 
-## Install PortAudio
+Configure ALSA 
 
- sudo apt-get install libusb-1.0-0-dev libasound2-dev portaudio19-dev libgl1-mesa-dev  xorg-dev
+vi /usr/share/alsa/alsa.conf
 
-# Install Lib USB
+comment out unused interfaces.
 
-sudo apt-get install libusb-1.0-0-dev
+# Install Visual Studio Code 
 
-sudo apt-get install libx11-dev
+sudo apt update
+sudo apt install code
 
-sudo apt install libxcursor-dev
 
-sudo apt install libxrandr-dev
 
-sudo apt-get install libx11-dev libxinerama-dev
-
-sudo apt-get install libxi-dev
-
-# Environment Variables.
-export GOARCH=arm
-export GOHOSTARCH=arm
-export LDFLAGS="-L /usr/lib/aarch64-linux-gnu"
-
-# Clean up default ALSA configuration file.
 
 
 
