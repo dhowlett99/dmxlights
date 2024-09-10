@@ -334,7 +334,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
-		sequence.StartBlackout = true
 		sequence.Blackout = true
 		return sequence
 

@@ -382,7 +382,7 @@ func FixtureReceiver(
 	soundTriggers []*common.Trigger,
 	soundConfig *sound.SoundConfig,
 	dmxController *ft232.DMXController,
-	fixtures *Fixtures,
+	fixturesConfig *Fixtures,
 	dmxInterfacePresent bool) {
 
 	if debug {
@@ -402,6 +402,15 @@ func FixtureReceiver(
 		cmd := <-fixtureStepChannel
 
 		switch {
+
+		case cmd.Blackout:
+			// Soft fade downs should be disabled for blackout.
+			lastColor.RGBColor = cmd.LastColor
+			lastColor.ScannerColor = 0
+			// If blackout, turn the fixture off.
+			MapFixtures(false, false, cmd.SequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			continue
+
 		case cmd.Type == "lastColor":
 			if debug {
 				fmt.Printf("%d:%d LastColor set to %s\n", cmd.SequenceNumber, myFixtureNumber, common.GetColorNameByRGB(cmd.LastColor))
@@ -414,14 +423,14 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d Activate switch number %d name %s Postition %d Speed %d Shift %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwiTch.Number, cmd.SwiTch.Name, cmd.SwiTch.CurrentPosition, cmd.Override.Speed, cmd.Override.Shift)
 			}
-			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixturesConfig, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 
 		case cmd.Clear || cmd.Blackout:
 			if debug {
 				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
 			}
-			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixtures, dmxController, dmxInterfacePresent)
+			lastColor = clear(myFixtureNumber, cmd, stopFadeDown, stopFadeUp, fixturesConfig, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StartFlood:
@@ -438,21 +447,21 @@ func FixtureReceiver(
 			case stopFadeDown <- true:
 			case <-time.After(100 * time.Millisecond):
 			}
-			lastColor = startFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = startFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.StopFlood:
 			if debug {
 				fmt.Printf("%d:%d StopFlood\n", cmd.SequenceNumber, myFixtureNumber)
 			}
-			lastColor = stopFlood(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = stopFlood(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticOn:
 			if debug {
 				fmt.Printf("%d:%d Static On Master=%d Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Master, cmd.Hidden)
 			}
-			lastColor = setStaticOn(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = setStaticOn(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticFadeUp:
@@ -460,21 +469,21 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Static Fade Up Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
 			// FadeUpStatic doesn't return a lastColor, instead it sends a message directly to the fixture to set lastColor once it's finished fading up.
-			fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			fadeUpStatic(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixturesConfig, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.RGBStaticOff:
 			if debug {
 				fmt.Printf("%d:%d Static Off Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
-			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixtures, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			staticOff(myFixtureNumber, cmd, lastColor, stopFadeDown, stopFadeUp, fixturesConfig, fixtureStepChannel, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.Type == "scanner":
 			if debug {
 				fmt.Printf("%d:%d Play Scanner Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 			}
-			lastColor = playScanner(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playScanner(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 
 		case cmd.Type == "rgb":
@@ -482,7 +491,7 @@ func FixtureReceiver(
 				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
 
 			}
-			lastColor = playRGB(myFixtureNumber, cmd, fixtures, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
+			lastColor = playRGB(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
 		}
 	}
@@ -1406,16 +1415,6 @@ func MapSwitchFixture(swiTch common.Switch,
 		masterChannel, err := FindChannelNumberByName(thisFixture, "Master")
 		if err != nil && debug {
 			fmt.Printf("warning! fixture %s: %s\n", thisFixture.Name, err)
-		}
-
-		// If blackout, set master to off.
-		if blackout {
-			// Blackout the fixture by setting master brightness to zero.
-			if debug {
-				fmt.Printf("SetChannel %d To Value %d\n", thisFixture.Address+int16(masterChannel), 0)
-			}
-			SetChannel(thisFixture.Address+int16(masterChannel), byte(0), dmxController, dmxInterfacePresent)
-			return lastColor
 		}
 
 		// Play Actions which send messages to a dedicated mini sequencer.

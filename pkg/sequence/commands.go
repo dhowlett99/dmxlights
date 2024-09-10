@@ -24,17 +24,6 @@ import (
 
 func processCommands(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, switchChannels []common.SwitchChannel, fixtureStepChannels []chan common.FixtureCommand, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
-	// Soft fade downs should be disabled for blackout.
-	// Send blackout messages to all fixtures.
-	// And then continue on to process further commands.
-	if sequence.StartBlackout {
-		if debug {
-			fmt.Printf("%d: Start Blackout\n", mySequenceNumber)
-		}
-		blackout(fixtureStepChannels)
-		sequence.StartBlackout = false
-	}
-
 	// Clear all fixtures.
 	if sequence.Clear {
 		if debug {
