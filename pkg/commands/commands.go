@@ -417,6 +417,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = false
 		sequence.Blackout = false
+		sequence.MasterChanging = true
 		return sequence
 
 	case common.UpdateBounce:

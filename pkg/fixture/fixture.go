@@ -401,15 +401,13 @@ func FixtureReceiver(
 		// Wait for first step
 		cmd := <-fixtureStepChannel
 
-		switch {
-
-		case cmd.Blackout:
+		if cmd.Blackout {
 			// Soft fade downs should be disabled for blackout.
 			lastColor.RGBColor = cmd.LastColor
 			lastColor.ScannerColor = 0
-			// If blackout, turn the fixture off.
-			MapFixtures(false, false, cmd.SequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
-			continue
+		}
+
+		switch {
 
 		case cmd.Type == "lastColor":
 			if debug {
@@ -426,7 +424,7 @@ func FixtureReceiver(
 			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixturesConfig, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 
-		case cmd.Clear || cmd.Blackout:
+		case cmd.Clear:
 			if debug {
 				fmt.Printf("%d:%d Clear %t Blackout %t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Clear, cmd.Blackout)
 			}
@@ -489,7 +487,6 @@ func FixtureReceiver(
 		case cmd.Type == "rgb":
 			if debug {
 				fmt.Printf("%d:%d Play RGB Hidden=%t\n", cmd.SequenceNumber, myFixtureNumber, cmd.Hidden)
-
 			}
 			lastColor = playRGB(myFixtureNumber, cmd, fixturesConfig, eventsForLaunchpad, guiButtons, dmxController, dmxInterfacePresent)
 			continue
@@ -1138,19 +1135,33 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 
 	// We control the brightness of each color with the brightness value.
 	// The overall fixture brightness is set from the master value.
-	Red := (float64(color.R) / 100) * (float64(brightness) / 2.55)
-	Green := (float64(color.G) / 100) * (float64(brightness) / 2.55)
-	Blue := (float64(color.B) / 100) * (float64(brightness) / 2.55)
+	var Red float64
+	var Green float64
+	var Blue float64
+	var Master int
+	var Brightness int
+
+	// The best blackout solution is to manually pull all the colors down.
+	if blackout {
+		Master = 0
+		Brightness = 0
+		Red = 0
+		Green = 0
+		Blue = 0
+	} else {
+		Master = master
+		Brightness = brightness
+		Red = (float64(color.R) / 100) * (float64(Brightness) / 2.55)
+		Green = (float64(color.G) / 100) * (float64(Brightness) / 2.55)
+		Blue = (float64(color.B) / 100) * (float64(Brightness) / 2.55)
+	}
+	if debug {
+		fmt.Printf("MapFixtures Fixture No %d Sequence No %d Red %f Green %f Blue %f Brightness %d Master %d Blackout %t\n", displayFixture, mySequenceNumber, Red, Green, Blue, Brightness, Master, blackout)
+	}
 
 	for _, fixture := range fixtures.Fixtures {
 		if fixture.Group == mySequenceNumber+1 {
 			for channelNumber, channel := range fixture.Channels {
-
-				// Right of the bat if we're blacked out, set the channel to 0 and our work here is done.
-				if blackout {
-					SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-					continue
-				}
 
 				// Match the fixture number unless there are mulitple sub fixtures.
 				if fixture.Number == displayFixture+1 || fixture.MultiFixtureDevice {
@@ -1235,14 +1246,14 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 									strings.Contains(channel.Name, "invert") ||
 									strings.Contains(channel.Name, "Invert") {
 									if debug {
-										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(master)))
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(Master)))
 									}
-									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(Master)), dmxController, dmxInterfacePresent)
 								} else {
 									if debug {
-										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), master)
+										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), Master)
 									}
-									SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+									SetChannel(fixture.Address+int16(channelNumber), byte(Master), dmxController, dmxInterfacePresent)
 								}
 							}
 						}
@@ -1253,9 +1264,9 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 								strings.Contains(channel.Name, "Reverse") ||
 								strings.Contains(channel.Name, "invert") ||
 								strings.Contains(channel.Name, "Invert") {
-								SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(Master)), dmxController, dmxInterfacePresent)
 							} else {
-								SetChannel(fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Address+int16(channelNumber), byte(Master), dmxController, dmxInterfacePresent)
 							}
 						}
 						// Shutter

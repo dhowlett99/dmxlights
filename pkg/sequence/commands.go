@@ -100,7 +100,7 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	}
 
 	// Turn static mode off.
-	if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood && sequence.Type != "switch" {
+	if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood && sequence.Type != "switch" && !sequence.Run {
 		if debug {
 			fmt.Printf("%d: Stop Static\n", mySequenceNumber)
 		}

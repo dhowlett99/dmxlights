@@ -138,6 +138,11 @@ func clearFixture(fixtureNumber int, fixtureStepChannels []chan common.FixtureCo
 }
 
 func playStep(sequence *common.Sequence, step int, fixtureNumber int, rgbPositions map[int]common.Position, scannerPositions map[int]map[int]common.Position, fixtureStepChannels []chan common.FixtureCommand) {
+
+	if debug {
+		fmt.Printf("playStep number %d to fixture %d\n", step, fixtureNumber)
+	}
+
 	// Even if the fixture is disabled we still need to send this message to the fixture.
 	// beacuse the fixture is the one who is responsible for turning it off.
 	command := common.FixtureCommand{
