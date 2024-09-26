@@ -211,8 +211,6 @@ func newMiniSequencer(fixture *Fixture,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		//MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
-
 		// Find the program channel for this fixture.
 		programChannel, err := FindChannelNumberByName(fixture, "Program")
 		if err != nil {
@@ -288,7 +286,11 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("fixture %s: Control: send Program Address %d Value %d \n", fixture.Name, fixture.Address+int16(programState), master)
 			}
-			SetChannel(fixture.Address+int16(programChannel), byte(programState), dmxController, dmxInterfacePresent)
+			if blackout {
+				SetChannel(fixture.Address+int16(programChannel), 0, dmxController, dmxInterfacePresent)
+			} else {
+				SetChannel(fixture.Address+int16(programChannel), byte(programState), dmxController, dmxInterfacePresent)
+			}
 		}
 
 		return
