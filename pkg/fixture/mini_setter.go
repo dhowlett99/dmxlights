@@ -34,7 +34,7 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 	dmxInterfacePresent bool) {
 
 	if debug {
-		fmt.Printf("settings are available\n")
+		fmt.Printf("newMiniSetter: settings are available\n")
 	}
 
 	// Not Blackout.
@@ -51,7 +51,7 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 
 		howBright := int((float64(value) / 100) * (float64(master) / 2.55))
 		if debug {
-			fmt.Printf("Fixture %s setting value %d master %d howBright %d\n", thisFixture.Name, int(value), master, howBright)
+			fmt.Printf("newMiniSetter: Fixture %s setting value %d master %d howBright %d\n", thisFixture.Name, int(value), master, howBright)
 		}
 
 		if strings.Contains(settingName, "reverse") || strings.Contains(settingName, "invert") {

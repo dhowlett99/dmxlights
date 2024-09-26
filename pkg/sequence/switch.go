@@ -73,7 +73,7 @@ func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 		CurrentSwitchState: swiTch.CurrentPosition,
 		MasterChanging:     sequence.MasterChanging,
 		RGBFade:            sequence.RGBFade,
-		Override:           sequence.Switches[swiTch.CurrentPosition].Override,
+		Override:           sequence.Switches[switchNumber].Override,
 	}
 
 	// Send a message to the fixture to operate the switch.

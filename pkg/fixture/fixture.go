@@ -1399,6 +1399,11 @@ func MapSwitchFixture(swiTch common.Switch,
 		fmt.Printf("MapSwitchFixture switchNumber %d, current position %d fade speed %d\n", swiTch.Number, swiTch.CurrentPosition, RGBFade)
 	}
 
+	// Master dinmmer is the best way to blackout a switch.
+	if blackout {
+		master = 0
+	}
+
 	// We start by having the switch and its current state passed in.
 
 	// Now we find the fixture used by the switch
