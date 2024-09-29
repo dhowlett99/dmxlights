@@ -22,9 +22,10 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
 
 	if debug {
 		fmt.Printf("Decrease Fade Time Type=%s Sequence=%d Type=%s\n", this.SelectedType, this.TargetSequence, sequences[this.TargetSequence].Type)
@@ -125,7 +126,7 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		// Send a message to override / increase the selected switch shift.
 		cmd := common.Command{
-			Action: common.OverrideFade,
+			Action: common.OverrideGobo,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
@@ -133,6 +134,11 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// Set the gobo name.
+		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.FindGoboNameByNumber(useFixture, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
 
 		// Update the status bar
 		UpdateFade(this, guiButtons)
@@ -142,7 +148,7 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 }
 
-func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
 
 	if debug {
 		fmt.Printf("Increase Fade Time\n")
@@ -232,7 +238,7 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		return
 	}
 
-	// Deal with an Switch sequence with a projector fixture.
+	// Deal with an Switch sequence with a projector fixture. Increase Gobo
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 		// Increase the switch size.
@@ -241,9 +247,9 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = common.MAX_PROJECTOR_GOBO
 		}
 
-		// Send a message to override / increase the selected switch shift.
+		// Send a message to override / increase the selected gobo.
 		cmd := common.Command{
-			Action: common.OverrideFade,
+			Action: common.OverrideGobo,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
@@ -251,6 +257,11 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// Set the gobo name.
+		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.FindGoboNameByNumber(useFixture, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
 
 		// Update the status bar
 		UpdateFade(this, guiButtons)

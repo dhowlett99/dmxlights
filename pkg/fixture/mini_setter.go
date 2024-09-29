@@ -28,12 +28,14 @@ import (
 )
 
 // Process settings.
-func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel int,
+func newMiniSetter(thisFixture *Fixture, override common.Override, setting common.Setting, masterChannel int,
 	dmxController *ft232.DMXController,
 	master int,
 	dmxInterfacePresent bool) {
 
-	if debug {
+	debug_mini_setter := false
+
+	if debug_mini_setter {
 		fmt.Printf("newMiniSetter: settings are available\n")
 	}
 
@@ -50,45 +52,126 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 		value, _ := strconv.ParseFloat(setting.FixtureValue, 32)
 
 		howBright := int((float64(value) / 100) * (float64(master) / 2.55))
-		if debug {
+		if debug_mini_setter {
 			fmt.Printf("newMiniSetter: Fixture %s setting value %d master %d howBright %d\n", thisFixture.Name, int(value), master, howBright)
 		}
 
 		if strings.Contains(settingName, "reverse") || strings.Contains(settingName, "invert") {
 			// Invert the brightness value,  some fixtures have the max brightness at 0 and off at 255.
-			if debug {
+			if debug_mini_setter {
 				fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(reverse_dmx(howBright)), dmxController, dmxInterfacePresent)
 		} else {
 			// Set the master brightness value.
-			if debug {
+			if debug_mini_setter {
 				fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
 			}
 			SetChannel(thisFixture.Address+int16(masterChannel), byte(howBright), dmxController, dmxInterfacePresent)
 		}
-
 	} else {
-
 		// If the setting value has is a number set it directly.
 		if IsNumericOnly(setting.FixtureValue) {
-
 			value, _ := strconv.Atoi(setting.FixtureValue)
 			if IsNumericOnly(setting.Channel) {
 				channel, _ := strconv.Atoi(setting.Channel)
 				channel = channel - 1 // Channels are relative to the base address so deduct one to make it work.
-				if debug {
-					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				if debug_mini_setter {
+					fmt.Printf("fixture %s: IsNumber Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			} else {
 				// Handle the fact that the channel may be a label as well.
 				// Look for this channels number in this fixture identified by ID.
 				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-				if debug {
-					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				if debug_mini_setter {
+					fmt.Printf("fixture %s: ChannelLabel Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
-				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
+
+				// Override settings code.
+				var overrideHasHappened bool
+
+				// Override Speed.
+				if setting.Channel == "Speed" && override.OverrideSpeed {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Speed=%d\n", thisFixture.Address+int16(channel), override.Speed)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Speed), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideSpeed = false
+				}
+
+				// Override Shift.
+				if setting.Channel == "RotateSpeed" && override.OverrideShift {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Shift=%d\n", thisFixture.Address+int16(channel), override.Shift)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Shift), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideShift = false
+				}
+
+				// Override Size.
+				if setting.Channel == "Size" && override.OverrideSize {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Size=%d\n", thisFixture.Address+int16(channel), override.Size)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Size), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideSize = false
+				}
+
+				// Override Fade
+				if setting.Channel == "Fade" && override.OverrideFade {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Fade=%d\n", thisFixture.Address+int16(channel), override.Fade)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Fade), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideFade = false
+				}
+
+				// Override RotateSpeed.
+				if setting.Channel == "RotateSpeed" && override.OverrideRotateSpeed {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Rotate Speed=%d\n", thisFixture.Address+int16(channel), override.RotateSpeed)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.RotateSpeed), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideRotateSpeed = false
+				}
+
+				// Override Color.
+				if setting.Channel == "Color" && override.OverrideColors {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Colors=%d\n", thisFixture.Address+int16(channel), override.Color)
+					}
+
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Color), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideColors = false
+				}
+
+				// Override Gobo.
+				if setting.Channel == "Gobo" && override.OverrideGobo {
+					// Lookup correct value for this Gobo number.
+					gobo := FindGoboDMXValueByNumber(thisFixture, override.Gobo)
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Gobo=%d\n", thisFixture.Address+int16(channel), gobo)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(gobo), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideGobo = false
+				}
+
+				// Not overriding this channel, so use value from config.
+				if !overrideHasHappened {
+					if debug_mini_setter {
+						fmt.Printf("Set Channel Channel %ds Value %d\n", thisFixture.Address+int16(channel), byte(value))
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
+				}
+
 			}
 
 		} else {
@@ -103,15 +186,15 @@ func newMiniSetter(thisFixture *Fixture, setting common.Setting, masterChannel i
 			if IsNumericOnly(setting.Channel) {
 				// Find the channel
 				channel, _ := strconv.ParseFloat(setting.Channel, 32)
-				if debug {
-					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				if debug_mini_setter {
+					fmt.Printf("fixture %s: SettingisValue Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			} else {
 				// Look for this channels number in this fixture identified by ID.
 				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
-				if debug {
-					fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(channel), value)
+				if debug_mini_setter {
+					fmt.Printf("fixture %s: SettingisID Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			}

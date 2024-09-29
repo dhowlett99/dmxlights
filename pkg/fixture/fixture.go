@@ -405,9 +405,21 @@ func FixtureReceiver(
 			// Soft fade downs should be disabled for blackout.
 			lastColor.RGBColor = cmd.LastColor
 			lastColor.ScannerColor = 0
+			// Make sure we are blacked out.
+			cmd.Master = 0
 		}
 
 		switch {
+
+		case cmd.Type == "override":
+			if debug {
+				fmt.Printf("FixtureReceiver: override %+v\n", cmd.Override)
+			}
+			// Talk to the mini sequencer.
+			overrideMiniSequencer(cmd, switchChannels)
+			// Call the mini setter. Step through all the settings.
+			overrideMiniSetter(cmd, fixturesConfig, dmxController, dmxInterfacePresent)
+			continue
 
 		case cmd.Type == "lastColor":
 			if debug {
@@ -1474,7 +1486,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
 		for _, newSetting := range state.Settings {
-			newMiniSetter(thisFixture, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
+			newMiniSetter(thisFixture, override, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
 		}
 	}
 	return lastColor
@@ -1498,6 +1510,40 @@ func IsNumericOnly(str string) bool {
 	return true
 }
 
+func FindFixtureByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures *Fixtures) (*Fixture, error) {
+
+	if debug {
+		fmt.Printf("FindFixtureByGroupAndNumber seq %d fixture %d\n", sequenceNumber, fixtureNumber)
+	}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == sequenceNumber+1 {
+			if fixture.Number == fixtureNumber+1 {
+				if debug {
+					fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+				}
+				return &fixture, nil
+			}
+		}
+	}
+	return nil, fmt.Errorf("FindFixtureByGroupAndNumber: failed to find fixture for sequence %d fixture %d", sequenceNumber, fixtureNumber)
+}
+
+func FindFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
+
+	if debug {
+		fmt.Printf("FindFixtureByLabel label is %s\n", label)
+	}
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Label == label {
+			if debug {
+				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
+			}
+			return &fixture, nil
+		}
+	}
+	return nil, fmt.Errorf("FindFixtureByGroupAndNumber: failed to find fixture by label %s", label)
+}
+
 func FindFixtureAddressByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures *Fixtures) (int16, error) {
 	if debug {
 		fmt.Printf("findFixtureAddressByGroupAndNumber seq %d fixture %d\n", sequenceNumber, fixtureNumber)
@@ -1513,27 +1559,6 @@ func FindFixtureAddressByGroupAndNumber(sequenceNumber int, fixtureNumber int, f
 		}
 	}
 	return 0, fmt.Errorf("findFixtureByName: failed to find address for sequence %d fixture %d", sequenceNumber, fixtureNumber)
-}
-
-func FindFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
-
-	if debug {
-		fmt.Printf("findFixtureByLabel: Look for fixture by Label %s\n", label)
-	}
-
-	if label == "" {
-		return nil, fmt.Errorf("findFixtureByLabel: fixture label is empty")
-	}
-
-	for _, fixture := range fixtures.Fixtures {
-		if strings.Contains(fixture.Label, label) {
-			if debug {
-				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
-			}
-			return &fixture, nil
-		}
-	}
-	return nil, fmt.Errorf("findFixtureByLabel: failed to find fixture by label– %s", label)
 }
 
 func FindFixtureAddressByName(fixtureName string, fixtures *Fixtures) string {
@@ -1683,6 +1708,30 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 	return "Unknown"
 }
 
+// FindGoboDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
+func FindGoboDMXValueByNumber(fixture *Fixture, number int) int {
+
+	if debug {
+		fmt.Printf("FindGoboDMXValueByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Gobo") {
+			for _, setting := range channel.Settings {
+				if setting.Number == number {
+					if debug {
+						fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
+					}
+					dmx, _ := strconv.Atoi(setting.Value)
+					return dmx
+				}
+			}
+		}
+	}
+
+	return 0
+}
+
 // FindColorNameByNumber takes the color number and returns the color name for this fixture.
 func FindColorNameByNumber(fixture *Fixture, number int) string {
 
@@ -1781,7 +1830,7 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 func FindChannelNumberByName(fixture *Fixture, channelName string) (int, error) {
 
 	if debug {
-		fmt.Printf("FindChannelNumberByName\n")
+		fmt.Printf("FindChannelNumberByName channelName %s\n", channelName)
 	}
 
 	for channelNumber, channel := range fixture.Channels {

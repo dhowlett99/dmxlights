@@ -22,7 +22,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func processCommands(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, switchChannels []common.SwitchChannel, fixtureStepChannels []chan common.FixtureCommand, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func processCommands(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Clear all fixtures.
 	if sequence.Clear {
@@ -55,9 +55,19 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Override the selected switch.
 	if sequence.PlaySwitchOnce && sequence.Override && sequence.Type == "switch" {
 		if debug {
-			fmt.Printf("%d: Override Single Switch\n", mySequenceNumber)
+			fmt.Printf("%d: Override Single Switch=%d Override=%+v\n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override)
 		}
-		overrideSwitch(mySequenceNumber, sequence, switchChannels)
+		// Pass through the override command.
+		command := common.FixtureCommand{
+			Type:          "override",
+			Master:        sequence.Master,
+			Blackout:      sequence.Blackout,
+			CurrentSwitch: sequence.CurrentSwitch,
+			SwiTch:        sequence.Switches[sequence.CurrentSwitch],
+			Override:      sequence.Switches[sequence.CurrentSwitch].Override,
+		}
+		fixtureStepChannels[sequence.CurrentSwitch] <- command
+
 		sequence.PlaySwitchOnce = false
 		sequence.Override = false
 	}

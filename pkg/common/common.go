@@ -233,17 +233,23 @@ type Switch struct {
 }
 
 type Override struct {
-	Override    bool
-	Speed       int
-	Shift       int
-	Size        int
-	Fade        int
-	RotateSpeed int
-	Colors      []color.RGBA
-	Color       int
-	ColorName   string
-	Gobo        int
-	GoboName    string
+	OverrideSpeed       bool
+	Speed               int
+	OverrideShift       bool
+	Shift               int
+	OverrideSize        bool
+	Size                int
+	OverrideFade        bool
+	Fade                int
+	OverrideRotateSpeed bool
+	RotateSpeed         int
+	OverrideColors      bool
+	Colors              []color.RGBA
+	Color               int
+	ColorName           string
+	OverrideGobo        bool
+	Gobo                int
+	GoboName            string
 }
 
 type StaticColorButton struct {
@@ -426,13 +432,6 @@ type Sequence struct {
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
 	Override                    bool                        // Override a switch.
-	OverrideSpeed               bool                        // Override a switch speed.
-	OverrideShift               bool                        // Override a switch shift.
-	OverrideSize                bool                        // Override a switch size.
-	OverrideFade                bool                        // Override a switch fade.
-	OverrideRotateSpeed         bool                        // Override a switchs projector rotate speed.
-	OverrideColor               bool                        // Override a switchs projector color.
-	OverrideGobo                bool                        // Override a switchs projector gobo.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StepSwitch                  bool                        // Step the switch if true.
 	FocusSwitch                 bool                        // Focus the switch.
@@ -559,6 +558,7 @@ type FixtureCommand struct {
 	Program int
 
 	// Switch Commands
+	CurrentSwitch      int
 	SwiTch             Switch
 	State              State
 	CurrentSwitchState int

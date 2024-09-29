@@ -378,14 +378,14 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  F A D E
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  F A D E
 	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
 		return
 	}
 

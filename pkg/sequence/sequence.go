@@ -97,7 +97,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Process any commands.
-		processCommands(mySequenceNumber, &sequence, channels, switchChannels, fixtureStepChannels, eventsForLauchpad, guiButtons)
+		processCommands(mySequenceNumber, &sequence, channels, fixtureStepChannels, eventsForLauchpad, guiButtons)
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase && sequence.Run && !sequence.Static && !sequence.StartFlood {
