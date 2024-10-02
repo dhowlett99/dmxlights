@@ -302,6 +302,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotateSpeed
 					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotateSpeed
 
+					// If the rotate is set to auto then we need to show the rotate speed.
+					if o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
+						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					}
+
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
 
