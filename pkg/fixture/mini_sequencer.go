@@ -510,8 +510,6 @@ func newMiniSequencer(fixture *Fixture,
 		var clockwiseSpeed int
 		var antiClockwiseSpeed int
 
-		fixtureInfo := FindFixtureInfo(fixture)
-		fmt.Printf("Fixture Info rotate options are %s\n", fixtureInfo.RotateOptions)
 		// Calculate the rotation speed based on direction and soeed.
 		if cfg.Rotatable {
 			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
