@@ -63,7 +63,7 @@ func main() {
 	// Start the GUI.
 	fmt.Println("Starting GUI")
 	panel := gui.NewPanel() // Panel represents the buttons in the GUI.
-	myApp := app.New()
+	myApp := app.NewWithID("com.github.dhowlett99.dmxlights")
 
 	myWindow := myApp.NewWindow("DMX Lights")
 	myWindow.Resize(fyne.NewSize(400, 50))

@@ -143,7 +143,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
 		// Restore any changed channels settings.
-		for channelNumber := range cp.ChannelList {
+		for channelNumber := range savedChannels {
 			cp.ChannelList[channelNumber].Settings = append(cp.ChannelList[channelNumber].Settings[:0:0], savedChannels[channelNumber].Settings...)
 		}
 		modal.Hide()
