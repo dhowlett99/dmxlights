@@ -1858,16 +1858,18 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 	// Add the auto option for rotate
 	var autoFound bool
 	for _, option := range availableRotateOptions {
-		if !strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
+		if strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
 			autoFound = true
-			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
 		}
-		// Now if we didn't find a dedicated channel for automatically rotating in different directions.
-		// Add our internal keyword for Auto.
-		if !autoFound {
-			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
-		}
+		fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
 	}
+	// Now if we didn't find a dedicated channel for automatically rotating in different directions.
+	// Add our internal keyword for Auto.
+	if !autoFound {
+		fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+	}
+
+	fmt.Printf("Rotate Options are %s\n", fixtureInfo.RotateOptions)
 
 	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
