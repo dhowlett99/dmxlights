@@ -1273,8 +1273,8 @@ fixtures:
       number: 3
       value: "63"
       selectedvalue: ""
-    - name: Forwarrd Fast
-      label: Forwarrd Fast
+    - name: Forward Fast
+      label: Forward Fast
       number: 4
       value: "127"
       selectedvalue: ""

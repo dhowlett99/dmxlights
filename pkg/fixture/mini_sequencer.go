@@ -523,8 +523,9 @@ func newMiniSequencer(fixture *Fixture,
 				fmt.Printf("Fixture %s clockwise rotate speed: %s\n", fixture.Name, err)
 			}
 			if debug {
-				fmt.Printf("clockwiseSpeed %d\n", clockwiseSpeed)
-				fmt.Printf("antiClockwiseSpeed %d\n", antiClockwiseSpeed)
+				fmt.Printf("RotateSpeed %s\n", action.RotateSpeed)
+				fmt.Printf("Forward clockwiseSpeed %d\n", clockwiseSpeed)
+				fmt.Printf("Reverse antiClockwiseSpeed %d\n", antiClockwiseSpeed)
 			}
 		}
 
