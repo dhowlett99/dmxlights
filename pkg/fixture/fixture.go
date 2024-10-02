@@ -138,11 +138,14 @@ type Group struct {
 }
 
 type FixtureInfo struct {
-	HasRotate       bool
-	HasGobo         bool
-	HasColorWheel   bool
-	HasProgram      bool
-	HasProgramSpeed bool
+	HasRotate          bool
+	RotateOptions      []string
+	HasRotateSpeed     bool
+	RotateSpeedOptions []string
+	HasGobo            bool
+	HasColorWheel      bool
+	HasProgram         bool
+	HasProgramSpeed    bool
 }
 
 type Setting struct {
@@ -1848,11 +1851,49 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 
 	fixtureInfo := FixtureInfo{}
 	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
+	fixtureInfo.HasRotateSpeed = isThisAChannel(*thisFixture, "RotateSpeed")
+
+	// Find all the options for the channel called "Rotate".
+	availableRotateOptions := getOptionsForAChannel(*thisFixture, "Rotate")
+	// Add the auto option for rotate
+	var autoFound bool
+	for _, option := range availableRotateOptions {
+		if !strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
+			autoFound = true
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
+		}
+		// Now if we didn't find a dedicated channel for automatically rotating in different directions.
+		// Add our internal keyword for Auto.
+		if !autoFound {
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+		}
+	}
+
+	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
+
 	fixtureInfo.HasColorWheel = isThisAChannel(*thisFixture, "Color")
 	fixtureInfo.HasGobo = isThisAChannel(*thisFixture, "Gobo")
 	fixtureInfo.HasProgram = isThisAChannel(*thisFixture, "Program")
 	fixtureInfo.HasProgramSpeed = isThisAChannel(*thisFixture, "ProgramSpeed")
 	return fixtureInfo
+}
+
+func getOptionsForAChannel(thisFixture Fixture, channelName string) []string {
+
+	if debug {
+		fmt.Printf("getOptionsForAChannel\n")
+	}
+
+	var options []string
+
+	for _, channel := range thisFixture.Channels {
+		if channel.Name == channelName {
+			for _, setting := range channel.Settings {
+				options = append(options, setting.Name)
+			}
+		}
+	}
+	return options
 }
 
 func isThisAChannel(thisFixture Fixture, channelName string) bool {

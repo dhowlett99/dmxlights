@@ -1263,28 +1263,34 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Rotate Clockwise Slow
-      number: 1
+    - name: Reverse Slow
+      label: Reverse Slow
+      number: 2
       value: "1"
       selectedvalue: ""
-    - name: Rotate Clockwise Medium
-      number: 2
+    - name: Reverse Medium
+      label: Reverse Medium
+      number: 3
       value: "63"
       selectedvalue: ""
-    - name: Rotate Clockwise Fast
-      number: 3
+    - name: Reverse Fast
+      label: Reverse Fast
+      number: 4
       value: "127"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Slow
-      number: 4
+    - name: Reverse Slow
+      label: Reverse Slow
+      number: 5
       value: "255"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Medium
-      number: 4
+    - name: Reverse Medium
+      label: Reverse Medium
+      number: 6
       value: "191"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Fast
-      number: 5
+    - name: Reverse Fast
+      label: Reverse Fast
+      number: 7
       value: "128"
       selectedvalue: ""
   - number: 2
@@ -1379,27 +1385,27 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Rotate Clockwise Slow
+    - name: Reverse Slow
       number: 1
       value: "1"
       selectedvalue: ""
-    - name: Rotate Clockwise Medium
+    - name: Reverse Medium
       number: 2
       value: "63"
       selectedvalue: ""
-    - name: Rotate Clockwise Fast
+    - name: Reverse Fast
       number: 3
       value: "127"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Slow
+    - name: Reverse Slow
       number: 4
       value: "255"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Medium
+    - name: Reverse Medium
       number: 4
       value: "191"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Fast
+    - name: Reverse Fast
       number: 5
       value: "128"
       selectedvalue: ""
@@ -1624,34 +1630,34 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Rotate Clockwise Slow
-      label: Rotate Clockwise Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 2
       value: "120"
       selectedvalue: ""
-    - name: Rotate Clockwise Medium
-      label: Rotate Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 3
       value: "65"
       selectedvalue: ""
-    - name: Rotate Clockwise Fast
-      label: Rotate Clockwise Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 4
       value: "10"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Slow
-      label: Rotate Anti Clockwise Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 5
       value: "135"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Medium
-      label: Rotate Anti Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 6
       channel: (Select one)
       value: "190"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Fast
-      label: Rotate Anti Clockwise Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 7
       channel: (Select one)
       value: "245"
@@ -1689,8 +1695,8 @@ fixtures:
       number: 6
       value: "105"
       selectedvalue: ""
-    - name: Rotate Clockwise Fast to Slow
-      label: Rotate Clockwise Fast to Slow
+    - name: Reverse Fast to Slow
+      label: Reverse Fast to Slow
       number: 7
       value: "128"
       selectedvalue: ""
@@ -1699,8 +1705,8 @@ fixtures:
       number: 8
       value: "187"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise  Slow to Fast
-      label: Rotate Anti Clockwise  Slow to Fast
+    - name: Reverse  Slow to Fast
+      label: Reverse  Slow to Fast
       number: 9
       value: "197"
       selectedvalue: ""
@@ -1839,33 +1845,33 @@ fixtures:
       number: 1
       value: 0-127
       selectedvalue: ""
-    - name: Rotate Clockwise Slow
-      label: Rotate Clockwise Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 2
       value: "192"
       selectedvalue: ""
-    - name: Rotate Clockwise Medium
-      label: Rotate Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 2
       value: "223"
       selectedvalue: ""
-    - name: Rotate Clockwise Fast
-      label: Rotate Clockwise Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 2
       value: "255"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Slow
-      label: Rotate Anti Clockwise Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 3
       value: "191"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Medium
-      label: Rotate Anti Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 3
       value: "160"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Fast
-      label: Rotate Anti Clockwise Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 3
       value: "128"
       selectedvalue: ""
@@ -2085,12 +2091,12 @@ fixtures:
       channel: Master
       value: "255"
       selectedvalue: ""
-    - name: Rotate Anti Clockwise Fast
-      label: Rotate Anti Clockwise Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 2
       channel: Rotate
       value: "245"
-      selectedvalue: Rotate Anti Clockwise Fast
+      selectedvalue: Reverse Fast
     - name: Color1
       label: Color1
       number: 3
@@ -2160,12 +2166,12 @@ fixtures:
       channel: Master
       value: "255"
       selectedvalue: ""
-    - name: Rotatae Clockwise Fast
-      label: Rotatae Clockwise Fast
+    - name: Forward Fast
+      label: Forward Fast
       number: 2
       channel: Rotate
       value: "12"
-      selectedvalue: Rotatae Clockwise Fast
+      selectedvalue: Forward Fast
     - name: Color4
       label: Color4
       number: 3
@@ -2814,7 +2820,7 @@ fixtures:
       fade: Soft
       size: Short
       speed: Fast
-      rotate: Rotate Anti Clockwise
+      rotate: Reverse Slow
       rotatespeed: Slow
       program: ""
       programspeed: ""
@@ -2920,12 +2926,12 @@ fixtures:
       channel: Gobo
       value: "0"
       selectedvalue: ZigZag
-    - name: Rotate Clockwise Medium
-      label: Rotate Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 4
       channel: Rotate
       value: "255"
-      selectedvalue: Rotate Clockwise Medium
+      selectedvalue: Reverse Medium
     - name: Blackout
       label: Blackout
       number: 5
@@ -2963,12 +2969,12 @@ fixtures:
       channel: Gobo
       value: "18"
       selectedvalue: Horiz Waves
-    - name: Rotate Clockwise Medium
-      label: Rotate Clockwise Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 4
       channel: Rotate
       value: "192"
-      selectedvalue: Rotate ClockWise
+      selectedvalue: Reverse
     - name: Blackout
       label: Blackout
       number: 5
@@ -3006,12 +3012,12 @@ fixtures:
       channel: Gobo
       value: "28"
       selectedvalue: Croc Petals
-    - name: Rotate Anti Clockwise Slow
-      label: Rotate Anti Clockwise Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 4
       channel: Rotate
       value: "191"
-      selectedvalue: Rotate Anti Clockwise Slow
+      selectedvalue: Reverse Slow
     - name: Blackout
       label: Blackout
       number: 5
