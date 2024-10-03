@@ -1738,8 +1738,6 @@ func FindRotateDMXValueByIndex(fixture *Fixture, index int) int {
 // FindRotateSpeedNameByNumber takes the gobo number and returns the gobo name for this fixture.
 func FindRotateSpeedNameByNumber(fixture *Fixture, number int) string {
 
-	debug := true
-
 	if debug {
 		fmt.Printf("FindRotateSpeedNameByNumber Looking for rotate speed %d in fixture %s\n", number, fixture.Name)
 	}

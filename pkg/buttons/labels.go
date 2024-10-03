@@ -314,7 +314,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 		common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed), "speed", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName), "shift", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName), "fade", false, guiButtons)
 		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName), "size", false, guiButtons)
 
