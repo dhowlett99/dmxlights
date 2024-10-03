@@ -604,7 +604,13 @@ func newMiniSequencer(fixture *Fixture,
 					if debug_mini {
 						fmt.Printf("Override is set so Rotate Speed is %d\n", override.RotateSpeed)
 					}
-					cfg.RotateSpeed = override.RotateSpeed
+					// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
+					// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
+					// override.RotateSpeed is the index so for example 1 is setting 1.
+					cfg.RotateSpeed = FindRotateDMXValueByIndex(fixture, override.RotateSpeed)
+					if debug_override {
+						fmt.Printf("Apply Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
+					}
 				}
 
 				if override.Color != 0 {
@@ -726,9 +732,15 @@ func newMiniSequencer(fixture *Fixture,
 						if cmd.Action == common.UpdateRotateSpeed {
 							const ROTATE_SPEED = 0
 							override.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
-							cfg.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
 							if debug_override {
-								fmt.Printf("Rotate Speed %d\n", cmd.Args[ROTATE_SPEED].Value.(int))
+								fmt.Printf("Override Speed Index=%d\n", override.RotateSpeed)
+							}
+							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
+							// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
+							// override.RotateSpeed is the index so for example 1 is setting 1.
+							cfg.RotateSpeed = FindRotateDMXValueByIndex(fixture, override.RotateSpeed)
+							if debug_override {
+								fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 							}
 						}
 
@@ -899,7 +911,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 			config.AutoGobo = true
 		default:
 			// find current gobo number.
-			config.Gobo = FindGobo(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
+			config.Gobo = FindGoboByName(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
 			config.AutoGobo = false
 		}
 

@@ -546,7 +546,7 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 	pan := 128
 	tilt := 128
 	shutter := FindShutter(fixtureNumber, cmd.SequenceNumber, "Open", fixtures)
-	gobo := FindGobo(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
+	gobo := FindGoboByName(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
 	scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
 	rotate := 0
 	program := 0
@@ -611,7 +611,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// Look for a matching color
 		color := common.GetColorNameByRGB(lamp.Color)
 		// Find a suitable gobo based on the requested static lamp color.
-		scannerGobo := FindGobo(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+		scannerGobo := FindGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 		// Find a suitable color wheel settin based on the requested static lamp color.
 		scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
@@ -662,7 +662,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					// Look for a matching color
 					color := common.GetColorNameByRGB(lastColor.RGBColor)
 					// Find a suitable gobo based on the requested static lamp color.
-					scannerGobo := FindGobo(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+					scannerGobo := FindGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 					// Find a suitable color wheel settin based on the requested static lamp color.
 					scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
@@ -701,7 +701,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 				// Look for a matching color
 				color := common.GetColorNameByRGB(lamp.Color)
 				// Find a suitable gobo based on the requested static lamp color.
-				scannerGobo := FindGobo(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+				scannerGobo := FindGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 				// Find a suitable color wheel settin based on the requested static lamp color.
 				scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
@@ -770,7 +770,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 				// Look for a matching color
 				color := common.GetColorNameByRGB(lastColor.RGBColor)
 				// Find a suitable gobo based on the requested static lamp color.
-				scannerGobo := FindGobo(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+				scannerGobo := FindGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 				// Find a suitable color wheel settin based on the requested static lamp color.
 				scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
@@ -843,7 +843,7 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 			color := common.GetColorNameByRGB(fixture.BaseColor)
 
 			// Find a suitable gobo based on the requested chaser lamp color.
-			scannerGobo := FindGobo(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
+			scannerGobo := FindGoboByName(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
 			// Find a suitable color wheel setting based on the requested static lamp color.
 			scannerColor := FindColor(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
 
@@ -1711,6 +1711,62 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 	return "Unknown"
 }
 
+// FindRotateDMXValueByIndex takes the rotate setting number and returns the DMX value which selects this speed.
+func FindRotateDMXValueByIndex(fixture *Fixture, index int) int {
+
+	if debug {
+		fmt.Printf("FindRotateDMXValueByIndex Looking for rotate speed index %d in fixture %s\n", index, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Rotate") {
+			for _, setting := range channel.Settings {
+				if setting.Number == index {
+					if debug {
+						fmt.Printf("Rotate Speed %d Name %s\n", setting.Number, setting.Name)
+					}
+					dmx, _ := strconv.Atoi(setting.Value)
+					return dmx
+				}
+			}
+		}
+	}
+
+	return 0
+}
+
+// FindRotateSpeedNameByNumber takes the gobo number and returns the gobo name for this fixture.
+func FindRotateSpeedNameByNumber(fixture *Fixture, number int) string {
+
+	debug := true
+
+	if debug {
+		fmt.Printf("FindRotateSpeedNameByNumber Looking for rotate speed %d in fixture %s\n", number, fixture.Name)
+	}
+
+	if number == -1 {
+		if debug {
+			fmt.Printf("Rotate Speed %d Name Auto\n", number)
+		}
+		return "Auto"
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Rotate") {
+			for _, setting := range channel.Settings {
+				if setting.Number == number {
+					if debug {
+						fmt.Printf("Rotate Speed %d Name %s\n", setting.Number, setting.Name)
+					}
+					return setting.Name
+				}
+			}
+		}
+	}
+
+	return "Unknown"
+}
+
 // FindGoboDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
 func FindGoboDMXValueByNumber(fixture *Fixture, number int) int {
 
@@ -1759,7 +1815,7 @@ func FindColorNameByNumber(fixture *Fixture, number int) string {
 }
 
 // findGobo takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
-func FindGobo(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
+func FindGoboByName(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
 
 	if debug {
 		fmt.Printf("FindGobo\n")

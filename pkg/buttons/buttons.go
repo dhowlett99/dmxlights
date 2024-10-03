@@ -306,7 +306,7 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
-	// S E L E C T  S A V E   R E C A L L  P R E S E T S
+	//  S A V E   R E C A L L  P R E S E T S
 	if X < 8 && (Y > 3 && Y < 7) {
 		savePresets(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, replyChannels)
 		return
@@ -315,14 +315,14 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
 		return
 	}
 
@@ -1016,10 +1016,11 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	shift := this.RGBShift[this.TargetSequence]
 	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 	switchRGBShift := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
-	switchRoatetSpeed := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
+	switchRotateSpeed := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
+	switchRotateSpeedName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
 
 	if debug {
-		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d\n", shift, scannerShift, switchRGBShift, switchRoatetSpeed)
+		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotateSpeed, switchRotateSpeedName)
 	}
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
@@ -1034,7 +1035,7 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 				common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchRGBShift), "shift", false, guiButttons)
 			}
 			if this.SelectedFixtureType == "projector" {
-				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", switchRoatetSpeed), "shift", false, guiButttons)
+				common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchRotateSpeed, switchRotateSpeedName), "shift", false, guiButttons)
 			}
 		}
 	}

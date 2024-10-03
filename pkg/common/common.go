@@ -243,6 +243,7 @@ type Override struct {
 	Fade                int
 	OverrideRotateSpeed bool
 	RotateSpeed         int
+	RotateSpeedName     string
 	OverrideColors      bool
 	Colors              []color.RGBA
 	Color               int

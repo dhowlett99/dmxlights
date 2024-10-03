@@ -170,7 +170,7 @@ func TestFindGobo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FindGobo(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
+			if got := FindGoboByName(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
 				t.Errorf("FindGobo() = %v, want %v", got, tt.want)
 			}
 		})
