@@ -2245,6 +2245,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+		newOverride.RotateSpeedName = FindRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
 
 		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
@@ -2259,6 +2260,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+		newOverride.RotateSpeedName = FindRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
 
 		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
@@ -2273,6 +2275,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+		newOverride.RotateSpeedName = FindRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
 
 		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
@@ -2287,6 +2290,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		newOverride.Size = cfg.Size
 		newOverride.Fade = cfg.Fade
 		newOverride.RotateSpeed = cfg.RotateSpeed
+		newOverride.RotateSpeedName = FindRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
 
 		newOverride.Color = cfg.Color
 		newOverride.Colors = cfg.Colors
