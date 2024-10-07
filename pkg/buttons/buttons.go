@@ -70,7 +70,7 @@ type CurrentState struct {
 	LastSelectedSequence        int                        // Store fof the last selected squence.
 	MusicTrigger                bool                       // Does this seleted switch have a music trigger.
 	Speed                       map[int]int                // Local copy of sequence speed. Indexed by sequence.
-	SwitchOverrides             [][]common.Override        // Local copy of overriden switch fixture speeds. Indexed by switch number and state.
+	SwitchOverrides             *[][]common.Override       // Pointer to local copy of overriden switch fixture values. Indexed by switch number and state.
 	RGBShift                    map[int]int                // Current rgb fixture shift. Indexed by sequence.
 	ScannerShift                map[int]int                // Current scanner shift for all fixtures.  Indexed by sequence
 	RGBSize                     map[int]int                // current RGB sequence this.Size[this.SelectedSequence]. Indexed by sequence
@@ -940,10 +940,12 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	mode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
-	switchSpeed := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
+	overrides := *this.SwitchOverrides
+	switchSpeed := overrides[this.SelectedSwitch][switchPosition].Speed
 
 	if debug {
-		fmt.Printf("UpdateSpeed Type=%s Switch %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed)
+		fmt.Printf("UpdateSpeed Type=%s Switch %d Position %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, switchPosition, switchSpeed)
 	}
 
 	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
@@ -967,7 +969,6 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 				} else {
 					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchSpeed), "speed", false, guiButtons)
 				}
-
 			}
 		}
 		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
@@ -986,9 +987,10 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	tYpe := this.SelectedType
 	size := this.RGBSize[this.TargetSequence]
 	scannerFade := this.ScannerSize[this.TargetSequence]
-	switchSize := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
-	switchColor := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
-	switchColorName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
+	overrides := *this.SwitchOverrides
+	switchSize := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
+	switchColor := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
+	switchColorName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" || tYpe == "switch" {
@@ -1015,9 +1017,10 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	tYpe := this.SelectedType
 	shift := this.RGBShift[this.TargetSequence]
 	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-	switchRGBShift := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
-	switchRotateSpeed := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
-	switchRotateSpeedName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
+	overrides := *this.SwitchOverrides
+	switchRGBShift := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
+	switchRotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
+	switchRotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
 
 	if debug {
 		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotateSpeed, switchRotateSpeedName)
@@ -1051,9 +1054,10 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	fixtureType := this.SelectedFixtureType
 	fade := this.RGBFade[this.TargetSequence]
 	scannerCoordinates := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-	switchFade := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
-	switchGobo := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
-	switchGoboName := this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
+	overrides := *this.SwitchOverrides
+	switchFade := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
+	switchGobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
+	switchGoboName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {

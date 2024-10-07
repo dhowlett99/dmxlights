@@ -134,9 +134,10 @@ func scannerAutoPattern(sequence *common.Sequence) []common.Step {
 // Currently supports up to 8 scanner gobos and as many colors defined by sequence.ScannerAvailableColors
 // Returns - Nothing, gobo is determined by sequence.ScannerGobo. Color is determined by sequence.ScannerColor
 func scannerAutoColor(steps []common.Step, sequence *common.Sequence) []common.Step {
-	//if debug {
-	fmt.Printf("scannerAutoColor: \n")
-	//}
+
+	if debug {
+		fmt.Printf("scannerAutoColor: \n")
+	}
 
 	scannerLastColor := 0
 

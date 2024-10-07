@@ -855,9 +855,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateAutoColor:
 		const AUTO_COLOR = 0
 		const SELECTED_TYPE = 1
-		//if debug {
-		fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
-		//}
+		if debug {
+			fmt.Printf("Sequence %d: of Type %s : Command Update Auto Color to  %t\n", mySequenceNumber, command.Args[SELECTED_TYPE].Value, command.Args[AUTO_COLOR].Value)
+		}
 		sequence.AutoColor = command.Args[AUTO_COLOR].Value.(bool)
 		selectedType := command.Args[SELECTED_TYPE].Value.(string)
 

@@ -31,6 +31,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/override"
 )
 
 type FixturesPanel struct {
@@ -140,7 +141,7 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
@@ -612,6 +613,17 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
+
+		// Find the switch sequence number.
+		var SwitchSequenceNumber int
+		for sequenceNumber, sequence := range sequences {
+			if sequence.Type == "switch" {
+				SwitchSequenceNumber = sequenceNumber
+			}
+		}
+		// When we add a new set of fixtues with a possible new switch states we also need to populate a new override for that switch state.
+		// So we recreate the overrides from scratch by using the pointer to SwitchOverrides.
+		override.UpdateOverrides(SwitchSequenceNumber, fixtures, switchOverrides)
 
 		// Clear switch positions to their first positions.
 		for _, seq := range sequences {

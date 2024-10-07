@@ -39,6 +39,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/editor"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx"
@@ -500,7 +501,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	commandChannels []chan common.Command,
 	replyChannels []chan common.Sequence,
 	updateChannels []chan common.Sequence,
-	dmxInterfacePresent bool) *fyne.Container {
+	dmxInterfacePresent bool,
+	SwitchOverrides *[][]common.Override) *fyne.Container {
 
 	var popup *widget.PopUp
 
@@ -581,7 +583,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("DMXLIGI", func() {
-				modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
+				modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels, SwitchOverrides)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
@@ -619,9 +621,9 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	return row0
 }
 
-func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) error {
+func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, SwitchOverrides *[][]common.Override) error {
 
-	modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels)
+	modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels, SwitchOverrides)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err
@@ -685,12 +687,12 @@ func AreYouSureDialog(myWindow fyne.Window, message string) *widget.PopUp {
 // MakeToolbar generates a tool bar at the top of the main window.
 func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
-	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures) *widget.Toolbar {
+	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures, this *buttons.CurrentState) *widget.Toolbar {
 
 	// Project open.
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
-			FileOpen(myWindow, startConfig, fixturesConfig, commandChannels)
+			FileOpen(myWindow, startConfig, fixturesConfig, commandChannels, this)
 		}),
 
 		// Project save.
@@ -708,7 +710,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	return toolbar
 }
 
-func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command) {
+func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, this *buttons.CurrentState) {
 	fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 		if err == nil && reader != nil {
 			newFixturesConfig, err := fixture.LoadFixturesReader(reader)
@@ -726,11 +728,15 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 				// Copy the newFixtures into the old pointer to the fixtures config.
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
 
+				// Create a new set of overrides.
+				override.UpdateOverrides(this.SwitchSequenceNumber, fixturesConfig, this.SwitchOverrides)
+
 				// Stop all the sequences.
 				cmd := common.Command{
 					Action: common.Reset,
 				}
 				common.SendCommandToAllSequence(cmd, commandChannels)
+
 				// Update the fixtures config in all the sequences.
 				cmd = common.Command{
 					Action: common.UpdateFixturesConfig,

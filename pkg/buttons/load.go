@@ -157,29 +157,31 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
 				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
 
+				overrides := *this.SwitchOverrides
 				//  Restore any switch Overrides.
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Size != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
 				}
 
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors != nil {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo != 0 {
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo
 				}
+				this.SwitchOverrides = &overrides
 
 				if debug {
 					var stateNames []string

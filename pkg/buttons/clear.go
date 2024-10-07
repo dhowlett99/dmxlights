@@ -175,7 +175,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.ScannerSize[this.SelectedSequence] = common.DEFAULT_SCANNER_SIZE        // Reset the scanner size back to default.
 		this.ScannerChaser[sequenceNumber] = false                                   // Clear the scanner chase mode.
 		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
-		this.SwitchPosition = [NUMBER_SWITCHES]int{}                                 // Clear switch positions to their first positions.
 		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
 		this.SelectedMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
 		this.SelectButtonPressed[sequenceNumber] = false                             // Clear buttoned selecetd mode.
@@ -188,6 +187,11 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
 		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.
 		this.ClearPressed[this.TargetSequence] = false                               // Reset the counter that counts how many times we've pressed the clear button.
+
+		// Clear switch positions to their first positions.
+		for switchNumber := 0; switchNumber < NUMBER_SWITCHES; switchNumber++ {
+			this.SwitchPosition[switchNumber] = 0
+		}
 
 		// Enable all fixtures.
 		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
@@ -233,14 +237,16 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 					action := fixture.GetSwitchConfig(swiTchNumber, int16(stateNumber), fixturesConfig)
 					cfg := fixture.GetConfig(action, thisFixture, fixturesConfig)
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = cfg.Speed
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = cfg.Shift
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = cfg.Size
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = cfg.Fade
+					overrides := *this.SwitchOverrides
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = cfg.Speed
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = cfg.Shift
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = cfg.Size
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = cfg.Fade
 
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = cfg.RotateSpeed
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = cfg.Colors
-					this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = cfg.Gobo
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = cfg.RotateSpeed
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = cfg.Colors
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = cfg.Gobo
+					this.SwitchOverrides = &overrides
 				}
 				if debug {
 					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)

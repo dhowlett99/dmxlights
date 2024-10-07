@@ -29,6 +29,8 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		fmt.Printf("Decrease Speed \n")
 	}
 
+	overrides := *this.SwitchOverrides
+
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
 	// If we're in shutter chase mode.
@@ -67,7 +69,7 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 	if this.SelectedType == "switch" {
 		// Copy the updated speed setting into the local switch speed storage
-		this.Speed[this.TargetSequence] = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+		this.Speed[this.TargetSequence] = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 	}
 
 	// Decrease Speed.
@@ -92,14 +94,14 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 		if this.SelectedType == "switch" {
 			// Copy the updated speed setting into the local switch speed storage
-			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
 			// Send a message to override / decrease the selected switch speed.
 			cmd := common.Command{
 				Action: common.OverrideSpeed,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Speed", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -116,6 +118,8 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 	}
 
+	this.SwitchOverrides = &overrides
+
 	// Update the status bar
 	UpdateSpeed(this, guiButtons)
 
@@ -126,6 +130,8 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	if debug {
 		fmt.Printf("Increase Speed \n")
 	}
+
+	overrides := *this.SwitchOverrides
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
@@ -165,7 +171,7 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 	if this.SelectedType == "switch" {
 		// Copy the updated speed setting into the local switch speed storage
-		this.Speed[this.TargetSequence] = this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+		this.Speed[this.TargetSequence] = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 	}
 
 	if !sequences[this.TargetSequence].MusicTrigger {
@@ -188,14 +194,14 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 		if this.SelectedType == "switch" {
 			// Copy the speed setting into the local switch speed storage
-			this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = this.Speed[this.TargetSequence]
 			// Send a message to override / increase the selected switch speed.
 			cmd := common.Command{
 				Action: common.OverrideSpeed,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Speed", Value: this.SwitchOverrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -211,6 +217,8 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 		}
 	}
+
+	this.SwitchOverrides = &overrides
 
 	// Update the status bar
 	UpdateSpeed(this, guiButtons)

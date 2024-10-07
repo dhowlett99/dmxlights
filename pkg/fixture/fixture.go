@@ -97,10 +97,14 @@ type ActionConfig struct {
 	Speed             int
 	Shift             int
 	TriggerState      bool
+	RotateName        string
+	RotateNumber      int
 	RotateSpeed       int
 	Rotatable         bool
-	Clockwise         bool
-	AntiClockwise     bool
+	ReverseSpeed      int
+	ForwardSpeed      int
+	Forward           bool //Clockwise
+	Reverse           bool //AntiClockwise
 	AutoRotate        bool
 	Program           int
 	ProgramOptions    []string
@@ -1046,9 +1050,12 @@ func findChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName
 func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByNameAndSpeed for fixture %s setting name %s and setting speed %s\n", fixtureName, settingName, settingSpeed)
+		fmt.Printf("findChannelSettingByNameAndSpeed for fixture %s channel name %s setting name %s and setting speed %s\n", fixtureName, channelName, settingName, settingSpeed)
 	}
 
+	if channelName == "" {
+		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error channel name is empty")
+	}
 	if settingName == "" {
 		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error setting name is empty")
 	}
@@ -1060,10 +1067,12 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 
 		if fixtureName == fixture.Name {
 			for _, channel := range fixture.Channels {
-				if debug {
-					fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)
-				}
+
 				if channel.Name == channelName {
+					if debug {
+						fmt.Printf("fixture %s: inspect channel %s for %s\n", fixture.Name, channel.Name, settingName)
+					}
+
 					for _, setting := range channel.Settings {
 						if debug {
 							fmt.Printf("inspect setting %+v \n", setting)
@@ -1094,7 +1103,7 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 							}
 
 							if debug {
-								fmt.Printf("findChannelSettingByNameAndSpeed: speed found is %d\n", v)
+								fmt.Printf("speed found is %d\n", v)
 							}
 							return v, nil
 						}
@@ -1104,7 +1113,7 @@ func findChannelSettingByNameAndSpeed(fixtureName string, channelName string, se
 		}
 	}
 
-	return 0, fmt.Errorf("channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
+	return 0, fmt.Errorf("warning: channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
 }
 
 func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixtures *Fixtures, dmxController *ft232.DMXController,
@@ -1735,7 +1744,7 @@ func FindRotateDMXValueByIndex(fixture *Fixture, index int) int {
 	return 0
 }
 
-// FindRotateSpeedNameByNumber takes the gobo number and returns the gobo name for this fixture.
+// FindRotateSpeedNameByNumber takes the rotate speed number and returns the rotate speed name for this fixture.
 func FindRotateSpeedNameByNumber(fixture *Fixture, number int) string {
 
 	if debug {
@@ -1763,6 +1772,29 @@ func FindRotateSpeedNameByNumber(fixture *Fixture, number int) string {
 	}
 
 	return "Unknown"
+}
+
+// FindRotateSpeedNumberByName takes the rotate speed name and returns the rotate speed setting number for this fixture.
+func FindRotateSpeedNumberByName(fixture *Fixture, rotateSettingName string) int {
+
+	if debug {
+		fmt.Printf("FindRotateSpeedNameByNumber Looking for rotate speed %s in fixture %s\n", rotateSettingName, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Rotate") {
+			for _, setting := range channel.Settings {
+				if setting.Name == rotateSettingName {
+					if debug {
+						fmt.Printf("Rotate Speed %d Name %s\n", setting.Number, setting.Name)
+					}
+					return setting.Number
+				}
+			}
+		}
+	}
+
+	return 0
 }
 
 // FindGoboDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
@@ -1907,20 +1939,22 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
 	fixtureInfo.HasRotateSpeed = isThisAChannel(*thisFixture, "RotateSpeed")
 
-	// Find all the options for the channel called "Rotate".
-	availableRotateOptions := getOptionsForAChannel(*thisFixture, "Rotate")
-	// Add the auto option for rotate
-	var autoFound bool
-	for _, option := range availableRotateOptions {
-		if strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
-			autoFound = true
+	// Find all the options for the channel called "Rotate".But only if we have a Rotate Channel exists.
+	if fixtureInfo.HasRotate {
+		availableRotateOptions := getOptionsForAChannel(*thisFixture, "Rotate")
+		// Add the auto option for rotate
+		var autoFound bool
+		for _, option := range availableRotateOptions {
+			if strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
+				autoFound = true
+			}
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
 		}
-		fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
-	}
-	// Now if we didn't find a dedicated channel for automatically rotating in different directions.
-	// Add our internal keyword for Auto.
-	if !autoFound {
-		fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+		// Now if we didn't find a dedicated channel for automatically rotating in different directions.
+		// Add our internal keyword for Auto.
+		if !autoFound {
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+		}
 	}
 
 	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
@@ -1952,12 +1986,11 @@ func getOptionsForAChannel(thisFixture Fixture, channelName string) []string {
 
 func isThisAChannel(thisFixture Fixture, channelName string) bool {
 
-	if debug {
-		fmt.Printf("isThisAChannel\n")
-	}
-
 	for _, channel := range thisFixture.Channels {
 		if channel.Name == channelName {
+			if debug {
+				fmt.Printf("\tisThisAChannel fixture %s channelName %s true\n", thisFixture.Name, channelName)
+			}
 			return true
 		}
 	}

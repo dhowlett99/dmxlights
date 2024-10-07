@@ -23,6 +23,7 @@ import (
 	"image/color"
 	"os"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
@@ -507,25 +508,6 @@ func newMiniSequencer(fixture *Fixture,
 		var rotateCounter int
 		var goboChangeFrequency int
 		var goboCounter int
-		var clockwiseSpeed int
-		var antiClockwiseSpeed int
-
-		// Calculate the rotation speed based on direction and soeed.
-		if cfg.Rotatable {
-			antiClockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
-			if err != nil {
-				fmt.Printf("Fixture %s anti clockwise rotate speed: %s\n", fixture.Name, err)
-			}
-			clockwiseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
-			if err != nil {
-				fmt.Printf("Fixture %s clockwise rotate speed: %s\n", fixture.Name, err)
-			}
-			if debug {
-				fmt.Printf("RotateSpeed %s\n", action.RotateSpeed)
-				fmt.Printf("Forward clockwiseSpeed %d\n", clockwiseSpeed)
-				fmt.Printf("Reverse antiClockwiseSpeed %d\n", antiClockwiseSpeed)
-			}
-		}
 
 		// Main chaser thread.
 		go func() {
@@ -646,23 +628,14 @@ func newMiniSequencer(fixture *Fixture,
 						if rotateCounter > cfg.RotateSensitivity {
 							rotateCounter = 1
 						}
-						if !cfg.Clockwise && !cfg.AntiClockwise {
-							cfg.RotateSpeed = 0
-						}
-						if cfg.Clockwise {
-							cfg.RotateSpeed = clockwiseSpeed
-						}
-						if cfg.AntiClockwise {
-							cfg.RotateSpeed = antiClockwiseSpeed
-						}
 
 						if cfg.AutoRotate {
 							if rotateCounter < (cfg.RotateSensitivity / 2) {
 								// Clockwise Speed.
-								cfg.RotateSpeed = clockwiseSpeed
+								cfg.RotateSpeed = cfg.ForwardSpeed
 							} else {
 								// Anti Clockwise Speed.
-								cfg.RotateSpeed = antiClockwiseSpeed
+								cfg.RotateSpeed = cfg.ReverseSpeed
 							}
 						}
 					}
@@ -680,7 +653,7 @@ func newMiniSequencer(fixture *Fixture,
 					}
 
 					if debug_mini {
-						fmt.Printf("Rotate Value %d Counter %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, rotateCounter, clockwiseSpeed, antiClockwiseSpeed)
+						fmt.Printf("Rotate Value %d Counter %d  Clockwise %d Anti %d \n", cfg.RotateSpeed, rotateCounter, cfg.ForwardSpeed, cfg.ReverseSpeed)
 						fmt.Printf("Gobo %d goboChangeFrequency %d\n", cfg.Gobo, goboChangeFrequency)
 						fmt.Printf("switch:%d waiting for beat on %d with speed %d\n", swiTch.Number, swiTch.Number+10, cfg.SpeedDuration)
 						fmt.Printf("switch:%d speed %d\n", swiTch.Number, cfg.SpeedDuration)
@@ -987,32 +960,72 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	// TODO work out how to make shift work correctly for 4 fixtures.
 	config.Shift = 1
 
-	switch action.Rotate {
-	case "Off":
+	// Deal with the rotate parameters.
+
+	// Rotate is a channel with a number of settings,
+	// Each setting represents a speed, direction or both.
+	// At this point the rotate action contains the name of the setting.
+	// The rotate config needs to hold the rotate setting number so we can recall it and
+	// step through the settings with the override.
+	// We use the key words Forward and Reverse to represent Clockwise and Anticlockwise respectively.
+
+	// Lookup the setting number for this rotate name.
+
+	//fmt.Printf("Fixture Name %s Action %+v\n", fixture.Name, action)
+	config.RotateName = action.Rotate
+	config.RotateNumber = FindRotateSpeedNumberByName(fixture, action.Rotate)
+	config.Rotatable = false
+	config.AutoRotate = false
+
+	if strings.Contains(config.RotateName, "Off") {
 		config.Rotatable = false
 		config.AutoRotate = false
-		config.Clockwise = false
-		config.AntiClockwise = false
-	case "Clockwise":
+	}
+
+	if strings.Contains(config.RotateName, "Forward") {
 		config.Rotatable = true
 		config.AutoRotate = false
-		config.Clockwise = true
-		config.AntiClockwise = false
-	case "Anti Clockwise":
+	}
+
+	if strings.Contains(config.RotateName, "Reverse") {
 		config.Rotatable = true
 		config.AutoRotate = false
-		config.Clockwise = false
-		config.AntiClockwise = true
-	case "Auto":
+	}
+	if strings.Contains(config.RotateName, "Auto") {
 		config.Rotatable = true
-		config.AutoRotate = true
-		config.Clockwise = false
-		config.AntiClockwise = false
-	default:
-		config.Rotatable = false
-		config.AutoRotate = false
-		config.Clockwise = false
-		config.AntiClockwise = false
+		if isThisAChannel(*fixture, "Rotate") {
+			config.Rotatable = true
+		} else {
+			config.Rotatable = false
+		}
+	}
+
+	// Calculate the rotation speed based on direction and speed.
+	if config.Rotatable {
+		config.ReverseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
+		if err != nil {
+			fmt.Printf("Looking for channel:Rotate and Setting:Reverse %s\n", err)
+		}
+		config.ForwardSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
+		if err != nil {
+			fmt.Printf("Looking for channel:Rotate and Setting:Forward %s\n", err)
+		}
+		if debug {
+			fmt.Printf("RotateName%s\n", config.RotateName)
+			fmt.Printf("Forward Speed %d\n", config.ForwardSpeed)
+			fmt.Printf("Reverse Speed %d\n", config.ReverseSpeed)
+			fmt.Printf("Rotate %d\n", config.RotateNumber)
+		}
+
+		if !config.Forward && !config.Reverse {
+			config.RotateSpeed = 0
+		}
+		if config.Forward {
+			config.RotateSpeed = config.ForwardSpeed
+		}
+		if config.Reverse {
+			config.RotateSpeed = config.ReverseSpeed
+		}
 	}
 
 	switch action.Speed {
@@ -1074,6 +1087,10 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	default:
 		config.Strobe = false
 		config.StrobeSpeed = 0
+	}
+
+	if debug {
+		fmt.Printf("Config %+v\n", config)
 	}
 
 	return config
