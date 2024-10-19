@@ -1634,18 +1634,18 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Reverse Slow
-      label: Reverse Slow
+    - name: Forward Slow
+      label: Forward Slow
       number: 2
       value: "120"
       selectedvalue: ""
-    - name: Reverse Medium
-      label: Reverse Medium
+    - name: Forward Medium
+      label: Forward Medium
       number: 3
       value: "65"
       selectedvalue: ""
-    - name: Reverse Fast
-      label: Reverse Fast
+    - name: Forward Fast
+      label: Forward Fast
       number: 4
       value: "10"
       selectedvalue: ""
