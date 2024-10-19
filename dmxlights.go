@@ -38,6 +38,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/dmx"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/gui"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/launchpad"
 	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/pattern"
@@ -121,6 +122,14 @@ func main() {
 	this.Functions = make(map[int][]common.Function)                      // Array holding functions for each sequence.
 	this.SavedSequenceColors = make(map[int][]color.RGBA)                 // Array holding saved sequence colors for each sequence. Used by the color picker.
 	this.LastSelectedSwitch = common.NOT_SELECTED                         // Set the last selected switch to not selected.
+
+	// Load button labels.
+	var err error
+	this.Labels, err = labels.LoadLabels()
+	if err != nil {
+		fmt.Printf("Loading labels: %s\n", err.Error())
+		os.Exit(-1)
+	}
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = []common.SwitchChannel{}

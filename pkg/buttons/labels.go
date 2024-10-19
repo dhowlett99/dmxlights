@@ -23,6 +23,7 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 )
 
 func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
@@ -84,16 +85,17 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 		Label string
 		Color color.RGBA
 	}
+
 	// Storage for the rgb labels on the top row.
 	var guiTopRGBButtons [8]topButton
-	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: colors.Magenta}
-	guiTopRGBButtons[1] = topButton{Label: "RED", Color: colors.Red}
-	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: colors.Green}
-	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: colors.Blue}
-	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: colors.Cyan}
-	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: colors.Cyan}
-	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: colors.Cyan}
-	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: colors.Cyan}
+	guiTopRGBButtons[0] = topButton{Label: labels.GetLabel(this.Labels, "Clear", "Clear"), Color: colors.Magenta}
+	guiTopRGBButtons[1] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Red"), Color: colors.Red}
+	guiTopRGBButtons[2] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Green"), Color: colors.Green}
+	guiTopRGBButtons[3] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Blue"), Color: colors.Blue}
+	guiTopRGBButtons[4] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Decrease"), Color: colors.Cyan}
+	guiTopRGBButtons[5] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Increase"), Color: colors.Cyan}
+	guiTopRGBButtons[6] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Decrease"), Color: colors.Cyan}
+	guiTopRGBButtons[7] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Increase"), Color: colors.Cyan}
 
 	// Storage for the scanner labels on the Top row.
 	var guiTopScannerButtons [8]topButton

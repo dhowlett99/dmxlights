@@ -1,0 +1,25 @@
+entrys:
+- name: Clear
+  labels:
+  - name: Clear
+    label: CLEAR
+- name: Colors
+  labels:
+  - name: Red
+    label: RED
+  - name: Green
+    label: GREEN
+  - name: Blue
+    label: BLUE
+- name: Sensitivity
+  labels:
+  - name: Decrease
+    label: "SENS\n-"
+  - name: Increase
+    label: "SENS\n+"
+- name: Master
+  labels:
+  - name: Decrease
+    label: "MAST\n-"
+  - name: Increase
+    label: "MAST\n+"

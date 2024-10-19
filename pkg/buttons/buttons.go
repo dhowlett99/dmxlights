@@ -28,6 +28,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/pad"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
@@ -132,6 +133,7 @@ type CurrentState struct {
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
 	RGBPatterns                 map[int]common.Pattern     // Available RGB Patterns.
+	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
 }
 
 func ProcessButtons(X int, Y int,
