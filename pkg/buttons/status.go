@@ -20,10 +20,25 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan common.Command, sequence *common.Sequence) {
+func toggleFixtureStatus(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("Disable Fixture X:%d Y:%d\n", X, Y)
+		fmt.Printf("Fixture State Enabled %t  Inverted %t Reversed %t\n", this.FixtureState[Y][X].Enabled, this.FixtureState[Y][X].RGBInverted, this.FixtureState[Y][X].RGBInverted)
+	}
+
+	// Rotate the  fixture state based on last fixture state.
+	setFixtureStatus(this, X, Y, commandChannels, sequences[Y])
+
+	// Show the status.
+	showFixtureStatus(Y, sequences[Y].Number, sequences[Y].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+}
+
+func setFixtureStatus(this *CurrentState, X int, Y int, commandChannels []chan common.Command, sequence *common.Sequence) {
 
 	// There are three possiblities OFF, ON and INVERTED.
 	if sequence.Type == "rgb" {
@@ -302,31 +317,31 @@ func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures 
 
 		// Enabled but not inverted then On and green.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "On", guiButtons)
 		}
 
 		// Enabled and inverted then Invert and puple. Not reversed
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && !this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Purple, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, colors.Purple, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Invert", guiButtons)
 		}
 
 		// Enabled not inverted but revesed then reverse and yellow.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Reversed", guiButtons)
 		}
 
 		// Enabled  inverted and revesed then reverse and white.
 		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Invert & Reversed", guiButtons)
 		}
 
 		// Not enabled and not inverted then off and blue.
 		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Red, this.MasterBrightness, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, colors.Red, this.MasterBrightness, eventsForLaunchpad, guiButtons)
 			common.LabelButton(fixtureNumber, sequenceNumber, "Off", guiButtons)
 		}
 

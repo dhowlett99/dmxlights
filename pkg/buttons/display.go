@@ -1,3 +1,20 @@
+// Copyright (C) 2022, 2023 , 2024 dhowlett99.
+// This is button processor, used by the launchpad and gui interfaces.
+// This file controls the display when pressing the select button.
+// Decides which menu items / buttons are displayed.
+//
+// This program is free software: you can redistribute it and/or modify
+// it under the terms of the GNU General Public License as published by
+// the Free Software Foundation, either version 3 of the License, or
+// (at your option) any later version.
+//
+// This program is distributed in the hope that it will be useful,
+// but WITHOUT ANY WARRANTY; without even the implied warranty of
+// MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+// GNU General Public License for more details.
+
+// You should have received a copy of the GNU General Public License
+// along with this program.  If not, see <http://www.gnu.org/licenses/>.
 package buttons
 
 import (
@@ -10,21 +27,15 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 	debug := false
 
-	// Tailor the top buttons to the sequence type.
-	common.ShowTopButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
-
-	// Tailor the bottom buttons to the sequence type.
-	common.ShowBottomButtons(sequences[sequenceNumber].Type, eventsForLaunchpad, guiButtons)
-
 	// Show this sequence running status in the start/stop button.
 	common.ShowRunningStatus(this.Running[sequenceNumber], eventsForLaunchpad, guiButtons)
 	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
 
 	// Update the status bar.
-	showStatusBar(this, sequences, guiButtons)
+	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 	// Light the sequence selector button.
-	SequenceSelect(eventsForLaunchpad, guiButtons, this)
+	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 	switch {
 
