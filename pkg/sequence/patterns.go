@@ -50,7 +50,7 @@ func setupNewRGBPattern(sequence *common.Sequence, availablePatterns map[int]com
 		// Set the chase RGB steps used to chase the shutter.
 		sequence.ScannerChaser = true
 		// Chaser start with a standard chase pattern in white.
-		steps = replaceRGBcolorsInSteps(steps, []color.RGBA{colors.White})
+		steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, []color.RGBA{colors.White})
 	}
 
 	if debug {
@@ -118,47 +118,79 @@ func makeACopy(src, dist interface{}) (err error) {
 	return gob.NewDecoder(&buf).Decode(dist)
 }
 
-func replaceRGBcolorsInSteps(steps []common.Step, colors []color.RGBA) []common.Step {
-
-	if debug {
-		fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colors)
-	}
+func replaceRGBcolorsInSteps(patternName string, steps []common.Step, colorsIn []color.RGBA) []common.Step {
 
 	stepsOut := []common.Step{}
-	err := makeACopy(steps, &stepsOut)
-	if err != nil {
-		fmt.Printf("replaceRGBcolorsInSteps: error failed to copy steps.\n")
-	}
+
+	//if debug {
+	fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colorsIn)
+	fmt.Printf("PatternName: %v\n", patternName)
+	//}
 
 	var insertColor int
-	numberColors := len(colors)
+	numberColors := len(colorsIn)
 
-	for stepNumber, step := range steps {
-		for fixtureNumber, fixture := range step.Fixtures {
+	if patternName == "Flash" {
 
-			// found a color.
-			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
-				if insertColor >= numberColors {
-					insertColor = 0
-				}
-				newFixture := stepsOut[stepNumber].Fixtures[fixtureNumber]
-				newFixture.Color = colors[insertColor]
-				stepsOut[stepNumber].Fixtures[fixtureNumber] = newFixture
-				insertColor++
+		for _, newColor := range colorsIn {
+
+			// Create a step with all fixtures to that color.
+			newStep := common.Step{}
+			// Init the map for the fixtures.
+			newStep.Fixtures = make(map[int]common.Fixture, 8)
+			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+				newFixture := common.Fixture{}
+				newFixture.Color = newColor
+				newStep.Fixtures[fixtureNumber] = newFixture
 			}
+			stepsOut = append(stepsOut, newStep)
+
+			// Create a blank step with all fixtures with a black.
+			newStep = common.Step{}
+			// Init the map for the fixtures.
+			newStep.Fixtures = make(map[int]common.Fixture, 8)
+			// Set all fixtures to that color.
+			for fixtureNumber := 0; fixtureNumber < 8; fixtureNumber++ {
+				newFixture := common.Fixture{}
+				newFixture.Color = colors.Black
+				newStep.Fixtures[fixtureNumber] = newFixture
+			}
+			stepsOut = append(stepsOut, newStep)
 
 		}
-	}
 
-	if debug {
-		for stepNumber, step := range stepsOut {
-			fmt.Printf("Step %d\n", stepNumber)
+	} else {
+		err := makeACopy(steps, &stepsOut)
+		if err != nil {
+			fmt.Printf("replaceRGBcolorsInSteps: error failed to copy steps.\n")
+		}
+
+		for stepNumber, step := range steps {
 			for fixtureNumber, fixture := range step.Fixtures {
-				fmt.Printf("\tFixture %d\n", fixtureNumber)
-				fmt.Printf("\t\tColor %+v\n", fixture.Color)
+
+				// found a color.
+				if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
+					if insertColor >= numberColors {
+						insertColor = 0
+					}
+					newFixture := stepsOut[stepNumber].Fixtures[fixtureNumber]
+					newFixture.Color = colorsIn[insertColor]
+					stepsOut[stepNumber].Fixtures[fixtureNumber] = newFixture
+					insertColor++
+				}
 			}
 		}
 	}
+
+	//if debug {
+	for stepNumber, step := range stepsOut {
+		fmt.Printf("Step %d\n", stepNumber)
+		for fixtureNumber, fixture := range step.Fixtures {
+			fmt.Printf("\tFixture %d\n", fixtureNumber)
+			fmt.Printf("\t\tColor %+v\n", fixture.Color)
+		}
+	}
+	//}
 
 	return stepsOut
 }

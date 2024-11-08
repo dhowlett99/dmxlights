@@ -106,7 +106,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 					fmt.Printf("RGB SavedSequenceColors\n")
 				}
 				// Recover origial colors after auto color is switched off.
-				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+				steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, sequence.SequenceColors)
 				sequence.AutoColor = false
 			}
 		} else {
@@ -115,7 +115,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Patter
 				if debug {
 					fmt.Printf("replaceRGBcolorsInSteps\n")
 				}
-				steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+				steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, sequence.SequenceColors)
 				// Save the current color selection.
 				if sequence.SaveColors {
 					sequence.SavedSequenceColors = common.HowManyColorsInSteps(steps)

@@ -29,8 +29,9 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 
 	full := 255
 	type args struct {
-		steps  []common.Step
-		colors []color.RGBA
+		steps       []common.Step
+		colors      []color.RGBA
+		patternName string
 	}
 	tests := []struct {
 		name string
@@ -164,7 +165,7 @@ func Test_replaceRGBcolorsInSteps(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := replaceRGBcolorsInSteps(tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
+			if got := replaceRGBcolorsInSteps(tt.args.patternName, tt.args.steps, tt.args.colors); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("replaceRGBcolorsInSteps() = %v, want %v", got, tt.want)
 			}
 		})

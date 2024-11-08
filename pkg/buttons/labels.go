@@ -99,7 +99,7 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 
 	// Storage for the scanner labels on the Top row.
 	var guiTopScannerButtons [8]topButton
-	guiTopScannerButtons[0] = topButton{Label: "CLEAR.^", Color: colors.White}
+	guiTopScannerButtons[0] = topButton{Label: labels.GetLabel(this.Labels, "Clear", "Clear ^"), Color: colors.White}
 	guiTopScannerButtons[1] = topButton{Label: "V", Color: colors.White}
 	guiTopScannerButtons[2] = topButton{Label: "<", Color: colors.White}
 	guiTopScannerButtons[3] = topButton{Label: ">", Color: colors.White}

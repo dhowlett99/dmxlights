@@ -47,7 +47,7 @@ func rgbAutoColors(sequence *common.Sequence, steps []common.Step) []common.Step
 	}
 
 	// Now replace the color in the steps.
-	steps = replaceRGBcolorsInSteps(steps, sequence.SequenceColors)
+	steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, sequence.SequenceColors)
 
 	return steps
 }

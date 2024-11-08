@@ -3,6 +3,8 @@ entrys:
   labels:
   - name: Clear
     label: CLEAR
+  - name: "Clear ^"
+    label: "CLEAR ^"
 - name: Colors
   labels:
   - name: Red
