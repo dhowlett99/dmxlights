@@ -3,6 +3,7 @@
 GO111MODULE=on
 COVERAGE = -coverprofile=../c.out -covermode=atomic
 SHELL := /usr/bin/env bash
+VERSION := "3.0"
 export PKG_CONFIG_PATH=/usr/local/Cellar/portaudio/19.7.0/lib/pkgconfig
 
 # The name of the application
@@ -57,7 +58,7 @@ deploy: installer
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
-	$(GOPATH)/bin/fyne package --appVersion 2.1 --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
+	$(GOPATH)/bin/fyne package --appVersion ${VERSION} --id com.github.dhowlett99.dmxlights -os darwin -icon dmxlights.png -use-raw-icon
 	# fix the Info.plist
 	./fix.sh dmxlights.app/Contents/Info.plist > /tmp/file
 	mv /tmp/file dmxlights.app/Contents/Info.plist
@@ -70,3 +71,6 @@ deploy: installer
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
 
+
+release: deploy
+	$(GOPATH)/bin/fyne release -os ios -appID com.github.dhowlett99.dmxlights -appVersion ${VERSION} -appBuild 1 -icon dmxlights.png -use-raw-icon -profile 1
