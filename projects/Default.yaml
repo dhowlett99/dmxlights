@@ -2449,9 +2449,9 @@ fixtures:
       value: "255"
       selectedvalue: ""
     flash: false
-  - name: Sound Triggered Color Change
+  - name: SoundInt
     number: 7
-    label: Sound
+    label: SoundInt
     buttoncolor: White
     master: 0
     settings:
@@ -2486,10 +2486,10 @@ fixtures:
       value: "255"
       selectedvalue: ""
     flash: false
-  - name: Mini
+  - name: Sound
     number: 8
-    label: Mini
-    buttoncolor: Pink
+    label: Sound
+    buttoncolor: White
     master: 0
     actions:
     - name: Mini
@@ -2508,30 +2508,6 @@ fixtures:
       program: "Off"
       programspeed: ""
       strobe: "Off"
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Reddy
-    number: 9
-    label: Reddy
-    buttoncolor: Orange
-    master: 0
-    actions:
-    - name: Reddy
-      number: 1
-      colors:
-      - Red
-      map: ""
-      mode: Static
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
       strobespeed: ""
       gobo: ""
       gobospeed: ""
