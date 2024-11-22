@@ -25,3 +25,81 @@ entrys:
     label: "MAST\n-"
   - name: Increase
     label: "MAST\n+"
+- name: Speed
+  labels:
+  - name: Down
+    label: "Speed\nDown"
+  - name: Up
+    label: "Speed\nUp"
+- name: Shift
+  labels:
+  - name: Down
+    label: "Shift\nDown"
+  - name: Up
+    label: "Shift\nUp"
+- name: Size
+  labels:
+  - name: Down
+    label: "Size\nDown"
+  - name: Up
+    label: "Size\nUp"
+- name: Fade
+  labels:
+  - name: Soft
+    label: "Fade\nSoft"
+  - name: Sharp
+    label: "Fade\nSharp"
+- name: Coord
+  labels:
+  - name: Down
+    label: "Coord\nDown"
+  - name: Up
+    label: "Coord\nUp"
+- name: Chase Speed
+  labels:
+  - name: Down
+    label: "Chase\nSpeed\nDown"
+  - name: Up
+    label: "Chase\nSpeed\nUp"
+- name: Chase Shift
+  labels:
+  - name: Down
+    label: "Chase\nShift\nDown"
+  - name: Up
+    label: "Chase\nShift\nUp"
+- name: Chase Size
+  labels:
+  - name: Down
+    label: "Chase\nSize\nDown"
+  - name: Up
+    label: "Chase\nSize\nUp"
+- name: Chase Fade
+  labels:
+  - name: Soft
+    label: "Chase\nFade\nSoft"
+  - name: Sharp
+    label: "Chase\nFade\nSharp"
+- name: Shutter Speed
+  labels:
+  - name: Down
+    label: "Shutter\nSpeed\nDown"
+  - name: Up
+    label: "Shutter\nSpeed\nUp"
+- name: Rotate Speed
+  labels:
+  - name: Down
+    label: "Rotate\nSpeed\nDown"
+  - name: Up
+    label: "Rotate\nSpeed\nUp"
+- name: Color
+  labels:
+  - name: Down
+    label: "Color\nDown"
+  - name: Up
+    label: "Color\nUp"
+- name: Gobo
+  labels:
+  - name: Down
+    label: "Gobo\nDown"
+  - name: Up
+    label: "Gobo\nUp"

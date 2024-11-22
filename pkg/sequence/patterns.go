@@ -122,10 +122,10 @@ func replaceRGBcolorsInSteps(patternName string, steps []common.Step, colorsIn [
 
 	stepsOut := []common.Step{}
 
-	//if debug {
-	fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colorsIn)
-	fmt.Printf("PatternName: %v\n", patternName)
-	//}
+	if debug {
+		fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colorsIn)
+		fmt.Printf("PatternName: %v\n", patternName)
+	}
 
 	var insertColor int
 	numberColors := len(colorsIn)
@@ -182,15 +182,15 @@ func replaceRGBcolorsInSteps(patternName string, steps []common.Step, colorsIn [
 		}
 	}
 
-	//if debug {
-	for stepNumber, step := range stepsOut {
-		fmt.Printf("Step %d\n", stepNumber)
-		for fixtureNumber, fixture := range step.Fixtures {
-			fmt.Printf("\tFixture %d\n", fixtureNumber)
-			fmt.Printf("\t\tColor %+v\n", fixture.Color)
+	if debug {
+		for stepNumber, step := range stepsOut {
+			fmt.Printf("Step %d\n", stepNumber)
+			for fixtureNumber, fixture := range step.Fixtures {
+				fmt.Printf("\tFixture %d\n", fixtureNumber)
+				fmt.Printf("\t\tColor %+v\n", fixture.Color)
+			}
 		}
 	}
-	//}
 
 	return stepsOut
 }

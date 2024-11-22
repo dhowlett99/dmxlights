@@ -167,58 +167,58 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 
 	// Storage for the rgb labels on the bottom row.
 	var guiBottomRGBButtons [8]bottonButton
-	guiBottomRGBButtons[0] = bottonButton{Label: "Speed\nDown", Color: colors.Cyan}
-	guiBottomRGBButtons[1] = bottonButton{Label: "Speed\nUp", Color: colors.Cyan}
-	guiBottomRGBButtons[2] = bottonButton{Label: "Shift\nDown", Color: colors.Cyan}
-	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: colors.Cyan}
-	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: colors.Cyan}
-	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: colors.Cyan}
-	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: colors.Cyan}
-	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: colors.Cyan}
+	guiBottomRGBButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Down"), Color: colors.Cyan}
+	guiBottomRGBButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
+	guiBottomRGBButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Down"), Color: colors.Cyan}
+	guiBottomRGBButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
+	guiBottomRGBButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Down"), Color: colors.Cyan}
+	guiBottomRGBButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Up"), Color: colors.Cyan}
+	guiBottomRGBButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Fade", "Soft"), Color: colors.Cyan}
+	guiBottomRGBButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Fade", "Sharp"), Color: colors.Cyan}
 
 	// Storage for the scanner labels on the bottom row.
 	var guiBottomScannerButtons [8]bottonButton
-	guiBottomScannerButtons[0] = bottonButton{Label: "Speed\nDown", Color: colors.Cyan}
-	guiBottomScannerButtons[1] = bottonButton{Label: "Speed\nUp", Color: colors.Cyan}
-	guiBottomScannerButtons[2] = bottonButton{Label: "Shift\nDown", Color: colors.Cyan}
-	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: colors.Cyan}
-	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: colors.Cyan}
-	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: colors.Cyan}
-	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: colors.Cyan}
-	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: colors.Cyan}
+	guiBottomScannerButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Down"), Color: colors.Cyan}
+	guiBottomScannerButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
+	guiBottomScannerButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Down"), Color: colors.Cyan}
+	guiBottomScannerButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Up"), Color: colors.Cyan}
+	guiBottomScannerButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Down"), Color: colors.Cyan}
+	guiBottomScannerButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Up"), Color: colors.Cyan}
+	guiBottomScannerButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Coord", "Down"), Color: colors.Cyan}
+	guiBottomScannerButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Coord", "Up"), Color: colors.Cyan}
 
 	// Storage for chaser labels on the bottom row.
 	var guiBottomChaserButtons [8]bottonButton
-	guiBottomChaserButtons[0] = bottonButton{Label: "Chase\nSpeed\nDown", Color: colors.Cyan}
-	guiBottomChaserButtons[1] = bottonButton{Label: "Chase\nSpeed\nUp", Color: colors.Cyan}
-	guiBottomChaserButtons[2] = bottonButton{Label: "Chase\nShift\nDown", Color: colors.Cyan}
-	guiBottomChaserButtons[3] = bottonButton{Label: "Chase\nShift\nUp", Color: colors.Cyan}
-	guiBottomChaserButtons[4] = bottonButton{Label: "Chase\nSize\nDown", Color: colors.Cyan}
-	guiBottomChaserButtons[5] = bottonButton{Label: "Chase\nSize\nUp", Color: colors.Cyan}
-	guiBottomChaserButtons[6] = bottonButton{Label: "Chase\nFade\nSoft", Color: colors.Cyan}
-	guiBottomChaserButtons[7] = bottonButton{Label: "Chase\nFade\nSharp", Color: colors.Cyan}
+	guiBottomChaserButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Speed", "Down"), Color: colors.Cyan}
+	guiBottomChaserButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase", "Up"), Color: colors.Cyan}
+	guiBottomChaserButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Shift", "Down"), Color: colors.Cyan}
+	guiBottomChaserButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Shift", "Up"), Color: colors.Cyan}
+	guiBottomChaserButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Size", "Down"), Color: colors.Cyan}
+	guiBottomChaserButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Size", "Up"), Color: colors.Cyan}
+	guiBottomChaserButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Fade", "Soft"), Color: colors.Cyan}
+	guiBottomChaserButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Fade", "Sharp"), Color: colors.Cyan}
 
 	// Storage for the rgb labels on the bottom row.
 	var guiBottomSwitchButtons [8]bottonButton
-	guiBottomSwitchButtons[0] = bottonButton{Label: "Speed\nDown", Color: colors.Cyan}
-	guiBottomSwitchButtons[1] = bottonButton{Label: "Speed\nUp", Color: colors.Cyan}
-	guiBottomSwitchButtons[2] = bottonButton{Label: "Shift\nDown", Color: colors.Cyan}
-	guiBottomSwitchButtons[3] = bottonButton{Label: "Shift\nUp", Color: colors.Cyan}
-	guiBottomSwitchButtons[4] = bottonButton{Label: "Size\nDown", Color: colors.Cyan}
-	guiBottomSwitchButtons[5] = bottonButton{Label: "Size\nUp", Color: colors.Cyan}
-	guiBottomSwitchButtons[6] = bottonButton{Label: "Fade\nSoft", Color: colors.Cyan}
-	guiBottomSwitchButtons[7] = bottonButton{Label: "Fade\nSharp", Color: colors.Cyan}
+	guiBottomSwitchButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Down"), Color: colors.Cyan}
+	guiBottomSwitchButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
+	guiBottomSwitchButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Down"), Color: colors.Cyan}
+	guiBottomSwitchButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Up"), Color: colors.Cyan}
+	guiBottomSwitchButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Down"), Color: colors.Cyan}
+	guiBottomSwitchButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Up"), Color: colors.Cyan}
+	guiBottomSwitchButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Fade", "Soft"), Color: colors.Cyan}
+	guiBottomSwitchButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Fade", "Sharp"), Color: colors.Cyan}
 
 	// Storage for the rgb labels on the bottom row.
 	var guiBottomProjectorButtons [8]bottonButton
-	guiBottomProjectorButtons[0] = bottonButton{Label: "Shutter\nSpeed\nDown", Color: colors.Cyan}
-	guiBottomProjectorButtons[1] = bottonButton{Label: "Shutter\nSpeed\nUp", Color: colors.Cyan}
-	guiBottomProjectorButtons[2] = bottonButton{Label: "Rotate\nSpeed\nDown", Color: colors.Cyan}
-	guiBottomProjectorButtons[3] = bottonButton{Label: "Rotate\nSpeed\nUp", Color: colors.Cyan}
-	guiBottomProjectorButtons[4] = bottonButton{Label: "Color\nDown", Color: colors.Cyan}
-	guiBottomProjectorButtons[5] = bottonButton{Label: "Color\nUp", Color: colors.Cyan}
-	guiBottomProjectorButtons[6] = bottonButton{Label: "Gobo\nDown", Color: colors.Cyan}
-	guiBottomProjectorButtons[7] = bottonButton{Label: "Gobo\nUp", Color: colors.Cyan}
+	guiBottomProjectorButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Shutter Speed", "Down"), Color: colors.Cyan}
+	guiBottomProjectorButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Shutter Speed", "Up"), Color: colors.Cyan}
+	guiBottomProjectorButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Rotate Speed", "Down"), Color: colors.Cyan}
+	guiBottomProjectorButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Rotate Speed", "Up"), Color: colors.Cyan}
+	guiBottomProjectorButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Down"), Color: colors.Cyan}
+	guiBottomProjectorButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Up"), Color: colors.Cyan}
+	guiBottomProjectorButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Down"), Color: colors.Cyan}
+	guiBottomProjectorButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Up"), Color: colors.Cyan}
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
