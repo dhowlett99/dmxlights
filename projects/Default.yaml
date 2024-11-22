@@ -2333,7 +2333,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   - name: Blue
-    number: 3
+    number: 4
     label: Blue
     buttoncolor: Blue
     master: 0
