@@ -2341,32 +2341,37 @@ fixtures:
     - name: mode
       label: mode
       number: 1
-      channel: "1"
+      channel: Program
       value: "0"
       selectedvalue: ""
     - name: red
+      label: red
       number: 2
-      channel: "2"
+      channel: Red1
       value: "0"
-      selectedvalue: ""
+      selectedvalue: "0"
     - name: green
+      label: green
       number: 3
-      channel: "3"
+      channel: Green1
       value: "0"
       selectedvalue: ""
     - name: blue
+      label: blue
       number: 4
-      channel: "4"
+      channel: Blue1
       value: "255"
       selectedvalue: ""
     - name: strobe
+      label: strobe
       number: 5
-      channel: "5"
+      channel: Speed
       value: "0"
       selectedvalue: ""
     - name: master reverse
+      label: master reverse
       number: 6
-      channel: "6"
+      channel: Master Reverse
       value: "255"
       selectedvalue: ""
     flash: false

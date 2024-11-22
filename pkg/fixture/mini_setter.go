@@ -56,7 +56,12 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 			fmt.Printf("newMiniSetter: Fixture %s setting value %d master %d howBright %d\n", thisFixture.Name, int(value), master, howBright)
 		}
 
-		if strings.Contains(settingName, "reverse") || strings.Contains(settingName, "invert") {
+		// If we are using the master reverse feature, we can label it in the setting name or the channel name.
+		if strings.Contains(settingName, "reverse") ||
+			strings.Contains(settingName, "invert") ||
+			strings.Contains(channelName, "reverse") ||
+			strings.Contains(channelName, "invert") {
+
 			// Invert the brightness value,  some fixtures have the max brightness at 0 and off at 255.
 			if debug_mini_setter {
 				fmt.Printf("fixture %s: Control: send Setting %s Address %d Value %d \n", thisFixture.Name, setting.Name, thisFixture.Address+int16(masterChannel), int(howBright))
