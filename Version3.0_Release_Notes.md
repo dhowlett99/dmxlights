@@ -32,6 +32,18 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 
 * Presets can be deleted by a long press on the launchpad, but you cannot delete a preset from the GUI.
 
+* When opening the open or save project you may see an error message, this is because Fyne.io hard codes the favorites locations. 
+
+    In my case I didn't have a 'Videos' directory in my home directory so I got:-
+   
+    **Fyne error:  Getting List favorite locations
+    At: /Users/derek/project/pkg/mod/fyne.io/fyne/v2@v2.5.1/dialog/file_darwin.go:40
+    Fyne error:  Getting favorite locations
+    Cause: uri is not listable
+    At: /Users/derek/project/pkg/mod/fyne.io/fyne/v2@v2.5.1/dialog/file.go:359**
+
+    Workaround To avoid this error you need to have the following directories in your "Home" dirctory:- "Documents","Desktop","Downloads","Music","Pictures","Movies","Videos"
+
 # Dependances.
 
 * The fyne toolkit for creating graphical apps for desktop, mobile and web. https://fyne.io/
