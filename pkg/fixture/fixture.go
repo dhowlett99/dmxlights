@@ -944,17 +944,20 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 		fmt.Printf("findChannelSettingByLabel: looking for Label %s in Channel %s settings\n", label, channelName)
 	}
 
-	var fixtureName string
-
 	// Look through the channels.
 	for _, channel := range fixture.Channels {
 		if debug {
 			fmt.Printf("inspect channel %s for %s\n", channel.Name, channelName)
 		}
-		// Match the channel.
-		if channel.Name == channelName {
+		// Match the channel. So covert to lowercase first and then look if it is the search Name.
+		channelName := strings.ToLower(channel.Name)
+		searchName := strings.ToLower(channelName)
+		if debug {
+			fmt.Printf("channelName=%s searchName=%s\n", channelName, searchName)
+		}
+		if channelName == searchName {
 			if debug {
-				fmt.Printf("channel.Settings %+v\n", channel.Settings)
+				fmt.Printf("Found a matching name: channel.Settings %+v\n", channel.Settings)
 			}
 
 			// Look through the settings.
@@ -963,10 +966,15 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 					fmt.Printf("inspect setting -> Label %s = label %s\n", setting.Label, label)
 				}
 
-				// Match Setting.
-				if setting.Label == label {
+				// Match Setting. So covert to lowercase first and then look if it is the search label.
+				channelLabel := strings.ToLower(setting.Label)
+				searchLabel := strings.ToLower(label)
+				if debug {
+					fmt.Printf("channelLabel=%s searchLabel=%s\n", channelLabel, searchLabel)
+				}
+				if channelLabel == searchLabel {
 					if debug {
-						fmt.Printf("Found! Fixture.Name=%s Channel.Name=%s Label=%s Setting.Name %s Setting.Value %s\n", fixture.Name, channel.Name, label, setting.Name, setting.Value)
+						fmt.Printf("Found a matcing label: Fixture.Name=%s Channel.Name=%s Label=%s Setting.Name %s Setting.Value %s\n", fixture.Name, channel.Name, label, setting.Name, setting.Value)
 					}
 					v, _ := strconv.Atoi(setting.Value)
 					return v, nil
@@ -975,7 +983,7 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 		}
 	}
 
-	return 0, fmt.Errorf("label setting \"%s\" not found i channel \"%s\" fixture :%s", label, channelName, fixtureName)
+	return 0, fmt.Errorf("label setting \"%s\" not found in channel \"%s\" fixture :%s", label, channelName, fixture.Name)
 }
 
 func fixtureHasChannel(fixture *Fixture, channelName string) bool {

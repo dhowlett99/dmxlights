@@ -2294,8 +2294,84 @@ fixtures:
       value: "255"
       selectedvalue: ""
     flash: false
-  - name: Slow Color Change
+  - name: Green
     number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    settings:
+    - name: mode
+      label: mode
+      number: 1
+      channel: "1"
+      value: "0"
+      selectedvalue: ""
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+      selectedvalue: ""
+    - name: green
+      number: 3
+      channel: "3"
+      value: "255"
+      selectedvalue: ""
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "0"
+      selectedvalue: ""
+    - name: strobe
+      number: 5
+      channel: "5"
+      value: "0"
+      selectedvalue: ""
+    - name: master reverse
+      number: 6
+      channel: "6"
+      value: "255"
+      selectedvalue: ""
+    flash: false
+  - name: Blue
+    number: 3
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    settings:
+    - name: mode
+      label: mode
+      number: 1
+      channel: "1"
+      value: "0"
+      selectedvalue: ""
+    - name: red
+      number: 2
+      channel: "2"
+      value: "0"
+      selectedvalue: ""
+    - name: green
+      number: 3
+      channel: "3"
+      value: "0"
+      selectedvalue: ""
+    - name: blue
+      number: 4
+      channel: "4"
+      value: "255"
+      selectedvalue: ""
+    - name: strobe
+      number: 5
+      channel: "5"
+      value: "0"
+      selectedvalue: ""
+    - name: master reverse
+      number: 6
+      channel: "6"
+      value: "255"
+      selectedvalue: ""
+    flash: false
+  - name: Slow Color Change
+    number: 5
     label: SlwChg
     buttoncolor: Red
     master: 0
@@ -2332,7 +2408,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   - name: Meduim Color Change
-    number: 4
+    number: 6
     label: MdChg
     buttoncolor: Yellow
     master: 0
@@ -2369,7 +2445,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   - name: Sound Triggered Color Change
-    number: 5
+    number: 7
     label: Sound
     buttoncolor: White
     master: 0
@@ -2406,7 +2482,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   - name: Mini
-    number: 6
+    number: 8
     label: Mini
     buttoncolor: Pink
     master: 0
@@ -2432,7 +2508,7 @@ fixtures:
       gobospeed: ""
     flash: false
   - name: Reddy
-    number: 7
+    number: 9
     label: Reddy
     buttoncolor: Orange
     master: 0
