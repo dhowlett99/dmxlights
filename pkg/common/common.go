@@ -30,7 +30,7 @@ import (
 const debug = false
 
 const NOT_SELECTED = -1
-const VERSION = "3.0 Beta"
+const VERSION = "3.0"
 const MAX_NUMBER_OF_CHANNELS = 8
 const MAX_DMX_ADDRESS = 512
 const MAX_TEXT_ENTRY_LENGTH = 35
