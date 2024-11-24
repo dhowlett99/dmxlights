@@ -61,7 +61,22 @@ var Violet = color.RGBA{R: 199, G: 21, B: 133, A: 255}
 var White = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 var EmptyColor = color.RGBA{}
 
-func getColorFromIndexNumberFromColorsLibrary(selectedColor int, colorLibrary []color.RGBA) color.RGBA {
+func GetAvailableColors() []color.RGBA {
+	var availableColors []color.RGBA
+	availableColors = append(availableColors, Red)
+	availableColors = append(availableColors, Orange)
+	availableColors = append(availableColors, Yellow)
+	availableColors = append(availableColors, Green)
+	availableColors = append(availableColors, Cyan)
+	availableColors = append(availableColors, Blue)
+	availableColors = append(availableColors, Purple)
+	availableColors = append(availableColors, Pink)
+	availableColors = append(availableColors, White)
+	availableColors = append(availableColors, Black)
 
+	return availableColors
+}
+
+func GetColorFromIndexNumberFromColorsLibrary(selectedColor int, colorLibrary []color.RGBA) color.RGBA {
 	return colorLibrary[selectedColor]
 }

@@ -3365,7 +3365,7 @@ fixtures:
     buttoncolor: Red
     master: 0
     actions:
-    - name: "On"
+    - name: Red
       number: 1
       colors:
       - Red
@@ -3413,7 +3413,7 @@ fixtures:
     buttoncolor: Blue
     master: 0
     actions:
-    - name: New
+    - name: Blue
       number: 1
       colors:
       - Blue

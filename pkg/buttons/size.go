@@ -237,10 +237,10 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		return
 	}
 
-	// Deal with an Switch sequence with a projector fixture.
+	// Deal with the switch sequence. Increase Color.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		// Increase the switch size.
+		// Increase the switch color.
 		overrides := *this.SwitchOverrides
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color + 1
 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > common.MAX_PROJECTOR_COLOR {
@@ -248,9 +248,9 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		}
 		this.SwitchOverrides = &overrides
 
-		// Send a message to override / increase the selected switch shift.
+		// Send a message to override / increase the selected switch color.
 		cmd := common.Command{
-			Action: common.OverrideSize,
+			Action: common.OverrideColor,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},

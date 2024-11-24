@@ -77,6 +77,9 @@ func newMiniSequencer(fixture *Fixture,
 		fmt.Printf("newMiniSequencer: start fixture %s\n", fixture.Name)
 	}
 
+	// Create a standard pallete used by mini sequencer.
+	standardPallete := colors.GetAvailableColors()
+
 	switchName := fmt.Sprintf("switch%d", swiTch.Number)
 
 	mySequenceNumber := fixture.Group - 1
@@ -601,7 +604,10 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					// You can only override a single color.
 					cfg.Color = override.Color
-					cfg.Colors = []color.RGBA{cfg.Colors[override.Color]}
+					newColor := colors.GetColorFromIndexNumberFromColorsLibrary(cfg.Color-1, standardPallete)
+					cfg.Colors = []color.RGBA{
+						newColor,
+					}
 				}
 
 				if override.Gobo != 0 {
@@ -720,10 +726,13 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Colors
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
-							override.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
-							cfg.Colors = cmd.Args[COLORS].Value.([]color.RGBA)
+							override.Color = cmd.Args[COLORS].Value.(int)
+							newColor := colors.GetColorFromIndexNumberFromColorsLibrary(override.Color-1, standardPallete)
+							cfg.Colors = []color.RGBA{
+								newColor,
+							}
 							if debug_override {
-								fmt.Printf("Colors %+v\n", cmd.Args[COLORS].Value.([]color.RGBA))
+								fmt.Printf("Color Selected is %d %+v\n", override.Color-1, newColor)
 							}
 						}
 

@@ -137,7 +137,7 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		}
 		// Send a message to the selected switch device.
 		switchCommand := common.Command{
-			Action: common.UpdateRotateSpeed,
+			Action: common.UpdateColors,
 			Args: []common.Arg{
 				// Add one since we count from 0
 				{Name: "Color", Value: cmd.SwiTch.Override.Color},
@@ -157,7 +157,7 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		}
 		// Send a message to the selected switch device.
 		switchCommand := common.Command{
-			Action: common.UpdateRotateSpeed,
+			Action: common.UpdateGobo,
 			Args: []common.Arg{
 				// Add one since we count from 0
 				{Name: "Gobo", Value: cmd.SwiTch.Override.Gobo},
