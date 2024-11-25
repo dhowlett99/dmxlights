@@ -422,8 +422,16 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("FixtureReceiver: override %+v\n", cmd.Override)
 			}
-			// Talk to the mini sequencer.
-			overrideMiniSequencer(cmd, switchChannels)
+
+			// Overide is done differently for chase actions.
+			if cmd.State.Actions[0].Mode == "Chase" {
+				// Send a message to the mini sequencer in chase mode.
+				overrideMiniSequencer(cmd, switchChannels)
+			} else {
+				// Call the minisequencer directly in in Static or Control Mode with the new override values.
+				lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixturesConfig, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
+			}
+
 			// Call the mini setter. Step through all the settings.
 			overrideMiniSetter(cmd, fixturesConfig, dmxController, dmxInterfacePresent)
 			continue
@@ -440,6 +448,8 @@ func FixtureReceiver(
 			if debug {
 				fmt.Printf("%d:%d Activate switch number %d name %s Postition %d Speed %d Shift %d\n", cmd.SequenceNumber, myFixtureNumber, cmd.SwiTch.Number, cmd.SwiTch.Name, cmd.SwiTch.CurrentPosition, cmd.Override.Speed, cmd.Override.Shift)
 			}
+			// Since this is a swich being changed, we clear any override for this sequence.
+			cmd.Override = common.Override{}
 			lastColor = MapSwitchFixture(cmd.SwiTch, cmd.State, cmd.Override, cmd.RGBFade, dmxController, fixturesConfig, cmd.Blackout, cmd.Master, cmd.Master, cmd.MasterChanging, lastColor, switchChannels, soundTriggers, soundConfig, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)
 			continue
 

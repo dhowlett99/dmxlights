@@ -347,9 +347,16 @@ func newMiniSequencer(fixture *Fixture,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		color, err := common.GetRGBColorByName(action.Colors[0])
-		if err != nil {
-			fmt.Printf("error %d\n", err)
+		// Decide on the color.
+		var color color.RGBA
+		if override.Color > 0 {
+			color = standardPallete[override.Color]
+		} else {
+			// Use the color from the action.
+			color, err = common.GetRGBColorByName(action.Colors[0])
+			if err != nil {
+				fmt.Printf("error %d\n", err)
+			}
 		}
 
 		// Soft start

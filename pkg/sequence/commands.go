@@ -57,14 +57,22 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 		if debug {
 			fmt.Printf("%d: Override Single Switch=%d Override=%+v\n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override)
 		}
+
+		// Get switch data variables setup.
+		swiTch := sequence.Switches[sequence.CurrentSwitch]
+		state := swiTch.States[swiTch.CurrentPosition]
+
 		// Pass through the override command.
 		command := common.FixtureCommand{
-			Type:          "override",
-			Master:        sequence.Master,
-			Blackout:      sequence.Blackout,
-			CurrentSwitch: sequence.CurrentSwitch,
-			SwiTch:        sequence.Switches[sequence.CurrentSwitch],
-			Override:      sequence.Switches[sequence.CurrentSwitch].Override,
+			Type:           "override",
+			Master:         sequence.Master,
+			Blackout:       sequence.Blackout,
+			CurrentSwitch:  sequence.CurrentSwitch,
+			SwiTch:         sequence.Switches[sequence.CurrentSwitch],
+			Override:       sequence.Switches[sequence.CurrentSwitch].Override,
+			State:          state,
+			RGBFade:        sequence.RGBFade,
+			MasterChanging: sequence.MasterChanging,
 		}
 		fixtureStepChannels[sequence.CurrentSwitch] <- command
 

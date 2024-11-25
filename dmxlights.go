@@ -104,7 +104,7 @@ func main() {
 	this.StaticButtons = makeStaticButtonsStorage()                       // Make storgage for color editing button results.
 	this.PresetsStore = presets.LoadPresets()                             // Load the presets from their json files.
 	this.Speed = make(map[int]int, NumberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
-	this.SwitchOverrides = &overrides                                     // Initialise local override storage for eight switches. Indexed by switch number.
+	this.SwitchOverrides = &overrides                                     // Initialise local override storage for eight switches. Indexed by switch number and state.
 	this.RGBSize = make(map[int]int, NumberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
 	this.RGBPatterns = pattern.MakePatterns()                             // Build the default set of Patterns.
 	this.ScannerSize = make(map[int]int, NumberOfSequences)               // Initialise storage for four sequences.
