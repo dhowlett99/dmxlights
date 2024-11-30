@@ -24,7 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func Test_generatePairsPattern(t *testing.T) {
+func Test_generateFlashPattern(t *testing.T) {
 	type args struct {
 		numberOfFixtures int
 	}
@@ -34,37 +34,39 @@ func Test_generatePairsPattern(t *testing.T) {
 		want common.Pattern
 	}{
 		{
-			name: "Generate pairs pattern for 8 fixtures",
+			name: "Generate standard flash pattern of 8 fixtures",
 			args: args{
 				numberOfFixtures: 8,
 			},
 			want: common.Pattern{
-				Name:   "Pairs",
-				Label:  "Pairs",
-				Number: 3,
+				Name:   "Flash",
+				Number: 1,
+				Label:  "Flash",
 				Steps: []common.Step{
 					{
+						KeyStep: true,
 						Fixtures: map[int]common.Fixture{
-							0: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-							1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							2: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-							3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							4: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-							5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							6: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-							7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
+							0: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							1: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							2: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							3: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							4: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							5: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							6: {MasterDimmer: full, Enabled: true, Color: colors.White},
+							7: {MasterDimmer: full, Enabled: true, Color: colors.White},
 						},
 					},
 					{
+						KeyStep: true,
 						Fixtures: map[int]common.Fixture{
 							0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							1: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
+							1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
 							2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							3: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
+							3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
 							4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							5: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
+							5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
 							6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-							7: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
+							7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
 						},
 					},
 				},
@@ -73,8 +75,8 @@ func Test_generatePairsPattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := generatePairsPattern(tt.args.numberOfFixtures); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("generatePairsPattern() = %+v, want %+v", got, tt.want)
+			if got := generateFlashPattern(tt.args.numberOfFixtures); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("generateFlashPattern() = %+v, want %+v", got, tt.want)
 			}
 		})
 	}

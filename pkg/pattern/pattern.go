@@ -68,39 +68,7 @@ func MakePatterns() map[int]common.Pattern {
 
 	standard := generateChasePattern(8)
 
-	flash := common.Pattern{
-		Name:   "Flash",
-		Number: 1,
-		Label:  "Flash",
-		Steps: []common.Step{
-			{
-				KeyStep: true,
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.White},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.White},
-				},
-			},
-			{
-				KeyStep: true,
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-		},
-	}
+	flash := generateFlashPattern(8)
 
 	rgbchase := common.Pattern{
 		Name:   "RGB Chase",
