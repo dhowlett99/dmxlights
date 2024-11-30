@@ -1,5 +1,5 @@
-// Copyright (C) 2022 dhowlett99.
-// This is the dmxlights fixture editor it is attached to a fixture and
+// Copyright (C) 2022,2023,2024 dhowlett99.
+// This is the dmxlights pattern generator it is attached to a fixture and
 // describes the fixtures properties which is then saved in the fixtures.yaml
 //
 // This program is free software: you can redistribute it and/or modify
@@ -66,109 +66,7 @@ func MakePatterns() map[int]common.Pattern {
 
 	Patterns := make(map[int]common.Pattern)
 
-	standard := common.Pattern{
-		Name:   "Chase",
-		Number: 0,
-		Label:  "Std.Chase",
-		Steps: []common.Step{
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Shutter: 255, Brightness: 255, Color: colors.Green},
-				},
-			},
-		},
-	}
+	standard := generateChasePattern(8)
 
 	flash := common.Pattern{
 		Name:   "Flash",
@@ -248,37 +146,7 @@ func MakePatterns() map[int]common.Pattern {
 		},
 	}
 
-	pairs := common.Pattern{
-		Name:   "Pairs",
-		Label:  "Pairs",
-		Number: 3,
-		Steps: []common.Step{
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-				},
-			},
-		},
-	}
+	pairs := generatePairsPattern(8)
 
 	inward := common.Pattern{
 		Name:   "Inward",
