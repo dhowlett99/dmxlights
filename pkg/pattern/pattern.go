@@ -70,49 +70,7 @@ func MakePatterns() map[int]common.Pattern {
 
 	flash := generateFlashPattern(8)
 
-	rgbchase := common.Pattern{
-		Name:   "RGB Chase",
-		Number: 2,
-		Label:  "RGB.Chase",
-		Steps: []common.Step{
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Green},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Blue},
-				},
-			},
-		},
-	}
+	rgbchase := generateRgbChasePattern(8)
 
 	pairs := generatePairsPattern(8)
 
