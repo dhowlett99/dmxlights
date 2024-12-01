@@ -74,61 +74,7 @@ func MakePatterns() map[int]common.Pattern {
 
 	pairs := generatePairsPattern(8)
 
-	inward := common.Pattern{
-		Name:   "Inward",
-		Label:  "Inward",
-		Number: 4,
-		Steps: []common.Step{
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-			{
-				Fixtures: map[int]common.Fixture{
-					0: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					1: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					2: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					3: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					4: {MasterDimmer: full, Enabled: true, Color: colors.Red},
-					5: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					6: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-					7: {MasterDimmer: full, Enabled: true, Color: colors.Black},
-				},
-			},
-		},
-	}
+	inward := generateInwardChasePattern(8)
 
 	color := common.Pattern{
 		Name:   "Color Chase",
