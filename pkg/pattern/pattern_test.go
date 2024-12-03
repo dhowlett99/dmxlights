@@ -95,7 +95,7 @@ func Test_circleGenerator(t *testing.T) {
 	}
 }
 
-func Test_generatePattern(t *testing.T) {
+func Test_generateScannerPattern(t *testing.T) {
 
 	allFixturesEnabled := map[int]common.FixtureState{
 		0: {
@@ -855,7 +855,7 @@ func Test_generatePattern(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := GeneratePattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase, allFixturesEnabled); !reflect.DeepEqual(got, tt.want) {
+			if got := GenerateScannerPattern(tt.Coordinates, tt.fixtures, tt.shift, tt.chase, allFixturesEnabled); !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("Got = %+v", got)
 				t.Errorf("Want = %+v", tt.want)
 			}

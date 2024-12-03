@@ -208,7 +208,7 @@ func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Patter
 
 	// Scanner circle pattern 0
 	coordinates := pattern.CircleGenerator(sequence.ScannerSize, sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates], float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
-	circlePatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	circlePatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	circlePatten.Name = "circle"
 	circlePatten.Number = 0
 	circlePatten.Label = "Circle"
@@ -216,7 +216,7 @@ func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Patter
 
 	// Scanner left right pattern 1
 	coordinates = pattern.ScanGeneratorLeftRight(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
-	leftRightPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	leftRightPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	leftRightPatten.Name = "leftright"
 	leftRightPatten.Number = 1
 	leftRightPatten.Label = "Left.Right"
@@ -224,7 +224,7 @@ func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Patter
 
 	// // Scanner up down pattern 2
 	coordinates = pattern.ScanGeneratorUpDown(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
-	upDownPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	upDownPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	upDownPatten.Name = "updown"
 	upDownPatten.Number = 2
 	upDownPatten.Label = "Up.Down"
@@ -232,14 +232,14 @@ func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Patter
 
 	// // Scanner zig zag pattern 3
 	coordinates = pattern.ScanGenerateSawTooth(float64(sequence.ScannerSize), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates]), float64(sequence.ScannerOffsetTilt), float64(sequence.ScannerOffsetPan))
-	zigZagPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	zigZagPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	zigZagPatten.Name = "zigzag"
 	zigZagPatten.Number = 3
 	zigZagPatten.Label = "Zig.Zag"
 	scannerPattens[3] = zigZagPatten
 
 	coordinates = []pattern.Coordinate{{Pan: 127, Tilt: 127}}
-	stopPatten := pattern.GeneratePattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
+	stopPatten := pattern.GenerateScannerPattern(coordinates, sequence.NumberFixtures, sequence.ScannerShift, sequence.ScannerChaser, sequence.FixtureState)
 	stopPatten.Name = "stop"
 	stopPatten.Number = 4
 	stopPatten.Label = "Stop"
@@ -247,7 +247,7 @@ func getAvailableScannerPattens(sequence *common.Sequence) map[int]common.Patter
 
 	if debug {
 		for _, pattern := range scannerPattens {
-			fmt.Printf("Made a pattern called %s\n", pattern.Name)
+			fmt.Printf("Made a scanner pattern called %s\n", pattern.Name)
 		}
 	}
 
