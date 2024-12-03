@@ -170,7 +170,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	guiBottomRGBButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Down"), Color: colors.Cyan}
 	guiBottomRGBButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
 	guiBottomRGBButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Down"), Color: colors.Cyan}
-	guiBottomRGBButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Speed", "Up"), Color: colors.Cyan}
+	guiBottomRGBButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Shift", "Up"), Color: colors.Cyan}
 	guiBottomRGBButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Down"), Color: colors.Cyan}
 	guiBottomRGBButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Size", "Up"), Color: colors.Cyan}
 	guiBottomRGBButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Fade", "Soft"), Color: colors.Cyan}
