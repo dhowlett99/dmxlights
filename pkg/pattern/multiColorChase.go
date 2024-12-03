@@ -17,8 +17,6 @@
 package pattern
 
 import (
-	"fmt"
-
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
@@ -102,8 +100,6 @@ func generateMultiColorChasePattern(numberOfFixtures int) common.Pattern {
 
 		// Make space for fixtures in this step.
 		fixtures := make(map[int]common.Fixture, numberOfFixtures)
-
-		fmt.Printf("Step %d \n", stepNumber)
 
 		// Populate Fixtures for this step.
 		for fixtureNumber := 0; fixtureNumber < numberOfFixtures; fixtureNumber++ {
