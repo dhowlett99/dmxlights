@@ -58,7 +58,7 @@ func selectPattern(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 	// We call ShowPatternSelectionButtons here so the selections will flash as you press them.
 	this.EditFixtureSelectionMode = false
-	ShowPatternSelectionButtons(this, sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+	ShowPatternSelectionButtons(sequences[this.SelectedSequence], sequences[this.SelectedSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 	// Update the labels.
 	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)

@@ -24,7 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 )
 
-func generateSteps(steps []common.Step, availablePatterns map[int]common.Pattern, sequence *common.Sequence, soundConfig *sound.SoundConfig, fixturesConfig *fixture.Fixtures) []common.Step {
+func generateSteps(steps []common.Step, availablePatterns []common.Pattern, sequence *common.Sequence, soundConfig *sound.SoundConfig, fixturesConfig *fixture.Fixtures) []common.Step {
 
 	if debug {
 		fmt.Printf("generateSteps\n")
@@ -51,7 +51,7 @@ func generateSteps(steps []common.Step, availablePatterns map[int]common.Pattern
 	return steps
 }
 
-func updateRGBSteps(steps []common.Step, availablePatterns map[int]common.Pattern, sequence *common.Sequence) []common.Step {
+func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, sequence *common.Sequence) []common.Step {
 
 	if debug {
 		fmt.Printf("updateRGBSteps\n")

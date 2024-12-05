@@ -100,7 +100,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		common.ClearSelectedRowOfButtons(this.DisplaySequence, eventsForLaunchpad, guiButtons)
 		this.EditFixtureSelectionMode = false
 
-		ShowPatternSelectionButtons(this, sequences[this.TargetSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowPatternSelectionButtons(sequences[this.SelectedSequence], sequences[this.TargetSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
 		if this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION {

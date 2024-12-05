@@ -2632,3 +2632,63 @@ func SendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command com
 		fixture <- command
 	}
 }
+
+func HowManyFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) int {
+
+	var recents []int
+
+	if debug {
+		fmt.Printf("HowManyFixturesInGroup for sequence %d\n", sequenceNumber)
+	}
+
+	var count int
+	for _, fixture := range fixturesConfig.Fixtures {
+
+		// Found the group.
+		if fixture.Group == sequenceNumber+1 {
+
+			if debug {
+				fmt.Printf("Found fixture in group %d\n", fixture.Number)
+			}
+
+			// Have we seen this fixture number already
+			if !haveWeSeenThisBefore(recents, fixture.Number) {
+
+				// If this is a multifixture device
+				if fixture.MultiFixtureDevice {
+
+					// Then count the number of RGB channels.
+					for _, channel := range fixture.Channels {
+						if strings.Contains(channel.Name, "Red") {
+							count++
+						}
+					}
+					return count
+				}
+
+				// Only count this one if we haven't counted it already.
+				if debug {
+					fmt.Printf("Add fixture in recents %d\n", fixture.Number)
+				}
+				recents = append(recents, fixture.Number)
+				count++
+			}
+		}
+	}
+
+	if debug {
+		fmt.Printf("Found %d fixtures for sequence number %d\n", count, sequenceNumber)
+	}
+	return count
+}
+
+func haveWeSeenThisBefore(recents []int, fixtureNumber int) bool {
+
+	for _, recent := range recents {
+		if fixtureNumber == recent {
+			return true
+		}
+
+	}
+	return false
+}

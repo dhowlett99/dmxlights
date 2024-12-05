@@ -414,6 +414,7 @@ type Sequence struct {
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
+	RGBAvailablePatterns        []Pattern                   // Available RGB Patterns. Index by pattern number.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUp                      []int                       // Fade up values.
 	FadeOn                      []int                       // Fade on values.

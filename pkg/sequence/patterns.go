@@ -29,7 +29,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/position"
 )
 
-func setupNewRGBPattern(sequence *common.Sequence, availablePatterns map[int]common.Pattern) []common.Step {
+func setupNewRGBPattern(sequence *common.Sequence, availablePatterns []common.Pattern) []common.Step {
 
 	if debug {
 		fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)

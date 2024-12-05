@@ -45,8 +45,6 @@ type SequenceConfig struct {
 
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
-	mySequenceNumber int,
-	availablePatterns map[int]common.Pattern,
 	eventsForLauchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
@@ -60,32 +58,15 @@ func PlaySequence(sequence common.Sequence,
 
 	// Create channels used for stepping the fixture threads for this sequnece.
 	fixtureStepChannels := []chan common.FixtureCommand{}
-	fixtureStepChannel0 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel0)
-	fixtureStepChannel1 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel1)
-	fixtureStepChannel2 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel2)
-	fixtureStepChannel3 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel3)
-	fixtureStepChannel4 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel4)
-	fixtureStepChannel5 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel5)
-	fixtureStepChannel6 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel6)
-	fixtureStepChannel7 := make(chan common.FixtureCommand)
-	fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel7)
+	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+		fixtureStepChannel := make(chan common.FixtureCommand)
+		fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel)
+	}
 
-	// Create eight fixture threads for this sequence.
-	go fixture.FixtureReceiver(0, fixtureStepChannels[0], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(1, fixtureStepChannels[1], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(2, fixtureStepChannels[2], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(3, fixtureStepChannels[3], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(4, fixtureStepChannels[4], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(5, fixtureStepChannels[5], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(6, fixtureStepChannels[6], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	go fixture.FixtureReceiver(7, fixtureStepChannels[7], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	// Create a fixture thread for each fixture.
+	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+		go fixture.FixtureReceiver(fixtureNumber, fixtureStepChannels[fixtureNumber], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	}
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -97,16 +78,16 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Process any commands.
-		processCommands(mySequenceNumber, &sequence, channels, fixtureStepChannels, eventsForLauchpad, guiButtons)
+		processCommands(sequence.Number, &sequence, channels, fixtureStepChannels, eventsForLauchpad, guiButtons)
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase && sequence.Run && !sequence.Static && !sequence.StartFlood {
 
 			// Update the steps.
-			steps = generateSteps(steps, availablePatterns, &sequence, soundConfig, fixturesConfig)
+			steps = generateSteps(steps, sequence.RGBAvailablePatterns, &sequence, soundConfig, fixturesConfig)
 
 			if debug {
-				fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", mySequenceNumber, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
+				fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", sequence.Number, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
 			}
 
 			// Calculate positions from steps.  Soeed, shift, size and fade can be addjusted in this loop.
@@ -125,23 +106,23 @@ func PlaySequence(sequence common.Sequence,
 
 				// Listen for any commands during chase so inside sequence steps loop, time out for the next step at the speed of the chase.
 				// or additionally timeout when get a beat that also triggers the next step.
-				sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, speed, sequence, channels, fixturesConfig)
+				sequence = commands.ListenCommandChannelAndWait(sequence.Number, speed, sequence, channels, fixturesConfig)
 				if !sequence.Run || sequence.Clear || sequence.StartFlood || sequence.StopFlood ||
 					sequence.Static || sequence.UpdateShift || sequence.StartPattern || sequence.UpdateColors || sequence.UpdateSize {
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 						clearFixture(fixtureNumber, fixtureStepChannels)
 					}
 					if debug {
-						fmt.Printf("%d: Break\n", mySequenceNumber)
-						fmt.Printf("%d: Run %t \n", mySequenceNumber, sequence.Run)
-						fmt.Printf("%d: Clear %t \n", mySequenceNumber, sequence.Clear)
-						fmt.Printf("%d: StartFlood %t\n", mySequenceNumber, sequence.StartFlood)
-						fmt.Printf("%d: StopFlood %t\n", mySequenceNumber, sequence.StopFlood)
-						fmt.Printf("%d: Statics %t\n", mySequenceNumber, sequence.Static)
-						fmt.Printf("%d: UpdateShift %t\n", mySequenceNumber, sequence.UpdateShift)
-						fmt.Printf("%d: StartPattern %t\n", mySequenceNumber, sequence.StartPattern)
-						fmt.Printf("%d: UpdateColors %t\n", mySequenceNumber, sequence.UpdateColors)
-						fmt.Printf("%d: UpdateSize %t\n", mySequenceNumber, sequence.UpdateSize)
+						fmt.Printf("%d: Break\n", sequence.Number)
+						fmt.Printf("%d: Run %t \n", sequence.Number, sequence.Run)
+						fmt.Printf("%d: Clear %t \n", sequence.Number, sequence.Clear)
+						fmt.Printf("%d: StartFlood %t\n", sequence.Number, sequence.StartFlood)
+						fmt.Printf("%d: StopFlood %t\n", sequence.Number, sequence.StopFlood)
+						fmt.Printf("%d: Statics %t\n", sequence.Number, sequence.Static)
+						fmt.Printf("%d: UpdateShift %t\n", sequence.Number, sequence.UpdateShift)
+						fmt.Printf("%d: StartPattern %t\n", sequence.Number, sequence.StartPattern)
+						fmt.Printf("%d: UpdateColors %t\n", sequence.Number, sequence.UpdateColors)
+						fmt.Printf("%d: UpdateSize %t\n", sequence.Number, sequence.UpdateSize)
 					}
 					// Break out of the step loop to process commands.
 					break
@@ -153,12 +134,12 @@ func PlaySequence(sequence common.Sequence,
 			}
 		} else {
 			if debug {
-				fmt.Printf("%d: Start Listen for commands\n", mySequenceNumber)
+				fmt.Printf("%d: Start Listen for commands\n", sequence.Number)
 			}
 
 			// This is where we wait for command when the sequence isn't running.
 			// Check for any waiting commands. Setting a large timeout means that we only return when we hava a command.
-			sequence = commands.ListenCommandChannelAndWait(mySequenceNumber, 50*time.Hour, sequence, channels, fixturesConfig)
+			sequence = commands.ListenCommandChannelAndWait(sequence.Number, 50*time.Hour, sequence, channels, fixturesConfig)
 		}
 	}
 }

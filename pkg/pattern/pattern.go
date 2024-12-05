@@ -62,28 +62,24 @@ func MakeSingleFixtureChase(colors []color.RGBA) common.Pattern {
 	return single
 }
 
-func MakePatterns() map[int]common.Pattern {
+func MakePatterns(numberFixtures int) []common.Pattern {
 
-	Patterns := make(map[int]common.Pattern)
+	if debug {
+		fmt.Printf("MakePatterns for %d fixtures\n", numberFixtures)
+	}
+
+	Patterns := make([]common.Pattern, 8)
 
 	// Generate Patterns.
-	standard := generateChasePattern(8)
-	flash := generateFlashPattern(8)
-	rgbchase := generateRgbChasePattern(8)
-	pairs := generatePairsPattern(8)
-	inward := generateInwardChasePattern(8)
-	color := generateColorChasePattern(8)
-	multi := generateMultiColorChasePattern(8)
-	vu := generateVuChasePattern(8)
+	Patterns[0] = generateChasePattern(numberFixtures)
+	Patterns[1] = generateFlashPattern(numberFixtures)
+	Patterns[2] = generateRgbChasePattern(numberFixtures)
+	Patterns[3] = generatePairsPattern(numberFixtures)
+	Patterns[4] = generateInwardChasePattern(numberFixtures)
+	Patterns[5] = generateColorChasePattern(numberFixtures)
+	Patterns[6] = generateMultiColorChasePattern(8)
+	Patterns[7] = generateVuChasePattern(numberFixtures)
 
-	Patterns[0] = standard
-	Patterns[1] = flash
-	Patterns[2] = rgbchase
-	Patterns[3] = pairs
-	Patterns[4] = inward
-	Patterns[5] = color
-	Patterns[6] = multi
-	Patterns[7] = vu
 	return Patterns
 
 }

@@ -132,8 +132,9 @@ type CurrentState struct {
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
-	RGBPatterns                 map[int]common.Pattern     // Available RGB Patterns.
-	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
+	//RGBPatterns                 [][]common.Pattern         // Available RGB Patterns. Indexed sequence number and then by pattern number.
+	NumberFixtures []int             // Number of fixures for this sequence, indexed by sequence number.
+	Labels         *labels.LabelData // Space for button labels as loaded from labels.yaml
 }
 
 func ProcessButtons(X int, Y int,
@@ -749,17 +750,17 @@ func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence
 // master is the master brightness for the same buttons.
 // this.TargetSequence - is the squence you are updating the pattern, this could be different in the case
 // of scanner shutter chaser sequence which doesn't have it's own buttons.
-func ShowPatternSelectionButtons(this *CurrentState, master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func ShowPatternSelectionButtons(sequence *common.Sequence, master int, targetSequence common.Sequence, displaySequence int, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("Sequence Name %s Type %s  Label %s\n", targetSequence.Name, targetSequence.Type, targetSequence.Label)
-		for _, pattern := range this.RGBPatterns {
+		for _, pattern := range sequence.RGBAvailablePatterns {
 			fmt.Printf("Found a pattern called %s\n", pattern.Name)
 		}
 	}
 
 	if targetSequence.Type == "rgb" {
-		for _, pattern := range this.RGBPatterns {
+		for _, pattern := range sequence.RGBAvailablePatterns {
 			if debug {
 				fmt.Printf("pattern is %s\n", pattern.Name)
 			}

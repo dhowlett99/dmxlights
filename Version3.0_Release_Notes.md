@@ -23,6 +23,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Color Display show sequences current color(s).
 * Updates Comscans project.
 * Buttons are labels in the GUI from labels.yaml
+* You can now have more than eight fixtures in a sequence.
 
 ## Known Problems
 
