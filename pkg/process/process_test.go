@@ -2,9 +2,11 @@ package process
 
 import (
 	"fmt"
+	"image/color"
 	"reflect"
 	"testing"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -20,7 +22,7 @@ func Test_processDifferentColor(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         common.Color
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -46,25 +48,28 @@ func Test_processDifferentColor(t *testing.T) {
 					FadeDown: []int{255, 50, 0},
 				},
 				fixture: common.Fixture{
-					Color: common.Color{
+					Color: color.RGBA{
 						R: 255,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
-				color: common.Color{
+				color: color.RGBA{
 					R: 255,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 0,
 								G: 255,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -72,10 +77,11 @@ func Test_processDifferentColor(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -86,15 +92,15 @@ func Test_processDifferentColor(t *testing.T) {
 
 				0: {
 					// Fade Down Green.
-					{BaseColor: common.Green, Color: common.Color{R: 0, G: 255, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Green, Color: common.Color{R: 0, G: 50, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Green, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Green, Color: colors.Green, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Green, Color: colors.Green50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Green, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Fade Up Red.
-					{BaseColor: common.Red, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for on time.
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
@@ -137,7 +143,7 @@ func Test_processSameColorNotBlack(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         common.Color
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -165,27 +171,30 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Red.
 				fixture: common.Fixture{
-					Color: common.Color{
+					Color: color.RGBA{
 						R: 255,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
 				// Color is therefor Red.
-				color: common.Color{
+				color: color.RGBA{
 					R: 255,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				// Last step was also red.
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 255,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -193,10 +202,11 @@ func Test_processSameColorNotBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -207,15 +217,15 @@ func Test_processSameColorNotBlack(t *testing.T) {
 
 				0: {
 					// Play out the existing Red
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for the on time.
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep Red on for the down time.
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},
@@ -258,7 +268,7 @@ func Test_processDiffColorBlack(t *testing.T) {
 		fadeColors    map[int][]common.FixtureBuffer
 		fixture       common.Fixture
 		fixtureNumber int
-		color         common.Color
+		color         color.RGBA
 		colorNumber   int
 		lastStep      common.Step
 		nextStep      common.Step
@@ -287,27 +297,30 @@ func Test_processDiffColorBlack(t *testing.T) {
 				fixtureNumber: 0,
 				// Fixture contains color Black.
 				fixture: common.Fixture{
-					Color: common.Color{
+					Color: color.RGBA{
 						R: 0,
 						G: 0,
 						B: 0,
+						A: 255,
 					},
 				},
 				colorNumber: 0,
 				// Color is therefor Black.
-				color: common.Color{
+				color: color.RGBA{
 					R: 0,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 				// Last step was also red.
 				lastStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 255,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -315,10 +328,11 @@ func Test_processDiffColorBlack(t *testing.T) {
 				nextStep: common.Step{
 					Fixtures: map[int]common.Fixture{
 						0: {
-							Color: common.Color{
+							Color: color.RGBA{
 								R: 0,
 								G: 0,
 								B: 0,
+								A: 255,
 							},
 						},
 					},
@@ -329,21 +343,21 @@ func Test_processDiffColorBlack(t *testing.T) {
 
 				0: {
 					// Fade Down Red to Black.
-					{BaseColor: common.Red, Color: common.Color{R: 255, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 50, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Red, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Red50, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Red, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the off time, same as on time.
-					//{Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					//{Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade up time.
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade on time.
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 					// Keep off for the fade down time.
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
-					{BaseColor: common.Black, Color: common.Color{R: 0, G: 0, B: 0, W: 0, A: 0, UV: 0, Flash: false}, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
+					{BaseColor: colors.Black, Color: colors.Black, MasterDimmer: 0, Brightness: 255, Gobo: 0, Pan: 0, Tilt: 0, Shutter: 0, Enabled: false},
 				},
 			},
 		},

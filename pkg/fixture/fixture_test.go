@@ -17,6 +17,7 @@
 package fixture
 
 import (
+	"reflect"
 	"testing"
 )
 
@@ -169,7 +170,7 @@ func TestFindGobo(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := FindGobo(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
+			if got := FindGoboByName(tt.args.myFixtureNumber, tt.args.mySequenceNumber, tt.args.selectedGobo, tt.args.fixtures); got != tt.want {
 				t.Errorf("FindGobo() = %v, want %v", got, tt.want)
 			}
 		})
@@ -328,6 +329,107 @@ func TestCheckFixturesAreTheSame(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			if got, _ := CheckFixturesAreTheSame(tt.args.fixtures, tt.args.startConfig); got != tt.want {
 				t.Errorf("CheckFixturesAreTheSame() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}
+
+func TestGetSwitchSpeeds(t *testing.T) {
+	type args struct {
+		fixturesConfig *Fixtures
+		swiTchNumber   int
+		stateNumber    int16
+	}
+
+	fixturesConfig := &Fixtures{
+		Fixtures: []Fixture{
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 1,
+				States: []State{
+					{
+						Name:   "On",
+						Number: 1,
+						Actions: []Action{
+							{
+								Name:  "Fade",
+								Mode:  "Chase",
+								Speed: "Fast",
+							},
+						},
+					},
+					{
+						Name:   "Off",
+						Number: 2,
+					},
+				},
+			},
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 2,
+				States: []State{
+					{
+						Name:   "On",
+						Number: 1,
+					},
+					{
+						Name:   "Off",
+						Number: 2,
+					},
+				},
+			},
+			{
+				Type:   "switch",
+				Group:  3,
+				Number: 3,
+				States: []State{
+					{
+						Name:   "Off",
+						Number: 1,
+					},
+					{
+						Name:   "Fade",
+						Number: 2,
+						Actions: []Action{
+							{
+								Mode:  "Chase",
+								Speed: "Fast",
+							},
+						},
+					},
+				},
+			},
+		},
+	}
+
+	tests := []struct {
+		name string
+		args args
+		want Action
+	}{
+		{
+			name: "find the right action based on switch and state number",
+			args: args{
+				fixturesConfig: fixturesConfig,
+				swiTchNumber:   1,
+				stateNumber:    1,
+			},
+
+			want: Action{
+				Name:  "Fade",
+				Mode:  "Chase",
+				Speed: "Fast",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			got := GetSwitchConfig(tt.args.swiTchNumber, tt.args.stateNumber, tt.args.fixturesConfig)
+			if !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("GetSwitchSpeeds() got = %+v\n", got)
+				t.Errorf("GetSwitchSpeeds() want= %+v\n", tt.want)
 			}
 		})
 	}
