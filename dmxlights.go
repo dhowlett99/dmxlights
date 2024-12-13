@@ -342,38 +342,7 @@ func main() {
 		}
 
 		// Setup Functions Labels.
-		if newSequence.Type == "rgb" {
-			this.FunctionLabels[0] = "RGB\nPatten"
-			this.FunctionLabels[1] = "RGB\nAuto\nColor"
-			this.FunctionLabels[2] = "RGB\nAuto\nPatten"
-			this.FunctionLabels[3] = "RGB\nBounce"
-			this.FunctionLabels[4] = "RGB\nChase\nColor"
-			this.FunctionLabels[5] = "RGB\nStatic\nColor"
-			this.FunctionLabels[6] = "RGB\nInvert"
-			this.FunctionLabels[7] = "RGB\nMusic"
-		}
-
-		if newSequence.Type == "scanner" && newSequence.Label != "chaser" {
-			this.FunctionLabels[0] = "Scanner\nPatten"
-			this.FunctionLabels[1] = "Scanner\nAuto\nColor"
-			this.FunctionLabels[2] = "Scanner\nAuto\nPatten"
-			this.FunctionLabels[3] = "Scanner\nBounce"
-			this.FunctionLabels[4] = "Scanner\nColor"
-			this.FunctionLabels[5] = "Scanner\nGobo"
-			this.FunctionLabels[6] = "Scanner\nShutter\nChaser"
-			this.FunctionLabels[7] = "Scanner\nMusic"
-		}
-
-		if newSequence.Type == "rgb" && newSequence.Label == "chaser" {
-			this.FunctionLabels[0] = "Chase\nPatten"
-			this.FunctionLabels[1] = "Chase\nAuto\nColor"
-			this.FunctionLabels[2] = "Chase\nAuto\nPatten"
-			this.FunctionLabels[3] = "Chase\nBounce"
-			this.FunctionLabels[4] = "Chase\nColor"
-			this.FunctionLabels[5] = "Chase\nStatic\nColor"
-			this.FunctionLabels[6] = "Chase\nInvert"
-			this.FunctionLabels[7] = "Chase\nMusic"
-		}
+		setupFunctionLabels(&newSequence, &this)
 
 		// Make functions for each of the sequences.
 		for function := 0; function < 8; function++ {
@@ -649,4 +618,40 @@ func makeStaticButtonsStorage() []common.StaticColorButton {
 	staticButtons = append(staticButtons, staticButton8)
 
 	return staticButtons
+}
+
+// Modify the function key labels.
+func setupFunctionLabels(sequence *common.Sequence, this *buttons.CurrentState) {
+	if sequence.Type == "rgb" {
+		this.FunctionLabels[0] = labels.GetLabel(this.Labels, "RGB Buttons", "Pattern")
+		this.FunctionLabels[1] = labels.GetLabel(this.Labels, "RGB Buttons", "Auto Color")
+		this.FunctionLabels[2] = labels.GetLabel(this.Labels, "RGB Buttons", "Auto Pattern")
+		this.FunctionLabels[3] = labels.GetLabel(this.Labels, "RGB Buttons", "Bounce")
+		this.FunctionLabels[4] = labels.GetLabel(this.Labels, "RGB Buttons", "Chase Color")
+		this.FunctionLabels[5] = labels.GetLabel(this.Labels, "RGB Buttons", "Static Color")
+		this.FunctionLabels[6] = labels.GetLabel(this.Labels, "RGB Buttons", "Invert")
+		this.FunctionLabels[7] = labels.GetLabel(this.Labels, "RGB Buttons", "Music")
+	}
+
+	if sequence.Type == "scanner" && sequence.Label != "chaser" {
+		this.FunctionLabels[0] = labels.GetLabel(this.Labels, "Scanner Buttons", "Pattern")
+		this.FunctionLabels[1] = labels.GetLabel(this.Labels, "Scanner Buttons", "Auto Color")
+		this.FunctionLabels[2] = labels.GetLabel(this.Labels, "Scanner Buttons", "Auto Pattern")
+		this.FunctionLabels[3] = labels.GetLabel(this.Labels, "Scanner Buttons", "Bounce")
+		this.FunctionLabels[4] = labels.GetLabel(this.Labels, "Scanner Buttons", "Color")
+		this.FunctionLabels[5] = labels.GetLabel(this.Labels, "Scanner Buttons", "Gobo")
+		this.FunctionLabels[6] = labels.GetLabel(this.Labels, "Scanner Buttons", "Shutter Chaser")
+		this.FunctionLabels[7] = labels.GetLabel(this.Labels, "Scanner Buttons", "Music")
+	}
+
+	if sequence.Type == "rgb" && sequence.Label == "chaser" {
+		this.FunctionLabels[0] = labels.GetLabel(this.Labels, "Chaser Buttons", "Pattern")
+		this.FunctionLabels[1] = labels.GetLabel(this.Labels, "Chaser Buttons", "Auto Color")
+		this.FunctionLabels[2] = labels.GetLabel(this.Labels, "Chaser Buttons", "Auto Pattern")
+		this.FunctionLabels[3] = labels.GetLabel(this.Labels, "Chaser Buttons", "Bounce")
+		this.FunctionLabels[4] = labels.GetLabel(this.Labels, "Chaser Buttons", "Chase Color")
+		this.FunctionLabels[5] = labels.GetLabel(this.Labels, "Chaser Buttons", "Static Color")
+		this.FunctionLabels[6] = labels.GetLabel(this.Labels, "Chaser Buttons", "Invert")
+		this.FunctionLabels[7] = labels.GetLabel(this.Labels, "Chaser Buttons", "Music")
+	}
 }
