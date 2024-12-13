@@ -31,22 +31,24 @@ import (
 //	description: free text describing the sequence.
 //	group: assignes to one of the top 4 rows of the launchpad. 1-4
 //	type:  rgb, scanner or switch
-func LoadSequences() (sequences *SequencesConfig, err error) {
+func LoadSequences() (sequences *SequencesConfig, numberOfSequences int, err error) {
 	filename := "sequences.yaml"
 
 	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
-		return nil, errors.New("error: loading sequences.yaml file: " + err.Error())
+		return nil, 0, errors.New("error: loading sequences.yaml file: " + err.Error())
 	}
 	data, err := os.ReadFile(filename)
 	if err != nil {
-		return nil, errors.New("error: reading sequences.yaml file: " + err.Error())
+		return nil, 0, errors.New("error: reading sequences.yaml file: " + err.Error())
 	}
 
 	sequences = &SequencesConfig{}
 	err = yaml.Unmarshal(data, sequences)
 	if err != nil {
-		return nil, errors.New("error: unmarshalling sequences config: " + err.Error())
+		return nil, 0, errors.New("error: unmarshalling sequences config: " + err.Error())
 	}
-	return sequences, nil
+	numberOfSequences = len(sequences.Sequences)
+
+	return sequences, numberOfSequences, nil
 }
