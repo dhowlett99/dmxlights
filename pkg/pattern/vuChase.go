@@ -17,6 +17,7 @@
 package pattern
 
 import (
+	"fmt"
 	"math"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
@@ -24,8 +25,8 @@ import (
 )
 
 type MaxMins struct {
-	Max int
 	Min int
+	Max int
 }
 
 func getGroups(patternSize int, numLights int) []MaxMins {
@@ -38,6 +39,9 @@ func getGroups(patternSize int, numLights int) []MaxMins {
 			Max: (i + 1) * width,
 		}
 	}
+	if debug {
+		fmt.Printf("Width %d Groups %d\n", width, groups)
+	}
 
 	return groups
 }
@@ -45,22 +49,16 @@ func getGroups(patternSize int, numLights int) []MaxMins {
 // Generate dynamic chase pattern based on the number of fixtures.
 func generateVuChasePattern(numberOfFixtures int) common.Pattern {
 
+	if debug {
+		fmt.Printf("generateVuChasePattern for fixtures %d\n", numberOfFixtures)
+	}
+
 	// Divide up the fixtures into 8 groups used by this pattern.
 	// groups := numberOfFixtures / 8
 	// maxGroup := groups * numberOfFixtures
 	// fmt.Printf("Number of Groups %d MaxGroup %d\n", groups, maxGroup)
 	patterSize := 8
 	groups := getGroups(patterSize, numberOfFixtures)
-
-	chasePattern := common.Pattern{
-		Name:   "VU.Meter",
-		Label:  "VU.Meter",
-		Number: 7,
-		Steps:  []common.Step{},
-	}
-
-	// We need a step for every fixture in the chase.
-	numberSteps := numberOfFixtures
 
 	// Define fixtures.
 	redFixture := common.Fixture{
@@ -89,6 +87,138 @@ func generateVuChasePattern(numberOfFixtures int) common.Pattern {
 		Color:        colors.Black,
 	}
 
+	chaseSteps := []common.Step{
+		{
+			StepNumber: 0,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: blackFixture,
+				2: blackFixture,
+				3: blackFixture,
+				4: blackFixture,
+				5: blackFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 1,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: blackFixture,
+				3: blackFixture,
+				4: blackFixture,
+				5: blackFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 2,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: blackFixture,
+				4: blackFixture,
+				5: blackFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 3,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: greenFixture,
+				4: blackFixture,
+				5: blackFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 4,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: greenFixture,
+				4: greenFixture,
+				5: blackFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 5,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: greenFixture,
+				4: greenFixture,
+				5: yellowFixture,
+				6: blackFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 6,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: greenFixture,
+				4: greenFixture,
+				5: yellowFixture,
+				6: orangeFixture,
+				7: blackFixture,
+			},
+		},
+		{
+			StepNumber: 7,
+			KeyStep:    false,
+			Fixtures: map[int]common.Fixture{
+				0: greenFixture,
+				1: greenFixture,
+				2: greenFixture,
+				3: greenFixture,
+				4: greenFixture,
+				5: yellowFixture,
+				6: orangeFixture,
+				7: redFixture,
+			},
+		},
+	}
+
+	patternOut := common.Pattern{
+		Name:   "VU.Meter",
+		Label:  "VU.Meter",
+		Number: 7,
+	}
+
+	/// We need a step for every step in the chase pattern.
+	numberSteps := len(chaseSteps)
+
+	if debug {
+		fmt.Printf("Number of Fixtures %d\n", numberOfFixtures)
+		fmt.Printf("Number of Groups %d\n", len(groups))
+		fmt.Printf("Number of Steps %d\n", numberSteps)
+	}
+
+	width := int(math.Floor(float64(numberOfFixtures) / float64(numberSteps)))
+
 	// Populate the steps in the pattern.
 	for stepNumber := 0; stepNumber < numberSteps; stepNumber++ {
 
@@ -98,93 +228,25 @@ func generateVuChasePattern(numberOfFixtures int) common.Pattern {
 		// Make space for fixtures in this step.
 		fixtures := make(map[int]common.Fixture, numberOfFixtures)
 
-		// Populate Fixtures for this step.
-		if stepNumber >= groups[0].Min && stepNumber <= groups[0].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = blackFixture
-			fixtures[2] = blackFixture
-			fixtures[3] = blackFixture
-			fixtures[4] = blackFixture
-			fixtures[5] = blackFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
+		if debug {
+			fmt.Printf("Step number %d\n", stepNumber)
+			fmt.Printf("Group number %d Min=%d Max=%d\n", stepNumber, groups[stepNumber].Min, groups[stepNumber].Max)
 		}
 
-		if stepNumber >= groups[1].Min && stepNumber <= groups[1].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = blackFixture
-			fixtures[3] = blackFixture
-			fixtures[4] = blackFixture
-			fixtures[5] = blackFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
-		}
+		if (stepNumber*width) >= groups[stepNumber].Min && (stepNumber*width) <= groups[stepNumber].Max {
 
-		if stepNumber >= groups[2].Min && stepNumber <= groups[2].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = blackFixture
-			fixtures[4] = blackFixture
-			fixtures[5] = blackFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
-		}
+			if debug {
+				fmt.Printf("\tGroup number %d width %d\n", stepNumber, width)
+			}
 
-		if stepNumber >= groups[3].Min && stepNumber <= groups[3].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = greenFixture
-			fixtures[4] = blackFixture
-			fixtures[5] = blackFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
-		}
-
-		if stepNumber >= groups[4].Min && stepNumber <= groups[4].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = greenFixture
-			fixtures[4] = greenFixture
-			fixtures[5] = blackFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
-		}
-
-		if stepNumber >= groups[5].Min && stepNumber <= groups[5].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = greenFixture
-			fixtures[4] = greenFixture
-			fixtures[5] = yellowFixture
-			fixtures[6] = blackFixture
-			fixtures[7] = blackFixture
-		}
-
-		if stepNumber >= groups[6].Min && stepNumber <= groups[6].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = greenFixture
-			fixtures[4] = greenFixture
-			fixtures[5] = yellowFixture
-			fixtures[6] = orangeFixture
-			fixtures[7] = blackFixture
-		}
-
-		if stepNumber >= groups[7].Min && stepNumber <= groups[7].Max {
-			fixtures[0] = greenFixture
-			fixtures[1] = greenFixture
-			fixtures[2] = greenFixture
-			fixtures[3] = greenFixture
-			fixtures[4] = greenFixture
-			fixtures[5] = yellowFixture
-			fixtures[6] = orangeFixture
-			fixtures[7] = redFixture
+			// Populate Fixtures for this step.
+			for fixtureNumber := 0; fixtureNumber < numberOfFixtures; fixtureNumber++ {
+				patternIndex := int(math.Floor(float64(fixtureNumber) / float64(width)))
+				if debug {
+					fmt.Printf("\tFixture number %d patternIndex %d color %s\n", fixtureNumber, patternIndex, common.GetColorNameByRGB(chaseSteps[stepNumber].Fixtures[patternIndex].Color))
+				}
+				fixtures[fixtureNumber] = chaseSteps[stepNumber].Fixtures[patternIndex]
+			}
 		}
 
 		// Now that all the fixtures have been added.
@@ -192,8 +254,9 @@ func generateVuChasePattern(numberOfFixtures int) common.Pattern {
 		newStep.Fixtures = fixtures
 
 		// Add the step.
-		chasePattern.Steps = append(chasePattern.Steps, newStep)
+		patternOut.Steps = append(patternOut.Steps, newStep)
+
 	}
 
-	return chasePattern
+	return patternOut
 }

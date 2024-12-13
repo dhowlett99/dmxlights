@@ -431,8 +431,6 @@ func hasColor(color color.RGBA) bool {
 // So make sure you also turn off the fixture in the fixture receiver.
 func ApplyFixtureState(patternIn common.Pattern, scannerState map[int]common.FixtureState) common.Pattern {
 
-	debug := false
-
 	generatedSteps := patternIn.Steps
 
 	var patternOut common.Pattern

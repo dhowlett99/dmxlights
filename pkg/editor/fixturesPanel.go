@@ -141,6 +141,15 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 	return data
 }
 
+func generateFixtureNumberOptions(totalNumberOptions int) []string {
+
+	var options []string
+	for x := 0; x < totalNumberOptions; x++ {
+		options = append(options, strconv.Itoa(x))
+	}
+	return options
+}
+
 func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
@@ -153,7 +162,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 
 	// Populate group options from the available sequence labels.
 	fp.GroupOptions = getGroupOptions(groupConfig)
-	fp.NumberOptions = []string{"1", "2", "3", "4", "5", "6", "7", "8"}
+	fp.NumberOptions = generateFixtureNumberOptions(255)
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
 	// Storage for error flags for each fixture.

@@ -34,8 +34,8 @@ func setupNewRGBPattern(sequence *common.Sequence, availablePatterns []common.Pa
 	if debug {
 		fmt.Printf("updateRGBPatterns: Pattern Number %d\n", sequence.SelectedPattern)
 	}
-
-	RGBPattern := position.ApplyFixtureState(availablePatterns[sequence.SelectedPattern], sequence.FixtureState)
+	selectedPattern := availablePatterns[sequence.SelectedPattern]
+	RGBPattern := position.ApplyFixtureState(selectedPattern, sequence.FixtureState)
 	sequence.EnabledNumberFixtures = pattern.GetNumberEnabledScanners(sequence.FixtureState, sequence.NumberFixtures)
 	steps := RGBPattern.Steps
 	sequence.Pattern.Name = RGBPattern.Name

@@ -552,6 +552,11 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 		fmt.Printf("Fixture:%d Set RGB Flood\n", fixtureNumber)
 	}
 
+	if fixtureNumber > 7 {
+		fixtureNumber = fixtureNumber - 8
+		cmd.SequenceNumber = cmd.SequenceNumber + 1
+	}
+
 	// TODO find sequence numbers from config.
 	if cmd.SequenceNumber == 4 {
 		cmd.SequenceNumber = 2
@@ -579,6 +584,11 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 
 	if debug {
 		fmt.Printf("Fixture:%d Set Stop RGB Flood\n", fixtureNumber)
+	}
+
+	if fixtureNumber > 7 {
+		fixtureNumber = fixtureNumber - 8
+		cmd.SequenceNumber = cmd.SequenceNumber + 1
 	}
 
 	// TODO find sequence numbers from config.
@@ -821,12 +831,12 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 
 }
 
+// Now play all the values for this state.
 func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
 
 	if debug {
 		fmt.Printf("playRGB: fixtureNumber %d", fixtureNumber)
 	}
-	// Now play all the values for this state.
 
 	// Play out fixture to DMX channels.
 	fixture := cmd.RGBPosition.Fixtures[fixtureNumber]
@@ -864,6 +874,10 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 			lastColor = MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, fixtureNumber, fixture.Color, 0, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 		} else {
 			if !cmd.Hidden {
+				if fixtureNumber > 7 {
+					fixtureNumber = fixtureNumber - 8
+					cmd.SequenceNumber = cmd.SequenceNumber + 1
+				}
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, fixture.Color, cmd.Master, eventsForLaunchpad, guiButtons)
 			}
 			lastColor = MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, fixtureNumber, fixture.Color, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)

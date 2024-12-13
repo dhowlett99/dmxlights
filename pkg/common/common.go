@@ -276,13 +276,10 @@ type FixtureState struct {
 }
 
 type Pattern struct {
-	Name     string
-	Label    string
-	Number   int
-	Length   int // 8, 4 or 2
-	Size     int
-	Fixtures int    // 8 Fixtures
-	Steps    []Step `json:"-"` // Don't save the steps as they can be very large.
+	Name   string // Pattern Name
+	Label  string // Pattern Label
+	Number int    // Pattern Number
+	Steps  []Step `json:"-"` // Don't save the steps as they can be very large.
 }
 
 type Arg struct {

@@ -66,13 +66,13 @@ func rgbAutoPattern(sequence *common.Sequence, availablePatterns []common.Patter
 		if pattern.Number == sequence.SelectedPattern {
 			sequence.Pattern.Number = patternNumber
 			if debug {
-				fmt.Printf(">>>> I AM PATTEN %d\n", patternNumber)
+				fmt.Printf(">>>> I AM PATTEN %d called %s\n", patternNumber, pattern.Name)
 			}
 			break
 		}
 	}
 	sequence.SelectedPattern++
-	if sequence.SelectedPattern > len(availablePatterns) {
+	if sequence.SelectedPattern >= len(availablePatterns) {
 		sequence.SelectedPattern = 0
 	}
 
