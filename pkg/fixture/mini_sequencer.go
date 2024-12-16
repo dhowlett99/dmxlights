@@ -36,6 +36,7 @@ import (
 
 const debug_mini bool = false
 const debug_override bool = false
+const debug_rotate bool = false
 
 const FADE_SHARP int = 10
 const FADE_NORMAL int = 5
@@ -524,6 +525,10 @@ func newMiniSequencer(fixture *Fixture,
 
 			if cfg.Rotatable {
 
+				if debug_rotate {
+					fmt.Printf("Fixture %s is rotatable\n", fixture.Name)
+				}
+
 				rotateChannel, err := FindChannelNumberByName(fixture, "Rotate")
 				if err != nil {
 					fmt.Printf("rotator: %s,", err)
@@ -532,6 +537,11 @@ func newMiniSequencer(fixture *Fixture,
 				if err != nil {
 					fmt.Printf("master: %s,", err)
 					return
+				}
+
+				if debug_rotate {
+					fmt.Printf("rotateChannel %d masterChannel %d cfg.RotateSpeed %d\n", rotateChannel, masterChannel, cfg.RotateSpeed)
+					fmt.Printf("cfg.ForwardSpeed %d, cfg.ReverseSpeed %d \n", cfg.ForwardSpeed, cfg.ReverseSpeed)
 				}
 
 				// Consume any left over stop commands before starting.
@@ -593,7 +603,7 @@ func newMiniSequencer(fixture *Fixture,
 				}
 
 				if override.RotateSpeed != 0 {
-					if debug_mini {
+					if debug_rotate {
 						fmt.Printf("Override is set so Rotate Speed is %d\n", override.RotateSpeed)
 					}
 					// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
@@ -643,6 +653,9 @@ func newMiniSequencer(fixture *Fixture,
 						}
 
 						if cfg.AutoRotate {
+							if debug_rotate {
+								fmt.Printf("AutoRotate is on\n")
+							}
 							if rotateCounter < (cfg.RotateSensitivity / 2) {
 								// Clockwise Speed.
 								cfg.RotateSpeed = cfg.ForwardSpeed
@@ -718,7 +731,7 @@ func newMiniSequencer(fixture *Fixture,
 						if cmd.Action == common.UpdateRotateSpeed {
 							const ROTATE_SPEED = 0
 							override.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
-							if debug_override {
+							if debug_override || debug_rotate {
 								fmt.Printf("Override Speed Index=%d\n", override.RotateSpeed)
 							}
 							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
@@ -996,19 +1009,28 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	if strings.Contains(config.RotateName, "Off") {
 		config.Rotatable = false
 		config.AutoRotate = false
+		config.Forward = false
+		config.Reverse = false
 	}
 
 	if strings.Contains(config.RotateName, "Forward") {
 		config.Rotatable = true
 		config.AutoRotate = false
+		config.Forward = true
+		config.Reverse = false
 	}
 
 	if strings.Contains(config.RotateName, "Reverse") {
 		config.Rotatable = true
 		config.AutoRotate = false
+		config.Forward = false
+		config.Reverse = true
 	}
 	if strings.Contains(config.RotateName, "Auto") {
 		config.Rotatable = true
+		config.AutoRotate = true
+		config.Forward = false
+		config.Reverse = false
 		if isThisAChannel(*fixture, "Rotate") {
 			config.Rotatable = true
 		} else {
@@ -1026,7 +1048,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		if err != nil {
 			fmt.Printf("Looking for channel:Rotate and Setting:Forward %s\n", err)
 		}
-		if debug {
+		if debug_rotate {
 			fmt.Printf("RotateName%s\n", config.RotateName)
 			fmt.Printf("Forward Speed %d\n", config.ForwardSpeed)
 			fmt.Printf("Reverse Speed %d\n", config.ReverseSpeed)
@@ -1041,6 +1063,9 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		}
 		if config.Reverse {
 			config.RotateSpeed = config.ReverseSpeed
+		}
+		if debug_rotate {
+			fmt.Printf("RotateSpeed %d\n", config.RotateSpeed)
 		}
 	}
 
