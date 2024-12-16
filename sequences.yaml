@@ -1,7 +1,7 @@
 sequences:
 - name: sequence0
   label: foh
-  description: Front of House Main Par Cans
+  description: Front of House
   group: 1
   type: rgb
 - name: sequence1

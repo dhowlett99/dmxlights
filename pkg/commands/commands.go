@@ -19,8 +19,10 @@ package commands
 
 import (
 	"fmt"
+	"image/color"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -73,12 +75,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Remove the hidden flag.
 		sequence.Hidden = false
 		// Clear the sequence colors.
-		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = common.HowManyColorsInSteps(sequence.Pattern.Steps)
-		sequence.CurrentColors = []common.Color{}
+		sequence.UpdateColors = false
 		// Reset the speed back to the default.
 		sequence.Speed = common.DEFAULT_SPEED
-		sequence.CurrentSpeed = SetSpeed(common.DEFAULT_SPEED)
+		sequence.CurrentSpeed = common.SetSpeed(common.DEFAULT_SPEED)
 		// Stop the strobe mode.
 		sequence.Strobe = false
 		sequence.StrobeSpeed = common.DEFAULT_STROBE_SPEED
@@ -124,9 +124,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.ScannerSize = common.DEFAULT_SCANNER_SIZE
 			sequence.ScannerShift = common.DEFAULT_SCANNER_SHIFT
 			// Reset the scanner pattern back to default.
-			sequence.UpdateSequenceColor = false
+			sequence.UpdateColors = false
 			sequence.RecoverSequenceColors = false
-			sequence.UpdatePattern = true
+			sequence.StartPattern = true
 			sequence.SelectedPattern = common.DEFAULT_PATTERN
 		}
 		// Clear all the function buttons for this sequence.
@@ -150,6 +150,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			for switchNumber := 0; switchNumber < len(sequence.Switches); switchNumber++ {
 				newSwitch := common.Switch{}
 				newSwitch.CurrentPosition = 0
+				newSwitch.Selected = false
+				newOverride := common.Override{}
+				// Default overrides set here.
+				newOverride.Speed = 0
+				newOverride.Shift = 0
+				newOverride.Size = 0
+				newOverride.Fade = 0
+				newSwitch.Override = newOverride
 				newSwitch.Description = sequence.Switches[switchNumber].Description
 				newSwitch.Fixture = sequence.Switches[switchNumber].Fixture
 				newSwitch.Label = sequence.Switches[switchNumber].Label
@@ -159,7 +167,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
 				sequence.Switches[switchNumber] = newSwitch
 			}
+			sequence.PlaySingleSwitch = false
 			sequence.PlaySwitchOnce = true
+			sequence.StepSwitch = true
+			sequence.FocusSwitch = false
 		}
 		return sequence
 
@@ -191,17 +202,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Update %s to %d\n", mySequenceNumber, command.Args[SPEED].Name, command.Args[SPEED].Value)
 		}
 		sequence.Speed = command.Args[SPEED].Value.(int)
-		sequence.CurrentSpeed = SetSpeed(command.Args[SPEED].Value.(int))
+		sequence.CurrentSpeed = common.SetSpeed(command.Args[SPEED].Value.(int))
 		return sequence
 
 	case common.UpdatePattern:
 		const PATTEN_NUMBER = 0
 		if debug {
-			fmt.Printf("%d: Command Update Scanner Patten to %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
+			fmt.Printf("%d: Command Update Pattern to number %d\n", mySequenceNumber, command.Args[PATTEN_NUMBER].Value)
 		}
-		sequence.UpdateSequenceColor = false
+		sequence.UpdateColors = false
 		sequence.RecoverSequenceColors = false
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
+		sequence.NewPattern = true
 		sequence.SelectedPattern = command.Args[PATTEN_NUMBER].Value.(int)
 		return sequence
 
@@ -249,11 +261,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.UpdateRGBSize:
-		const START = 0
+		const SIZE = 0
 		if debug {
-			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[START].Value)
+			fmt.Printf("%d: Command Update Size to %d\n", mySequenceNumber, command.Args[SIZE].Value)
 		}
-		sequence.RGBSize = getSize(command.Args[START].Value.(int))
+		sequence.RGBSize = common.GetSize(command.Args[SIZE].Value.(int))
 		return sequence
 
 	case common.UpdateScannerSize:
@@ -272,20 +284,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.RGBFade = command.Args[FADE_SPEED].Value.(int)
 		return sequence
 
-	case common.UpdateColor:
-		const COLOR = 0
-		if debug {
-			fmt.Printf("%d: Command Update Color to %d\n", mySequenceNumber, command.Args[COLOR].Value)
-		}
-		sequence.Color = command.Args[COLOR].Value.(int)
-		return sequence
-
 	case common.Start:
 		if debug {
 			fmt.Printf("%d: Command Start\n", mySequenceNumber)
 		}
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.Static = false
+		sequence.StartPattern = true
 		sequence.Run = true
 		return sequence
 
@@ -294,8 +299,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command StartChase\n", mySequenceNumber)
 		}
 		sequence.ScannerChaser = true
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.Static = false
+		sequence.StartPattern = true
 		sequence.Run = true
 		return sequence
 
@@ -304,7 +310,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			fmt.Printf("%d: Command Stop Chase\n", mySequenceNumber)
 		}
 		sequence.ScannerChaser = false
-		sequence.Mode = "Sequence"
+		sequence.Chase = false
 		sequence.Static = false
 		sequence.Run = false
 		return sequence
@@ -407,6 +413,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = false
 		sequence.Blackout = false
+		sequence.MasterChanging = true
 		return sequence
 
 	case common.UpdateBounce:
@@ -453,13 +460,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update All Static Colors\n", mySequenceNumber)
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
-			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(color.RGBA))
 			fmt.Printf("Lamp Flash   %+v\n", command.Args[STATIC_FIXTURE_FLASH].Value.(bool))
 		}
 		// Set fixtures.
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
 			sequence.StaticColors[fixture].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
-			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+			sequence.StaticColors[fixture].Color = command.Args[STATIC_COLOR].Value.(color.RGBA)
 			sequence.StaticColors[fixture].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
@@ -477,7 +484,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const STATIC_COLOR = 4          // Color
 		if debug {
 			fmt.Printf("%d: Command Update Static Color\n", mySequenceNumber)
-			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(common.Color))
+			fmt.Printf("Lamp Color   %+v\n", command.Args[STATIC_COLOR].Value.(color.RGBA))
 			fmt.Printf("Selected Color:%d Flash:%t\n", command.Args[STATIC_SELECTED_COLOR].Value, command.Args[STATIC_FIXTURE_FLASH].Value)
 		}
 		sequence.StaticFadeUpOnce = false // We don't want to fade as we set colors.
@@ -489,36 +496,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.StaticColors[fixture].Flash = false
 		}
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].SelectedColor = command.Args[STATIC_SELECTED_COLOR].Value.(int)
-		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(common.Color)
+		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Color = command.Args[STATIC_COLOR].Value.(color.RGBA)
 		sequence.StaticColors[command.Args[STATIC_FIXTURE_NUMBER].Value.(int)].Flash = command.Args[STATIC_FIXTURE_FLASH].Value.(bool)
-		return sequence
-
-	case common.UpdateASingeSequenceColor:
-		const SELECTED_X = 0
-		const SELECTED_Y = 1
-
-		X := command.Args[SELECTED_X].Value.(int)
-		Y := command.Args[SELECTED_Y].Value.(int)
-
-		newColor := common.GetColor(X, Y)
-		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to X:%d Y:%d Name:%s \n", mySequenceNumber, command.Args[SELECTED_X].Value, command.Args[SELECTED_Y].Value, newColor.Name)
-		}
-
-		sequence.SequenceColors = append(sequence.SequenceColors, newColor.Color)
-		sequence.UpdateSequenceColor = true
-		sequence.SaveColors = true
-
 		return sequence
 
 	case common.UpdateSequenceColors:
 		const COLORS = 0
 		if debug {
-			fmt.Printf("%d: Command Update Sequence Color to %+v\n", mySequenceNumber, command.Args[COLORS].Value)
+			fmt.Printf("%d: Command Update Sequence Color Type %s to %+v\n", mySequenceNumber, sequence.Type, command.Args[COLORS].Value)
 		}
 
-		sequence.SequenceColors = command.Args[COLORS].Value.([]common.Color)
-		sequence.UpdateSequenceColor = true
+		sequence.SequenceColors = command.Args[COLORS].Value.([]color.RGBA)
+		sequence.UpdateColors = true
 		sequence.SaveColors = true
 
 		return sequence
@@ -526,20 +515,23 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	case common.UpdateScannerColor:
 		const SELECTED_COLOR = 0
 		const FIXTURE_NUMBER = 1
-		if debug {
-			fmt.Printf("%d: Command Update Scanner Color for fixture %d to %d\n", mySequenceNumber, command.Args[FIXTURE_NUMBER].Value, command.Args[SELECTED_COLOR].Value)
-		}
 		sequence.SaveColors = true
-		sequence.ScannerColor[command.Args[FIXTURE_NUMBER].Value.(int)] = command.Args[SELECTED_COLOR].Value.(int)
-		return sequence
+		selectedColor := command.Args[SELECTED_COLOR].Value.(int)
+		selectedScanner := command.Args[FIXTURE_NUMBER].Value.(int)
 
-	case common.ClearSequenceColor:
+		// Update Color for this scanner.
+		sequence.ScannerColor[selectedScanner] = selectedColor
+
+		// Clear out existing sequemce colors.
+		sequence.SequenceColors = []color.RGBA{}
+
+		// Look through the scanners and find their current color.
+		// We set sequence colors so the color display shows the correct colors for the scanners.
+		sequence.SequenceColors = fixture.HowManyScannerColors(&sequence, fixturesConfig)
+
 		if debug {
-			fmt.Printf("%d: Command Clear Sequence Color \n", mySequenceNumber)
+			fmt.Printf("%d: Command Update Scanner Colors for fixture %d to %d final colors %+v\n", mySequenceNumber, selectedScanner, selectedColor, sequence.SequenceColors)
 		}
-		sequence.UpdateSequenceColor = false
-		sequence.SequenceColors = []common.Color{}
-		sequence.CurrentColors = []common.Color{}
 		return sequence
 
 	case common.ClearStaticColor:
@@ -613,12 +605,192 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySingleSwitch = false
 		return sequence
 
+	case common.OverrideSpeed:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_SPEED = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchSpeed := command.Args[SWITCH_SPEED].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchSpeed)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSwitchSelected = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideSpeed = true
+		sequence.Switches[switchNumber].Override.Speed = switchSpeed
+
+		return sequence
+
+	case common.OverrideShift:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_SHIFT = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchShift := command.Args[SWITCH_SHIFT].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Shift %d\n", mySequenceNumber, switchNumber, switchPosition, switchShift)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideShift = true
+		sequence.Switches[switchNumber].Override.Shift = switchShift
+
+		return sequence
+
+	case common.OverrideSize:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_SIZE = 2 // Integer
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchSize := command.Args[SWITCH_SIZE].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Size %d\n", mySequenceNumber, switchNumber, switchPosition, switchSize)
+		}
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideSize = true
+		sequence.Switches[switchNumber].Override.Size = switchSize
+
+		return sequence
+
+	case common.OverrideFade:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_FADE = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchFade := command.Args[SWITCH_FADE].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Fade %d\n", mySequenceNumber, switchNumber, switchPosition, switchFade)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSwitchSelected = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideFade = true
+		sequence.Switches[switchNumber].Override.Fade = switchFade
+
+		return sequence
+
+	case common.OverrideRotateSpeed:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_ROTATE_SPEED = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchRotateSpeed := command.Args[SWITCH_ROTATE_SPEED].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Rotate Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchRotateSpeed)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideRotateSpeed = true
+		sequence.Switches[switchNumber].Override.RotateSpeed = switchRotateSpeed
+
+		return sequence
+
+	case common.OverrideColor:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_COLOR = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchColor := command.Args[SWITCH_COLOR].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Color %d\n", mySequenceNumber, switchNumber, switchPosition, switchColor)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSwitchSelected = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideColors = true
+		sequence.Switches[switchNumber].Override.Color = switchColor
+
+		return sequence
+
+	case common.OverrideGobo:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_GOBO = 2 // Integer
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchGobo := command.Args[SWITCH_GOBO].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Gobo %d\n", mySequenceNumber, switchNumber, switchPosition, switchGobo)
+		}
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSwitchSelected = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideGobo = true
+		sequence.Switches[switchNumber].Override.Gobo = switchGobo
+
+		// // Set the gobo name.
+		// useFixture, _ := fixture.FindFixtureByGroupAndNumber(mySequenceNumber, switchNumber, fixturesConfig)
+		// sequence.Switches[switchNumber].Override.GoboName = fixture.FindGoboNameByNumber(useFixture, switchGobo)
+
+		return sequence
+
 	// Update the named switch position for the current sequence.
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer
 		const SWITCH_POSITION = 1 // Integer
+		const SWITCH_STEP = 2     // Boolean,
+		const SWITCH_FOCUS = 3    // Boolean, true to focus switch, full brighness. false to defocue dim button.
 		if debug {
-			fmt.Printf("%d: Command Update Switch %d to Position %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[SWITCH_POSITION].Value)
+			fmt.Printf("%d: Command Update Switch %d to Position %d Step %t Focus %t\n",
+				mySequenceNumber,
+				command.Args[SWITCH_NUMBER].Value,
+				command.Args[SWITCH_POSITION].Value,
+				command.Args[SWITCH_STEP].Value, command.Args[SWITCH_FOCUS].Value)
 		}
 
 		// Loop through all the switchies. and reset their current state back to 0.
@@ -634,10 +806,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		newSwitch.Number = sequence.Switches[switchNumber].Number
 		newSwitch.States = sequence.Switches[switchNumber].States
 		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
+		// Since this is switch being set directly we should use the values from the config.
+		// So reset the overrides. Also done in the button copy of overrides.
+		sequence.Switches[switchNumber].Override = common.Override{}
+		newSwitch.Override = sequence.Switches[switchNumber].Override
+		newSwitch.Selected = command.Args[SWITCH_FOCUS].Value.(bool)
 		sequence.Switches[switchNumber] = newSwitch
 		sequence.CurrentSwitch = command.Args[SWITCH_NUMBER].Value.(int)
 		sequence.PlaySwitchOnce = true
 		sequence.PlaySingleSwitch = true
+		sequence.StepSwitch = command.Args[SWITCH_STEP].Value.(bool)
+		sequence.FocusSwitch = command.Args[SWITCH_FOCUS].Value.(bool)
 		sequence.Run = false
 		sequence.Type = "switch"
 		sequence.MasterChanging = false
@@ -663,13 +842,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			newScannerState.ScannerPatternReversed = command.Args[FIXTURE_SCANNER_REVERSED].Value.(bool)
 			sequence.FixtureState[command.Args[FIXTURE_NUMBER].Value.(int)] = newScannerState
 		}
-
-		// When we disable a fixture we send a off command to the shutter to make it go off.
-		// We only want to do this once to avoid flooding the universe with DMX commands.
-		sequence.DisableOnceMutex.Lock()
-		sequence.DisableOnce[command.Args[FIXTURE_NUMBER].Value.(int)] = true
-		sequence.DisableOnceMutex.Unlock()
-		// it will be the fixtures resposiblity to unset this when it's played the stop command.
 
 		return sequence
 
@@ -764,7 +936,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.MusicTrigger = command.Args[STATE].Value.(bool)
 		sequence.Run = true
-		sequence.Mode = "Sequence"
+		sequence.Chase = true
 		sequence.ScannerChaser = false
 		if sequence.Label == "chaser" && sequence.Run {
 			sequence.ScannerChaser = true
@@ -772,7 +944,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if sequence.Type == "scanner" && sequence.Label != "chaser" && sequence.Run {
 			sequence.ScannerChaser = false
 		}
-		sequence.UpdatePattern = true
+		sequence.StartPattern = true
 		sequence.Static = false
 		sequence.PlayStaticOnce = false
 		sequence.ChangeMusicTrigger = true
@@ -799,9 +971,17 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
+				// Save run state.
+				sequence.SavedRun = seq.Run
+				// Don't start until everything is ready.
+				sequence.Run = false
 				// Don't assume we're blacked out.
 				sequence.Blackout = false
 				sequence.StaticFadeUpOnce = true
+				// Because steps are not stored in the config file. UpdatePattern generates the steps.
+				sequence.StartPattern = true
+				// Restore any sequenceColors.
+				sequence.UpdateColors = true
 				return sequence
 			}
 		}
@@ -814,7 +994,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		fixturesConfig = command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures)
 
 		// Find the fixtures.
-		sequence.ScannersAvailable = SetAvalableFixtures(fixturesConfig)
+		sequence.ScannersAvailable = SetAvalableFixtures(mySequenceNumber, fixturesConfig)
 
 		// Find the number of fixtures for this sequence.
 		if sequence.Label == "chaser" {
@@ -849,58 +1029,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	return sequence
 }
 
-// Used to convert a speed to a millisecond time.
-func SetSpeed(commandSpeed int) (Speed time.Duration) {
-	if commandSpeed == 0 {
-		Speed = 3500
-	}
-	if commandSpeed == 1 {
-		Speed = 3000
-	}
-	if commandSpeed == 2 {
-		Speed = 2500
-	}
-	if commandSpeed == 3 {
-		Speed = 1800
-	}
-	if commandSpeed == 4 {
-		Speed = 1500
-	}
-	if commandSpeed == 5 {
-		Speed = 1000
-	}
-	if commandSpeed == 6 {
-		Speed = 750
-	}
-	if commandSpeed == 7 {
-		Speed = 500
-	}
-	if commandSpeed == 8 {
-		Speed = 250
-	}
-	if commandSpeed == 9 {
-		Speed = 150
-	}
-	if commandSpeed == 10 {
-		Speed = 125
-	}
-	if commandSpeed == 11 {
-		Speed = 100
-	}
-	if commandSpeed == 12 {
-		Speed = 75
-	}
-	return Speed * time.Millisecond
-}
-
-func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) map[int]common.Switch {
+func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtures) []common.Switch {
 
 	if debug {
 		fmt.Printf("Load switch data\n")
 	}
 
 	// A new group of switches.
-	newSwitchList := make(map[int]common.Switch)
+	newSwitchList := make([]common.Switch, 8)
 
 	switchNumber := 0
 
@@ -976,46 +1112,20 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 	return newSwitchList
 }
 
-func getSize(size int) int {
-
-	switch size {
-	case 1:
-		return 1
-	case 2:
-		return 5
-	case 3:
-		return 15
-	case 4:
-		return 25
-	case 5:
-		return 35
-	case 6:
-		return 45
-	case 7:
-		return 55
-	case 8:
-		return 65
-	case 9:
-		return 75
-	case 10:
-		return 85
-	}
-	return 0
-}
-
-func SetAvalableFixtures(fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
+func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) []common.StaticColorButton {
 
 	// You need to select a fixture before you can choose a color or gobo.
 	// availableFixtures holds a set of red buttons, one for every available fixture.
 	availableFixtures := []common.StaticColorButton{}
-	for _, fixture := range fixturesConfig.Fixtures {
-		if fixture.Type == "scanner" {
+	for _, f := range fixturesConfig.Fixtures {
+		if f.Type == "scanner" {
 			newFixture := common.StaticColorButton{}
-			newFixture.Name = fixture.Name
-			newFixture.Label = fixture.Label
-			newFixture.Number = fixture.Number
+			newFixture.Name = f.Name
+			newFixture.Label = f.Label
+			newFixture.Number = f.Number
 			newFixture.SelectedColor = 1 // Red
-			newFixture.Color = common.Color{R: 255, G: 0, B: 0}
+			newFixture.Color = colors.Red
+			//newFixture.NumberOfGobos = fixture.HowManyGobosForThisFixture(f.Number, sequenceNumber, fixturesConfig)
 			availableFixtures = append(availableFixtures, newFixture)
 		}
 	}
@@ -1035,7 +1145,9 @@ func GetNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 		if fixture.Group-1 == sequenceNumber {
 			// config has use_channels set.
 			if fixture.MultiFixtureDevice {
-				fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				if debug {
+					fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
+				}
 				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
 				// we always return the max channels in a sequence, currently 8
 				return common.MAX_NUMBER_OF_CHANNELS
