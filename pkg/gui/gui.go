@@ -710,6 +710,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 	return toolbar
 }
 
+// Open file.
 func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, this *buttons.CurrentState) {
 	fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 		if err == nil && reader != nil {

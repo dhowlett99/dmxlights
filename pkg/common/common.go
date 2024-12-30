@@ -325,6 +325,7 @@ const (
 	UpdateScannerSize
 	Blackout
 	Normal
+	LoadNewFixtures
 	UpdateFunctions
 	GetUpdatedSequence
 	ResetAllSwitchPositions
@@ -426,6 +427,7 @@ type Sequence struct {
 	SaveChase                   bool                        // Save the state of chase in flood.
 	StaticColors                []StaticColorButton         // Used in static color editing
 	Clear                       bool                        // Clear all fixtures in this sequence.
+	LoadNewFixtures             bool                        // Load all fixtures for this sequence.
 	Static                      bool                        // We're a static sequence.
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
@@ -510,6 +512,8 @@ type Step struct {
 }
 
 type FixtureCommand struct {
+	Stop bool
+
 	Step           int
 	NumberSteps    int
 	Type           string

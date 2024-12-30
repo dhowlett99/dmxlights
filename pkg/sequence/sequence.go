@@ -45,7 +45,7 @@ type SequenceConfig struct {
 
 // Now the sequence has been created, this functions starts the sequence.
 func PlaySequence(sequence common.Sequence,
-	eventsForLauchpad chan common.ALight,
+	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
 	fixturesConfig *fixture.Fixtures,
@@ -56,17 +56,9 @@ func PlaySequence(sequence common.Sequence,
 
 	var steps []common.Step
 
-	// Create channels used for stepping the fixture threads for this sequnece.
+	// Create new set of fixtures.
 	fixtureStepChannels := []chan common.FixtureCommand{}
-	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-		fixtureStepChannel := make(chan common.FixtureCommand)
-		fixtureStepChannels = append(fixtureStepChannels, fixtureStepChannel)
-	}
-
-	// Create a fixture thread for each fixture.
-	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-		go fixture.FixtureReceiver(fixtureNumber, fixtureStepChannels[fixtureNumber], eventsForLauchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-	}
+	sequence.LoadNewFixtures = true
 
 	// So this is the outer loop where sequence waits for commands and processes them if we're not playing a sequence.
 	// i.e the sequence is in STOP mode and this is the way we change the RUN flag to START a sequence again.
@@ -78,7 +70,7 @@ func PlaySequence(sequence common.Sequence,
 		}
 
 		// Process any commands.
-		processCommands(sequence.Number, &sequence, channels, fixtureStepChannels, eventsForLauchpad, guiButtons)
+		fixtureStepChannels = processCommands(&sequence, channels, switchChannels, fixtureStepChannels, soundConfig, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController, dmxInterfacePresent)
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase && sequence.Run && !sequence.Static && !sequence.StartFlood {

@@ -69,5 +69,6 @@ deploy: installer
 	cp groups.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
+	cp labels.yaml dmxlights.app/Contents/Resources/
 	cp *.json dmxlights.app/Contents/Resources/
 

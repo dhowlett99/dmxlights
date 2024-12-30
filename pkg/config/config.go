@@ -27,7 +27,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func SaveConfig(config []common.Sequence, filename string) {
+func SaveConfigToFile(config []common.Sequence, filename string) {
 
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
@@ -41,7 +41,7 @@ func SaveConfig(config []common.Sequence, filename string) {
 	}
 }
 
-func LoadConfig(filename string) []common.Sequence {
+func LoadConfigFromFile(filename string) []common.Sequence {
 
 	config := []common.Sequence{}
 
@@ -92,7 +92,7 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 		}
 
 		// Write to config file.
-		SaveConfig(config, fmt.Sprintf("config%d.%d.json", X, Y))
+		SaveConfigToFile(config, fmt.Sprintf("config%d.%d.json", X, Y))
 	}()
 
 	// Ask for all the sequencers for their config.

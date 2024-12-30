@@ -20,34 +20,46 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/sound"
+	"github.com/oliread/usbdmx/ft232"
 )
 
-func processCommands(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
+func processCommands(sequence *common.Sequence, channels common.Channels, switchChannels []common.SwitchChannel, fixtureStepChannels []chan common.FixtureCommand, soundConfig *sound.SoundConfig, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) []chan common.FixtureCommand {
+
+	// Load new set of fixtures and setup fixture threads and channels to those fixtures.
+	if sequence.LoadNewFixtures {
+
+		if debug {
+			fmt.Printf("%d: Load New Fixtures\n", sequence.Number)
+		}
+		fixtureStepChannels = LoadNewFixtures(sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+	}
 
 	// Clear all fixtures.
 	if sequence.Clear {
 		if debug {
-			fmt.Printf("%d: Clear\n", mySequenceNumber)
+			fmt.Printf("%d: Clear\n", sequence.Number)
 		}
-		clearSequence(mySequenceNumber, sequence, fixtureStepChannels)
+		clearSequence(sequence.Number, sequence, fixtureStepChannels)
 		sequence.Clear = false
 	}
 
 	// Show all switches.
 	if sequence.PlaySwitchOnce && !sequence.PlaySingleSwitch && !sequence.Override && sequence.Type == "switch" {
 		if debug {
-			fmt.Printf("%d: Show All Switches\n", mySequenceNumber)
+			fmt.Printf("%d: Show All Switches\n", sequence.Number)
 		}
-		showAllSwitches(mySequenceNumber, sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
+		showAllSwitches(sequence.Number, sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons)
 		sequence.PlaySwitchOnce = false
 	}
 
 	// Show the selected switch.
 	if sequence.PlaySwitchOnce && sequence.PlaySingleSwitch && !sequence.Override && sequence.Type == "switch" {
 		if debug {
-			fmt.Printf("%d: Show Single Switch\n", mySequenceNumber)
+			fmt.Printf("%d: Show Single Switch\n", sequence.Number)
 		}
-		showSelectedSwitch(mySequenceNumber, sequence, fixtureStepChannels, eventsForLauchpad, guiButtons)
+		showSelectedSwitch(sequence.Number, sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons)
 		sequence.PlaySwitchOnce = false
 		sequence.PlaySingleSwitch = false
 	}
@@ -55,7 +67,7 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Override the selected switch.
 	if sequence.PlaySwitchOnce && sequence.Override && sequence.Type == "switch" {
 		if debug {
-			fmt.Printf("%d: Override Single Switch=%d Override=%+v\n", mySequenceNumber, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override)
+			fmt.Printf("%d: Override Single Switch=%d Override=%+v\n", sequence.Number, sequence.CurrentSwitch, sequence.Switches[sequence.CurrentSwitch].Override)
 		}
 
 		// Get switch data variables setup.
@@ -83,9 +95,9 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Start flood.
 	if sequence.StartFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 		if debug {
-			fmt.Printf("%d: Start Flood\n", mySequenceNumber)
+			fmt.Printf("%d: Start Flood\n", sequence.Number)
 		}
-		startFlood(mySequenceNumber, sequence, fixtureStepChannels)
+		startFlood(sequence.Number, sequence, fixtureStepChannels)
 		if sequence.Chase {
 			sequence.SaveChase = true
 		}
@@ -97,13 +109,13 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Stop flood.
 	if sequence.StopFlood && sequence.FloodPlayOnce && sequence.Type != "switch" {
 		if debug {
-			fmt.Printf("%d: Stop Flood\n", mySequenceNumber)
+			fmt.Printf("%d: Stop Flood\n", sequence.Number)
 		}
 		if sequence.SaveChase {
 			sequence.SaveChase = false
 			sequence.Chase = true
 		}
-		stopFlood(mySequenceNumber, sequence, fixtureStepChannels)
+		stopFlood(sequence.Number, sequence, fixtureStepChannels)
 		sequence.StopFlood = false
 		sequence.FloodPlayOnce = false
 	}
@@ -111,18 +123,20 @@ func processCommands(mySequenceNumber int, sequence *common.Sequence, channels c
 	// Sequence in static mode.
 	if sequence.PlayStaticOnce && sequence.Static && !sequence.StartFlood && sequence.Type != "switch" {
 		if debug {
-			fmt.Printf("%d: Start Static\n", mySequenceNumber)
+			fmt.Printf("%d: Start Static\n", sequence.Number)
 		}
-		startStatic(mySequenceNumber, sequence, channels, fixtureStepChannels)
+		startStatic(sequence.Number, sequence, channels, fixtureStepChannels)
 		sequence.PlayStaticOnce = false
 	}
 
 	// Turn static mode off.
 	if sequence.PlayStaticOnce && !sequence.Static && !sequence.StartFlood && sequence.Type != "switch" && !sequence.Run {
 		if debug {
-			fmt.Printf("%d: Stop Static\n", mySequenceNumber)
+			fmt.Printf("%d: Stop Static\n", sequence.Number)
 		}
-		stopStatic(mySequenceNumber, sequence, channels, fixtureStepChannels)
+		stopStatic(sequence.Number, sequence, channels, fixtureStepChannels)
 		sequence.PlayStaticOnce = false
 	}
+
+	return fixtureStepChannels
 }

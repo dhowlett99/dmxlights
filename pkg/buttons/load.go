@@ -82,14 +82,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		// Play out this sequence.
 		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
-		// Now start any thing that needs to run.
-		if sequences[sequenceNumber].SavedRun {
-			cmd := common.Command{
-				Action: common.Start,
-			}
-			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-		}
-
 		// Restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
 		this.RGBShift[sequenceNumber] = sequences[sequenceNumber].RGBShift
@@ -122,11 +114,6 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
-		}
-
-		// Reload the fixture state.
-		for fixtureNumber := 0; fixtureNumber < sequences[sequenceNumber].NumberFixtures; fixtureNumber++ {
-			this.FixtureState[sequenceNumber][fixtureNumber] = sequences[sequenceNumber].FixtureState[fixtureNumber]
 		}
 
 		// Restore the functions states from the sequence.
@@ -193,6 +180,21 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 			}
 			deFocusAllSwitches(this, sequences, commandChannels)
 		}
+
+		// Reload Fixtures including state.
+		cmd := common.Command{
+			Action: common.LoadNewFixtures,
+		}
+		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+		// Now start any thing that needs to run.
+		if sequences[sequenceNumber].SavedRun {
+			cmd := common.Command{
+				Action: common.Start,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+		}
+
 		if debug {
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}

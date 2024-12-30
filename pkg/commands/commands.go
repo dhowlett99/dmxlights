@@ -967,7 +967,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		x := command.Args[X].Value.(int)
 		y := command.Args[Y].Value.(int)
-		config := config.LoadConfig(fmt.Sprintf("config%d.%d.json", x, y))
+		config := config.LoadConfigFromFile(fmt.Sprintf("config%d.%d.json", x, y))
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq
@@ -1023,6 +1023,13 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.ScannerGobo[x] = 1
 		}
 
+		return sequence
+
+	case common.LoadNewFixtures:
+		if debug {
+			fmt.Printf("%d: Command Load New Fixures\n", mySequenceNumber)
+		}
+		sequence.LoadNewFixtures = true
 		return sequence
 	}
 

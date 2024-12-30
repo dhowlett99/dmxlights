@@ -408,6 +408,14 @@ func FixtureReceiver(
 		// Wait for first step
 		cmd := <-fixtureStepChannel
 
+		// Stop fixture channel.
+		if cmd.Stop {
+			if debug {
+				fmt.Printf("Fixture %d Stopping\n", myFixtureNumber)
+			}
+			break
+		}
+
 		if cmd.Blackout {
 			// Soft fade downs should be disabled for blackout.
 			lastColor.RGBColor = cmd.LastColor
