@@ -1,6 +1,7 @@
 // Copyright (C) 2022,2023 dhowlett99.
 // This is the dmxlights main sequencer responsible for controlling all
-// of the fixtures in a group.
+// of the fixtures in a group. This file holds the code for creating
+// a new sequence.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -28,7 +29,8 @@ import (
 
 // Before a sequence can run it needs to be created.
 // Assigns default values for all types of sequence.
-func CreateSequence(
+// Returns a sequence of type common.Sequence.
+func NewSequence(
 	sequenceType string,
 	sequenceLabel string,
 	mySequenceNumber int,

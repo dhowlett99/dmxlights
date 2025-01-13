@@ -314,7 +314,7 @@ const (
 	Stop
 	StopChase
 	ReadConfig
-	LoadConfig
+	LoadPreset
 	UpdateSpeed
 	UpdatePattern
 	UpdateRGBFadeSpeed
@@ -418,6 +418,7 @@ type Sequence struct {
 	FadeOn                      []int                       // Fade on values.
 	FadeDown                    []int                       // Fade down values.
 	FadeOff                     []int                       // Fade off values.
+	LastColors                  []LastColor                 // Sequence stores the last color for each fixture, array indexed by fixture number.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
@@ -520,7 +521,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      color.RGBA
+	LastColor      LastColor
 
 	// Common commands.
 	Hidden         bool

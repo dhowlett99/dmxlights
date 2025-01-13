@@ -102,7 +102,7 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		}
 
 		// Short press means load the config.
-		loadConfig(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		loadPreset(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		common.StartStaticSequences(sequences, commandChannels)
 	}
 
@@ -158,7 +158,7 @@ func savePresets(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 				if this.SavePreset {
 					this.SavePreset = false
 				}
-				loadConfig(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+				loadPreset(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 				common.StartStaticSequences(sequences, commandChannels)
 			} else { // Launchpad path.
 				// This is a valid preset we might be trying to load it or delete it.

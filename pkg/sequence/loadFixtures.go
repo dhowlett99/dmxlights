@@ -41,8 +41,12 @@ func LoadNewFixtures(sequence *common.Sequence,
 	fixturesConfig *fixture.Fixtures,
 	dmxInterfacePresent bool) []chan common.FixtureCommand {
 
+	if debug {
+		fmt.Printf("%d: Load %d New Fixtures \n", sequence.Number, sequence.NumberFixtures)
+	}
+
 	// Stop existing Fixture threads.
-	StopFixtureReceivers(fixtureStepChannels)
+	StopFixtureReceivers(fixtureStepChannels, *sequence)
 
 	// Wait for fixture threads to stop.
 	time.Sleep(25 * time.Millisecond)
@@ -68,20 +72,24 @@ func LoadNewFixtures(sequence *common.Sequence,
 // StopFixtureReceivers sends a message to all the current fixtures
 // and asks the fixture thread to stop.
 // Takes
-func StopFixtureReceivers(fixtureStepChannels []chan common.FixtureCommand) {
+func StopFixtureReceivers(fixtureStepChannels []chan common.FixtureCommand, sequence common.Sequence) {
 
 	if debug {
 		fmt.Printf("StopFixtureReceivers\n")
 	}
 
-	// Prepare a message to be sent to the fixtures in the sequence.
-	command := common.FixtureCommand{
-		Stop: true,
+	for fixtureNumber := range fixtureStepChannels {
+		if sequence.LastColors != nil {
+			// Prepare a message to be sent to the fixtures in the sequence.
+			command := common.FixtureCommand{
+				Stop:      true,
+				LastColor: sequence.LastColors[fixtureNumber],
+			}
+
+			// Now tell the fixtures what to do.
+			fixtureStepChannels[fixtureNumber] <- command
+		}
 	}
-
-	// Now tell all the fixtures what they need to do.
-	fixture.SendToAllFixtures(fixtureStepChannels, command)
-
 }
 
 // CountNumberOfFixtures counts the number of fixturs in this sequence.

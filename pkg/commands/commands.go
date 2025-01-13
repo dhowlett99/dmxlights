@@ -958,8 +958,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.ScannerChaser = command.Args[STATE].Value.(bool)
 		return sequence
 
-	// If we are being asked to load a config, use the new sequence.
-	case common.LoadConfig:
+	// If we are being asked to load a preset, use the new sequence.
+	case common.LoadPreset:
 		const X = 0
 		const Y = 1
 		if debug {

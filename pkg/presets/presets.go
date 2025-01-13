@@ -115,6 +115,7 @@ func LoadPresets() map[string]Preset {
 		return presets
 	}
 
+	// Unmarshal into presets map.
 	err = json.Unmarshal(data, &presets)
 	if err != nil {
 		log.Fatalf("error unmashalling presets: %v from file:%s", err, "presets.json")

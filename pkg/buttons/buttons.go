@@ -105,7 +105,7 @@ type CurrentState struct {
 	LastStaticColorButtonX      int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY      int                        // Which Static Color button did we change last.
 	SoundGain                   float32                    // Fine gain -0.09 -> 0.09
-	FixtureState                [][]common.FixtureState    // Which fixture is enabled: bool and inverted: bool on which sequence. [sequeneNumber],[fixtureNumber]
+	FixtureState                [][]*common.FixtureState   // Which fixture is enabled: bool and inverted: bool on which sequence. [sequeneNumber],[fixtureNumber]
 	SelectedFixture             int                        // Which fixture is selected when changing scanner color or gobo.
 	FollowingAction             string                     // String to find next function, used in selecting a fixture.
 	OffsetPan                   int                        // Offset for Pan.
@@ -132,9 +132,8 @@ type CurrentState struct {
 	SwitchSequenceNumber        int                        // Switch sequence number, setup at start.
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
-	//RGBPatterns                 [][]common.Pattern         // Available RGB Patterns. Indexed sequence number and then by pattern number.
-	NumberFixtures []int             // Number of fixures for this sequence, indexed by sequence number.
-	Labels         *labels.LabelData // Space for button labels as loaded from labels.yaml
+	NumberFixtures              []int                      // Number of fixures for this sequence, indexed by sequence number.
+	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
 }
 
 func ProcessButtons(X int, Y int,
@@ -556,7 +555,7 @@ func ProcessButtons(X int, Y int,
 // With the new color picker there can be 24 colors displayed.
 // ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
 // the targetSequence .CurrentColors selects which colors are selected.
-// Returns the RGBAvailableColors []common.StaticColorButton
+// Returns nothing, simply displays the available colors on the buttons.
 func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {

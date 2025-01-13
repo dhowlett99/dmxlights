@@ -20,8 +20,8 @@ package sequence
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
@@ -29,16 +29,33 @@ func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepC
 	if debug {
 		fmt.Printf("sequence %d CLEAR\n", mySequenceNumber)
 	}
-	// Prepare a message to be sent to the fixtures in the sequence.
-	command := common.FixtureCommand{
-		Master:         sequence.Master,
-		Blackout:       sequence.Blackout,
-		Type:           sequence.Type,
-		Label:          sequence.Label,
-		SequenceNumber: sequence.Number,
-		Clear:          sequence.Clear,
+	// Set color.
+	newColor := common.LastColor{
+		RGBColor: colors.White,
 	}
 
-	// Now tell all the fixtures what they need to do.
-	fixture.SendToAllFixtures(fixtureStepChannels, command)
+	// Init last colors
+	sequence.LastColors = make([]common.LastColor, sequence.NumberFixtures)
+
+	if sequence.LastColors != nil {
+		// Prepare a message to be sent to all the fixtures in the sequence.
+		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+
+			command := common.FixtureCommand{
+				Master:         sequence.Master,
+				Blackout:       sequence.Blackout,
+				Type:           sequence.Type,
+				Label:          sequence.Label,
+				SequenceNumber: sequence.Number,
+				Clear:          sequence.Clear,
+				LastColor:      sequence.LastColors[fixtureNumber],
+			}
+
+			// Now tell the fixtures what to do.
+			fixtureStepChannels[fixtureNumber] <- command
+
+			// Now set the LastColors.
+			sequence.LastColors = append(sequence.LastColors, newColor)
+		}
+	}
 }

@@ -21,7 +21,6 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 func startStatic(mySequenceNumber int, sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand) {
@@ -40,51 +39,81 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 
 	// Now send the Fade up command to the fixture.
 	if sequence.StaticFadeUpOnce {
-		if debug {
-			fmt.Printf("%d: Sequence Fade up static \n", mySequenceNumber)
-		}
-		// Prepare a message to be sent to the fixtures in the sequence.
-		command := common.FixtureCommand{
-			Master:          sequence.Master,
-			Blackout:        sequence.Blackout,
-			Type:            sequence.Type,
-			Label:           sequence.Label,
-			SequenceNumber:  sequence.Number,
-			RGBStaticFadeUp: true,
-			RGBFade:         sequence.RGBFade,
-			RGBStaticColors: sequence.StaticColors,
-			Hidden:          false,
-			StrobeSpeed:     sequence.StrobeSpeed,
-			Strobe:          sequence.Strobe,
-			ScannerChaser:   sequence.ScannerChaser,
-		}
 
-		// Now tell all the fixtures what they need to do.
-		fixture.SendToAllFixtures(fixtureStepChannels, command)
+		// Prepare a message to be sent to the fixtures in the sequence.
+		for fixtureNumber := range fixtureStepChannels {
+
+			if debug {
+				fmt.Printf("%d:%d Sequence Fade up Once static lastColor %s requested color %s\n", mySequenceNumber, fixtureNumber, common.GetColorNameByRGB(sequence.LastColors[fixtureNumber].RGBColor), common.GetColorNameByRGB(sequence.StaticColors[fixtureNumber].Color))
+			}
+
+			command := common.FixtureCommand{
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
+				Type:            sequence.Type,
+				Label:           sequence.Label,
+				SequenceNumber:  sequence.Number,
+				RGBStaticFadeUp: true,
+				RGBFade:         sequence.RGBFade,
+				RGBStaticColors: sequence.StaticColors,
+				Hidden:          false,
+				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
+				ScannerChaser:   sequence.ScannerChaser,
+				LastColor:       sequence.LastColors[fixtureNumber],
+			}
+
+			// Now tell the fixtures what to do.
+			fixtureStepChannels[fixtureNumber] <- command
+
+			// Copy the new color into the last color buffer.
+			newColor := common.LastColor{
+				RGBColor: sequence.StaticColors[fixtureNumber].Color,
+			}
+			sequence.LastColors = append(sequence.LastColors, newColor)
+
+		}
 
 		// Done fading for this static scene only reset when we set a static scene again.
 		sequence.StaticFadeUpOnce = false
 	} else {
 		// else just play the static scene.
-		if debug {
-			fmt.Printf("%d: Sequence Turn on static \n", mySequenceNumber)
-		}
-		command := common.FixtureCommand{
-			Master:          sequence.Master,
-			Blackout:        sequence.Blackout,
-			Type:            sequence.Type,
-			Label:           sequence.Label,
-			SequenceNumber:  sequence.Number,
-			Hidden:          false,
-			StrobeSpeed:     sequence.StrobeSpeed,
-			Strobe:          sequence.Strobe,
-			ScannerChaser:   sequence.ScannerChaser,
-			RGBStaticOn:     true,
-			RGBStaticColors: sequence.StaticColors,
-		}
 
-		// Now tell all the fixtures what they need to do.
-		fixture.SendToAllFixtures(fixtureStepChannels, command)
+		if sequence.LastColors != nil {
+
+			// Prepare a message to be sent to the fixtures in the sequence.
+			for fixtureNumber := range fixtureStepChannels {
+
+				if debug {
+					fmt.Printf("%d:%d Sequence Just Play static lastColor %s requested color %s\n", mySequenceNumber, fixtureNumber, common.GetColorNameByRGB(sequence.LastColors[fixtureNumber].RGBColor), common.GetColorNameByRGB(sequence.StaticColors[fixtureNumber].Color))
+				}
+
+				command := common.FixtureCommand{
+					Master:          sequence.Master,
+					Blackout:        sequence.Blackout,
+					Type:            sequence.Type,
+					Label:           sequence.Label,
+					SequenceNumber:  sequence.Number,
+					Hidden:          false,
+					StrobeSpeed:     sequence.StrobeSpeed,
+					Strobe:          sequence.Strobe,
+					ScannerChaser:   sequence.ScannerChaser,
+					RGBStaticOn:     true,
+					RGBStaticColors: sequence.StaticColors,
+					LastColor:       sequence.LastColors[fixtureNumber],
+				}
+
+				// Now tell the fixtures what to do.
+				fixtureStepChannels[fixtureNumber] <- command
+
+				// Copy the new color into the last color buffer.
+				newColor := common.LastColor{
+					RGBColor: sequence.StaticColors[fixtureNumber].Color,
+				}
+				sequence.LastColors = append(sequence.LastColors, newColor)
+
+			}
+		}
 	}
 }
 
@@ -95,22 +124,28 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 
 	channels.SoundTriggers[mySequenceNumber].State = false
 
-	// Prepare a message to be sent to the fixtures in the sequence.
-	command := common.FixtureCommand{
-		Master:          sequence.Master,
-		Blackout:        sequence.Blackout,
-		Type:            sequence.Type,
-		Label:           sequence.Label,
-		SequenceNumber:  sequence.Number,
-		Hidden:          sequence.Hidden,
-		StrobeSpeed:     sequence.StrobeSpeed,
-		Strobe:          sequence.Strobe,
-		ScannerChaser:   sequence.ScannerChaser,
-		RGBStaticOff:    true,
-		RGBStaticColors: sequence.StaticColors,
-		RGBFade:         sequence.RGBFade,
-	}
+	if sequence.LastColors != nil {
 
-	// Now tell all the fixtures what they need to do.
-	fixture.SendToAllFixtures(fixtureStepChannels, command)
+		// Prepare a message to be sent to the fixtures in the sequence.
+		for fixtureNumber := range fixtureStepChannels {
+			command := common.FixtureCommand{
+				Master:          sequence.Master,
+				Blackout:        sequence.Blackout,
+				Type:            sequence.Type,
+				Label:           sequence.Label,
+				SequenceNumber:  sequence.Number,
+				Hidden:          sequence.Hidden,
+				StrobeSpeed:     sequence.StrobeSpeed,
+				Strobe:          sequence.Strobe,
+				ScannerChaser:   sequence.ScannerChaser,
+				RGBStaticOff:    true,
+				RGBStaticColors: sequence.StaticColors,
+				RGBFade:         sequence.RGBFade,
+				LastColor:       sequence.LastColors[fixtureNumber],
+			}
+
+			// Now tell the fixtures what to do.
+			fixtureStepChannels[fixtureNumber] <- command
+		}
+	}
 }

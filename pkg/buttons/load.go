@@ -25,7 +25,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
-func loadConfig(sequences []*common.Sequence, this *CurrentState,
+func loadPreset(sequences []*common.Sequence, this *CurrentState,
 	X int, Y int,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
@@ -38,7 +38,7 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 
 	// Load the config.
 	// Which forces all sequences to load their config in the stopped position. Run=false.
-	config.AskToLoadConfig(commandChannels, X, Y)
+	config.AskToLoadPreset(commandChannels, X, Y)
 
 	// Turn the selected preset light flashing it's current color and yellow.
 	if this.LastPreset != nil {
@@ -93,6 +93,16 @@ func loadConfig(sequences []*common.Sequence, this *CurrentState,
 		this.Running[sequenceNumber] = sequences[sequenceNumber].SavedRun
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
+		this.NumberFixtures[sequenceNumber] = sequences[sequenceNumber].NumberFixtures
+
+		// Restore fixture state.
+		fixtureState := []*common.FixtureState{}
+		for fixtureNumber := 0; fixtureNumber < this.NumberFixtures[sequenceNumber]; fixtureNumber++ {
+			this.FixtureState[sequenceNumber] = make([]*common.FixtureState, this.NumberFixtures[sequenceNumber])
+			newState := sequences[sequenceNumber].FixtureState[fixtureNumber]
+			fixtureState = append(fixtureState, &newState)
+		}
+		this.FixtureState[sequenceNumber] = fixtureState
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type

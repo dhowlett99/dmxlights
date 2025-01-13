@@ -44,7 +44,7 @@ type SequenceConfig struct {
 }
 
 // Now the sequence has been created, this functions starts the sequence.
-func PlaySequence(sequence common.Sequence,
+func StartSequence(sequence common.Sequence,
 	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
