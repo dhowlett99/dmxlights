@@ -65,8 +65,8 @@ func StartSequence(sequence common.Sequence,
 	for {
 
 		// Copy in the fixture status into the static color buffer.
-		for fixtureNumber := range sequence.StaticColors {
-			sequence.StaticColors[fixtureNumber].Enabled = sequence.FixtureState[fixtureNumber].Enabled
+		for fixtureNumber, state := range sequence.FixtureState {
+			sequence.StaticColors[fixtureNumber].Enabled = state.Enabled
 		}
 
 		// Process any commands.

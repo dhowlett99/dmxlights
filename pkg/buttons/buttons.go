@@ -105,7 +105,7 @@ type CurrentState struct {
 	LastStaticColorButtonX      int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY      int                        // Which Static Color button did we change last.
 	SoundGain                   float32                    // Fine gain -0.09 -> 0.09
-	FixtureState                [][]*common.FixtureState   // Which fixture is enabled: bool and inverted: bool on which sequence. [sequeneNumber],[fixtureNumber]
+	FixtureState                [][]common.FixtureState    // Which fixture is enabled: bool and inverted: bool on which sequence. [sequeneNumber],[fixtureNumber]
 	SelectedFixture             int                        // Which fixture is selected when changing scanner color or gobo.
 	FollowingAction             string                     // String to find next function, used in selecting a fixture.
 	OffsetPan                   int                        // Offset for Pan.

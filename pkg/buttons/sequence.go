@@ -114,9 +114,6 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 		// Start the sequence.
 		cmd := common.Command{
 			Action: common.Start,
-			Args: []common.Arg{
-				{Name: "Speed", Value: this.Speed[this.SelectedSequence]},
-			},
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)

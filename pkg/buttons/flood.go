@@ -54,9 +54,6 @@ func floodOff(numberSequences int, this *CurrentState, commandChannels []chan co
 		if this.Running[sequenceNumber] {
 			cmd = common.Command{
 				Action: common.Start,
-				Args: []common.Arg{
-					{Name: "Start", Value: true},
-				},
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}

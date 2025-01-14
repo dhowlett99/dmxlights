@@ -384,7 +384,6 @@ func newMiniSequencer(fixture *Fixture,
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
 					// Fade down complete, set lastColor to empty in the fixture.
-					fmt.Printf("%d:%d MiniSequencer fade down complete - setting lastColor to %s\n", mySequenceNumber, myFixtureNumber, common.GetColorNameByRGB(colors.EmptyColor))
 					emptyColor := common.LastColor{
 						RGBColor: colors.EmptyColor,
 					}

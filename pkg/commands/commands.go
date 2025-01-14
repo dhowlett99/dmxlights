@@ -90,11 +90,11 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		// Enable all fixtures
 		for fixture := 0; fixture < sequence.NumberFixtures; fixture++ {
-			newScannerState := common.FixtureState{}
-			newScannerState.Enabled = true
-			newScannerState.RGBInverted = false
-			newScannerState.ScannerPatternReversed = false
-			sequence.FixtureState[fixture] = newScannerState
+			state := sequence.FixtureState[fixture]
+			state.Enabled = true
+			state.RGBInverted = false
+			state.ScannerPatternReversed = false
+			sequence.FixtureState[fixture] = state
 		}
 
 		if sequence.Type == "rgb" {
@@ -982,6 +982,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.StartPattern = true
 				// Restore any sequenceColors.
 				sequence.UpdateColors = true
+				// Reload the fixtures.
+				sequence.LoadNewFixtures = true
 				return sequence
 			}
 		}

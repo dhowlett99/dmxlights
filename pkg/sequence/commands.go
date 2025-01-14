@@ -34,6 +34,7 @@ func processCommands(sequence *common.Sequence, channels common.Channels, switch
 			fmt.Printf("%d: Load New Fixtures\n", sequence.Number)
 		}
 		fixtureStepChannels = LoadNewFixtures(sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+		sequence.LoadNewFixtures = false
 	}
 
 	// Clear all fixtures.

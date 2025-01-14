@@ -73,9 +73,6 @@ func NewSequence(
 		availableScannerColors, scannerColors = fixture.GetAvailableScannerColors(fixturesConfig)
 	}
 
-	// A map of the state of fixtures in the sequence.
-	// We can disable a fixture by setting fixture Enabled to false.
-	FixtureState := make(map[int]common.FixtureState, 8)
 	var numberFixtures int
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
@@ -85,15 +82,20 @@ func NewSequence(
 		numberFixtures = commands.GetNumberOfFixtures(mySequenceNumber, fixturesConfig)
 	}
 
+	// A map of the state of fixtures in the sequence.
+	// We can disable a fixture by setting fixture Enabled to false.
+	// Set the sequence default fixture states.
 	// Enable all the defined fixtures.
-	for x := 0; x < numberFixtures; x++ {
-		newScanner := common.FixtureState{}
-		newScanner.Enabled = true
-		newScanner.RGBInverted = false
-		newScanner.ScannerPatternReversed = false
-		FixtureState[x] = newScanner
-		// Set the first gobo for every fixture.
-		scannerGobos[x] = common.DEFAULT_SCANNER_GOBO
+	// RGB Invert set to false
+	// Scanner Pattern not reversed.
+	fixtureState := make(map[int]common.FixtureState, numberFixtures) // Make space for the fixture states.
+	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
+		newFixture := common.FixtureState{}
+		newFixture.Enabled = true
+		newFixture.RGBInverted = false
+		newFixture.ScannerPatternReversed = false
+		fixtureState[fixtureNumber] = newFixture
+		scannerGobos[fixtureNumber] = common.DEFAULT_SCANNER_GOBO
 	}
 
 	// Set default sequence colors.
@@ -141,12 +143,13 @@ func NewSequence(
 		AutoColor:              false,
 		AutoPattern:            false,
 		SelectedPattern:        common.DEFAULT_PATTERN,
-		FixtureState:           FixtureState,
+		FixtureState:           fixtureState,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
 		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
+		LoadNewFixtures:        true,
 	}
 
 	// Load the switch information in from the fixtures config.

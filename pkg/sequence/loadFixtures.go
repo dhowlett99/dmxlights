@@ -49,7 +49,7 @@ func LoadNewFixtures(sequence *common.Sequence,
 	StopFixtureReceivers(fixtureStepChannels, *sequence)
 
 	// Wait for fixture threads to stop.
-	time.Sleep(25 * time.Millisecond)
+	time.Sleep(500 * time.Millisecond)
 
 	// Count the number of fixtures for this sequence.
 	sequence.NumberFixtures = CountNumberOfFixtures(*sequence, fixturesConfig)
@@ -59,9 +59,6 @@ func LoadNewFixtures(sequence *common.Sequence,
 
 	// Because the number of fixtures may have changes reload the patterns.
 	sequence.RGBAvailablePatterns = LoadAvailablePatterns(*sequence, fixturesConfig)
-
-	// Set the fixtures states to enables and not inverted.
-	sequence.FixtureState = SetDefaultFixtureState(sequence.NumberFixtures)
 
 	// Now create a thread for each one of the new fixtures.
 	CreateFixtureReceiverThreads(sequence.NumberFixtures, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, soundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
@@ -132,29 +129,6 @@ func CreateFixtureChannels(numberFixtures int, fixturesConfig *fixture.Fixtures)
 	}
 	return fixtureStepChannels
 
-}
-
-// SetDefaultFixtureState sets the default fixture state i.e every fixture enabled and not inverted.
-// Takes the number of fixtures.
-// Returns an array of type fixture.State.
-func SetDefaultFixtureState(numberFixtures int) map[int]common.FixtureState {
-
-	if debug {
-		fmt.Printf("SetDefaultFixtureState\n")
-	}
-
-	fixtureState := make(map[int]common.FixtureState, numberFixtures)
-
-	// Set the default fixture state.
-	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {
-		newFixture := common.FixtureState{}
-		newFixture.Enabled = true
-		newFixture.RGBInverted = false
-		newFixture.ScannerPatternReversed = false
-		fixtureState[fixtureNumber] = newFixture
-	}
-
-	return fixtureState
 }
 
 // Create a fixture thread for each fixture.

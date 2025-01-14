@@ -96,11 +96,11 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.NumberFixtures[sequenceNumber] = sequences[sequenceNumber].NumberFixtures
 
 		// Restore fixture state.
-		fixtureState := []*common.FixtureState{}
+		fixtureState := []common.FixtureState{}
 		for fixtureNumber := 0; fixtureNumber < this.NumberFixtures[sequenceNumber]; fixtureNumber++ {
-			this.FixtureState[sequenceNumber] = make([]*common.FixtureState, this.NumberFixtures[sequenceNumber])
+			this.FixtureState[sequenceNumber] = make([]common.FixtureState, this.NumberFixtures[sequenceNumber])
 			newState := sequences[sequenceNumber].FixtureState[fixtureNumber]
-			fixtureState = append(fixtureState, &newState)
+			fixtureState = append(fixtureState, newState)
 		}
 		this.FixtureState[sequenceNumber] = fixtureState
 
@@ -191,13 +191,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			deFocusAllSwitches(this, sequences, commandChannels)
 		}
 
-		// Reload Fixtures including state.
-		cmd := common.Command{
-			Action: common.LoadNewFixtures,
-		}
-		common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
-
-		// Now start any thing that needs to run.
+		// Now start any thing that needs to run with load fixtures on.
 		if sequences[sequenceNumber].SavedRun {
 			cmd := common.Command{
 				Action: common.Start,
