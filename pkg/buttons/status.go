@@ -311,6 +311,11 @@ func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures 
 
 	for fixtureNumber := 0; fixtureNumber < NumberFixtures; fixtureNumber++ {
 
+		// in version 3.0 We are not supporting fixture status for any more than 8 fixtures.
+		if fixtureNumber > 7 {
+			return
+		}
+
 		if debug {
 			fmt.Printf("Sequence %d: Fixture %d Enabled %t Inverted %t\n", sequenceNumber, fixtureNumber, this.FixtureState[sequenceNumber][fixtureNumber].Enabled, this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted)
 		}

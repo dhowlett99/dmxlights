@@ -72,9 +72,6 @@ func NewSequence(
 		availableScannerColors, scannerColors = fixture.GetAvailableScannerColors(fixturesConfig)
 	}
 
-	// A map of the state of fixtures in the sequence.
-	// We can disable a fixture by setting fixture Enabled to false.
-	FixtureState := make(map[int]common.FixtureState, 8)
 	var numberFixtures int
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
@@ -145,7 +142,7 @@ func NewSequence(
 		AutoColor:              false,
 		AutoPattern:            false,
 		SelectedPattern:        common.DEFAULT_PATTERN,
-		FixtureState:           FixtureState,
+		FixtureState:           fixtureState,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
