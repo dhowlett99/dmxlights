@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023, 2024, 2025 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is part of the dmxlights sequencer, this file holds
 // some helper function for setting up fixtures in a sequence.
 //
@@ -25,7 +25,6 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/pattern"
 	"github.com/dhowlett99/dmxlights/pkg/sound"
 	"github.com/oliread/usbdmx/ft232"
 )
@@ -58,7 +57,7 @@ func LoadNewFixtures(sequence *common.Sequence,
 	fixtureStepChannels = CreateFixtureChannels(sequence.NumberFixtures, fixturesConfig)
 
 	// Because the number of fixtures may have changes reload the patterns.
-	sequence.RGBAvailablePatterns = LoadAvailablePatterns(*sequence, fixturesConfig)
+	sequence.RGBAvailablePatterns = fixture.LoadAvailablePatterns(*sequence, fixturesConfig)
 
 	// Now create a thread for each one of the new fixtures.
 	CreateFixtureReceiverThreads(sequence.NumberFixtures, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, soundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
@@ -76,16 +75,15 @@ func StopFixtureReceivers(fixtureStepChannels []chan common.FixtureCommand, sequ
 	}
 
 	for fixtureNumber := range fixtureStepChannels {
-		if sequence.LastColors != nil {
-			// Prepare a message to be sent to the fixtures in the sequence.
-			command := common.FixtureCommand{
-				Stop:      true,
-				LastColor: sequence.LastColors[fixtureNumber],
-			}
 
-			// Now tell the fixtures what to do.
-			fixtureStepChannels[fixtureNumber] <- command
+		// Prepare a message to be sent to the fixtures in the sequence.
+		command := common.FixtureCommand{
+			Stop: true,
 		}
+
+		// Now tell the fixtures what to do.
+		fixtureStepChannels[fixtureNumber] <- command
+
 	}
 }
 
@@ -100,18 +98,6 @@ func CountNumberOfFixtures(sequence common.Sequence, fixturesConfig *fixture.Fix
 	}
 
 	return sequence.NumberFixtures
-}
-
-// LoadAvailablePatterns configures a set of patterns for an RGB sequence.
-// Takes a sequence and fixtures config.
-// Returns an array of available patterns for this RGB sequence.
-func LoadAvailablePatterns(sequence common.Sequence, fixturesConfig *fixture.Fixtures) []common.Pattern {
-
-	RGBAvailablePatterns := pattern.MakePatterns(sequence.NumberFixtures)
-	if debug {
-		fmt.Printf("%d: Number of Patterms %d\n", sequence.Number, len(RGBAvailablePatterns))
-	}
-	return RGBAvailablePatterns
 }
 
 // Create channels used for stepping the fixture threads for this sequnece.
@@ -144,7 +130,7 @@ func CreateFixtureReceiverThreads(numberFixtures int,
 	dmxInterfacePresent bool) int {
 
 	if debug {
-		fmt.Printf("CreateFixtureReceiverThreads\n")
+		fmt.Printf("CreateFixtureReceiverThreads for %d Fixtures\n", numberFixtures)
 	}
 
 	for fixtureNumber := 0; fixtureNumber < numberFixtures; fixtureNumber++ {

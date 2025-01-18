@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights main sequencer responsible for controlling all
 // of the fixtures in a group. This file holds the code for creating
 // a new sequence.
@@ -29,7 +29,6 @@ import (
 
 // Before a sequence can run it needs to be created.
 // Assigns default values for all types of sequence.
-// Returns a sequence of type common.Sequence.
 func NewSequence(
 	sequenceType string,
 	sequenceLabel string,
@@ -73,6 +72,9 @@ func NewSequence(
 		availableScannerColors, scannerColors = fixture.GetAvailableScannerColors(fixturesConfig)
 	}
 
+	// A map of the state of fixtures in the sequence.
+	// We can disable a fixture by setting fixture Enabled to false.
+	FixtureState := make(map[int]common.FixtureState, 8)
 	var numberFixtures int
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
@@ -143,13 +145,12 @@ func NewSequence(
 		AutoColor:              false,
 		AutoPattern:            false,
 		SelectedPattern:        common.DEFAULT_PATTERN,
-		FixtureState:           fixtureState,
+		FixtureState:           FixtureState,
 		ScannerCoordinates:     []int{12, 16, 24, 32, 64},
 		ScannerColor:           scannerColors,
 		ScannerOffsetPan:       common.SCANNER_MID_POINT,
 		ScannerOffsetTilt:      common.SCANNER_MID_POINT,
 		GuiFixtureLabels:       fixtureLabels,
-		LoadNewFixtures:        true,
 	}
 
 	// Load the switch information in from the fixtures config.

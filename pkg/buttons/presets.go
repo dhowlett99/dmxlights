@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 , 2024 dhowlett99.
+// Copyright (C) 2022, 2023, 2024, 2025 dhowlett99.
 // This is button processor, used by the launchpad and gui interfaces.
 // This file processes preset buttons and controls their actions.
 //
@@ -101,7 +101,7 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			fmt.Printf("Load Preset X:%d Y:%d\n", X, Y)
 		}
 
-		// Short press means load the config.
+		// Short press means load the preset.
 		loadPreset(sequences, this, X, Y, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		common.StartStaticSequences(sequences, commandChannels)
 	}

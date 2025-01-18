@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights mini sequencer, used by the actions to control
 // single fixtures.
 // Implemented and depends usbdmx.
@@ -163,7 +163,7 @@ func newMiniSequencer(fixture *Fixture,
 			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
 			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
 		} else {
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		}
 
 		return
@@ -323,28 +323,28 @@ func newMiniSequencer(fixture *Fixture,
 		// Stop any running fades.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running chases.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any rotates.
 		select {
 		case switchChannels[swiTch.Number].StopRotate <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -384,12 +384,9 @@ func newMiniSequencer(fixture *Fixture,
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
 					// Fade down complete, set lastColor to empty in the fixture.
-					emptyColor := common.LastColor{
-						RGBColor: colors.EmptyColor,
-					}
 					command := common.FixtureCommand{
 						Type:      "lastColor",
-						LastColor: emptyColor,
+						LastColor: colors.EmptyColor,
 					}
 					select {
 					case fixtureStepChannel <- command:
@@ -409,14 +406,9 @@ func newMiniSequencer(fixture *Fixture,
 					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 				}
 				// Fade up complete, set lastColor up in the fixture.
-				fmt.Printf("%d:%d MiniSequencer fade down complete - setting lastColor to %s\n", mySequenceNumber, myFixtureNumber, common.GetColorNameByRGB(colors.EmptyColor))
-
-				lastColor := common.LastColor{
-					RGBColor: color,
-				}
 				command := common.FixtureCommand{
 					Type:      "lastColor",
-					LastColor: lastColor,
+					LastColor: color,
 				}
 				select {
 				case fixtureStepChannel <- command:
@@ -439,14 +431,14 @@ func newMiniSequencer(fixture *Fixture,
 		// Stop any running fade ups.
 		select {
 		case switchChannels[swiTch.Number].StopFadeUp <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
 		// Stop any running fade downs.
 		select {
 		case switchChannels[swiTch.Number].StopFadeDown <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -497,7 +489,7 @@ func newMiniSequencer(fixture *Fixture,
 		// Turn off the fixture.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 
@@ -517,7 +509,7 @@ func newMiniSequencer(fixture *Fixture,
 		// Stop any left over sequence left over for this switch.
 		select {
 		case switchChannels[swiTch.Number].Stop <- true:
-			MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 		case <-time.After(100 * time.Millisecond):
 		}
 

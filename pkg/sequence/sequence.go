@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights main sequencer responsible for controlling all
 // of the fixtures in a group.
 //
@@ -56,7 +56,11 @@ func StartSequence(sequence common.Sequence,
 
 	var steps []common.Step
 
-	// Create new set of fixtures.
+	if debug {
+		fmt.Printf("Start sequence %d\n", sequence.Number)
+	}
+
+	// Create channels used for stepping the fixture threads for this sequnece.
 	fixtureStepChannels := []chan common.FixtureCommand{}
 	sequence.LoadNewFixtures = true
 
@@ -69,8 +73,27 @@ func StartSequence(sequence common.Sequence,
 			sequence.StaticColors[fixtureNumber].Enabled = state.Enabled
 		}
 
+		// Load new set of RGB Patterns if signaled to do so.
+		if sequence.LoadPatterns {
+			if debug {
+				fmt.Printf("%d: Load New Patterns\n", sequence.Number)
+			}
+			sequence.RGBAvailablePatterns = fixture.LoadAvailablePatterns(sequence, fixturesConfig)
+			sequence.LoadPatterns = false
+		}
+
+		// Load new set of fixtures and setup fixture threads and channels to those fixtures.
+		// If signaled to do so.
+		if sequence.LoadNewFixtures {
+			if debug {
+				fmt.Printf("%d: Load New Fixtures\n", sequence.Number)
+			}
+			fixtureStepChannels = LoadNewFixtures(&sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
+			sequence.LoadNewFixtures = false
+		}
+
 		// Process any commands.
-		fixtureStepChannels = processCommands(&sequence, channels, switchChannels, fixtureStepChannels, soundConfig, eventsForLaunchpad, guiButtons, fixturesConfig, dmxController, dmxInterfacePresent)
+		processCommands(&sequence, channels, fixtureStepChannels, eventsForLaunchpad, guiButtons)
 
 		// Sequence in normal running chase mode.
 		if sequence.Chase && sequence.Run && !sequence.Static && !sequence.StartFlood {

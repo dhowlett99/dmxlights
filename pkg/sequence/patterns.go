@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights main sequencers pattern functions.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -124,6 +124,7 @@ func replaceRGBcolorsInSteps(patternName string, steps []common.Step, colorsIn [
 
 	if debug {
 		fmt.Printf("replaceRGBcolorsInSteps: with colors %+v\n", colorsIn)
+		fmt.Printf("Number Steps In: %v\n", len(steps))
 		fmt.Printf("PatternName: %v\n", patternName)
 	}
 

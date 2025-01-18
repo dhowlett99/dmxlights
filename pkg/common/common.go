@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights common functions.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -418,7 +418,6 @@ type Sequence struct {
 	FadeOn                      []int                       // Fade on values.
 	FadeDown                    []int                       // Fade down values.
 	FadeOff                     []int                       // Fade off values.
-	LastColors                  []LastColor                 // Sequence stores the last color for each fixture, array indexed by fixture number.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
 	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
@@ -429,6 +428,7 @@ type Sequence struct {
 	StaticColors                []StaticColorButton         // Used in static color editing
 	Clear                       bool                        // Clear all fixtures in this sequence.
 	LoadNewFixtures             bool                        // Load all fixtures for this sequence.
+	LoadPatterns                bool                        // Load RGB Patterns for this sequence.
 	Static                      bool                        // We're a static sequence.
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
@@ -521,7 +521,7 @@ type FixtureCommand struct {
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      LastColor
+	LastColor      color.RGBA
 
 	// Common commands.
 	Hidden         bool

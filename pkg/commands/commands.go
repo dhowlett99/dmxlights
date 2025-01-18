@@ -1,4 +1,4 @@
-// Copyright (C) 2022 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights fixture editor it is attached to a fixture and
 // describes the fixtures properties which is then saved in the fixtures.yaml
 //
@@ -982,8 +982,8 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.StartPattern = true
 				// Restore any sequenceColors.
 				sequence.UpdateColors = true
-				// Reload the fixtures.
-				sequence.LoadNewFixtures = true
+				// Since avalaible patterns aren't stored in the sequence, we need to create them again.
+				sequence.LoadPatterns = true
 				return sequence
 			}
 		}
@@ -1006,6 +1006,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 			sequence.NumberFixtures = GetNumberOfFixtures(mySequenceNumber, fixturesConfig)
 		}
 
+		// Destoy current fixtures and create new threads for the new fixtures.
+		sequence.LoadNewFixtures = true
+
 		// Setup fixtures labels.
 		sequence.GuiFixtureLabels = []string{}
 		for _, fixture := range fixturesConfig.Fixtures {
@@ -1027,12 +1030,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		return sequence
 
-	case common.LoadNewFixtures:
-		if debug {
-			fmt.Printf("%d: Command Load New Fixures\n", mySequenceNumber)
-		}
-		sequence.LoadNewFixtures = true
-		return sequence
 	}
 
 	return sequence
@@ -1145,7 +1142,7 @@ func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) [
 func GetNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
 
 	if debug {
-		fmt.Printf("getNumberOfFixturesn for sequence %d\n", sequenceNumber)
+		fmt.Printf("getNumberOfFixtures for sequence %d\n", sequenceNumber)
 	}
 
 	var numberFixtures int

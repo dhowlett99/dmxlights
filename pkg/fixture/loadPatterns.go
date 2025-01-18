@@ -1,6 +1,6 @@
 // Copyright (C) 2022,2023,2024,2025 dhowlett99.
-// This is the dmxlights main sequencer responsible for controlling all
-// of the fixtures in a group.
+// This is the dmxlights fixture control code.
+// this function is used to set up the RGB patterns using the fixture config.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -15,30 +15,23 @@
 // You should have received a copy of the GNU General Public License
 // along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
-package sequence
+package fixture
 
 import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/pattern"
 )
 
-func clearSequence(mySequenceNumber int, sequence *common.Sequence, fixtureStepChannels []chan common.FixtureCommand) {
+// LoadAvailablePatterns configures a set of patterns for an RGB sequence.
+// Takes a sequence and fixtures config.
+// Returns an array of available patterns for this RGB sequence.
+func LoadAvailablePatterns(sequence common.Sequence, fixturesConfig *Fixtures) []common.Pattern {
 
+	RGBAvailablePatterns := pattern.MakePatterns(sequence.NumberFixtures)
 	if debug {
-		fmt.Printf("sequence %d CLEAR\n", mySequenceNumber)
+		fmt.Printf("%d: Number of Patterms %d\n", sequence.Number, len(RGBAvailablePatterns))
 	}
-	// Prepare a message to be sent to the fixtures in the sequence.
-	command := common.FixtureCommand{
-		Master:         sequence.Master,
-		Blackout:       sequence.Blackout,
-		Type:           sequence.Type,
-		Label:          sequence.Label,
-		SequenceNumber: sequence.Number,
-		Clear:          sequence.Clear,
-	}
-
-	// Now tell all the fixtures what they need to do.
-	fixture.SendToAllFixtures(fixtureStepChannels, command)
+	return RGBAvailablePatterns
 }

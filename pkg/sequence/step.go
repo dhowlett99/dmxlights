@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023,2024 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights main sequencers step functions.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -59,7 +59,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 
 	if sequence.StartPattern {
 		if debug {
-			fmt.Printf("Start Pattern\n")
+			fmt.Printf("Start Pattern with %d fixtures & number steps=%d\n", sequence.NumberFixtures, len(steps))
 		}
 		steps = setupNewRGBPattern(sequence, availablePatterns)
 		sequence.StartPattern = false
@@ -69,7 +69,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 	// Auto RGB colors.
 	if sequence.AutoColor && sequence.Type == "rgb" && sequence.Pattern.Label != "Multi.Color" && sequence.Pattern.Label != "Color.Chase" {
 		if debug {
-			fmt.Printf("RGB AutoColor\n")
+			fmt.Printf("%d: RGB AutoColor\n", sequence.Number)
 		}
 		steps = rgbAutoColors(sequence, steps)
 	}
@@ -77,7 +77,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 	// Auto Gobo Change for Chaser.
 	if sequence.AutoColor && sequence.Label == "chaser" {
 		if debug {
-			fmt.Printf("RGB AutoColor Chaser\n")
+			fmt.Printf("%d: RGB AutoColor Chaser\n", sequence.Number)
 		}
 		steps = chaserAutoGobo(steps, sequence)
 	}
@@ -85,7 +85,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 	// Auto pattern change.
 	if sequence.AutoPattern && sequence.Type == "rgb" {
 		if debug {
-			fmt.Printf("RGB AutoPattern\n")
+			fmt.Printf("%d: RGB AutoPattern\n", sequence.Number)
 		}
 		steps = rgbAutoPattern(sequence, availablePatterns)
 	}
@@ -95,15 +95,15 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 	// If we are updating the color in a sequence.
 	if sequence.UpdateColors && sequence.Type == "rgb" {
 		if debug {
-			fmt.Printf("RGB UpdateColors\n")
+			fmt.Printf("%d: RGB UpdateColors\n", sequence.Number)
 		}
 		if sequence.RecoverSequenceColors {
 			if debug {
-				fmt.Printf("RGB RecoverSequenceColors\n")
+				fmt.Printf("%d: RGB RecoverSequenceColors\n", sequence.Number)
 			}
 			if sequence.SavedSequenceColors != nil {
 				if debug {
-					fmt.Printf("RGB SavedSequenceColors\n")
+					fmt.Printf("%d: RGB SavedSequenceColors\n", sequence.Number)
 				}
 				// Recover origial colors after auto color is switched off.
 				steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, sequence.SequenceColors)
@@ -113,7 +113,7 @@ func updateRGBSteps(steps []common.Step, availablePatterns []common.Pattern, seq
 			// We are updating color in sequence and sequence colors are set.
 			if len(sequence.SequenceColors) > 0 {
 				if debug {
-					fmt.Printf("replaceRGBcolorsInSteps\n")
+					fmt.Printf("%d: replaceRGBcolorsInSteps\n", sequence.Number)
 				}
 				steps = replaceRGBcolorsInSteps(sequence.Pattern.Name, steps, sequence.SequenceColors)
 				// Save the current color selection.

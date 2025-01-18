@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023,2024 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights main sequencers which processes commands.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -20,22 +20,9 @@ import (
 	"fmt"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
-	"github.com/dhowlett99/dmxlights/pkg/sound"
-	"github.com/oliread/usbdmx/ft232"
 )
 
-func processCommands(sequence *common.Sequence, channels common.Channels, switchChannels []common.SwitchChannel, fixtureStepChannels []chan common.FixtureCommand, soundConfig *sound.SoundConfig, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController, dmxInterfacePresent bool) []chan common.FixtureCommand {
-
-	// Load new set of fixtures and setup fixture threads and channels to those fixtures.
-	if sequence.LoadNewFixtures {
-
-		if debug {
-			fmt.Printf("%d: Load New Fixtures\n", sequence.Number)
-		}
-		fixtureStepChannels = LoadNewFixtures(sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
-		sequence.LoadNewFixtures = false
-	}
+func processCommands(sequence *common.Sequence, channels common.Channels, fixtureStepChannels []chan common.FixtureCommand, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Clear all fixtures.
 	if sequence.Clear {
@@ -138,6 +125,4 @@ func processCommands(sequence *common.Sequence, channels common.Channels, switch
 		stopStatic(sequence.Number, sequence, channels, fixtureStepChannels)
 		sequence.PlayStaticOnce = false
 	}
-
-	return fixtureStepChannels
 }
