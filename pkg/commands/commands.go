@@ -225,6 +225,24 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.RGBShift = command.Args[SHIFT].Value.(int)
 		return sequence
 
+	case common.InvertAllFixtures:
+
+		// Invert all the fixtures.
+		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+			state := sequence.FixtureState[fixtureNumber]
+			state.RGBInverted = true
+			sequence.FixtureState[fixtureNumber] = state
+		}
+
+	case common.EnableAllFixtures:
+
+		// Enable all the fixture.
+		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+			state := sequence.FixtureState[fixtureNumber]
+			state.Enabled = true
+			sequence.FixtureState[fixtureNumber] = state
+		}
+
 	case common.UpdateRGBInvert:
 		const INVERT = 0
 		if debug {

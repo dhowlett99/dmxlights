@@ -165,9 +165,6 @@ func main() {
 		newSwitch.CommandChannel = make(chan common.Command)
 		this.SwitchChannels = append(this.SwitchChannels, newSwitch)
 	}
-	// Initialize fixture states for the sequences.
-	this.FixtureState = make([][]common.FixtureState, numberOfSequences)
-	this.NumberFixtures = make([]int, numberOfSequences)
 
 	// Setup DMX interface.
 	fmt.Println("Setup DMX Interface")
@@ -319,29 +316,18 @@ func main() {
 		fmt.Printf("Found sequence %s, fixtures %d, label:%s \tdesc: %s, \ttype: \t%s\n", sequenceConf.Name, newSequence.NumberFixtures, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
 
 		// Setup Default State.
-		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                                                    // Selected speed for the sequence. Common to all types of sequence.
-		this.Running[sequenceNumber] = false                                                                 // Set this sequence to be in the not running state. Common to all types of sequence.
-		this.Strobe[sequenceNumber] = false                                                                  // Set strobe to be off for all sequences.
-		this.StrobeSpeed[sequenceNumber] = common.DEFAULT_STROBE_SPEED                                       // Set the strobe speed to be the fastest for this sequence.
-		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                                             // Default RGB shift size.
-		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT                                     // Default scanner shift size.
-		this.SequenceType[sequenceNumber] = newSequence.Type                                                 // Set the sequence type.
-		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                                               // Set the defaults size for the RGB fixtures.
-		this.ScannerSize[sequenceNumber] = common.DEFAULT_SCANNER_SIZE                                       // Set the defaults size for the scanner fixtures.
-		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                                               // Set the default fade time for RGB fixtures.
-		this.ScannerFade[sequenceNumber] = common.DEFAULT_SCANNER_FADE                                       // Set the default fade time for scanners.
-		this.ScannerCoordinates[sequenceNumber] = common.DEFAULT_SCANNER_COORDNIATES                         // Set the default fade time for scanners.
-		this.NumberFixtures[sequenceNumber] = newSequence.NumberFixtures                                     // Set the number of fixtures for this sequence.
-		this.FixtureState[sequenceNumber] = make([]common.FixtureState, this.NumberFixtures[sequenceNumber]) // Make space for the fixture states.
-
-		// Set the default fixture state.
-		for fixtureNumber := 0; fixtureNumber < this.NumberFixtures[sequenceNumber]; fixtureNumber++ {
-			newFixture := common.FixtureState{}
-			newFixture.Enabled = true
-			newFixture.RGBInverted = false
-			newFixture.ScannerPatternReversed = false
-			this.FixtureState[sequenceNumber][fixtureNumber] = newFixture
-		}
+		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Selected speed for the sequence. Common to all types of sequence.
+		this.Running[sequenceNumber] = false                                         // Set this sequence to be in the not running state. Common to all types of sequence.
+		this.Strobe[sequenceNumber] = false                                          // Set strobe to be off for all sequences.
+		this.StrobeSpeed[sequenceNumber] = common.DEFAULT_STROBE_SPEED               // Set the strobe speed to be the fastest for this sequence.
+		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.
+		this.ScannerShift[sequenceNumber] = common.DEFAULT_SCANNER_SHIFT             // Default scanner shift size.
+		this.SequenceType[sequenceNumber] = newSequence.Type                         // Set the sequence type.
+		this.RGBSize[sequenceNumber] = common.DEFAULT_RGB_SIZE                       // Set the defaults size for the RGB fixtures.
+		this.ScannerSize[sequenceNumber] = common.DEFAULT_SCANNER_SIZE               // Set the defaults size for the scanner fixtures.
+		this.RGBFade[sequenceNumber] = common.DEFAULT_RGB_FADE                       // Set the default fade time for RGB fixtures.
+		this.ScannerFade[sequenceNumber] = common.DEFAULT_SCANNER_FADE               // Set the default fade time for scanners.
+		this.ScannerCoordinates[sequenceNumber] = common.DEFAULT_SCANNER_COORDNIATES // Set the default fade time for scanners.
 
 		// Setup Functions Labels.
 		setupFunctionLabels(&newSequence, &this)

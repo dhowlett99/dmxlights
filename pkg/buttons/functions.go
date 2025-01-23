@@ -498,24 +498,21 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = true
 
+		// Turn on  RGB Invert mode means all the fixtures should be inverted.
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
 			Args: []common.Arg{
-				{Name: "RGBInvert", Value: true},
+				{Name: "RGBInvert All", Value: true},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Turn on invert means all the fixture states should be inverted.
-		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.RGBInverted = true
-			this.FixtureState[this.TargetSequence][fixtureNumber] = state
-		}
+		// Update local copy of fixture state.
+		sequences[Y].FixtureState = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels).FixtureState
 
 		if debug {
 			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, sequences[this.TargetSequence].FixtureState[fixtureNumber])
 			}
 		}
 
@@ -541,25 +538,21 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
 
+		// Turn off invert means all the fixture states should be not inverted.
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
 			Args: []common.Arg{
-				{Name: "RGBInvert", Value: false},
+				{Name: "RGBInvert Off", Value: false},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Turn off invert means all the fixture states should be not inverted.
-		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.RGBInverted = false
-			state.ScannerPatternReversed = false
-			this.FixtureState[this.TargetSequence][fixtureNumber] = state
-		}
+		// Update local copy of fixture state.
+		sequences[Y].FixtureState = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels).FixtureState
 
 		if debug {
 			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, sequences[Y].FixtureState[fixtureNumber])
 			}
 		}
 

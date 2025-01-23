@@ -93,16 +93,6 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.Running[sequenceNumber] = sequences[sequenceNumber].SavedRun
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
-		this.NumberFixtures[sequenceNumber] = sequences[sequenceNumber].NumberFixtures
-
-		// Restore fixture state.
-		fixtureState := []common.FixtureState{}
-		for fixtureNumber := 0; fixtureNumber < this.NumberFixtures[sequenceNumber]; fixtureNumber++ {
-			this.FixtureState[sequenceNumber] = make([]common.FixtureState, this.NumberFixtures[sequenceNumber])
-			newState := sequences[sequenceNumber].FixtureState[fixtureNumber]
-			fixtureState = append(fixtureState, newState)
-		}
-		this.FixtureState[sequenceNumber] = fixtureState
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type

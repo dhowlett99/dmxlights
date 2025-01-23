@@ -194,11 +194,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		}
 
 		// Enable all fixtures.
-		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-			this.FixtureState[sequence.Number][fixtureNumber].Enabled = true
-			this.FixtureState[sequence.Number][fixtureNumber].RGBInverted = false
-			this.FixtureState[sequence.Number][fixtureNumber].ScannerPatternReversed = false
-		}
+		EnableAllFixtures(sequence.Number, commandChannels)
 
 		// Clear all the function buttons for this sequence.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
@@ -254,9 +250,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 			}
 		}
-
-		// Set the colors.
-		//sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
 
 		// Handle the display for this sequence.
 		this.SelectedSequence = sequenceNumber

@@ -347,6 +347,8 @@ const (
 	UpdateAutoPattern
 	ToggleFixtureState
 	UpdateRGBShift
+	InvertAllFixtures
+	EnableAllFixtures
 	UpdateRGBInvert
 	UpdateScannerShift
 	UpdateScannerColor

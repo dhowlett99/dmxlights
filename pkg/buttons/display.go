@@ -155,7 +155,7 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		common.HideSequence(sequenceNumber, commandChannels)
 
 		// Display the fixture status bar.
-		showFixtureStatus(this.TargetSequence, sequences[sequenceNumber].Number, sequences[sequenceNumber].NumberFixtures, this, eventsForLaunchpad, guiButtons, commandChannels)
+		showFixtureStatus(this.TargetSequence, sequences[sequenceNumber], eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
