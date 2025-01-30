@@ -102,7 +102,7 @@ func StartSequence(sequence common.Sequence,
 			steps = generateSteps(steps, sequence.RGBAvailablePatterns, &sequence, soundConfig, fixturesConfig)
 
 			if debug {
-				fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberSteps=%d \n", sequence.Number, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberSteps)
+				fmt.Printf("%d: Begin CHASE Sequence type %s label %s Running %t Colors %+v NumberFIxtures=%d, NumberSteps=%d \n", sequence.Number, sequence.Type, sequence.Label, sequence.Run, sequence.SequenceColors, sequence.NumberFixtures, sequence.NumberSteps)
 			}
 
 			// Calculate positions from steps.  Soeed, shift, size and fade can be addjusted in this loop.
