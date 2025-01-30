@@ -57,7 +57,7 @@ func StartSequence(sequence common.Sequence,
 	var steps []common.Step
 
 	if debug {
-		fmt.Printf("Start sequence %d\n", sequence.Number)
+		fmt.Printf("Start sequence %d with %d fixtures\n", sequence.Number, sequence.NumberFixtures)
 	}
 
 	// Create channels used for stepping the fixture threads for this sequnece.

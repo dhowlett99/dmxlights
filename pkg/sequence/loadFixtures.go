@@ -51,7 +51,7 @@ func LoadNewFixtures(sequence *common.Sequence,
 	time.Sleep(500 * time.Millisecond)
 
 	// Count the number of fixtures for this sequence.
-	sequence.NumberFixtures = CountNumberOfFixtures(*sequence, fixturesConfig)
+	sequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequence.Number, fixturesConfig)
 
 	// Create a new set of fixture command channels.
 	fixtureStepChannels = CreateFixtureChannels(sequence.NumberFixtures, fixturesConfig)
@@ -85,19 +85,6 @@ func StopFixtureReceivers(fixtureStepChannels []chan common.FixtureCommand, sequ
 		fixtureStepChannels[fixtureNumber] <- command
 
 	}
-}
-
-// CountNumberOfFixtures counts the number of fixturs in this sequence.
-// Takes the sequence number and the fixture config.
-// Returns a number of fixtures available for this sequence.
-func CountNumberOfFixtures(sequence common.Sequence, fixturesConfig *fixture.Fixtures) int {
-
-	sequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequence.Number, fixturesConfig)
-	if debug {
-		fmt.Printf("%d: Number of Patterms %d\n", sequence.Number, sequence.NumberFixtures)
-	}
-
-	return sequence.NumberFixtures
 }
 
 // Create channels used for stepping the fixture threads for this sequnece.

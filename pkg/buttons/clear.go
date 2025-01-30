@@ -28,10 +28,8 @@ import (
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
-
-	debug := false
 
 	if debug {
 		fmt.Printf("CLEAR LAUNCHPAD\n")
@@ -117,9 +115,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Start full clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
-		buttonTouched(common.Button{X: X, Y: Y}, colors.Cyan, colors.White, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: 0, Y: -1}, colors.Cyan, colors.White, eventsForLaunchpad, guiButtons)
 	} else {
-		buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Magenta, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: 0, Y: -1}, colors.White, colors.Magenta, eventsForLaunchpad, guiButtons)
 	}
 
 	// Reset the launchpad.

@@ -2667,7 +2667,7 @@ func HowManyFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) int {
 	var recents []int
 
 	if debug {
-		fmt.Printf("HowManyFixturesInGroup for sequence %d\n", sequenceNumber)
+		fmt.Printf("\nHowManyFixturesInGroup for sequence %d\n", sequenceNumber)
 	}
 
 	var count int
@@ -2677,7 +2677,7 @@ func HowManyFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) int {
 		if fixture.Group == sequenceNumber+1 {
 
 			if debug {
-				fmt.Printf("Found fixture in group %d\n", fixture.Number)
+				fmt.Printf("\t%d: Found fixture in group %d\n", sequenceNumber, fixture.Number)
 			}
 
 			// Have we seen this fixture number already
@@ -2686,18 +2686,25 @@ func HowManyFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) int {
 				// If this is a multifixture device
 				if fixture.MultiFixtureDevice {
 
+					if debug {
+						fmt.Printf("\t\t%d: Found MultiFixtureDevice %d\n", sequenceNumber, fixture.Number)
+					}
+
 					// Then count the number of RGB channels.
 					for _, channel := range fixture.Channels {
 						if strings.Contains(channel.Name, "Red") {
+							if debug {
+								fmt.Printf("\t\t\t%d: Found Red Channel %d\n", sequenceNumber, fixture.Number)
+							}
 							count++
 						}
 					}
-					return count
+					break
 				}
 
 				// Only count this one if we haven't counted it already.
 				if debug {
-					fmt.Printf("Add fixture in recents %d\n", fixture.Number)
+					fmt.Printf("\t\tAdd fixture in recents %d\n", fixture.Number)
 				}
 				recents = append(recents, fixture.Number)
 				count++
@@ -2706,7 +2713,7 @@ func HowManyFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) int {
 	}
 
 	if debug {
-		fmt.Printf("Found %d fixtures for sequence number %d\n", count, sequenceNumber)
+		fmt.Printf("%d: Found %d fixtures\n", sequenceNumber, count)
 	}
 	return count
 }
@@ -2720,4 +2727,25 @@ func haveWeSeenThisBefore(recents []int, fixtureNumber int) bool {
 
 	}
 	return false
+}
+
+// Automatically set the number of sub fixtures inside a fixture.
+func SetMultiFixtureFlag(fixturesConfig *Fixtures) {
+
+	for fixtureNumber, fixture := range fixturesConfig.Fixtures {
+		// Automatically set the number of sub fixtures inside a fixture.
+		var numberSubFixtures int
+		for _, channel := range fixture.Channels {
+			if strings.Contains(channel.Name, "Red") {
+				numberSubFixtures++
+			}
+		}
+		if numberSubFixtures > 1 {
+			if debug {
+				fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
+			}
+			fixturesConfig.Fixtures[fixtureNumber].MultiFixtureDevice = true
+			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
+		}
+	}
 }

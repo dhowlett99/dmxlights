@@ -685,14 +685,15 @@ func AreYouSureDialog(myWindow fyne.Window, message string) *widget.PopUp {
 }
 
 // MakeToolbar generates a tool bar at the top of the main window.
-func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
-	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command,
-	config *usbdmx.ControllerConfig, launchPadName string, fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures, this *buttons.CurrentState) *widget.Toolbar {
+func MakeToolbar(myWindow fyne.Window, sequences []*common.Sequence, dmxController *ft232.DMXController,
+	guiButtons chan common.ALight, eventsForLaunchPad chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence,
+	fixturesConfig *fixture.Fixtures, startConfig *fixture.Fixtures, this *buttons.CurrentState) *widget.Toolbar {
 
 	// Project open.
 	toolbar := widget.NewToolbar(
 		widget.NewToolbarAction(theme.FolderOpenIcon(), func() {
-			FileOpen(myWindow, startConfig, fixturesConfig, commandChannels, this)
+			FileOpen(myWindow, startConfig, this, sequences, dmxController, fixturesConfig,
+				commandChannels, eventsForLaunchPad, guiButtons, updateChannels)
 		}),
 
 		// Project save.
@@ -702,7 +703,7 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 
 		widget.NewToolbarSeparator(),
 		widget.NewToolbarAction(theme.SettingsIcon(), func() {
-			modal := RunSettingsPopUp(myWindow, soundConfig, guiButtons, eventsForLaunchPad, config, launchPadName)
+			modal := RunSettingsPopUp(myWindow, this.SoundConfig, guiButtons, eventsForLaunchPad, this.DmxInterfacePresentConfig, this.LaunchpadName)
 			modal.Resize(fyne.NewSize(250, 250))
 			modal.Show()
 		}),
@@ -711,7 +712,9 @@ func MakeToolbar(myWindow fyne.Window, soundConfig *sound.SoundConfig,
 }
 
 // Open file.
-func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, this *buttons.CurrentState) {
+func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons.CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
+
 	fileOpener := dialog.NewFileOpen(func(reader fyne.URIReadCloser, err error) {
 		if err == nil && reader != nil {
 			newFixturesConfig, err := fixture.LoadFixturesReader(reader)
@@ -725,6 +728,9 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 				startConfig.Fixtures = append(startConfig.Fixtures, newFixturesConfig.Fixtures...)
 				filename := filepath.Base(reader.URI().String())
 				myWindow.SetTitle("DMX Lights:" + filename)
+
+				// Automatically set the number of sub fixtures inside a fixture.
+				fixture.SetMultiFixtureFlag(newFixturesConfig)
 
 				// Copy the newFixtures into the old pointer to the fixtures config.
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
@@ -747,6 +753,7 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 				}
 				common.SendCommandToAllSequence(cmd, commandChannels)
 			}
+			buttons.Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		}
 	}, myWindow)
 	pwd, _ := os.Getwd()

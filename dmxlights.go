@@ -23,7 +23,6 @@ import (
 	"os"
 	"os/signal"
 	"strconv"
-	"strings"
 	"syscall"
 	"time"
 
@@ -237,22 +236,8 @@ func main() {
 		}
 	}
 
-	for fixtureNumber, fixture := range fixturesConfig.Fixtures {
-		// Automatically set the number of sub fixtures inside a fixture.
-		var numberSubFixtures int
-		for _, channel := range fixture.Channels {
-			if strings.Contains(channel.Name, "Red") {
-				numberSubFixtures++
-			}
-		}
-		if numberSubFixtures > 1 {
-			if debug {
-				fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
-			}
-			fixturesConfig.Fixtures[fixtureNumber].MultiFixtureDevice = true
-			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
-		}
-	}
+	// Automatically set the number of sub fixtures inside a fixture.
+	fixture.SetMultiFixtureFlag(fixturesConfig)
 
 	// Now that the fixtures config is setup, make a copy.
 	startConfig := &fixture.Fixtures{}
@@ -421,7 +406,9 @@ func main() {
 	this.SoundConfig = sound.NewSoundTrigger(this.SequenceChannels, guiButtons, eventsForLaunchpad)
 
 	// Generate the toolbar at the top.
-	toolbar := gui.MakeToolbar(myWindow, this.SoundConfig, guiButtons, eventsForLaunchpad, commandChannels, dmxInterfaceConfig, this.LaunchpadName, fixturesConfig, startConfig, &this)
+	toolbar := gui.MakeToolbar(myWindow, sequences, dmxController,
+		guiButtons, eventsForLaunchpad, commandChannels, updateChannels,
+		fixturesConfig, startConfig, &this)
 
 	// Create objects for bottom status bar.
 	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED))
@@ -525,7 +512,7 @@ func main() {
 
 	// Clear the pad. Strobe is set to 0.
 	fixture.AllFixturesOff(sequences, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, this.DmxInterfacePresent)
-	buttons.Clear(0, 0, &this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+	buttons.Clear(&this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 
 	// If present create a thread to listen to launchpad button events.
 	if this.LaunchPadConnected {
@@ -553,7 +540,8 @@ func main() {
 
 	// Main menu.
 	openProject := fyne.NewMenuItem("Open", func() {
-		gui.FileOpen(myWindow, startConfig, fixturesConfig, commandChannels, &this)
+		gui.FileOpen(myWindow, startConfig, &this, sequences, dmxController, fixturesConfig,
+			commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 	})
 	saveProject := fyne.NewMenuItem("Save", func() {
 		gui.FileSave(myWindow, startConfig, fixturesConfig, commandChannels)

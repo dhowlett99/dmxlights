@@ -1019,9 +1019,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Find the number of fixtures for this sequence.
 		if sequence.Label == "chaser" {
 			scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
-			sequence.NumberFixtures = GetNumberOfFixtures(scannerSequenceNumber, fixturesConfig)
+			sequence.NumberFixtures = fixture.HowManyFixturesInGroup(scannerSequenceNumber, fixturesConfig)
 		} else {
-			sequence.NumberFixtures = GetNumberOfFixtures(mySequenceNumber, fixturesConfig)
+			sequence.NumberFixtures = fixture.HowManyFixturesInGroup(mySequenceNumber, fixturesConfig)
 		}
 
 		// Destoy current fixtures and create new threads for the new fixtures.
@@ -1155,43 +1155,4 @@ func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) [
 	}
 
 	return availableFixtures
-}
-
-func GetNumberOfFixtures(sequenceNumber int, fixtures *fixture.Fixtures) int {
-
-	if debug {
-		fmt.Printf("getNumberOfFixtures for sequence %d\n", sequenceNumber)
-	}
-
-	var numberFixtures int
-
-	for _, fixture := range fixtures.Fixtures {
-		if fixture.Group-1 == sequenceNumber {
-			// config has use_channels set.
-			if fixture.MultiFixtureDevice {
-				if debug {
-					fmt.Printf("Sequence %d Found Number of Channels def. : %d\n", sequenceNumber, fixture.NumberSubFixtures)
-				}
-				// Since we don't yet have code that understands how to place a multi fixture device into a sequence
-				// we always return the max channels in a sequence, currently 8
-				return common.MAX_NUMBER_OF_CHANNELS
-			} else {
-				// Examine the channels and count number of color channels.
-				// We use Red for the count.
-				var subFixture int
-				if subFixture > 1 {
-					numberFixtures = numberFixtures + subFixture
-				} else {
-					if fixture.Number > numberFixtures {
-						numberFixtures++
-					}
-				}
-			}
-		}
-	}
-
-	if debug {
-		fmt.Printf("numberFixtures found %d\n", numberFixtures)
-	}
-	return numberFixtures
 }
