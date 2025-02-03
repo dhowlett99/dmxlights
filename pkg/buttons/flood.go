@@ -49,6 +49,18 @@ func floodOff(numberSequences int, this *CurrentState, commandChannels []chan co
 		common.SendCommandToAllSequence(cmd, commandChannels)
 	}
 
+	// Retore any shutter chaser mode.
+	if this.ScannerChaser[this.SelectedSequence] {
+		// Tell the scanner sequence to hide their indicator lamps.
+		cmd = common.Command{
+			Action: common.Hide,
+			Args: []common.Arg{
+				{Name: "Hide", Value: this.ScannerChaser[this.SelectedSequence]},
+			},
+		}
+		common.SendCommandToSequence(this.ScannerSequenceNumber, cmd, commandChannels)
+	}
+
 	// ReStart any sequences that were running before the flood.
 	for sequenceNumber := 0; sequenceNumber < numberSequences; sequenceNumber++ {
 		if this.Running[sequenceNumber] {

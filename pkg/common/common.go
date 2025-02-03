@@ -558,7 +558,6 @@ type FixtureCommand struct {
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int
 	ScannerShutterPositions  map[int]Position
-	ScannerHasShutterChase   bool
 
 	// Derby Commands
 	Rotate  int

@@ -584,7 +584,7 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-		// Tell the scannern & chaser sequences that the scanner shutter chase flag is on.
+		// Tell the scanner & chaser sequences that the scanner shutter chase flag is on.
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{

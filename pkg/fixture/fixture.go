@@ -1192,7 +1192,7 @@ func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixt
 
 // When want to light a DMX fixture we need for find it in our fuxture.yaml configuration file.
 // This function maps the requested fixture into a DMX address.
-func MapFixtures(chaser bool, hadShutterChase bool,
+func MapFixtures(chaser bool, hasShutterChaser bool,
 	mySequenceNumber int,
 	displayFixture int,
 	color color.RGBA,
@@ -1282,7 +1282,7 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 						if strings.Contains(channel.Name, "ProgramSpeed") {
 							SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
 						}
-						if !hadShutterChase {
+						if !hasShutterChaser {
 							if strings.Contains(channel.Name, "Gobo") {
 								for _, setting := range channel.Settings {
 									if setting.Number == selectedGobo {
@@ -1292,7 +1292,7 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 								}
 							}
 						}
-						if !hadShutterChase {
+						if !hasShutterChaser {
 							if strings.Contains(channel.Name, "Color") {
 								for _, setting := range channel.Settings {
 									if setting.Number-1 == scannerColor {
@@ -1310,7 +1310,7 @@ func MapFixtures(chaser bool, hadShutterChase bool,
 							}
 						}
 						// Master Dimmer.
-						if !hadShutterChase {
+						if !hasShutterChaser {
 							if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
 								if strings.Contains(channel.Name, "reverse") ||
 									strings.Contains(channel.Name, "Reverse") ||
