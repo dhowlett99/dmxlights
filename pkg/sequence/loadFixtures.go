@@ -51,7 +51,12 @@ func LoadNewFixtures(sequence *common.Sequence,
 	time.Sleep(500 * time.Millisecond)
 
 	// Count the number of fixtures for this sequence.
-	sequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequence.Number, fixturesConfig)
+	// The chaser uses the fixtures from the scanner group.
+	if sequence.Label == "chaser" {
+		sequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequence.ScannerSequenceNumber, fixturesConfig)
+	} else {
+		sequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequence.Number, fixturesConfig)
+	}
 
 	// Create a new set of fixture command channels.
 	fixtureStepChannels = CreateFixtureChannels(sequence.NumberFixtures, fixturesConfig)

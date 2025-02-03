@@ -278,22 +278,23 @@ func main() {
 
 		if newSequence.Label == "chaser" {
 			this.ChaserSequenceNumber = sequenceNumber
+			newSequence.ChaserSequenceNumber = sequenceNumber
 		}
 
 		if newSequence.Type == "scanner" {
 			this.ScannerSequenceNumber = sequenceNumber
+			newSequence.ScannerSequenceNumber = sequenceNumber
 			common.GlobalScannerSequenceNumber = sequenceNumber
 		}
 
+		// Count the number of fixtures for this sequence.
 		// The chaser uses the fixtures from the scanner group.
-		var useSequenceNumber int
-		if sequenceNumber == this.ChaserSequenceNumber {
-			useSequenceNumber = this.ScannerSequenceNumber
+		if newSequence.Label == "chaser" {
+			newSequence.NumberFixtures = fixture.HowManyFixturesInGroup(newSequence.ScannerSequenceNumber, fixturesConfig)
 		} else {
-			useSequenceNumber = sequenceNumber
+			newSequence.NumberFixtures = fixture.HowManyFixturesInGroup(sequenceNumber, fixturesConfig)
 		}
 
-		newSequence.NumberFixtures = fixture.HowManyFixturesInGroup(useSequenceNumber, fixturesConfig)
 		newSequence.RGBAvailablePatterns = pattern.MakePatterns(newSequence.NumberFixtures)
 		sequences = append(sequences, &newSequence)
 

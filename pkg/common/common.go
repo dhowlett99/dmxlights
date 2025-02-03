@@ -386,6 +386,8 @@ type Sequence struct {
 	Label                       string                      // Sequence label.
 	Description                 string                      // Sequence description.
 	Number                      int                         // Sequence number.
+	ChaserSequenceNumber        int                         // Chaser Sequence Number.
+	ScannerSequenceNumber       int                         // Scanner Sequence Number.
 	Run                         bool                        // True if this sequence is running.
 	SavedRun                    bool                        // Place to save state when loading.
 	Bounce                      bool                        // True if this sequence is bouncing.
