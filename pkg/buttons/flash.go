@@ -29,23 +29,28 @@ import (
 
 func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, dmxController *ft232.DMXController) {
 
+	// If we press a fixture button that doesn't have a real fixture behind it, then give up.
+	if X == sequences[Y].NumberFixtures {
+		return
+	}
+
 	this.SelectedType = sequences[Y].Type
 
 	if debug {
-		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d\n", X, Y, this.TargetSequence)
+		fmt.Printf("Flash ON Fixture Pressed X:%d Y:%d Target Seq %d Fixtures=%d\n", X, Y, this.TargetSequence, sequences[Y].NumberFixtures)
 	}
 
 	colorPattern := 5
 	flashSequence := common.Sequence{
 		Pattern: common.Pattern{
 			Name:  "colors",
-			Steps: sequences[this.SelectedSequence].RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
+			Steps: sequences[Y].RGBAvailablePatterns[colorPattern].Steps, // Use the color pattern for flashing.
 		},
 	}
 
 	pan := common.SCANNER_MID_POINT
 	tilt := common.SCANNER_MID_POINT
-	color := flashSequence.Pattern.Steps[X].Fixtures[X].Color
+	color := colors.White
 	shutter := flashSequence.Pattern.Steps[X].Fixtures[X].Shutter
 	rotate := flashSequence.Pattern.Steps[X].Fixtures[X].Rotate
 	music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
