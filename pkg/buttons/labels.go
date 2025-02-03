@@ -190,7 +190,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// Storage for chaser labels on the bottom row.
 	var guiBottomChaserButtons [8]bottonButton
 	guiBottomChaserButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Speed", "Down"), Color: colors.Cyan}
-	guiBottomChaserButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase", "Up"), Color: colors.Cyan}
+	guiBottomChaserButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Speed", "Up"), Color: colors.Cyan}
 	guiBottomChaserButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Shift", "Down"), Color: colors.Cyan}
 	guiBottomChaserButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Shift", "Up"), Color: colors.Cyan}
 	guiBottomChaserButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Chase Size", "Down"), Color: colors.Cyan}
