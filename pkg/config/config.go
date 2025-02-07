@@ -66,7 +66,7 @@ func DeleteConfig(filename string) error {
 	return nil
 }
 
-func AskToLoadPreset(commandChannels []chan common.Command, X int, Y int) {
+func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
 	command := common.Command{
 		Action: common.LoadPreset,
 		Args: []common.Arg{
