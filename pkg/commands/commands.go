@@ -1013,8 +1013,18 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const FIXTURES_CONFIG = 0
 		fixturesConfig = command.Args[FIXTURES_CONFIG].Value.(*fixture.Fixtures)
 
-		// Find the fixtures.
-		sequence.ScannersAvailable = SetAvalableFixtures(mySequenceNumber, fixturesConfig)
+		if sequence.Label == "scanner" {
+			// Find the fixtures.
+			sequence.ScannersAvailable = SetAvalableFixtures(mySequenceNumber, fixturesConfig)
+
+			// Setup fixtures labels.
+			sequence.GuiFixtureLabels = []string{}
+			for _, fixture := range fixturesConfig.Fixtures {
+				if fixture.Type == "scanner" {
+					sequence.GuiFixtureLabels = append(sequence.GuiFixtureLabels, fixture.Label)
+				}
+			}
+		}
 
 		// Find the number of fixtures for this sequence.
 		if sequence.Label == "chaser" {
@@ -1027,15 +1037,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Destoy current fixtures and create new threads for the new fixtures.
 		sequence.LoadNewFixtures = true
 
-		// Setup fixtures labels.
-		sequence.GuiFixtureLabels = []string{}
-		for _, fixture := range fixturesConfig.Fixtures {
-			if fixture.Type == "scanner" {
-				sequence.GuiFixtureLabels = append(sequence.GuiFixtureLabels, fixture.Label)
-			}
-		}
+		// Make patterns for the number of fixtures.
+		sequence.LoadPatterns = true
 
-		// Enable all the defined fixtures.
+		// Reset the state of all the defined fixtures.
 		for x := 0; x < sequence.NumberFixtures; x++ {
 			newScanner := common.FixtureState{}
 			newScanner.Enabled = true
@@ -1141,12 +1146,12 @@ func SetAvalableFixtures(sequenceNumber int, fixturesConfig *fixture.Fixtures) [
 	// You need to select a fixture before you can choose a color or gobo.
 	// availableFixtures holds a set of red buttons, one for every available fixture.
 	availableFixtures := []common.StaticColorButton{}
-	for _, f := range fixturesConfig.Fixtures {
-		if f.Type == "scanner" {
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "scanner" {
 			newFixture := common.StaticColorButton{}
-			newFixture.Name = f.Name
-			newFixture.Label = f.Label
-			newFixture.Number = f.Number
+			newFixture.Name = fixture.Name
+			newFixture.Label = fixture.Label
+			newFixture.Number = fixture.Number
 			newFixture.SelectedColor = 1 // Red
 			newFixture.Color = colors.Red
 			//newFixture.NumberOfGobos = fixture.HowManyGobosForThisFixture(f.Number, sequenceNumber, fixturesConfig)

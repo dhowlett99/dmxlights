@@ -493,7 +493,7 @@ func newNoHoverButton(label string, tapped func()) *noHoverButton {
 func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	sequences []*common.Sequence,
 	this *buttons.CurrentState,
-	eventsForLauchpad chan common.ALight,
+	eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight,
 	dmxController *ft232.DMXController,
 	groupConfig *fixture.Groups,
@@ -547,8 +547,8 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 					buttonCancel := widget.NewButton("Cancel", func() {
 						presets.RemovePreset(this.PresetsStore, X, Y)
 						// Unused preset is set to yellow.
-						common.LightLamp(common.Button{X: X, Y: Y - 1}, colors.PresetYellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-						buttons.SavePresetOff(this, eventsForLauchpad, guiButtons)
+						common.LightLamp(common.Button{X: X, Y: Y - 1}, colors.PresetYellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+						buttons.SavePresetOff(this, eventsForLaunchpad, guiButtons)
 						popup.Hide()
 					})
 
@@ -571,19 +571,19 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 						}
 						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: presetInput.Text, State: true, Selected: true, ButtonColor: buttonColorSelect.Selected}
 						presets.SavePresets(this.PresetsStore)
-						presets.RefreshPresets(eventsForLauchpad, guiButtons, this.PresetsStore)
+						presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 					}
 					popup.Show()
 				}
 			}
 			this.GUI = true
-			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLauchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
+			buttons.ProcessButtons(X, Y-1, sequences, this, eventsForLaunchpad, guiButtons, dmxController, fixturesConfig, commandChannels, replyChannels, updateChannels)
 
 			skipPopup = false
 		})
 		if X == 8 && Y == 0 {
 			button := widget.NewButton("DMXLIGI", func() {
-				modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels, SwitchOverrides)
+				modal, err := editor.NewFixturePanel(this, sequences, myWindow, groupConfig, fixturesConfig, eventsForLaunchpad, guiButtons, commandChannels, SwitchOverrides)
 				if err != nil {
 					fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", Y, X, err)
 					return
@@ -621,9 +621,9 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 	return row0
 }
 
-func NewFixtureEditor(sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, SwitchOverrides *[][]common.Override) error {
+func NewFixtureEditor(this *buttons.CurrentState, sequences []*common.Sequence, myWindow fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, SwitchOverrides *[][]common.Override) error {
 
-	modal, err := editor.NewFixturePanel(sequences, myWindow, groupConfig, fixturesConfig, commandChannels, SwitchOverrides)
+	modal, err := editor.NewFixturePanel(this, sequences, myWindow, groupConfig, fixturesConfig, eventsForLaunchpad, guiButtons, commandChannels, SwitchOverrides)
 	if err != nil {
 		fmt.Println(err.Error())
 		return err

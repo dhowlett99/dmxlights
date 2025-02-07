@@ -25,7 +25,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
-func floodOff(numberSequences int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func FloodOff(numberSequences int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Turn the flood button back to white.
 	common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
@@ -147,7 +147,7 @@ func toggleFlood(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 			this.PresetsStore[*this.LastPreset] = presets.Preset{State: lastPreset.State, Selected: true, Label: lastPreset.Label, ButtonColor: lastPreset.ButtonColor}
 			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 		}
-		floodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
+		FloodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 }

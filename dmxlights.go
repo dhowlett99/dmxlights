@@ -556,7 +556,7 @@ func main() {
 		modal.Show()
 	})
 	editFixtures := fyne.NewMenuItem("Edit", func() {
-		gui.NewFixtureEditor(sequences, myWindow, groupConfig, fixturesConfig, commandChannels, this.SwitchOverrides)
+		gui.NewFixtureEditor(&this, sequences, myWindow, groupConfig, fixturesConfig, eventsForLaunchpad, guiButtons, commandChannels, this.SwitchOverrides)
 	})
 	projectMenu := fyne.NewMenu("Project", openProject, saveProject)
 	settingsMenu := fyne.NewMenu("Settings", editSettings)

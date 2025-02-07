@@ -47,7 +47,7 @@ func togglePresetSaveMode(numberSequences int, this *CurrentState, eventsForLaun
 	}
 	this.SavePreset = true
 	if this.Flood { // Turn off flood.
-		floodOff(numberSequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		FloodOff(numberSequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 	}
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 	common.FlashLight(common.SAVE_BUTTON, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)

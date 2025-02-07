@@ -28,6 +28,7 @@ import (
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/buttons"
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -144,13 +145,13 @@ func updateArray(fixtures []fixture.Fixture) [][]string {
 func generateFixtureNumberOptions(totalNumberOptions int) []string {
 
 	var options []string
-	for x := 0; x < totalNumberOptions; x++ {
+	for x := 1; x <= totalNumberOptions; x++ {
 		options = append(options, strconv.Itoa(x))
 	}
 	return options
 }
 
-func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtures *fixture.Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
@@ -162,7 +163,7 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 
 	// Populate group options from the available sequence labels.
 	fp.GroupOptions = getGroupOptions(groupConfig)
-	fp.NumberOptions = generateFixtureNumberOptions(255)
+	fp.NumberOptions = generateFixtureNumberOptions(8)
 	fp.TypeOptions = []string{"rgb", "scanner", "switch", "projector"}
 
 	// Storage for error flags for each fixture.
@@ -622,6 +623,43 @@ func NewFixturePanel(sequences []*common.Sequence, w fyne.Window, groupConfig *f
 
 		// Insert updated fixture into fixtures.
 		fixtures.Fixtures = fp.FixtureList
+
+		// Stop any running sequences.
+		for _, sequence := range sequences {
+			cmd := common.Command{
+				Action: common.Stop,
+			}
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(sequence.Number, cmd, commandChannels)
+		}
+
+		// Clear the sequence buttons.
+		for _, sequence := range sequences {
+			this.Running[sequence.Number] = false
+			common.ShowRunningStatus(this.Running[sequence.Number], eventsForLaunchpad, guiButtons)
+			// Clear the pattern function keys
+			common.ClearSelectedRowOfButtons(sequence.Number, eventsForLaunchpad, guiButtons)
+			// Turn off any function mode.
+			this.SelectedMode[this.SelectedSequence] = buttons.NORMAL
+			this.SelectButtonPressed[sequence.Number] = false
+			buttons.SavePresetOff(this, eventsForLaunchpad, guiButtons)
+			if this.Flood { // Turn off flood.
+				buttons.FloodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
+			}
+		}
+
+		// Count the number of fixtures for all sequences since the user may have added or deleted fixtures.
+		// The chaser uses the fixtures from the scanner group.
+		for _, sequence := range sequences {
+			cmd := common.Command{
+				Action: common.UpdateFixturesConfig,
+				Args: []common.Arg{
+					{Name: "Fixtures", Value: fixtures},
+				},
+			}
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(sequence.Number, cmd, commandChannels)
+		}
 
 		// Find the switch sequence number.
 		var SwitchSequenceNumber int

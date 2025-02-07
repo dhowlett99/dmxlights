@@ -73,15 +73,6 @@ func StartSequence(sequence common.Sequence,
 			sequence.StaticColors[fixtureNumber].Enabled = state.Enabled
 		}
 
-		// Load new set of RGB Patterns if signaled to do so.
-		if sequence.LoadPatterns {
-			if debug {
-				fmt.Printf("%d: Load New Patterns\n", sequence.Number)
-			}
-			sequence.RGBAvailablePatterns = fixture.LoadAvailablePatterns(sequence, fixturesConfig)
-			sequence.LoadPatterns = false
-		}
-
 		// Load new set of fixtures and setup fixture threads and channels to those fixtures.
 		// If signaled to do so.
 		if sequence.LoadNewFixtures {
@@ -90,6 +81,15 @@ func StartSequence(sequence common.Sequence,
 			}
 			fixtureStepChannels = LoadNewFixtures(&sequence, fixtureStepChannels, eventsForLaunchpad, guiButtons, switchChannels, channels.SoundTriggers, soundConfig, dmxController, fixturesConfig, dmxInterfacePresent)
 			sequence.LoadNewFixtures = false
+		}
+
+		// Load new set of RGB Patterns if signaled to do so.
+		if sequence.LoadPatterns {
+			if debug {
+				fmt.Printf("%d: Load New Patterns\n", sequence.Number)
+			}
+			sequence.RGBAvailablePatterns = fixture.LoadAvailablePatterns(sequence, fixturesConfig)
+			sequence.LoadPatterns = false
 		}
 
 		// Process any commands.
