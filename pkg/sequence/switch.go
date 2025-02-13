@@ -59,6 +59,11 @@ func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number-1].Override.Speed)
 	}
 
+	if switchNumber >= sequence.NumberFixtures {
+		fmt.Printf("setSwitchDMX: error switch number exceeds number of fixtures")
+		return
+	}
+
 	state := swiTch.States[swiTch.CurrentPosition]
 
 	// Now send a message to the fixture to play all the values for this state.

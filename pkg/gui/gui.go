@@ -570,7 +570,7 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 							return
 						}
 						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: presetInput.Text, State: true, Selected: true, ButtonColor: buttonColorSelect.Selected}
-						presets.SavePresets(this.PresetsStore)
+						presets.SavePresets(this.PresetsStore, this.ProjectName)
 						presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 					}
 					popup.Show()
@@ -727,7 +727,9 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 				startConfig.Fixtures = []fixture.Fixture{}
 				startConfig.Fixtures = append(startConfig.Fixtures, newFixturesConfig.Fixtures...)
 				filename := filepath.Base(reader.URI().String())
-				myWindow.SetTitle("DMX Lights:" + filename)
+				result := strings.Split(filename, ".")
+				this.ProjectName = result[0]
+				myWindow.SetTitle("DMX Lights:" + this.ProjectName)
 
 				// Automatically set the number of sub fixtures inside a fixture.
 				fixture.SetMultiFixtureFlag(newFixturesConfig)
@@ -752,6 +754,12 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 					},
 				}
 				common.SendCommandToAllSequence(cmd, commandChannels)
+
+				this.PresetsStore, err = presets.LoadPresets(this.ProjectName)
+				if err != nil {
+					// If this project doesn't have a preset store file, create one.
+					presets.SavePresets(this.PresetsStore, this.ProjectName)
+				}
 			}
 			buttons.Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		}

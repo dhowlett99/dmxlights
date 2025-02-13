@@ -51,7 +51,7 @@ const debug = false
 
 const NumberOfSwitches = 8
 
-const DEFAULT_PROJECT = "Default.yaml"
+const DEFAULT_PROJECT = "Default"
 
 func main() {
 
@@ -112,6 +112,7 @@ func main() {
 	overrides := make([][]common.Override, NumberOfSwitches)
 
 	// Setup the current state.
+	this.ProjectName = DEFAULT_PROJECT                                    // Project Name.
 	this.MyWindow = myWindow                                              // Pointer to main window.
 	this.Blackout = false                                                 // Blackout starts in off.
 	this.Flood = false                                                    // Flood starts in off.
@@ -132,7 +133,6 @@ func main() {
 	this.SequenceType = make([]string, numberOfSequences)                 // Remember sequence type.
 	this.EditPatternMode = false                                          // Remember when we are in editing pattern mode.
 	this.StaticButtons = makeStaticButtonsStorage()                       // Make storgage for color editing button results.
-	this.PresetsStore = presets.LoadPresets()                             // Loads the preset definitions from their json file.
 	this.Speed = make(map[int]int, numberOfSequences+NumberOfSwitches)    // Initialise storage for four sequences and eight switches.
 	this.SwitchOverrides = &overrides                                     // Initialise local override storage for eight switches. Indexed by switch number and state.
 	this.RGBSize = make(map[int]int, numberOfSequences+NumberOfSwitches)  // Initialise storage for four sequences and eight switches.
@@ -151,6 +151,12 @@ func main() {
 	this.Functions = make(map[int][]common.Function)                      // Array holding functions for each sequence.
 	this.SavedSequenceColors = make(map[int][]color.RGBA)                 // Array holding saved sequence colors for each sequence. Used by the color picker.
 	this.LastSelectedSwitch = common.NOT_SELECTED                         // Set the last selected switch to not selected.
+
+	// Load default preset file.
+	this.PresetsStore, err = presets.LoadPresets(this.ProjectName) // Loads the preset definitions from their json file.
+	if err != nil {
+		fmt.Printf("error loading preset store for Default project")
+	}
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = []common.SwitchChannel{}
@@ -179,7 +185,7 @@ func main() {
 	go func() {
 		<-c
 		fmt.Println("Saving Presets")
-		presets.SavePresets(this.PresetsStore)
+		presets.SavePresets(this.PresetsStore, this.ProjectName)
 		os.Exit(1)
 	}()
 
@@ -568,7 +574,7 @@ func main() {
 	myWindow.ShowAndRun()
 
 	fmt.Println("Saving Presets")
-	presets.SavePresets(this.PresetsStore)
+	presets.SavePresets(this.PresetsStore, this.ProjectName)
 
 }
 

@@ -66,9 +66,10 @@ deploy: installer
 	codesign --force --deep --entitlements entitlements.plist --verbose=2 --options runtime --sign ${CERT} -i ${APP_ID} ${APP_NAME}.app
 	mkdir -p dmxlights.app/Contents/Resources/projects
 	cp projects/Default.yaml dmxlights.app/Contents/Resources/projects
+	- ./deploy_presets.sh
 	cp groups.yaml dmxlights.app/Contents/Resources/
 	cp sequences.yaml dmxlights.app/Contents/Resources/
 	cp dmxlights.png dmxlights.app/Contents/Resources/
 	cp labels.yaml dmxlights.app/Contents/Resources/
-	cp *.json dmxlights.app/Contents/Resources/
+
 

@@ -84,14 +84,17 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
 		}
 
+		// Get the name of the config file.
+		path := config.GetProjectConfigPath(this.ProjectName, X, Y)
+
 		// Delete the config file
-		config.DeleteConfig(fmt.Sprintf("config%d.%d.json", X, Y))
+		config.DeleteConfig(path)
 
 		// Delete from preset store
 		this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)] = presets.Preset{State: false, Selected: false, Label: "", ButtonColor: ""}
 
 		// Update the copy of presets on disk.
-		presets.SavePresets(this.PresetsStore)
+		presets.SavePresets(this.PresetsStore, this.ProjectName)
 
 		// Show presets again.
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
@@ -128,12 +131,12 @@ func savePresets(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 		this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
 		this.LastPreset = &location
 
-		config.AskToSaveConfig(commandChannels, replyChannels, X, Y)
+		config.AskToSaveConfig(commandChannels, replyChannels, X, Y, this.ProjectName)
 
-		// turn off the save button from flashing.
+		// Turn off the save button from flashing.
 		common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
-		presets.SavePresets(this.PresetsStore)
+		presets.SavePresets(this.PresetsStore, this.ProjectName)
 
 		// clear any selected preset.
 		for location, preset := range this.PresetsStore {

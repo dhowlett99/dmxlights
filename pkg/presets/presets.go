@@ -90,38 +90,49 @@ func RemovePreset(presets map[string]Preset, x int, y int) {
 	presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset
 }
 
-func SavePresets(presets map[string]Preset) {
+func SavePresets(presets map[string]Preset, projectName string) {
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(presets, "", " ")
 	if err != nil {
 		log.Fatalf("error: marshalling config: %v", err)
 	}
 
+	// Get the preset filename for this project.
+	path := GetPresetNamePath(projectName)
+
 	// Write to file
-	err = os.WriteFile("presets.json", data, 0644)
+	err = os.WriteFile(path, data, 0644)
 	if err != nil {
 		log.Fatalf("error: writing config: %v to file:%s", err, "presets.json")
 	}
 }
 
-func LoadPresets() map[string]Preset {
+func GetPresetNamePath(projectName string) string {
+	path := "projects/." + projectName + "/presets.json"
+	return path
+}
+
+func LoadPresets(projectName string) (map[string]Preset, error) {
+
+	path := GetPresetNamePath(projectName)
 
 	presets := map[string]Preset{}
 
 	// Read the file.
-	data, err := os.ReadFile("presets.json")
+	data, err := os.ReadFile(path)
 	if err != nil {
 		fmt.Printf("error reading presets: %v from file:%s\n", err, "presets.json")
-		return presets
+		return presets, err
 	}
 
 	// Unmarshal into presets map.
 	err = json.Unmarshal(data, &presets)
 	if err != nil {
 		log.Fatalf("error unmashalling presets: %v from file:%s", err, "presets.json")
+		return presets, err
 	}
 
-	return presets
+	return presets, nil
 }
 
 func GetPresetNumber(X int, Y int) string {

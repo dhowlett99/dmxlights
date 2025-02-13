@@ -38,7 +38,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 	// Load the config.
 	// Which forces all sequences to load their config in the stopped position. Run=false.
-	config.AskToLoadConfig(commandChannels, X, Y)
+	config.AskToLoadConfig(commandChannels, X, Y, this.ProjectName)
 
 	// Turn the selected preset light flashing it's current color and yellow.
 	if this.LastPreset != nil {

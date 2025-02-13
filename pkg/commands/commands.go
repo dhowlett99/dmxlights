@@ -978,14 +978,21 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 	// If we are being asked to load a preset, use the new sequence.
 	case common.LoadPreset:
-		const X = 0
-		const Y = 1
+		const FIXTURE = 0
+		const SEQUENCE = 1
+		const PROJECT_NAME = 2
+		X := command.Args[FIXTURE].Value.(int)
+		Y := command.Args[SEQUENCE].Value.(int)
+		projectName := command.Args[PROJECT_NAME].Value.(string)
 		if debug {
-			fmt.Printf("%d: Command Load Config\n", mySequenceNumber)
+			fmt.Printf("%d: Command Load Config for Project %s\n", mySequenceNumber, projectName)
 		}
-		x := command.Args[X].Value.(int)
-		y := command.Args[Y].Value.(int)
-		config := config.LoadConfigFromFile(fmt.Sprintf("config%d.%d.json", x, y))
+
+		// Get the name of the config file.
+		path := config.GetProjectConfigPath(projectName, X, Y)
+
+		config := config.LoadConfigFromFile(path)
+
 		for _, seq := range config {
 			if seq.Number == sequence.Number {
 				sequence = seq

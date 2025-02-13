@@ -52,6 +52,7 @@ const (
 )
 
 type CurrentState struct {
+	ProjectName                 string                    // Name of current project.
 	MyWindow                    fyne.Window               // Pointer to main window.
 	GUI                         bool                      // Flag to indicate use of GUI.
 	Crash1                      bool                      // Flags to detect launchpad crash.
@@ -198,6 +199,8 @@ func ProcessButtons(X int, Y int,
 	if X >= 100 && X < 108 &&
 		(Y > 3 && Y < 7) {
 
+		// Remove the button off offset.
+		X = X - 100
 		recallPreset(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
 		return
 	}

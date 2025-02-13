@@ -224,20 +224,22 @@ func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
 // LoadFixtures opens the fixtures config file using the filename passed.
 // Returns a pointer to the fixtures config.
 // Returns an error.
-func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
+func LoadFixtures(projectName string) (fixtures *Fixtures, err error) {
+
+	filename := "projects" + "/" + projectName + ".yaml"
 
 	if debug {
-		fmt.Printf("LoadFixtures from file %s\n", "projects/"+filename)
+		fmt.Printf("LoadFixtures from file %s\n", filename)
 	}
 
 	// Open the fixtures yaml file.
-	_, err = os.OpenFile("projects/"+filename, os.O_RDONLY, 0644)
+	_, err = os.OpenFile(filename, os.O_RDONLY, 0644)
 	if err != nil {
 		return nil, err
 	}
 
 	// Reads the fixtures yaml file.
-	data, err := os.ReadFile("projects/" + filename)
+	data, err := os.ReadFile(filename)
 	if err != nil {
 		return nil, err
 	}
@@ -246,11 +248,11 @@ func LoadFixtures(filename string) (fixtures *Fixtures, err error) {
 	fixtures = &Fixtures{}
 	err = yaml.Unmarshal(data, fixtures)
 	if err != nil {
-		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + err.Error())
+		return nil, errors.New("error: unmarshalling file: " + filename + err.Error())
 	}
 
 	if len(fixtures.Fixtures) == 0 {
-		return nil, errors.New("error: unmarshalling file: " + "projects/" + filename + " error: fixtures are empty")
+		return nil, errors.New("error: unmarshalling file: " + filename + " error: fixtures are empty")
 	}
 
 	return fixtures, nil
@@ -1828,6 +1830,11 @@ func FindRotateSpeedNumberByName(fixture *Fixture, rotateSettingName string) int
 		fmt.Printf("FindRotateSpeedNameByNumber Looking for rotate speed %s in fixture %s\n", rotateSettingName, fixture.Name)
 	}
 
+	if fixture == nil {
+		fmt.Printf("FindRotateSpeedNumberByName: fixture is empty\n")
+		return 0
+	}
+
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Rotate") {
 			for _, setting := range channel.Settings {
@@ -1983,6 +1990,12 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 	}
 
 	fixtureInfo := FixtureInfo{}
+
+	if thisFixture == nil {
+		fmt.Printf("FindFixtureInfo: fixture is empty\n")
+		return fixtureInfo
+	}
+
 	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
 	fixtureInfo.HasRotateSpeed = isThisAChannel(*thisFixture, "RotateSpeed")
 
