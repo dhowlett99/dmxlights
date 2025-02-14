@@ -308,7 +308,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		}
 		sequence.Chase = true
 		sequence.Static = false
-		sequence.StartPattern = true
 		sequence.Run = true
 		return sequence
 
