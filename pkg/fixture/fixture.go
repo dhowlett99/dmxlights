@@ -1753,6 +1753,10 @@ func FindGoboNameByNumber(fixture *Fixture, number int) string {
 		return "Auto"
 	}
 
+	if fixture == nil {
+		return "Not Found"
+	}
+
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Gobo") {
 			for _, setting := range channel.Settings {
@@ -1805,6 +1809,10 @@ func FindRotateSpeedNameByNumber(fixture *Fixture, number int) string {
 			fmt.Printf("Rotate Speed %d Name Auto\n", number)
 		}
 		return "Auto"
+	}
+
+	if fixture == nil {
+		return "Not Found"
 	}
 
 	for _, channel := range fixture.Channels {
@@ -1880,6 +1888,10 @@ func FindColorNameByNumber(fixture *Fixture, number int) string {
 
 	if debug {
 		fmt.Printf("FindColorNameByNumber looking for color number %d inside fixture %s\n", number, fixture.Name)
+	}
+
+	if fixture == nil {
+		return "Not Found"
 	}
 
 	for _, channel := range fixture.Channels {
@@ -1996,8 +2008,8 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 		return fixtureInfo
 	}
 
-	fixtureInfo.HasRotate = isThisAChannel(*thisFixture, "Rotate")
-	fixtureInfo.HasRotateSpeed = isThisAChannel(*thisFixture, "RotateSpeed")
+	fixtureInfo.HasRotate = isThisAChannel(thisFixture, "Rotate")
+	fixtureInfo.HasRotateSpeed = isThisAChannel(thisFixture, "RotateSpeed")
 
 	// Find all the options for the channel called "Rotate".But only if we have a Rotate Channel exists.
 	if fixtureInfo.HasRotate {
@@ -2019,10 +2031,10 @@ func FindFixtureInfo(thisFixture *Fixture) FixtureInfo {
 
 	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
-	fixtureInfo.HasColorWheel = isThisAChannel(*thisFixture, "Color")
-	fixtureInfo.HasGobo = isThisAChannel(*thisFixture, "Gobo")
-	fixtureInfo.HasProgram = isThisAChannel(*thisFixture, "Program")
-	fixtureInfo.HasProgramSpeed = isThisAChannel(*thisFixture, "ProgramSpeed")
+	fixtureInfo.HasColorWheel = isThisAChannel(thisFixture, "Color")
+	fixtureInfo.HasGobo = isThisAChannel(thisFixture, "Gobo")
+	fixtureInfo.HasProgram = isThisAChannel(thisFixture, "Program")
+	fixtureInfo.HasProgramSpeed = isThisAChannel(thisFixture, "ProgramSpeed")
 	return fixtureInfo
 }
 
@@ -2044,7 +2056,11 @@ func getOptionsForAChannel(thisFixture Fixture, channelName string) []string {
 	return options
 }
 
-func isThisAChannel(thisFixture Fixture, channelName string) bool {
+func isThisAChannel(thisFixture *Fixture, channelName string) bool {
+
+	if thisFixture == nil {
+		return false
+	}
 
 	for _, channel := range thisFixture.Channels {
 		if channel.Name == channelName {

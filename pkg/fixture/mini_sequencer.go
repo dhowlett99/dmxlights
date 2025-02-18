@@ -1031,7 +1031,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.AutoRotate = true
 		config.Forward = false
 		config.Reverse = false
-		if isThisAChannel(*fixture, "Rotate") {
+		if isThisAChannel(fixture, "Rotate") {
 			config.Rotatable = true
 		} else {
 			config.Rotatable = false

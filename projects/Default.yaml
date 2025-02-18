@@ -1737,13 +1737,13 @@ fixtures:
       value: "255"
       selectedvalue: ""
 - id: 30
-  name: Equinox
+  name: Equinox Graphix
   label: graphix
   number: 1
   description: Equinox Graphix
   type: projector
   group: 106
-  address: 185
+  address: 175
   channels:
   - number: 1
     name: Master
@@ -1955,10 +1955,334 @@ fixtures:
       value: "200"
       selectedvalue: "200"
 - id: 31
+  name: Equinox Helix
+  label: helix
+  number: 2
+  description: Equinox Helix
+  type: projector
+  group: 106
+  address: 185
+  channels:
+  - number: 1
+    name: Master
+  - number: 2
+    name: Shutter
+    value: 0
+    settings:
+    - name: Blackout
+      label: Blackout
+      number: 1
+      value: 0-31
+      selectedvalue: ""
+    - name: Open
+      label: Open
+      number: 2
+      value: 32-63
+      selectedvalue: ""
+    - name: Strobe
+      label: Strobe
+      number: 3
+      value: 64-95
+      selectedvalue: ""
+    - name: Open
+      label: Open
+      number: 4
+      value: 96-127
+      selectedvalue: ""
+    - name: Pulse
+      label: Pulse
+      number: 5
+      value: 129-159
+      selectedvalue: ""
+    - name: Open
+      label: Open
+      number: 6
+      value: 160-191
+      selectedvalue: ""
+    - name: Random
+      label: Random
+      number: 7
+      value: 192-223
+      selectedvalue: ""
+    - name: Open
+      label: Open
+      number: 8
+      value: 224-255
+      selectedvalue: ""
+  - number: 3
+    name: Color
+    value: 0
+    settings:
+    - name: Open
+      label: Open
+      number: 1
+      channel: New
+      value: 0-15
+      selectedvalue: ""
+    - name: Red
+      label: Red
+      number: 2
+      channel: (Select one)
+      value: 16-22
+      selectedvalue: ""
+    - name: Blue
+      label: Blue
+      number: 3
+      channel: (Select one)
+      value: 30-36
+      selectedvalue: ""
+    - name: Magenta
+      label: Magenta
+      number: 4
+      channel: (Select one)
+      value: 44-50
+      selectedvalue: ""
+    - name: Yellow
+      label: Yellow
+      number: 5
+      channel: (Select one)
+      value: 58-64
+      selectedvalue: ""
+    - name: Green
+      label: Green
+      number: 6
+      channel: (Select one)
+      value: 72-78
+      selectedvalue: ""
+    - name: Orange
+      label: Orange
+      number: 7
+      channel: (Select one)
+      value: 86-92
+      selectedvalue: ""
+    - name: Cyan
+      label: Cyan
+      number: 8
+      channel: (Select one)
+      value: 100-106
+      selectedvalue: ""
+    - name: UV
+      label: UV
+      number: 9
+      channel: (Select one)
+      value: 114-120
+      selectedvalue: ""
+    - name: 3200K
+      label: 3200K
+      number: 10
+      channel: (Select one)
+      value: 121-127
+      selectedvalue: ""
+    - name: Scroll Forward
+      label: Scroll Forward
+      number: 11
+      channel: (Select one)
+      value: 128-191
+      selectedvalue: ""
+    - name: Scroll Reverse
+      label: Scroll Reverse
+      number: 12
+      channel: (Select one)
+      value: 192-255
+      selectedvalue: ""
+  - number: 4
+    name: Gobo
+    value: 0
+    settings:
+    - name: Open
+      label: Open
+      number: 1
+      value: "0"
+      selectedvalue: ""
+    - name: Gobo1
+      label: Gobo1
+      number: 2
+      value: "18"
+      selectedvalue: ""
+    - name: Gobo2
+      label: Gobo2
+      number: 3
+      value: "28"
+      selectedvalue: ""
+    - name: Gobo3
+      label: Gobo3
+      number: 4
+      value: "44"
+      selectedvalue: ""
+    - name: Gobo4
+      label: Gobo4
+      number: 5
+      value: "50"
+      selectedvalue: ""
+    - name: Gobo5
+      label: Gobo5
+      number: 6
+      value: "58"
+      selectedvalue: ""
+    - name: Gobo6
+      label: Gobo6
+      number: 7
+      value: "68"
+      selectedvalue: ""
+    - name: Gobo7
+      label: Gobo7
+      number: 8
+      value: "78"
+      selectedvalue: ""
+    - name: Gobo8
+      label: Gobo8
+      number: 9
+      value: "88"
+      selectedvalue: ""
+    - name: Gobo9
+      label: Gobo9
+      number: 10
+      channel: (Select one)
+      value: "98"
+      selectedvalue: ""
+    - name: Gobo10
+      label: Gobo10
+      number: 11
+      channel: (Select one)
+      value: "108"
+      selectedvalue: ""
+    - name: Gobo11
+      label: Gobo11
+      number: 12
+      channel: (Select one)
+      value: "118"
+      selectedvalue: ""
+    - name: Scroll Forward
+      label: Scroll Forward
+      number: 13
+      channel: (Select one)
+      value: 128-191
+      selectedvalue: ""
+    - name: Scroll Reverse
+      label: Scroll Reverse
+      number: 14
+      channel: (Select one)
+      value: 192-255
+      selectedvalue: ""
+  - number: 5
+    name: Rotate
+    value: 0
+    settings:
+    - name: Mirror Index
+      label: Mirror Index
+      number: 1
+      value: 0-127
+      selectedvalue: ""
+    - name: Forward Slow
+      label: Forward Slow
+      number: 2
+      value: "192"
+      selectedvalue: ""
+    - name: Forward Medium
+      label: Forward Medium
+      number: 3
+      value: "223"
+      selectedvalue: ""
+    - name: Forward Fast
+      label: Forward Fast
+      number: 4
+      value: "255"
+      selectedvalue: ""
+    - name: Reverse Slow
+      label: Reverse Slow
+      number: 5
+      value: "191"
+      selectedvalue: ""
+    - name: Reverse Medium
+      label: Reverse Medium
+      number: 6
+      value: "160"
+      selectedvalue: ""
+    - name: Reverse Fast
+      label: Reverse Fast
+      number: 7
+      value: "128"
+      selectedvalue: ""
+  - number: 6
+    name: Program
+    settings:
+    - name: Blackout
+      label: Blackout
+      number: 1
+      value: 0-3
+      selectedvalue: ""
+    - name: Show0
+      label: Show0
+      number: 2
+      value: 4-31
+      selectedvalue: ""
+    - name: Show1
+      label: Show1
+      number: 3
+      value: 32-59
+      selectedvalue: ""
+    - name: Show2
+      label: Show2
+      number: 4
+      value: 60-87
+      selectedvalue: ""
+    - name: Show3
+      label: Show3
+      number: 5
+      value: 88-115
+      selectedvalue: ""
+    - name: Show4
+      label: Show4
+      number: 6
+      value: 116-143
+      selectedvalue: ""
+    - name: Show5
+      label: Show5
+      number: 7
+      value: 144-171
+      selectedvalue: ""
+    - name: Show6
+      label: Show6
+      number: 8
+      value: 172-199
+      selectedvalue: ""
+    - name: Show7
+      label: Show7
+      number: 9
+      value: 200-227
+      selectedvalue: ""
+    - name: Show8
+      label: Show8
+      number: 10
+      value: 228-255
+      selectedvalue: ""
+  - number: 7
+    name: ProgramSpeed
+    value: 0
+    settings:
+    - name: Slow
+      label: Slow
+      number: 1
+      channel: New
+      value: "10"
+      selectedvalue: "10"
+    - name: Medium
+      label: Medium
+      number: 2
+      channel: New
+      value: "100"
+      selectedvalue: "100"
+    - name: Fast
+      label: Fast
+      number: 3
+      channel: New
+      value: "200"
+      selectedvalue: "200"
+- id: 32
   name: switch1
   label: SW1.Oil
   number: 1
-  description: Oil Wheel Projector
+  description: Projectors
   type: switch
   group: 4
   address: 69
@@ -2011,14 +2335,14 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: Oil1
-- id: 32
+- id: 33
   name: switch2
-  label: SW2.Flame
+  label: SW2.Booth
   number: 2
-  description: Flame Projector
+  description: Gibraltar Booth
   type: switch
   group: 4
-  address: 70
+  address: 90
   channels: []
   states:
   - name: "Off"
@@ -2026,29 +2350,156 @@ fixtures:
     label: "Off"
     buttoncolor: Green
     master: 0
-    settings:
+    actions:
     - name: "Off"
-      label: "Off"
-      number: 0
-      channel: Program
-      value: "Off"
-      selectedvalue: ""
+      number: 1
+      colors: []
+      map: ""
+      mode: "Off"
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
     flash: false
-  - name: "On"
+  - name: Red
     number: 2
-    label: "On"
+    label: Red
     buttoncolor: Red
     master: 0
+    actions:
+    - name: Red
+      number: 1
+      colors:
+      - Red
+      map: ""
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors:
+      - Green
+      map: ""
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 1
+      colors:
+      - Blue
+      map: ""
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Fade
+    number: 5
+    label: Fade
+    buttoncolor: Yellow
+    master: 0
+    actions:
+    - name: Fade
+      number: 1
+      colors:
+      - Red
+      - Green
+      - Blue
+      map: ""
+      mode: Chase
+      fade: Soft
+      size: Medium
+      speed: Medium
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Sound
+    number: 6
+    label: Sound
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Sound
+      number: 1
+      colors:
+      - Green
+      - Red
+      - Blue
+      map: ""
+      mode: Chase
+      fade: Sharp
+      size: "Off"
+      speed: Music
+      rotate: "Off"
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
     settings:
-    - name: "On"
-      label: "On"
-      number: 0
-      channel: Program
-      value: "On"
+    - name: mode
+      number: 1
+      channel: "1"
+      value: "255"
       selectedvalue: ""
     flash: false
-  use_fixture: flames
-- id: 33
+  use_fixture: megabar
+- id: 34
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -2210,7 +2661,7 @@ fixtures:
       gobospeed: Fast
     flash: false
   use_fixture: deluge
-- id: 34
+- id: 35
   name: switch4
   label: SW4.Vue
   number: 4
@@ -2513,7 +2964,7 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: vue
-- id: 35
+- id: 36
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -2731,9 +3182,9 @@ fixtures:
       selectedvalue: ""
     flash: false
   use_fixture: par38
-- id: 36
+- id: 37
   name: switch6
-  label: SW6.DERBY
+  label: SW6.Derbys
   number: 6
   description: ADJ DEKKER 1
   type: switch
@@ -2924,11 +3375,413 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: dekker1
-- id: 37
+- id: 38
   name: switch7
-  label: SW7.GRAPHIX
+  label: SW7.Graphix
   number: 7
   description: Equinox Graphix
+  type: switch
+  group: 4
+  address: 175
+  channels: []
+  states:
+  - name: "Off"
+    number: 1
+    label: "Off"
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: "Off"
+      number: 0
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Blackout
+      programspeed: Slow
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    settings:
+    - name: New Setting
+      number: 1
+      channel: Master
+      value: "0"
+      selectedvalue: ""
+    flash: false
+  - name: ZigZag
+    number: 2
+    label: ZigZag
+    buttoncolor: Red
+    master: 0
+    settings:
+    - name: "255"
+      label: "255"
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: Open
+      label: Open
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: ZigZag
+      label: ZigZag
+      number: 3
+      channel: Gobo
+      value: "0"
+      selectedvalue: ZigZag
+    - name: Reverse Medium
+      label: Reverse Medium
+      number: 4
+      channel: Rotate
+      value: "255"
+      selectedvalue: Reverse Medium
+    - name: Blackout
+      label: Blackout
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: Fast
+      label: Fast
+      number: 6
+      channel: ProgramSpeed
+      value: "200"
+      selectedvalue: Fast
+    flash: false
+  - name: Waves
+    number: 3
+    label: Waves
+    buttoncolor: Cyan
+    master: 0
+    settings:
+    - name: "255"
+      label: "255"
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: Open
+      label: Open
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: Horiz Waves
+      label: Horiz Waves
+      number: 3
+      channel: Gobo
+      value: "18"
+      selectedvalue: Horiz Waves
+    - name: Reverse Medium
+      label: Reverse Medium
+      number: 4
+      channel: Rotate
+      value: "192"
+      selectedvalue: Reverse
+    - name: Blackout
+      label: Blackout
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: Fast
+      label: Fast
+      number: 6
+      channel: ProgramSpeed
+      value: "0"
+      selectedvalue: "0"
+    flash: false
+  - name: Petals
+    number: 4
+    label: Petals
+    buttoncolor: Cyan
+    master: 0
+    settings:
+    - name: "255"
+      label: "255"
+      number: 1
+      channel: Master
+      value: "255"
+      selectedvalue: "255"
+    - name: Open
+      label: Open
+      number: 2
+      channel: Shutter
+      value: "32"
+      selectedvalue: Open
+    - name: Croc Petals
+      label: Croc Petals
+      number: 3
+      channel: Gobo
+      value: "28"
+      selectedvalue: Croc Petals
+    - name: Reverse Slow
+      label: Reverse Slow
+      number: 4
+      channel: Rotate
+      value: "191"
+      selectedvalue: Reverse Slow
+    - name: Blackout
+      label: Blackout
+      number: 5
+      channel: Program
+      value: "0"
+      selectedvalue: Blackout
+    - name: Fast
+      label: Fast
+      number: 6
+      channel: ProgramSpeed
+      value: "0"
+      selectedvalue: Slow
+    flash: false
+  - name: Show0
+    number: 5
+    label: Show0
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show0
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show0
+      programspeed: Slow
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show1
+    number: 6
+    label: Show1
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show1
+      programspeed: Medium
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show2
+    number: 7
+    label: Show2
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show2
+      programspeed: Medium
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show3
+    number: 8
+    label: Show3
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: New
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show3
+      programspeed: Medium
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show4
+    number: 9
+    label: Show4
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show4
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show4
+      programspeed: Medium
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show5
+    number: 10
+    label: Show5
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show5
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show5
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show6
+    number: 11
+    label: Show6
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show6
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show6
+      programspeed: Medium
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show7
+    number: 12
+    label: Show7
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show7
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Show8
+    number: 13
+    label: Show8
+    buttoncolor: Orange
+    master: 0
+    actions:
+    - name: Show8
+      number: 1
+      colors: []
+      map: ""
+      mode: Control
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: Show8
+      programspeed: Fast
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Auto
+    number: 14
+    label: Auto
+    buttoncolor: White
+    master: 0
+    actions:
+    - name: Auto
+      number: 1
+      colors:
+      - Green
+      - Cyan
+      - Blue
+      map: "On"
+      mode: Chase
+      fade: Soft
+      size: Short
+      speed: Music
+      rotate: Auto
+      rotatespeed: Fast
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: Auto
+      gobospeed: Fast
+    flash: false
+  use_fixture: graphix
+- id: 39
+  name: switch8
+  label: SW8.Helix
+  number: 8
+  description: Equinox Helix
   type: switch
   group: 4
   address: 185
@@ -3325,168 +4178,4 @@ fixtures:
       gobo: Auto
       gobospeed: Fast
     flash: false
-  use_fixture: graphix
-- id: 38
-  name: switch8
-  label: SW8.Booth
-  number: 8
-  description: Gibraltar Booth
-  type: switch
-  group: 4
-  address: 90
-  channels: []
-  states:
-  - name: "Off"
-    number: 1
-    label: "Off"
-    buttoncolor: Green
-    master: 0
-    actions:
-    - name: "Off"
-      number: 1
-      colors: []
-      map: ""
-      mode: "Off"
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Red
-    number: 2
-    label: Red
-    buttoncolor: Red
-    master: 0
-    actions:
-    - name: Red
-      number: 1
-      colors:
-      - Red
-      map: ""
-      mode: Static
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Green
-    number: 3
-    label: Green
-    buttoncolor: Green
-    master: 0
-    actions:
-    - name: New
-      number: 1
-      colors:
-      - Green
-      map: ""
-      mode: Static
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Blue
-    number: 4
-    label: Blue
-    buttoncolor: Blue
-    master: 0
-    actions:
-    - name: Blue
-      number: 1
-      colors:
-      - Blue
-      map: ""
-      mode: Static
-      fade: ""
-      size: ""
-      speed: ""
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Fade
-    number: 5
-    label: Fade
-    buttoncolor: Yellow
-    master: 0
-    actions:
-    - name: Fade
-      number: 1
-      colors:
-      - Red
-      - Green
-      - Blue
-      map: ""
-      mode: Chase
-      fade: Soft
-      size: Medium
-      speed: Medium
-      rotate: ""
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    flash: false
-  - name: Sound
-    number: 6
-    label: Sound
-    buttoncolor: White
-    master: 0
-    actions:
-    - name: Sound
-      number: 1
-      colors:
-      - Green
-      - Red
-      - Blue
-      map: ""
-      mode: Chase
-      fade: Sharp
-      size: "Off"
-      speed: Music
-      rotate: "Off"
-      rotatespeed: ""
-      program: ""
-      programspeed: ""
-      strobe: ""
-      strobespeed: ""
-      gobo: ""
-      gobospeed: ""
-    settings:
-    - name: mode
-      number: 1
-      channel: "1"
-      value: "255"
-      selectedvalue: ""
-    flash: false
-  use_fixture: megabar
+  use_fixture: helix

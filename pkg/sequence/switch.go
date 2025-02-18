@@ -56,11 +56,11 @@ func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 	swiTch := sequence.Switches[switchNumber]
 
 	if debug {
-		fmt.Printf("switchNumber %d current %d selected %t speed %d\n", swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number-1].Override.Speed)
+		fmt.Printf("sequence %d type %s fixtures %d switchNumber %d current %d selected %t speed %d\n", sequence.Number, sequence.Type, sequence.NumberFixtures, swiTch.Number, swiTch.CurrentPosition, swiTch.Selected, sequence.Switches[swiTch.Number-1].Override.Speed)
 	}
 
 	if switchNumber >= sequence.NumberFixtures {
-		fmt.Printf("setSwitchDMX: error switch number exceeds number of fixtures")
+		fmt.Printf("setSwitchDMX: error switch number exceeds number of fixtures\n")
 		return
 	}
 
