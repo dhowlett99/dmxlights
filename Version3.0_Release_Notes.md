@@ -25,6 +25,8 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Buttons are labels in the GUI from labels.yaml
 * We now correctly count the number of fixtures in a sequence. Max still 8.
 * Presets are now saved inside a project, so presets relate to fixtures correctly.
+* Support for Equinox Helix
+* Bug fix to entering ranges in settings panel.
 
 ## Known Problems
 
