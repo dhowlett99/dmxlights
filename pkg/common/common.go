@@ -581,25 +581,26 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	ID           string
-	Number       int
-	Name         string
-	Label        string
-	MasterDimmer int
-	Brightness   int
-	ScannerColor color.RGBA
-	BaseColor    color.RGBA
-	Color        color.RGBA
-	Pan          int
-	Tilt         int
-	Shutter      int
-	Rotate       int
-	Music        int
-	Gobo         int
-	Program      int
-	Enabled      bool
-	Inverted     bool
-	State        int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
+	ID             string
+	Number         int
+	Name           string
+	Label          string
+	MasterDimmer   int
+	Brightness     int
+	ScannerColor   color.RGBA
+	BaseColor      color.RGBA
+	HasRGBChannels bool
+	Color          color.RGBA
+	Pan            int
+	Tilt           int
+	Shutter        int
+	Rotate         int
+	Music          int
+	Gobo           int
+	Program        int
+	Enabled        bool
+	Inverted       bool
+	State          int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
 }
 
 type ButtonPresets struct {

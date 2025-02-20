@@ -239,7 +239,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 				fp.UpdateChannels = false
 			}
 			if fp.UpdateUseFixture {
-				address := fixture.FindFixtureAddressByName(fp.UseFixture, fixtures)
+				address := fixture.GetFadeValuesFixtureAddressByName(fp.UseFixture, fixtures)
 				data[fp.UpdateThisFixture][FIXTURE_ADDRESS] = address
 				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
 				dmx, _ := strconv.Atoi(address)

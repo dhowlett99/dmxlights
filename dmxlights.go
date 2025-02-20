@@ -245,6 +245,9 @@ func main() {
 	// Automatically set the number of sub fixtures inside a fixture.
 	fixture.SetMultiFixtureFlag(fixturesConfig)
 
+	// Set the RGB if the fixture has red, green and blue channels.
+	fixture.SetHasRGBFlag(fixturesConfig)
+
 	// Now that the fixtures config is setup, make a copy.
 	startConfig := &fixture.Fixtures{}
 	startConfig.Fixtures = []fixture.Fixture{}

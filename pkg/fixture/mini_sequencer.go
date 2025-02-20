@@ -284,7 +284,7 @@ func newMiniSequencer(fixture *Fixture,
 
 		if fixtureHasChannel(fixture, "Program") {
 			// Look up the program state required.
-			programState, err := findChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
+			programState, err := GetChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}
@@ -609,7 +609,7 @@ func newMiniSequencer(fixture *Fixture,
 					// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 					// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 					// override.RotateSpeed is the index so for example 1 is setting 1.
-					cfg.RotateSpeed = FindRotateDMXValueByIndex(fixture, override.RotateSpeed)
+					cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.RotateSpeed)
 					if debug_override {
 						fmt.Printf("Apply Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 					}
@@ -737,7 +737,7 @@ func newMiniSequencer(fixture *Fixture,
 							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 							// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 							// override.RotateSpeed is the index so for example 1 is setting 1.
-							cfg.RotateSpeed = FindRotateDMXValueByIndex(fixture, override.RotateSpeed)
+							cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.RotateSpeed)
 							if debug_override {
 								fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 							}
@@ -788,15 +788,41 @@ func newMiniSequencer(fixture *Fixture,
 
 					var actualMaster int
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-						fixture := fixtures[fixtureNumber]
-						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+						thisFixture := fixtures[fixtureNumber]
+						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, thisFixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 						if cfg.Map {
 							// Use sound triggered brighness and apply master
-							actualMaster = int((float64(fixture.Brightness) / 100) * (float64(master) / 2.55))
+							actualMaster = int((float64(thisFixture.Brightness) / 100) * (float64(master) / 2.55))
 						} else {
 							actualMaster = master
 						}
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, fixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						if fixture.HasRGBChannels {
+							MapFixtures(false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						} else {
+
+							// Find the color name.
+							colorInName := common.GetColorNameByRGB(color.RGBA{
+								R: thisFixture.Color.R,
+								G: thisFixture.Color.G,
+								B: thisFixture.Color.B,
+							})
+							// Look up the settings for the color channel.
+							channelNumber, err := FindChannelNumberByName(fixture, "Color")
+							if err != nil {
+								fmt.Printf("error %s\n", err)
+							}
+							channelSettings, err := GetChannelSettinsByName(fixture, "Color", fixturesConfig)
+							if err != nil {
+								fmt.Printf("error %s\n", err)
+							}
+							// Look for a setting that matches the color.
+							for _, setting := range channelSettings {
+								if setting.Name == colorInName {
+									SetChannel(fixture.Address+int16(channelNumber), byte(setting.Value), dmxController, dmxInterfacePresent)
+								}
+							}
+
+						}
 					}
 
 					rotateCounter++
@@ -913,7 +939,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 			config.AutoGobo = true
 		default:
 			// find current gobo number.
-			config.Gobo = FindGoboByName(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
+			config.Gobo = GetGoboByName(fixture.Number-1, fixture.Group-1, action.Gobo, fixturesConfig)
 			config.AutoGobo = false
 		}
 
@@ -1002,7 +1028,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	//fmt.Printf("Fixture Name %s Action %+v\n", fixture.Name, action)
 	config.RotateName = action.Rotate
-	config.RotateNumber = FindRotateSpeedNumberByName(fixture, action.Rotate)
+	config.RotateNumber = GetRotateSpeedNumberByName(fixture, action.Rotate)
 	config.Rotatable = false
 	config.AutoRotate = false
 
@@ -1040,11 +1066,11 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	// Calculate the rotation speed based on direction and speed.
 	if config.Rotatable {
-		config.ReverseSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
+		config.ReverseSpeed, err = GetChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
 		if err != nil {
 			fmt.Printf("Looking for channel:Rotate and Setting:Reverse %s\n", err)
 		}
-		config.ForwardSpeed, err = findChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
+		config.ForwardSpeed, err = GetChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
 		if err != nil {
 			fmt.Printf("Looking for channel:Rotate and Setting:Forward %s\n", err)
 		}

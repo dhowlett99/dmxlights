@@ -219,7 +219,7 @@ func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft23
 				var stateNames []string
 
 				// Find the details of the fixture for this switch.
-				thisFixture, err := fixture.FindFixtureByLabel(swiTch.UseFixture, fixturesConfig)
+				thisFixture, err := fixture.GetFixtureByLabel(swiTch.UseFixture, fixturesConfig)
 				if err != nil {
 					fmt.Printf("error %s\n", err.Error())
 				}

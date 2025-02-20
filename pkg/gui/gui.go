@@ -734,6 +734,9 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 				// Automatically set the number of sub fixtures inside a fixture.
 				fixture.SetMultiFixtureFlag(newFixturesConfig)
 
+				// Set the RGB if the fixture has red, green and blue channels.
+				fixture.SetHasRGBFlag(fixturesConfig)
+
 				// Copy the newFixtures into the old pointer to the fixtures config.
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
 

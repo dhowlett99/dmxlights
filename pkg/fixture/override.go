@@ -184,7 +184,7 @@ func overrideMiniSetter(cmd common.FixtureCommand, fixturesConfig *Fixtures, dmx
 	}
 
 	// Find the details of the fixture for this switch.
-	thisFixture, err := FindFixtureByLabel(useFixtureLabel, fixturesConfig)
+	thisFixture, err := GetFixtureByLabel(useFixtureLabel, fixturesConfig)
 	if err != nil {
 		fmt.Printf("error %s\n", err.Error())
 	}

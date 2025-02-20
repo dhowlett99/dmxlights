@@ -138,9 +138,9 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Set the rotate speed name.
-		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName = fixture.FindRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed)
+		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName = fixture.GetRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed)
 		this.SwitchOverrides = &overrides
 		// Update the status bar
 		UpdateShift(this, guiButtons)
@@ -261,9 +261,9 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Set the rotate speed name.
-		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName = fixture.FindRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed)
+		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName = fixture.GetRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed)
 		this.SwitchOverrides = &overrides
 
 		// Update the status bar

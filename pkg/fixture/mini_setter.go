@@ -1,4 +1,4 @@
-// Copyright (C) 2022,2023,2024 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights mini settings player, used by the fixture to control
 // settings for fixtures.
 // Implemented and depends usbdmx.
@@ -160,7 +160,7 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 				// Override Gobo.
 				if setting.Channel == "Gobo" && override.OverrideGobo {
 					// Lookup correct value for this Gobo number.
-					gobo := FindGoboDMXValueByNumber(thisFixture, override.Gobo)
+					gobo := GetGoboDMXValueByNumber(thisFixture, override.Gobo)
 					if debug_mini_setter {
 						fmt.Printf("Override is set Address=%d Gobo=%d\n", thisFixture.Address+int16(channel), gobo)
 					}

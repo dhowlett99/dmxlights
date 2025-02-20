@@ -139,9 +139,9 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Set the gobo name.
-		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.FindGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
+		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.GetGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
 		this.SwitchOverrides = &overrides
 
 		// Update the status bar
@@ -266,9 +266,9 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Set the gobo name.
-		theSwitch, _ := fixture.FindFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.FindFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.FindGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
+		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
+		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.GetGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
 		this.SwitchOverrides = &overrides
 
 		// Update the status bar
