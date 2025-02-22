@@ -229,7 +229,7 @@ func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft23
 
 					stateNames = append(stateNames, state.Name)
 
-					action := fixture.GetSwitchConfig(swiTchNumber, int16(stateNumber), fixturesConfig)
+					action := fixture.GetSwitchAction(swiTchNumber, int16(stateNumber), fixturesConfig)
 					cfg := fixture.GetConfig(action, thisFixture, fixturesConfig)
 					overrides := *this.SwitchOverrides
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = cfg.Speed

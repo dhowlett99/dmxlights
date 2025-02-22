@@ -383,14 +383,14 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  F A D E
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
+		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  F A D E
 	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
+		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
@@ -993,9 +993,6 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 	size := this.RGBSize[this.TargetSequence]
 	scannerFade := this.ScannerSize[this.TargetSequence]
 	overrides := *this.SwitchOverrides
-	switchSize := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
-	switchColor := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
-	switchColorName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" || tYpe == "switch" {
@@ -1005,10 +1002,16 @@ func UpdateSize(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", scannerFade), "size", false, guiButttons)
 		}
 		if tYpe == "switch" && this.SelectedFixtureType == "rgb" {
+			switchSize := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButttons)
 		}
 		if tYpe == "switch" && this.SelectedFixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColor, switchColorName), "size", false, guiButttons)
+			switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color - 1
+			switchColorName := "Unknown"
+			if len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors) > 0 {
+				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
+			}
+			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColorIndex, switchColorName), "size", false, guiButttons)
 		}
 	}
 	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
@@ -1062,7 +1065,6 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 	overrides := *this.SwitchOverrides
 	switchFade := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
 	switchGobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
-	switchGoboName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
 		if tYpe == "rgb" {
@@ -1075,6 +1077,12 @@ func UpdateFade(this *CurrentState, guiButttons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchFade), "fade", false, guiButttons)
 		}
 		if tYpe == "switch" && fixtureType == "projector" {
+			switchGoboName := "Unknown"
+			numberOfGobos := len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos)
+			maxNumberGobos := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxGobos
+			if numberOfGobos > 0 && switchGobo < maxNumberGobos && switchGobo != -1 {
+				switchGoboName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos[switchGobo]
+			}
 			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButttons)
 		}
 	}

@@ -986,93 +986,52 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, fixturesConfig *Fixtures) common.Override {
 
 	// Convert this switches action into a config we can query.
-	action := GetSwitchConfig(switchNumber, int16(stateNumber), fixturesConfig)
+	action := GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
 	cfg := GetConfig(action, fixture, fixturesConfig)
 
 	if debug {
-		fmt.Printf("---> Discover Action Name %s Color %+v Cfg.Colors %+v\n", action.Name, action.Colors, cfg.Colors)
+		fmt.Printf("DiscoverSwitchOveride: Discover Fixture Name %s Switch %d State %d\n", fixture.Name, switchNumber, stateNumber)
 	}
 
 	// Create a new override for this action.
 	newOverride := common.Override{}
 
-	// if action.Mode == "Off" {
-	// 	newOverride.Colors = []color.RGBA{}
-	// }
+	newOverride.Speed = cfg.Speed
+	newOverride.Shift = cfg.Shift
+	newOverride.Size = cfg.Size
+	newOverride.Fade = cfg.Fade
 
-	if action.Mode == "Static" {
-		newOverride.Speed = cfg.Speed
-		newOverride.Shift = cfg.Shift
-		newOverride.Size = cfg.Size
-		newOverride.Fade = cfg.Fade
-		newOverride.RotateSpeed = cfg.RotateSpeed
-		newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
+	newOverride.RotateSpeed = cfg.RotateSpeed
+	newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
 
-		newOverride.Color = cfg.Color
-		newOverride.Colors = cfg.Colors
-		newOverride.ColorName = GetColorNameByNumber(fixture, cfg.Color)
-		newOverride.Gobo = cfg.Gobo
-		newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
-	}
+	newOverride.Color = 1
+	newOverride.Colors = cfg.Colors
 
-	if action.Mode == "Control" {
-		newOverride.Speed = cfg.Speed
-		newOverride.Shift = cfg.Shift
-		newOverride.Size = cfg.Size
-		newOverride.Fade = cfg.Fade
-		newOverride.RotateSpeed = cfg.RotateSpeed
-		newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
+	newOverride.ColorName = GetColorNameByNumber(fixture, newOverride.Color)
+	newOverride.AvailableColors = GetAvailableColorsByFixure(fixture)
+	newOverride.MaxColors = len(newOverride.AvailableColors)
 
-		newOverride.Color = cfg.Color
-		newOverride.Colors = cfg.Colors
-		newOverride.ColorName = GetColorNameByNumber(fixture, cfg.Color)
-		newOverride.Gobo = cfg.Gobo
-		newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
-	}
-
-	if action.Mode == "Chase" {
-		newOverride.Speed = cfg.Speed
-		newOverride.Shift = cfg.Shift
-		newOverride.Size = cfg.Size
-		newOverride.Fade = cfg.Fade
-		newOverride.RotateSpeed = cfg.RotateSpeed
-		newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
-
-		newOverride.Color = cfg.Color
-		newOverride.Colors = cfg.Colors
-		newOverride.ColorName = GetColorNameByNumber(fixture, cfg.Color)
-		newOverride.Gobo = cfg.Gobo
-		newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
-	}
-
-	if action.Mode == "Setting" {
-		newOverride.Speed = cfg.Speed
-		newOverride.Shift = cfg.Shift
-		newOverride.Size = cfg.Size
-		newOverride.Fade = cfg.Fade
-		newOverride.RotateSpeed = cfg.RotateSpeed
-		newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
-
-		newOverride.Color = cfg.Color
-		newOverride.Colors = cfg.Colors
-		newOverride.ColorName = GetColorNameByNumber(fixture, cfg.Color)
-		newOverride.Gobo = cfg.Gobo
-		newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
-	}
+	newOverride.Gobo = cfg.Gobo
+	newOverride.AvailableGobos = GetAvailableGobosByFixure(fixture)
+	newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
+	newOverride.MaxGobos = len(newOverride.AvailableGobos)
 
 	if debug {
+		fmt.Printf("Action Mode %s\n", action.Mode)
 		fmt.Printf("Action Name %s\n", action.Name)
-		fmt.Printf("\tSwitch Number %d State Number %d\n", switchNumber, stateNumber)
-		fmt.Printf("\t\t Rotate Speed %d\n", newOverride.RotateSpeed)
-		fmt.Printf("\t\t Colors %+v\n", newOverride.Colors)
-		fmt.Printf("\t\t Color %+v\n", newOverride.Color)
-		fmt.Printf("\t\t Color Name %s\n", newOverride.ColorName)
-		fmt.Printf("\t\t Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
+		fmt.Printf("Switch Number %d State Number %d\n", switchNumber, stateNumber)
+		fmt.Printf("Rotate Speed %d\n", newOverride.RotateSpeed)
+		fmt.Printf("Colors %+v\n", newOverride.Colors)
+		fmt.Printf("ColorIndex %+v\n", newOverride.Color)
+		fmt.Printf("Action AvailableColors %s\n", newOverride.AvailableColors)
+		fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
+		fmt.Printf("Color Names %s\n", newOverride.ColorName)
+		fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
 	}
 	return newOverride
 }
 
-func GetSwitchConfig(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
+func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
 
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "switch" {

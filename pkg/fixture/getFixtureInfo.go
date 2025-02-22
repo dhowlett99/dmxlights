@@ -387,6 +387,30 @@ func GetRotateSpeedNumberByName(fixture *Fixture, rotateSettingName string) int 
 	return 0
 }
 
+// GetColorDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
+func GetColorDMXValueByNumber(fixture *Fixture, number int) int {
+
+	if debug {
+		fmt.Printf("GetColorDMXValueByNumber Looking for color %d in fixture %s\n", number, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Color") {
+			for _, setting := range channel.Settings {
+				if setting.Number == number {
+					if debug {
+						fmt.Printf("Color %d Name %s\n", setting.Number, setting.Name)
+					}
+					dmx, _ := strconv.Atoi(setting.Value)
+					return dmx
+				}
+			}
+		}
+	}
+
+	return 0
+}
+
 // GetGoboDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
 func GetGoboDMXValueByNumber(fixture *Fixture, number int) int {
 
@@ -411,15 +435,40 @@ func GetGoboDMXValueByNumber(fixture *Fixture, number int) int {
 	return 0
 }
 
+func GetAvailableColorsByFixure(fixture *Fixture) []string {
+
+	var colors []string
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Color") {
+			for _, setting := range channel.Settings {
+				colors = append(colors, setting.Name)
+			}
+		}
+	}
+	return colors
+}
+
+func GetAvailableGobosByFixure(fixture *Fixture) []string {
+
+	var colors []string
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Gobo") {
+			for _, setting := range channel.Settings {
+				colors = append(colors, setting.Name)
+			}
+		}
+	}
+	return colors
+}
+
 // GetColorNameByNumber takes the color number and returns the color name for this fixture.
 func GetColorNameByNumber(fixture *Fixture, number int) string {
 
-	if debug {
-		fmt.Printf("GetColorNameByNumber looking for color number %d inside fixture %s\n", number, fixture.Name)
-	}
-
 	if fixture == nil {
 		return "Not Found"
+	}
+	if debug {
+		fmt.Printf("GetColorNameByNumber looking for color number %d inside fixture %s\n", number, fixture.Name)
 	}
 
 	for _, channel := range fixture.Channels {
@@ -427,7 +476,7 @@ func GetColorNameByNumber(fixture *Fixture, number int) string {
 			for _, setting := range channel.Settings {
 				if setting.Number == number {
 					if debug {
-						fmt.Printf("Found name %s\n", setting.Name)
+						fmt.Printf("Found color name %s\n", setting.Name)
 					}
 					return setting.Name
 				}

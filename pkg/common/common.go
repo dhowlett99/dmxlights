@@ -247,9 +247,13 @@ type Override struct {
 	OverrideColors      bool
 	Colors              []color.RGBA
 	Color               int
+	MaxColors           int
 	ColorName           string
+	AvailableColors     []string
 	OverrideGobo        bool
 	Gobo                int
+	MaxGobos            int
+	AvailableGobos      []string
 	GoboName            string
 }
 

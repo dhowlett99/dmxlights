@@ -317,10 +317,18 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// Projector functions.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed), "speed", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName), "fade", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName), "size", false, guiButtons)
+		speed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+		rotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
+		rotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
+		gobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
+		goboName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
+		colorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
+		colorName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
+
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", rotateSpeed, rotateSpeedName), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", colorIndex, colorName), "size", false, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomProjectorButtons {

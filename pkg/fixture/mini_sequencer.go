@@ -74,8 +74,8 @@ func newMiniSequencer(fixture *Fixture,
 	guiButtons chan common.ALight,
 	fixtureStepChannel chan common.FixtureCommand) {
 
-	if debug {
-		fmt.Printf("newMiniSequencer: start fixture %s\n", fixture.Name)
+	if debug_mini {
+		fmt.Printf("newMiniSequencer: actions are available fixture %s actionName %s\n", fixture.Name, action.Name)
 	}
 
 	// Create a standard pallete used by mini sequencer.
@@ -617,10 +617,10 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors is %+v\n", override.Color)
+						fmt.Printf("Override is set so Colors is %+v\n", override.Colors)
 					}
 					// You can only override a single color.
-					cfg.Color = override.Color
+					cfg.Colors[cfg.Color] = override.Colors[cfg.Color]
 					newColor := colors.GetColorFromIndexNumberFromColorsLibrary(cfg.Color-1, standardPallete)
 					cfg.Colors = []color.RGBA{
 						newColor,
@@ -966,8 +966,8 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 			fmt.Printf("error: %s\n", err.Error())
 		}
 		config.Colors = colorLibrary
-		// TODO take the first color in the library.
-		config.Color = 0
+		// Take the first color in the library.
+		config.Color = 1
 	}
 
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.

@@ -36,7 +36,7 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 	debug_mini_setter := false
 
 	if debug_mini_setter {
-		fmt.Printf("newMiniSetter: settings are available\n")
+		fmt.Printf("newMiniSetter: settings are available fixture %s settingName %s\n", thisFixture.Name, setting.Name)
 	}
 
 	// Not Blackout.
@@ -148,11 +148,11 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 
 				// Override Color.
 				if setting.Channel == "Color" && override.OverrideColors {
+					color := GetColorDMXValueByNumber(thisFixture, override.Color)
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Colors=%d\n", thisFixture.Address+int16(channel), override.Color)
+						fmt.Printf("Override is set Address=%d ColorsNumber=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Color, color)
 					}
-
-					SetChannel(thisFixture.Address+int16(channel), byte(override.Color), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(color), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideColors = false
 				}
@@ -162,7 +162,7 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 					// Lookup correct value for this Gobo number.
 					gobo := GetGoboDMXValueByNumber(thisFixture, override.Gobo)
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Gobo=%d\n", thisFixture.Address+int16(channel), gobo)
+						fmt.Printf("Override is set Address=%d GoboNumber=%d  DMX Value=%d\n", thisFixture.Address+int16(channel), override.Gobo, gobo)
 					}
 					SetChannel(thisFixture.Address+int16(channel), byte(gobo), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true

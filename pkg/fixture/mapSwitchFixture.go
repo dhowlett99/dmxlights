@@ -85,10 +85,6 @@ func MapSwitchFixture(swiTch common.Switch,
 
 		// Play Actions which send messages to a dedicated mini sequencer.
 		for _, action := range state.Actions {
-			if debug {
-				fmt.Printf("actions are available\n")
-			}
-
 			newAction := Action{}
 			newAction.Name = action.Name
 			newAction.Number = action.Number

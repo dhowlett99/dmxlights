@@ -134,6 +134,7 @@ func decreaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
 				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
+				{Name: "ColorName", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -243,8 +244,8 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		// Increase the switch color.
 		overrides := *this.SwitchOverrides
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color + 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > common.MAX_PROJECTOR_COLOR {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = common.MAX_PROJECTOR_COLOR
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
 		}
 		this.SwitchOverrides = &overrides
 
@@ -255,6 +256,7 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
 				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
+				{Name: "ColorName", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)

@@ -22,10 +22,9 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
+func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Decrease Fade Time Type=%s Sequence=%d Type=%s\n", this.SelectedType, this.TargetSequence, sequences[this.TargetSequence].Type)
@@ -138,12 +137,6 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Set the gobo name.
-		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.GetGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
-		this.SwitchOverrides = &overrides
-
 		// Update the status bar
 		UpdateFade(this, guiButtons)
 
@@ -152,7 +145,7 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 }
 
-func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
+func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Increase Fade Time\n")
@@ -249,9 +242,10 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		// Increase the switch size.
 		overrides := *this.SwitchOverrides
+		maxNumberGobos := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxGobos
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo + 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo > common.MAX_PROJECTOR_GOBO {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = common.MAX_PROJECTOR_GOBO
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo > maxNumberGobos {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = maxNumberGobos
 		}
 
 		// Send a message to override / increase the selected gobo.
@@ -264,12 +258,6 @@ func increaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Set the gobo name.
-		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName = fixture.GetGoboNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo)
-		this.SwitchOverrides = &overrides
 
 		// Update the status bar
 		UpdateFade(this, guiButtons)
