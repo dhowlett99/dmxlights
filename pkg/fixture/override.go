@@ -110,17 +110,17 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		return
 	}
 
-	if cmd.Override.RotateSpeed > 0 {
+	if cmd.Override.Rotate > 0 {
 
 		if debug {
-			fmt.Printf("Override switch number %d RotateSpeed %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.RotateSpeed)
+			fmt.Printf("Override switch number %d RotateSpeed %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Rotate)
 		}
 		// Send a message to the selected switch device.
 		switchCommand := common.Command{
 			Action: common.UpdateRotateSpeed,
 			Args: []common.Arg{
 				// Add one since we count from 0
-				{Name: "RotateSpeed", Value: cmd.SwiTch.Override.RotateSpeed},
+				{Name: "RotateSpeed", Value: cmd.SwiTch.Override.Rotate},
 			},
 		}
 		select {

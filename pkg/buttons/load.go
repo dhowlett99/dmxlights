@@ -159,8 +159,8 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
 				}
 
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = sequences[sequenceNumber].Switches[swiTchNumber].Override.RotateSpeed
+				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Rotate != 0 {
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = sequences[sequenceNumber].Switches[swiTchNumber].Override.Rotate
 				}
 				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors != nil {
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors

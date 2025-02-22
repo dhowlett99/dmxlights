@@ -737,7 +737,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
 		sequence.Switches[switchNumber].Override.OverrideRotateSpeed = true
-		sequence.Switches[switchNumber].Override.RotateSpeed = switchRotateSpeed
+		sequence.Switches[switchNumber].Override.Rotate = switchRotateSpeed
 
 		return sequence
 

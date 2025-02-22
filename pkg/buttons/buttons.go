@@ -1027,8 +1027,8 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 	overrides := *this.SwitchOverrides
 	switchRGBShift := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
-	switchRotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
-	switchRotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
+	switchRotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
+	switchRotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName
 
 	if debug {
 		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotateSpeed, switchRotateSpeedName)

@@ -602,14 +602,14 @@ func newMiniSequencer(fixture *Fixture,
 					cfg.Fade = override.Fade
 				}
 
-				if override.RotateSpeed != 0 {
+				if override.Rotate != 0 {
 					if debug_rotate {
-						fmt.Printf("Override is set so Rotate Speed is %d\n", override.RotateSpeed)
+						fmt.Printf("Override is set so Rotate Speed is %d\n", override.Rotate)
 					}
 					// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 					// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 					// override.RotateSpeed is the index so for example 1 is setting 1.
-					cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.RotateSpeed)
+					cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.Rotate)
 					if debug_override {
 						fmt.Printf("Apply Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 					}
@@ -730,14 +730,14 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Rotate Speed
 						if cmd.Action == common.UpdateRotateSpeed {
 							const ROTATE_SPEED = 0
-							override.RotateSpeed = cmd.Args[ROTATE_SPEED].Value.(int)
+							override.Rotate = cmd.Args[ROTATE_SPEED].Value.(int)
 							if debug_override || debug_rotate {
-								fmt.Printf("Override Speed Index=%d\n", override.RotateSpeed)
+								fmt.Printf("Override Speed Index=%d\n", override.Rotate)
 							}
 							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 							// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 							// override.RotateSpeed is the index so for example 1 is setting 1.
-							cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.RotateSpeed)
+							cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.Rotate)
 							if debug_override {
 								fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 							}

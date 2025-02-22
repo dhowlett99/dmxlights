@@ -237,7 +237,7 @@ func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft23
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = cfg.Size
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = cfg.Fade
 
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed = cfg.RotateSpeed
+					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = cfg.RotateSpeed
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = cfg.Colors
 					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = cfg.Gobo
 					this.SwitchOverrides = &overrides

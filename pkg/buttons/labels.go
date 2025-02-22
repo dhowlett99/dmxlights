@@ -318,8 +318,8 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 		speed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
-		rotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeed
-		rotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateSpeedName
+		rotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
+		rotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName
 		gobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
 		goboName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
 		colorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color

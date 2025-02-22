@@ -1001,8 +1001,10 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 	newOverride.Size = cfg.Size
 	newOverride.Fade = cfg.Fade
 
-	newOverride.RotateSpeed = cfg.RotateSpeed
-	newOverride.RotateSpeedName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
+	newOverride.Rotate = cfg.RotateSpeed
+	newOverride.RotateName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
+	newOverride.RotateChannels = GetAvailableRotateChannelsByFixure(fixture)
+	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
 	newOverride.Color = 1
 	newOverride.Colors = cfg.Colors
@@ -1016,18 +1018,19 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 	newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
 	newOverride.MaxGobos = len(newOverride.AvailableGobos)
 
-	if debug {
-		fmt.Printf("Action Mode %s\n", action.Mode)
-		fmt.Printf("Action Name %s\n", action.Name)
-		fmt.Printf("Switch Number %d State Number %d\n", switchNumber, stateNumber)
-		fmt.Printf("Rotate Speed %d\n", newOverride.RotateSpeed)
-		fmt.Printf("Colors %+v\n", newOverride.Colors)
-		fmt.Printf("ColorIndex %+v\n", newOverride.Color)
-		fmt.Printf("Action AvailableColors %s\n", newOverride.AvailableColors)
-		fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
-		fmt.Printf("Color Names %s\n", newOverride.ColorName)
-		fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
-	}
+	//if debug {
+	fmt.Printf("Action Mode %s\n", action.Mode)
+	fmt.Printf("Action Name %s\n", action.Name)
+	fmt.Printf("Switch Number %d State Number %d\n", switchNumber, stateNumber)
+	fmt.Printf("Rotate Speed %d\n", newOverride.Rotate)
+	fmt.Printf("No Rotate Speeds %d\n", newOverride.MaxRotateSpeed)
+	fmt.Printf("Colors %+v\n", newOverride.Colors)
+	fmt.Printf("ColorIndex %+v\n", newOverride.Color)
+	fmt.Printf("Action AvailableColors %s\n", newOverride.AvailableColors)
+	fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
+	fmt.Printf("Color Names %s\n", newOverride.ColorName)
+	fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
+	//}
 	return newOverride
 }
 

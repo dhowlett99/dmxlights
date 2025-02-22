@@ -139,9 +139,9 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 				// Override RotateSpeed.
 				if setting.Channel == "RotateSpeed" && override.OverrideRotateSpeed {
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Rotate Speed=%d\n", thisFixture.Address+int16(channel), override.RotateSpeed)
+						fmt.Printf("Override is set Address=%d Rotate Speed=%d\n", thisFixture.Address+int16(channel), override.Rotate)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.RotateSpeed), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(override.Rotate), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideRotateSpeed = false
 				}
