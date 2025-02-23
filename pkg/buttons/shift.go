@@ -22,10 +22,9 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
-	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
+func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Decrease Shift\n")
@@ -34,11 +33,7 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
 	// If we're in shutter chase mode.
-	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
-		this.TargetSequence = this.ChaserSequenceNumber
-	} else {
-		this.TargetSequence = this.SelectedSequence
-	}
+	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
 
 	// Deal with an RGB sequence.
 	if sequences[this.TargetSequence].Type == "rgb" {
@@ -137,11 +132,6 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Set the rotate speed name.
-		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate)
-		this.SwitchOverrides = &overrides
 		// Update the status bar
 		UpdateShift(this, guiButtons)
 
@@ -150,7 +140,7 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 }
 
-func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, fixturesConfig *fixture.Fixtures) {
+func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Increase Shift \n")
@@ -159,11 +149,7 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
 	// If we're in shutter chase mode.
-	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
-		this.TargetSequence = this.ChaserSequenceNumber
-	} else {
-		this.TargetSequence = this.SelectedSequence
-	}
+	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
 
 	// Deal with an RGB sequence.
 	if sequences[this.TargetSequence].Type == "rgb" {
@@ -248,6 +234,7 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
 		}
+		this.SwitchOverrides = &overrides
 
 		// Send a message to override / increase the selected switch shift.
 		cmd := common.Command{
@@ -259,12 +246,6 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Set the rotate speed name.
-		theSwitch, _ := fixture.GetFixtureByGroupAndNumber(this.SelectedSequence, this.SelectedSwitch, fixturesConfig)
-		useFixture, _ := fixture.GetFixtureByLabel(theSwitch.UseFixture, fixturesConfig)
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate)
-		this.SwitchOverrides = &overrides
 
 		// Update the status bar
 		UpdateShift(this, guiButtons)

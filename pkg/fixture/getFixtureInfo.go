@@ -435,6 +435,19 @@ func GetGoboDMXValueByNumber(fixture *Fixture, number int) int {
 	return 0
 }
 
+func GetAvailableSpeedChannelsByFixure(fixture *Fixture) []string {
+
+	var speeds []string
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Speed") {
+			for _, setting := range channel.Settings {
+				speeds = append(speeds, setting.Name)
+			}
+		}
+	}
+	return speeds
+}
+
 func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
 
 	var rotateSpeeds []string

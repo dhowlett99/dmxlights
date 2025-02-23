@@ -235,6 +235,8 @@ type Switch struct {
 type Override struct {
 	OverrideSpeed          bool
 	Speed                  int
+	AvailableSpeedChannels []string
+	MaxSpeeds              int
 	OverrideShift          bool
 	Shift                  int
 	OverrideSize           bool

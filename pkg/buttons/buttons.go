@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022, 2023, 2024, 2025 dhowlett99.
 // This is button processor, used by the launchpad and gui interfaces.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -320,14 +320,14 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
+		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, fixturesConfig)
+		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
@@ -948,9 +948,10 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	switchPosition := this.SwitchPosition[this.SelectedSwitch]
 	overrides := *this.SwitchOverrides
 	switchSpeed := overrides[this.SelectedSwitch][switchPosition].Speed
+	fixtureType := this.SelectedFixtureType
 
 	if debug {
-		fmt.Printf("UpdateSpeed Type=%s Switch %d Position %d Speed=%d\n", this.SelectedType, this.SelectedSwitch, switchPosition, switchSpeed)
+		fmt.Printf("UpdateSpeed Selected Type=%s Fixture Type %s Switch %d Position %d Speed=%d\n", this.SelectedType, fixtureType, this.SelectedSwitch, switchPosition, switchSpeed)
 	}
 
 	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
@@ -974,6 +975,20 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 				} else {
 					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchSpeed), "speed", false, guiButtons)
 				}
+			}
+			if tYpe == "switch" && fixtureType == "projector" {
+				switchSpeedName := "Unknown"
+				switchSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
+				numberOfSpeeds := len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableSpeedChannels)
+				maxNumberSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds
+				if numberOfSpeeds > 0 && switchSpeed <= maxNumberSpeeds && switchSpeed != -1 {
+					availableSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableSpeedChannels
+					if switchSpeed > 0 {
+						switchSpeedName = availableSpeeds[switchSpeed-1]
+					}
+				}
+
+				common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d:%s", switchSpeed, switchSpeedName), "speed", false, guiButtons)
 			}
 		}
 		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {

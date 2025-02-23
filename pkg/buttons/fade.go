@@ -33,13 +33,7 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
 	// If we're a scanner and we're in shutter chase mode.
-	if sequences[this.SelectedSequence].Type == "scanner" &&
-		this.ScannerChaser[this.SelectedSequence] &&
-		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
-		this.TargetSequence = this.ChaserSequenceNumber
-	} else {
-		this.TargetSequence = this.SelectedSequence
-	}
+	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
 
 	if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Label == "chaser" {
 
@@ -125,6 +119,7 @@ func decreaseFade(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo < common.MIN_PROJECTOR_GOBO {
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = common.MIN_PROJECTOR_GOBO
 		}
+		this.SwitchOverrides = &overrides
 
 		// Send a message to override / increase the selected switch shift.
 		cmd := common.Command{

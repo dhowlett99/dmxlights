@@ -1026,7 +1026,6 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	// Lookup the setting number for this rotate name.
 
-	//fmt.Printf("Fixture Name %s Action %+v\n", fixture.Name, action)
 	config.RotateName = action.Rotate
 	config.RotateNumber = GetRotateSpeedNumberByName(fixture, action.Rotate)
 	config.Rotatable = false
@@ -1132,6 +1131,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.RotateSensitivity = SENSITIVITY_LONG
 	default:
 		config.TriggerState = false
+		config.Speed = 1
 		config.SpeedDuration = time.Duration(12 * time.Hour)
 		config.MusicTrigger = false
 		config.NumberSteps = MEDIUM_NUMBER_STEPS

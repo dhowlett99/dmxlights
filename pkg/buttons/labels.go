@@ -226,13 +226,10 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// RGB Front of house or uplighters.
 	if this.SelectedType == "rgb" {
 
-		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
-		common.UpdateStatusBar("       ", "tilt", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Red %02d", this.StaticButtons[this.TargetSequence].Color.R), "red", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Green %02d", this.StaticButtons[this.TargetSequence].Color.G), "green", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Blue %02d", this.StaticButtons[this.TargetSequence].Color.B), "blue", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
+		UpdateShift(this, guiButtons)
+		UpdateSize(this, guiButtons)
+		UpdateFade(this, guiButtons)
 
 		// Loop through the available button names this sequence
 		for index, button := range guiBottomRGBButtons {
@@ -259,9 +256,10 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == NORMAL || this.SelectedMode[this.DisplaySequence] == FUNCTION || this.SelectedMode[this.DisplaySequence] == STATUS) {
 
-		common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", getScannerShiftLabel(this.ScannerShift[this.TargetSequence])), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])), "fade", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
+		UpdateShift(this, guiButtons)
+		UpdateSize(this, guiButtons)
+		UpdateFade(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomScannerButtons {
@@ -280,9 +278,10 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY || this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION) {
 
-		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
+		UpdateShift(this, guiButtons)
+		UpdateSize(this, guiButtons)
+		UpdateFade(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomChaserButtons {
@@ -317,18 +316,10 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// Projector functions.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		speed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
-		rotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
-		rotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName
-		gobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
-		goboName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].GoboName
-		colorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
-		colorName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ColorName
-
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", rotateSpeed, rotateSpeedName), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", colorIndex, colorName), "size", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
+		UpdateShift(this, guiButtons)
+		UpdateSize(this, guiButtons)
+		UpdateFade(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomProjectorButtons {
