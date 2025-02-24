@@ -1295,6 +1295,13 @@ func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALi
 	guiButtons <- event
 }
 
+func ClearBottomStatusBar(guiButtons chan ALight) {
+	UpdateStatusBar(" ", "speed", false, guiButtons)
+	UpdateStatusBar(" ", "shift", false, guiButtons)
+	UpdateStatusBar(" ", "size", false, guiButtons)
+	UpdateStatusBar(" ", "fade", false, guiButtons)
+}
+
 func FlashLight(button Button, onColor color.RGBA, offColor color.RGBA, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.

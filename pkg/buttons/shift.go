@@ -132,6 +132,9 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
+		// Get the current switch state in order to decide what we display on status bar.
+		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
+
 		// Update the status bar
 		UpdateShift(this, guiButtons)
 
@@ -246,6 +249,9 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// Get the current switch state in order to decide what we display on status bar.
+		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
 
 		// Update the status bar
 		UpdateShift(this, guiButtons)
