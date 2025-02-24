@@ -1030,6 +1030,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	config.RotateNumber = GetRotateSpeedNumberByName(fixture, action.Rotate)
 	config.Rotatable = false
 	config.AutoRotate = false
+	config.RotateSpeed = 1
 
 	if strings.Contains(config.RotateName, "Off") {
 		config.Rotatable = false
@@ -1081,7 +1082,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		}
 
 		if !config.Forward && !config.Reverse {
-			config.RotateSpeed = 0
+			config.RotateSpeed = 1
 		}
 		if config.Forward {
 			config.RotateSpeed = config.ForwardSpeed

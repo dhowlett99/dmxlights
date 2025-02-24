@@ -1061,7 +1061,19 @@ func UpdateShift(this *CurrentState, guiButttons chan common.ALight) {
 				common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchRGBShift), "shift", false, guiButttons)
 			}
 			if this.SelectedFixtureType == "projector" {
-				common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchRotateSpeed, switchRotateSpeedName), "shift", false, guiButttons)
+
+				rotate := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
+				availableRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateChannels
+				numberOfRotates := len(availableRotates)
+				maxNumberRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
+				rotateName := "Unknown"
+				if numberOfRotates > 0 && rotate <= maxNumberRotates && rotate != -1 {
+					if rotate > 0 {
+						rotateName = availableRotates[rotate-1]
+					}
+				}
+				common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", rotate, rotateName), "shift", false, guiButttons)
+
 			}
 		}
 	}

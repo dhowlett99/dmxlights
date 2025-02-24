@@ -118,7 +118,7 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		overrides := *this.SwitchOverrides
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = 0
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
 		}
 
 		// Send a message to override / increase the selected switch shift.
