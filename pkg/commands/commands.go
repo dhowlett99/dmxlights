@@ -745,16 +745,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const SWITCH_NUMBER = 0
 		const SWITCH_POSITION = 1
 		const SWITCH_COLOR = 2
-		const SWITCH_COLOR_NAMES = 3
+		const SWITCH_COLOR_NAME = 3
 
 		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
 		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
 		switchColorIndex := command.Args[SWITCH_COLOR].Value.(int)
-		switchColorName := command.Args[SWITCH_COLOR_NAMES].Value.(string)
+		switchColorName := command.Args[SWITCH_COLOR_NAME].Value.(string)
 
-		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d ColorIndex %d ColorName %s\n", mySequenceNumber, switchNumber, switchPosition, switchColorIndex, switchColorName)
-		}
+		//if debug {
+		fmt.Printf("%d: Command Override Switch Number %d Position %d ColorIndex %d ColorName %s\n", mySequenceNumber, switchNumber, switchPosition, switchColorIndex, switchColorName)
+		//}
 
 		sequence.PlaySwitchOnce = true
 		sequence.Override = true

@@ -1029,7 +1029,7 @@ func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, 
 		fmt.Printf("Max Rotate Speeds %d\n", newOverride.MaxRotateSpeed)
 		fmt.Printf("Colors %+v\n", newOverride.Colors)
 		fmt.Printf("ColorIndex %+v\n", newOverride.Color)
-		fmt.Printf("Action AvailableColors %s\n", newOverride.AvailableColors)
+		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
 		fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
 		fmt.Printf("Color Names %s\n", newOverride.ColorName)
 		fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)

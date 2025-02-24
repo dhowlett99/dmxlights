@@ -135,7 +135,7 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -154,7 +154,7 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	if debug {
-		fmt.Printf("Increase Speed \n")
+		fmt.Printf("Increase Speed SelectedType %s SelectedFixtureType %s\n", this.SelectedType, this.SelectedFixtureType)
 	}
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
@@ -219,9 +219,9 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
 
 			overrides := *this.SwitchOverrides
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed + 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > common.MAX_SPEED {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MAX_SPEED
 			}
 			this.SwitchOverrides = &overrides
 
@@ -254,11 +254,11 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.OverrideRotateSpeed,
+				Action: common.OverrideSpeed,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)

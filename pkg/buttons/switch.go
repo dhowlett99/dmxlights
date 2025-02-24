@@ -40,11 +40,6 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 	}
 
-	// Clear out any override for this switch position and state.
-	overrides := *this.SwitchOverrides
-	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]] = common.Override{}
-	this.SwitchOverrides = &overrides
-
 	// Get an upto date copy of the switch information by updating our copy of the switch sequence.
 	sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
 

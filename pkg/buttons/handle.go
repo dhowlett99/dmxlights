@@ -205,6 +205,8 @@ func deFocusAllSwitches(this *CurrentState, sequences []*common.Sequence, comman
 		this.LastSelectedSwitch = switchNumber
 		deFocusSingleSwitch(this, sequences, commandChannels)
 	}
+
+	this.LastSelectedSwitch = common.NOT_SELECTED
 }
 
 // Just send a message to defocus the last selected switch button.
