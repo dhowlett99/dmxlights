@@ -282,7 +282,7 @@ func main() {
 		if newSequence.Label == "switch" {
 			this.SwitchSequenceNumber = sequenceNumber
 			// Create a new set of overrides.
-			override.UpdateOverrides(sequenceNumber, fixturesConfig, this.SwitchOverrides)
+			override.CreateOverrides(sequenceNumber, fixturesConfig, this.SwitchOverrides)
 		}
 
 		if newSequence.Label == "chaser" {

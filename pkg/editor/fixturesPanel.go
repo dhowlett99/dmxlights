@@ -670,7 +670,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 		}
 		// When we add a new set of fixtues with a possible new switch states we also need to populate a new override for that switch state.
 		// So we recreate the overrides from scratch by using the pointer to SwitchOverrides.
-		override.UpdateOverrides(SwitchSequenceNumber, fixtures, switchOverrides)
+		override.CreateOverrides(SwitchSequenceNumber, fixtures, switchOverrides)
 
 		// Clear switch positions to their first positions.
 		for _, seq := range sequences {

@@ -23,6 +23,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 
 	"github.com/oliread/usbdmx/ft232"
@@ -215,38 +216,11 @@ func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft23
 			// Now set our local representation of switches
 			for swiTchNumber, swiTch := range sequence.Switches {
 				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
-
-				var stateNames []string
-
-				// Find the details of the fixture for this switch.
-				thisFixture, err := fixture.GetFixtureByLabel(swiTch.UseFixture, fixturesConfig)
-				if err != nil {
-					fmt.Printf("error %s\n", err.Error())
-				}
-
-				// Reset the speeds of switch sequences.
-				for stateNumber, state := range swiTch.States {
-
-					stateNames = append(stateNames, state.Name)
-
-					action := fixture.GetSwitchAction(swiTchNumber, int16(stateNumber), fixturesConfig)
-					cfg := fixture.GetConfig(action, thisFixture, fixturesConfig)
-					overrides := *this.SwitchOverrides
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = cfg.Speed
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = cfg.Shift
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = cfg.Size
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = cfg.Fade
-
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = cfg.RotateSpeed
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = cfg.Colors
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = cfg.Gobo
-					this.SwitchOverrides = &overrides
-				}
-				if debug {
-					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
-				}
-
 			}
+
+			// Create a new set of overrides.
+			override.ResetOverrides(sequenceNumber, fixturesConfig, this.SwitchOverrides)
+
 		}
 
 		// Handle the display for this sequence.

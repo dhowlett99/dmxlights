@@ -741,7 +741,7 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures
 
 				// Create a new set of overrides.
-				override.UpdateOverrides(this.SwitchSequenceNumber, fixturesConfig, this.SwitchOverrides)
+				override.CreateOverrides(this.SwitchSequenceNumber, fixturesConfig, this.SwitchOverrides)
 
 				// Stop all the sequences.
 				cmd := common.Command{

@@ -86,7 +86,7 @@ type Action struct {
 
 type ActionConfig struct {
 	Name              string
-	Colors            []color.RGBA // Colos available for this fixture.
+	Colors            []color.RGBA // Available colors for this fixture.
 	Color             int          // The selected color index for this fixture.
 	Map               bool
 	Fade              int
@@ -981,60 +981,6 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 		}
 	}
 	return false
-}
-
-func DiscoverSwitchOveride(fixture *Fixture, switchNumber int, stateNumber int, fixturesConfig *Fixtures) common.Override {
-
-	// Convert this switches action into a config we can query.
-	action := GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
-	cfg := GetConfig(action, fixture, fixturesConfig)
-
-	if debug {
-		fmt.Printf("DiscoverSwitchOveride: Discover Fixture Name %s Switch %d State %d\n", fixture.Name, switchNumber, stateNumber)
-	}
-
-	// Create a new override for this action.
-	newOverride := common.Override{}
-
-	newOverride.Speed = cfg.Speed
-	newOverride.AvailableSpeedChannels = GetAvailableSpeedChannelsByFixure(fixture)
-	newOverride.MaxSpeeds = len(newOverride.AvailableSpeedChannels)
-
-	newOverride.Shift = cfg.Shift
-	newOverride.Size = cfg.Size
-	newOverride.Fade = cfg.Fade
-
-	newOverride.Rotate = cfg.RotateSpeed
-	newOverride.RotateName = GetRotateSpeedNameByNumber(fixture, cfg.RotateSpeed)
-	newOverride.RotateChannels = GetAvailableRotateChannelsByFixure(fixture)
-	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
-
-	newOverride.Color = 1
-	newOverride.Colors = cfg.Colors
-
-	newOverride.ColorName = GetColorNameByNumber(fixture, newOverride.Color)
-	newOverride.AvailableColors = GetAvailableColorsByFixure(fixture)
-	newOverride.MaxColors = len(newOverride.AvailableColors)
-
-	newOverride.Gobo = cfg.Gobo
-	newOverride.AvailableGobos = GetAvailableGobosByFixure(fixture)
-	newOverride.GoboName = GetGoboNameByNumber(fixture, cfg.Gobo)
-	newOverride.MaxGobos = len(newOverride.AvailableGobos)
-
-	if debug {
-		fmt.Printf("Action Mode %s\n", action.Mode)
-		fmt.Printf("Action Name %s\n", action.Name)
-		fmt.Printf("Switch Number %d State Number %d\n", switchNumber, stateNumber)
-		fmt.Printf("Rotate Speed %d\n", newOverride.Rotate)
-		fmt.Printf("Max Rotate Speeds %d\n", newOverride.MaxRotateSpeed)
-		fmt.Printf("Colors %+v\n", newOverride.Colors)
-		fmt.Printf("ColorIndex %+v\n", newOverride.Color)
-		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
-		fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
-		fmt.Printf("Color Names %s\n", newOverride.ColorName)
-		fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
-	}
-	return newOverride
 }
 
 func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
