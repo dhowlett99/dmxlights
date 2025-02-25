@@ -236,6 +236,7 @@ func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft23
 
 	// Set the first sequnence.
 	this.SelectedSequence = 0
+	this.SelectedType = "rgb"
 	this.LastSelectedSwitch = common.NOT_SELECTED
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
