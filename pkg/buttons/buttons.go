@@ -354,7 +354,9 @@ func ProcessButtons(X int, Y int,
 	// S T A R T - Start sequence.
 	if X == 8 && Y == 5 {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		toggleSequence(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		if this.SelectedType != "switch" {
+			toggleSequence(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		}
 		return
 	}
 
