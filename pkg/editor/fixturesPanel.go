@@ -944,37 +944,12 @@ func checkDMXValue(value string) error {
 		return fmt.Errorf("DMX Value error, must only numbers, ranges can be specified e.g. 10-20")
 	}
 
-	// No check the numbers in a range.
-	if strings.Contains(value, "-") {
-		// We've found a range of values.
-		// Find the start value
-		numbers := strings.Split(value, "-")
-
-		// Now apply the range depending on the speed
-		// Check the start of the range.
-		err := checkDMXnumber(numbers[0])
-		if err != nil {
-			return err
-		}
-		// Check the stop value of the range.
-		if numbers[1] != "" {
-			err = checkDMXnumber(numbers[1])
-			if err != nil {
-				return err
-			}
-		}
-
-		// Check the range makes sense.
-		if numbers[1] < numbers[0] && numbers[1] != "" {
-			return fmt.Errorf("second value in range must be greater than first")
-		}
-	} else {
-		// Check the single value (no range case).
-		err := checkDMXnumber(value)
-		if err != nil {
-			return err
-		}
+	// Now check the DMX value.
+	err := checkDMXnumber(value)
+	if err != nil {
+		return err
 	}
+
 	return nil
 }
 

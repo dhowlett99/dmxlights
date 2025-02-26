@@ -27,6 +27,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Presets are now saved inside a project, so presets relate to fixtures correctly.
 * Support for Equinox Helix
 * Bug fix to entering ranges in settings panel.
+* You can't enter a range of numbers in Settings DMX values.
 
 ## Known Problems
 
