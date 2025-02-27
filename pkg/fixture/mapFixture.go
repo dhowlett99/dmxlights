@@ -34,6 +34,7 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 	mySequenceNumber int,
 	displayFixture int,
 	color color.RGBA,
+	baseColorName color.RGBA,
 	pan int, tilt int, shutter int, rotate int, program int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
 	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
@@ -236,6 +237,18 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 						}
 						if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
 							SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
+						}
+					} else {
+						// Set the color using the original actions base color.
+						if strings.Contains(channel.Name, "Color") {
+							baseColor := common.GetColorNameByRGB(baseColorName)
+							// Look for a setting that matches the color.
+							for _, setting := range channel.Settings {
+								if setting.Name == baseColor {
+									v, _ := strconv.Atoi(setting.Value)
+									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								}
+							}
 						}
 					}
 				}

@@ -63,7 +63,7 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 			// Find a suitable color wheel setting based on the requested static lamp color.
 			scannerColor := FindColor(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
 
-			lastColor = MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, fixtureNumber, fixture.Color, 0, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, fixtureNumber, fixture.Color, fixture.Color, 0, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 		} else {
 			if !cmd.Hidden {
 				if fixtureNumber > 7 {
@@ -72,7 +72,7 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 				}
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, fixture.Color, cmd.Master, eventsForLaunchpad, guiButtons)
 			}
-			lastColor = MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, fixtureNumber, fixture.Color, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+			lastColor = MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, fixtureNumber, fixture.Color, fixture.Color, 0, 0, 0, 0, 0, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 		}
 	}
 

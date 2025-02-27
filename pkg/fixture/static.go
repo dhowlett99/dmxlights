@@ -63,7 +63,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// Find a suitable color wheel settin based on the requested static lamp color.
 		scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
-		return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+		return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 	}
 
 	return common.LastColor{}
@@ -134,7 +134,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 						// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
 						master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
 					}
-					MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+					MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, lastColor.RGBColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 					// Control how long the fade take with the speed control.
 					time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
@@ -164,7 +164,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					// Listen for stop command.
 					select {
 					case <-stopFadeUp:
-						lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+						lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 						return
 					case <-time.After(10 * time.Millisecond):
 					}
@@ -176,7 +176,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					if !cmd.Hidden {
 						common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, fade, eventsForLaunchpad, guiButtons)
 					}
-					lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+					lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 					// Control how long the fade take with the speed control.
 					time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))
@@ -242,7 +242,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 					// scanners doesn't have a rgb color mixing capability so the wheel has to be faded using the master.
 					master = int(float64(cmd.Master) / 100 * (float64(fade) / 2.55))
 				}
-				MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+				MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lastColor.RGBColor, lastColor.RGBColor, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 				// Control how long the fade take with the speed control.
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cmd.RGBFade)))

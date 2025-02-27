@@ -48,7 +48,7 @@ func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// at this stage.
 		scannerBrightness := int(math.Round((float64(fixture.Brightness) / 100) * (float64(cmd.Master) / 2.55)))
 		// Tell the scanner what to do.
-		lastColor = MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, fixtureNumber, fixture.ScannerColor, fixture.Pan, fixture.Tilt,
+		lastColor = MapFixtures(false, cmd.ScannerChaser, cmd.SequenceNumber, fixtureNumber, fixture.ScannerColor, fixture.ScannerColor, fixture.Pan, fixture.Tilt,
 			fixture.Shutter, cmd.Rotate, cmd.Program, cmd.ScannerGobo, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, scannerBrightness, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 
 		// Scannner is rotating, work out what to do with the launchpad lamps.
@@ -65,7 +65,7 @@ func playScanner(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		}
 	} else {
 		// This scanner is disabled, shut it off.
-		lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+		lastColor = MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixtures, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 	}
 
 	return lastColor

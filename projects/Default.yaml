@@ -4219,9 +4219,9 @@ fixtures:
       value: "0"
       selectedvalue: ""
     flash: false
-  - name: ZigZag
+  - name: Red
     number: 2
-    label: ZigZag
+    label: Red
     buttoncolor: Red
     master: 0
     settings:
@@ -4237,18 +4237,18 @@ fixtures:
       channel: Shutter
       value: 32-63
       selectedvalue: Open
-    - name: Color
-      label: Color
+    - name: Red
+      label: Red
       number: 3
       channel: Color
-      value: "0"
-      selectedvalue: ""
-    - name: ZigZag
-      label: ZigZag
+      value: "16"
+      selectedvalue: Red
+    - name: Gobo1
+      label: Gobo1
       number: 4
       channel: Gobo
-      value: "0"
-      selectedvalue: ZigZag
+      value: "18"
+      selectedvalue: Gobo1
     - name: Forward Slow
       label: Forward Slow
       number: 5
@@ -4268,10 +4268,10 @@ fixtures:
       value: "100"
       selectedvalue: Medium
     flash: false
-  - name: Waves
+  - name: Green
     number: 3
-    label: Waves
-    buttoncolor: Cyan
+    label: Green
+    buttoncolor: Green
     master: 0
     settings:
     - name: "255"
@@ -4286,34 +4286,40 @@ fixtures:
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: Horiz Waves
-      label: Horiz Waves
+    - name: Green
+      label: Green
       number: 3
+      channel: Color
+      value: "72"
+      selectedvalue: Green
+    - name: Gobo2
+      label: Gobo2
+      number: 4
       channel: Gobo
-      value: "18"
-      selectedvalue: Horiz Waves
+      value: "28"
+      selectedvalue: Gobo2
     - name: Reverse Medium
       label: Reverse Medium
-      number: 4
+      number: 5
       channel: Rotate
       value: "192"
       selectedvalue: Reverse
     - name: Blackout
       label: Blackout
-      number: 5
+      number: 6
       channel: Program
       value: "0"
       selectedvalue: Blackout
     - name: Fast
       label: Fast
-      number: 6
+      number: 7
       channel: ProgramSpeed
       value: "0"
       selectedvalue: "0"
     flash: false
-  - name: Petals
+  - name: Blue
     number: 4
-    label: Petals
+    label: Blue
     buttoncolor: Cyan
     master: 0
     settings:
@@ -4329,27 +4335,33 @@ fixtures:
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: Croc Petals
-      label: Croc Petals
+    - name: Blue
+      label: Blue
       number: 3
+      channel: Color
+      value: "30"
+      selectedvalue: Blue
+    - name: Gobo3
+      label: Gobo3
+      number: 4
       channel: Gobo
-      value: "28"
-      selectedvalue: Croc Petals
+      value: "38"
+      selectedvalue: Gobo3
     - name: Reverse Slow
       label: Reverse Slow
-      number: 4
+      number: 5
       channel: Rotate
       value: "191"
       selectedvalue: Reverse Slow
     - name: Blackout
       label: Blackout
-      number: 5
+      number: 6
       channel: Program
       value: "0"
       selectedvalue: Blackout
     - name: Fast
       label: Fast
-      number: 6
+      number: 7
       channel: ProgramSpeed
       value: "0"
       selectedvalue: Slow
@@ -4570,16 +4582,23 @@ fixtures:
     - name: Auto
       number: 1
       colors:
+      - Red
+      - Orange
+      - Yellow
       - Green
       - Cyan
       - Blue
+      - Purple
+      - Pink
+      - White
+      - Black
       map: "On"
       mode: Chase
       fade: Soft
       size: Short
       speed: Music
       rotate: Auto
-      rotatespeed: Fast
+      rotatespeed: Medium
       program: ""
       programspeed: ""
       strobe: ""
