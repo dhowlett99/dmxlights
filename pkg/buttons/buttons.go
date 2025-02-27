@@ -1026,13 +1026,11 @@ func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButtons)
 		}
 		if tYpe == "switch" && this.SelectedFixtureType == "projector" {
-			switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color - 1
+			switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
 			switchColorName := "Unknown"
 			if len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors) > 0 {
 				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
 			}
-			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColorIndex, switchColorName), "size", false, guiButtons)
-
 			if this.SwitchStateName != "Off" {
 				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColorIndex, switchColorName), "size", false, guiButtons)
 			} else {
@@ -1124,7 +1122,9 @@ func UpdateFade(this *CurrentState, guiButtons chan common.ALight) {
 			numberOfGobos := len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos)
 			maxNumberGobos := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxGobos
 			if numberOfGobos > 0 && switchGobo < maxNumberGobos && switchGobo != -1 {
-				switchGoboName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos[switchGobo]
+				if switchGobo != 0 {
+					switchGoboName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos[switchGobo-1]
+				}
 			}
 			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButtons)
 

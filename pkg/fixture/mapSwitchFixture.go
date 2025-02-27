@@ -120,7 +120,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		// Now play any preset DMX values directly to the universe.
 		// Step through all the settings.
 		for _, newSetting := range state.Settings {
-			newMiniSetter(thisFixture, override, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
+			newMiniSetter(thisFixture, &override, newSetting, masterChannel, dmxController, master, dmxInterfacePresent)
 		}
 	}
 	return lastColor

@@ -793,10 +793,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Switches[switchNumber].Override.OverrideGobo = true
 		sequence.Switches[switchNumber].Override.Gobo = switchGobo
 
-		// // Set the gobo name.
-		// useFixture, _ := fixture.FindFixtureByGroupAndNumber(mySequenceNumber, switchNumber, fixturesConfig)
-		// sequence.Switches[switchNumber].Override.GoboName = fixture.FindGoboNameByNumber(useFixture, switchGobo)
-
 		return sequence
 
 	// Update the named switch position for the current sequence.

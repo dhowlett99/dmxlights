@@ -70,7 +70,7 @@ func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error)
 func GetChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
-		fmt.Printf("findChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
+		fmt.Printf("GetChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
 	}
 
 	for _, channel := range fixture.Channels {
@@ -118,7 +118,7 @@ func GetChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName 
 		}
 	}
 
-	return 0, fmt.Errorf("setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
+	return 0, fmt.Errorf("GetChannelSettingByChannelNameAndSettingName: setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
 }
 
 func GetChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
@@ -411,17 +411,17 @@ func GetColorDMXValueByNumber(fixture *Fixture, number int) int {
 	return 0
 }
 
-// GetGoboDMXValueByNumber takes the gobo number and returns the DMX value which selects this Gobo.
-func GetGoboDMXValueByNumber(fixture *Fixture, number int) int {
+// GetADMXValue takes the setting number and channel name then returns the DMX value.
+func GetADMXValue(fixture *Fixture, settinNumber int, channelName string) int {
 
 	if debug {
-		fmt.Printf("GetGoboDMXValueByNumber Looking for gobo %d in fixture %s\n", number, fixture.Name)
+		fmt.Printf("GetADMXValue Looking in channel %s for number %d in fixture %s\n", channelName, settinNumber, fixture.Name)
 	}
 
 	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, "Gobo") {
+		if strings.Contains(channel.Name, channelName) {
 			for _, setting := range channel.Settings {
-				if setting.Number == number {
+				if setting.Number == settinNumber {
 					if debug {
 						fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
 					}
@@ -464,6 +464,7 @@ func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
 func GetAvailableColorsByFixure(fixture *Fixture) []string {
 
 	var colors []string
+	colors = append(colors, "White") // Add a empty color so we start the array from 1.
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Color") {
 			for _, setting := range channel.Settings {

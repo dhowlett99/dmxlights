@@ -2094,75 +2094,70 @@ fixtures:
       number: 1
       value: "0"
       selectedvalue: ""
-    - name: Gobo1
-      label: Gobo1
+    - name: Snowflakes
+      label: Snowflakes
       number: 2
       value: "18"
       selectedvalue: ""
-    - name: Gobo2
-      label: Gobo2
+    - name: Hearts
+      label: Hearts
       number: 3
       value: "28"
       selectedvalue: ""
-    - name: Gobo3
-      label: Gobo3
+    - name: Swirls
+      label: Swirls
       number: 4
       value: "38"
       selectedvalue: ""
-    - name: Gobo4
-      label: Gobo4
+    - name: Ccccs
+      label: Ccccs
       number: 5
       value: "48"
       selectedvalue: ""
-    - name: Gobo5
-      label: Gobo5
+    - name: Squares
+      label: Squares
       number: 6
       value: "58"
       selectedvalue: ""
-    - name: Gobo6
-      label: Gobo6
+    - name: Paws
+      label: Paws
       number: 7
       value: "68"
       selectedvalue: ""
-    - name: Gobo7
-      label: Gobo7
+    - name: VertBars
+      label: VertBars
       number: 8
       value: "78"
       selectedvalue: ""
-    - name: Gobo8
-      label: Gobo8
+    - name: 4Circles
+      label: 4Circles
       number: 9
       value: "88"
       selectedvalue: ""
-    - name: Gobo9
-      label: Gobo9
+    - name: Flakes
+      label: Flakes
       number: 10
-      channel: (Select one)
       value: "98"
       selectedvalue: ""
-    - name: Gobo10
-      label: Gobo10
+    - name: Stars
+      label: Stars
       number: 11
-      channel: (Select one)
       value: "108"
       selectedvalue: ""
-    - name: Gobo11
-      label: Gobo11
+    - name: RingCircles
+      label: RingCircles
       number: 12
-      channel: (Select one)
       value: "118"
       selectedvalue: ""
     - name: Scroll Forward
       label: Scroll Forward
       number: 13
-      channel: (Select one)
-      value: 128-191
+      value: 225
       selectedvalue: ""
     - name: Scroll Reverse
       label: Scroll Reverse
       number: 14
-      channel: (Select one)
-      value: 192-255
+      value: 160
       selectedvalue: ""
   - number: 5
     name: Rotate
@@ -2173,33 +2168,33 @@ fixtures:
       number: 1
       value: 0-127
       selectedvalue: ""
-    - name: Forward Slow
-      label: Forward Slow
+    - name: Reverse Slow
+      label: Reverse Slow
       number: 2
       value: "192"
       selectedvalue: ""
-    - name: Forward Medium
-      label: Forward Medium
+    - name: Reverse Medium
+      label: Reverse Medium
       number: 3
       value: "223"
       selectedvalue: ""
-    - name: Forward Fast
-      label: Forward Fast
+    - name: Reverse Fast
+      label: Reverse Fast
       number: 4
       value: "255"
       selectedvalue: ""
-    - name: Reverse Slow
-      label: Reverse Slow
+    - name: Forward Slow
+      label: Forward Slow
       number: 5
       value: "191"
       selectedvalue: ""
-    - name: Reverse Medium
-      label: Reverse Medium
+    - name: Forward Medium
+      label: Forward Medium
       number: 6
       value: "160"
       selectedvalue: ""
-    - name: Reverse Fast
-      label: Reverse Fast
+    - name: Forward Fast
+      label: Forward Fast
       number: 7
       value: "128"
       selectedvalue: ""
@@ -4225,44 +4220,44 @@ fixtures:
     buttoncolor: Red
     master: 0
     settings:
-    - name: "255"
-      label: "255"
+    - name: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: Open
-      label: Open
+    - name: Shutter
+      label: Shutter
       number: 2
       channel: Shutter
-      value: 32-63
+      value: "32"
       selectedvalue: Open
-    - name: Red
-      label: Red
+    - name: Color
+      label: Color
       number: 3
       channel: Color
       value: "16"
       selectedvalue: Red
-    - name: Gobo1
-      label: Gobo1
+    - name: Gobo
+      label: Gobo
       number: 4
       channel: Gobo
       value: "18"
       selectedvalue: Gobo1
-    - name: Forward Slow
-      label: Forward Slow
+    - name: Rotate
+      label: Rotate
       number: 5
       channel: Rotate
       value: "192"
       selectedvalue: Forward Slow
-    - name: "Off"
-      label: "Off"
+    - name: Program
+      label: Program
       number: 6
       channel: Program
       value: "0"
       selectedvalue: "Off"
-    - name: Medium
-      label: Medium
+    - name: ProgramSpeed
+      label: ProgramSpeed
       number: 7
       channel: ProgramSpeed
       value: "100"
@@ -4274,44 +4269,44 @@ fixtures:
     buttoncolor: Green
     master: 0
     settings:
-    - name: "255"
-      label: "255"
+    - name: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: Open
-      label: Open
+    - name: Shutter
+      label: Shutter
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: Green
-      label: Green
+    - name: Color
+      label: Color
       number: 3
       channel: Color
       value: "72"
       selectedvalue: Green
-    - name: Gobo2
-      label: Gobo2
+    - name: Gobo
+      label: Gobo
       number: 4
       channel: Gobo
-      value: "28"
+      value: "32"
       selectedvalue: Gobo2
-    - name: Reverse Medium
-      label: Reverse Medium
+    - name: Rotate
+      label: Rotate
       number: 5
       channel: Rotate
       value: "192"
       selectedvalue: Reverse
-    - name: Blackout
-      label: Blackout
+    - name: Progran
+      label: Progran
       number: 6
       channel: Program
       value: "0"
       selectedvalue: Blackout
-    - name: Fast
-      label: Fast
+    - name: ProgramSpeed
+      label: ProgramSpeed
       number: 7
       channel: ProgramSpeed
       value: "0"
@@ -4323,44 +4318,44 @@ fixtures:
     buttoncolor: Cyan
     master: 0
     settings:
-    - name: "255"
-      label: "255"
+    - name: Master
+      label: Master
       number: 1
       channel: Master
       value: "255"
       selectedvalue: "255"
-    - name: Open
-      label: Open
+    - name: Shutter
+      label: Shutter
       number: 2
       channel: Shutter
       value: "32"
       selectedvalue: Open
-    - name: Blue
-      label: Blue
+    - name: Color
+      label: Color
       number: 3
       channel: Color
       value: "30"
       selectedvalue: Blue
-    - name: Gobo3
-      label: Gobo3
+    - name: Gobo
+      label: Gobo
       number: 4
       channel: Gobo
       value: "38"
       selectedvalue: Gobo3
-    - name: Reverse Slow
-      label: Reverse Slow
+    - name: Rotate
+      label: Rotate
       number: 5
       channel: Rotate
       value: "191"
       selectedvalue: Reverse Slow
-    - name: Blackout
-      label: Blackout
+    - name: Program
+      label: Program
       number: 6
       channel: Program
       value: "0"
       selectedvalue: Blackout
-    - name: Fast
-      label: Fast
+    - name: ProgramSpeed
+      label: ProgramSpeed
       number: 7
       channel: ProgramSpeed
       value: "0"

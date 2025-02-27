@@ -28,7 +28,7 @@ import (
 )
 
 // Process settings.
-func newMiniSetter(thisFixture *Fixture, override common.Override, setting common.Setting, masterChannel int,
+func newMiniSetter(thisFixture *Fixture, override *common.Override, setting common.Setting, masterChannel int,
 	dmxController *ft232.DMXController,
 	master int,
 	dmxInterfacePresent bool) {
@@ -97,9 +97,10 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 				var overrideHasHappened bool
 
 				// Override Speed.
-				if setting.Channel == "Speed" && override.OverrideSpeed {
+				if (setting.Channel == "Speed" || setting.Channel == "ProgramSpeed") && override.OverrideSpeed {
+					speed := GetADMXValue(thisFixture, override.Speed, "Speed")
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Speed=%d\n", thisFixture.Address+int16(channel), override.Speed)
+						fmt.Printf("Override is set Address=%d Speed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Speed, speed)
 					}
 					SetChannel(thisFixture.Address+int16(channel), byte(override.Speed), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
@@ -107,48 +108,52 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 				}
 
 				// Override Shift.
-				if setting.Channel == "RotateSpeed" && override.OverrideShift {
+				if setting.Channel == "Shift" && override.OverrideShift {
+					shift := GetADMXValue(thisFixture, override.Rotate, "Shift")
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Shift=%d\n", thisFixture.Address+int16(channel), override.Shift)
+						fmt.Printf("Override is set Address=%d Shift=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Shift, shift)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.Shift), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(shift), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideShift = false
 				}
 
 				// Override Size.
 				if setting.Channel == "Size" && override.OverrideSize {
+					size := GetADMXValue(thisFixture, override.Rotate, "Size")
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Size=%d\n", thisFixture.Address+int16(channel), override.Size)
+						fmt.Printf("Override is set Address=%d Size=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Size, size)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.Size), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(size), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideSize = false
 				}
 
 				// Override Fade
 				if setting.Channel == "Fade" && override.OverrideFade {
+					fade := GetADMXValue(thisFixture, override.Fade, "Fade")
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Fade=%d\n", thisFixture.Address+int16(channel), override.Fade)
+						fmt.Printf("Override is set Address=%d Fade=%d\n DMX Value=%d\n", thisFixture.Address+int16(channel), override.Fade, fade)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.Fade), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(fade), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideFade = false
 				}
 
 				// Override RotateSpeed.
-				if setting.Channel == "RotateSpeed" && override.OverrideRotateSpeed {
+				if setting.Channel == "Rotate" && override.OverrideRotateSpeed {
+					rotate := GetADMXValue(thisFixture, override.Rotate, "Rotate")
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Rotate Speed=%d\n", thisFixture.Address+int16(channel), override.Rotate)
+						fmt.Printf("Override is set Address=%d Rotate Speed=%d  DMX Value=%d\n", thisFixture.Address+int16(channel), override.Rotate, rotate)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.Rotate), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(rotate), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideRotateSpeed = false
 				}
 
 				// Override Color.
 				if setting.Channel == "Color" && override.OverrideColors {
-					color := GetColorDMXValueByNumber(thisFixture, override.Color)
+					color := GetADMXValue(thisFixture, override.Color, "Color")
 					if debug_mini_setter {
 						fmt.Printf("Override is set Address=%d ColorsNumber=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Color, color)
 					}
@@ -160,7 +165,7 @@ func newMiniSetter(thisFixture *Fixture, override common.Override, setting commo
 				// Override Gobo.
 				if setting.Channel == "Gobo" && override.OverrideGobo {
 					// Lookup correct value for this Gobo number.
-					gobo := GetGoboDMXValueByNumber(thisFixture, override.Gobo)
+					gobo := GetADMXValue(thisFixture, override.Gobo, "Gobo")
 					if debug_mini_setter {
 						fmt.Printf("Override is set Address=%d GoboNumber=%d  DMX Value=%d\n", thisFixture.Address+int16(channel), override.Gobo, gobo)
 					}

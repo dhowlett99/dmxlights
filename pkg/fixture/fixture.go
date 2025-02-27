@@ -431,7 +431,7 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 		}
 	}
 
-	return 0, fmt.Errorf("label setting \"%s\" not found in channel \"%s\" fixture :%s", label, channelName, fixture.Name)
+	return 0, fmt.Errorf("findChannelSettingByLabel: label setting \"%s\" not found in channel \"%s\" fixture :%s", label, channelName, fixture.Name)
 }
 
 func fixtureHasChannel(fixture *Fixture, channelName string) bool {

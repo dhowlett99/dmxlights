@@ -196,7 +196,7 @@ func overrideMiniSetter(cmd common.FixtureCommand, fixturesConfig *Fixtures, dmx
 	}
 
 	for _, newSetting := range state.Settings {
-		newMiniSetter(thisFixture, cmd.Override, newSetting, masterChannel, dmxController, cmd.Master, dmxInterfacePresent)
+		newMiniSetter(thisFixture, &cmd.Override, newSetting, masterChannel, dmxController, cmd.Master, dmxInterfacePresent)
 	}
 
 }
