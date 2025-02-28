@@ -464,7 +464,6 @@ func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
 func GetAvailableColorsByFixure(fixture *Fixture) []string {
 
 	var colors []string
-	colors = append(colors, "White") // Add a empty color so we start the array from 1.
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Color") {
 			for _, setting := range channel.Settings {

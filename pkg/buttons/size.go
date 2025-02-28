@@ -127,14 +127,22 @@ func decreaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		}
 		this.SwitchOverrides = &overrides
 
+		switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
+		var switchColorName string
+
+		switchMaxNumberColors := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
+		if switchMaxNumberColors > 0 && switchColorIndex <= switchMaxNumberColors && switchColorIndex != -1 {
+			switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
+		}
+
 		// Send a message to override / increase the selected switch shift.
 		cmd := common.Command{
 			Action: common.OverrideColor,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
-				{Name: "ColorName", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color]},
+				{Name: "Color", Value: switchColorIndex},
+				{Name: "ColorName", Value: switchColorName},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
@@ -246,11 +254,20 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		// Increase the switch color.
 		overrides := *this.SwitchOverrides
+		switchMaxNumberColors := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
+
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color + 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color > switchMaxNumberColors {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color = switchMaxNumberColors
 		}
 		this.SwitchOverrides = &overrides
+
+		switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
+		var switchColorName string
+
+		if switchMaxNumberColors > 0 && switchColorIndex <= switchMaxNumberColors && switchColorIndex != -1 {
+			switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
+		}
 
 		// Send a message to override / increase the selected switch color.
 		cmd := common.Command{
@@ -258,8 +275,8 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
-				{Name: "ColorName", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color]},
+				{Name: "Color", Value: switchColorIndex},
+				{Name: "ColorName", Value: switchColorName},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)

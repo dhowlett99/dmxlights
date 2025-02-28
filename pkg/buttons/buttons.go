@@ -1028,8 +1028,9 @@ func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 		if tYpe == "switch" && this.SelectedFixtureType == "projector" {
 			switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
 			switchColorName := "Unknown"
-			if len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors) > 0 {
-				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
+			switchMaxNumberColors := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
+			if switchMaxNumberColors > 0 && switchColorIndex <= switchMaxNumberColors && switchColorIndex != -1 {
+				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex-1]
 			}
 			if this.SwitchStateName != "Off" {
 				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColorIndex, switchColorName), "size", false, guiButtons)
