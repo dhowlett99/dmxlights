@@ -33,7 +33,7 @@ func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumb
 	cfg := fixture.GetConfig(action, useFixture, fixturesConfig)
 
 	if debug {
-		fmt.Printf("DiscoverSwitchOveride: Discover Fixture Name %s Switch %d State %d\n", useFixture.Name, switchNumber, stateNumber)
+		fmt.Printf("ResetSwitchOveride: Reset Override for Fixture Name %s Switch %d State %d\n", useFixture.Name, switchNumber, stateNumber)
 	}
 
 	overrides := *switchOverrides
@@ -54,7 +54,7 @@ func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumb
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
-	newOverride.Color = 1
+	newOverride.Color = cfg.Color
 	newOverride.Colors = cfg.Colors
 
 	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
@@ -127,7 +127,7 @@ func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateN
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
-	newOverride.Color = 1
+	newOverride.Color = cfg.Color
 	newOverride.Colors = cfg.Colors
 
 	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)

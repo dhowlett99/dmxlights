@@ -1016,10 +1016,12 @@ func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtur
 						}
 
 						if state.Settings != nil {
-							action := convertSettingToAction(fixture, state.Settings)
 							if debug {
-								fmt.Printf("Settings:- action number %d colors %+v\n", action.Number, action.Colors)
+								for _, setting := range state.Settings {
+									fmt.Printf("setting Number %d Label %s Channel %s Valuue %s\n", setting.Number, setting.Label, setting.Channel, setting.Value)
+								}
 							}
+							action := convertSettingToAction(fixture, state.Settings)
 							return action
 						}
 					}
@@ -1042,6 +1044,10 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 
 	// Look through settings and buuld up the new action.
 	for _, setting := range settings {
+
+		if debug {
+			fmt.Printf("Fixture name %s setting name %s label %s Channel %s name %s value %s\n", fixture.Name, setting.Name, setting.Label, setting.Channel, setting.Name, setting.Value)
+		}
 
 		if setting.Channel == "Speed" {
 			newAction.RotateSpeed = setting.Value
@@ -1072,19 +1078,17 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 
 		// A channel setting can only contain one value
 		// so only one color.
-		if debug {
-			fmt.Printf("setting name %s label %s Channel %s value %s\n", setting.Name, setting.Label, setting.Channel, setting.Value)
-		}
-
 		if setting.Channel == "Color" {
 			// If a setting has a channel name which is a number we lookup that color name.
-			if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
-				// Lookup color number in list of available colors.
-				colorName := GetColorNameByNumber(&fixture, colorNumber)
-				newAction.Colors = []string{colorName}
+			if IsNumericOnly(setting.Value) {
+				if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
+					// Lookup color number in list of available colors.
+					colorName := GetColorNameByNumber(&fixture, colorNumber)
+					newAction.Colors = []string{colorName}
+				}
 			} else {
-				// we use that name as the color.
-				newAction.Colors = []string{setting.Value}
+				// we use that string as the color.
+				newAction.Colors = []string{setting.Name}
 			}
 			if setting.Name == "Off" {
 				newAction.Colors = []string{"Green"}

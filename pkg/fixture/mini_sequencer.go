@@ -933,7 +933,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	}
 
-	if action.Colors != nil {
+	if len(action.Colors) > 0 {
 		// Find the color by name from the library of supported colors.
 		colorLibrary, err := common.GetColorArrayByNames(action.Colors)
 		if err != nil {
@@ -941,7 +941,10 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		}
 		config.Colors = colorLibrary
 		// Take the first color in the library.
-		config.Color = 1
+		firstColor := action.Colors[0]
+
+		// Get the color number based on color.
+		config.Color = FindColor(fixture.Group, fixture.ID, firstColor, fixturesConfig)
 	}
 
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.

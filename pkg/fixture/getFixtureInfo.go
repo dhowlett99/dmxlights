@@ -517,7 +517,7 @@ func GetColorNameByNumber(fixture *Fixture, number int) string {
 func GetGoboByName(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
 
 	if debug {
-		fmt.Printf("GetGoboByName\n")
+		fmt.Printf("GetGoboByName fixture %d seq %d gobo name %s\n", myFixtureNumber, mySequenceNumber, selectedGobo)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
@@ -527,6 +527,9 @@ func GetGoboByName(myFixtureNumber int, mySequenceNumber int, selectedGobo strin
 					if strings.Contains(channel.Name, "Gobo") {
 						for _, setting := range channel.Settings {
 							if strings.Contains(setting.Name, selectedGobo) {
+								if debug {
+									fmt.Printf("GetGoboByName setting no %d\n", setting.Number)
+								}
 								return setting.Number
 							}
 						}

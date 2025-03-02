@@ -380,6 +380,8 @@ Program Speed | Speed of the show as defined in a fixture channel called Program
 Switched fixtures are configured in the config as described above, but sometimes it's useful to override a parameter.
 
 Switches now have the ability to be selected indidually just like any other sequence. This way you can select a switch and for example override the speed, color or gobo settings using the button at the botton of the Launchpad or GUI . Overriden settings can be stored in a preset.
+
+Note that you can only override a setting that exists as a channel in the fixture. For example to Override ProgramSpeed the fixture would need to have a channel called ProgramSpeed.
  
 Notice that all switch indicators will be shown dimmed, only when you select a switch will it brighten up and become focused. Tapping further will change the state (switch position).
 You can also override switch parameters like speed when a switch is selected. The status bar at the bottom will also show overridable switch parameters.
