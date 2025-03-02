@@ -1127,7 +1127,6 @@ func UpdateFade(this *CurrentState, guiButtons chan common.ALight) {
 					switchGoboName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos[switchGobo-1]
 				}
 			}
-			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButtons)
 
 			if this.SwitchStateName != "Off" {
 				common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButtons)

@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022, 2023, 2024, 2025 dhowlett99.
 // This implements the load preset feature, used by the buttons package.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -138,46 +138,11 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		if sequences[sequenceNumber].Type == "switch" {
 
 			// Get an upto date copy of the switch sequence.
-			//sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
+			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
-			// Now set our local representation of switches
-			for swiTchNumber, swiTch := range sequences[sequenceNumber].Switches {
-				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
+			// Get the overrides.
+			RefreshLocalOverrides(this, sequences[sequenceNumber])
 
-				overrides := *this.SwitchOverrides
-				//  Restore any switch Overrides.
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = sequences[sequenceNumber].Switches[swiTchNumber].Override.Speed
-				}
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = sequences[sequenceNumber].Switches[swiTchNumber].Override.Shift
-				}
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Size != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = sequences[sequenceNumber].Switches[swiTchNumber].Override.Size
-				}
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = sequences[sequenceNumber].Switches[swiTchNumber].Override.Fade
-				}
-
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Rotate != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = sequences[sequenceNumber].Switches[swiTchNumber].Override.Rotate
-				}
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors != nil {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Colors = sequences[sequenceNumber].Switches[swiTchNumber].Override.Colors
-				}
-				if sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo != 0 {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo = sequences[sequenceNumber].Switches[swiTchNumber].Override.Gobo
-				}
-				this.SwitchOverrides = &overrides
-
-				if debug {
-					var stateNames []string
-					for _, state := range swiTch.States {
-						stateNames = append(stateNames, state.Name)
-					}
-					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPosition[swiTchNumber], stateNames)
-				}
-			}
 			deFocusAllSwitches(this, sequences, commandChannels)
 		}
 

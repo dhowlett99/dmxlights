@@ -28,6 +28,10 @@ import (
 )
 
 // Process settings.
+
+// newMiniSetter -The mini setter takes a bunch of settings/values from a switch state and applies them to the
+// DMX universe, using SetChannel primitive directly.
+// It uses the the settings channel name to identify the channel to use in the fixture.
 func newMiniSetter(thisFixture *Fixture, override *common.Override, setting common.Setting, masterChannel int,
 	dmxController *ft232.DMXController,
 	master int,
