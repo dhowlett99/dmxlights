@@ -490,6 +490,9 @@ func GetAvailableGobosByFixure(fixture *Fixture) []string {
 // GetColorNameByNumber takes the color number and returns the color name for this fixture.
 func GetColorNameByNumber(fixture *Fixture, number int) string {
 
+	if number == 0 {
+		number = 1
+	}
 	if fixture == nil {
 		return "Not Found"
 	}
@@ -510,6 +513,9 @@ func GetColorNameByNumber(fixture *Fixture, number int) string {
 		}
 	}
 
+	if debug {
+		fmt.Printf("NOT Found  color name Unkown\n")
+	}
 	return "Unknown"
 }
 

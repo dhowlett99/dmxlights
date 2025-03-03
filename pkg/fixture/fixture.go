@@ -609,11 +609,35 @@ func HowManyGobosForThisFixture(myFixtureNumber int, mySequenceNumber int, fixtu
 	return 0
 }
 
+func FindColorinFixture(fixture *Fixture, color string) int {
+
+	if debug {
+		fmt.Printf("FindColor looking for %s in fixture %s\n", color, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Color") {
+			for _, setting := range channel.Settings {
+				if setting.Name == color {
+					if debug {
+						fmt.Printf("Found setting number %d\n", setting.Number)
+					}
+					return setting.Number
+				}
+			}
+		}
+	}
+	if debug {
+		fmt.Printf("Not FOund setting number returning 0\n")
+	}
+	return 0
+}
+
 // FindColor takes the name of a color channel setting like "White" and returns the color number for this type of scanner.
 func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures) int {
 
 	if debug {
-		fmt.Printf("FindColor\n")
+		fmt.Printf("FindColor looking for %s seq %d fixture %d\n", color, mySequenceNumber, myFixtureNumber)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
@@ -623,6 +647,9 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 					if strings.Contains(channel.Name, "Color") {
 						for _, setting := range channel.Settings {
 							if setting.Name == color {
+								if debug {
+									fmt.Printf("Found setting number %d\n", setting.Number)
+								}
 								return setting.Number
 							}
 						}
@@ -630,6 +657,9 @@ func FindColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures
 				}
 			}
 		}
+	}
+	if debug {
+		fmt.Printf("Not FOund setting number returning 0\n")
 	}
 	return 0
 }
@@ -1046,7 +1076,7 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 	for _, setting := range settings {
 
 		if debug {
-			fmt.Printf("Fixture name %s setting name %s label %s Channel %s name %s value %s\n", fixture.Name, setting.Name, setting.Label, setting.Channel, setting.Name, setting.Value)
+			fmt.Printf("convertSettingToAction: Fixture name %s setting name %s label %s Channel %s name %s value %s\n", fixture.Name, setting.Name, setting.Label, setting.Channel, setting.Name, setting.Value)
 		}
 
 		if setting.Channel == "Speed" {
@@ -1080,7 +1110,7 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 		// so only one color.
 		if setting.Channel == "Color" {
 			// If a setting has a channel name which is a number we lookup that color name.
-			if IsNumericOnly(setting.Value) {
+			if IsNumericOnly(setting.Name) {
 				if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
 					// Lookup color number in list of available colors.
 					colorName := GetColorNameByNumber(&fixture, colorNumber)

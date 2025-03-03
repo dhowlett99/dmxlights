@@ -1030,6 +1030,9 @@ func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 			switchColorName := "Unknown"
 			switchMaxNumberColors := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
 			if switchMaxNumberColors > 0 && switchColorIndex <= switchMaxNumberColors && switchColorIndex != -1 {
+				if switchColorIndex > 0 {
+					switchColorIndex--
+				}
 				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
 			}
 			if this.SwitchStateName != "Off" {

@@ -944,7 +944,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		firstColor := action.Colors[0]
 
 		// Get the color number based on color.
-		config.Color = FindColor(fixture.Group, fixture.ID, firstColor, fixturesConfig)
+		config.Color = FindColorinFixture(fixture, firstColor)
 	}
 
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
