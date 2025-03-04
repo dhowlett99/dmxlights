@@ -57,7 +57,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
 	}
-	fixtureInfo := fixture.FindFixtureInfo(&basedOnFixture)
+	fixtureInfo := fixture.GetFixtureInfo(&basedOnFixture)
 	if debug {
 		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}

@@ -78,7 +78,7 @@ func MapSwitchFixture(swiTch common.Switch,
 		}
 
 		// Look for Master channel in this fixture identified by ID.
-		masterChannel, err := FindChannelNumberByName(thisFixture, "Master")
+		masterChannel, err := GetChannelNumberByName(thisFixture, "Master")
 		if err != nil && debug {
 			fmt.Printf("warning! fixture %s: %s\n", thisFixture.Name, err)
 		}

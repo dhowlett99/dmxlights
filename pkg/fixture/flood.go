@@ -45,7 +45,7 @@ func startFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures
 	tilt := 128
 	shutter := GetShutter(fixtureNumber, cmd.SequenceNumber, "Open", fixtures)
 	gobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
-	scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
+	scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, "White", fixtures)
 	rotate := 0
 	program := 0
 

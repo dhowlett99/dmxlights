@@ -61,7 +61,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// Find a suitable gobo based on the requested static lamp color.
 		scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 		// Find a suitable color wheel settin based on the requested static lamp color.
-		scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+		scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 		return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, common.SCANNER_MID_POINT, common.SCANNER_MID_POINT, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 	}
@@ -118,7 +118,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					// Find a suitable gobo based on the requested static lamp color.
 					scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 					// Find a suitable color wheel settin based on the requested static lamp color.
-					scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+					scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 					// Listen for stop command.
 					select {
@@ -157,7 +157,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 				// Find a suitable gobo based on the requested static lamp color.
 				scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 				// Find a suitable color wheel settin based on the requested static lamp color.
-				scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+				scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 				// Fade up fixture.
 				for _, fade := range fadeUpValues {
@@ -226,7 +226,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 				// Find a suitable gobo based on the requested static lamp color.
 				scannerGobo := GetGoboByName(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 				// Find a suitable color wheel settin based on the requested static lamp color.
-				scannerColor := FindColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
+				scannerColor := GetColor(fixtureNumber, cmd.SequenceNumber, color, fixtures)
 
 				// Listen for stop commands.
 				select {

@@ -61,7 +61,7 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 			// Find a suitable gobo based on the requested chaser lamp color.
 			scannerGobo := GetGoboByName(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
 			// Find a suitable color wheel setting based on the requested static lamp color.
-			scannerColor := FindColor(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
+			scannerColor := GetColor(fixtureNumber, scannerFixturesSequenceNumber, color, fixtures)
 
 			lastColor = MapFixtures(true, cmd.ScannerChaser, scannerFixturesSequenceNumber, fixtureNumber, fixture.Color, fixture.Color, 0, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, cmd.Master, fixture.Brightness, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 		} else {

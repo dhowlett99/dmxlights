@@ -26,7 +26,7 @@ import (
 
 const debug = false
 
-func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumber int, switchOverrides *[][]common.Override, fixturesConfig *fixture.Fixtures) {
+func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumber int, switchOverrides *[][]common.Override, fixturesConfig *fixture.Fixtures) common.Override {
 
 	// Convert this switches action into a config we can query.
 	action := fixture.GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
@@ -41,64 +41,11 @@ func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumb
 	// Create a new override for this action.
 	newOverride := overrides[switchNumber-1][stateNumber-1]
 
-	newOverride.Speed = cfg.Speed
-	newOverride.AvailableSpeedChannels = fixture.GetAvailableSpeedChannelsByFixure(useFixture)
-	newOverride.MaxSpeeds = len(newOverride.AvailableSpeedChannels)
-
-	newOverride.Shift = cfg.Shift
-	newOverride.Size = cfg.Size
-	newOverride.Fade = cfg.Fade
-
-	newOverride.Rotate = cfg.RotateSpeed
-	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
-	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
-	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
-
-	newOverride.Color = cfg.Color
-	newOverride.Colors = cfg.Colors
-
-	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
-	newOverride.AvailableColors = fixture.GetAvailableColorsByFixure(useFixture)
-	newOverride.MaxColors = len(newOverride.AvailableColors)
-
-	newOverride.Gobo = cfg.Gobo
-	newOverride.AvailableGobos = fixture.GetAvailableGobosByFixure(useFixture)
-	newOverride.GoboName = fixture.GetGoboNameByNumber(useFixture, cfg.Gobo)
-	newOverride.MaxGobos = len(newOverride.AvailableGobos)
+	populateOverride(useFixture, &newOverride, cfg)
 
 	overrides[switchNumber-1][stateNumber-1] = newOverride
 
-	if debug {
-
-		fmt.Printf("Speed %d\n", newOverride.Speed)
-		fmt.Printf("AvailableSpeedChannels %s\n", newOverride.AvailableSpeedChannels)
-		fmt.Printf("MaxSpeeds %d\n", newOverride.MaxSpeeds)
-
-		fmt.Printf("Shift %d\n", newOverride.Shift)
-		fmt.Printf("Size %d\n", newOverride.Size)
-		fmt.Printf("Fade %d\n", newOverride.Fade)
-
-		fmt.Printf("RotateSpeed %d\n", newOverride.Rotate)
-		fmt.Printf("RotateName %s\n", newOverride.RotateName)
-		fmt.Printf("RotateChannels %s\n", newOverride.RotateChannels)
-		fmt.Printf("MaxRotateSpeed %d\n", newOverride.MaxRotateSpeed)
-
-		fmt.Printf("Color %d\n", newOverride.Color)
-		fmt.Printf("Colors %+v\n", newOverride.Colors)
-		fmt.Printf("ColorName %s\n", newOverride.ColorName)
-		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
-		fmt.Printf("MaxColors %d\n", newOverride.MaxColors)
-
-		fmt.Printf("Gobo %d\n", newOverride.Gobo)
-		fmt.Printf("AvailableGobos %s\n", newOverride.AvailableGobos)
-		fmt.Printf("GoboName %s\n", newOverride.GoboName)
-		fmt.Printf("MaxGobos %d\n", newOverride.MaxGobos)
-
-	}
-
-	overrides[switchNumber-1][stateNumber-1] = newOverride
-
-	switchOverrides = &overrides
+	return newOverride
 }
 
 func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumber int, fixturesConfig *fixture.Fixtures) common.Override {
@@ -114,45 +61,8 @@ func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateN
 	// Create a new override for this action.
 	newOverride := common.Override{}
 
-	newOverride.Speed = cfg.Speed
-	newOverride.AvailableSpeedChannels = fixture.GetAvailableSpeedChannelsByFixure(useFixture)
-	newOverride.MaxSpeeds = len(newOverride.AvailableSpeedChannels)
+	populateOverride(useFixture, &newOverride, cfg)
 
-	newOverride.Shift = cfg.Shift
-	newOverride.Size = cfg.Size
-	newOverride.Fade = cfg.Fade
-
-	newOverride.Rotate = cfg.RotateSpeed
-	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
-	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
-	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
-
-	newOverride.Color = cfg.Color
-	newOverride.Colors = cfg.Colors
-
-	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
-	newOverride.AvailableColors = fixture.GetAvailableColorsByFixure(useFixture)
-	newOverride.MaxColors = len(newOverride.AvailableColors)
-
-	newOverride.Gobo = cfg.Gobo
-	newOverride.AvailableGobos = fixture.GetAvailableGobosByFixure(useFixture)
-	newOverride.GoboName = fixture.GetGoboNameByNumber(useFixture, cfg.Gobo)
-	newOverride.MaxGobos = len(newOverride.AvailableGobos)
-
-	if debug {
-		fmt.Printf("Action Mode %s\n", action.Mode)
-		fmt.Printf("Action Name %s\n", action.Name)
-		fmt.Printf("Switch Number %d State Number %d\n", switchNumber, stateNumber)
-		fmt.Printf("Rotate Speed %d\n", newOverride.Rotate)
-		fmt.Printf("Max Rotate Speeds %d\n", newOverride.MaxRotateSpeed)
-		fmt.Printf("Action Color %s Color %d\n", action.Colors, newOverride.Color)
-		fmt.Printf("Colors %+v\n", newOverride.Colors)
-		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
-		fmt.Printf("MaxColors %+v\n", newOverride.MaxColors)
-		fmt.Printf("Color Names %s\n", newOverride.ColorName)
-		fmt.Printf("Gobo action %s newOverride Gobo %d Gobo Name %s\n", action.Gobo, newOverride.Gobo, newOverride.GoboName)
-		fmt.Printf("==========================================\n")
-	}
 	return newOverride
 }
 
@@ -186,7 +96,7 @@ func CreateOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switc
 			}
 
 			// Load the config for this state of of this switch
-			override := DiscoverSwitchOveride(thisFixture, swiTch.Number, int(state.Number), fixturesConfig)
+			override := DiscoverSwitchOveride(thisFixture, swiTchNumber, int(stateNumber), fixturesConfig)
 
 			// Assign this discovered override to the current switch state.
 			overrides[swiTchNumber] = append(overrides[swiTchNumber], override)
@@ -241,7 +151,8 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 			}
 
 			// Load the config for this state of of this switch
-			ResetSwitchOveride(thisFixture, swiTch.Number, int(state.Number), switchOverrides, fixturesConfig)
+			overrides[swiTchNumber][stateNumber] = ResetSwitchOveride(thisFixture, swiTch.Number, int(state.Number), switchOverrides, fixturesConfig)
+			switchOverrides = &overrides
 
 			if debug {
 				fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
@@ -260,4 +171,67 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 
 	// re-instate the pointer to the overrides.
 	switchOverrides = &overrides
+}
+
+func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override, cfg fixture.ActionConfig) {
+
+	newOverride.Speed = cfg.Speed
+	newOverride.AvailableSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Speed")
+	newOverride.MaxSpeeds = len(newOverride.AvailableSpeedChannels)
+
+	newOverride.Shift = cfg.Shift
+
+	newOverride.Size = cfg.Size
+
+	newOverride.Fade = cfg.Fade
+
+	newOverride.ProgramSpeed = cfg.ProgramSpeed
+	newOverride.AvailableProgramSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "ProgramSpeed")
+	newOverride.MaxProgramSpeeds = len(newOverride.AvailableProgramSpeedChannels)
+
+	newOverride.Rotate = cfg.RotateSpeed
+	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
+	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
+	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
+
+	newOverride.Color = cfg.Color
+	newOverride.Colors = cfg.Colors
+	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
+	newOverride.AvailableColors = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Color")
+	newOverride.MaxColors = len(newOverride.AvailableColors)
+
+	newOverride.Gobo = cfg.Gobo
+	newOverride.AvailableGobos = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Gobo")
+	newOverride.GoboName = fixture.GetGoboNameByNumber(useFixture, cfg.Gobo)
+	newOverride.MaxGobos = len(newOverride.AvailableGobos)
+
+	if debug {
+		fmt.Printf("Speed %d\n", newOverride.Speed)
+		fmt.Printf("AvailableSpeedChannels %s\n", newOverride.AvailableSpeedChannels)
+		fmt.Printf("MaxSpeeds %d\n", newOverride.MaxSpeeds)
+
+		fmt.Printf("Shift %d\n", newOverride.Shift)
+		fmt.Printf("Size %d\n", newOverride.Size)
+		fmt.Printf("Fade %d\n", newOverride.Fade)
+
+		fmt.Printf("ProgramSpeed %d\n", newOverride.ProgramSpeed)
+		fmt.Printf("AvailableProgramSpeedChannels %s\n", newOverride.AvailableProgramSpeedChannels)
+		fmt.Printf("MaxProgramSpeeds %d\n", newOverride.MaxProgramSpeeds)
+
+		fmt.Printf("RotateSpeed %d\n", newOverride.Rotate)
+		fmt.Printf("RotateName %s\n", newOverride.RotateName)
+		fmt.Printf("RotateChannels %s\n", newOverride.RotateChannels)
+		fmt.Printf("MaxRotateSpeed %d\n", newOverride.MaxRotateSpeed)
+
+		fmt.Printf("Color %d\n", newOverride.Color)
+		fmt.Printf("Colors %+v\n", newOverride.Colors)
+		fmt.Printf("ColorName %s\n", newOverride.ColorName)
+		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
+		fmt.Printf("MaxColors %d\n", newOverride.MaxColors)
+
+		fmt.Printf("Gobo %d\n", newOverride.Gobo)
+		fmt.Printf("AvailableGobos %s\n", newOverride.AvailableGobos)
+		fmt.Printf("GoboName %s\n", newOverride.GoboName)
+		fmt.Printf("MaxGobos %d\n", newOverride.MaxGobos)
+	}
 }

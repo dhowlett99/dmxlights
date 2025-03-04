@@ -92,7 +92,7 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 			} else {
 				// Handle the fact that the channel may be a label as well.
 				// Look for this channels number in this fixture identified by ID.
-				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
+				channel, _ := GetChannelNumberByName(thisFixture, setting.Channel)
 				if debug_mini_setter {
 					fmt.Printf("fixture %s: ChannelLabel Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
@@ -101,7 +101,7 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 				var overrideHasHappened bool
 
 				// Override Speed.
-				if (setting.Channel == "Speed" || setting.Channel == "ProgramSpeed") && override.OverrideSpeed {
+				if setting.Channel == "Speed" && override.OverrideSpeed {
 					speed := GetADMXValue(thisFixture, override.Speed, "Speed")
 					if debug_mini_setter {
 						fmt.Printf("Override is set Address=%d Speed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Speed, speed)
@@ -142,6 +142,17 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 					SetChannel(thisFixture.Address+int16(channel), byte(fade), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideFade = false
+				}
+
+				// Override ProgramSpeed.
+				if setting.Channel == "ProgramSpeed" && override.OverrideProgramSpeed {
+					programSpeed := GetADMXValue(thisFixture, override.Speed, "ProgramSpeed")
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d ProgramSpeed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.ProgramSpeed, programSpeed)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.ProgramSpeed), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideProgramSpeed = false
 				}
 
 				// Override RotateSpeed.
@@ -206,7 +217,7 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 				SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 			} else {
 				// Look for this channels number in this fixture identified by ID.
-				channel, _ := FindChannelNumberByName(thisFixture, setting.Channel)
+				channel, _ := GetChannelNumberByName(thisFixture, setting.Channel)
 				if debug_mini_setter {
 					fmt.Printf("fixture %s: SettingisID Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}

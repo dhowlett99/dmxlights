@@ -40,6 +40,7 @@ const MIN_SPEED = 0
 const MAX_SPEED = 12
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
+const MIN_PROJECTOR_PROGRAM_SPEED = 1
 const MIN_PROJECTOR_ROTATE_SPEED = 1
 const MAX_PROJECTOR_ROTATE_SPEED = 10
 const MIN_PROJECTOR_COLOR = 1
@@ -237,29 +238,40 @@ type Override struct {
 	Speed                  int
 	AvailableSpeedChannels []string
 	MaxSpeeds              int
-	OverrideShift          bool
-	Shift                  int
-	OverrideSize           bool
-	Size                   int
-	OverrideFade           bool
-	Fade                   int
+
+	OverrideProgramSpeed          bool
+	ProgramSpeed                  int
+	AvailableProgramSpeedChannels []string
+	MaxProgramSpeeds              int
+
+	OverrideShift bool
+	Shift         int
+
+	OverrideSize bool
+	Size         int
+
+	OverrideFade bool
+	Fade         int
+
 	OverrideRotateSpeed    bool
 	Rotate                 int
 	RotateName             string
 	RotateChannels         []string
 	MaxRotateSpeedChannels int
 	MaxRotateSpeed         int
-	OverrideColors         bool
-	Colors                 []color.RGBA
-	Color                  int
-	MaxColors              int
-	ColorName              string
-	AvailableColors        []string
-	OverrideGobo           bool
-	Gobo                   int
-	MaxGobos               int
-	AvailableGobos         []string
-	GoboName               string
+
+	OverrideColors  bool
+	Colors          []color.RGBA
+	Color           int
+	MaxColors       int
+	ColorName       string
+	AvailableColors []string
+
+	OverrideGobo   bool
+	Gobo           int
+	MaxGobos       int
+	AvailableGobos []string
+	GoboName       string
 }
 
 type StaticColorButton struct {
@@ -340,6 +352,7 @@ const (
 	ResetAllSwitchPositions
 	UpdateSwitch
 	OverrideSpeed
+	OverrideProgramSpeed
 	OverrideShift
 	OverrideSize
 	OverrideFade

@@ -422,10 +422,10 @@ func GetADMXValue(fixture *Fixture, settinNumber int, channelName string) int {
 		if strings.Contains(channel.Name, channelName) {
 			for _, setting := range channel.Settings {
 				if setting.Number == settinNumber {
-					if debug {
-						fmt.Printf("Gobo %d Name %s\n", setting.Number, setting.Name)
-					}
 					dmx, _ := strconv.Atoi(setting.Value)
+					if debug {
+						fmt.Printf("Setting Name %d DMX value %d\n", setting.Number, dmx)
+					}
 					return dmx
 				}
 			}
@@ -435,17 +435,17 @@ func GetADMXValue(fixture *Fixture, settinNumber int, channelName string) int {
 	return 0
 }
 
-func GetAvailableSpeedChannelsByFixure(fixture *Fixture) []string {
+func GetAvailableSettingsForChannelsByFixure(fixture *Fixture, channelName string) []string {
 
-	var speeds []string
+	var settings []string
 	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, "Speed") {
+		if strings.Contains(channel.Name, channelName) {
 			for _, setting := range channel.Settings {
-				speeds = append(speeds, setting.Name)
+				settings = append(settings, setting.Name)
 			}
 		}
 	}
-	return speeds
+	return settings
 }
 
 func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
@@ -459,32 +459,6 @@ func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
 		}
 	}
 	return rotateSpeeds
-}
-
-func GetAvailableColorsByFixure(fixture *Fixture) []string {
-
-	var colors []string
-	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, "Color") {
-			for _, setting := range channel.Settings {
-				colors = append(colors, setting.Name)
-			}
-		}
-	}
-	return colors
-}
-
-func GetAvailableGobosByFixure(fixture *Fixture) []string {
-
-	var colors []string
-	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, "Gobo") {
-			for _, setting := range channel.Settings {
-				colors = append(colors, setting.Name)
-			}
-		}
-	}
-	return colors
 }
 
 // GetColorNameByNumber takes the color number and returns the color name for this fixture.
@@ -519,6 +493,26 @@ func GetColorNameByNumber(fixture *Fixture, number int) string {
 	return "Unknown"
 }
 
+// GetChannelNumberByName takes the name of a channel and setting  and returns the setting number.
+func GetChannelSettingInfo(fixture *Fixture, channelName string, settingName string, fixtures *Fixtures) int {
+
+	if debug {
+		fmt.Printf("GetChannelNumberByName fixture name %s number %d channel name %s\n", fixture.Name, fixture.Number, channelName)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, channelName) {
+			for _, setting := range channel.Settings {
+				if setting.Name == settingName {
+					return setting.Number
+				}
+			}
+		}
+	}
+
+	return -1
+}
+
 // GetGoboByName takes the name of a gobo channel setting like "Open" and returns the gobo number  for this type of scanner.
 func GetGoboByName(myFixtureNumber int, mySequenceNumber int, selectedGobo string, fixtures *Fixtures) int {
 
@@ -545,4 +539,172 @@ func GetGoboByName(myFixtureNumber int, mySequenceNumber int, selectedGobo strin
 		}
 	}
 	return 0
+}
+
+// GetNumberOfGobosForThisFixture takes the fixture number, sequence number and the fixturesConfig
+// Returns returns the number of gobos this fixture has.
+func GetNumberOfGobosForThisFixture(myFixtureNumber int, mySequenceNumber int, fixtures *Fixtures) int {
+
+	if debug {
+		fmt.Printf("GetNumberOfGobosForThisFixture\n")
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == mySequenceNumber+1 {
+			if fixture.Number == myFixtureNumber+1 {
+				for _, channel := range fixture.Channels {
+					if strings.Contains(channel.Name, "Gobo") {
+						return len(channel.Settings)
+					}
+				}
+			}
+		}
+	}
+	return 0
+}
+
+func GetColorNumberFromFixture(fixture *Fixture, color string) int {
+
+	if debug {
+		fmt.Printf("FindColor looking for %s in fixture %s\n", color, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Color") {
+			for _, setting := range channel.Settings {
+				if setting.Name == color {
+					if debug {
+						fmt.Printf("Found setting number %d\n", setting.Number)
+					}
+					return setting.Number
+				}
+			}
+		}
+	}
+	if debug {
+		fmt.Printf("Not FOund setting number returning 0\n")
+	}
+	return 0
+}
+
+// GetColor takes the name of a color channel setting like "White" and returns the color number for this type of scanner.
+func GetColor(myFixtureNumber int, mySequenceNumber int, color string, fixtures *Fixtures) int {
+
+	if debug {
+		fmt.Printf("GetColor looking for %s seq %d fixture %d\n", color, mySequenceNumber, myFixtureNumber)
+	}
+
+	for _, fixture := range fixtures.Fixtures {
+		if fixture.Group == mySequenceNumber+1 {
+			if fixture.Number == myFixtureNumber+1 {
+				for _, channel := range fixture.Channels {
+					if strings.Contains(channel.Name, "Color") {
+						for _, setting := range channel.Settings {
+							if setting.Name == color {
+								if debug {
+									fmt.Printf("Found setting number %d\n", setting.Number)
+								}
+								return setting.Number
+							}
+						}
+					}
+				}
+			}
+		}
+	}
+	if debug {
+		fmt.Printf("Not FOund setting number returning 0\n")
+	}
+	return 0
+}
+
+func GetChannelNumberByName(fixture *Fixture, channelName string) (int, error) {
+
+	if debug {
+		fmt.Printf("FindChannelNumberByName channelName %s\n", channelName)
+	}
+
+	for channelNumber, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, channelName) {
+			return channelNumber, nil
+		}
+	}
+	return 0, fmt.Errorf("channel %s not found in fixture %s", channelName, fixture.Name)
+}
+
+func GetFixtureInfo(thisFixture *Fixture) FixtureInfo {
+	if debug {
+		fmt.Printf("FindFixtureInfo\n")
+	}
+
+	fixtureInfo := FixtureInfo{}
+
+	if thisFixture == nil {
+		fmt.Printf("FindFixtureInfo: fixture is empty\n")
+		return fixtureInfo
+	}
+
+	fixtureInfo.HasRotate = IsThisAChannel(thisFixture, "Rotate")
+	fixtureInfo.HasRotateSpeed = IsThisAChannel(thisFixture, "RotateSpeed")
+
+	// Find all the options for the channel called "Rotate".But only if we have a Rotate Channel exists.
+	if fixtureInfo.HasRotate {
+		availableRotateOptions := GetChannelOptions(*thisFixture, "Rotate")
+		// Add the auto option for rotate
+		var autoFound bool
+		for _, option := range availableRotateOptions {
+			if strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
+				autoFound = true
+			}
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
+		}
+		// Now if we didn't find a dedicated channel for automatically rotating in different directions.
+		// Add our internal keyword for Auto.
+		if !autoFound {
+			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+		}
+	}
+
+	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
+
+	fixtureInfo.HasColorWheel = IsThisAChannel(thisFixture, "Color")
+	fixtureInfo.HasGobo = IsThisAChannel(thisFixture, "Gobo")
+	fixtureInfo.HasProgram = IsThisAChannel(thisFixture, "Program")
+	fixtureInfo.HasProgramSpeed = IsThisAChannel(thisFixture, "ProgramSpeed")
+	return fixtureInfo
+}
+
+func GetChannelOptions(thisFixture Fixture, channelName string) []string {
+
+	if debug {
+		fmt.Printf("GetChannelOptions\n")
+	}
+
+	var options []string
+
+	for _, channel := range thisFixture.Channels {
+		if channel.Name == channelName {
+			for _, setting := range channel.Settings {
+				options = append(options, setting.Name)
+			}
+		}
+	}
+	return options
+}
+
+func IsThisAChannel(thisFixture *Fixture, channelName string) bool {
+
+	if thisFixture == nil {
+		return false
+	}
+
+	for _, channel := range thisFixture.Channels {
+		if channel.Name == channelName {
+			if debug {
+				fmt.Printf("\tisThisAChannel fixture %s channelName %s true\n", thisFixture.Name, channelName)
+			}
+			return true
+		}
+	}
+	return false
 }

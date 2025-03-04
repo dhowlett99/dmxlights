@@ -978,19 +978,22 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 				}
 			}
 			if tYpe == "switch" && fixtureType == "projector" {
-				switchSpeedName := "Unknown"
-				switchSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
-				numberOfSpeeds := len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableSpeedChannels)
-				maxNumberSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds
-				if numberOfSpeeds > 0 && switchSpeed <= maxNumberSpeeds && switchSpeed != -1 {
-					availableSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableSpeedChannels
-					if switchSpeed > 0 {
-						switchSpeedName = availableSpeeds[switchSpeed-1]
+				switchProgramSpeedName := "Unknown"
+				switchNumber := this.SelectedSwitch
+				switchPosition := this.SwitchPosition[switchNumber]
+				switchProgramSpeed := overrides[switchNumber][switchPosition].ProgramSpeed
+				numberOfProgramSpeeds := len(overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels)
+				maxNumberProgramSpeeds := overrides[switchNumber][switchPosition].MaxProgramSpeeds
+
+				if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
+					availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
+					if switchProgramSpeed > 0 {
+						switchProgramSpeedName = availableProgramSpeeds[switchProgramSpeed-1]
 					}
 				}
 
 				if this.SwitchStateName != "Off" {
-					common.UpdateStatusBar(fmt.Sprintf("Shutter Speed %02d:%s", switchSpeed, switchSpeedName), "speed", false, guiButtons)
+					common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchProgramSpeed, switchProgramSpeedName), "speed", false, guiButtons)
 				} else {
 					common.ClearBottomStatusBar(guiButtons)
 				}
