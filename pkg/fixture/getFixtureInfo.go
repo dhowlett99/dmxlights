@@ -54,7 +54,7 @@ func GetFixtureDetailsById(id int, fixtures *Fixtures) (Fixture, error) {
 // GetFixtureDetailsByLabel - find a fixture in the fixtures config.
 // Returns details of the fixture.
 // Returns an error.
-func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error) {
+func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
 	// scan the fixtures structure for the selected fixture.
 	if debug {
 		fmt.Printf("GetFixtureDetailsByLabel: Looking for Fixture by Label %s\n", label)
@@ -65,10 +65,10 @@ func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (Fixture, error)
 			fmt.Printf("Fixture Label %s and Name %s States %+v\n", fixture.Label, fixture.Name, fixture.States)
 		}
 		if fixture.Label == label {
-			return fixture, nil
+			return &fixture, nil
 		}
 	}
-	return Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
+	return &Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
 }
 
 func GetChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
@@ -203,22 +203,6 @@ func GetFixtureByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures 
 		}
 	}
 	return nil, fmt.Errorf("FindFixtureByGroupAndNumber: failed to find fixture for sequence %d fixture %d", sequenceNumber, fixtureNumber)
-}
-
-func GetFixtureByLabel(label string, fixtures *Fixtures) (*Fixture, error) {
-
-	if debug {
-		fmt.Printf("FindFixtureByLabel label is %s\n", label)
-	}
-	for _, fixture := range fixtures.Fixtures {
-		if fixture.Label == label {
-			if debug {
-				fmt.Printf("Found fixture %s Group %d Number %d Address %d\n", fixture.Name, fixture.Group, fixture.Number, fixture.Address)
-			}
-			return &fixture, nil
-		}
-	}
-	return nil, fmt.Errorf("FindFixtureByGroupAndNumber: failed to find fixture by label %s", label)
 }
 
 func GetFadeValuesFixtureAddressByName(fixtureName string, fixtures *Fixtures) string {

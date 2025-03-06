@@ -57,7 +57,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
 	}
-	fixtureInfo := fixture.GetFixtureInfo(&basedOnFixture)
+	fixtureInfo := fixture.GetFixtureInfo(basedOnFixture)
 	if debug {
 		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}
@@ -95,7 +95,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	// If this fixture has a gobo channel.
 	if fixtureInfo.HasGobo {
 		// Add all the specified options for the gobo channel
-		ap.ActionGoboOptions = append(ap.ActionGoboOptions, populateGoboNames(useFixture, fixtures)...)
+		ap.ActionGoboOptions = append(ap.ActionGoboOptions, populateGoboNames(*useFixture, fixtures)...)
 	}
 
 	ap.ActionsPanel.Hide()
