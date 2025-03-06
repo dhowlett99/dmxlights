@@ -96,8 +96,8 @@ type ActionConfig struct {
 	Speed             int
 	Shift             int
 	TriggerState      bool
+	Rotate            int
 	RotateName        string
-	RotateNumber      int
 	RotateSpeed       int
 	Rotatable         bool
 	ReverseSpeed      int
@@ -912,7 +912,7 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 		}
 
 		if setting.Channel == "Speed" {
-			newAction.RotateSpeed = setting.Value
+			newAction.Speed = setting.Value
 		}
 		if setting.Channel == "Fade" {
 			newAction.Fade = setting.Value
@@ -923,7 +923,18 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 		}
 
 		if setting.Channel == "Rotate" {
-			newAction.Rotate = setting.Value
+			// The rotate channel has to have settings which include the
+			// direction and speed e.g. Forward Slow
+			// TODO Remove this hard coding and make it configurable.
+			newAction.Rotate = setting.Name
+			if strings.Contains(setting.Name, "Slow") ||
+				strings.Contains(setting.Name, "Medium") ||
+				strings.Contains(setting.Name, "Fast") {
+
+				// Find the rotate speed, Slow Medium Fast etc.
+				rotateSettings := strings.Split(setting.Name, " ")
+				newAction.RotateSpeed = rotateSettings[1]
+			}
 		}
 
 		if setting.Channel == "RotateSpeed" {

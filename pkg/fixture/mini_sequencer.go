@@ -996,7 +996,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	// Lookup the setting number for this rotate name.
 
 	config.RotateName = action.Rotate
-	config.RotateNumber = GetRotateSpeedNumberByName(fixture, action.Rotate)
+	config.Rotate = GetRotateSpeedNumberByName(fixture, action.Rotate)
 	config.Rotatable = false
 	config.AutoRotate = false
 	config.RotateSpeed = 1
@@ -1035,19 +1035,19 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	// Calculate the rotation speed based on direction and speed.
 	if config.Rotatable {
-		config.ReverseSpeed, err = GetChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
+		config.ReverseSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
 		if err != nil {
-			fmt.Printf("Looking for channel:Rotate and Setting:Reverse %s\n", err)
+			fmt.Printf("Looking in channel:Rotate for Setting:Reverse %s error: %s\n", action.RotateSpeed, err)
 		}
-		config.ForwardSpeed, err = GetChannelSettingByNameAndSpeed(fixture.Name, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
+		config.ForwardSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
 		if err != nil {
-			fmt.Printf("Looking for channel:Rotate and Setting:Forward %s\n", err)
+			fmt.Printf("Looking in channel:Rotate for Setting:Forward %s error: %s\n", action.RotateSpeed, err)
 		}
 		if debug_rotate {
 			fmt.Printf("RotateName%s\n", config.RotateName)
 			fmt.Printf("Forward Speed %d\n", config.ForwardSpeed)
 			fmt.Printf("Reverse Speed %d\n", config.ReverseSpeed)
-			fmt.Printf("Rotate %d\n", config.RotateNumber)
+			fmt.Printf("Rotate %d\n", config.Rotate)
 		}
 
 		if !config.Forward && !config.Reverse {

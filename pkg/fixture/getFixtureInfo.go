@@ -121,73 +121,66 @@ func GetChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName 
 	return 0, fmt.Errorf("GetChannelSettingByChannelNameAndSettingName: setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
 }
 
-func GetChannelSettingByNameAndSpeed(fixtureName string, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
-
+func GetChannelSettingByNameAndSpeed(fixture *Fixture, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {
 	if debug {
-		fmt.Printf("findChannelSettingByNameAndSpeed for fixture %s channel name %s setting name %s and setting speed %s\n", fixtureName, channelName, settingName, settingSpeed)
+		fmt.Printf("GetChannelSettingByNameAndSpeed for fixture %s channel name %s setting name %s and setting speed %s\n", fixture.Name, channelName, settingName, settingSpeed)
 	}
 
 	if channelName == "" {
-		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error channel name is empty")
+		return 0, fmt.Errorf("GetChannelSettingByNameAndSpeed: Fixture %s error channel name is empty", fixture.Name)
 	}
 	if settingName == "" {
-		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error setting name is empty")
+		return 0, fmt.Errorf("GetChannelSettingByNameAndSpeed: Fixture %s error setting name is empty", fixture.Name)
 	}
 	if settingSpeed == "" {
-		return 0, fmt.Errorf("findChannelSettingByNameAndSpeed: error setting speed is empty")
+		return 0, fmt.Errorf("GetChannelSettingByNameAndSpeed: Fixture %s error setting speed is empty", fixture.Name)
 	}
 
-	for _, fixture := range fixtures.Fixtures {
+	for _, channel := range fixture.Channels {
 
-		if fixtureName == fixture.Name {
-			for _, channel := range fixture.Channels {
+		if channel.Name == channelName {
+			if debug {
+				fmt.Printf("fixture %s: inspect channel %s for %s\n", fixture.Name, channel.Name, settingName)
+			}
 
-				if channel.Name == channelName {
+			for _, setting := range channel.Settings {
+				if debug {
+					fmt.Printf("\tinspect setting %+v \n", setting)
+					fmt.Printf("\tgot:setting.Name %s  want name %s speed %s\n", setting.Name, settingName, settingSpeed)
+				}
+				if strings.Contains(setting.Name, settingName) && strings.Contains(setting.Name, settingSpeed) {
+
 					if debug {
-						fmt.Printf("fixture %s: inspect channel %s for %s\n", fixture.Name, channel.Name, settingName)
+						fmt.Printf("\t\tFixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Value)
 					}
 
-					for _, setting := range channel.Settings {
-						if debug {
-							fmt.Printf("inspect setting %+v \n", setting)
-							fmt.Printf("got:setting.Name %s  want name %s speed %s\n", setting.Name, settingName, settingSpeed)
+					// If the setting value contains a "-" remove it and then take the first valuel.
+					var err error
+					var v int
+					if strings.Contains(setting.Value, "-") {
+						// We've found a range of values.
+						// Find the start value
+						numbers := strings.Split(setting.Value, "-")
+						v, err = strconv.Atoi(numbers[0])
+						if err != nil {
+							return 0, err
 						}
-						if strings.Contains(setting.Name, settingName) && strings.Contains(setting.Name, settingSpeed) {
-
-							if debug {
-								fmt.Printf("FixtureName=%s ChannelName=%s SettingName=%s SettingSpeed=%s, SettingValue=%s\n", fixture.Name, channel.Name, settingName, settingSpeed, setting.Value)
-							}
-
-							// If the setting value contains a "-" remove it and then take the first valuel.
-							var err error
-							var v int
-							if strings.Contains(setting.Value, "-") {
-								// We've found a range of values.
-								// Find the start value
-								numbers := strings.Split(setting.Value, "-")
-								v, err = strconv.Atoi(numbers[0])
-								if err != nil {
-									return 0, err
-								}
-							} else {
-								v, err = strconv.Atoi(setting.Value)
-								if err != nil {
-									return 0, err
-								}
-							}
-
-							if debug {
-								fmt.Printf("speed found is %d\n", v)
-							}
-							return v, nil
+					} else {
+						v, err = strconv.Atoi(setting.Value)
+						if err != nil {
+							return 0, err
 						}
 					}
+
+					if debug {
+						fmt.Printf("FOUND -> channel %s setting %s %s in fixture %s value %d", channelName, settingName, settingSpeed, fixture.Name, v)
+					}
+					return v, nil
 				}
 			}
 		}
 	}
-
-	return 0, fmt.Errorf("warning: channel %s setting %s not found in fixture :%s", channelName, settingSpeed, fixtureName)
+	return 0, fmt.Errorf("warning: channel %s setting %s %s not found in fixture %s", channelName, settingName, settingSpeed, fixture.Name)
 }
 
 func GetFixtureByGroupAndNumber(sequenceNumber int, fixtureNumber int, fixtures *Fixtures) (*Fixture, error) {

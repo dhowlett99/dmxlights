@@ -69,7 +69,7 @@ func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateN
 func CreateOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switchOverrides *[][]common.Override) {
 
 	if debug {
-		fmt.Printf("UpdateOverrides\n")
+		fmt.Printf("CreateOverrides\n")
 	}
 
 	// Store the switch Config locally.
@@ -189,7 +189,7 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.AvailableProgramSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "ProgramSpeed")
 	newOverride.MaxProgramSpeeds = len(newOverride.AvailableProgramSpeedChannels)
 
-	newOverride.Rotate = cfg.RotateSpeed
+	newOverride.Rotate = cfg.Rotate
 	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
