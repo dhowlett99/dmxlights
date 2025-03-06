@@ -1060,9 +1060,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Find the number of fixtures for this sequence.
 		if sequence.Label == "chaser" {
 			scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
-			sequence.NumberFixtures = fixture.HowManyFixturesInGroup(scannerSequenceNumber, fixturesConfig)
+			sequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(scannerSequenceNumber, fixturesConfig)
 		} else {
-			sequence.NumberFixtures = fixture.HowManyFixturesInGroup(mySequenceNumber, fixturesConfig)
+			sequence.NumberFixtures = fixture.GetNumberOfFixturesInGroup(mySequenceNumber, fixturesConfig)
 		}
 
 		// Destoy current fixtures and create new threads for the new fixtures.

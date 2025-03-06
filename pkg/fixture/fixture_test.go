@@ -137,7 +137,7 @@ func Test_getNumberOfFixtures(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if got := HowManyFixturesInGroup(tt.args.sequenceNumber, tt.args.fixtures); got != tt.want {
+			if got := GetNumberOfFixturesInGroup(tt.args.sequenceNumber, tt.args.fixtures); got != tt.want {
 				t.Errorf("GetNumberOfFixtures() got=%+v, want=%+v", got, tt.want)
 			}
 		})

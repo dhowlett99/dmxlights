@@ -19,6 +19,7 @@ package fixture
 
 import (
 	"fmt"
+	"strconv"
 	"strings"
 	"time"
 
@@ -311,4 +312,101 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	}
 
 	return config
+}
+
+// Given the fixture and the list of settings for this state
+// buill a new action that represents the set of settings.
+func convertSettingToAction(fixture Fixture, settings []Setting) Action {
+
+	newAction := Action{}
+
+	newAction.Mode = "Setting"
+	newAction.Name = "Setting"
+	newAction.Number = 1
+
+	// Look through settings and buuld up the new action.
+	for _, setting := range settings {
+
+		if debug {
+			fmt.Printf("convertSettingToAction: Fixture name %s setting name %s label %s Channel %s name %s value %s\n", fixture.Name, setting.Name, setting.Label, setting.Channel, setting.Name, setting.Value)
+		}
+
+		if setting.Channel == "Speed" {
+			newAction.Speed = setting.Value
+		}
+		if setting.Channel == "Fade" {
+			newAction.Fade = setting.Value
+		}
+
+		if setting.Channel == "Size" {
+			newAction.Fade = setting.Value
+		}
+
+		if setting.Channel == "Rotate" {
+			// The rotate channel has to have settings which include the
+			// direction and speed e.g. Forward Slow
+			// TODO Remove this hard coding and make it configurable.
+			newAction.Rotate = setting.Name
+			if strings.Contains(setting.Name, "Slow") ||
+				strings.Contains(setting.Name, "Medium") ||
+				strings.Contains(setting.Name, "Fast") {
+
+				// Find the rotate speed, Slow Medium Fast etc.
+				rotateSettings := strings.Split(setting.Name, " ")
+				newAction.RotateSpeed = rotateSettings[1]
+			}
+		}
+
+		if setting.Channel == "RotateSpeed" {
+			newAction.RotateSpeed = setting.Value
+		}
+
+		if setting.Channel == "Program" {
+			newAction.Program = setting.Value
+		}
+
+		if setting.Channel == "ProgramSpeed" {
+			newAction.ProgramSpeed = setting.Name
+		}
+
+		// A channel setting can only contain one value
+		// so only one color.
+		if setting.Channel == "Color" {
+			// If a setting has a channel name which is a number we lookup that color name.
+			if IsNumericOnly(setting.Name) {
+				if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
+					// Lookup color number in list of available colors.
+					colorName := GetColorNameByNumber(&fixture, colorNumber)
+					newAction.Colors = []string{colorName}
+				}
+			} else {
+				// we use that string as the color.
+				newAction.Colors = []string{setting.Name}
+			}
+			if setting.Name == "Off" {
+				newAction.Colors = []string{"Green"}
+			}
+			if setting.Name == "On" {
+				newAction.Colors = []string{"Red"}
+			}
+		}
+
+		if setting.Channel == "Strobe" {
+			newAction.Strobe = setting.Value
+		}
+
+		if setting.Channel == "StrobeSpeed" {
+			newAction.StrobeSpeed = setting.Value
+		}
+
+		if setting.Channel == "Gobo" {
+			newAction.Gobo = setting.Name
+		}
+
+		if setting.Channel == "GoboSpeed" {
+			newAction.GoboSpeed = setting.Value
+		}
+
+	}
+	return newAction
 }

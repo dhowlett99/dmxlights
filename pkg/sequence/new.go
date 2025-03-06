@@ -76,9 +76,9 @@ func NewSequence(
 	// Find the number of fixtures for this sequence.
 	if sequenceLabel == "chaser" {
 		scannerSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
-		numberFixtures = fixture.HowManyFixturesInGroup(scannerSequenceNumber, fixturesConfig)
+		numberFixtures = fixture.GetNumberOfFixturesInGroup(scannerSequenceNumber, fixturesConfig)
 	} else {
-		numberFixtures = fixture.HowManyFixturesInGroup(mySequenceNumber, fixturesConfig)
+		numberFixtures = fixture.GetNumberOfFixturesInGroup(mySequenceNumber, fixturesConfig)
 	}
 
 	// A map of the state of fixtures in the sequence.
