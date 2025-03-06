@@ -268,7 +268,7 @@ func newMiniSequencer(fixture *Fixture,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
-			programSpeed, err := GetChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
+			programSpeed, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "Program", action.Program)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}
@@ -286,7 +286,7 @@ func newMiniSequencer(fixture *Fixture,
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
 			// Look up the program state required.
-			programState, err := GetChannelSettingByChannelNameAndSettingName(fixture, "Program", action.Program)
+			programState, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "Program", action.Program)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}

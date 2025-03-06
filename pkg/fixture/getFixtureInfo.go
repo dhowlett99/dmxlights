@@ -71,7 +71,9 @@ func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (*Fixture, error
 	return &Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
 }
 
-func GetChannelSettingByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
+// GetChannelSettingByChannelNameAndSettingName Look through the fixtures channels and use the channel name and setting name.
+// returns the setting value.
+func GetChannelSettingValueByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
 		fmt.Printf("GetChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
