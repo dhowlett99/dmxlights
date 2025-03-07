@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -43,7 +44,7 @@ const (
 	CHANNEL_SETTINGS
 )
 
-func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, groupConfig *fixture.Groups, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewChannelEditor\n")
@@ -60,8 +61,11 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
 
+	// Resolve the group number to a name.
+	groupName := getGroupName(groupConfig, strconv.Itoa(thisFixture.Group))
+
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("Edit Channel Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("Edit Channel Config for Sequence %s Fixture %d", groupName, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}

@@ -585,7 +585,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 							return
 						}
 					} else {
-						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, fixtures)
+						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, groupConfig, fixtures)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return

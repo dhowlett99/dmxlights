@@ -19,7 +19,7 @@ groups:
   number: 104
 - name: rightwall
   number: 105
-- name: wall2
+- name: wall
   number: 106
 - name: ceiling
   number: 107
