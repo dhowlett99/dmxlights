@@ -284,30 +284,6 @@ func GetGoboNameByNumber(fixture *Fixture, number int) string {
 	return "Unknown"
 }
 
-// GetRotateDMXValueByIndex takes the rotate setting number and returns the DMX value which selects this speed.
-func GetRotateDMXValueByIndex(fixture *Fixture, index int) int {
-
-	if debug {
-		fmt.Printf("GetRotateDMXValueByIndex Looking for rotate speed index %d in fixture %s\n", index, fixture.Name)
-	}
-
-	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, "Rotate") {
-			for _, setting := range channel.Settings {
-				if setting.Number == index {
-					if debug {
-						fmt.Printf("Rotate Speed %d Name %s\n", setting.Number, setting.Name)
-					}
-					dmx, _ := strconv.Atoi(setting.Value)
-					return dmx
-				}
-			}
-		}
-	}
-
-	return 0
-}
-
 // GetRotateSpeedNameByNumber takes the rotate speed number and returns the rotate speed name for this fixture.
 func GetRotateSpeedNameByNumber(fixture *Fixture, number int) string {
 

@@ -4244,18 +4244,18 @@ fixtures:
       channel: Rotate
       value: "160"
       selectedvalue: Forward Medium
-    - name: Show0
-      label: Show0
+    - name: "Off"
+      label: "Off"
       number: 6
       channel: Program
-      value: "13"
-      selectedvalue: Show0
-    - name: Fast
-      label: Fast
+      value: "0"
+      selectedvalue: "Off"
+    - name: Slow
+      label: Slow
       number: 7
       channel: ProgramSpeed
-      value: "200"
-      selectedvalue: Fast
+      value: "10"
+      selectedvalue: Slow
     flash: false
   - name: Green
     number: 3

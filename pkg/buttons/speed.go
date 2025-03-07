@@ -249,19 +249,19 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
 			overrides := *this.SwitchOverrides
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxSpeeds
 			}
 			this.SwitchOverrides = &overrides
 
 			// Send a message to override / increase the selected switch shift.
 			cmd := common.Command{
-				Action: common.OverrideSpeed,
+				Action: common.OverrideProgramSpeed,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)

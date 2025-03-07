@@ -245,10 +245,38 @@ func newMiniSequencer(fixture *Fixture,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
+
+			var rotate int = 0
 			if debug {
-				fmt.Printf("fixture %s: Control: send Rotate Address %d Value %d \n", fixture.Name, fixture.Address+int16(rotateChannel), master)
+				fmt.Printf("fixture %s: Control: send Rotate Address %d Value %d \n", fixture.Name, fixture.Address+int16(rotateChannel), rotate)
 			}
-			SetChannel(fixture.Address+int16(rotateChannel), byte(0), dmxController, dmxInterfacePresent)
+			if override.Gobo != 0 {
+				rotate = GetADMXValue(fixture, override.Rotate, "Rotate")
+				if debug_mini {
+					fmt.Printf("Override is set so Rotate is %d DMX Vaue %d\n", override.Rotate, rotate)
+				}
+			}
+			SetChannel(fixture.Address+int16(rotateChannel), byte(rotate), dmxController, dmxInterfacePresent)
+		}
+
+		if fixtureHasChannel(fixture, "Color") {
+			// Find the color channel for this fixture.
+			colorChannel, err := GetChannelNumberByName(fixture, "Color")
+			if err != nil {
+				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
+			}
+
+			var color int = 0
+			if debug {
+				fmt.Printf("fixture %s: Control: send Color Address %d Value %d \n", fixture.Name, fixture.Address+int16(colorChannel), color)
+			}
+			if override.Color != 0 {
+				color = GetADMXValue(fixture, override.Color, "Color")
+				if debug_mini {
+					fmt.Printf("Override is set so Color is %d DMX Vaue %d\n", override.Gobo, color)
+				}
+			}
+			SetChannel(fixture.Address+int16(colorChannel), byte(color), dmxController, dmxInterfacePresent)
 		}
 
 		if fixtureHasChannel(fixture, "Gobo") {
@@ -260,7 +288,14 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("fixture %s: Control: send Gobo Address %d Value %d \n", fixture.Name, fixture.Address+int16(goboChannel), master)
 			}
-			SetChannel(fixture.Address+int16(goboChannel), byte(0), dmxController, dmxInterfacePresent)
+			var gobo int = 0
+			if override.Gobo != 0 {
+				gobo = GetADMXValue(fixture, override.Gobo, "Gobo")
+				if debug_mini {
+					fmt.Printf("Override is set so Gobo is %d DMX Vaue %d\n", override.Gobo, gobo)
+				}
+			}
+			SetChannel(fixture.Address+int16(goboChannel), byte(gobo), dmxController, dmxInterfacePresent)
 		}
 		if fixtureHasChannel(fixture, "ProgramSpeed") {
 			// Find the program speed channel for this fixture.
@@ -268,12 +303,18 @@ func newMiniSequencer(fixture *Fixture,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
-			programSpeed, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "Program", action.Program)
+			programSpeed, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "ProgramSpeed", action.ProgramSpeed)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}
 			if debug {
 				fmt.Printf("fixture %s: Control: send ProgramSpeed Address %d Value %d \n", fixture.Name, fixture.Address+int16(programSpeedChannel), master)
+			}
+			if override.ProgramSpeed != 0 {
+				programSpeed = GetADMXValue(fixture, override.ProgramSpeed, "ProgramSpeed")
+				if debug_mini {
+					fmt.Printf("Override is set so ProgramSpeed is %d DMX Vaue %d\n", override.ProgramSpeed, programSpeed)
+				}
 			}
 			// Now play that DMX value on the program channel of this fixture.
 			SetChannel(fixture.Address+int16(programSpeedChannel), byte(programSpeed), dmxController, dmxInterfacePresent)
@@ -585,6 +626,14 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
+
+				if override.ProgramSpeed != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
+					}
+					cfg.ProgramSpeed = GetADMXValue(fixture, override.ProgramSpeed, "ProgramSpeed")
+				}
+
 				if override.Shift != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Shift is %d\n", override.Shift)
@@ -611,7 +660,7 @@ func newMiniSequencer(fixture *Fixture,
 					// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 					// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 					// override.RotateSpeed is the index so for example 1 is setting 1.
-					cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.Rotate)
+					cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
 					if debug_override {
 						fmt.Printf("Apply Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 					}
@@ -739,7 +788,7 @@ func newMiniSequencer(fixture *Fixture,
 							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
 							// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
 							// override.RotateSpeed is the index so for example 1 is setting 1.
-							cfg.RotateSpeed = GetRotateDMXValueByIndex(fixture, override.Rotate)
+							cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
 							if debug_override {
 								fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 							}
