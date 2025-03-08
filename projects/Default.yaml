@@ -2260,21 +2260,27 @@ fixtures:
     name: ProgramSpeed
     value: 0
     settings:
-    - name: Slow
-      label: Slow
+    - name: "Off"
+      label: "Off"
       number: 1
       channel: New
+      value: "0"
+      selectedvalue: "0"
+    - name: Slow
+      label: Slow
+      number: 2
+      channel: (Select one)
       value: "10"
       selectedvalue: "10"
     - name: Medium
       label: Medium
-      number: 2
+      number: 3
       channel: New
       value: "100"
       selectedvalue: "100"
     - name: Fast
       label: Fast
-      number: 3
+      number: 4
       channel: New
       value: "200"
       selectedvalue: "200"
@@ -4250,12 +4256,12 @@ fixtures:
       channel: Program
       value: "0"
       selectedvalue: "Off"
-    - name: Slow
-      label: Slow
+    - name: "Off"
+      label: "Off"
       number: 7
       channel: ProgramSpeed
-      value: "10"
-      selectedvalue: Slow
+      value: "0"
+      selectedvalue: "Off"
     flash: false
   - name: Green
     number: 3
@@ -4384,7 +4390,7 @@ fixtures:
     buttoncolor: Orange
     master: 0
     actions:
-    - name: New
+    - name: Show1
       number: 1
       colors: []
       map: ""
