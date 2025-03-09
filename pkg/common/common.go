@@ -234,25 +234,34 @@ type Switch struct {
 }
 
 type Override struct {
-	OverrideSpeed          bool
-	Speed                  int
-	AvailableSpeedChannels []string
-	MaxSpeeds              int
 
+	// RGB / Scanner Speed
+	IsSpeedOverrideAble bool
+	OverrideSpeed       bool
+	Speed               int
+	MaxSpeeds           int
+
+	// Program Speed
+	IsProgramSpeedOverrideAble    bool
 	OverrideProgramSpeed          bool
 	ProgramSpeed                  int
 	AvailableProgramSpeedChannels []string
 	MaxProgramSpeeds              int
 
+	// Shift
 	OverrideShift bool
 	Shift         int
 
+	// Size
 	OverrideSize bool
 	Size         int
 
+	// Fade
 	OverrideFade bool
 	Fade         int
 
+	// Rotate
+	IsRotateOverrideAble   bool
 	OverrideRotateSpeed    bool
 	Rotate                 int
 	RotateName             string
@@ -260,18 +269,22 @@ type Override struct {
 	MaxRotateSpeedChannels int
 	MaxRotateSpeed         int
 
-	OverrideColors  bool
-	Colors          []color.RGBA
-	Color           int
-	MaxColors       int
-	ColorName       string
-	AvailableColors []string
+	// Colors
+	IsColorOverrideAble bool
+	OverrideColors      bool
+	Colors              []color.RGBA
+	Color               int
+	MaxColors           int
+	ColorName           string
+	AvailableColors     []string
 
-	OverrideGobo   bool
-	Gobo           int
-	MaxGobos       int
-	AvailableGobos []string
-	GoboName       string
+	// Gobo
+	IsGoboOverrideAble bool
+	OverrideGobo       bool
+	Gobo               int
+	MaxGobos           int
+	AvailableGobos     []string
+	GoboName           string
 }
 
 type StaticColorButton struct {

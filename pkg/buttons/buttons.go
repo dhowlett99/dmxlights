@@ -950,8 +950,18 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	overrides := *this.SwitchOverrides
 	switchSpeed := overrides[this.SelectedSwitch][switchPosition].Speed
 	fixtureType := this.SelectedFixtureType
+	switchNumber := this.SelectedSwitch
+	switchProgramSpeedName := "Unknown"
+	switchProgramSpeed := overrides[switchNumber][switchPosition].ProgramSpeed
+	numberOfProgramSpeeds := len(overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels)
+	maxNumberProgramSpeeds := overrides[switchNumber][switchPosition].MaxProgramSpeeds
+	isProgramSpeedOverrideAble := overrides[switchNumber][switchPosition].IsProgramSpeedOverrideAble
 
-	if debug {
+	if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
+		availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
+		if switchProgramSpeed > 0 {
+			switchProgramSpeedName = availableProgramSpeeds[switchProgramSpeed-1]
+		}
 		fmt.Printf("UpdateSpeed Selected Type=%s Fixture Type %s Switch %d Position %d Speed=%d\n", this.SelectedType, fixtureType, this.SelectedSwitch, switchPosition, switchSpeed)
 	}
 
@@ -966,37 +976,27 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 				} else {
 					common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
 				}
+				return
 			}
 			if tYpe == "scanner" {
 				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButtons)
 			}
 			if tYpe == "switch" {
-				if this.MusicTrigger {
-					common.UpdateStatusBar("MUSIC", "speed", false, guiButtons)
-				} else {
-					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchSpeed), "speed", false, guiButtons)
-				}
-			}
-			if tYpe == "switch" && fixtureType == "projector" {
-				switchProgramSpeedName := "Unknown"
-				switchNumber := this.SelectedSwitch
-				switchPosition := this.SwitchPosition[switchNumber]
-				switchProgramSpeed := overrides[switchNumber][switchPosition].ProgramSpeed
-				numberOfProgramSpeeds := len(overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels)
-				maxNumberProgramSpeeds := overrides[switchNumber][switchPosition].MaxProgramSpeeds
-
-				if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
-					availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
-					if switchProgramSpeed > 0 {
-						switchProgramSpeedName = availableProgramSpeeds[switchProgramSpeed-1]
-					}
-				}
 
 				if this.SwitchStateName != "Off" {
-					common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchProgramSpeed, switchProgramSpeedName), "speed", false, guiButtons)
+					if isProgramSpeedOverrideAble {
+						common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchProgramSpeed, switchProgramSpeedName), "speed", false, guiButtons)
+					} else {
+						if this.MusicTrigger {
+							common.UpdateStatusBar("MUSIC", "speed", false, guiButtons)
+						} else {
+							common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchSpeed), "speed", false, guiButtons)
+						}
+					}
 				} else {
 					common.ClearBottomStatusBar(guiButtons)
 				}
+				return
 			}
 		}
 		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {

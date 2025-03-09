@@ -175,9 +175,9 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 
 func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override, cfg fixture.ActionConfig) {
 
+	newOverride.IsSpeedOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Speed")
 	newOverride.Speed = cfg.Speed
-	newOverride.AvailableSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Speed")
-	newOverride.MaxSpeeds = len(newOverride.AvailableSpeedChannels)
+	newOverride.MaxSpeeds = common.MAX_SPEED
 
 	newOverride.Shift = cfg.Shift
 
@@ -185,50 +185,58 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 
 	newOverride.Fade = cfg.Fade
 
+	newOverride.IsProgramSpeedOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "ProgramSpeed")
 	newOverride.ProgramSpeed = cfg.ProgramSpeed
 	newOverride.AvailableProgramSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "ProgramSpeed")
 	newOverride.MaxProgramSpeeds = len(newOverride.AvailableProgramSpeedChannels)
 
+	newOverride.IsRotateOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Rotate")
 	newOverride.Rotate = cfg.Rotate
 	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
+	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
 	newOverride.Colors = cfg.Colors
 	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
 	newOverride.AvailableColors = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Color")
 	newOverride.MaxColors = len(newOverride.AvailableColors)
 
+	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo
 	newOverride.AvailableGobos = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Gobo")
 	newOverride.GoboName = fixture.GetGoboNameByNumber(useFixture, cfg.Gobo)
 	newOverride.MaxGobos = len(newOverride.AvailableGobos)
 
 	if debug {
+		fmt.Printf("Speed OverrideAble %t\n", newOverride.IsSpeedOverrideAble)
 		fmt.Printf("Speed %d\n", newOverride.Speed)
-		fmt.Printf("AvailableSpeedChannels %s\n", newOverride.AvailableSpeedChannels)
 		fmt.Printf("MaxSpeeds %d\n", newOverride.MaxSpeeds)
 
 		fmt.Printf("Shift %d\n", newOverride.Shift)
 		fmt.Printf("Size %d\n", newOverride.Size)
 		fmt.Printf("Fade %d\n", newOverride.Fade)
 
+		fmt.Printf("ProgramSpeed OverrideAble %t\n", newOverride.IsProgramSpeedOverrideAble)
 		fmt.Printf("ProgramSpeed %d\n", newOverride.ProgramSpeed)
 		fmt.Printf("AvailableProgramSpeedChannels %s\n", newOverride.AvailableProgramSpeedChannels)
 		fmt.Printf("MaxProgramSpeeds %d\n", newOverride.MaxProgramSpeeds)
 
+		fmt.Printf("Rotate OverrideAble %t\n", newOverride.IsRotateOverrideAble)
 		fmt.Printf("RotateSpeed %d\n", newOverride.Rotate)
 		fmt.Printf("RotateName %s\n", newOverride.RotateName)
 		fmt.Printf("RotateChannels %s\n", newOverride.RotateChannels)
 		fmt.Printf("MaxRotateSpeed %d\n", newOverride.MaxRotateSpeed)
 
+		fmt.Printf("Color OverrideAble %t\n", newOverride.IsColorOverrideAble)
 		fmt.Printf("Color %d\n", newOverride.Color)
 		fmt.Printf("Colors %+v\n", newOverride.Colors)
 		fmt.Printf("ColorName %s\n", newOverride.ColorName)
 		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
 		fmt.Printf("MaxColors %d\n", newOverride.MaxColors)
 
+		fmt.Printf("Gobo OverrideAble %t\n", newOverride.IsGoboOverrideAble)
 		fmt.Printf("Gobo %d\n", newOverride.Gobo)
 		fmt.Printf("AvailableGobos %s\n", newOverride.AvailableGobos)
 		fmt.Printf("GoboName %s\n", newOverride.GoboName)

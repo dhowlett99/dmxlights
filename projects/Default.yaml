@@ -1293,12 +1293,16 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
+    override: true
   - number: 2
     name: Red1
+    override: true
   - number: 3
     name: Green1
+    override: true
   - number: 4
     name: Blue1
+    override: true
   - number: 5
     name: White1
   - number: 6
@@ -1413,12 +1417,16 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
+    override: true
   - number: 2
     name: Red1
+    override: true
   - number: 3
     name: Green1
+    override: true
   - number: 4
     name: Blue1
+    override: true
   - number: 5
     name: White1
   - number: 6
@@ -2085,6 +2093,7 @@ fixtures:
       channel: (Select one)
       value: 192-255
       selectedvalue: ""
+    override: true
   - number: 4
     name: Gobo
     value: 0
@@ -2159,6 +2168,7 @@ fixtures:
       number: 14
       value: "160"
       selectedvalue: ""
+    override: true
   - number: 5
     name: Rotate
     value: 0
@@ -2198,6 +2208,7 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
+    override: true
   - number: 6
     name: Program
     settings:
@@ -2284,6 +2295,7 @@ fixtures:
       channel: New
       value: "200"
       selectedvalue: "200"
+    override: true
   states:
   - name: "Off"
     number: 1

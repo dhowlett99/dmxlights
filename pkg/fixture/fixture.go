@@ -169,6 +169,7 @@ type Channel struct {
 	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
 	Comment    string    `yaml:"comment,omitempty"`
 	Settings   []Setting `yaml:"settings,omitempty"`
+	Override   bool      `yaml:"override,omitempty"`
 }
 
 // LoadFixturesReader opens the fixtures config file using the io reader passed.

@@ -42,6 +42,7 @@ const (
 	CHANNEL_DELETE
 	CHANNEL_ADD
 	CHANNEL_SETTINGS
+	CHANNEL_OVERRIDE
 )
 
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, groupConfig *fixture.Groups, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
@@ -203,8 +204,10 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				cp.ChannelList[st.UpdateThisChannel].MaxDegrees = st.SettingMaxDegrees
 				st.UpdateSettings = false
 			}
+			// Number of rows in table.
 			height := len(data)
-			width := 5
+			// Number of columns in table.
+			width := 6
 			return height, width
 		},
 
@@ -229,7 +232,10 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				widget.NewButton("+", func() {}),
 
 				// Settings for this channel button.
-				widget.NewButton("settings", func() {}),
+				widget.NewButton("Settings", func() {}),
+
+				// Override switch
+				widget.NewCheck("", func(bool) {}),
 			)
 		},
 
@@ -261,6 +267,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					newChannel.Comment = cp.ChannelList[i.Row].Comment
 					newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
 					newChannel.Offset = cp.ChannelList[i.Row].Offset
+					newChannel.Override = cp.ChannelList[i.Row].Override
 					cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
 					data = makeChannelsArray(cp.ChannelList)
 				}
@@ -310,6 +317,30 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					}
 				}
 			}
+
+			// Override Check Box.
+			if i.Col == CHANNEL_OVERRIDE {
+				showChannelsField(CHANNEL_OVERRIDE, o)
+				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).SetChecked(cp.ChannelList[i.Row].Override)
+				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).OnChanged = func(value bool) {
+					// Highlight this channel
+					cp.ChannelPanel.Select(i)
+					if cp.ChannelList != nil {
+						newChannel := fixture.Channel{}
+						newChannel.Name = cp.ChannelList[i.Row].Name
+						newChannel.Number = cp.ChannelList[i.Row].Number
+						newChannel.Value = cp.ChannelList[i.Row].Value
+						newChannel.Settings = cp.ChannelList[i.Row].Settings
+						newChannel.Comment = cp.ChannelList[i.Row].Comment
+						newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
+						newChannel.Offset = cp.ChannelList[i.Row].Offset
+						newChannel.Override = value
+
+						cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
+						data = makeChannelsArray(cp.ChannelList)
+					}
+				}
+			}
 		},
 	)
 
@@ -318,7 +349,8 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 	cp.ChannelPanel.SetColumnWidth(1, 160) // Name
 	cp.ChannelPanel.SetColumnWidth(2, 20)  // Delete
 	cp.ChannelPanel.SetColumnWidth(3, 20)  // Add
-	cp.ChannelPanel.SetColumnWidth(4, 100) // Settings
+	cp.ChannelPanel.SetColumnWidth(4, 80)  // Settings
+	cp.ChannelPanel.SetColumnWidth(5, 20)  // Override
 
 	return &cp
 }
@@ -465,6 +497,7 @@ func makeChannelsArray(channels []fixture.Channel) [][]string {
 		newChannel = append(newChannel, "-")
 		newChannel = append(newChannel, "+")
 		newChannel = append(newChannel, "Settings")
+		newChannel = append(newChannel, "Override")
 
 		data = append(data, newChannel)
 	}
@@ -488,6 +521,9 @@ func showChannelsField(field int, o fyne.CanvasObject) {
 		o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = false
 	case field == CHANNEL_SETTINGS:
 		o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = false
+	case field == CHANNEL_OVERRIDE:
+		o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).Hidden = false
+
 	}
 }
 
@@ -500,4 +536,5 @@ func hideAllChannelsFields(o fyne.CanvasObject) {
 	o.(*fyne.Container).Objects[CHANNEL_DELETE].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).Hidden = true
 }

@@ -394,6 +394,16 @@ func GetADMXValue(fixture *Fixture, settinNumber int, channelName string) int {
 	return 0
 }
 
+func IsThisChannelOverrideAble(fixture *Fixture, channelName string) bool {
+
+	for _, channel := range fixture.Channels {
+		if channel.Name == channelName {
+			return channel.Override
+		}
+	}
+	return false
+}
+
 func GetAvailableSettingsForChannelsByFixure(fixture *Fixture, channelName string) []string {
 
 	var settings []string
