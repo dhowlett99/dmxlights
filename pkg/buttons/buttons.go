@@ -949,7 +949,6 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	switchPosition := this.SwitchPosition[this.SelectedSwitch]
 	overrides := *this.SwitchOverrides
 	switchSpeed := overrides[this.SelectedSwitch][switchPosition].Speed
-	fixtureType := this.SelectedFixtureType
 	switchNumber := this.SelectedSwitch
 	switchProgramSpeedName := "Unknown"
 	switchProgramSpeed := overrides[switchNumber][switchPosition].ProgramSpeed
@@ -962,7 +961,6 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 		if switchProgramSpeed > 0 {
 			switchProgramSpeedName = availableProgramSpeeds[switchProgramSpeed-1]
 		}
-		fmt.Printf("UpdateSpeed Selected Type=%s Fixture Type %s Switch %d Position %d Speed=%d\n", this.SelectedType, fixtureType, this.SelectedSwitch, switchPosition, switchSpeed)
 	}
 
 	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
