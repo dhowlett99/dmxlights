@@ -45,6 +45,34 @@ const (
 	CHANNEL_OVERRIDE
 )
 
+func headerChannelsCreate() fyne.CanvasObject {
+	h := &ActiveHeader{}
+	h.ExtendBaseWidget(h)
+	h.SetText("000")
+	return h
+}
+
+func headerChannelsUpdate(id widget.TableCellID, o fyne.CanvasObject) {
+	header := o.(*ActiveHeader)
+	header.TextStyle.Bold = true
+	switch id.Col {
+	case -1:
+		header.SetText(strconv.Itoa(id.Row + 1))
+	case 0:
+		header.SetText("ID")
+	case 1:
+		header.SetText("Channel Name")
+	case 2:
+		header.SetText("-")
+	case 3:
+		header.SetText("+")
+	case 4:
+		header.SetText("Settings")
+	case 5:
+		header.SetText("OVR")
+	}
+}
+
 func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, groupConfig *fixture.Groups, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
@@ -192,7 +220,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
-	cp.ChannelPanel = widget.NewTable(
+	cp.ChannelPanel = widget.NewTableWithHeaders(
 
 		// Function to find length.
 		func() (int, int) {
@@ -323,8 +351,6 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				showChannelsField(CHANNEL_OVERRIDE, o)
 				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).SetChecked(cp.ChannelList[i.Row].Override)
 				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).OnChanged = func(value bool) {
-					// Highlight this channel
-					cp.ChannelPanel.Select(i)
 					if cp.ChannelList != nil {
 						newChannel := fixture.Channel{}
 						newChannel.Name = cp.ChannelList[i.Row].Name
@@ -343,6 +369,10 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			}
 		},
 	)
+
+	cp.ChannelPanel.CreateHeader = headerChannelsCreate
+	cp.ChannelPanel.UpdateHeader = headerChannelsUpdate
+	cp.ChannelPanel.ShowHeaderColumn = false
 
 	// Setup the columns of this table.
 	cp.ChannelPanel.SetColumnWidth(0, 40)  // Number
