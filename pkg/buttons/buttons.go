@@ -1055,12 +1055,25 @@ func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 	shift := this.RGBShift[this.TargetSequence]
 	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 	overrides := *this.SwitchOverrides
+	switchNumber := this.SelectedSwitch
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
 	switchRGBShift := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
-	switchRotateSpeed := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
+	switchRotate := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
 	switchRotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName
 
+	availableRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateChannels
+	numberOfRotates := len(availableRotates)
+	maxNumberRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
+	rotateName := "Unknown"
+	if numberOfRotates > 0 && switchRotate <= maxNumberRotates && switchRotate != -1 {
+		if switchRotate > 0 {
+			rotateName = availableRotates[switchRotate-1]
+		}
+	}
+	isRotateOverrideAble := overrides[switchNumber][switchPosition].IsRotateOverrideAble
+
 	if debug {
-		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotateSpeed, switchRotateSpeedName)
+		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotate, switchRotateSpeedName)
 	}
 
 	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
@@ -1071,28 +1084,21 @@ func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", scannerShift), "shift", false, guiButtons)
 		}
 		if tYpe == "switch" {
-			if this.SelectedFixtureType == "rgb" {
-				common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchRGBShift), "shift", false, guiButtons)
-			}
-			if this.SelectedFixtureType == "projector" {
 
-				rotate := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
-				availableRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateChannels
-				numberOfRotates := len(availableRotates)
-				maxNumberRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
-				rotateName := "Unknown"
-				if numberOfRotates > 0 && rotate <= maxNumberRotates && rotate != -1 {
-					if rotate > 0 {
-						rotateName = availableRotates[rotate-1]
+			if this.SwitchStateName != "Off" {
+
+				if this.SelectedFixtureType == "rgb" {
+					common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchRGBShift), "shift", false, guiButtons)
+				}
+
+				if isRotateOverrideAble {
+					if this.SelectedFixtureType == "projector" {
+						common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchRotate, rotateName), "shift", false, guiButtons)
 					}
 				}
-
-				if this.SwitchStateName != "Off" {
-					common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", rotate, rotateName), "shift", false, guiButtons)
-				} else {
-					common.ClearBottomStatusBar(guiButtons)
-				}
-
+			} else {
+				// Display a empty place holder.
+				common.UpdateStatusBar(fmt.Sprintf("Shift %02d", 0), "shift", false, guiButtons)
 			}
 		}
 	}

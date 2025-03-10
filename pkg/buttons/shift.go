@@ -114,26 +114,55 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	// Deal with an Switch that holds a projector.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		// Decrement the Switch Shift.
+		// Pull the overrides
 		overrides := *this.SwitchOverrides
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
-		}
 
-		// Send a message to override / increase the selected switch shift.
-		cmd := common.Command{
-			Action: common.OverrideRotateSpeed,
-			Args: []common.Arg{
-				{Name: "SwitchNumber", Value: this.SelectedSwitch},
-				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
-			},
+		switchPosition := this.SwitchPosition[this.SelectedSwitch]
+		IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
+
+		if IsRotateOverrideAble {
+
+			// Decrement the Switch Shift.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
+			}
+
+			// Send a message to override / increase the selected switch shift.
+			cmd := common.Command{
+				Action: common.OverrideRotateSpeed,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		} else {
+
+			// Decrement the Rotate Speed.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < common.MIN_PROJECTOR_ROTATE_SPEED {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MIN_PROJECTOR_ROTATE_SPEED
+			}
+
+			// Send a message to override / increase the selected rotate speed.
+			cmd := common.Command{
+				Action: common.OverrideRotateSpeed,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "Rotate", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Get the current switch state in order to decide what we display on status bar.
 		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
+
+		// Push the overrides.
+		this.SwitchOverrides = &overrides
 
 		// Update the status bar
 		UpdateShift(this, guiButtons)
@@ -232,26 +261,55 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	// Deal with an Switch sequence that has a projector fixture.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
+		// Pull the overrides.
 		overrides := *this.SwitchOverrides
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate + 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
-		}
-		this.SwitchOverrides = &overrides
 
-		// Send a message to override / increase the selected switch shift.
-		cmd := common.Command{
-			Action: common.OverrideRotateSpeed,
-			Args: []common.Arg{
-				{Name: "SwitchNumber", Value: this.SelectedSwitch},
-				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
-			},
+		switchPosition := this.SwitchPosition[this.SelectedSwitch]
+		isRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
+
+		if isRotateOverrideAble {
+			// Increment the Switch Shift.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate + 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
+			}
+
+			// Send a message to override / increase the selected switch shift.
+			cmd := common.Command{
+				Action: common.OverrideRotateSpeed,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		} else {
+
+			// Increment the Switch Rotate Speed.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
+			}
+
+			// Send a message to override / decrease the selected switch speed.
+			cmd := common.Command{
+				Action: common.OverrideSpeed,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
+				},
+			}
+			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 		// Get the current switch state in order to decide what we display on status bar.
 		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
+
+		// Push the overrides.
+		this.SwitchOverrides = &overrides
 
 		// Update the status bar
 		UpdateShift(this, guiButtons)

@@ -1674,6 +1674,7 @@ fixtures:
       channel: (Select one)
       value: "245"
       selectedvalue: ""
+    override: true
   - number: 3
     name: Gobo
     settings:
@@ -1722,6 +1723,7 @@ fixtures:
       number: 9
       value: "197"
       selectedvalue: ""
+    override: true
 - id: 29
   name: 'Flames '
   label: flames
@@ -1848,6 +1850,7 @@ fixtures:
       number: 9
       value: "117"
       selectedvalue: ""
+    override: true
   - number: 4
     name: Rotate
     value: 0
@@ -1887,6 +1890,7 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
+    override: true
   - number: 5
     name: Program
     settings:
@@ -1962,6 +1966,7 @@ fixtures:
       channel: New
       value: "200"
       selectedvalue: "200"
+    override: true
 - id: 31
   name: Equinox Helix
   label: helix
