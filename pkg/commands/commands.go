@@ -821,6 +821,32 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		return sequence
 
+	case common.OverrideStrobe:
+		const SWITCH_NUMBER = 0
+		const SWITCH_POSITION = 1
+		const SWITCH_STROBE = 2
+		const SWITCH_STROBE_SPEED = 3
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchStrobe := command.Args[SWITCH_STROBE].Value.(bool)
+		switchStrobeSpeed := command.Args[SWITCH_STROBE_SPEED].Value.(int)
+
+		if debug {
+			fmt.Printf("%d: Command Override Switch Number %d Position %d Strobe %t Strobe Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchStrobe, switchStrobeSpeed)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSwitchSelected = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverrideStrobe = switchStrobe
+		sequence.Switches[switchNumber].Override.StrobeSpeed = switchStrobeSpeed
+
 	// Update the named switch position for the current sequence.
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer

@@ -235,6 +235,17 @@ type Switch struct {
 
 type Override struct {
 
+	// Shutter
+	IsShutterOverrideAble bool
+	OverrideShutter       bool
+
+	// Strobe
+	IsStrobeOverrideAble         bool
+	OverrideStrobe               bool // On / Off
+	StrobeSpeed                  int  // Index into strobe speed settings
+	AvailableStrobeSpeedChannels []string
+	MaxStrobeSpeeds              int
+
 	// RGB / Scanner Speed
 	IsSpeedOverrideAble bool
 	OverrideSpeed       bool
@@ -372,6 +383,7 @@ const (
 	OverrideRotateSpeed
 	OverrideColor
 	OverrideGobo
+	OverrideStrobe
 	Inverted
 	UpdateGobo
 	Flood

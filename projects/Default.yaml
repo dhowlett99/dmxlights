@@ -2951,7 +2951,7 @@ fixtures:
     - name: "Off"
       label: "Off"
       number: 3
-      channel: Color
+      channel: Gobo
       value: "0"
       selectedvalue: ""
     flash: false

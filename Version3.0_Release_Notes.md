@@ -27,7 +27,6 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Presets are now saved inside a project, so presets relate to fixtures correctly.
 * Support for Equinox Helix
 * Bug fix to entering ranges in settings panel.
-* You can't enter a range of numbers in Settings DMX values.
 
 ## Known Problems
 
@@ -48,6 +47,9 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
     At: /Users/derek/project/pkg/mod/fyne.io/fyne/v2@v2.5.1/dialog/file.go:359**
 
     Workaround To avoid this error you need to have the following directories in your "Home" dirctory:- "Documents","Desktop","Downloads","Music","Pictures","Movies","Videos"
+
+* When using a switch override, you can only override a fixtures channel if the 'setting' in the switch config contains the same channel with the same name. 
+  i.e To override the strobe setting for a fixture you must have both a channel called Strobe in the fixture config AND a setting named Strobe.
 
 # Dependances.
 

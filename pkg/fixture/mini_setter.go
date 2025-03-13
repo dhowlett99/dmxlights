@@ -92,13 +92,27 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 			} else {
 				// Handle the fact that the channel may be a label as well.
 				// Look for this channels number in this fixture identified by ID.
-				channel, _ := GetChannelNumberByName(thisFixture, setting.Channel)
+				channel, err := GetChannelNumberByName(thisFixture, setting.Channel)
+				if err != nil {
+					fmt.Printf("error fixure %s has no channel %s\n", thisFixture.Name, setting.Channel)
+					return
+				}
 				if debug_mini_setter {
 					fmt.Printf("fixture %s: ChannelLabel Control: Channel=%s send Setting=%s Address=%d Value=%d\n", thisFixture.Name, setting.Channel, setting.Name, thisFixture.Address+int16(channel), value)
 				}
 
 				// Override settings code.
 				var overrideHasHappened bool
+
+				// Override Strobe.
+				if setting.Channel == "Strobe" && override.OverrideStrobe {
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Strobe=%t StrobeSpeed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.OverrideStrobe, override.StrobeSpeed, override.StrobeSpeed)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(override.StrobeSpeed), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideStrobe = false
+				}
 
 				// Override Speed.
 				if setting.Channel == "Speed" && override.OverrideSpeed {

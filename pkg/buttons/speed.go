@@ -43,15 +43,53 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			this.StrobeSpeed[this.SelectedSequence] = 0
 		}
 
-		cmd := common.Command{
-			Action: common.UpdateStrobeSpeed,
-			Args: []common.Arg{
-				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
-			},
+		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
+
+			cmd := common.Command{
+				Action: common.UpdateStrobeSpeed,
+				Args: []common.Arg{
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			}
+
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+		// Override switch fixture.
+		if sequences[this.TargetSequence].Type == "switch" {
+
+			// Pull the overrides.
+			overrides := *this.SwitchOverrides
+
+			// Stop the strobe
+			this.StrobeSpeed[this.SelectedSequence] -= 10
+			if this.StrobeSpeed[this.SelectedSequence] < 0 {
+				this.StrobeSpeed[this.SelectedSequence] = 0
+			}
+
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = true
+
+			// Copy in the current strobe speed.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
+
+			cmd := common.Command{
+				Action: common.OverrideStrobe,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+					{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
+				},
+			}
+			// Send a message to the sequence.
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Push the overrides.
+			this.SwitchOverrides = &overrides
+
 		}
 
 		// Update the status bar
@@ -204,15 +242,51 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			this.StrobeSpeed[this.SelectedSequence] = 255
 		}
 
-		cmd := common.Command{
-			Action: common.UpdateStrobeSpeed,
-			Args: []common.Arg{
-				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
-			},
+		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
+
+			cmd := common.Command{
+				Action: common.UpdateStrobeSpeed,
+				Args: []common.Arg{
+					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+				},
+			}
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+			if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
+				common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+			}
 		}
-		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
-		if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
-			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
+		// Override switch fixture.
+		if sequences[this.TargetSequence].Type == "switch" {
+
+			// Pull the overrides.
+			overrides := *this.SwitchOverrides
+
+			this.StrobeSpeed[this.SelectedSequence] += 10
+			if this.StrobeSpeed[this.SelectedSequence] > 255 {
+				this.StrobeSpeed[this.SelectedSequence] = 255
+			}
+
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = true
+
+			// Copy in the current strobe speed.
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
+
+			cmd := common.Command{
+				Action: common.OverrideStrobe,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.SelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+					{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
+				},
+			}
+			// Send a message to the sequence.
+			common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+			// Push the overrides.
+			this.SwitchOverrides = &overrides
+
 		}
 
 		// Update the status bar
