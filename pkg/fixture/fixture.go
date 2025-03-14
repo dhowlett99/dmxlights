@@ -91,6 +91,7 @@ type ActionConfig struct {
 	Map               bool
 	Fade              int
 	NumberSteps       int
+	Shutter           int
 	Size              int
 	SpeedDuration     time.Duration
 	Speed             int
@@ -116,6 +117,8 @@ type ActionConfig struct {
 	GoboSpeed         int
 	AutoGobo          bool
 	GoboOptions       []string
+	Pan               int
+	Tilt              int
 	RotateSensitivity int
 }
 

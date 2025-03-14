@@ -233,10 +233,24 @@ func newMiniSequencer(fixture *Fixture,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
-			if debug {
-				fmt.Printf("fixture %s: Control: send Shutter Address %d Value %d \n", fixture.Name, fixture.Address+int16(shutterChannel), master)
+			if debug_mini {
+				fmt.Printf("fixture %s: Control: send Shutter Address %d Value %d Strobe %t\n", fixture.Name, fixture.Address+int16(shutterChannel), master, override.Strobe)
 			}
-			SetChannel(fixture.Address+int16(shutterChannel), byte(32), dmxController, dmxInterfacePresent)
+
+			if override.Strobe {
+				strobeValues := GetADMXValueMaxMin(fixture, "Strobe", "Shutter")
+				shutter := makeStrobeSpeed(strobeValues, override.StrobeSpeed)
+				if debug_mini {
+					fmt.Printf("Override is set Address=%d Strobe Shutter=%t DMX Value=%d\n", fixture.Address+int16(shutterChannel), override.Shutter, shutter)
+				}
+				SetChannel(fixture.Address+int16(shutterChannel), byte(shutter), dmxController, dmxInterfacePresent)
+			} else {
+				shutter := GetADMXValueByName(fixture, "Open", "Shutter")
+				if debug_mini {
+					fmt.Printf("Override is set Address=%d Open Shutter=%t DMX Value=%d\n", fixture.Address+int16(shutterChannel), override.Shutter, shutter)
+				}
+				SetChannel(fixture.Address+int16(shutterChannel), byte(shutter), dmxController, dmxInterfacePresent)
+			}
 		}
 
 		if fixtureHasChannel(fixture, "Rotate") {
@@ -627,6 +641,23 @@ func newMiniSequencer(fixture *Fixture,
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
 				}
 
+				if override.Shutter || override.Strobe {
+					if override.Strobe {
+						strobeValues := GetADMXValueMaxMin(fixture, "Strobe", "Shutter")
+						shutter := makeStrobeSpeed(strobeValues, override.StrobeSpeed)
+						if debug_mini {
+							fmt.Printf("Override is set Strobe Shutter=%t DMX Value=%d\n", override.Shutter, shutter)
+						}
+						cfg.Shutter = shutter
+					} else {
+						shutter := GetADMXValueByName(fixture, "Open", "Shutter")
+						if debug_mini {
+							fmt.Printf("Override is set Open Shutter=%t DMX Value=%d\n", override.Shutter, shutter)
+						}
+						cfg.Shutter = shutter
+					}
+				}
+
 				if override.ProgramSpeed != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
@@ -741,6 +772,9 @@ func newMiniSequencer(fixture *Fixture,
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
+						if debug_override {
+							fmt.Printf("CMD is %+v\n", cmd)
+						}
 						// Update RGB Speed or Scanner Shutter Speed but not in music trigger mode.
 						if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
 							const SPEED = 0
@@ -750,6 +784,21 @@ func newMiniSequencer(fixture *Fixture,
 								fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
 							}
 						}
+
+						// Update Shutter when strobe speed changes.
+						if cmd.Action == common.UpdateStrobeSpeed {
+							const STROBE = 0
+							const STROBE_SPEED = 1
+							override.Strobe = cmd.Args[STROBE].Value.(bool)
+							override.Shutter = cmd.Args[STROBE].Value.(bool)
+
+							cfg.Strobe = cmd.Args[STROBE].Value.(bool)
+							cfg.StrobeSpeed = cmd.Args[STROBE_SPEED].Value.(int)
+							if debug_override {
+								fmt.Printf("Strobe Speed %d\n", cmd.Args[STROBE_SPEED].Value.(int))
+							}
+						}
+
 						// Update Shift.
 						if cmd.Action == common.UpdateRGBShift {
 							const SHIFT = 0
@@ -847,7 +896,7 @@ func newMiniSequencer(fixture *Fixture,
 						} else {
 							actualMaster = master
 						}
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, thisFixture.BaseColor, 0, 0, 0, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, thisFixture.Color, thisFixture.BaseColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, 0, cfg.Gobo, 0, fixturesConfig, blackout, brightness, actualMaster, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					}
 
 					rotateCounter++

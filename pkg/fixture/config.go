@@ -308,6 +308,10 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.StrobeSpeed = 0
 	}
 
+	// TODO add scanner support to mini sequencer.
+	config.Pan = 0
+	config.Tilt = 0
+
 	if debug {
 		fmt.Printf("Config %+v\n", config)
 	}

@@ -26,6 +26,28 @@ import (
 
 func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.SwitchChannel) {
 
+	// Override the selected switches strobe.
+	if cmd.Override.Strobe {
+
+		if debug {
+			fmt.Printf("Override switch number %d Strobe %t \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Strobe)
+		}
+		// Send a message to the selected switch device.
+		switchCommand := common.Command{
+			Action: common.UpdateStrobeSpeed,
+			Args: []common.Arg{
+				// Add one since we count from 0
+				{Name: "Strobe", Value: cmd.SwiTch.Override.Strobe},
+				{Name: "Strobe Speed", Value: cmd.SwiTch.Override.StrobeSpeed},
+			},
+		}
+		select {
+		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
+		case <-time.After(10 * time.Millisecond):
+		}
+		return
+	}
+
 	// Override the selected switch speed.
 	if cmd.Override.Speed > 0 {
 

@@ -49,6 +49,7 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
+					{Name: "STROBE", Value: this.Strobe[this.SelectedSequence]},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}
@@ -249,6 +250,7 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
 				Args: []common.Arg{
+					{Name: "STROBE", Value: this.Strobe[this.SelectedSequence]},
 					{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
 				},
 			}

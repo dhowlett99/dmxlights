@@ -405,10 +405,12 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		return sequence
 
 	case common.UpdateStrobeSpeed:
-		const STROBE_SPEED = 0
+		const STROBE = 0
+		const STROBE_SPEED = 1
 		if debug {
 			fmt.Printf("%d: Command to Update Strobe Speed to %d\n", mySequenceNumber, command.Args[STROBE_SPEED].Value)
 		}
+		sequence.Strobe = command.Args[STROBE].Value.(bool)
 		sequence.StrobeSpeed = command.Args[STROBE_SPEED].Value.(int)
 		if sequence.StartFlood {
 			sequence.FloodPlayOnce = true

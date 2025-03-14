@@ -418,7 +418,7 @@ func GetADMXValueByName(fixture *Fixture, settingName string, channelName string
 	return 0
 }
 
-// GetADMXValueMaxMin takes the setting number and channel name then returns the DMX value.
+// GetADMXValueMaxMin takes the setting name and channel name then returns the DMX value.
 func GetADMXValueMaxMin(fixture *Fixture, settingName string, channelName string) []int {
 
 	if debug {
