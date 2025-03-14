@@ -38,12 +38,13 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
 	// Decrease Strobe Speed.
 	if this.Strobe[this.SelectedSequence] {
-		this.StrobeSpeed[this.SelectedSequence] -= 10
-		if this.StrobeSpeed[this.SelectedSequence] < 0 {
-			this.StrobeSpeed[this.SelectedSequence] = 0
-		}
 
 		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
+
+			this.StrobeSpeed[this.SelectedSequence] -= 10
+			if this.StrobeSpeed[this.SelectedSequence] < 0 {
+				this.StrobeSpeed[this.SelectedSequence] = 0
+			}
 
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
@@ -65,12 +66,12 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			overrides := *this.SwitchOverrides
 
 			// Stop the strobe
-			this.StrobeSpeed[this.SelectedSequence] -= 10
+			this.StrobeSpeed[this.SelectedSequence] -= 25
 			if this.StrobeSpeed[this.SelectedSequence] < 0 {
 				this.StrobeSpeed[this.SelectedSequence] = 0
 			}
 
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = true
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = true
 
 			// Copy in the current strobe speed.
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
@@ -80,7 +81,7 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
 					{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
 				},
 			}
@@ -237,12 +238,13 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 	// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
 	// Increase Strobe Speed.
 	if this.Strobe[this.SelectedSequence] {
-		this.StrobeSpeed[this.SelectedSequence] += 10
-		if this.StrobeSpeed[this.SelectedSequence] > 255 {
-			this.StrobeSpeed[this.SelectedSequence] = 255
-		}
 
 		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
+
+			this.StrobeSpeed[this.SelectedSequence] += 10
+			if this.StrobeSpeed[this.SelectedSequence] > common.MAX_STROBE_SPEED {
+				this.StrobeSpeed[this.SelectedSequence] = common.MAX_STROBE_SPEED
+			}
 
 			cmd := common.Command{
 				Action: common.UpdateStrobeSpeed,
@@ -262,12 +264,12 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			// Pull the overrides.
 			overrides := *this.SwitchOverrides
 
-			this.StrobeSpeed[this.SelectedSequence] += 10
+			this.StrobeSpeed[this.SelectedSequence] += 25
 			if this.StrobeSpeed[this.SelectedSequence] > 255 {
 				this.StrobeSpeed[this.SelectedSequence] = 255
 			}
 
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = true
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = true
 
 			// Copy in the current strobe speed.
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
@@ -277,7 +279,7 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+					{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
 					{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
 				},
 			}

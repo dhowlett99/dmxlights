@@ -70,6 +70,8 @@ const DEFAULT_SCANNER_COORDNIATES = 0
 const SCANNER_MID_POINT = 127
 const DEFAULT_RGB_FADE_STEPS = 10
 const DEFAULT_STROBE_SPEED = 255
+const MAX_STROBE_SPEED = 255
+const MIN_STROBE_SPEED = 1
 
 const IS_SCANNER = true
 const IS_RGB = false
@@ -237,11 +239,11 @@ type Override struct {
 
 	// Shutter
 	IsShutterOverrideAble bool
-	OverrideShutter       bool
+	Shutter               bool
 
 	// Strobe
 	IsStrobeOverrideAble         bool
-	OverrideStrobe               bool // On / Off
+	Strobe                       bool // On / Off
 	StrobeSpeed                  int  // Index into strobe speed settings
 	AvailableStrobeSpeedChannels []string
 	MaxStrobeSpeeds              int

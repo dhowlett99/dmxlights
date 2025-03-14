@@ -176,7 +176,7 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override, cfg fixture.ActionConfig) {
 
 	newOverride.IsShutterOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Strobe")
-	newOverride.OverrideStrobe = cfg.Strobe
+	newOverride.Strobe = cfg.Strobe
 	newOverride.StrobeSpeed = cfg.StrobeSpeed
 	newOverride.AvailableStrobeSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Speed")
 	newOverride.MaxStrobeSpeeds = len(newOverride.AvailableStrobeSpeedChannels)

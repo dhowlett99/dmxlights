@@ -1192,7 +1192,7 @@ func StopStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiBu
 		overrides := *this.SwitchOverrides
 
 		// Stop the strobe
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = false
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = false
 
 		// Copy in the current strobe speed.
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
@@ -1202,7 +1202,7 @@ func StopStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiBu
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
 				{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
 			},
 		}
@@ -1258,7 +1258,7 @@ func StartStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 		overrides := *this.SwitchOverrides
 
 		// Enable the strobe.
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe = true
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = true
 
 		// Copy in the current strobe speed.
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
@@ -1268,7 +1268,7 @@ func StartStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiB
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].OverrideStrobe},
+				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
 				{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
 			},
 		}

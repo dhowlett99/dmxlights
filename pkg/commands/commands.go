@@ -844,7 +844,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
-		sequence.Switches[switchNumber].Override.OverrideStrobe = switchStrobe
+		sequence.Switches[switchNumber].Override.Strobe = switchStrobe
 		sequence.Switches[switchNumber].Override.StrobeSpeed = switchStrobeSpeed
 
 	// Update the named switch position for the current sequence.

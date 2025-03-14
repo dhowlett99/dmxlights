@@ -20,6 +20,7 @@ package fixture
 
 import (
 	"fmt"
+	"math"
 	"strconv"
 	"strings"
 
@@ -104,14 +105,36 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 				// Override settings code.
 				var overrideHasHappened bool
 
+				// Override Shutter.
+				if setting.Channel == "Shutter" && (override.Shutter || override.Strobe) {
+
+					if override.Strobe {
+						strobeValues := GetADMXValueMaxMin(thisFixture, "Strobe", setting.Channel)
+						shutter := makeStrobeSpeed(strobeValues, override.StrobeSpeed)
+						if debug_mini_setter {
+							fmt.Printf("Override is set Address=%d Strobe Shutter=%t DMX Value=%d\n", thisFixture.Address+int16(channel), override.Shutter, shutter)
+						}
+						SetChannel(thisFixture.Address+int16(channel), byte(shutter), dmxController, dmxInterfacePresent)
+					} else {
+						shutter := GetADMXValueByName(thisFixture, "Open", "Shutter")
+						if debug_mini_setter {
+							fmt.Printf("Override is set Address=%d Open Shutter=%t DMX Value=%d\n", thisFixture.Address+int16(channel), override.Shutter, shutter)
+						}
+						SetChannel(thisFixture.Address+int16(channel), byte(shutter), dmxController, dmxInterfacePresent)
+					}
+					overrideHasHappened = true
+					override.Strobe = false
+					override.Shutter = false
+				}
+
 				// Override Strobe.
-				if setting.Channel == "Strobe" && override.OverrideStrobe {
+				if setting.Channel == "Strobe" && override.Strobe {
 					if debug_mini_setter {
-						fmt.Printf("Override is set Address=%d Strobe=%t StrobeSpeed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.OverrideStrobe, override.StrobeSpeed, override.StrobeSpeed)
+						fmt.Printf("Override is set Address=%d Strobe=%t StrobeSpeed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Strobe, override.StrobeSpeed, override.StrobeSpeed)
 					}
 					SetChannel(thisFixture.Address+int16(channel), byte(override.StrobeSpeed), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
-					override.OverrideStrobe = false
+					override.Strobe = false
 				}
 
 				// Override Speed.
@@ -206,7 +229,7 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 				// Not overriding this channel, so use value from config.
 				if !overrideHasHappened {
 					if debug_mini_setter {
-						fmt.Printf("Set Channel Channel %ds Value %d\n", thisFixture.Address+int16(channel), byte(value))
+						fmt.Printf("Set Channel Channel %d Value %d\n", thisFixture.Address+int16(channel), byte(value))
 					}
 					SetChannel(thisFixture.Address+int16(channel), byte(value), dmxController, dmxInterfacePresent)
 				}
@@ -239,4 +262,100 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 			}
 		}
 	}
+}
+
+// makeStrobeSpeed takes a range of strobe values and the current strobe speed value,
+// returns the strobe speed as a DMX value.
+func makeStrobeSpeed(strobeValues []int, strobeSpeed int) int {
+
+	var minValue float32
+	var maxValue float32
+	var step float32
+	var stepNumber float32
+	var slotSize float32
+	var groupIndex int
+
+	var MAX_STROBE_SPEED = float32(common.MAX_STROBE_SPEED)
+
+	dmxValue := -1
+
+	if len(strobeValues) > 0 {
+		minValue = float32(strobeValues[0])
+		maxValue = float32(strobeValues[1])
+		speed := strobeSpeed
+		slotSize = MAX_STROBE_SPEED / 10
+
+		numberOfValues := maxValue - minValue
+		inc := numberOfValues / 9
+
+		groups := getGroups(10, 255)
+		if debug {
+			fmt.Printf("Groups %+v\n", groups)
+		}
+
+		// Populate array.
+		if debug {
+			fmt.Printf("Populate array.\n")
+		}
+		for step = minValue; step < maxValue; step += inc {
+
+			s := float32(math.Round(float64(step)))
+			if debug {
+				fmt.Printf("stepNumber %d dmx %d speed %d\n", int(stepNumber), int(s), int(speed))
+			}
+			dmxValue = int(s)
+			if int(stepNumber) >= groups[groupIndex].Min && int(stepNumber) <= groups[groupIndex].Max {
+				groups[groupIndex].DMXValue = dmxValue
+			}
+
+			stepNumber += slotSize
+			groupIndex++
+		}
+
+		// Print array.
+		if debug {
+			fmt.Printf("Print array.\n")
+
+			for groupIndex := 0; groupIndex < len(groups); groupIndex++ {
+				fmt.Printf("min %d max %d dmx %d\n", groups[groupIndex].Min, groups[groupIndex].Max, groups[groupIndex].DMXValue)
+			}
+		}
+
+		// Find value based on index.
+		if debug {
+			fmt.Printf("Print array.\n")
+		}
+		for groupIndex := 0; groupIndex < len(groups); groupIndex++ {
+			if speed > groups[groupIndex].Min-1 && speed < groups[groupIndex].Max-1 {
+				if debug {
+					fmt.Printf("Found DMX value %d\n", groups[groupIndex].DMXValue)
+				}
+				return groups[groupIndex].DMXValue
+			}
+		}
+	}
+	return dmxValue
+}
+
+type MaxMins struct {
+	Min      int
+	Max      int
+	DMXValue int
+}
+
+func getGroups(patternSize int, numLights int) []MaxMins {
+	width := int(math.Floor(float64(numLights) / float64(patternSize)))
+	groups := make([]MaxMins, patternSize)
+
+	for i := 0; i < int(patternSize); i++ {
+		groups[i] = MaxMins{
+			Min: i * width,
+			Max: (i + 1) * width,
+		}
+	}
+	if debug {
+		fmt.Printf("Width %d Groups %d\n", width, groups)
+	}
+
+	return groups
 }

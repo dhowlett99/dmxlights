@@ -394,6 +394,71 @@ func GetADMXValue(fixture *Fixture, settinNumber int, channelName string) int {
 	return 0
 }
 
+// GetADMXValueByName takes the setting number and channel name then returns the DMX value.
+func GetADMXValueByName(fixture *Fixture, settingName string, channelName string) int {
+
+	if debug {
+		fmt.Printf("GetADMXValueByName Looking in channel %s for name %s in fixture %s\n", channelName, settingName, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, channelName) {
+			for _, setting := range channel.Settings {
+				if setting.Name == settingName {
+					dmx, _ := strconv.Atoi(setting.Value)
+					if debug {
+						fmt.Printf("Setting Name %d DMX value %d\n", setting.Number, dmx)
+					}
+					return dmx
+				}
+			}
+		}
+	}
+
+	return 0
+}
+
+// GetADMXValueMaxMin takes the setting number and channel name then returns the DMX value.
+func GetADMXValueMaxMin(fixture *Fixture, settingName string, channelName string) []int {
+
+	if debug {
+		fmt.Printf("GetADMXValueMaxMin Looking in channel %s for name %s in fixture %s\n", channelName, settingName, fixture.Name)
+	}
+
+	dmxValues := []int{}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, channelName) {
+			for _, setting := range channel.Settings {
+				if setting.Name == settingName {
+
+					if strings.Contains(setting.Value, "-") {
+						values := strings.Split(setting.Value, "-")
+						for _, value := range values {
+							dmx, _ := strconv.Atoi(value)
+							if debug {
+								fmt.Printf("Found Values in Setting Name %s DMX value %d\n", setting.Name, dmx)
+							}
+							dmxValues = append(dmxValues, dmx)
+						}
+						return dmxValues
+					} else {
+						dmx, _ := strconv.Atoi(setting.Value)
+						//if debug {
+						fmt.Printf("Found A single Value in Setting Name %s DMX value %d\n", setting.Name, dmx)
+						//}
+						dmxValues = append(dmxValues, dmx)
+						return dmxValues
+					}
+
+				}
+			}
+		}
+	}
+
+	return dmxValues
+}
+
 func IsThisChannelOverrideAble(fixture *Fixture, channelName string) bool {
 
 	for _, channel := range fixture.Channels {
