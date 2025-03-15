@@ -173,8 +173,9 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 			switchPosition := this.SwitchPosition[this.SelectedSwitch]
 			isProgramSpeedOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
+			actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 
-			if isProgramSpeedOverrideAble {
+			if isProgramSpeedOverrideAble && actionMode == "Control" {
 
 				// Decrement the Switch Speed.
 				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed - 1
@@ -369,8 +370,9 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 			switchPosition := this.SwitchPosition[this.SelectedSwitch]
 			isProgramSpeedOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
+			actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 
-			if isProgramSpeedOverrideAble {
+			if isProgramSpeedOverrideAble && actionMode == "Control" {
 
 				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
 				if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds {

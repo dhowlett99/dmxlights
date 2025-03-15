@@ -943,7 +943,7 @@ func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan c
 
 func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 
-	mode := this.SelectedMode[this.DisplaySequence]
+	selectedMode := this.SelectedMode[this.DisplaySequence]
 	tYpe := this.SelectedType
 	speed := this.Speed[this.TargetSequence]
 	switchPosition := this.SwitchPosition[this.SelectedSwitch]
@@ -955,6 +955,7 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	numberOfProgramSpeeds := len(overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels)
 	maxNumberProgramSpeeds := overrides[switchNumber][switchPosition].MaxProgramSpeeds
 	isProgramSpeedOverrideAble := overrides[switchNumber][switchPosition].IsProgramSpeedOverrideAble
+	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 
 	if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
 		availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
@@ -967,7 +968,7 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
 	} else {
 
-		if mode == NORMAL || mode == FUNCTION || mode == STATUS {
+		if selectedMode == NORMAL || selectedMode == FUNCTION || selectedMode == STATUS {
 			if tYpe == "rgb" {
 				if !this.Strobe[this.TargetSequence] {
 					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
@@ -982,7 +983,8 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 			if tYpe == "switch" {
 
 				if this.SwitchStateName != "Off" {
-					if isProgramSpeedOverrideAble {
+					if isProgramSpeedOverrideAble && actionMode == "Control" {
+
 						common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchProgramSpeed, switchProgramSpeedName), "speed", false, guiButtons)
 					} else {
 						if this.MusicTrigger {
@@ -997,7 +999,7 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 				return
 			}
 		}
-		if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
+		if selectedMode == CHASER_DISPLAY || selectedMode == CHASER_FUNCTION {
 			if !this.Strobe[this.TargetSequence] {
 				common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButtons)
 			} else {

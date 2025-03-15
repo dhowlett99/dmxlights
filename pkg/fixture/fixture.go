@@ -86,6 +86,7 @@ type Action struct {
 
 type ActionConfig struct {
 	Name              string
+	Mode              string
 	Colors            []color.RGBA // Available colors for this fixture.
 	Color             int          // The selected color index for this fixture.
 	Map               bool

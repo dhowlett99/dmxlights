@@ -118,7 +118,7 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		overrides := *this.SwitchOverrides
 
 		switchPosition := this.SwitchPosition[this.SelectedSwitch]
-		IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
+		IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
 
 		if IsRotateOverrideAble {
 

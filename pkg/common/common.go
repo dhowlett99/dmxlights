@@ -237,6 +237,9 @@ type Switch struct {
 
 type Override struct {
 
+	// Currents action modes are mini sequencer - Off ,Static, Control, Chase and for the mini setter - Setting.
+	Mode string
+
 	// Shutter
 	IsShutterOverrideAble bool
 	Shutter               bool

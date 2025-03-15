@@ -39,6 +39,9 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		fmt.Printf("GetConfig() This fixture %s has Rotate Feature %+v\n", fixture.Name, fixtureInfo)
 	}
 
+	// Pass through which mode we are in.
+	config.Mode = action.Mode
+
 	// Find all the specified settings for the program channel
 	if fixtureInfo.HasProgram {
 
