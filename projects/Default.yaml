@@ -1609,17 +1609,50 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Strobe
-  - number: 6
-    name: Program
     settings:
-    - name: New
+    - name: "Off"
+      label: "Off"
       number: 1
+      channel: New
       value: 0-15
       selectedvalue: ""
     - name: Strobe
       label: Strobe
       number: 2
+      channel: (Select one)
       value: 16-255
+      selectedvalue: ""
+  - number: 6
+    name: Program
+    settings:
+    - name: "Off"
+      label: "Off"
+      number: 1
+      value: 0-127
+      selectedvalue: ""
+    - name: Color Mixing
+      label: Color Mixing
+      number: 2
+      channel: (Select one)
+      value: 128-159
+      selectedvalue: ""
+    - name: 3 Color
+      label: 3 Color
+      number: 3
+      channel: (Select one)
+      value: 160-191
+      selectedvalue: ""
+    - name: 7 Color
+      label: 7 Color
+      number: 4
+      channel: (Select one)
+      value: 192-223
+      selectedvalue: ""
+    - name: Sound
+      label: Sound
+      number: 5
+      channel: (Select one)
+      value: 224-255
       selectedvalue: ""
   - number: 7
     name: Master
