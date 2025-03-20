@@ -94,8 +94,8 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 		}
 
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		// Update the status bar.
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}
@@ -295,7 +295,7 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 
 		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		UpdateSpeed(this, guiButtons)
 
 		return
 	}

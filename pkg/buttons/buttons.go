@@ -957,6 +957,12 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 	isProgramSpeedOverrideAble := overrides[switchNumber][switchPosition].IsProgramSpeedOverrideAble
 	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 
+	if this.Strobe[this.SelectedSequence] {
+		// Update the status bar
+		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		return
+	}
+
 	if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
 		availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
 		if switchProgramSpeed > 0 {
