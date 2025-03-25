@@ -70,7 +70,7 @@ type CurrentState struct {
 	SelectedFixtureType         string                     // The use fixture type for a switch.
 	LastSelectedSwitch          int                        // The last selected switch.
 	LastSelectedSequence        int                        // Store fof the last selected squence.
-	MusicTrigger                bool                       // Does this seleted switch have a music trigger.
+	SwitchHasMusicTrigger       bool                       // Does this seleted switch have a music trigger.
 	Speed                       map[int]int                // Local copy of sequence speed. Indexed by sequence.
 	SwitchOverrides             *[][]common.Override       // Pointer to local copy of overriden switch fixture values. Indexed by switch number and state.
 	RGBShift                    map[int]int                // Current rgb fixture shift. Indexed by sequence.

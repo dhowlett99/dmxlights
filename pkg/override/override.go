@@ -175,7 +175,7 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 
 func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override, cfg fixture.ActionConfig) {
 
-	newOverride.Mode = cfg.Mode
+	newOverride.Mode = cfg.Mode // Action mode. Setting, Off , Static, Control, Chase.
 
 	newOverride.IsShutterOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Strobe")
 	newOverride.Strobe = cfg.Strobe
@@ -204,6 +204,8 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
+	newOverride.HasRGBChannels = useFixture.HasRGBChannels
+	newOverride.HasColorChannel = useFixture.HasColorChannel
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
 	newOverride.Colors = cfg.Colors

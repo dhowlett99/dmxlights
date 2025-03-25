@@ -79,6 +79,10 @@ func GetChannelSettingValueByChannelNameAndSettingName(fixture *Fixture, channel
 		fmt.Printf("GetChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
 	}
 
+	if settingName == "" {
+		return 0, fmt.Errorf("GetChannelSettingByChannelNameAndSettingName: settingName is empty for channel %s in fixture %s", channelName, fixture.Name)
+	}
+
 	for _, channel := range fixture.Channels {
 		if debug {
 			fmt.Printf("inspect channel %s for %s\n", channel.Name, settingName)

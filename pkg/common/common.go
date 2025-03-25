@@ -286,6 +286,8 @@ type Override struct {
 	MaxRotateSpeed         int
 
 	// Colors
+	HasRGBChannels      bool
+	HasColorChannel     bool
 	IsColorOverrideAble bool
 	OverrideColors      bool
 	Colors              []color.RGBA

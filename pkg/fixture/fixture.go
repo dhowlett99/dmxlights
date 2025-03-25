@@ -137,6 +137,7 @@ type Fixture struct {
 	MultiFixtureDevice bool      `yaml:"-"` // Calulated internally.
 	NumberSubFixtures  int       `yaml:"-"` // Calulated internally.
 	HasRGBChannels     bool      `yaml:"-"` // Calulated internally.
+	HasColorChannel    bool      `yaml:"-"` // Calulated internally.
 	UseFixture         string    `yaml:"use_fixture,omitempty"`
 }
 
@@ -628,6 +629,7 @@ func SetHasRGBFlag(fixturesConfig *Fixtures) {
 		var hasRed bool
 		var hasGreen bool
 		var hasBlue bool
+		var hasColor bool
 
 		for _, channel := range fixture.Channels {
 			if strings.Contains(channel.Name, "Red") {
@@ -639,11 +641,17 @@ func SetHasRGBFlag(fixturesConfig *Fixtures) {
 			if strings.Contains(channel.Name, "Blue") {
 				hasBlue = true
 			}
+			if strings.Contains(channel.Name, "Color") {
+				hasColor = true
+			}
 		}
 
 		// Now we have looked at every channel.
 		if hasRed && hasGreen && hasBlue {
 			fixturesConfig.Fixtures[fixtureNumber].HasRGBChannels = true
+		}
+		if hasColor {
+			fixturesConfig.Fixtures[fixtureNumber].HasColorChannel = true
 		}
 
 	}

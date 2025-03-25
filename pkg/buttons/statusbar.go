@@ -22,219 +22,339 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+type SwitchInfo struct {
+	Number               int
+	Mode                 int
+	SelectedMode         int
+	Type                 string
+	FixtureType          string
+	Speed                int
+	RGBShift             int
+	ScannerShift         string
+	Size                 int
+	RGBFade              int
+	ScannerFade          int
+	ScannerCoordinates   string
+	Position             int
+	IsRotateOverrideAble bool
+	Rotate               int
+	RotateName           string
+	RotateSpeedName      string
+	AvailableRotates     []string
+	NumberOfRotates      int
+	ColorIndex           int
+	ColorName            string
+	MaxNumberColors      int
+
+	Gobo                   int
+	OverrideAvailableGobos int
+	GoboName               string
+	NumberOfGobos          int
+	MaxNumberGobos         int
+
+	OverrideSpeed int
+	OverrideSize  int
+	OverrideFade  int
+	OverrideGobo  int
+
+	ProgramSpeedName              string
+	ProgramSpeed                  int
+	AvailableProgramSpeedChannels int
+	MaxNumberProgramSpeeds        int
+	NumberOfProgramSpeeds         int
+	IsProgramSpeedOverrideAble    bool
+	HasColorChannel               bool
+	HasRGBChannels                bool
+	ActionMode                    string
+}
+
+func getSwitchDetails(this *CurrentState) SwitchInfo {
+
+	var switchInfo SwitchInfo
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Pull overrides.
+	overrides := *this.SwitchOverrides
+
+	switchInfo.OverrideSpeed = overrides[number][position].Speed
+	switchInfo.OverrideSize = overrides[number][position].Size
+	switchInfo.OverrideGobo = overrides[number][position].Gobo
+	switchInfo.AvailableRotates = overrides[number][position].RotateChannels
+	switchInfo.Rotate = overrides[number][position].Rotate
+	switchInfo.RotateSpeedName = overrides[number][position].RotateName
+	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
+	switchInfo.ColorIndex = overrides[number][position].Color
+	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
+	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
+	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
+	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
+	switchInfo.AvailableProgramSpeedChannels = len(overrides[number][position].AvailableProgramSpeedChannels)
+	switchInfo.MaxNumberProgramSpeeds = overrides[number][position].MaxProgramSpeeds
+	switchInfo.IsProgramSpeedOverrideAble = overrides[number][position].IsProgramSpeedOverrideAble
+	switchInfo.ActionMode = overrides[number][position].Mode
+	switchInfo.Gobo = overrides[number][position].Gobo
+	switchInfo.OverrideAvailableGobos = len(overrides[number][position].AvailableGobos)
+	switchInfo.MaxNumberGobos = overrides[number][position].MaxGobos
+	switchInfo.OverrideFade = overrides[number][position].Fade
+
+	switchInfo.SelectedMode = this.SelectedMode[this.DisplaySequence]
+	switchInfo.Type = this.SelectedType
+	switchInfo.FixtureType = this.SelectedFixtureType
+
+	// Speed
+	switchInfo.Speed = this.Speed[this.TargetSequence]
+
+	// Size
+	switchInfo.Size = this.RGBSize[this.TargetSequence]
+
+	// Fade
+	switchInfo.ScannerFade = this.ScannerSize[this.TargetSequence]
+	switchInfo.RGBFade = this.RGBFade[this.TargetSequence]
+
+	// Rotate
+	switchInfo.NumberOfRotates = len(switchInfo.AvailableRotates)
+	switchInfo.RotateName = "Unknown"
+	if switchInfo.NumberOfRotates > 0 && switchInfo.Rotate <= switchInfo.NumberOfRotates && switchInfo.Rotate != -1 {
+		if switchInfo.Rotate > 0 {
+			switchInfo.RotateName = switchInfo.AvailableRotates[switchInfo.Rotate-1]
+		}
+	}
+
+	// Shift
+	switchInfo.RGBShift = this.RGBShift[this.TargetSequence]
+	switchInfo.ScannerShift = getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
+	switchInfo.ProgramSpeedName = "Unknown"
+
+	switchInfo.ColorName = "Unknown"
+
+	// Colors
+	if switchInfo.MaxNumberColors > 0 && switchInfo.ColorIndex <= switchInfo.MaxNumberColors && switchInfo.ColorIndex != -1 {
+		if switchInfo.ColorIndex > 0 {
+			switchInfo.ColorIndex--
+		}
+		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.ColorIndex]
+	}
+
+	// Program Speed
+	switchInfo.NumberOfProgramSpeeds = switchInfo.AvailableProgramSpeedChannels
+	if switchInfo.NumberOfProgramSpeeds > 0 && switchInfo.ProgramSpeed <= switchInfo.MaxNumberProgramSpeeds && switchInfo.ProgramSpeed != -1 {
+		availableProgramSpeeds := overrides[number][position].AvailableProgramSpeedChannels
+		if switchInfo.NumberOfProgramSpeeds > 0 {
+			switchInfo.ProgramSpeedName = availableProgramSpeeds[switchInfo.ProgramSpeed-1]
+		}
+	}
+
+	// Gobo
+	switchInfo.GoboName = "Unknown"
+	switchInfo.NumberOfGobos = switchInfo.OverrideAvailableGobos
+	if switchInfo.NumberOfGobos > 0 && switchInfo.Gobo < switchInfo.MaxNumberGobos && switchInfo.Gobo != -1 {
+		if switchInfo.Gobo != 0 {
+			switchInfo.GoboName = overrides[number][position].AvailableGobos[switchInfo.Gobo-1]
+		}
+	}
+
+	// Scanner
+	switchInfo.ScannerCoordinates = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
+
+	return switchInfo
+}
+
 func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 
-	selectedMode := this.SelectedMode[this.DisplaySequence]
-	tYpe := this.SelectedType
-	speed := this.Speed[this.TargetSequence]
-	switchPosition := this.SwitchPosition[this.SelectedSwitch]
-	overrides := *this.SwitchOverrides
-	switchSpeed := overrides[this.SelectedSwitch][switchPosition].Speed
-	switchNumber := this.SelectedSwitch
-	switchProgramSpeedName := "Unknown"
-	switchProgramSpeed := overrides[switchNumber][switchPosition].ProgramSpeed
-	numberOfProgramSpeeds := len(overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels)
-	maxNumberProgramSpeeds := overrides[switchNumber][switchPosition].MaxProgramSpeeds
-	isProgramSpeedOverrideAble := overrides[switchNumber][switchPosition].IsProgramSpeedOverrideAble
-	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
+	switchInfo := getSwitchDetails(this)
 
+	// Are we changing the strobe speed.
 	if this.Strobe[this.SelectedSequence] {
 		// Update the status bar
 		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
 		return
 	}
 
-	if numberOfProgramSpeeds > 0 && switchProgramSpeed <= maxNumberProgramSpeeds && switchProgramSpeed != -1 {
-		availableProgramSpeeds := overrides[switchNumber][switchPosition].AvailableProgramSpeedChannels
-		if switchProgramSpeed > 0 {
-			switchProgramSpeedName = availableProgramSpeeds[switchProgramSpeed-1]
-		}
+	// Are we in music trigger so no speed to change. Sequence or Switch.
+	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State || this.SwitchHasMusicTrigger {
+		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
+		return
 	}
 
-	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State {
-		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-	} else {
+	// Chaser mode.
+	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
 
-		if selectedMode == NORMAL || selectedMode == FUNCTION || selectedMode == STATUS {
-			if tYpe == "rgb" {
-				if !this.Strobe[this.TargetSequence] {
-					common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
-				} else {
-					common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-				}
-				return
-			}
-			if tYpe == "scanner" {
-				common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", speed), "speed", false, guiButtons)
-			}
-			if tYpe == "switch" {
-
-				if this.SwitchStateName != "Off" {
-					if isProgramSpeedOverrideAble && actionMode == "Control" {
-
-						common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchProgramSpeed, switchProgramSpeedName), "speed", false, guiButtons)
-					} else {
-						if this.MusicTrigger {
-							common.UpdateStatusBar("MUSIC", "speed", false, guiButtons)
-						} else {
-							common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchSpeed), "speed", false, guiButtons)
-						}
-					}
-				} else {
-					common.ClearBottomStatusBar(guiButtons)
-				}
-				return
-			}
+		if !this.Strobe[this.TargetSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
 		}
-		if selectedMode == CHASER_DISPLAY || selectedMode == CHASER_FUNCTION {
-			if !this.Strobe[this.TargetSequence] {
-				common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", speed), "speed", false, guiButtons)
-			} else {
-				common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-			}
+		return
+	}
+
+	// Not a Chaser.
+	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
+
+		// Sequence is strobing this fixture.
+		if this.Strobe[this.TargetSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
+			return
 		}
+
+		// Sequence has a RGB fixture.
+		if switchInfo.Type == "rgb" && !this.Strobe[this.TargetSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+			return
+		}
+
+		// Sequence has a Scanner fixture.
+		if switchInfo.Type == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+			return
+		}
+
+		// Switch has a RGB fixture.
+		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+			return
+		}
+
+		// Switch has a scanner fixture.
+		if switchInfo.Type == "switch" && this.SelectedFixtureType == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+			return
+		}
+
+		// Switch has a projector in control mode.
+		if switchInfo.Type == "switch" &&
+			this.SelectedFixtureType == "projector" &&
+			switchInfo.IsProgramSpeedOverrideAble &&
+			switchInfo.ActionMode == "Control" {
+
+			common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchInfo.ProgramSpeed, switchInfo.ProgramSpeedName), "speed", false, guiButtons)
+			return
+		}
+
+		// // Switch has a projector that has a dedicated color wheel and associated channel.
+		// if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" && switchInfo.HasColorChannel {
+		// 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+		// 	return
+		// }
+
+		// // Switch has a projector that has a RGB channels.
+		// if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" && switchInfo.HasRGBChannels {
+		// 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
+		// 	return
+		// }
+
+		// Assume nothing is selected, display a empty place holder.
+		common.UpdateStatusBar(fmt.Sprintf("NOT AVAILABLE %02d", 0), "speed", false, guiButtons)
+		return
+
 	}
 }
 
 func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 
-	mode := this.SelectedMode[this.DisplaySequence]
-	tYpe := this.SelectedType
-	size := this.RGBSize[this.TargetSequence]
-	scannerFade := this.ScannerSize[this.TargetSequence]
-	overrides := *this.SwitchOverrides
+	switchInfo := getSwitchDetails(this)
 
-	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" || tYpe == "switch" {
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", size), "size", false, guiButtons)
+	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
+		if switchInfo.Type == "rgb" || switchInfo.Type == "switch" {
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchInfo.Size), "size", false, guiButtons)
 		}
-		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", scannerFade), "size", false, guiButtons)
+		if switchInfo.Type == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", switchInfo.ScannerFade), "size", false, guiButtons)
 		}
-		if tYpe == "switch" && this.SelectedFixtureType == "rgb" {
-			switchSize := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchSize), "size", false, guiButtons)
+		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchInfo.OverrideSize), "size", false, guiButtons)
 		}
-		if tYpe == "switch" && this.SelectedFixtureType == "projector" {
-			switchColorIndex := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color
-			switchColorName := "Unknown"
-			switchMaxNumberColors := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxColors
-			if switchMaxNumberColors > 0 && switchColorIndex <= switchMaxNumberColors && switchColorIndex != -1 {
-				if switchColorIndex > 0 {
-					switchColorIndex--
-				}
-				switchColorName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors[switchColorIndex]
-			}
+		if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" {
 			if this.SwitchStateName != "Off" {
-				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchColorIndex, switchColorName), "size", false, guiButtons)
+				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.ColorIndex, switchInfo.ColorName), "size", false, guiButtons)
 			} else {
 				common.ClearBottomStatusBar(guiButtons)
 			}
 		}
 	}
-	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", size), "size", false, guiButtons)
+	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", switchInfo.Size), "size", false, guiButtons)
 	}
 }
 
 func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 
-	mode := this.SelectedMode[this.DisplaySequence]
-	tYpe := this.SelectedType
-	shift := this.RGBShift[this.TargetSequence]
-	scannerShift := getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-	overrides := *this.SwitchOverrides
-	switchNumber := this.SelectedSwitch
-	switchPosition := this.SwitchPosition[this.SelectedSwitch]
-	switchRGBShift := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift
-	switchRotate := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate
-	switchRotateSpeedName := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateName
-
-	availableRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].RotateChannels
-	numberOfRotates := len(availableRotates)
-	maxNumberRotates := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
-	rotateName := "Unknown"
-	if numberOfRotates > 0 && switchRotate <= maxNumberRotates && switchRotate != -1 {
-		if switchRotate > 0 {
-			rotateName = availableRotates[switchRotate-1]
-		}
-	}
-	isRotateOverrideAble := overrides[switchNumber][switchPosition].IsRotateOverrideAble
+	switchInfo := getSwitchDetails(this)
 
 	if debug {
-		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", shift, scannerShift, switchRGBShift, switchRotate, switchRotateSpeedName)
+		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", switchInfo.RGBShift, switchInfo.ScannerShift, switchInfo.RGBShift, switchInfo.Rotate, switchInfo.RotateSpeedName)
 	}
 
-	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", shift), "shift", false, guiButtons)
-		}
-		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", scannerShift), "shift", false, guiButtons)
-		}
-		if tYpe == "switch" {
-
-			if this.SwitchStateName != "Off" {
-
-				if this.SelectedFixtureType == "rgb" {
-					common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchRGBShift), "shift", false, guiButtons)
-				}
-
-				if isRotateOverrideAble {
-					if this.SelectedFixtureType == "projector" {
-						common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchRotate, rotateName), "shift", false, guiButtons)
-					}
-				}
-			} else {
-				// Display a empty place holder.
-				common.UpdateStatusBar(fmt.Sprintf("Shift %02d", 0), "shift", false, guiButtons)
-			}
-		}
+	// Chaser mode.
+	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
 	}
-	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", shift), "shift", false, guiButtons)
+
+	// Not a Chaser.
+	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
+
+		// Sequence has a RGB fixture.
+		if switchInfo.Type == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
+			return
+		}
+
+		// Sequence has a Scanner fixture.
+		if switchInfo.Type == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", switchInfo.ScannerShift), "shift", false, guiButtons)
+			return
+		}
+
+		// Switch has a RGB fixture.
+		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
+			return
+		}
+
+		// Switch has a scanner fixture.
+		if switchInfo.Type == "switch" && switchInfo.FixtureType == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", switchInfo.ScannerShift), "shift", false, guiButtons)
+			return
+		}
+
+		// Switch has a projector in control mode.
+		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" && switchInfo.IsRotateOverrideAble && switchInfo.ActionMode != "Control" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchInfo.Rotate, switchInfo.RotateName), "shift", false, guiButtons)
+			return
+		}
+
+		// Assume nothing is selected, display a empty place holder.
+		common.UpdateStatusBar(fmt.Sprintf("Shift N/A%02d", 0), "shift", false, guiButtons)
+		return
 	}
+
 }
 
 func UpdateFade(this *CurrentState, guiButtons chan common.ALight) {
 
-	mode := this.SelectedMode[this.DisplaySequence]
-	tYpe := this.SelectedType
-	fixtureType := this.SelectedFixtureType
-	fade := this.RGBFade[this.TargetSequence]
-	scannerCoordinates := getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-	overrides := *this.SwitchOverrides
-	switchFade := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade
-	switchGobo := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Gobo
+	switchInfo := getSwitchDetails(this)
 
-	if mode == NORMAL || mode == FUNCTION || mode == STATUS {
-		if tYpe == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", fade), "fade", false, guiButtons)
+	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
+		if switchInfo.Type == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
 		}
-		if tYpe == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", scannerCoordinates), "fade", false, guiButtons)
+		if switchInfo.Type == "scanner" {
+			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", switchInfo.ScannerCoordinates), "fade", false, guiButtons)
 		}
-		if tYpe == "switch" && fixtureType == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchFade), "fade", false, guiButtons)
+		if switchInfo.Type == "switch" && switchInfo.FixtureType == "rgb" {
+			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
 		}
-		if tYpe == "switch" && fixtureType == "projector" {
-			switchGoboName := "Unknown"
-			numberOfGobos := len(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos)
-			maxNumberGobos := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxGobos
-			if numberOfGobos > 0 && switchGobo < maxNumberGobos && switchGobo != -1 {
-				if switchGobo != 0 {
-					switchGoboName = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableGobos[switchGobo-1]
-				}
-			}
-
+		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" {
 			if this.SwitchStateName != "Off" {
-				common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchGobo, switchGoboName), "fade", false, guiButtons)
+				common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchInfo.Gobo, switchInfo.GoboName), "fade", false, guiButtons)
 			} else {
 				common.ClearBottomStatusBar(guiButtons)
 			}
 		}
 	}
-	if mode == CHASER_DISPLAY || mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", fade), "fade", false, guiButtons)
+	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
+		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
 	}
 }

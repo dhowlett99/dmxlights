@@ -91,7 +91,7 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	SelectSequence(this)
 
 	// Find out if this switch state has a music trigger.
-	this.MusicTrigger = fixture.GetSwitchStateIsMusicTriggerOn(this.SelectedSwitch, int16(this.SwitchPosition[this.SelectedSwitch]), fixturesConfig)
+	this.SwitchHasMusicTrigger = fixture.GetSwitchStateIsMusicTriggerOn(this.SelectedSwitch, int16(this.SwitchPosition[this.SelectedSwitch]), fixturesConfig)
 
 	// Get the current switch state in order to decide what we display on status bar.
 	this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
