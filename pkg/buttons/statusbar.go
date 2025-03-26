@@ -246,7 +246,7 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 		// }
 
 		// Assume nothing is selected, display a empty place holder.
-		common.UpdateStatusBar(fmt.Sprintf("NOT AVAILABLE %02d", 0), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", 0), "speed", false, guiButtons)
 		return
 
 	}

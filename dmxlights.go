@@ -424,10 +424,10 @@ func main() {
 		fixturesConfig, startConfig, &this)
 
 	// Create objects for bottom status bar.
-	panel.SpeedLabel = widget.NewLabel(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED))
-	panel.ShiftLabel = widget.NewLabel(fmt.Sprintf("Shift %02d", common.DEFAULT_RGB_SHIFT))
-	panel.SizeLabel = widget.NewLabel(fmt.Sprintf("Size %02d", common.DEFAULT_RGB_SIZE))
-	panel.FadeLabel = widget.NewLabel(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE))
+	panel.SpeedLabel = widget.NewButton(fmt.Sprintf("Speed %02d", common.DEFAULT_SPEED), func() {})
+	panel.ShiftLabel = widget.NewButton(fmt.Sprintf("Shift %02d", common.DEFAULT_RGB_SHIFT), func() {})
+	panel.SizeLabel = widget.NewButton(fmt.Sprintf("Size %02d", common.DEFAULT_RGB_SIZE), func() {})
+	panel.FadeLabel = widget.NewButton(fmt.Sprintf("Fade %02d", common.DEFAULT_RGB_FADE), func() {})
 	panel.VersionLabel = widget.NewButton("Version"+" "+common.VERSION, func() {})
 	panel.VersionLabel.Hidden = false
 	panel.DisplayMode = widget.NewButton("NORMAL", func() {})

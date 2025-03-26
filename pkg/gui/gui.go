@@ -56,10 +56,10 @@ type Button struct {
 
 type MyPanel struct {
 	Buttons          [][]Button
-	SpeedLabel       *widget.Label
-	ShiftLabel       *widget.Label
-	SizeLabel        *widget.Label
-	FadeLabel        *widget.Label
+	SpeedLabel       *widget.Button
+	ShiftLabel       *widget.Button
+	SizeLabel        *widget.Button
+	FadeLabel        *widget.Button
 	VersionLabel     *widget.Button
 	DisplayMode      *widget.Button
 	ColorDisplay     *fyne.Container
