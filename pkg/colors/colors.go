@@ -62,19 +62,35 @@ var White = color.RGBA{R: 255, G: 255, B: 255, A: 255}
 var EmptyColor = color.RGBA{}
 
 func GetAvailableColors() []color.RGBA {
-	var availableColors []color.RGBA
-	availableColors = append(availableColors, Red)
-	availableColors = append(availableColors, Orange)
-	availableColors = append(availableColors, Yellow)
-	availableColors = append(availableColors, Green)
-	availableColors = append(availableColors, Cyan)
-	availableColors = append(availableColors, Blue)
-	availableColors = append(availableColors, Purple)
-	availableColors = append(availableColors, Pink)
-	availableColors = append(availableColors, White)
-	availableColors = append(availableColors, Black)
+	var colors []color.RGBA
+	colors = append(colors, Red)
+	colors = append(colors, Orange)
+	colors = append(colors, Yellow)
+	colors = append(colors, Green)
+	colors = append(colors, Cyan)
+	colors = append(colors, Blue)
+	colors = append(colors, Purple)
+	colors = append(colors, Pink)
+	colors = append(colors, White)
+	colors = append(colors, Black)
 
-	return availableColors
+	return colors
+}
+
+func GetAvailableColorsAsStrings() []string {
+	var colors []string
+	colors = append(colors, "Red")
+	colors = append(colors, "Orange")
+	colors = append(colors, "Yellow")
+	colors = append(colors, "Green")
+	colors = append(colors, "Cyan")
+	colors = append(colors, "Blue")
+	colors = append(colors, "Purple")
+	colors = append(colors, "Pink")
+	colors = append(colors, "White")
+	colors = append(colors, "Black")
+
+	return colors
 }
 
 func GetColorFromIndexNumberFromColorsLibrary(selectedColor int, colorLibrary []color.RGBA) color.RGBA {

@@ -19,6 +19,7 @@ package override
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -210,9 +211,15 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.Color = cfg.Color
 	newOverride.Colors = cfg.Colors
 	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
-	newOverride.AvailableColors = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Color")
-	newOverride.MaxColors = len(newOverride.AvailableColors)
 
+	if useFixture.HasColorChannel {
+		newOverride.AvailableColors = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Color")
+	}
+	if useFixture.HasRGBChannels {
+		newOverride.AvailableColors = colors.GetAvailableColorsAsStrings()
+	}
+
+	newOverride.MaxColors = len(newOverride.AvailableColors)
 	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo
 	newOverride.AvailableGobos = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Gobo")

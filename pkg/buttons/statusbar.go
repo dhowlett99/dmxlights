@@ -42,9 +42,10 @@ type SwitchInfo struct {
 	RotateSpeedName      string
 	AvailableRotates     []string
 	NumberOfRotates      int
-	ColorIndex           int
+	Color                int
 	ColorName            string
 	MaxNumberColors      int
+	AvailableColors      []string
 
 	Gobo                   int
 	OverrideAvailableGobos int
@@ -86,8 +87,9 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.Rotate = overrides[number][position].Rotate
 	switchInfo.RotateSpeedName = overrides[number][position].RotateName
 	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
-	switchInfo.ColorIndex = overrides[number][position].Color
+	switchInfo.Color = overrides[number][position].Color
 	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
+	switchInfo.AvailableColors = overrides[number][position].AvailableColors
 	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
 	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
 	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
@@ -128,14 +130,10 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.ScannerShift = getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
 	switchInfo.ProgramSpeedName = "Unknown"
 
-	switchInfo.ColorName = "Unknown"
-
 	// Colors
-	if switchInfo.MaxNumberColors > 0 && switchInfo.ColorIndex <= switchInfo.MaxNumberColors && switchInfo.ColorIndex != -1 {
-		if switchInfo.ColorIndex > 0 {
-			switchInfo.ColorIndex--
-		}
-		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.ColorIndex]
+	switchInfo.ColorName = "Unknown"
+	if switchInfo.MaxNumberColors > 0 && switchInfo.Color < switchInfo.MaxNumberColors && switchInfo.Color != -1 {
+		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.Color]
 	}
 
 	// Program Speed
@@ -268,7 +266,7 @@ func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 		}
 		if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" {
 			if this.SwitchStateName != "Off" {
-				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.ColorIndex, switchInfo.ColorName), "size", false, guiButtons)
+				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.Color, switchInfo.ColorName), "size", false, guiButtons)
 			} else {
 				common.ClearBottomStatusBar(guiButtons)
 			}

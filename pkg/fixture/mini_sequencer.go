@@ -77,9 +77,6 @@ func newMiniSequencer(fixture *Fixture,
 		fmt.Printf("newMiniSequencer: actions are available fixture %s actionName %s\n", fixture.Name, action.Name)
 	}
 
-	// Create a standard pallete used by mini sequencer.
-	standardPallete := colors.GetAvailableColors()
-
 	switchName := fmt.Sprintf("switch%d", swiTch.Number)
 
 	mySequenceNumber := fixture.Group - 1
@@ -311,6 +308,7 @@ func newMiniSequencer(fixture *Fixture,
 			}
 			SetChannel(fixture.Address+int16(goboChannel), byte(gobo), dmxController, dmxInterfacePresent)
 		}
+
 		if fixtureHasChannel(fixture, "ProgramSpeed") {
 			// Find the program speed channel for this fixture.
 			programSpeedChannel, err := GetChannelNumberByName(fixture, "ProgramSpeed")
@@ -405,15 +403,58 @@ func newMiniSequencer(fixture *Fixture,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		// Decide on the color.
+		// Decide on the shutter value.
+		if fixtureHasChannel(fixture, "Shutter") {
+			if override.Strobe {
+				strobeValues := GetADMXValueMaxMin(fixture, "Strobe", "Shutter")
+				cfg.Shutter = makeStrobeSpeed(strobeValues, override.StrobeSpeed)
+				if debug_mini {
+					fmt.Printf("Override is set so Shutter is %t DMX Vaue %d\n", override.Shutter, cfg.Shutter)
+				}
+			} else {
+				shutter := GetADMXValueByName(fixture, "Open", "Shutter")
+				if debug_mini {
+					fmt.Printf("Override is set Open Shutter=%t DMX Value=%d\n", override.Shutter, shutter)
+				}
+			}
+		}
+
+		// Decide on the static color.
 		var color color.RGBA
 		if override.Color > 0 {
-			color = standardPallete[override.Color]
+			colorName := override.AvailableColors[override.Color-1]
+			color, err = common.GetRGBColorByName(colorName)
+			if err != nil {
+				fmt.Printf("error %d\n", err)
+			}
+			if debug_mini {
+				fmt.Printf("Override is set so Color is %d Color %+v\n", override.Color, color)
+			}
 		} else {
-			// Use the color from the action.
+			// Use the fitst static color from the action.
 			color, err = common.GetRGBColorByName(action.Colors[0])
 			if err != nil {
 				fmt.Printf("error %d\n", err)
+			}
+		}
+
+		// Decide on the static gobo.
+		if fixtureHasChannel(fixture, "Gobo") {
+			if override.Gobo > 0 {
+				cfg.Gobo = GetADMXValue(fixture, override.Gobo, "Gobo")
+				//if debug_mini {
+				fmt.Printf("Override is set so Gobo is %d DMX Vaue %d\n", override.Rotate, cfg.Gobo)
+				//}
+			}
+		}
+
+		// Decide on the static rotate speed.
+		if fixtureHasChannel(fixture, "Rotate") {
+			if override.Rotate != 0 {
+				cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
+				//if debug_mini {
+				fmt.Printf("Override is set so Rotate is %d DMX Vaue %d\n", override.Rotate, cfg.RotateSpeed)
+				//}
 			}
 		}
 
@@ -436,7 +477,7 @@ func newMiniSequencer(fixture *Fixture,
 						case <-time.After(10 * time.Millisecond):
 						}
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
-						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, lastColor.RGBColor, lastColor.RGBColor, 0, 0, 0, cfg.RotateSpeed, cfg.Program, 0, 0, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, lastColor.RGBColor, lastColor.RGBColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, 0, 0, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 						// Control how long the fade take with the fade control.
 						time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 					}
@@ -458,7 +499,7 @@ func newMiniSequencer(fixture *Fixture,
 					case <-time.After(10 * time.Millisecond):
 					}
 					common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, color, fade, eventsForLaunchpad, guiButtons)
-					MapFixtures(false, false, mySequenceNumber, myFixtureNumber, color, color, 0, 0, 0, cfg.RotateSpeed, cfg.Program, 0, 0, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+					MapFixtures(false, false, mySequenceNumber, myFixtureNumber, color, color, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.Gobo, cfg.ScannerColor, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					// Control how long the fade take with the fade control.
 					time.Sleep((5 * time.Millisecond) * (time.Duration(common.Reverse(cfg.Fade))))
 				}
@@ -473,7 +514,7 @@ func newMiniSequencer(fixture *Fixture,
 				}
 			} else {
 				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, color, master, eventsForLaunchpad, guiButtons)
-				MapFixtures(false, false, mySequenceNumber, myFixtureNumber, color, color, 0, 0, 0, cfg.RotateSpeed, cfg.Program, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
+				MapFixtures(false, false, mySequenceNumber, myFixtureNumber, color, color, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.Gobo, cfg.ScannerColor, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 			}
 		}(lastColor)
 		return
@@ -703,7 +744,10 @@ func newMiniSequencer(fixture *Fixture,
 					}
 					// You can only override a single color.
 					cfg.Colors[cfg.Color] = override.Colors[cfg.Color]
-					newColor := colors.GetColorFromIndexNumberFromColorsLibrary(cfg.Color-1, standardPallete)
+					newColor, err := common.GetRGBColorByName(override.AvailableColors[cfg.Color-1])
+					if err != nil {
+						fmt.Printf("error %d\n", err)
+					}
 					cfg.Colors = []color.RGBA{
 						newColor,
 					}
@@ -847,7 +891,10 @@ func newMiniSequencer(fixture *Fixture,
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
 							override.Color = cmd.Args[COLORS].Value.(int)
-							newColor := colors.GetColorFromIndexNumberFromColorsLibrary(override.Color-1, standardPallete)
+							newColor, err := common.GetRGBColorByName(override.AvailableColors[cfg.Color-1])
+							if err != nil {
+								fmt.Printf("error %d\n", err)
+							}
 							cfg.Colors = []color.RGBA{
 								newColor,
 							}

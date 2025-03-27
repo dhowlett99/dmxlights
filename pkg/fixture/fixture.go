@@ -116,6 +116,7 @@ type ActionConfig struct {
 	StrobeSpeed       int
 	Gobo              int
 	GoboSpeed         int
+	ScannerColor      int
 	AutoGobo          bool
 	GoboOptions       []string
 	Pan               int
