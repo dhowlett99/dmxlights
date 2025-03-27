@@ -1522,7 +1522,7 @@ fixtures:
   label: vue
   number: 1
   description: Chauvet Vue 1.1
-  type: rgb
+  type: projector
   group: 105
   address: 139
   channels:
@@ -1576,10 +1576,13 @@ fixtures:
       selectedvalue: ""
   - number: 2
     name: Red1
+    override: true
   - number: 3
     name: Green1
+    override: true
   - number: 4
     name: Blue1
+    override: true
   - number: 5
     name: Speed
   - number: 6
