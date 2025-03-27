@@ -1095,6 +1095,45 @@ func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]
 	return gobos
 }
 
+func GetAvailableColors(fixture *Fixture) []color.RGBA {
+
+	colors := []color.RGBA{}
+
+	for _, channel := range fixture.Channels {
+
+		if channel.Name == "Color" {
+			for _, setting := range channel.Settings {
+
+				color, err := common.GetRGBColorByName(setting.Name)
+				if err != nil {
+					//fmt.Printf("warning %s\n", err)
+					continue
+				}
+				colors = append(colors, color)
+			}
+		}
+	}
+
+	return colors
+}
+
+func GetAvailableColorNames(fixture *Fixture) []string {
+
+	colors := []string{}
+
+	for _, channel := range fixture.Channels {
+
+		if channel.Name == "Color" {
+			for _, setting := range channel.Settings {
+
+				colors = append(colors, setting.Name)
+			}
+		}
+	}
+
+	return colors
+}
+
 // getAvailableScannerColors looks through the fixtures list and finds scanners that
 // have colors defined in their config. It then returns an array of these available colors.
 // Also returns a map of the default values for each scanner that has colors.

@@ -108,23 +108,29 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	}
 
-	if len(action.Colors) > 0 {
-
-		// If we have a color channel in the fixture get the color setting number based on color in the action.
-		if fixture.HasColorChannel {
-			// Find the avialable colors as listed in the color channel settings.
-			config.AvailableColors, err = common.GetColorArrayByNames(action.Colors)
-			if err != nil {
-				fmt.Printf("error: %s\n", err.Error())
-			}
-			// Look up the first color from the action in the available colors for this fixture.
-			config.ColorName = action.Colors[0]
-			config.Color = GetColorNumberFromFixture(fixture, action.Colors[0])
+	// If we have a color channel in the fixture get the color setting number based on color in the action.
+	if fixture.HasColorChannel {
+		// Find the avialable colors as listed in the color channel settings.
+		config.AvailableColors = GetAvailableColors(fixture)
+		if err != nil {
+			fmt.Printf("error: %s\n", err.Error())
 		}
+		config.AvailableColorNames = GetAvailableColorNames(fixture)
 
-		// If we have Red, Green, Blue color channels look for a matching color in
-		// the standard color pallete based on the first color in the actions.
-		if fixture.HasRGBChannels {
+		// Look up the first color from the action in the available colors for this fixture.
+		if len(action.Colors) > 0 {
+			config.ColorName = action.Colors[0]
+			// Color start at 0 , color settings start at 1 so -1 below.
+			config.Color = GetColorNumberFromFixture(fixture, action.Colors[0]) - 1
+		} else {
+			config.Color = 0 // Just use the first color available.
+		}
+	}
+
+	// If we have Red, Green, Blue color channels look for a matching color in
+	// the standard color pallete based on the first color in the actions.
+	if fixture.HasRGBChannels {
+		if len(action.Colors) > 0 {
 			config.AvailableColorNames = colors.GetAvailableColorsAsStrings()
 			// Look up the first color from the action in the standard color library.
 			config.ColorName = action.Colors[0]

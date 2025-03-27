@@ -635,16 +635,16 @@ func SetHasRGBFlag(fixturesConfig *Fixtures) {
 		var hasColor bool
 
 		for _, channel := range fixture.Channels {
-			if strings.Contains(channel.Name, "Red") {
+			if strings.Contains(channel.Name, "Red") || strings.Contains(channel.Name, "red") {
 				hasRed = true
 			}
-			if strings.Contains(channel.Name, "Green") {
+			if strings.Contains(channel.Name, "Green") || strings.Contains(channel.Name, "green") {
 				hasGreen = true
 			}
-			if strings.Contains(channel.Name, "Blue") {
+			if strings.Contains(channel.Name, "Blue") || strings.Contains(channel.Name, "blue") {
 				hasBlue = true
 			}
-			if strings.Contains(channel.Name, "Color") {
+			if strings.Contains(channel.Name, "Color") || strings.Contains(channel.Name, "color") {
 				hasColor = true
 			}
 		}

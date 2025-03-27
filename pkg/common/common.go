@@ -957,6 +957,9 @@ func GetRGBColorByName(colorIn string) (color.RGBA, error) {
 	case "Yellow":
 		return colors.Yellow, nil
 
+	case "Magenta":
+		return colors.Magenta, nil
+
 	case "Green":
 		return colors.Green, nil
 
