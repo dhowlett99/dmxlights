@@ -145,8 +145,8 @@ func main() {
 	this.ClearPressed = make(map[int]bool, numberOfSequences)             // Initialise storage for four sequences.
 	this.ScannerChaser = make(map[int]bool, numberOfSequences)            // Initialise storage for four sequences.
 	this.ScannerCoordinates = make(map[int]int, numberOfSequences)        // Number of coordinates for scanner patterns is selected from 4 choices. 0=12, 1=16,2=24,3=32,4=64
-	this.LaunchPadConnected = true                                        // Assume launchpad is present, until tested.
-	this.DmxInterfacePresent = true                                       // Assume DMX interface card is present, until tested.
+	this.LaunchPadConnected = false                                       // Assume launchpad is not present, until tested.
+	this.DmxInterfacePresent = false                                      // Assume DMX interface card is not present, until tested.
 	this.LaunchpadName = "Novation Launchpad Mk3 Mini"                    // Name of launchpad.
 	this.Functions = make(map[int][]common.Function)                      // Array holding functions for each sequence.
 	this.SavedSequenceColors = make(map[int][]color.RGBA)                 // Array holding saved sequence colors for each sequence. Used by the color picker.
@@ -177,6 +177,9 @@ func main() {
 	if err != nil {
 		fmt.Printf("dmx interface: %v\n", err)
 		this.DmxInterfacePresent = false
+	} else {
+		this.DmxInterfacePresent = true
+		this.DmxInterfacePresentConfig = dmxInterfaceConfig
 	}
 
 	// Save the presets on exit.
@@ -197,6 +200,8 @@ func main() {
 		fmt.Printf("launchpad: %v\n", err)
 		this.LaunchPadConnected = false
 		this.LaunchpadName = "Not Found"
+	} else {
+		this.LaunchPadConnected = true
 	}
 
 	// If launchpad found, defer the close.
