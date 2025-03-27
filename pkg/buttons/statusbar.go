@@ -132,7 +132,7 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 
 	// Colors
 	switchInfo.ColorName = "Unknown"
-	if switchInfo.MaxNumberColors > 0 && switchInfo.Color < switchInfo.MaxNumberColors && switchInfo.Color != -1 {
+	if switchInfo.MaxNumberColors > 0 && switchInfo.Color <= switchInfo.MaxNumberColors && switchInfo.Color != -1 {
 		switchInfo.ColorName = overrides[number][position].AvailableColorNames[switchInfo.Color]
 	}
 

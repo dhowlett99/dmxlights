@@ -208,9 +208,9 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.HasColorChannel = useFixture.HasColorChannel
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
-	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
+	newOverride.ColorName = cfg.ColorName
 	newOverride.AvailableColorNames = cfg.AvailableColorNames
-	newOverride.MaxColors = len(cfg.AvailableColorNames)
+	newOverride.MaxColors = len(cfg.AvailableColorNames) - 1
 
 	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo

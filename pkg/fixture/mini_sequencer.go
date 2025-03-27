@@ -422,13 +422,13 @@ func newMiniSequencer(fixture *Fixture,
 		// Decide on the static color.
 		var color color.RGBA
 		if override.Color > 0 {
-			colorName := override.AvailableColorNames[override.Color-1]
+			colorName := override.AvailableColorNames[override.Color]
 			color, err = common.GetRGBColorByName(colorName)
 			if err != nil {
 				fmt.Printf("error %d\n", err)
 			}
 			if debug_mini {
-				fmt.Printf("Override is set so Color is %d Color %+v\n", override.Color, color)
+				fmt.Printf("Override is set so Color name is %s index is %d Color %+v Available Colors %+v\n", colorName, override.Color, color, override.AvailableColorNames)
 			}
 		} else {
 			// Use the fitst static color from the action.

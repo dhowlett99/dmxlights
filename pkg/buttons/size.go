@@ -116,7 +116,7 @@ func decreaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		return
 	}
 
-	// Deal with the switch sequence. Decrease Color.
+	// Deal with the switch sequence that has a projector fixture.
 	if sequences[this.TargetSequence].Type == "switch" && this.SelectedFixtureType == "projector" {
 
 		overrides := *this.SwitchOverrides

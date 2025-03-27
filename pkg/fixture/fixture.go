@@ -90,6 +90,7 @@ type ActionConfig struct {
 	AvailableColors     []color.RGBA // Available colors for this fixture.
 	AvailableColorNames []string
 	Color               int // The selected color index for this fixture.
+	ColorName           string
 	Map                 bool
 	Fade                int
 	NumberSteps         int
