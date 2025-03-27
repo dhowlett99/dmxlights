@@ -77,6 +77,15 @@ func GetAvailableColors() []color.RGBA {
 	return colors
 }
 
+func FindColorIndexByName(colorLibrary []string, colorIn string) int {
+	for colorNumber, color := range colorLibrary {
+		if color == colorIn {
+			return colorNumber
+		}
+	}
+	return -1
+}
+
 func GetAvailableColorsAsStrings() []string {
 	var colors []string
 	colors = append(colors, "Red")

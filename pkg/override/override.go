@@ -19,7 +19,6 @@ package override
 import (
 	"fmt"
 
-	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/commands"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
@@ -104,7 +103,7 @@ func CreateOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switc
 
 			if debug {
 				fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
-				fmt.Printf("\t Override Colors %+v\n", override.Colors)
+				fmt.Printf("\t Override Colors %+v\n", override.AvailableColors)
 			}
 		}
 	}
@@ -209,17 +208,10 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.HasColorChannel = useFixture.HasColorChannel
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
-	newOverride.Colors = cfg.Colors
 	newOverride.ColorName = fixture.GetColorNameByNumber(useFixture, newOverride.Color)
+	newOverride.AvailableColorNames = cfg.AvailableColorNames
+	newOverride.MaxColors = len(cfg.AvailableColorNames)
 
-	if useFixture.HasColorChannel {
-		newOverride.AvailableColors = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Color")
-	}
-	if useFixture.HasRGBChannels {
-		newOverride.AvailableColors = colors.GetAvailableColorsAsStrings()
-	}
-
-	newOverride.MaxColors = len(newOverride.AvailableColors)
 	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo
 	newOverride.AvailableGobos = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Gobo")
@@ -227,6 +219,7 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.MaxGobos = len(newOverride.AvailableGobos)
 
 	if debug {
+		fmt.Printf("Populate Fixture %s\n", useFixture.Name)
 		fmt.Printf("Speed OverrideAble %t\n", newOverride.IsSpeedOverrideAble)
 		fmt.Printf("Speed %d\n", newOverride.Speed)
 		fmt.Printf("MaxSpeeds %d\n", newOverride.MaxSpeeds)
@@ -248,9 +241,9 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 
 		fmt.Printf("Color OverrideAble %t\n", newOverride.IsColorOverrideAble)
 		fmt.Printf("Color %d\n", newOverride.Color)
-		fmt.Printf("Colors %+v\n", newOverride.Colors)
 		fmt.Printf("ColorName %s\n", newOverride.ColorName)
-		fmt.Printf("AvailableColors %s\n", newOverride.AvailableColors)
+		fmt.Printf("AvailableColors %+v\n", newOverride.AvailableColors)
+		fmt.Printf("AvailableColorNames %+v\n", newOverride.AvailableColorNames)
 		fmt.Printf("MaxColors %d\n", newOverride.MaxColors)
 
 		fmt.Printf("Gobo OverrideAble %t\n", newOverride.IsGoboOverrideAble)
@@ -258,5 +251,6 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 		fmt.Printf("AvailableGobos %s\n", newOverride.AvailableGobos)
 		fmt.Printf("GoboName %s\n", newOverride.GoboName)
 		fmt.Printf("MaxGobos %d\n", newOverride.MaxGobos)
+		fmt.Printf("\n")
 	}
 }

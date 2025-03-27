@@ -23,6 +23,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -108,17 +109,25 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	}
 
 	if len(action.Colors) > 0 {
-		// Find the color by name from the library of supported colors.
-		colorLibrary, err := common.GetColorArrayByNames(action.Colors)
-		if err != nil {
-			fmt.Printf("error: %s\n", err.Error())
-		}
-		config.Colors = colorLibrary
-		// Take the first color in the library.
-		firstColor := action.Colors[0]
 
-		// Get the color number based on color.
-		config.Color = GetColorNumberFromFixture(fixture, firstColor)
+		// If we have a color channel in the fixture get the color setting number based on color in the action.
+		if fixture.HasColorChannel {
+			// Find the avialable colors as listed in the color channel settings.
+			config.AvailableColors, err = common.GetColorArrayByNames(action.Colors)
+			if err != nil {
+				fmt.Printf("error: %s\n", err.Error())
+			}
+			// Look up the first color from the action in the available colors for this fixture.
+			config.Color = GetColorNumberFromFixture(fixture, action.Colors[0])
+		}
+
+		// If we have Red, Green, Blue color channels look for a matching color in
+		// the standard color pallete based on the first color in the actions.
+		if fixture.HasRGBChannels {
+			config.AvailableColorNames = colors.GetAvailableColorsAsStrings()
+			// Look up the first color from the action in the standard color library.
+			config.Color = colors.FindColorIndexByName(config.AvailableColorNames, action.Colors[0])
+		}
 	}
 
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.

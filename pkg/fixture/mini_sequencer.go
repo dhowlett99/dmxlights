@@ -422,7 +422,7 @@ func newMiniSequencer(fixture *Fixture,
 		// Decide on the static color.
 		var color color.RGBA
 		if override.Color > 0 {
-			colorName := override.AvailableColors[override.Color-1]
+			colorName := override.AvailableColorNames[override.Color-1]
 			color, err = common.GetRGBColorByName(colorName)
 			if err != nil {
 				fmt.Printf("error %d\n", err)
@@ -740,15 +740,15 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors is %+v\n", override.Colors)
+						fmt.Printf("Override is set so Colors is %+v\n", override.AvailableColors)
 					}
 					// You can only override a single color.
-					cfg.Colors[cfg.Color] = override.Colors[cfg.Color]
-					newColor, err := common.GetRGBColorByName(override.AvailableColors[cfg.Color-1])
+					cfg.AvailableColors[cfg.Color] = override.AvailableColors[cfg.Color]
+					newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
 					if err != nil {
 						fmt.Printf("error %d\n", err)
 					}
-					cfg.Colors = []color.RGBA{
+					cfg.AvailableColors = []color.RGBA{
 						newColor,
 					}
 				}
@@ -891,11 +891,11 @@ func newMiniSequencer(fixture *Fixture,
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
 							override.Color = cmd.Args[COLORS].Value.(int)
-							newColor, err := common.GetRGBColorByName(override.AvailableColors[cfg.Color-1])
+							newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
 							if err != nil {
 								fmt.Printf("error %d\n", err)
 							}
-							cfg.Colors = []color.RGBA{
+							cfg.AvailableColors = []color.RGBA{
 								newColor,
 							}
 							if debug_override {
@@ -964,7 +964,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 		RGBFade:              cfg.Fade,
 		RGBSize:              cfg.Size,
 	}
-	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.Colors)
+	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.AvailableColors)
 	steps := sequence.Pattern.Steps
 	sequence.NumberFixtures = 4
 	// Calculate fade curve values.

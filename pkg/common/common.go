@@ -288,11 +288,11 @@ type Override struct {
 	HasColorChannel     bool
 	IsColorOverrideAble bool
 	OverrideColors      bool
-	Colors              []color.RGBA
+	AvailableColors     []color.RGBA
+	AvailableColorNames []string
 	Color               int
 	MaxColors           int
 	ColorName           string
-	AvailableColors     []string
 
 	// Gobo
 	IsGoboOverrideAble bool

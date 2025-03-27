@@ -85,43 +85,44 @@ type Action struct {
 }
 
 type ActionConfig struct {
-	Name              string
-	Mode              string
-	Colors            []color.RGBA // Available colors for this fixture.
-	Color             int          // The selected color index for this fixture.
-	Map               bool
-	Fade              int
-	NumberSteps       int
-	Shutter           int
-	Size              int
-	SpeedDuration     time.Duration
-	Speed             int
-	Shift             int
-	TriggerState      bool
-	Rotate            int
-	RotateName        string
-	RotateSpeed       int
-	Rotatable         bool
-	ReverseSpeed      int
-	ForwardSpeed      int
-	Forward           bool //Clockwise
-	Reverse           bool //AntiClockwise
-	AutoRotate        bool
-	Program           int
-	ProgramOptions    []string
-	ProgramSpeed      int
-	Music             int
-	MusicTrigger      bool
-	Strobe            bool
-	StrobeSpeed       int
-	Gobo              int
-	GoboSpeed         int
-	ScannerColor      int
-	AutoGobo          bool
-	GoboOptions       []string
-	Pan               int
-	Tilt              int
-	RotateSensitivity int
+	Name                string
+	Mode                string
+	AvailableColors     []color.RGBA // Available colors for this fixture.
+	AvailableColorNames []string
+	Color               int // The selected color index for this fixture.
+	Map                 bool
+	Fade                int
+	NumberSteps         int
+	Shutter             int
+	Size                int
+	SpeedDuration       time.Duration
+	Speed               int
+	Shift               int
+	TriggerState        bool
+	Rotate              int
+	RotateName          string
+	RotateSpeed         int
+	Rotatable           bool
+	ReverseSpeed        int
+	ForwardSpeed        int
+	Forward             bool //Clockwise
+	Reverse             bool //AntiClockwise
+	AutoRotate          bool
+	Program             int
+	ProgramOptions      []string
+	ProgramSpeed        int
+	Music               int
+	MusicTrigger        bool
+	Strobe              bool
+	StrobeSpeed         int
+	Gobo                int
+	GoboSpeed           int
+	ScannerColor        int
+	AutoGobo            bool
+	GoboOptions         []string
+	Pan                 int
+	Tilt                int
+	RotateSensitivity   int
 }
 
 type Fixture struct {
