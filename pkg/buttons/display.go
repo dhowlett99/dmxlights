@@ -23,6 +23,17 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
+// Select modes.
+const (
+	NORMAL                int = iota // Normal RGB or Scanner Rotation display.
+	NORMAL_STATIC                    // Normal RGB in edit all static fixtures.
+	FUNCTION                         // Show the RGB or Scanner functions.
+	CHASER_DISPLAY                   //  Show the scanner shutter display.
+	CHASER_DISPLAY_STATIC            //  Shutter chaser in edit all fixtures mode.
+	CHASER_FUNCTION                  // Show the scammer shutter chaser functions.
+	STATUS                           // Show the fixture status states.
+)
+
 func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	debug := false
@@ -164,4 +175,61 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		fmt.Printf("%d: No Mode Selected\n", sequenceNumber)
 	}
 
+}
+
+func printMode(mode int) string {
+	if mode == NORMAL {
+		return "    NORMAL     "
+	}
+	if mode == NORMAL_STATIC {
+		return "    STATIC     "
+	}
+	if mode == CHASER_DISPLAY {
+		return "    CHASER     "
+	}
+	if mode == CHASER_DISPLAY_STATIC {
+		return " CHASER_STATIC "
+	}
+	if mode == FUNCTION {
+		return "   FUNCTION    "
+	}
+	if mode == CHASER_FUNCTION {
+		return "CHASER_FUNCTION"
+	}
+	if mode == STATUS {
+		return "     STATUS    "
+	}
+	return "UNKNOWN"
+}
+
+func clearAllModes(sequences []*common.Sequence, this *CurrentState) {
+	for sequenceNumber := range sequences {
+		this.SelectButtonPressed[sequenceNumber] = false
+		this.SelectedMode[sequenceNumber] = NORMAL
+		this.ShowRGBColorPicker = false
+		this.Static[this.DisplaySequence] = false
+		this.Static[this.TargetSequence] = false
+		this.ShowStaticColorPicker = false
+		this.EditGoboSelectionMode = false
+		this.EditPatternMode = false
+		for function := range this.Functions {
+			this.Functions[sequenceNumber][function].State = false
+		}
+	}
+}
+
+// SetTarget - If we're a scanner and we're in shutter chase mode and if we're in either CHASER_DISPLAY or CHASER_FUNCTION mode then
+// set the target sequence to the chaser sequence number.
+// Else the target is just this sequence number.
+// Returns the target sequence number.
+func SetTarget(this *CurrentState) {
+	if this.SelectedType == "scanner" &&
+		this.ScannerChaser[this.SelectedSequence] &&
+		(this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY) {
+		this.TargetSequence = this.ChaserSequenceNumber
+		this.DisplaySequence = this.SelectedSequence
+	} else {
+		this.TargetSequence = this.SelectedSequence
+		this.DisplaySequence = this.SelectedSequence
+	}
 }

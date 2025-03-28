@@ -20,6 +20,7 @@ package buttons
 import (
 	"fmt"
 	"image/color"
+	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -208,4 +209,51 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
 	}
 
 	return color.RGBA{}
+}
+
+// For the given sequence show the available sequence colors on the relevant buttons.
+// With the new color picker there can be 24 colors displayed.
+// ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
+// the targetSequence .CurrentColors selects which colors are selected.
+// Returns nothing, simply displays the available colors on the buttons.
+func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
+	}
+
+	common.HideSequence(0, commandChannels)
+	common.HideSequence(1, commandChannels)
+	common.HideSequence(1, commandChannels)
+
+	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
+
+		lamp.Flash = false
+
+		// Check if we need to flash this button.
+		for index, availableColor := range targetSequence.RGBAvailableColors {
+			for _, sequenceColor := range targetSequence.SequenceColors {
+				if availableColor.Color == sequenceColor {
+					if myFixtureNumber == index {
+						if debug {
+							fmt.Printf("myFixtureNumber %d   current color %+v\n", myFixtureNumber, sequenceColor)
+						}
+						lamp.Flash = true
+					}
+				}
+			}
+		}
+		if lamp.Flash {
+			Black := colors.Black
+			if debug {
+				fmt.Printf("FLASH myFixtureNumber X:%d Y:%d Color %+v \n", lamp.X, lamp.Y, lamp.Color)
+			}
+			common.FlashLight(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, Black, eventsForLaunchpad, guiButtons)
+		} else {
+			common.LightLamp(common.Button{X: lamp.X, Y: lamp.Y}, lamp.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		}
+		common.LabelButton(lamp.X, lamp.Y, lamp.Name, guiButtons)
+
+		time.Sleep(10 * time.Millisecond)
+	}
 }
