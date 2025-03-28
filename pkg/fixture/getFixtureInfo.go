@@ -71,16 +71,16 @@ func GetFixtureDetailsByLabel(label string, fixtures *Fixtures) (*Fixture, error
 	return &Fixture{}, fmt.Errorf("error: fixture label %s not found", label)
 }
 
-// GetChannelSettingByChannelNameAndSettingName Look through the fixtures channels and use the channel name and setting name.
+// GetChannelSettingByNameAndSetting Look through the fixtures channels and use the channel name and setting name.
 // returns the setting value.
-func GetChannelSettingValueByChannelNameAndSettingName(fixture *Fixture, channelName string, settingName string) (int, error) {
+func GetChannelSettingByNameAndSetting(fixture *Fixture, channelName string, settingName string) (int, error) {
 
 	if debug {
-		fmt.Printf("GetChannelSettingByChannelNameAndSettingName for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
+		fmt.Printf("GetChannelSettingByNameAndSetting for fixture %s on channel %s setting %s\n", fixture.Name, channelName, settingName)
 	}
 
 	if settingName == "" {
-		return 0, fmt.Errorf("GetChannelSettingByChannelNameAndSettingName: settingName is empty for channel %s in fixture %s", channelName, fixture.Name)
+		return 0, fmt.Errorf("GetChannelSettingByNameAndSetting: settingName is empty for channel %s in fixture %s", channelName, fixture.Name)
 	}
 
 	for _, channel := range fixture.Channels {
@@ -128,7 +128,7 @@ func GetChannelSettingValueByChannelNameAndSettingName(fixture *Fixture, channel
 		}
 	}
 
-	return 0, fmt.Errorf("GetChannelSettingByChannelNameAndSettingName: setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
+	return 0, fmt.Errorf("GetChannelSettingByNameAndSetting: setting %s not found in channel %s for fixture %s", settingName, channelName, fixture.Name)
 }
 
 func GetChannelSettingByNameAndSpeed(fixture *Fixture, channelName string, settingName string, settingSpeed string, fixtures *Fixtures) (int, error) {

@@ -132,6 +132,10 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	if fixture.HasRGBChannels {
 		if len(action.Colors) > 0 {
 			config.AvailableColorNames = colors.GetAvailableColorsAsStrings()
+			config.AvailableColors, err = common.GetColorArrayByNames(config.AvailableColorNames)
+			if err != nil {
+				fmt.Printf("error: %s\n", err.Error())
+			}
 			// Look up the first color from the action in the standard color library.
 			config.ColorName = action.Colors[0]
 			config.Color = colors.FindColorIndexByName(config.AvailableColorNames, action.Colors[0])

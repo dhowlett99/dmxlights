@@ -315,7 +315,7 @@ func newMiniSequencer(fixture *Fixture,
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
-			programSpeed, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "ProgramSpeed", action.ProgramSpeed)
+			programSpeed, err := GetChannelSettingByNameAndSetting(fixture, "ProgramSpeed", action.ProgramSpeed)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}
@@ -339,7 +339,7 @@ func newMiniSequencer(fixture *Fixture,
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
 			}
 			// Look up the program state required.
-			programState, err := GetChannelSettingValueByChannelNameAndSettingName(fixture, "Program", action.Program)
+			programState, err := GetChannelSettingByNameAndSetting(fixture, "Program", action.Program)
 			if err != nil {
 				fmt.Printf("warning: %s\n", err)
 			}
@@ -761,7 +761,7 @@ func newMiniSequencer(fixture *Fixture,
 				}
 
 				if debug_mini {
-					fmt.Printf("Speed %d Duration %d Shift %d \n", cfg.Speed, cfg.SpeedDuration, cfg.Shift)
+					fmt.Printf("Speed %d Duration %d Shift %d numberSteps %d\n", cfg.Speed, cfg.SpeedDuration, cfg.Shift, numberSteps)
 				}
 
 				// Run through the steps in the sequence.
@@ -954,6 +954,11 @@ func newMiniSequencer(fixture *Fixture,
 }
 
 func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position, int) {
+
+	if debug_mini {
+		fmt.Printf("createSequence cfg.Shift %d cfg.NumberSteps %d cfg.Fade %d  cfg.Size %d cfg.AvailableColors %+v\n", cfg.Shift, cfg.NumberSteps, cfg.Fade, cfg.Size, cfg.AvailableColors)
+	}
+
 	sequence := common.Sequence{
 		ScannerReverse:       false,
 		RGBInvert:            false,
