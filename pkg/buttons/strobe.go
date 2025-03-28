@@ -54,3 +54,138 @@ func toggleStrobe(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 	}
 }
+
+func StopStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if this.SelectedType == "rgb" {
+
+		// Stop strobing this sequence.
+		cmd := common.Command{
+			Action: common.Strobe,
+			Args: []common.Arg{
+				{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
+				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+	}
+
+	if this.SelectedType == "scanner" {
+
+		// Stop strobing this sequence.
+		cmd := common.Command{
+			Action: common.Strobe,
+			Args: []common.Arg{
+				{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
+				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Also send to chaser sequencer.
+		if this.ScannerChaser[this.SelectedSequence] {
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		}
+	}
+
+	if this.SelectedType == "switch" {
+
+		// Pull the overrides.
+		overrides := *this.SwitchOverrides
+
+		// Stop the strobe
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = false
+
+		// Copy in the current strobe speed.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
+
+		cmd := common.Command{
+			Action: common.OverrideStrobe,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
+				{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Push the overrides.
+		this.SwitchOverrides = &overrides
+
+	}
+
+	// Update the strobe button and status bar.
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+}
+
+func StartStrobe(this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+
+	if this.SelectedType == "rgb" {
+
+		cmd := common.Command{
+			Action: common.Strobe,
+			Args: []common.Arg{
+				{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
+				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+	}
+
+	if this.SelectedType == "scanner" {
+
+		cmd := common.Command{
+			Action: common.Strobe,
+			Args: []common.Arg{
+				{Name: "STROBE_STATE", Value: this.Strobe[this.SelectedSequence]},
+				{Name: "STROBE_SPEED", Value: this.StrobeSpeed[this.SelectedSequence]},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Also send to chaser sequencer.
+		if this.ScannerChaser[this.SelectedSequence] {
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+		}
+	}
+
+	if this.SelectedType == "switch" {
+
+		// Pull the overrides.
+		overrides := *this.SwitchOverrides
+
+		// Enable the strobe.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe = true
+
+		// Copy in the current strobe speed.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed = this.StrobeSpeed[this.SelectedSequence]
+
+		cmd := common.Command{
+			Action: common.OverrideStrobe,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Strobe", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Strobe},
+				{Name: "Strobe Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].StrobeSpeed},
+			},
+		}
+		// Send a message to the sequence.
+		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+
+		// Push the overrides.
+		this.SwitchOverrides = &overrides
+
+	}
+
+	// Update the strobe button and status bar.
+	common.ShowStrobeButtonStatus(this.Strobe[this.SelectedSequence], eventsForLaunchpad, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+}
