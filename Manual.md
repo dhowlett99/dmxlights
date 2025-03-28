@@ -182,26 +182,87 @@ Plug the FTDI interface card and Novation Lauchpad using their respective USB ca
 
 ## LaunchPad Layout
 
-The launchpad buttons are laid out in a simple manner, the very top row are global controls.
-The next four top rows are reserved to control and display the sequence as defined in the fixtures.yaml file.
-The bottom three rows are reserved as storage for your scenes. Once you have selected all the required sequence
-charateristics you can press the SAVE buttton and the one of these preset buttons to store the scene.
-
 ![LaunchPad Layout](Layout.png)
+
+The launchpad buttons are laid out in a simple manner, the very top row are global controls. 
+
+### Clear. 
+Resets all sequences and switches to their default values, All sequences are stopped and switches set to their off positions. The first sequence will be selected.
+
+### Color Editing 
+
+Red, Green, Blue. Used when selecting a static color, you can actually set the Red, Green and Blue components of the static color.
+
+###  Sensitivity.
+![Sensitivity](Sensitivity.png)
+
+
+
+### Master Brightness.
+### Open a project.
+
+![Open File](OpenFile.png)
+
+### Save a project.
+
+![Save File](SaveFile.png)
+
+### Settings
+
+ The gear icon takes you to the settings page. Here you can see the connected DMX interface, The Novation Launchpad, and which microphone is selected.
+![Settings](settings.png)
+
+
+
+
+The next four top rows are reserved to control and display the sequence as defined in the fixtures.yaml file. The default project defines 
+
+## Default configuration
+
+* Sequence 1. RGB The Front of House spot lights as the first row of upto eight fixtures.
+The top row is configured as a stardard RGB sequence, assuming these will be configures to run the front of house PAR cans.
+
+* Sequence 2. RGB Uplighters as second row of upto eight fixtures.
+The next row is your uplighters, I would expect them to be placed around the room to give backgroud lighting. Again this sequence is configured as a RGB sequence.
+
+* Sequence 3. Scanner - Moving heads as the third row of upto eight fixtures.
+Next are the scanners arrange in sequence. Scanner sequences light different colors to represent the position of each scanner. By default all scanners follow the same patten and position in the patten. 
+
+* Sequnece 4. Chaser - Hidden below the scanner fixtures is a 8 way chaser used for chasing the lamps in the Moving heads.
+
+* Sequence 5. Switch - On the fourth row are upto eight switches.
+Finallay the last sequence is configured as a switch sequence. The eight buttons represent the state of a DMX fixture. Useful for turning on a projector. Every time you press a switch seqence fixture it will cycle through the states as defined in the fixtures.yaml file.
+
+
+The bottom three rows are reserved as storage for your scenes, this is called presets. Once you have selected all the required sequence
+charateristics you can press the SAVE buttton and the one of these preset buttons to store the scene. Much like storing a radio channel on your car radio.
+
+
 
 The very bottom row of buttons give more controls but these are specific to the selected sequence.
 
-The buttons on the far right allow you to select a sequence, save presets, start a sequence, stop a sequence
+* Speed control for the sequence.
+* Shift control for the sequence.
+* Size control for the sequnece.
+* Fade control for the sequence.
+
+The buttons on the far right allow you to 
+
+* select a sequence, 
+* Flood button creates white lights on all sequences.
+* save button is used to start the save preset process. 
+* start/stop a sequence. No need to program chases, they are all built in. Just press start to get a simple 8 way chase.
+* Strobe will set the stobe channel on all the fixtures in the selected group.
+
 The botton far right is the blackout button.
 
 ## Sequences
 
-A sequence is the basic control set in DMX Lights. A sequence can have a few different modes depending on
-the sequence type.
+A sequence is the basic control set in DMX Lights. A sequence can have a few different modes depending on the sequence type.
 
 ## Chase Sequence
 
-A basic chase sequence of 8 fixtures with 8 different colors.
+A basic chase sequence of 8 fixtures with up to 24 different colors.
 
 ## Scanner Sequence
 
@@ -211,28 +272,144 @@ A specific to a scanner, this type of sequence can scan in a circle, left to rig
 
 A static color sequence is where you want to setup a set of uplighters with specific colors.
 
-## Switch Sequence
+![StaticSelection](StaticSelection.png)
 
-A switch sequence is simply eight switches that can be used to control simple devices like projectors.
-A swicth can have multiple states, for example you could set a fixture to have specific color, brightness or Gobo.
+Pressing static color will show all eight fixtures with their default colors.
 
-## Default configuration
+Now click the fixture you want to set the color of and the color picker will be displayed
 
-The top row is configured as a stardard RGB sequence, assuming these will be configures to run the front of house PAR cans.
-The next row is your uplighters, I would expect them to be placed around the room to give backgroud lighting. Again this sequence is configured as a RGB sequence.
-Next are the scanners arrange in sequence. Scanner sequences light different colors to represent the position of each scanner. By default all scanners follow the same patten and position in the patten. 
-Finallay the last sequence is configured as a switch sequence. The eight buttons represent the state of a DMX fixture. Useful for turning on a projector. Every time you press a switch seqence fixture it will cycle through the states as defined in the fixtures.yaml file.
+![ColorPicker](ColorPicker.png)
 
-As soon as you start DMX lights the sequences will start to run,  you get a chase patten as soon as the pattens have been read from the configuration.  
+Selecting the color will then set that fixture.
+If you'd like to set all fixtures to the same color press the select button before selecting a fixture, all the fixture lamps will flash, pressing any fixture and the choosing a color will set all the fixtures to that color.
+
+## The Switch Sequence
+
+A switch sequence consists of eight switches, each switch can have a number of switch states. Each state can have either an action or set of DMX values.
+
+
+
+
+![SwitchSelect](SelectSwitch.png)
+
+* A switch sequence is simply eight switches that can be used to control simple devices like projectors.
+* A switch can have multiple states, for example you could set a fixture to have specific color, brightness or gobo.
+* A switch can also be configured with a mini sequencer of its own, typically used to change the color of your booth or a particular project setting.
+
+### Using DMX Values for fixture control
+
+From the switch state list click on Values.
+To the right of the switch state list a further list of values will be displayed.
+
+![Values](Values.png)
+
+Essentially this is the list of DMX values that will be applied to the fixture. The channel can be selected by number or its name as specified in the fixture (this is the fixture defined by useFixture fo the switch)
+
+You select the value and it will be shown in the value box. Names are simply used to make it easier to know what each channel does.
+
+Use -/+ to add or delete channels.
+
+### Using the Mini-Sequencer for fixture control.
+
+From the switch state list click on Actions.
+To the right of the switch state list an Action panel will be displayed
+
+Actions can bee configured for this state of the switch.
+
+Action Type | Purpose 
+-|-
+None | No action is configured.
+Off| No action is configured.
+Static | A static color is applied to the fixture.
+Chase | A chase sequence is applied to the fixture. This is a single fixture colored chase.
+Control| Used to select built in programs of the fixture (requires the fixture to have a Programs or Shows channel configured)
+
+
+#### Chase Mode. 
+
+![Actions](ActionPanel.png)
+
+In this mode the following options are avaialable.
+
+Button | Details
+-|-
+Mode |is the Action Type 
+Colors |allow you to select a color or colors.
+Off / On |is a flag which applies the chase brightness to the master channel. Used to control shutters which have no color control.
+Fade | is the speed of the 
+Size | the length of time the fixture stays on.
+Speed | Speed of the chase.
+Rotate | If the fixture has a rotate channel this usually controls the direction. Off,ClockWise,AntiClockWise or Auto for automatically changing direction.
+Rotate Speed | If the fixture has a Rotate Speed channel,this controls the speed.
+
+
+
+
+
+
+#### Static Mode
+
+In this mode the following options are avaialable.
+
+Button | Details
+-|-
+Mode | Static is the Action Type 
+Colors | Allows you to select a static color. Only one color should be selected.
+Fade | Speed of the fade sharp, normal or soft.
+
+
+![Static](StaticMode.png)
+
+
+#### Control Mode
+
+In this mode the following options are avaialable.
+
+Button | Details
+-|-
+Mode | Control is the Action Type 
+Program | Selectes the built-in show or program available in the fixture, fixture has to have the programs configured in the channel of the fixture.
+Program Speed | Speed of the show as defined in a fixture channel called Program Speed or Show Speed.
+
+
+![Control](ControlPanel.png)
+
+
+### Overriding switch fixture parameters.
+
+Switched fixtures are configured in the config as described above, but sometimes it's useful to override a parameter.
+
+Switches now have the ability to be selected indidually just like any other sequence. This way you can select a switch and for example override the speed, color or gobo settings using the button at the botton of the Launchpad or GUI . Overriden settings can be stored in a preset.
+
+Note that you can only override a setting that exists as a channel in the fixture. For example to Override ProgramSpeed the fixture would need to have a channel called ProgramSpeed.
+ 
+Notice that all switch indicators will be shown dimmed, only when you select a switch will it brighten up and become focused. Tapping further will change the state (switch position).
+You can also override switch parameters like speed when a switch is selected. The status bar at the bottom will also show overridable switch parameters.
+
+Availabe overrides are dependant on the type of fixture behind the switched.
+
+Fixture Type | Available Overrides.
+-|-
+Simple ON/OFF| None
+RGB| Speed, Shift, Size, Fade
+Derby | Speed,RotateSpeed,Colors
+Projector | Speed, RotateSpeed, Colors, Gobo
+
+<br/>
+
+## Basic Functions 
+
 
 # RGB Sequence configuration
 
 A RGB sequence will start with a green chase from left  to right. You can configure the following using the functions. 
 
-## RGB Functions 
+## RGB Functions
 
 To access RGB functions press the select button for this sequence twice.
 The Function keys light up Magenta. Functions are labeled from the left.
+
+![Functions](Functions.png)
 
 |Number | Function | Description |
 |-|-|-|

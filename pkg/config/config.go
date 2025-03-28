@@ -27,7 +27,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func SaveConfig(config []common.Sequence, filename string) {
+func SaveConfigToFile(config []common.Sequence, filename string) {
 
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
@@ -41,7 +41,7 @@ func SaveConfig(config []common.Sequence, filename string) {
 	}
 }
 
-func LoadConfig(filename string) []common.Sequence {
+func LoadConfigFromFile(filename string) []common.Sequence {
 
 	config := []common.Sequence{}
 
@@ -66,12 +66,13 @@ func DeleteConfig(filename string) error {
 	return nil
 }
 
-func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
+func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int, projectName string) {
 	command := common.Command{
-		Action: common.LoadConfig,
+		Action: common.LoadPreset,
 		Args: []common.Arg{
 			{Name: "X", Value: X},
 			{Name: "Y", Value: Y},
+			{Name: "Project Name", Value: projectName},
 		},
 	}
 
@@ -80,9 +81,17 @@ func AskToLoadConfig(commandChannels []chan common.Command, X int, Y int) {
 	}
 }
 
-func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Sequence, X int, Y int) {
+// Get the name of the config file.
+func GetProjectConfigPath(projectName string, X int, Y int) string {
+	path := "projects/." + projectName + "/" + fmt.Sprintf("config%d.%d.json", X, Y)
+	return path
+}
+
+func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Sequence, X int, Y int, projectName string) {
 
 	config := []common.Sequence{}
+
+	path := GetProjectConfigPath(projectName, X, Y)
 
 	go func() {
 		// Wait for responses from sequences.
@@ -92,7 +101,7 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 		}
 
 		// Write to config file.
-		SaveConfig(config, fmt.Sprintf("config%d.%d.json", X, Y))
+		SaveConfigToFile(config, path)
 	}()
 
 	// Ask for all the sequencers for their config.

@@ -18,17 +18,19 @@ package buttons
 
 import (
 	"fmt"
+	"image/color"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
+
 	"github.com/oliread/usbdmx/ft232"
 )
 
-func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
-
-	debug := false
 
 	if debug {
 		fmt.Printf("CLEAR LAUNCHPAD\n")
@@ -47,20 +49,11 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 			fmt.Printf("Shortcut to clear rgb chase colors\n")
 		}
 
-		// Clear the sequence colors for this sequence.
-		cmd := common.Command{
-			Action: common.ClearSequenceColor,
-		}
-		common.SendCommandToSequence(this.EditWhichStaticSequence, cmd, commandChannels)
-
-		// Get an upto date copy of the sequence.
-		sequences[this.EditWhichStaticSequence] = common.RefreshSequence(this.EditWhichStaticSequence, commandChannels, updateChannels)
-
-		// Set the colors.
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
+		// Clear the local copy of colors.
+		sequences[this.EditWhichStaticSequence].SequenceColors = []color.RGBA{}
 
 		// Flash the correct color buttons
-		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Clear has been pressed, next time we press clear we will get the full clear.
 		this.ClearPressed[this.TargetSequence] = true
@@ -123,9 +116,9 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Start full clear process.
 	if sequences[this.SelectedSequence].Type == "scanner" {
-		buttonTouched(common.Button{X: X, Y: Y}, common.Cyan, common.White, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: 0, Y: -1}, colors.Cyan, colors.White, eventsForLaunchpad, guiButtons)
 	} else {
-		buttonTouched(common.Button{X: X, Y: Y}, common.White, common.Magenta, eventsForLaunchpad, guiButtons)
+		buttonTouched(common.Button{X: 0, Y: -1}, colors.White, colors.Magenta, eventsForLaunchpad, guiButtons)
 	}
 
 	// Reset the launchpad.
@@ -142,20 +135,20 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Turn off the flashing save button.
 	this.SavePreset = false
-	common.LightLamp(common.SAVE_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Turn off the Running light.
-	common.LightLamp(common.RUNNING_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.RUNNING_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Turn off the this.Flood
 	if this.Flood {
 		this.Flood = false
 		// Turn the flood button back to white.
-		common.LightLamp(common.FLOOD_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	}
 
 	// Turn off the strobe light.
-	common.LightLamp(common.STROBE_BUTTON, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.STROBE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Clear out soundtriggers
 	for _, trigger := range this.SoundTriggers {
@@ -163,7 +156,7 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 	}
 
 	// Update status bar.
-	common.UpdateStatusBar("Version 2.1", "version", false, guiButtons)
+	common.UpdateStatusBar("Version"+" "+common.VERSION, "version", false, guiButtons)
 
 	// Now go through all sequences and turn off stuff.
 	for sequenceNumber, sequence := range sequences {
@@ -181,7 +174,6 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.ScannerSize[this.SelectedSequence] = common.DEFAULT_SCANNER_SIZE        // Reset the scanner size back to default.
 		this.ScannerChaser[sequenceNumber] = false                                   // Clear the scanner chase mode.
 		this.ScannerPattern = common.DEFAULT_PATTERN                                 // Reset the scanner pattern back to default.
-		this.SwitchPositions = [NUMBER_SWITCHES][NUMBER_SWITCHES]int{}               // Clear switch positions to their first positions.
 		this.EditFixtureSelectionMode = false                                        // Clear fixture selecetd mode.
 		this.SelectedMode[sequenceNumber] = NORMAL                                   // Clear function selecetd mode.
 		this.SelectButtonPressed[sequenceNumber] = false                             // Clear buttoned selecetd mode.
@@ -195,12 +187,13 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.
 		this.ClearPressed[this.TargetSequence] = false                               // Reset the counter that counts how many times we've pressed the clear button.
 
-		// Enable all fixtures.
-		for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
-			this.FixtureState[sequence.Number][fixtureNumber].Enabled = true
-			this.FixtureState[sequence.Number][fixtureNumber].RGBInverted = false
-			this.FixtureState[sequence.Number][fixtureNumber].ScannerPatternReversed = false
+		// Clear switch positions to their first positions.
+		for switchNumber := 0; switchNumber < NUMBER_SWITCHES; switchNumber++ {
+			this.SwitchPosition[switchNumber] = 0
 		}
+
+		// Enable all fixtures.
+		EnableAllFixtures(sequence.Number, commandChannels)
 
 		// Clear all the function buttons for this sequence.
 		if sequence.Type != "switch" { // Switch sequences don't have funcion keys.
@@ -222,24 +215,20 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 			// Now set our local representation of switches
 			for swiTchNumber, swiTch := range sequence.Switches {
-				this.SwitchPositions[sequenceNumber][swiTchNumber] = swiTch.CurrentPosition
-				if debug {
-					var stateNames []string
-					for _, state := range swiTch.States {
-						stateNames = append(stateNames, state.Name)
-					}
-					fmt.Printf("restoring switch number %d to postion %d states[%s]\n", swiTchNumber, this.SwitchPositions[sequenceNumber][swiTchNumber], stateNames)
-				}
+				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
 			}
-		}
 
-		// Set the colors.
-		sequences[sequenceNumber].CurrentColors = sequences[sequenceNumber].SequenceColors
+			// Create a new set of overrides.
+			override.ResetOverrides(sequenceNumber, fixturesConfig, this.SwitchOverrides)
+
+		}
 
 		// Handle the display for this sequence.
 		this.SelectedSequence = sequenceNumber
 		HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 	}
+
+	deFocusSingleSwitch(this, sequences, commandChannels)
 
 	// Clear the presets and display them.
 	presets.ClearPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
@@ -247,6 +236,8 @@ func Clear(X int, Y int, this *CurrentState, sequences []*common.Sequence, dmxCo
 
 	// Set the first sequnence.
 	this.SelectedSequence = 0
+	this.SelectedType = "rgb"
+	this.LastSelectedSwitch = common.NOT_SELECTED
 	HandleSelect(sequences, this, eventsForLaunchpad, commandChannels, guiButtons)
 
 }

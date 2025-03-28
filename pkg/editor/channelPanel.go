@@ -19,6 +19,7 @@ package editor
 
 import (
 	"fmt"
+	"strconv"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/container"
@@ -41,9 +42,38 @@ const (
 	CHANNEL_DELETE
 	CHANNEL_ADD
 	CHANNEL_SETTINGS
+	CHANNEL_OVERRIDE
 )
 
-func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func headerChannelsCreate() fyne.CanvasObject {
+	h := &ActiveHeader{}
+	h.ExtendBaseWidget(h)
+	h.SetText("000")
+	return h
+}
+
+func headerChannelsUpdate(id widget.TableCellID, o fyne.CanvasObject) {
+	header := o.(*ActiveHeader)
+	header.TextStyle.Bold = true
+	switch id.Col {
+	case -1:
+		header.SetText(strconv.Itoa(id.Row + 1))
+	case 0:
+		header.SetText("ID")
+	case 1:
+		header.SetText("Channel Name")
+	case 2:
+		header.SetText("-")
+	case 3:
+		header.SetText("+")
+	case 4:
+		header.SetText("Settings")
+	case 5:
+		header.SetText("OVR")
+	}
+}
+
+func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *FixturesPanel, groupConfig *fixture.Groups, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewChannelEditor\n")
@@ -60,8 +90,11 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
 
+	// Resolve the group number to a name.
+	groupName := getGroupName(groupConfig, strconv.Itoa(thisFixture.Group))
+
 	// Title.
-	title := widget.NewLabel(fmt.Sprintf("Edit Channel Config for Sequence %d Fixture %d", thisFixture.Group, thisFixture.Number))
+	title := widget.NewLabel(fmt.Sprintf("Edit Channel Config for Sequence %s Fixture %d", groupName, thisFixture.Number))
 	title.TextStyle = fyne.TextStyle{
 		Bold: true,
 	}
@@ -143,7 +176,7 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 	// Cancel button.
 	buttonCancel := widget.NewButton("Cancel", func() {
 		// Restore any changed channels settings.
-		for channelNumber := range cp.ChannelList {
+		for channelNumber := range savedChannels {
 			cp.ChannelList[channelNumber].Settings = append(cp.ChannelList[channelNumber].Settings[:0:0], savedChannels[channelNumber].Settings...)
 		}
 		modal.Hide()
@@ -187,7 +220,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 	cp.ChannelList = channels
 
 	// Channel or Switch State Selection Panel.
-	cp.ChannelPanel = widget.NewTable(
+	cp.ChannelPanel = widget.NewTableWithHeaders(
 
 		// Function to find length.
 		func() (int, int) {
@@ -199,8 +232,10 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				cp.ChannelList[st.UpdateThisChannel].MaxDegrees = st.SettingMaxDegrees
 				st.UpdateSettings = false
 			}
+			// Number of rows in table.
 			height := len(data)
-			width := 5
+			// Number of columns in table.
+			width := 6
 			return height, width
 		},
 
@@ -225,7 +260,10 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 				widget.NewButton("+", func() {}),
 
 				// Settings for this channel button.
-				widget.NewButton("settings", func() {}),
+				widget.NewButton("Settings", func() {}),
+
+				// Override switch
+				widget.NewCheck("", func(bool) {}),
 			)
 		},
 
@@ -257,6 +295,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					newChannel.Comment = cp.ChannelList[i.Row].Comment
 					newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
 					newChannel.Offset = cp.ChannelList[i.Row].Offset
+					newChannel.Override = cp.ChannelList[i.Row].Override
 					cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
 					data = makeChannelsArray(cp.ChannelList)
 				}
@@ -306,15 +345,42 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					}
 				}
 			}
+
+			// Override Check Box.
+			if i.Col == CHANNEL_OVERRIDE {
+				showChannelsField(CHANNEL_OVERRIDE, o)
+				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).SetChecked(cp.ChannelList[i.Row].Override)
+				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).OnChanged = func(value bool) {
+					if cp.ChannelList != nil {
+						newChannel := fixture.Channel{}
+						newChannel.Name = cp.ChannelList[i.Row].Name
+						newChannel.Number = cp.ChannelList[i.Row].Number
+						newChannel.Value = cp.ChannelList[i.Row].Value
+						newChannel.Settings = cp.ChannelList[i.Row].Settings
+						newChannel.Comment = cp.ChannelList[i.Row].Comment
+						newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
+						newChannel.Offset = cp.ChannelList[i.Row].Offset
+						newChannel.Override = value
+
+						cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
+						data = makeChannelsArray(cp.ChannelList)
+					}
+				}
+			}
 		},
 	)
+
+	cp.ChannelPanel.CreateHeader = headerChannelsCreate
+	cp.ChannelPanel.UpdateHeader = headerChannelsUpdate
+	cp.ChannelPanel.ShowHeaderColumn = false
 
 	// Setup the columns of this table.
 	cp.ChannelPanel.SetColumnWidth(0, 40)  // Number
 	cp.ChannelPanel.SetColumnWidth(1, 160) // Name
 	cp.ChannelPanel.SetColumnWidth(2, 20)  // Delete
 	cp.ChannelPanel.SetColumnWidth(3, 20)  // Add
-	cp.ChannelPanel.SetColumnWidth(4, 100) // Settings
+	cp.ChannelPanel.SetColumnWidth(4, 80)  // Settings
+	cp.ChannelPanel.SetColumnWidth(5, 20)  // Override
 
 	return &cp
 }
@@ -461,6 +527,7 @@ func makeChannelsArray(channels []fixture.Channel) [][]string {
 		newChannel = append(newChannel, "-")
 		newChannel = append(newChannel, "+")
 		newChannel = append(newChannel, "Settings")
+		newChannel = append(newChannel, "Override")
 
 		data = append(data, newChannel)
 	}
@@ -484,6 +551,9 @@ func showChannelsField(field int, o fyne.CanvasObject) {
 		o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = false
 	case field == CHANNEL_SETTINGS:
 		o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = false
+	case field == CHANNEL_OVERRIDE:
+		o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).Hidden = false
+
 	}
 }
 
@@ -496,4 +566,5 @@ func hideAllChannelsFields(o fyne.CanvasObject) {
 	o.(*fyne.Container).Objects[CHANNEL_DELETE].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[CHANNEL_ADD].(*widget.Button).Hidden = true
 	o.(*fyne.Container).Objects[CHANNEL_SETTINGS].(*widget.Button).Hidden = true
+	o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).Hidden = true
 }

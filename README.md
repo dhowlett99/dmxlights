@@ -97,7 +97,7 @@ File size is also smaller 111044.
 Create self-signed certificates in Keychain Access on Mac
 1. In the Keychain Access app on your Mac, choose Keychain Access > Certificate Assistant > Create a Certificate.
 2. Enter a 'dmxlights' as the name for the certificate.
-3. Choose an identity type, 'Selft Sigbed Root Certificate'  
+3. Choose an identity type, 'Self Signed Root Certificate'  
 4. then choose the type of certificate. 'Code Signing'
 Click Create.
 Review the certificate, then click Done.

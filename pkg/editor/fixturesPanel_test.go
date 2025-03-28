@@ -56,37 +56,9 @@ func Test_checkDMXnumber(t *testing.T) {
 			wantErr: true,
 		},
 		{
-			name: "range of numbers",
+			name: "string with a - in is an error",
 			args: args{
-				value: "100-200",
-			},
-			wantErr: false,
-		},
-		{
-			name: "range of numbers with text in first nunber is an error",
-			args: args{
-				value: "10A0-200",
-			},
-			wantErr: true,
-		},
-		{
-			name: "range of numbers with text in seconde number is an error",
-			args: args{
-				value: "100-20B0",
-			},
-			wantErr: true,
-		},
-		{
-			name: "range of numbers with text in both numbers is an error",
-			args: args{
-				value: "10AA0-20B0",
-			},
-			wantErr: true,
-		},
-		{
-			name: "range of numbers second number is less than first is an error",
-			args: args{
-				value: "100-2",
+				value: "1A-00",
 			},
 			wantErr: true,
 		},
