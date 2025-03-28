@@ -741,9 +741,11 @@ func newMiniSequencer(fixture *Fixture,
 				if override.Color != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Colors is %+v\n", override.AvailableColors)
+						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)
+						fmt.Printf("Color Index %d AvailableColors %+v\n", cfg.Color-1, override.AvailableColors)
 					}
 					// You can only override a single color.
-					cfg.AvailableColors[cfg.Color] = override.AvailableColors[cfg.Color]
+					cfg.AvailableColors = override.AvailableColors
 					newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
 					if err != nil {
 						fmt.Printf("error %d\n", err)
@@ -890,7 +892,11 @@ func newMiniSequencer(fixture *Fixture,
 						// Update Colors
 						if cmd.Action == common.UpdateColors {
 							const COLORS = 0
+							const AVAILABLE_COLORS = 1
+							const AVAILABLE_COLOR_NAMES = 2
 							override.Color = cmd.Args[COLORS].Value.(int)
+							override.AvailableColors = cmd.Args[AVAILABLE_COLORS].Value.([]color.RGBA)
+							override.AvailableColorNames = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
 							newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
 							if err != nil {
 								fmt.Printf("error %d\n", err)
@@ -968,6 +974,14 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 		RGBNumberStepsInFade: cfg.NumberSteps,
 		RGBFade:              cfg.Fade,
 		RGBSize:              cfg.Size,
+	}
+
+	// A chase must have a minimum of two colors to chase.
+	// If we have only one color in available colors, we add black to make the chase continue,
+	// albeit with only two colors, the one you selected and the black.
+	if len(cfg.AvailableColors) == 1 {
+		// Add black to available colors
+		cfg.AvailableColors = append(cfg.AvailableColors, colors.Black)
 	}
 	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.AvailableColors)
 	steps := sequence.Pattern.Steps
