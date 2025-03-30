@@ -34,6 +34,10 @@ const (
 
 func MakeSingleFixtureChase(colors []color.RGBA) common.Pattern {
 
+	if debug {
+		fmt.Printf("MakeSingleFixtureChase with colors %+v\n", colors)
+	}
+
 	steps := []common.Step{}
 	for _, color := range colors {
 		fixture := common.Fixture{

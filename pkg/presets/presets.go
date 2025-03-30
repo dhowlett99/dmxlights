@@ -49,7 +49,7 @@ func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common
 						common.FlashLight(common.Button{X: x, Y: y}, colors.Red, colors.PresetYellow, eventsForLauchpad, guiButtons)
 					} else {
 						// There is a color in the presets datatbase so set the color
-						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
+						color := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
 						common.FlashLight(common.Button{X: x, Y: y}, color, colors.PresetYellow, eventsForLauchpad, guiButtons)
 					}
 				} else {
@@ -60,7 +60,7 @@ func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common
 
 					} else {
 						// We're not selected and there is a button color specified so set that color.
-						color, _ := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
+						color := common.GetRGBColorByName(presets[fmt.Sprint(x)+","+fmt.Sprint(y)].ButtonColor)
 						common.LightLamp(common.Button{X: x, Y: y}, color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 					}
 				}

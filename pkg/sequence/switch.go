@@ -35,7 +35,7 @@ func setSwitchLamp(sequence common.Sequence, switchNumber int, eventsForLauchpad
 	state := swiTch.States[swiTch.CurrentPosition]
 
 	// Use the button color for this state to light the correct color on the launchpad.
-	color, _ := common.GetRGBColorByName(state.ButtonColor)
+	color := common.GetRGBColorByName(state.ButtonColor)
 	var brightness int
 	if swiTch.Selected {
 		brightness = common.MAX_DMX_BRIGHTNESS

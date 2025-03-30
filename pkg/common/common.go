@@ -911,10 +911,7 @@ func GetColorArrayByNames(names []string) ([]color.RGBA, error) {
 	colors := []color.RGBA{}
 	for _, color := range names {
 		// Find the color by name from the library of supported colors.
-		colorLibrary, err := GetRGBColorByName(color)
-		if err != nil {
-			return colors, err
-		}
+		colorLibrary := GetRGBColorByName(color)
 		newColor := colorLibrary
 
 		// Add the color to the chase colors.
@@ -937,7 +934,7 @@ func ConvertRGBtoRGBA(alight color.RGBA) color.RGBA {
 	return RGBAcolor
 }
 
-func GetRGBColorByName(colorIn string) (color.RGBA, error) {
+func GetRGBColorByName(colorIn string) color.RGBA {
 
 	if debug {
 		fmt.Printf("Looking for color %s\n", colorIn)
@@ -946,46 +943,47 @@ func GetRGBColorByName(colorIn string) (color.RGBA, error) {
 	switch colorIn {
 
 	case "Unknown":
-		return colors.White, nil
+		return colors.White
 
 	case "Red":
-		return colors.Red, nil
+		return colors.Red
 
 	case "Orange":
-		return colors.Orange, nil
+		return colors.Orange
 
 	case "Yellow":
-		return colors.Yellow, nil
+		return colors.Yellow
 
 	case "Magenta":
-		return colors.Magenta, nil
+		return colors.Magenta
 
 	case "Green":
-		return colors.Green, nil
+		return colors.Green
 
 	case "Cyan":
-		return colors.Cyan, nil
+		return colors.Cyan
 
 	case "Blue":
-		return colors.Blue, nil
+		return colors.Blue
 
 	case "Purple":
-		return colors.Purple, nil
+		return colors.Purple
 
 	case "Pink":
-		return colors.Pink, nil
+		return colors.Pink
 
 	case "White":
-		return colors.White, nil
+		return colors.White
 
 	case "Light Blue":
-		return colors.LightBlue, nil
+		return colors.LightBlue
 
 	case "Black":
-		return colors.Black, nil
+		return colors.Black
 
+	default:
+		return colors.White
 	}
-	return color.RGBA{}, fmt.Errorf("GetRGBColorByName: color not found: %s", colorIn)
 }
 
 func GetColorNameByRGB(colorIn color.RGBA) string {

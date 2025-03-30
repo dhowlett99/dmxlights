@@ -1103,12 +1103,7 @@ func GetAvailableColors(fixture *Fixture) []color.RGBA {
 
 		if channel.Name == "Color" {
 			for _, setting := range channel.Settings {
-
-				color, err := common.GetRGBColorByName(setting.Name)
-				if err != nil {
-					//fmt.Printf("warning %s\n", err)
-					continue
-				}
+				color := common.GetRGBColorByName(setting.Name)
 				colors = append(colors, color)
 			}
 		}
@@ -1152,11 +1147,7 @@ func GetAvailableScannerColors(fixtures *Fixtures) (map[int][]common.StaticColor
 					for _, setting := range channel.Settings {
 						newStaticColorButton := common.StaticColorButton{}
 						newStaticColorButton.SelectedColor = setting.Number
-						settingColor, err := common.GetRGBColorByName(setting.Name)
-						if err != nil {
-							fmt.Printf("error: %s\n", err)
-							continue
-						}
+						settingColor := common.GetRGBColorByName(setting.Name)
 						newStaticColorButton.Color = settingColor
 						availableScannerColors[fixture.Number] = append(availableScannerColors[fixture.Number], newStaticColorButton)
 						scannerColors[fixture.Number-1] = 0
@@ -1182,11 +1173,7 @@ func GetScannerColorName(scannerNumber int, colorNumber int, fixtures *Fixtures)
 					if strings.Contains(channel.Name, "Color") {
 						for _, setting := range channel.Settings {
 							if setting.Number == colorNumber+1 {
-								settingColor, err := common.GetRGBColorByName(setting.Name)
-								if err != nil {
-									fmt.Printf("error: %s\n", err)
-									continue
-								}
+								settingColor := common.GetRGBColorByName(setting.Name)
 								return settingColor, nil
 							}
 						}

@@ -156,7 +156,7 @@ func newMiniSequencer(fixture *Fixture,
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
 			}
 			state := swiTch.States[0]
-			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+			buttonColor := common.GetRGBColorByName(state.ButtonColor)
 			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
 		} else {
 			lastColor = MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, false, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
@@ -423,19 +423,13 @@ func newMiniSequencer(fixture *Fixture,
 		var color color.RGBA
 		if override.Color > 0 {
 			colorName := override.AvailableColorNames[override.Color]
-			color, err = common.GetRGBColorByName(colorName)
-			if err != nil {
-				fmt.Printf("error %d\n", err)
-			}
+			color = common.GetRGBColorByName(colorName)
 			if debug_mini {
 				fmt.Printf("Override is set so Color name is %s index is %d Color %+v Available Colors %+v\n", colorName, override.Color, color, override.AvailableColorNames)
 			}
 		} else {
 			// Use the fitst static color from the action.
-			color, err = common.GetRGBColorByName(action.Colors[0])
-			if err != nil {
-				fmt.Printf("error %d\n", err)
-			}
+			color = common.GetRGBColorByName(action.Colors[0])
 		}
 
 		// Decide on the static gobo.
@@ -566,7 +560,7 @@ func newMiniSequencer(fixture *Fixture,
 				time.Sleep((5 * time.Millisecond) * (time.Duration(cfg.Fade)))
 			}
 			state := swiTch.States[0]
-			buttonColor, _ := common.GetRGBColorByName(state.ButtonColor)
+			buttonColor := common.GetRGBColorByName(state.ButtonColor)
 			common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, buttonColor, master, eventsForLaunchpad, guiButtons)
 		}
 
@@ -740,16 +734,12 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors is %+v\n", override.AvailableColors)
+						fmt.Printf("Override is set so Colors Index is %d from Available %+v\n", override.Color-1, override.AvailableColors)
 						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)
-						fmt.Printf("Color Index %d AvailableColors %+v\n", cfg.Color-1, override.AvailableColors)
 					}
 					// You can only override a single color.
 					cfg.AvailableColors = override.AvailableColors
-					newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
-					if err != nil {
-						fmt.Printf("error %d\n", err)
-					}
+					newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color-1])
 					cfg.AvailableColors = []color.RGBA{
 						newColor,
 					}
@@ -818,107 +808,7 @@ func newMiniSequencer(fixture *Fixture,
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
-						if debug_override {
-							fmt.Printf("CMD is %+v\n", cmd)
-						}
-						// Update RGB Speed or Scanner Shutter Speed but not in music trigger mode.
-						if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
-							const SPEED = 0
-							override.Speed = cmd.Args[SPEED].Value.(int)
-							cfg.SpeedDuration = common.SetSpeed(override.Speed)
-							if debug_override {
-								fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
-							}
-						}
-
-						// Update Shutter when strobe speed changes.
-						if cmd.Action == common.UpdateStrobeSpeed {
-							const STROBE = 0
-							const STROBE_SPEED = 1
-							override.Strobe = cmd.Args[STROBE].Value.(bool)
-							override.Shutter = cmd.Args[STROBE].Value.(bool)
-
-							cfg.Strobe = cmd.Args[STROBE].Value.(bool)
-							cfg.StrobeSpeed = cmd.Args[STROBE_SPEED].Value.(int)
-							if debug_override {
-								fmt.Printf("Strobe Speed %d\n", cmd.Args[STROBE_SPEED].Value.(int))
-							}
-						}
-
-						// Update Shift.
-						if cmd.Action == common.UpdateRGBShift {
-							const SHIFT = 0
-							override.Shift = cmd.Args[SHIFT].Value.(int)
-							cfg.Shift = cmd.Args[SHIFT].Value.(int)
-							if debug_override {
-								fmt.Printf("Shift %d\n", cmd.Args[SHIFT].Value.(int))
-							}
-						}
-						// Update Size.
-						if cmd.Action == common.UpdateRGBSize {
-							const SIZE = 0
-							override.Size = cmd.Args[SIZE].Value.(int)
-							cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
-							if debug_override {
-								fmt.Printf("Size %d\n", cmd.Args[SIZE].Value.(int))
-							}
-						}
-						// Update Fade
-						if cmd.Action == common.UpdateRGBFadeSpeed {
-							const FADE = 0
-							override.Fade = cmd.Args[FADE].Value.(int)
-							cfg.Fade = cmd.Args[FADE].Value.(int)
-							if debug_override {
-								fmt.Printf("Fade %d\n", cmd.Args[FADE].Value.(int))
-							}
-						}
-
-						// Update Rotate Speed
-						if cmd.Action == common.UpdateRotateSpeed {
-							const ROTATE_SPEED = 0
-							override.Rotate = cmd.Args[ROTATE_SPEED].Value.(int)
-							if debug_override || debug_rotate {
-								fmt.Printf("Override Speed Index=%d\n", override.Rotate)
-							}
-							// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
-							// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
-							// override.RotateSpeed is the index so for example 1 is setting 1.
-							cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
-							if debug_override {
-								fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
-							}
-						}
-
-						// Update Colors
-						if cmd.Action == common.UpdateColors {
-							const COLORS = 0
-							const AVAILABLE_COLORS = 1
-							const AVAILABLE_COLOR_NAMES = 2
-							override.Color = cmd.Args[COLORS].Value.(int)
-							override.AvailableColors = cmd.Args[AVAILABLE_COLORS].Value.([]color.RGBA)
-							override.AvailableColorNames = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
-							newColor, err := common.GetRGBColorByName(override.AvailableColorNames[cfg.Color-1])
-							if err != nil {
-								fmt.Printf("error %d\n", err)
-							}
-							cfg.AvailableColors = []color.RGBA{
-								newColor,
-							}
-							if debug_override {
-								fmt.Printf("Color Selected is %d %+v\n", override.Color-1, newColor)
-							}
-						}
-
-						// Update Gobos
-						if cmd.Action == common.UpdateGobo {
-							const GOBO = 0
-							override.Gobo = cmd.Args[GOBO].Value.(int)
-							cfg.Gobo = cmd.Args[GOBO].Value.(int)
-							if debug_override {
-								fmt.Printf("Gobo %d\n", cmd.Args[GOBO].Value.(int))
-							}
-						}
-
+						cfg = listenForOverrideCommands(fixture, cfg, cmd, &override, sequence)
 						// Recreate the sequence and recalculate steps.
 						sequence, RGBPositions, numberSteps = createSequence(cfg)
 
@@ -941,6 +831,7 @@ func newMiniSequencer(fixture *Fixture,
 
 					var actualMaster int
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+
 						thisFixture := fixtures[fixtureNumber]
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, thisFixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 						if cfg.Map {
@@ -1008,6 +899,110 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	RGBPositions, numberSteps := position.AssemblePositions(fadeColors, sequence.NumberFixtures, totalNumberOfSteps, sequence.FixtureState, sequence.Optimisation)
 
 	return sequence, RGBPositions, numberSteps
+}
+
+func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Command, override *common.Override, sequence common.Sequence) ActionConfig {
+
+	if debug_override {
+		fmt.Printf("CMD is %+v\n", cmd)
+	}
+	// Update RGB Speed or Scanner Shutter Speed but not in music trigger mode.
+	if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
+		const SPEED = 0
+		override.Speed = cmd.Args[SPEED].Value.(int)
+		cfg.SpeedDuration = common.SetSpeed(override.Speed)
+		if debug_override {
+			fmt.Printf("Speed %d Duration %d\n", cmd.Args[SPEED].Value.(int), cfg.SpeedDuration)
+		}
+	}
+
+	// Update Shutter when strobe speed changes.
+	if cmd.Action == common.UpdateStrobeSpeed {
+		const STROBE = 0
+		const STROBE_SPEED = 1
+		override.Strobe = cmd.Args[STROBE].Value.(bool)
+		override.Shutter = cmd.Args[STROBE].Value.(bool)
+
+		cfg.Strobe = cmd.Args[STROBE].Value.(bool)
+		cfg.StrobeSpeed = cmd.Args[STROBE_SPEED].Value.(int)
+		if debug_override {
+			fmt.Printf("Strobe Speed %d\n", cmd.Args[STROBE_SPEED].Value.(int))
+		}
+	}
+
+	// Update Shift.
+	if cmd.Action == common.UpdateRGBShift {
+		const SHIFT = 0
+		override.Shift = cmd.Args[SHIFT].Value.(int)
+		cfg.Shift = cmd.Args[SHIFT].Value.(int)
+		if debug_override {
+			fmt.Printf("Shift %d\n", cmd.Args[SHIFT].Value.(int))
+		}
+	}
+	// Update Size.
+	if cmd.Action == common.UpdateRGBSize {
+		const SIZE = 0
+		override.Size = cmd.Args[SIZE].Value.(int)
+		cfg.Size = common.GetSize(cmd.Args[SIZE].Value.(int))
+		if debug_override {
+			fmt.Printf("Size %d\n", cmd.Args[SIZE].Value.(int))
+		}
+	}
+	// Update Fade
+	if cmd.Action == common.UpdateRGBFadeSpeed {
+		const FADE = 0
+		override.Fade = cmd.Args[FADE].Value.(int)
+		cfg.Fade = cmd.Args[FADE].Value.(int)
+		if debug_override {
+			fmt.Printf("Fade %d\n", cmd.Args[FADE].Value.(int))
+		}
+	}
+
+	// Update Rotate Speed
+	if cmd.Action == common.UpdateRotateSpeed {
+		const ROTATE_SPEED = 0
+		override.Rotate = cmd.Args[ROTATE_SPEED].Value.(int)
+		if debug_override || debug_rotate {
+			fmt.Printf("Override Speed Index=%d\n", override.Rotate)
+		}
+		// At this point we need to convert a 1-10 rotate value that means something to this specific fixture.
+		// cfg.RotateSpeed is the DMX value from the Rotate channel settings.
+		// override.RotateSpeed is the index so for example 1 is setting 1.
+		cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
+		if debug_override {
+			fmt.Printf("Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
+		}
+	}
+
+	// Update Colors
+	if cmd.Action == common.UpdateColors {
+		const COLORS = 0
+		const AVAILABLE_COLORS = 1
+		const AVAILABLE_COLOR_NAMES = 2
+		override.Color = cmd.Args[COLORS].Value.(int)
+		override.AvailableColors = cmd.Args[AVAILABLE_COLORS].Value.([]color.RGBA)
+		override.AvailableColorNames = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
+		newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color])
+		cfg.AvailableColors = []color.RGBA{
+			newColor,
+		}
+		if debug_override {
+			fmt.Printf("Color Selected is %d %+v\n", override.Color, newColor)
+		}
+	}
+
+	// Update Gobos
+	if cmd.Action == common.UpdateGobo {
+		const GOBO = 0
+		override.Gobo = cmd.Args[GOBO].Value.(int)
+		cfg.Gobo = cmd.Args[GOBO].Value.(int)
+		if debug_override {
+			fmt.Printf("Gobo %d\n", cmd.Args[GOBO].Value.(int))
+		}
+	}
+
+	return cfg
+
 }
 
 func GetChannelSettinsByName(fixture *Fixture, channelName string, fixturesConfig *Fixtures) ([]common.Setting, error) {

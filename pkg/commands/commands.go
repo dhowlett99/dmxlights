@@ -634,7 +634,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchSpeed := command.Args[SWITCH_SPEED].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchSpeed)
+			fmt.Printf("%d: Command Override Speed Switch Number %d Position %d Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchSpeed)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -645,6 +645,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideSpeed = true
 		sequence.Switches[switchNumber].Override.Speed = switchSpeed
 
@@ -660,7 +661,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchProgramSpeed := command.Args[SWITCH_SPEED].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Program Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchProgramSpeed)
+			fmt.Printf("%d: Command Override Program Speed for Switch Number %d Position %d Program Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchProgramSpeed)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -671,6 +672,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideProgramSpeed = true
 		sequence.Switches[switchNumber].Override.ProgramSpeed = switchProgramSpeed
 
@@ -686,7 +688,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchShift := command.Args[SWITCH_SHIFT].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Shift %d\n", mySequenceNumber, switchNumber, switchPosition, switchShift)
+			fmt.Printf("%d: Command Override Shift for Switch Number %d Position %d Shift %d\n", mySequenceNumber, switchNumber, switchPosition, switchShift)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -694,6 +696,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideShift = true
 		sequence.Switches[switchNumber].Override.Shift = switchShift
 
@@ -708,13 +711,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchSize := command.Args[SWITCH_SIZE].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Size %d\n", mySequenceNumber, switchNumber, switchPosition, switchSize)
+			fmt.Printf("%d: Command Override Size Switch Number %d Position %d Size %d\n", mySequenceNumber, switchNumber, switchPosition, switchSize)
 		}
 		sequence.PlaySwitchOnce = true
 		sequence.Override = true
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideSize = true
 		sequence.Switches[switchNumber].Override.Size = switchSize
 
@@ -730,7 +734,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchFade := command.Args[SWITCH_FADE].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Fade %d\n", mySequenceNumber, switchNumber, switchPosition, switchFade)
+			fmt.Printf("%d: Command Override Fade for Switch Number %d Position %d Fade %d\n", mySequenceNumber, switchNumber, switchPosition, switchFade)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -741,6 +745,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideFade = true
 		sequence.Switches[switchNumber].Override.Fade = switchFade
 
@@ -756,7 +761,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchRotateSpeed := command.Args[SWITCH_ROTATE_SPEED].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Rotate Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchRotateSpeed)
+			fmt.Printf("%d: Command Override Rotate Speed for Switch Number %d Position %d Rotate Speed %d\n", mySequenceNumber, switchNumber, switchPosition, switchRotateSpeed)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -764,6 +769,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideRotateSpeed = true
 		sequence.Switches[switchNumber].Override.Rotate = switchRotateSpeed
 
@@ -783,7 +789,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchAvailableColorNames := command.Args[SWITCH_AVAILABLE_COLOR_NAMES].Value.([]string)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Color %d Available Colors %+v\n", mySequenceNumber, switchNumber, switchPosition, switchColor, switchAvailableColorNames)
+			fmt.Printf("%d: Command Override Color for Switch Number %d Position %d Color %d Available Colors %+v\n", mySequenceNumber, switchNumber, switchPosition, switchColor, switchAvailableColorNames)
 		}
 
 		sequence.PlaySwitchOnce = true
@@ -794,6 +800,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideColors = true
 		sequence.Switches[switchNumber].Override.Color = switchColor
 		sequence.Switches[switchNumber].Override.AvailableColors = switchAvailableColors
@@ -811,7 +818,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchGobo := command.Args[SWITCH_GOBO].Value.(int)
 
 		if debug {
-			fmt.Printf("%d: Command Override Switch Number %d Position %d Gobo %d\n", mySequenceNumber, switchNumber, switchPosition, switchGobo)
+			fmt.Printf("%d: Command Override Gobo for Switch Number %d Position %d Gobo %d\n", mySequenceNumber, switchNumber, switchPosition, switchGobo)
 		}
 		sequence.PlaySwitchOnce = true
 		sequence.Override = true
@@ -821,6 +828,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideGobo = true
 		sequence.Switches[switchNumber].Override.Gobo = switchGobo
 
@@ -849,6 +857,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.Strobe = switchStrobe
 		sequence.Switches[switchNumber].Override.StrobeSpeed = switchStrobeSpeed
 

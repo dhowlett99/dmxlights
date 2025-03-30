@@ -2214,39 +2214,45 @@ fixtures:
     name: Rotate
     value: 0
     settings:
+    - name: "Off"
+      label: "Off"
+      number: 1
+      value: "0"
+      selectedvalue: ""
     - name: Mirror Index
       label: Mirror Index
-      number: 1
-      value: 0-127
+      number: 2
+      channel: (Select one)
+      value: 1-127
       selectedvalue: ""
     - name: Reverse Slow
       label: Reverse Slow
-      number: 2
+      number: 3
       value: "192"
       selectedvalue: ""
     - name: Reverse Medium
       label: Reverse Medium
-      number: 3
+      number: 4
       value: "223"
       selectedvalue: ""
     - name: Reverse Fast
       label: Reverse Fast
-      number: 4
+      number: 5
       value: "255"
       selectedvalue: ""
     - name: Forward Slow
       label: Forward Slow
-      number: 5
+      number: 6
       value: "191"
       selectedvalue: ""
     - name: Forward Medium
       label: Forward Medium
-      number: 6
+      number: 7
       value: "160"
       selectedvalue: ""
     - name: Forward Fast
       label: Forward Fast
-      number: 7
+      number: 8
       value: "128"
       selectedvalue: ""
     override: true
@@ -4621,9 +4627,41 @@ fixtures:
       gobo: ""
       gobospeed: ""
     flash: false
-  - name: Auto
+  - name: Soft
     number: 14
-    label: Auto
+    label: Soft
+    buttoncolor: ""
+    master: 0
+    actions:
+    - name: Soft
+      number: 1
+      colors:
+      - Red
+      - Orange
+      - Yellow
+      - Green
+      - Cyan
+      - Blue
+      - Purple
+      - Pink
+      - White
+      map: ""
+      mode: Chase
+      fade: Soft
+      size: Medium
+      speed: Medium
+      rotate: "Off"
+      rotatespeed: Slow
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: Open
+      gobospeed: ""
+    flash: false
+  - name: Sound
+    number: 15
+    label: Sound
     buttoncolor: White
     master: 0
     actions:
