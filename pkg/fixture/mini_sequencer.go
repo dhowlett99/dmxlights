@@ -808,7 +808,7 @@ func newMiniSequencer(fixture *Fixture,
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
-						cfg = listenForOverrideCommands(fixture, cfg, cmd, &override, sequence)
+						cfg = listenForOverrideCommands(fixture, cfg, cmd, &override)
 						// Recreate the sequence and recalculate steps.
 						sequence, RGBPositions, numberSteps = createSequence(cfg)
 
@@ -901,7 +901,7 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	return sequence, RGBPositions, numberSteps
 }
 
-func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Command, override *common.Override, sequence common.Sequence) ActionConfig {
+func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Command, override *common.Override) ActionConfig {
 
 	if debug_override {
 		fmt.Printf("CMD is %+v\n", cmd)
