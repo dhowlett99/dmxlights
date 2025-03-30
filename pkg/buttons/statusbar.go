@@ -231,6 +231,12 @@ func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
 			return
 		}
 
+		if switchInfo.Type == "switch" &&
+			this.SelectedFixtureType == "projector" {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.OverrideSpeed), "speed", false, guiButtons)
+			return
+		}
+
 		// // Switch has a projector that has a dedicated color wheel and associated channel.
 		// if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" && switchInfo.HasColorChannel {
 		// 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
