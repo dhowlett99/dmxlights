@@ -26,6 +26,11 @@ jobs:
       shell: bash
       run: brew install portaudio
 
+    - name: Install Libusb dependencies
+      if: runner.os == 'macOS'
+      shell: bash
+      run: brew install libusb; brew install pkg-config; export PKG_CONFIG_PATH="$(brew --prefix libusb)/lib/pkgconfig"
+
     - name: Build
       run: go build -v ./...
 
