@@ -20,110 +20,166 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan common.Command, sequence *common.Sequence) {
+func toggleFixtureStatus(sequences []*common.Sequence, selectedFixture int, selectedSequence int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
+
+	if debug {
+		fmt.Printf("Disable Fixture %d selectedSequence:%d\n", selectedFixture, selectedSequence)
+		fmt.Printf("Fixture State Enabled %t  Inverted %t Reversed %t\n", sequences[selectedSequence].FixtureState[selectedFixture].Enabled, sequences[selectedSequence].FixtureState[selectedFixture].RGBInverted, sequences[selectedSequence].FixtureState[selectedFixture].ScannerPatternReversed)
+	}
+
+	sequences[selectedSequence].FixtureState = GetFixtureStatus(selectedSequence, commandChannels, updateChannels)
+
+	// Rotate the  fixture state based on last fixture state.
+	SetFixtureStatus(sequences[selectedSequence], this, selectedFixture, selectedSequence, commandChannels)
+
+	// Show the status.
+	showFixtureStatus(selectedSequence, sequences[selectedSequence], eventsForLaunchpad, guiButtons, commandChannels)
+}
+
+func EnableAllFixtures(sequenceNumber int, commandChannels []chan common.Command) {
+
+	// Tell the sequence to invert this scanner.
+	cmd := common.Command{
+		Action: common.EnableAllFixtures,
+	}
+	common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+}
+
+func InvertAllFixtures(sequenceNumber int, commandChannels []chan common.Command) {
+
+	cmd := common.Command{
+		Action: common.InvertAllFixtures,
+	}
+	common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+}
+
+func GetFixtureStatus(selectedSequence int, commandChannels []chan common.Command, updateChannels []chan common.Sequence) map[int]common.FixtureState {
+
+	// Get an upto date copy of the sequence.
+	sequence := common.RefreshSequence(selectedSequence, commandChannels, updateChannels)
+
+	return sequence.FixtureState
+}
+
+func SetFixtureStatus(sequence *common.Sequence, this *CurrentState, selectedFixture int, selectedSequence int, commandChannels []chan common.Command) {
 
 	// There are three possiblities OFF, ON and INVERTED.
 	if sequence.Type == "rgb" {
 
 		// Disable fixture if we're already enabled and inverted.
-		if this.FixtureState[Y][X].Enabled && this.FixtureState[Y][X].RGBInverted && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && sequence.FixtureState[selectedFixture].RGBInverted && selectedFixture < sequence.NumberFixtures {
 			if debug {
-				fmt.Printf("Disable RGB fixture Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Disable RGB fixture Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = false
-			this.FixtureState[Y][X].RGBInverted = false
+			newState := common.FixtureState{}
+			newState.Enabled = false
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 			// If any fixture is not inverted turn off the global invert function.
-			this.Functions[Y][common.Function7_Invert_Chase].State = false
+			this.Functions[selectedSequence][common.Function7_Invert_Chase].State = false
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			return
 		}
 
 		// Enable RGB fixture if not enabled but inverted by the global invert all enabled fixtures function key.
-		if !this.FixtureState[Y][X].Enabled && this.FixtureState[Y][X].RGBInverted && X < sequence.NumberFixtures {
+		if !sequence.FixtureState[selectedFixture].Enabled && sequence.FixtureState[selectedFixture].RGBInverted && selectedFixture < sequence.NumberFixtures {
 
 			if debug {
-				fmt.Printf("Enable  RGB fixture Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Enable  RGB fixture Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = false
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			return
 		}
 
 		// Enable RGB fixture if not enabled and not inverted.
-		if !this.FixtureState[Y][X].Enabled && !this.FixtureState[Y][X].RGBInverted && X < sequence.NumberFixtures {
+		if !sequence.FixtureState[selectedFixture].Enabled && !sequence.FixtureState[selectedFixture].RGBInverted && selectedFixture < sequence.NumberFixtures {
 			if debug {
-				fmt.Printf("Disable RGB fixture Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Disable RGB fixture Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = false
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			return
 		}
 
 		// Invert RGB fixture if we're enabled but not inverted.
-		if this.FixtureState[Y][X].Enabled && !this.FixtureState[Y][X].RGBInverted && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && !sequence.FixtureState[selectedFixture].RGBInverted && selectedFixture < sequence.NumberFixtures {
 
 			if debug {
-				fmt.Printf("Invert RGB Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Invert RGB Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = true
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = true
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			return
 		}
@@ -133,26 +189,28 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 	if sequence.Type == "scanner" {
 
 		// OOF - Disable scanner if we're already enabled and inverted and reversed.
-		if this.FixtureState[Y][X].Enabled && this.FixtureState[Y][X].RGBInverted && this.FixtureState[Y][X].ScannerPatternReversed && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && sequence.FixtureState[selectedFixture].RGBInverted && sequence.FixtureState[selectedFixture].ScannerPatternReversed && selectedFixture < sequence.NumberFixtures {
 			if debug {
-				fmt.Printf("Disable scanner fixture Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Disable scanner fixture Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = false
-			this.FixtureState[Y][X].RGBInverted = false
-			this.FixtureState[Y][X].ScannerPatternReversed = false
+			newState := common.FixtureState{}
+			newState.Enabled = false
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
@@ -163,26 +221,28 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 		}
 
 		// ON - Enable scanner if not enabled and not inverted and not reversed.
-		if !this.FixtureState[Y][X].Enabled && !this.FixtureState[Y][X].RGBInverted && !this.FixtureState[Y][X].ScannerPatternReversed && X < sequence.NumberFixtures {
+		if !sequence.FixtureState[selectedFixture].Enabled && !sequence.FixtureState[selectedFixture].RGBInverted && !sequence.FixtureState[selectedFixture].ScannerPatternReversed && selectedFixture < sequence.NumberFixtures {
 			if debug {
-				fmt.Printf("Enable scanner fixture Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Enable scanner fixture Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = false
-			this.FixtureState[Y][X].ScannerPatternReversed = false
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
@@ -193,27 +253,29 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 		}
 
 		// Invert scanner if we're enabled but not inverted and not reversed.
-		if this.FixtureState[Y][X].Enabled && !this.FixtureState[Y][X].RGBInverted && !this.FixtureState[Y][X].ScannerPatternReversed && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && !sequence.FixtureState[selectedFixture].RGBInverted && !sequence.FixtureState[selectedFixture].ScannerPatternReversed && selectedFixture < sequence.NumberFixtures {
 
 			if debug {
-				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = true
-			this.FixtureState[Y][X].ScannerPatternReversed = false
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = true
+			newState.ScannerPatternReversed = false
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
@@ -223,27 +285,29 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 		}
 
 		// reverse scanner if we're enabled , inverted and not reversed.
-		if this.FixtureState[Y][X].Enabled && this.FixtureState[Y][X].RGBInverted && !this.FixtureState[Y][X].ScannerPatternReversed && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && sequence.FixtureState[selectedFixture].RGBInverted && !sequence.FixtureState[selectedFixture].ScannerPatternReversed && selectedFixture < sequence.NumberFixtures {
 
 			if debug {
-				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Invert Scanner Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
 
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = false
-			this.FixtureState[Y][X].ScannerPatternReversed = true
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = false
+			newState.ScannerPatternReversed = true
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
@@ -253,27 +317,28 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 		}
 
 		// reverse and invert scanner if we're enabled , inverted and reversed.
-		if this.FixtureState[Y][X].Enabled && !this.FixtureState[Y][X].RGBInverted && this.FixtureState[Y][X].ScannerPatternReversed && X < sequence.NumberFixtures {
+		if sequence.FixtureState[selectedFixture].Enabled && !sequence.FixtureState[selectedFixture].RGBInverted && sequence.FixtureState[selectedFixture].ScannerPatternReversed && selectedFixture < sequence.NumberFixtures {
 
 			if debug {
-				fmt.Printf("Reverse and Invert Scanner Number %d State on Sequence %d to false\n", X, Y)
+				fmt.Printf("Reverse and Invert Scanner Number %d State on Sequence %d to false\n", selectedFixture, selectedSequence)
 			}
-
-			this.FixtureState[Y][X].Enabled = true
-			this.FixtureState[Y][X].RGBInverted = true
-			this.FixtureState[Y][X].ScannerPatternReversed = true
+			newState := common.FixtureState{}
+			newState.Enabled = true
+			newState.RGBInverted = true
+			newState.ScannerPatternReversed = true
+			sequence.FixtureState[selectedFixture] = newState
 
 			// Tell the sequence to invert this scanner.
 			cmd := common.Command{
 				Action: common.ToggleFixtureState,
 				Args: []common.Arg{
-					{Name: "FixtureNumber", Value: X},
-					{Name: "FixtureState", Value: this.FixtureState[Y][X].Enabled},
-					{Name: "FixtureInverted", Value: this.FixtureState[Y][X].RGBInverted},
-					{Name: "FixtureReversed", Value: this.FixtureState[Y][X].ScannerPatternReversed},
+					{Name: "FixtureNumber", Value: selectedFixture},
+					{Name: "FixtureState", Value: sequence.FixtureState[selectedFixture].Enabled},
+					{Name: "FixtureInverted", Value: sequence.FixtureState[selectedFixture].RGBInverted},
+					{Name: "FixtureReversed", Value: sequence.FixtureState[selectedFixture].ScannerPatternReversed},
 				},
 			}
-			common.SendCommandToSequence(Y, cmd, commandChannels)
+			common.SendCommandToSequence(selectedSequence, cmd, commandChannels)
 
 			// If we're a scanner also tell the sequence shutter chaser to invert this fixture.
 			if this.SelectedType == "scanner" {
@@ -286,48 +351,53 @@ func setFixtureStatus(this *CurrentState, Y int, X int, commandChannels []chan c
 
 // Show Scanner status - Dim White is disabled, White is enabled.
 // Uses the >-this<- representation of the fixture status. Not actual sequences which are stored in the threads below us.
-func showFixtureStatus(selectedSequence int, sequenceNumber int, NumberFixtures int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func showFixtureStatus(selectedSequence int, sequence *common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("Show Fixture Status for sequence %d number of fixtures %d\n", sequenceNumber, NumberFixtures)
+		fmt.Printf("Show Fixture Status for sequence %d number of fixtures %d\n", sequence.Number, sequence.NumberFixtures)
 	}
 
 	common.HideSequence(selectedSequence, commandChannels)
 
-	for fixtureNumber := 0; fixtureNumber < NumberFixtures; fixtureNumber++ {
+	for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
+
+		// in version 3.0 We are not supporting fixture status for any more than 8 fixtures.
+		if fixtureNumber > 7 {
+			return
+		}
 
 		if debug {
-			fmt.Printf("Sequence %d: Fixture %d Enabled %t Inverted %t\n", sequenceNumber, fixtureNumber, this.FixtureState[sequenceNumber][fixtureNumber].Enabled, this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted)
+			fmt.Printf("Sequence %d: Fixture %d Enabled %t Inverted %t\n", sequence.Number, fixtureNumber, sequence.FixtureState[fixtureNumber].Enabled, sequence.FixtureState[fixtureNumber].RGBInverted)
 		}
 
 		// Enabled but not inverted then On and green.
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "On", guiButtons)
+		if sequence.FixtureState[fixtureNumber].Enabled && !sequence.FixtureState[fixtureNumber].RGBInverted {
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequence.Number}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(fixtureNumber, sequence.Number, "On", guiButtons)
 		}
 
 		// Enabled and inverted then Invert and puple. Not reversed
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && !this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Purple, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Invert", guiButtons)
+		if sequence.FixtureState[fixtureNumber].Enabled && sequence.FixtureState[fixtureNumber].RGBInverted && !sequence.FixtureState[fixtureNumber].ScannerPatternReversed {
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequence.Number}, colors.Purple, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(fixtureNumber, sequence.Number, "Invert", guiButtons)
 		}
 
 		// Enabled not inverted but revesed then reverse and yellow.
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && !this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Reversed", guiButtons)
+		if sequence.FixtureState[fixtureNumber].Enabled && !sequence.FixtureState[fixtureNumber].RGBInverted && sequence.FixtureState[fixtureNumber].ScannerPatternReversed {
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequence.Number}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(fixtureNumber, sequence.Number, "Reversed", guiButtons)
 		}
 
 		// Enabled  inverted and revesed then reverse and white.
-		if this.FixtureState[sequenceNumber][fixtureNumber].Enabled && this.FixtureState[sequenceNumber][fixtureNumber].RGBInverted && this.FixtureState[sequenceNumber][fixtureNumber].ScannerPatternReversed {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Invert & Reversed", guiButtons)
+		if sequence.FixtureState[fixtureNumber].Enabled && sequence.FixtureState[fixtureNumber].RGBInverted && sequence.FixtureState[fixtureNumber].ScannerPatternReversed {
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequence.Number}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(fixtureNumber, sequence.Number, "Invert & Reversed", guiButtons)
 		}
 
 		// Not enabled and not inverted then off and blue.
-		if !this.FixtureState[sequenceNumber][fixtureNumber].Enabled {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, common.Red, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-			common.LabelButton(fixtureNumber, sequenceNumber, "Off", guiButtons)
+		if !sequence.FixtureState[fixtureNumber].Enabled {
+			common.LightLamp(common.Button{X: fixtureNumber, Y: sequence.Number}, colors.Red, 255, eventsForLaunchpad, guiButtons)
+			common.LabelButton(fixtureNumber, sequence.Number, "Off", guiButtons)
 		}
 
 	}

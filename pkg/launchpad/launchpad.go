@@ -71,12 +71,18 @@ type coordinate struct {
 // launch pad. A channel is used to queue the events to be sent.
 func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad, LaunchPadConnected bool) {
 
+	type PrivateColorMap struct {
+		R     uint8
+		G     uint8
+		B     uint8
+		Flash bool
+	}
 	go func() {
 
-		launchPadMap := make(map[coordinate]common.Color, 81)
+		launchPadMap := make(map[coordinate]PrivateColorMap, 81)
 
 		for key := range launchPadMap {
-			launchPadMap[key] = common.Color{R: 0, G: 0, B: 0}
+			launchPadMap[key] = PrivateColorMap{R: 0, G: 0, B: 0, Flash: false}
 		}
 
 		for {
@@ -89,18 +95,18 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 
 				// What was the lamp previously set too ?
 				whichLamp := coordinate{X: alight.Button.X, Y: alight.Button.Y}
-				storedColor := common.Color{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
+				storedColor := PrivateColorMap{R: launchPadMap[whichLamp].R, G: launchPadMap[whichLamp].G, B: launchPadMap[whichLamp].B, Flash: launchPadMap[whichLamp].Flash}
 
 				// Take into account the brightness. Divide by 2 because launch pad is 1-127.
-				Red := int(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-				Green := int(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
-				Blue := int(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Red := uint8(((float64(alight.Red) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Green := uint8(((float64(alight.Green) / 2) / 100) * (float64(alight.Brightness) / 2.55))
+				Blue := uint8(((float64(alight.Blue) / 2) / 100) * (float64(alight.Brightness) / 2.55))
 
 				// We're in standard turn the light on.
 				if !alight.Flash {
 
 					// If we have this color already don't write again.
-					newColor := common.Color{R: Red, G: Green, B: Blue}
+					newColor := PrivateColorMap{R: Red, G: Green, B: Blue}
 
 					if storedColor != newColor || storedColor.Flash {
 						// Now light the launchpad button.
@@ -126,7 +132,7 @@ func ListenAndSendToLaunchPad(eventsForLauchpad chan common.ALight, pad *pad.Pad
 
 				}
 				// Remember what lamps are light.
-				launchPadMap[coordinate{X: alight.Button.X, Y: alight.Button.Y}] = common.Color{
+				launchPadMap[coordinate{X: alight.Button.X, Y: alight.Button.Y}] = PrivateColorMap{
 					R:     Red,
 					G:     Green,
 					B:     Blue,

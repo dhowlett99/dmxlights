@@ -19,13 +19,13 @@ package editor
 
 import (
 	"fmt"
-	"image/color"
 	"strings"
 
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
 	"fyne.io/fyne/v2/widget"
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
@@ -92,12 +92,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 	ap := ActionPanel{}
 	ap.ActionsList = actionsList
+	// TODO all these options should be set dynamically from fixtureInfo.
 	ap.ActionModeOptions = []string{"None", "Off", "Static", "Chase", "Control"}
 	ap.ActionSizeOptions = []string{"Off", "Short", "Medium", "Long"}
 	ap.ActionFadeOptions = []string{"Off", "Soft", "Normal", "Sharp"}
 	ap.ActionSpeedOptions = []string{"Off", "Slow", "Medium", "Fast", "VeryFast", "Music"}
-	ap.ActionRotateOptions = []string{"Off", "Clockwise", "Anti Clockwise", "Auto"}
-	ap.ActionRotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
+	ap.ActionRotateOptions = fixtureInfo.RotateOptions
+	ap.ActionRotateSpeedOptions = fixtureInfo.RotateSpeedOptions
 	ap.ActionProgramSpeedOptions = []string{"Slow", "Medium", "Fast"}
 	ap.ActionMusicOptions = []string{"Off", "On"}
 	ap.ActionStrobeOptions = []string{"Off", "Slow", "Medium", "Fast"}
@@ -150,16 +151,16 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					widget.NewButton("Select", func() {}),
 
 					container.NewHBox(
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
-						canvas.NewRectangle(color.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
+						canvas.NewRectangle(colors.White),
 					),
 
 					widget.NewRadioGroup(ap.ActionMapOptions, nil),
@@ -236,7 +237,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 				if value == "Static" {
 					hideAllActionFields(o.(*fyne.Container))
-					newAction := createBlankAction(ap, i)
+					newAction := createCopyOfAction(ap, i)
 					newAction.Mode = value
 					ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
@@ -298,8 +299,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
 
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotateSpeed
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotateSpeed
+
+					// If the rotate is set to auto then we need to show the rotate speed.
+					if o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
+						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					}
 
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
@@ -309,7 +316,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
 					} else {
 						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
 					}
 				}
 
@@ -325,12 +332,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
 
-					// Program
-					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
-					// Program Speed
-					o.(*fyne.Container).Objects[ACTIONS_PROGRAM_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_PROGRAM_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					// Program, only show if fixture has a program channel.
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasProgram
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasProgram
+					// Program Speed, only show if fixture has a program speed channel.
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasProgramSpeed
+					o.(*fyne.Container).Objects[ACTIONS_PROGRAM_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasProgramSpeed
 				}
 			}
 
@@ -457,7 +464,7 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				ap.UpdateThisAction = ap.CurrentState
 			}
 
-			// Gobo
+			// Gobo Speed
 			o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].GoboSpeed)
 			o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 				newAction := createCopyOfAction(ap, i)

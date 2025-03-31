@@ -17,47 +17,52 @@
 package common
 
 import (
+	"image/color"
 	"reflect"
 	"testing"
 )
 
 func Test_invertColor(t *testing.T) {
 	type args struct {
-		color Color
+		color color.RGBA
 	}
 	tests := []struct {
 		name    string
 		args    args
-		wantOut Color
+		wantOut color.RGBA
 	}{
 		{
 			name: "invert white",
 			args: args{
-				color: Color{
+				color: color.RGBA{
 					R: 255,
 					G: 255,
 					B: 255,
+					A: 255,
 				},
 			},
-			wantOut: Color{
+			wantOut: color.RGBA{
 				R: 0,
 				G: 0,
 				B: 0,
+				A: 255,
 			},
 		},
 		{
 			name: "invert black",
 			args: args{
-				color: Color{
+				color: color.RGBA{
 					R: 0,
 					G: 0,
 					B: 0,
+					A: 255,
 				},
 			},
-			wantOut: Color{
+			wantOut: color.RGBA{
 				R: 255,
 				G: 255,
 				B: 255,
+				A: 255,
 			},
 		},
 	}
@@ -280,12 +285,12 @@ func TestFindSensitivity(t *testing.T) {
 
 func TestReverseDmx(t *testing.T) {
 	type args struct {
-		n int
+		n uint8
 	}
 	tests := []struct {
 		name string
 		args args
-		want int
+		want uint8
 	}{
 		{
 			name: "Reverse 255",

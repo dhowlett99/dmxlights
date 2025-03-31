@@ -1,4 +1,4 @@
-// Copyright (C) 2022, 2023 dhowlett99.
+// Copyright (C) 2022,2023,2024,2025 dhowlett99.
 // This is the dmxlights common functions.
 //
 // This program is free software: you can redistribute it and/or modify
@@ -23,10 +23,14 @@ import (
 	"strings"
 	"sync"
 	"time"
+
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 )
 
 const debug = false
 
+const NOT_SELECTED = -1
+const VERSION = "3.0"
 const MAX_NUMBER_OF_CHANNELS = 8
 const MAX_DMX_ADDRESS = 512
 const MAX_TEXT_ENTRY_LENGTH = 35
@@ -34,13 +38,19 @@ const DEFAULT_SCANNER_SIZE = 60
 const MAX_SCANNER_SIZE = 127
 const MIN_SPEED = 0
 const MAX_SPEED = 12
-const MIN_RGB_SIZE = 0
-const MAX_RGB_SIZE = 10
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
+const MIN_PROJECTOR_PROGRAM_SPEED = 1
+const MIN_PROJECTOR_ROTATE_SPEED = 1
+const MAX_PROJECTOR_ROTATE_SPEED = 10
+const MIN_PROJECTOR_COLOR = 0
+const MIN_PROJECTOR_GOBO = 1
+const MIN_RGB_SIZE = 0
+const MAX_RGB_SIZE = 10
+const MIN_RGB_FADE = 1
+const MAX_RGB_FADE = 10
 const MAX_SCANNER_SHIFT = 3
 const MIN_SCANNER_SHIFT = 0
-const MAX_RGB_FADE = 10
 const MAX_COLOR_BAR = 9 // Eight colors and a default color bar.
 const MIN_DMX_BRIGHTNESS = 0
 const CENTER_DMX_BRIGHTNESS = 127
@@ -58,11 +68,12 @@ const DEFAULT_SCANNER_COORDNIATES = 0
 const SCANNER_MID_POINT = 127
 const DEFAULT_RGB_FADE_STEPS = 10
 const DEFAULT_STROBE_SPEED = 255
+const MAX_STROBE_SPEED = 255
+const MIN_STROBE_SPEED = 1
 
 const IS_SCANNER = true
 const IS_RGB = false
 
-var DefaultSequenceColors = []Color{{R: 0, G: 255, B: 0}}
 var GlobalScannerSequenceNumber int
 
 var FLOOD_BUTTON = Button{X: 8, Y: 3}
@@ -79,37 +90,59 @@ type Button struct {
 	X int
 	Y int
 }
-type ALight struct {
-	Button           Button
-	Brightness       int
-	Red              int
-	Green            int
-	Blue             int
-	Flash            bool
-	OnColor          Color
-	OffColor         Color
-	UpdateLabel      bool
-	Label            string
-	UpdateStatus     bool
-	Status           string
-	Which            string
-	FlashStopChannel chan bool
-	Hidden           bool
+
+type ColorDisplayControl struct {
+	Red     bool
+	Orange  bool
+	Yellow  bool
+	Green   bool
+	Cyan    bool
+	Blue    bool
+	Purple  bool
+	Magenta bool
+
+	Crimson     bool
+	DarkOrange  bool
+	Gold        bool
+	ForestGreen bool
+	Aqua        bool
+	SkyBlue     bool
+	DarkPurple  bool
+	Pink        bool
+
+	Salmon      bool
+	LightOrange bool
+	Olive       bool
+	LawnGreen   bool
+	Teal        bool
+	LightBlue   bool
+	Violet      bool
+	White       bool
 }
 
-type Color struct {
-	R     int
-	G     int
-	B     int
-	W     int
-	A     int
-	UV    int
-	Flash bool
+type ALight struct {
+	Button              Button
+	Brightness          int
+	Red                 uint8
+	Green               uint8
+	Blue                uint8
+	Flash               bool
+	OnColor             color.RGBA
+	OffColor            color.RGBA
+	UpdateLabel         bool
+	Label               string
+	UpdateStatus        bool
+	Status              string
+	Which               string
+	FlashStopChannel    chan bool
+	Hidden              bool
+	ColorDisplay        bool
+	ColorDisplayControl ColorDisplayControl
 }
 
 // Used for static fades, remember the last color.
 type LastColor struct {
-	RGBColor     Color
+	RGBColor     color.RGBA
 	ScannerColor int
 }
 
@@ -117,15 +150,15 @@ type ColorPicker struct {
 	Name  string
 	ID    int
 	Code  byte // Launchpad hex code for this color
-	Color Color
+	Color color.RGBA
 	X     int
 	Y     int
 }
 
 // Used in calculating Positions.
 type FixtureBuffer struct {
-	BaseColor    Color
-	Color        Color
+	BaseColor    color.RGBA
+	Color        color.RGBA
 	MasterDimmer int
 	Brightness   int
 	Gobo         int
@@ -196,6 +229,78 @@ type Switch struct {
 	MiniSequencerRunning bool
 	Blackout             bool
 	Master               int
+	Selected             bool
+	Override             Override
+}
+
+type Override struct {
+
+	// Currents action modes are mini sequencer - Off ,Static, Control, Chase and for the mini setter - Setting.
+	Mode string
+
+	// Shutter
+	IsShutterOverrideAble bool
+	Shutter               bool
+
+	// Strobe
+	IsStrobeOverrideAble         bool
+	Strobe                       bool // On / Off
+	StrobeSpeed                  int  // Index into strobe speed settings
+	AvailableStrobeSpeedChannels []string
+	MaxStrobeSpeeds              int
+
+	// RGB / Scanner Speed
+	IsSpeedOverrideAble bool
+	OverrideSpeed       bool
+	Speed               int
+	MaxSpeeds           int
+
+	// Program Speed
+	IsProgramSpeedOverrideAble    bool
+	OverrideProgramSpeed          bool
+	ProgramSpeed                  int
+	AvailableProgramSpeedChannels []string
+	MaxProgramSpeeds              int
+
+	// Shift
+	OverrideShift bool
+	Shift         int
+
+	// Size
+	OverrideSize bool
+	Size         int
+
+	// Fade
+	OverrideFade bool
+	Fade         int
+
+	// Rotate
+	IsRotateOverrideAble   bool
+	OverrideRotateSpeed    bool
+	Rotate                 int
+	RotateName             string
+	RotateChannels         []string
+	MaxRotateSpeedChannels int
+	MaxRotateSpeed         int
+
+	// Colors
+	HasRGBChannels      bool
+	HasColorChannel     bool
+	IsColorOverrideAble bool
+	OverrideColors      bool
+	AvailableColors     []color.RGBA
+	AvailableColorNames []string
+	Color               int
+	MaxColors           int
+	ColorName           string
+
+	// Gobo
+	IsGoboOverrideAble bool
+	OverrideGobo       bool
+	Gobo               int
+	MaxGobos           int
+	AvailableGobos     []string
+	GoboName           string
 }
 
 type StaticColorButton struct {
@@ -205,12 +310,13 @@ type StaticColorButton struct {
 	X                int
 	Y                int
 	SelectedSequence int
-	Color            Color
+	Color            color.RGBA
 	SelectedColor    int
 	Flash            bool
 	Setting          int
 	FirstPress       bool
 	Enabled          bool
+	//NumberOfGobos    int
 }
 
 type FixtureState struct {
@@ -220,13 +326,10 @@ type FixtureState struct {
 }
 
 type Pattern struct {
-	Name     string
-	Label    string
-	Number   int
-	Length   int // 8, 4 or 2
-	Size     int
-	Fixtures int    // 8 Fixtures
-	Steps    []Step `json:"-"` // Don't save the steps as they can be very large.
+	Name   string // Pattern Name
+	Label  string // Pattern Label
+	Number int    // Pattern Number
+	Steps  []Step `json:"-"` // Don't save the steps as they can be very large.
 }
 
 type Arg struct {
@@ -261,19 +364,31 @@ const (
 	Stop
 	StopChase
 	ReadConfig
-	LoadConfig
+	LoadPreset
 	UpdateSpeed
 	UpdatePattern
 	UpdateRGBFadeSpeed
 	UpdateRGBSize
+	UpdateRotateSpeed
+	UpdateColors
+	UpdateGobos
 	UpdateScannerSize
 	Blackout
 	Normal
-	UpdateColor
+	LoadNewFixtures
 	UpdateFunctions
 	GetUpdatedSequence
 	ResetAllSwitchPositions
 	UpdateSwitch
+	OverrideSpeed
+	OverrideProgramSpeed
+	OverrideShift
+	OverrideSize
+	OverrideFade
+	OverrideRotateSpeed
+	OverrideColor
+	OverrideGobo
+	OverrideStrobe
 	Inverted
 	UpdateGobo
 	Flood
@@ -284,6 +399,8 @@ const (
 	UpdateAutoPattern
 	ToggleFixtureState
 	UpdateRGBShift
+	InvertAllFixtures
+	EnableAllFixtures
 	UpdateRGBInvert
 	UpdateScannerShift
 	UpdateScannerColor
@@ -306,47 +423,13 @@ const (
 // 13 fade up values, 13 on values and 13 off values.
 const StepSize = 39
 
-var Black = Color{R: 0, G: 0, B: 0}
-var Red = Color{R: 255, G: 0, B: 0}
-var QuarterRed = Color{R: 50, G: 0, B: 0}
-var Green = Color{R: 0, G: 255, B: 0}
-var QuarterGreen = Color{R: 0, G: 50, B: 0}
-var Blue = Color{R: 0, G: 0, B: 255}
-var QuarterBlue = Color{R: 0, G: 0, B: 50}
-var PresetYellow = Color{R: 150, G: 150, B: 0}
-var Cyan = Color{R: 0, G: 255, B: 255}
-var Yellow = Color{R: 255, G: 255, B: 0}
-var QuarterYellow = Color{R: 50, G: 50, B: 0}
-var Orange = Color{R: 255, G: 111, B: 0}
-var Magenta = Color{R: 255, G: 0, B: 255}
-
-var Crimson = Color{R: 220, G: 20, B: 60}
-var DarkOrange = Color{R: 215, G: 50, B: 0}
-var Gold = Color{R: 255, G: 215, B: 0}
-var ForestGreen = Color{R: 0, G: 100, B: 0}
-var Aqua = Color{R: 127, G: 255, B: 212}
-var SkyBlue = Color{R: 0, G: 191, B: 255}
-var Purple = Color{R: 100, G: 0, B: 255}
-var DarkPurple = Color{R: 50, G: 0, B: 255}
-
-var Pink = Color{R: 255, G: 192, B: 203}
-var Salmon = Color{R: 250, G: 128, B: 114}
-var LightOrange = Color{R: 255, G: 175, B: 0}
-var Olive = Color{R: 150, G: 150, B: 0}
-var LawnGreen = Color{R: 124, G: 252, B: 0}
-var Teal = Color{R: 0, G: 128, B: 128}
-var LightBlue = Color{R: 100, G: 185, B: 255}
-var Violet = Color{R: 199, G: 21, B: 133}
-var White = Color{R: 255, G: 255, B: 255}
-var EmptyColor = Color{}
-
 type Gobo struct {
 	Name    string
 	Label   string
 	Number  int
 	Setting int
 	Flash   bool
-	Color   Color
+	Color   color.RGBA
 }
 
 // Sequence describes sequences.
@@ -355,7 +438,10 @@ type Sequence struct {
 	Label                       string                      // Sequence label.
 	Description                 string                      // Sequence description.
 	Number                      int                         // Sequence number.
+	ChaserSequenceNumber        int                         // Chaser Sequence Number.
+	ScannerSequenceNumber       int                         // Scanner Sequence Number.
 	Run                         bool                        // True if this sequence is running.
+	SavedRun                    bool                        // Place to save state when loading.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.
 	Hidden                      bool                        // Hidden is used to indicate sequence buttons are not visible.
@@ -372,9 +458,7 @@ type Sequence struct {
 	ChangeMusicTrigger          bool                        // true when we change the state of the music trigger.
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
-	CurrentColors               []Color                     // Storage for the colors in a sequence.
-	SequenceColors              []Color                     // Temporay storage for changing sequence colors.
-	Color                       int                         // Index into current sequnece colors.
+	SequenceColors              []color.RGBA                // Temporay storage for changing sequence colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures              int                         // Total Number of fixtures for this sequence.
@@ -384,6 +468,7 @@ type Sequence struct {
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
+	RGBAvailablePatterns        []Pattern                   // Available RGB Patterns. Index by pattern number.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUp                      []int                       // Fade up values.
 	FadeOn                      []int                       // Fade on values.
@@ -391,17 +476,23 @@ type Sequence struct {
 	FadeOff                     []int                       // Fade off values.
 	RGBFade                     int                         // RGB Fade time
 	RGBSize                     int                         // RGB Fade size
-	SavedSequenceColors         []Color                     // Used for updating the color in a sequence.
+	SavedSequenceColors         []color.RGBA                // Used for updating the color in a sequence.
 	RecoverSequenceColors       bool                        // Storage for recovering sequence colors, when you come out of automatic color change.
 	SaveColors                  bool                        // Indicate we should save colors in this sequence. used for above.
-	Mode                        string                      // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	Chase                       bool                        // Tells sequnece if we're in sequence (chase) or static (static colors) mode.
+	SaveChase                   bool                        // Save the state of chase in flood.
 	StaticColors                []StaticColorButton         // Used in static color editing
 	Clear                       bool                        // Clear all fixtures in this sequence.
+	LoadNewFixtures             bool                        // Load all fixtures for this sequence.
+	LoadPatterns                bool                        // Load RGB Patterns for this sequence.
 	Static                      bool                        // We're a static sequence.
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
+	Override                    bool                        // Override a switch.
 	PlaySingleSwitch            bool                        // Play a single switch.
+	StepSwitch                  bool                        // Step the switch if true.
+	FocusSwitch                 bool                        // Focus the switch.
 	StaticFadeUpOnce            bool                        // Only Fade up once, used for don't fade during color config operations.
 	StaticLampsOn               bool                        // Show the static scene on the lamps, but don't send anything to the DMX universe.
 	StartFlood                  bool                        // We're in flood mode.
@@ -428,16 +519,17 @@ type Sequence struct {
 	ScannerOffsetPan            int                         // Offset for pan values.
 	ScannerOffsetTilt           int                         // Offset for tilt values.
 	FixtureState                map[int]FixtureState        // Map of fixtures which are disabled.
-	DisableOnceMutex            *sync.RWMutex               // Lock to protect DisableOnce.
 	DisableOnce                 map[int]bool                // Map used to play disable only once.
 	UpdateSize                  bool                        // Command to update size.
 	UpdateShift                 bool                        // Command to update the shift.
-	UpdatePattern               bool                        // Flag to indicate we're going to change the RGB pattern.
-	UpdateSequenceColor         bool                        // Command to update the sequence colors.
-	Switches                    map[int]Switch              // A switch sequence stores its data in here.
+	StartPattern                bool                        // Flag to indicate we're going to start the pattern.
+	NewPattern                  bool                        // Flag to indicate we are selecting a new pattern.
+	UpdateColors                bool                        // Command to update the sequence colors.
+	Switches                    []Switch                    // A switch sequence stores its data in here. Indexed by switch number.
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
+	LastSwitchSelected          int                         // Storage for the last selected switch.
 }
 
 type Function struct {
@@ -462,6 +554,7 @@ type SwitchChannel struct {
 	StopFadeDown    chan bool
 	StopFadeUp      chan bool
 	KeepRotateAlive chan bool
+	CommandChannel  chan Command
 }
 
 type Hit struct {
@@ -476,13 +569,15 @@ type Step struct {
 }
 
 type FixtureCommand struct {
+	Stop bool
+
 	Step           int
 	NumberSteps    int
 	Type           string
 	Label          string
 	SequenceNumber int
 	FixtureState   FixtureState
-	LastColor      Color
+	LastColor      color.RGBA
 
 	// Common commands.
 	Hidden         bool
@@ -508,7 +603,6 @@ type FixtureCommand struct {
 	// Scanner Commands.
 	ScannerColor             int
 	ScannerPosition          Position
-	ScannerDisableOnce       bool
 	ScannerChaser            bool
 	ScannerAvailableColors   []StaticColorButton
 	ScannerGobo              int
@@ -516,7 +610,6 @@ type FixtureCommand struct {
 	ScannerOffsetTilt        int
 	ScannerNumberCoordinates int
 	ScannerShutterPositions  map[int]Position
-	ScannerHasShutterChase   bool
 
 	// Derby Commands
 	Rotate  int
@@ -524,9 +617,11 @@ type FixtureCommand struct {
 	Program int
 
 	// Switch Commands
-	SwitchData         Switch
+	CurrentSwitch      int
+	SwiTch             Switch
 	State              State
 	CurrentSwitchState int
+	Override           Override
 }
 
 type Position struct {
@@ -538,25 +633,26 @@ type Position struct {
 // following, depending if its a light or
 // a scanner.
 type Fixture struct {
-	ID           string
-	Number       int
-	Name         string
-	Label        string
-	MasterDimmer int
-	Brightness   int
-	ScannerColor Color
-	BaseColor    Color
-	Color        Color
-	Pan          int
-	Tilt         int
-	Shutter      int
-	Rotate       int
-	Music        int
-	Gobo         int
-	Program      int
-	Enabled      bool
-	Inverted     bool
-	State        int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
+	ID             string
+	Number         int
+	Name           string
+	Label          string
+	MasterDimmer   int
+	Brightness     int
+	ScannerColor   color.RGBA
+	BaseColor      color.RGBA
+	HasRGBChannels bool
+	Color          color.RGBA
+	Pan            int
+	Tilt           int
+	Shutter        int
+	Rotate         int
+	Music          int
+	Gobo           int
+	Program        int
+	Enabled        bool
+	Inverted       bool
+	State          int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
 }
 
 type ButtonPresets struct {
@@ -573,8 +669,8 @@ type Event struct {
 	Fadedown  bool
 	Shift     int
 	FadeTime  time.Duration
-	LastColor Color
-	Color     Color
+	LastColor color.RGBA
+	Color     color.RGBA
 }
 
 type Trigger struct {
@@ -606,6 +702,7 @@ func SendCommandToAllSequence(command Command, commandChannels []chan Command) {
 	commandChannels[2] <- command
 	commandChannels[3] <- command
 	commandChannels[4] <- command
+
 }
 
 func SendCommandToAllSequenceOfType(sequences []*Sequence, command Command, commandChannels []chan Command, Type string) {
@@ -657,254 +754,308 @@ func StartStaticSequences(sequences []*Sequence, commandChannels []chan Command)
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and
 // returns the color array
-func GetColorButtonsArray(color int) Color {
+func GetColorButtonsArray(colorIn int) color.RGBA {
 
-	switch color {
+	switch colorIn {
 	case 0:
-		return Red
+		return colors.Red
 	case 1:
-		return Orange
+		return colors.Orange
 	case 2:
-		return Yellow
+		return colors.Yellow
 	case 3:
-		return Green
+		return colors.Green
 	case 4:
-		return Cyan
+		return colors.Cyan
 	case 5:
-		return Blue
+		return colors.Blue
 	case 6:
-		return Purple
+		return colors.Purple
 	case 7:
-		return Magenta
+		return colors.Magenta
 	case 8:
-		return White
+		return colors.White
 	case 9:
-		return Black
+		return colors.Black
 	case 10:
-		return Red
+		return colors.Red
 	case 11:
-		return Orange
+		return colors.Orange
 	case 12:
-		return Yellow
+		return colors.Yellow
 	case 13:
-		return Green
+		return colors.Green
 	case 14:
-		return Cyan
+		return colors.Cyan
 	case 15:
-		return Blue
+		return colors.Blue
 	case 16:
-		return Purple
+		return colors.Purple
 	case 17:
-		return Magenta
+		return colors.Magenta
 	case 18:
-		return White
+		return colors.White
 	case 19:
-		return Black
+		return colors.Black
 	case 20:
-		return Red
+		return colors.Red
 	case 21:
-		return Orange
+		return colors.Orange
 	case 22:
-		return Yellow
+		return colors.Yellow
 	case 23:
-		return Green
+		return colors.Green
 	case 24:
-		return Cyan
+		return colors.Cyan
 	case 25:
-		return Blue
+		return colors.Blue
 	case 26:
-		return Purple
+		return colors.Purple
 	case 27:
-		return Magenta
+		return colors.Magenta
 	case 28:
-		return White
+		return colors.White
 	case 29:
-		return Black
+		return colors.Black
 	case 30:
-		return Red
+		return colors.Red
 	case 31:
-		return Orange
+		return colors.Orange
 	case 32:
-		return Yellow
+		return colors.Yellow
 	case 33:
-		return Green
+		return colors.Green
 	case 34:
-		return Cyan
+		return colors.Cyan
 	case 35:
-		return Blue
+		return colors.Blue
 	case 36:
-		return Purple
+		return colors.Purple
 	case 37:
-		return Magenta
+		return colors.Magenta
 	case 38:
-		return White
+		return colors.White
 	case 39:
-		return Black
+		return colors.Black
 	case 40:
-		return Red
+		return colors.Red
 	case 41:
-		return Orange
+		return colors.Orange
 	case 42:
-		return Yellow
+		return colors.Yellow
 	case 43:
-		return Green
+		return colors.Green
 	case 44:
-		return Cyan
+		return colors.Cyan
 	case 45:
-		return Blue
+		return colors.Blue
 	case 46:
-		return Purple
+		return colors.Purple
 	case 47:
-		return Magenta
+		return colors.Magenta
 	case 48:
-		return White
+		return colors.White
 	case 49:
-		return Black
+		return colors.Black
 	case 50:
-		return Red
+		return colors.Red
 	case 51:
-		return Orange
+		return colors.Orange
 	case 52:
-		return Yellow
+		return colors.Yellow
 	case 53:
-		return Green
+		return colors.Green
 	case 54:
-		return Cyan
+		return colors.Cyan
 	case 55:
-		return Blue
+		return colors.Blue
 	case 56:
-		return Purple
+		return colors.Purple
 	case 57:
-		return Magenta
+		return colors.Magenta
 	case 58:
-		return White
+		return colors.White
 	case 59:
-		return Black
+		return colors.Black
 	case 60:
-		return Red
+		return colors.Red
 	case 61:
-		return Orange
+		return colors.Orange
 	case 62:
-		return Yellow
+		return colors.Yellow
 	case 63:
-		return Green
+		return colors.Green
 	case 64:
-		return Cyan
+		return colors.Cyan
 	case 65:
-		return Blue
+		return colors.Blue
 	case 66:
-		return Purple
+		return colors.Purple
 	case 67:
-		return Magenta
+		return colors.Magenta
 	case 68:
-		return White
+		return colors.White
 	case 69:
-		return Black
+		return colors.Black
 	}
-	return Color{}
+
+	return color.RGBA{}
 }
 
-func GetColorArrayByNames(names []string) ([]Color, error) {
+func GetColorArrayByNames(names []string) ([]color.RGBA, error) {
 
-	colors := []Color{}
+	if debug {
+		fmt.Printf("GetColorArrayByNames: names are %+v\n", names)
+	}
+
+	colors := []color.RGBA{}
 	for _, color := range names {
 		// Find the color by name from the library of supported colors.
-		colorLibrary, err := GetRGBColorByName(color)
-		if err != nil {
-			return colors, err
-		}
+		colorLibrary := GetRGBColorByName(color)
 		newColor := colorLibrary
 
 		// Add the color to the chase colors.
 		colors = append(colors, newColor)
 	}
+
+	if debug {
+		fmt.Printf("GetColorArrayByNames: colors are %+v\n", colors)
+	}
 	return colors, nil
 }
 
-// Convert my common.Color RGB into color.NRGBA used by the fyne.io GUI library.
-func ConvertRGBtoNRGBA(alight Color) color.NRGBA {
-	NRGBAcolor := color.NRGBA{}
-	NRGBAcolor.R = uint8(alight.R)
-	NRGBAcolor.G = uint8(alight.G)
-	NRGBAcolor.B = uint8(alight.B)
-	NRGBAcolor.A = 255
-	return NRGBAcolor
+// Convert my common.Color RGB into color.RGBA used by the fyne.io GUI library.
+func ConvertRGBtoRGBA(alight color.RGBA) color.RGBA {
+	RGBAcolor := color.RGBA{}
+	RGBAcolor.R = uint8(alight.R)
+	RGBAcolor.G = uint8(alight.G)
+	RGBAcolor.B = uint8(alight.B)
+	RGBAcolor.A = 255
+	return RGBAcolor
 }
 
-func GetRGBColorByName(color string) (Color, error) {
-	switch color {
+func GetRGBColorByName(colorIn string) color.RGBA {
+
+	if debug {
+		fmt.Printf("Looking for color %s\n", colorIn)
+	}
+
+	switch colorIn {
+
+	case "Unknown":
+		return colors.White
+
 	case "Red":
-		return Red, nil
+		return colors.Red
 
 	case "Orange":
-		return Orange, nil
+		return colors.Orange
 
 	case "Yellow":
-		return Yellow, nil
+		return colors.Yellow
+
+	case "Magenta":
+		return colors.Magenta
 
 	case "Green":
-		return Green, nil
+		return colors.Green
 
 	case "Cyan":
-		return Cyan, nil
+		return colors.Cyan
 
 	case "Blue":
-		return Blue, nil
+		return colors.Blue
 
 	case "Purple":
-		return Purple, nil
+		return colors.Purple
 
 	case "Pink":
-		return Pink, nil
+		return colors.Pink
 
 	case "White":
-		return White, nil
+		return colors.White
 
 	case "Light Blue":
-		return LightBlue, nil
+		return colors.LightBlue
 
 	case "Black":
-		return Black, nil
+		return colors.Black
 
+	default:
+		return colors.White
 	}
-	return Color{}, fmt.Errorf("GetRGBColorByName: color not found: %s", color)
 }
 
-func GetColorNameByRGB(color Color) string {
-	switch color {
-	case LightBlue:
-		return "Light Blue"
-	case Red:
+func GetColorNameByRGB(colorIn color.RGBA) string {
+	switch colorIn {
+	case colors.LightBlue:
+		return "LightBlue"
+	case colors.Red:
 		return "Red"
-	case Orange:
+	case colors.Orange:
 		return "Orange"
-	case Yellow:
+	case colors.Yellow:
 		return "Yellow"
-	case Green:
+	case colors.Green:
 		return "Green"
-	case Cyan:
+	case colors.Cyan:
 		return "Cyan"
-	case Blue:
+	case colors.Blue:
 		return "Blue"
-	case Purple:
+	case colors.Purple:
 		return "Purple"
-	case Pink:
+	case colors.Pink:
 		return "Pink"
-	case White:
+	case colors.Magenta:
+		return "Magenta"
+
+	case colors.Crimson:
+		return "Crimson"
+	case colors.DarkOrange:
+		return "DarkOrange"
+	case colors.Gold:
+		return "Gold"
+	case colors.ForestGreen:
+		return "ForestGreen"
+	case colors.Aqua:
+		return "Aqua"
+	case colors.SkyBlue:
+		return "SkyBlue"
+	case colors.DarkPurple:
+		return "DarkPurple"
+	case colors.Pink:
+		return "Pink"
+
+	case colors.Salmon:
+		return "Salmon"
+	case colors.LightOrange:
+		return "LightOrange"
+	case colors.Olive:
+		return "Olive"
+	case colors.LawnGreen:
+		return "LawnGreen"
+	case colors.Teal:
+		return "Teal"
+	case colors.LightBlue:
+		return "LightBlue"
+	case colors.Violet:
+		return "Violet"
+	case colors.White:
 		return "White"
-	case Black:
+
+	case colors.Black:
 		return "Black"
 	}
 
 	return "White"
 }
 
-func HowManyColorsInSteps(steps []Step) (colors []Color) {
+func HowManyColorsInSteps(steps []Step) (colors []color.RGBA) {
 
 	if debug {
 		fmt.Printf("HowManyColorsInSteps \n")
 	}
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.RGBA]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -923,9 +1074,9 @@ func HowManyColorsInSteps(steps []Step) (colors []Color) {
 	return colors
 }
 
-func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
+func HowManyColorsInPositions(positionsMap map[int]Position) (colors []color.RGBA) {
 
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.RGBA]bool)
 	for _, position := range positionsMap {
 		for _, fixture := range position.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -941,9 +1092,9 @@ func HowManyColorsInPositions(positionsMap map[int]Position) (colors []Color) {
 	return colors
 }
 
-func HowManyStepColors(steps []Step) (colors []Color) {
+func HowManyStepColors(steps []Step) (colors []color.RGBA) {
 
-	colorMap := make(map[Color]bool)
+	colorMap := make(map[color.RGBA]bool)
 	for _, step := range steps {
 		for _, fixture := range step.Fixtures {
 			if fixture.Color.R > 0 || fixture.Color.G > 0 || fixture.Color.B > 0 {
@@ -958,24 +1109,6 @@ func HowManyStepColors(steps []Step) (colors []Color) {
 
 	if debug {
 		fmt.Printf("HowManyStepColors %d\n", len(colors))
-	}
-
-	return colors
-}
-
-func HowManyScannerColors(positionsMap map[int]Position) (colors []Color) {
-
-	colorMap := make(map[Color]bool)
-	for _, positionMap := range positionsMap {
-		fixtureLen := len(positionMap.Fixtures)
-		for fixtureNumber := 0; fixtureNumber < fixtureLen; fixtureNumber++ {
-			fixture := positionMap.Fixtures[fixtureNumber]
-			colorMap[fixture.Color] = true
-		}
-	}
-
-	for color := range colorMap {
-		colors = append(colors, color)
 	}
 
 	return colors
@@ -1015,8 +1148,8 @@ func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchp
 
 		if staticColorButton.Enabled {
 			if staticColorButton.Flash || staticFlashing {
-				onColor := Color{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
-				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, Black, eventsForLaunchpad, guiButtons)
+				onColor := color.RGBA{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, colors.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)
 			}
@@ -1033,7 +1166,7 @@ func ClearSelectedRowOfButtons(selectedSequence int, eventsForLauchpad chan ALig
 		return
 	}
 	for x := 0; x < 8; x++ {
-		LightLamp(Button{X: x, Y: selectedSequence}, Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+		LightLamp(Button{X: x, Y: selectedSequence}, colors.Black, MIN_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		LabelButton(x, selectedSequence, "", guiButtons)
 	}
 }
@@ -1047,131 +1180,20 @@ func ClearLabelsSelectedRowOfButtons(selectedSequence int, guiButtons chan ALigh
 	}
 }
 
-func ShowTopButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
-	type topButton struct {
-		Label string
-		Color Color
-	}
-	// Storage for the rgb labels on the top row.
-	var guiTopRGBButtons [8]topButton
-	guiTopRGBButtons[0] = topButton{Label: "CLEAR", Color: Magenta}
-	guiTopRGBButtons[1] = topButton{Label: "RED", Color: Red}
-	guiTopRGBButtons[2] = topButton{Label: "GREEN", Color: Green}
-	guiTopRGBButtons[3] = topButton{Label: "BLUE", Color: Blue}
-	guiTopRGBButtons[4] = topButton{Label: "SENS -", Color: Cyan}
-	guiTopRGBButtons[5] = topButton{Label: "SENS +", Color: Cyan}
-	guiTopRGBButtons[6] = topButton{Label: "MAST -", Color: Cyan}
-	guiTopRGBButtons[7] = topButton{Label: "MAST +", Color: Cyan}
-
-	// Storage for the scanner labels on the Top row.
-	var guiTopScannerButtons [8]topButton
-	guiTopScannerButtons[0] = topButton{Label: "CLEAR.^", Color: White}
-	guiTopScannerButtons[1] = topButton{Label: "V", Color: White}
-	guiTopScannerButtons[2] = topButton{Label: "<", Color: White}
-	guiTopScannerButtons[3] = topButton{Label: ">", Color: White}
-	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: Cyan}
-	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: Cyan}
-	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: Cyan}
-	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: Cyan}
-
-	//  The Top row of the Novation Launchpad.
-	TopRow := -1
-
-	if tYpe == "rgb" {
-		// Loop through the available functions for this sequence
-		for index, button := range guiTopRGBButtons {
-			if debug {
-				fmt.Printf("button %+v\n", button)
-			}
-			LightLamp(Button{X: index, Y: TopRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(index, TopRow, button.Label, guiButtons)
-		}
-	}
-	if tYpe == "scanner" {
-		// Loop through the available functions for this sequence
-		for index, button := range guiTopScannerButtons {
-			if debug {
-				fmt.Printf("button %+v\n", button)
-			}
-			LightLamp(Button{X: index, Y: TopRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(index, TopRow, button.Label, guiButtons)
-		}
-	}
-}
-
-func ShowBottomButtons(tYpe string, eventsForLauchpad chan ALight, guiButtons chan ALight) {
-
-	if debug {
-		fmt.Printf("ShowBottomButtons\n")
-	}
-
-	type bottonButton struct {
-		Label string
-		Color Color
-	}
-
-	// Storage for the rgb labels on the bottom row.
-	var guiBottomRGBButtons [8]bottonButton
-	guiBottomRGBButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
-	guiBottomRGBButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
-	guiBottomRGBButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
-	guiBottomRGBButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
-	guiBottomRGBButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
-	guiBottomRGBButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomRGBButtons[6] = bottonButton{Label: "Fade\nSoft", Color: Cyan}
-	guiBottomRGBButtons[7] = bottonButton{Label: "Fade\nSharp", Color: Cyan}
-
-	// Storage for the scanner labels on the bottom row.
-	var guiBottomScannerButtons [8]bottonButton
-	guiBottomScannerButtons[0] = bottonButton{Label: "Speed\nDown", Color: Cyan}
-	guiBottomScannerButtons[1] = bottonButton{Label: "Speed\nUp", Color: Cyan}
-	guiBottomScannerButtons[2] = bottonButton{Label: "Shift\nDown", Color: Cyan}
-	guiBottomScannerButtons[3] = bottonButton{Label: "Shift\nUp", Color: Cyan}
-	guiBottomScannerButtons[4] = bottonButton{Label: "Size\nDown", Color: Cyan}
-	guiBottomScannerButtons[5] = bottonButton{Label: "Size\nUp", Color: Cyan}
-	guiBottomScannerButtons[6] = bottonButton{Label: "Coord\nDown", Color: Cyan}
-	guiBottomScannerButtons[7] = bottonButton{Label: "Coord\nUp", Color: Cyan}
-
-	//  The bottom row of the Novation Launchpad.
-	bottomRow := 7
-
-	if tYpe == "rgb" {
-		// Loop through the available functions for this sequence
-		for index, button := range guiBottomRGBButtons {
-			if debug {
-				fmt.Printf("button %+v\n", button)
-			}
-			LightLamp(Button{X: index, Y: bottomRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(index, bottomRow, button.Label, guiButtons)
-		}
-	}
-	if tYpe == "scanner" {
-		// Loop through the available functions for this sequence
-		for index, button := range guiBottomScannerButtons {
-			if debug {
-				fmt.Printf("button %+v\n", button)
-			}
-			LightLamp(Button{X: index, Y: bottomRow}, button.Color, MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			LabelButton(index, bottomRow, button.Label, guiButtons)
-		}
-	}
-}
-
 func ShowRunningStatus(runningState bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if runningState {
-		LightLamp(RUNNING_BUTTON, Green, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		LightLamp(RUNNING_BUTTON, colors.Green, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	} else {
-		LightLamp(RUNNING_BUTTON, White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		LightLamp(RUNNING_BUTTON, colors.White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	}
 }
 
 func ShowStrobeButtonStatus(state bool, eventsForLaunchpad chan ALight, guiButtons chan ALight) {
 	if state {
-		FlashLight(STROBE_BUTTON, White, Magenta, eventsForLaunchpad, guiButtons)
+		FlashLight(STROBE_BUTTON, colors.White, colors.Magenta, eventsForLaunchpad, guiButtons)
 		return
 	}
-	LightLamp(STROBE_BUTTON, White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	LightLamp(STROBE_BUTTON, colors.White, MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 }
 
 func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
@@ -1191,7 +1213,7 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 }
 
 // LightOn Turn on a Light.
-func LightLamp(button Button, color Color, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func LightLamp(button Button, color color.RGBA, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
 		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", button.X, button.Y, color.R, color.G, color.B, master)
 	}
@@ -1221,6 +1243,91 @@ func LightLamp(button Button, color Color, master int, eventsForLauchpad chan AL
 	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
 }
 
+func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
+	if debug {
+		fmt.Printf("UpdateColorDisplay: control %+v\n", control)
+	}
+	event := ALight{
+		ColorDisplay:        true,
+		ColorDisplayControl: control,
+	}
+	guiButtons <- event // Event will be received by dmxlights.go by pkg/gui/gui.go ListenAndSendToGUI()
+}
+
+// GetColorList takes an array of colors and creates a ControlDisplayControl object which has the colors selected inside it.
+func GetColorList(colors []color.RGBA) ColorDisplayControl {
+
+	if debug {
+		fmt.Printf("GetColorList Colors=%+v\n", colors)
+	}
+
+	control := ColorDisplayControl{}
+
+	for _, color := range colors {
+		found := GetColorNameByRGB(color)
+		switch {
+		case found == "Red":
+			control.Red = true
+		case found == "Orange":
+			control.Orange = true
+		case found == "Yellow":
+			control.Yellow = true
+		case found == "Green":
+			control.Green = true
+		case found == "Cyan":
+			control.Cyan = true
+		case found == "Blue":
+			control.Blue = true
+		case found == "Purple":
+			control.Purple = true
+		case found == "Magenta":
+			control.Magenta = true
+
+		case found == "Crimson":
+			control.Crimson = true
+		case found == "DarkOrange":
+			control.DarkOrange = true
+		case found == "Gold":
+			control.Gold = true
+		case found == "ForestGreen":
+			control.ForestGreen = true
+		case found == "Aqua":
+			control.Aqua = true
+		case found == "SkyBlue":
+			control.SkyBlue = true
+		case found == "DarkPurple":
+			control.DarkPurple = true
+		case found == "Pink":
+			control.Pink = true
+
+		case found == "Salmon":
+			control.Salmon = true
+		case found == "LightOrange":
+			control.LightOrange = true
+		case found == "Olive":
+			control.Olive = true
+		case found == "LawnGreen":
+			control.LawnGreen = true
+		case found == "Teal":
+			control.Teal = true
+		case found == "LightBlue":
+			control.LightBlue = true
+		case found == "Violet":
+			control.Violet = true
+		case found == "White":
+			control.White = true
+		}
+
+	}
+
+	if debug {
+		fmt.Printf("GetColorList Control=%+v\n", control)
+	}
+
+	return control
+
+}
+
 func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALight) {
 	// Send message to fyne.io GUI.
 	event := ALight{
@@ -1232,29 +1339,14 @@ func UpdateStatusBar(status string, which string, hide bool, guiButtons chan ALi
 	guiButtons <- event
 }
 
-func UpdateBottomButtons(selectedType string, guiButtons chan ALight) {
-
-	LabelButton(0, 7, "Speed\nDown", guiButtons)
-	LabelButton(1, 7, "Speed\nUp", guiButtons)
-
-	LabelButton(2, 7, "Shift\nDown", guiButtons)
-	LabelButton(3, 7, "Shift\nUp", guiButtons)
-
-	LabelButton(4, 7, "Size\nDown", guiButtons)
-	LabelButton(5, 7, "Size\nUp", guiButtons)
-
-	if selectedType == "rgb" {
-		LabelButton(6, 7, "Fade\nSoft", guiButtons)
-		LabelButton(7, 7, "Fade\nSharp", guiButtons)
-	}
-
-	if selectedType == "scanner" {
-		LabelButton(6, 7, "Coord\nDown", guiButtons)
-		LabelButton(7, 7, "Coord\nUp", guiButtons)
-	}
+func ClearBottomStatusBar(guiButtons chan ALight) {
+	UpdateStatusBar(" ", "speed", false, guiButtons)
+	UpdateStatusBar(" ", "shift", false, guiButtons)
+	UpdateStatusBar(" ", "size", false, guiButtons)
+	UpdateStatusBar(" ", "fade", false, guiButtons)
 }
 
-func FlashLight(button Button, onColor Color, offColor Color, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func FlashLight(button Button, onColor color.RGBA, offColor color.RGBA, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{
@@ -1279,21 +1371,23 @@ func FlashLight(button Button, onColor Color, offColor Color, eventsForLauchpad 
 }
 
 // InvertColor just reverses the DMX values.
-func InvertColor(color Color) (out Color) {
+func InvertColor(colorIn color.RGBA) (out color.RGBA) {
 
-	out.R = ReverseDmx(color.R)
-	out.G = ReverseDmx(color.G)
-	out.B = ReverseDmx(color.B)
+	out.R = ReverseDmx(colorIn.R)
+	out.G = ReverseDmx(colorIn.G)
+	out.B = ReverseDmx(colorIn.B)
+	out.A = 255
 
 	return out
 }
 
 // Takes a DMX value 1-255 and reverses the value.
-func ReverseDmx(n int) int {
-	in := make(map[int]int, 255)
-	var y = 255
+func ReverseDmx(n uint8) uint8 {
+	in := make(map[uint8]uint8, 255)
+	var y uint8 = 255
+	var x uint8
 
-	for x := 0; x <= 255; x++ {
+	for x = 0; x < 255; x++ {
 
 		in[x] = y
 		y--
@@ -1507,6 +1601,77 @@ func FindSensitivity(soundGain float32) int {
 	return 99
 }
 
+// Used to convert a speed to a millisecond time.
+func SetSpeed(commandSpeed int) (Speed time.Duration) {
+	if commandSpeed == 0 {
+		Speed = 3500
+	}
+	if commandSpeed == 1 {
+		Speed = 3000
+	}
+	if commandSpeed == 2 {
+		Speed = 2500
+	}
+	if commandSpeed == 3 {
+		Speed = 1800
+	}
+	if commandSpeed == 4 {
+		Speed = 1500
+	}
+	if commandSpeed == 5 {
+		Speed = 1000
+	}
+	if commandSpeed == 6 {
+		Speed = 750
+	}
+	if commandSpeed == 7 {
+		Speed = 500
+	}
+	if commandSpeed == 8 {
+		Speed = 250
+	}
+	if commandSpeed == 9 {
+		Speed = 150
+	}
+	if commandSpeed == 10 {
+		Speed = 125
+	}
+	if commandSpeed == 11 {
+		Speed = 100
+	}
+	if commandSpeed == 12 {
+		Speed = 50
+	}
+	return Speed * time.Millisecond
+}
+
+func GetSize(size int) int {
+
+	switch size {
+	case 1:
+		return 1
+	case 2:
+		return 5
+	case 3:
+		return 15
+	case 4:
+		return 25
+	case 5:
+		return 35
+	case 6:
+		return 45
+	case 7:
+		return 55
+	case 8:
+		return 65
+	case 9:
+		return 75
+	case 10:
+		return 85
+	}
+	return 0
+}
+
 func FormatLabel(label string) string {
 	// replace any spaces with new lines.
 	// new lines are represented by a dot in code beneath us.
@@ -1517,38 +1682,38 @@ func newColorPicker() []ColorPicker {
 
 	colors := []ColorPicker{
 
-		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: Red},
-		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: Orange},
-		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: Yellow},
-		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: Green},
-		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: Cyan},
-		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: Blue},
-		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x32, Color: Purple},
-		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: Magenta},
+		{ID: 0, X: 0, Y: 0, Name: "Red", Code: 0x48, Color: colors.Red},
+		{ID: 1, X: 1, Y: 0, Name: "Orange", Code: 0x09, Color: colors.Orange},
+		{ID: 2, X: 2, Y: 0, Name: "Yellow", Code: 0x0d, Color: colors.Yellow},
+		{ID: 3, X: 3, Y: 0, Name: "Green", Code: 0x4C, Color: colors.Green},
+		{ID: 4, X: 4, Y: 0, Name: "Cyan", Code: 0x25, Color: colors.Cyan},
+		{ID: 5, X: 5, Y: 0, Name: "Blue", Code: 0x4f, Color: colors.Blue},
+		{ID: 6, X: 6, Y: 0, Name: "Purple", Code: 0x32, Color: colors.Purple},
+		{ID: 7, X: 7, Y: 0, Name: "Magenta", Code: 0x35, Color: colors.Magenta},
 
-		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: Crimson},
-		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: DarkOrange},
-		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: Gold},
-		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: ForestGreen},
-		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: Aqua},
-		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: SkyBlue},
-		{ID: 14, X: 6, Y: 1, Name: "Dark Purple", Code: 0x32, Color: DarkPurple},
-		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: Pink},
+		{ID: 8, X: 0, Y: 1, Name: "Crimson", Code: 0x38, Color: colors.Crimson},
+		{ID: 9, X: 1, Y: 1, Name: "Dark Orange", Code: 0x0a, Color: colors.DarkOrange},
+		{ID: 10, X: 2, Y: 1, Name: "Gold", Code: 0x61, Color: colors.Gold},
+		{ID: 11, X: 3, Y: 1, Name: "Forest Green", Code: 0x1b, Color: colors.ForestGreen},
+		{ID: 12, X: 4, Y: 1, Name: "Aqua", Code: 0x20, Color: colors.Aqua},
+		{ID: 13, X: 5, Y: 1, Name: "Sky Blue", Code: 0x25, Color: colors.SkyBlue},
+		{ID: 14, X: 6, Y: 1, Name: "Dark Purple", Code: 0x32, Color: colors.DarkPurple},
+		{ID: 15, X: 7, Y: 1, Name: "Pink", Code: 0x34, Color: colors.Pink},
 
-		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: Salmon},
-		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: LightOrange},
-		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: Olive},
-		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: LawnGreen},
-		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: Teal},
-		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: LightBlue},
-		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: Violet},
-		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: White},
+		{ID: 16, X: 0, Y: 2, Name: "Salmon", Code: 0x6b, Color: colors.Salmon},
+		{ID: 17, X: 1, Y: 2, Name: "Light Orange", Code: 0x0c, Color: colors.LightOrange},
+		{ID: 18, X: 2, Y: 2, Name: "Olive", Code: 0x10, Color: colors.Olive},
+		{ID: 19, X: 3, Y: 2, Name: "Lawn green", Code: 0x13, Color: colors.LawnGreen},
+		{ID: 20, X: 4, Y: 2, Name: "Teal", Code: 0x44, Color: colors.Teal},
+		{ID: 21, X: 5, Y: 2, Name: "Light Blue", Code: 0x20, Color: colors.LightBlue},
+		{ID: 22, X: 6, Y: 2, Name: "Violet", Code: 0x5e, Color: colors.Violet},
+		{ID: 23, X: 7, Y: 2, Name: "White", Code: 0x03, Color: colors.White},
 	}
 
 	return colors
 }
 
-func GetLaunchPadCodeByRGBColor(selectedColor Color) byte {
+func GetLaunchPadCodeByRGBColor(selectedColor color.RGBA) byte {
 
 	colors := newColorPicker()
 	if debug {

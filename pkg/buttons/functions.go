@@ -20,6 +20,7 @@ import (
 	"fmt"
 	"time"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -36,23 +37,26 @@ func ShowFunctionButtons(this *CurrentState, eventsForLauchpad chan common.ALigh
 			fmt.Printf("ShowFunctionButtons: function %s state %t\n", function.Name, function.State)
 		}
 		if !function.State && this.SelectedMode[this.DisplaySequence] != CHASER_FUNCTION { // Cyan
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		if !function.State && this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION { // Yellow
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		if function.State { // Magenta
-			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, common.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+			common.LightLamp(common.Button{X: index, Y: this.DisplaySequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 		}
 		common.LabelButton(index, this.DisplaySequence, function.Label, guiButtons)
 	}
 }
 
-func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
+func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	debug := false
 
-	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
+	if this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY ||
+		this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY_STATIC ||
+		this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION {
+
 		this.TargetSequence = this.ChaserSequenceNumber
 		this.DisplaySequence = this.SelectedSequence
 	} else {
@@ -96,7 +100,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.ClearSelectedRowOfButtons(this.DisplaySequence, eventsForLaunchpad, guiButtons)
 		this.EditFixtureSelectionMode = false
 
-		ShowPatternSelectionButtons(this, sequences[this.TargetSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
+		ShowPatternSelectionButtons(sequences[this.SelectedSequence], sequences[this.TargetSequence].Master, *sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons)
 
 		// If we are in the chaser function mode, we wannt to make sure the sequence shows the shutter chaser.
 		if this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION {
@@ -279,7 +283,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		sequences[this.TargetSequence].Type == "rgb" {
 
 		if debug {
-			fmt.Printf("Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
+			fmt.Printf("Target Seq%d: Mode:%d common.Function5_Color RGB Color Mode \n", this.TargetSequence, this.SelectedMode[this.TargetSequence])
 		}
 
 		this.ShowRGBColorPicker = true
@@ -292,13 +296,17 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		// Get an upto date copy of the sequence.
 		sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
 
-		// Make sure the sequence colors holds the correct colors from the pattern steps.
-		sequences[this.TargetSequence].SequenceColors = common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps)
+		// If sequence colors are empty use the colors from the pattern.
+		if len(sequences[this.TargetSequence].SequenceColors) == 0 {
+			// Make sure the sequence colors holds the correct colors from the pattern steps.
+			sequences[this.TargetSequence].SequenceColors = common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps)
+		}
 
 		if debug {
+			fmt.Printf("Default Colos %+v\n", common.HowManyColorsInSteps(sequences[this.TargetSequence].Pattern.Steps))
+			fmt.Printf("Sequence Colors %+v\n", sequences[this.TargetSequence].SequenceColors)
 			fmt.Printf("Map Function 5 RGB ====> sequences[%d].SequenceColors %+v\n", this.TargetSequence, sequences[this.TargetSequence].SequenceColors)
 		}
-		sequences[this.TargetSequence].CurrentColors = sequences[this.TargetSequence].SequenceColors
 
 		// Also save the sequence colors in local represention, so if the user doesn't select any colors we can restore the existing colors.
 		this.SavedSequenceColors[this.SelectedSequence] = sequences[this.SelectedSequence].SequenceColors
@@ -310,7 +318,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.HideAllSequences(commandChannels)
 
 		// Show the colors
-		ShowRGBColorPicker(*sequences[this.TargetSequence], this.DisplaySequence, eventsForLaunchpad, guiButtons, commandChannels)
+		ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
 
 		return
 	}
@@ -360,7 +368,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		this.SelectAllStaticFixtures = false
 
 		// Starting a static sequence will turn off any running sequence, so turn off the start lamp
-		common.LightLamp(common.Button{X: X, Y: this.DisplaySequence}, common.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: X, Y: this.DisplaySequence}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		//  and remember that this sequence is off.
 		this.Running[this.TargetSequence] = false
 
@@ -415,7 +423,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function6_Static_Gobo].State = false // Turn off static color off.
 		this.EditGoboSelectionMode = false                                              // Turn off the other option for this function key.
-		this.Static[this.DisplaySequence] = false                                       // Turn off edit static color mode.
+		this.Static[this.TargetSequence] = false                                        // Turn off edit static color mode.
 		this.ShowStaticColorPicker = false                                              // Turn off the color picker.
 		this.StaticFlashing[this.SelectedSequence] = false                              // Stop any flash commands being issued.
 
@@ -490,24 +498,21 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = true
 
+		// Turn on  RGB Invert mode means all the fixtures should be inverted.
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
 			Args: []common.Arg{
-				{Name: "RGBInvert", Value: true},
+				{Name: "RGBInvert All", Value: true},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Turn on invert means all the fixture states should be inverted.
-		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.RGBInverted = true
-			this.FixtureState[this.TargetSequence][fixtureNumber] = state
-		}
+		// Update local copy of fixture state.
+		sequences[Y].FixtureState = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels).FixtureState
 
 		if debug {
 			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, sequences[this.TargetSequence].FixtureState[fixtureNumber])
 			}
 		}
 
@@ -533,25 +538,21 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 
 		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
 
+		// Turn off invert means all the fixture states should be not inverted.
 		cmd := common.Command{
 			Action: common.UpdateRGBInvert,
 			Args: []common.Arg{
-				{Name: "RGBInvert", Value: false},
+				{Name: "RGBInvert Off", Value: false},
 			},
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Turn off invert means all the fixture states should be not inverted.
-		for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-			state := this.FixtureState[this.TargetSequence][fixtureNumber]
-			state.RGBInverted = false
-			state.ScannerPatternReversed = false
-			this.FixtureState[this.TargetSequence][fixtureNumber] = state
-		}
+		// Update local copy of fixture state.
+		sequences[Y].FixtureState = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels).FixtureState
 
 		if debug {
 			for fixtureNumber := 0; fixtureNumber < sequences[this.TargetSequence].NumberFixtures; fixtureNumber++ {
-				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, this.FixtureState[this.TargetSequence][fixtureNumber])
+				fmt.Printf("Seq%d: Fixture:%d This FixtureState: %+v\n", this.TargetSequence, fixtureNumber, sequences[Y].FixtureState[fixtureNumber])
 			}
 		}
 
@@ -583,7 +584,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		time.Sleep(500 * time.Millisecond) // But give the launchpad time to light the function key purple.
 
-		// Tell the scannern & chaser sequences that the scanner shutter chase flag is on.
+		// Tell the scanner & chaser sequences that the scanner shutter chase flag is on.
 		cmd := common.Command{
 			Action: common.UpdateScannerHasShutterChase,
 			Args: []common.Arg{
@@ -600,7 +601,7 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		// Update the labels.
-		showStatusBar(this, sequences, guiButtons)
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return
@@ -641,8 +642,12 @@ func processFunctions(X int, Y int, sequences []*common.Sequence, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+		// Make sure any left over static scene is turned off.
+		this.Static[this.ChaserSequenceNumber] = false
+		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
+
 		// Update the labels.
-		showStatusBar(this, sequences, guiButtons)
+		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 		return

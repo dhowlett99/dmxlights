@@ -20,8 +20,10 @@ package process
 
 import (
 	"fmt"
+	"image/color"
 	"math"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -34,7 +36,6 @@ const FADEDOWN = 3
 // processScannerColor takes this color and next color and adds a fade color to the fadeColors map.
 // This function uses simple rules to decide which fade value to add.
 func ProcessScannerColor(stepNumber int, start bool, end bool, bounce bool, invert bool, fadeColors map[int][]common.FixtureBuffer, thisFixture *common.Fixture, lastFixture *common.Fixture, nextFixture *common.Fixture, sequence common.Sequence, shift int) map[int][]common.FixtureBuffer {
-
 	fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_0", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 	return fadeColors
 
@@ -79,14 +80,14 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 	}
 
 	// RULE 2 - If color is different from last color and not black.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color != common.Black {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color != colors.Black {
 
 		if debug {
 			fmt.Printf("\t\tRULE#2 -fixture %d If color is different from last color and not black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
 		}
 
 		// Fade down last color but only if last color wasn't a black and we're not at the start.
-		if lastFixture.Color != common.Black && !start && !end && lastFixture.State != FADEDOWN {
+		if lastFixture.Color != colors.Black && !start && !end && lastFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn1 this state %d last state %d", thisFixture.State, lastFixture.State), shift, fadeColors, lastFixture.Color, sequence, thisFixture)
 		}
 
@@ -105,24 +106,24 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		}
 
 		// If the next color is black. Fade dowm this color down ready.
-		if nextFixture.Color == common.Black && !start && end && thisFixture.State != FADEDOWN {
+		if nextFixture.Color == colors.Black && !start && end && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn3", shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If the next color is another color but not black. Fade dowm this color down ready.
-		if lastFixture.Color != common.Black && nextFixture.Color != common.Black && thisFixture.Color != nextFixture.Color && !start && thisFixture.State != FADEDOWN {
+		if lastFixture.Color != colors.Black && nextFixture.Color != colors.Black && thisFixture.Color != nextFixture.Color && !start && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, fmt.Sprintf("FadeDwn4 state %d", thisFixture.State), shift, fadeColors, thisFixture.Color, sequence, thisFixture)
 		}
 
 		// If next color is not black and we're at the end or bouncing and we're the first fixture.
-		if nextFixture.Color != common.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
+		if nextFixture.Color != colors.Black && !start && end && bounce && thisFixture.Number == 0 && thisFixture.State != FADEDOWN {
 			fadeColors = fadeDownColor(stepNumber, 2, "FadeDwn5", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 		return fadeColors
 	}
 
 	// RULE #3 - If this color is different from last color and is a black and at the start.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == colors.Black && start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#3 -fixture %d If this color is different from last colar and a is a black and at the start.. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
@@ -138,7 +139,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 	}
 
 	// RULE #4 - If color is different from last color and color is a black.
-	if thisFixture.Color != lastFixture.Color && thisFixture.Color == common.Black && !start {
+	if thisFixture.Color != lastFixture.Color && thisFixture.Color == colors.Black && !start {
 
 		if debug {
 			fmt.Printf("\t\tRULE#4 fixture %d If color is different from last color and color is a black. start %t end %t bounce %t invert %t\n", thisFixture.Number, start, end, bounce, invert)
@@ -153,7 +154,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 		}
 
 		// If the next color is color fade back up.
-		if nextFixture.Color != common.Black && end && invert {
+		if nextFixture.Color != colors.Black && end && invert {
 			fadeColors = fadeUpColor(stepNumber, 2, "FadeUp_3", shift, fadeColors, nextFixture.Color, sequence, thisFixture)
 		}
 
@@ -168,7 +169,7 @@ func ProcessRGBColor(stepNumber int, start bool, end bool, bounce bool, invert b
 }
 
 // fadeDownColor fades down the given color using the sequences fade down and fade off values.
-func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d fadeDownColor color %+v\n", thisFixture.Number, color)
@@ -201,7 +202,7 @@ func fadeDownColor(stepNumber int, rule int, debugMsg string, shift int, fadeCol
 }
 
 // fadeUpColor fades up the given color using the sequences fade up and fade on values.
-func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d fadeUpColor color %+v\n", thisFixture.Number, color)
@@ -234,7 +235,7 @@ func fadeUpColor(stepNumber int, rule int, debugMsg string, shift int, fadeColor
 }
 
 // makeAColor is used to add a color to the fixture buffer map of size fadeUp, fadeOn, FadeDown and fadeOff, which is the width of one cycle.
-func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color common.Color, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
+func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors map[int][]common.FixtureBuffer, color color.RGBA, sequence common.Sequence, thisFixture *common.Fixture) map[int][]common.FixtureBuffer {
 
 	if debug {
 		fmt.Printf("\t\t\t\tfixture:%d makeAColor color %+v\n", thisFixture.Number, color)
@@ -271,10 +272,10 @@ func makeAColor(stepNumber int, rule int, debugMsg string, shift int, fadeColors
 }
 
 // addColor adds a color to the fixtures buffer array, which is used later for assembling the positions.
-func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fixture, color common.Color, insertValue int, chase bool) common.FixtureBuffer {
+func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fixture, colorIn color.RGBA, insertValue int, chase bool) common.FixtureBuffer {
 
 	if debug {
-		fmt.Printf("\t\t\t\t\tStep %d func=%s addColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, thisFixture.Number, color, insertValue)
+		fmt.Printf("\t\t\t\t\tStep %d func=%s addColor fixture %d color %+v slope %d\n", stepNumber, debugMsg, thisFixture.Number, colorIn, insertValue)
 	}
 
 	newColor := common.FixtureBuffer{}
@@ -285,16 +286,19 @@ func addColor(stepNumber int, rule int, debugMsg string, thisFixture *common.Fix
 		newColor.Rule = rule
 	}
 
-	newColor.BaseColor = color
-	newColor.Color = common.Color{}
+	newColor.BaseColor = colorIn
+	newColor.BaseColor.A = 255
+
 	newColor.Gobo = thisFixture.Gobo
 	newColor.Pan = thisFixture.Pan
 	newColor.Tilt = thisFixture.Tilt
 	newColor.Shutter = thisFixture.Shutter
-	newColor.Color.R = int(math.Round((float64(color.R) / 100) * (float64(insertValue) / 2.55)))
-	newColor.Color.G = int(math.Round((float64(color.G) / 100) * (float64(insertValue) / 2.55)))
-	newColor.Color.B = int(math.Round((float64(color.B) / 100) * (float64(insertValue) / 2.55)))
-	newColor.Color.W = int(math.Round((float64(color.W) / 100) * (float64(insertValue) / 2.55)))
+
+	newColor.Color = color.RGBA{}
+	newColor.Color.R = uint8(math.Round((float64(colorIn.R) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.G = uint8(math.Round((float64(colorIn.G) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.B = uint8(math.Round((float64(colorIn.B) / 100) * (float64(insertValue) / 2.55)))
+	newColor.Color.A = 255
 
 	if !chase {
 		newColor.Brightness = 255
