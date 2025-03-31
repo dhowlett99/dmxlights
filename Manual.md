@@ -2,7 +2,7 @@
 
 ## Introduction
 
-DMX lights is a Open Source Project to control DMX light fixtures.  It is designed for the small to medium mobile disco rig and be very easy to setup and use.
+DMX lights is a Open Source Project to control DMX light fixtures.  It is designed for the small to medium mobile disco rig or band and be very easy to setup and use.
 
 Firstly we use the Novation Launchpad Mini (Mk3) as the control surface and a cheap FTDI RS422 controller as the interface for the DMX lights.
 
