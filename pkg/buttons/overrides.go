@@ -55,7 +55,7 @@ func RefreshLocalOverrides(this *CurrentState, sequence *common.Sequence) {
 			if sequence.Switches[swiTchNumber].Override.AvailableColors != nil {
 				overrides[swiTchNumber][stateNumber].AvailableColors = sequence.Switches[swiTchNumber].Override.AvailableColors
 			}
-			if sequence.Switches[swiTchNumber].Override.Color != 0 {
+			if sequence.Switches[swiTchNumber].Override.OverrideColors {
 				overrides[swiTchNumber][stateNumber].Color = sequence.Switches[swiTchNumber].Override.Color
 			}
 			if sequence.Switches[swiTchNumber].Override.Gobo != 0 {

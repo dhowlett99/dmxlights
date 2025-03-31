@@ -281,7 +281,7 @@ func newMiniSequencer(fixture *Fixture,
 			if debug {
 				fmt.Printf("fixture %s: Control: send Color Address %d Value %d \n", fixture.Name, fixture.Address+int16(colorChannel), color)
 			}
-			if override.Color != 0 {
+			if override.OverrideColors {
 				color = GetADMXValue(fixture, override.Color, "Color")
 				if debug_mini {
 					fmt.Printf("Override is set so Color is %d DMX Vaue %d\n", override.Gobo, color)
@@ -421,7 +421,7 @@ func newMiniSequencer(fixture *Fixture,
 
 		// Decide on the static color.
 		var color color.RGBA
-		if override.Color > 0 {
+		if override.OverrideColors {
 			colorName := override.AvailableColorNames[override.Color]
 			color = common.GetRGBColorByName(colorName)
 			if debug_mini {

@@ -152,7 +152,7 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		return
 	}
 
-	if cmd.Override.Color > 0 {
+	if cmd.Override.OverrideColors {
 
 		if debug {
 			fmt.Printf("Override switch number %d Color %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Color)
