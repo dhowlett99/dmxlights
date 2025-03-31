@@ -19,12 +19,7 @@ jobs:
     - name: Set up Go
       uses: actions/setup-go@v4
       with:
-        go-version: '1.20'
-
-    - name: Add Lib Usb
-      if: runner.os == 'macOS'
-      shell: bash
-      run: /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)" for package in $(brew ls) do echo $package; brew unlink $package; brew link $package done
+        go-version: '1.22.0'
 
     - name: Install macOS PortAudio dependencies
       if: runner.os == 'macOS'
