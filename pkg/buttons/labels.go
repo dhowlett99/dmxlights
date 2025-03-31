@@ -309,7 +309,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
-		control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColorNames)
+		control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors)
 		common.UpdateColorDisplay(control, guiButtons)
 	}
 
@@ -329,7 +329,7 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
 			common.LabelButton(index, bottomRow, button.Label, guiButtons)
 		}
-		control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColorNames)
+		control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors)
 		if debug {
 			fmt.Printf("Control %+v\n", control)
 		}

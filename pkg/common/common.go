@@ -288,7 +288,7 @@ type Override struct {
 	HasColorChannel     bool
 	IsColorOverrideAble bool
 	OverrideColors      bool
-	AvailableColorNames []string
+	AvailableColors     []string
 	Color               int
 	MaxColors           int
 	ColorName           string

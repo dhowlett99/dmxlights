@@ -422,10 +422,10 @@ func newMiniSequencer(fixture *Fixture,
 		// Decide on the static color.
 		var color color.RGBA
 		if override.OverrideColors {
-			colorName := override.AvailableColorNames[override.Color]
+			colorName := override.AvailableColors[override.Color]
 			color = common.GetRGBColorByName(colorName)
 			if debug_mini {
-				fmt.Printf("Override is set so Color name is %s index is %d Color %+v Available Colors %+v\n", colorName, override.Color, color, override.AvailableColorNames)
+				fmt.Printf("Override is set so Color name is %s index is %d Color %+v Available Colors %+v\n", colorName, override.Color, color, override.AvailableColors)
 			}
 		} else {
 			// Use the fitst static color from the action.
@@ -606,6 +606,14 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		// Create a sequence and calculate steps.
+		if debug_mini {
+			fmt.Printf("Create the sequence and calculate steps.\n")
+		}
+		for _, color := range cfg.AvailableColors {
+			newColor := common.GetRGBColorByName(color)
+			cfg.SelectedColors = append(cfg.SelectedColors, newColor)
+		}
+
 		sequence, RGBPositions, numberSteps := createSequence(cfg)
 
 		var rotateCounter int
@@ -734,12 +742,12 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color-1, override.AvailableColorNames)
+						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color-1, override.AvailableColors)
 						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)
 					}
 					// You can only override a single color.
-					newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color-1])
-					cfg.AvailableColors = []color.RGBA{
+					newColor := common.GetRGBColorByName(override.AvailableColors[override.Color-1])
+					cfg.SelectedColors = []color.RGBA{
 						newColor,
 					}
 				}
@@ -809,6 +817,9 @@ func newMiniSequencer(fixture *Fixture,
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
 						cfg = listenForOverrideCommands(fixture, cfg, cmd, &override)
 						// Recreate the sequence and recalculate steps.
+						if debug_mini {
+							fmt.Printf("Recreate the sequence and recalculate steps.\n")
+						}
 						sequence, RGBPositions, numberSteps = createSequence(cfg)
 
 					case <-soundConfig.SoundTriggers[swiTch.Number+4].Channel:
@@ -852,7 +863,7 @@ func newMiniSequencer(fixture *Fixture,
 func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position, int) {
 
 	if debug_mini {
-		fmt.Printf("createSequence cfg.Shift %d cfg.NumberSteps %d cfg.Fade %d  cfg.Size %d cfg.AvailableColors %+v\n", cfg.Shift, cfg.NumberSteps, cfg.Fade, cfg.Size, cfg.AvailableColors)
+		fmt.Printf("createSequence cfg.Shift %d cfg.NumberSteps %d cfg.Fade %d  cfg.Size %d cfg.SelectedColors %+v\n", cfg.Shift, cfg.NumberSteps, cfg.Fade, cfg.Size, cfg.SelectedColors)
 	}
 
 	sequence := common.Sequence{
@@ -869,11 +880,11 @@ func createSequence(cfg ActionConfig) (common.Sequence, map[int]common.Position,
 	// A chase must have a minimum of two colors to chase.
 	// If we have only one color in available colors, we add black to make the chase continue,
 	// albeit with only two colors, the one you selected and the black.
-	if len(cfg.AvailableColors) == 1 {
+	if len(cfg.SelectedColors) == 1 {
 		// Add black to available colors
-		cfg.AvailableColors = append(cfg.AvailableColors, colors.Black)
+		cfg.SelectedColors = append(cfg.SelectedColors, colors.Black)
 	}
-	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.AvailableColors)
+	sequence.Pattern = pattern.MakeSingleFixtureChase(cfg.SelectedColors)
 	steps := sequence.Pattern.Steps
 	sequence.NumberFixtures = 4
 	// Calculate fade curve values.
@@ -978,9 +989,9 @@ func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Co
 		const COLORS = 0
 		const AVAILABLE_COLOR_NAMES = 1
 		override.Color = cmd.Args[COLORS].Value.(int)
-		override.AvailableColorNames = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
-		newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color])
-		cfg.AvailableColors = []color.RGBA{
+		override.AvailableColors = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
+		newColor := common.GetRGBColorByName(override.AvailableColors[override.Color])
+		cfg.SelectedColors = []color.RGBA{
 			newColor,
 		}
 		if debug_override {

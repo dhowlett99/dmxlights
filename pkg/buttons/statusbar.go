@@ -45,7 +45,7 @@ type SwitchInfo struct {
 	Color                int
 	ColorName            string
 	MaxNumberColors      int
-	AvailableColorNames  []string
+	AvailableColors      []string
 
 	Gobo                   int
 	OverrideAvailableGobos int
@@ -89,7 +89,7 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
 	switchInfo.Color = overrides[number][position].Color
 	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
-	switchInfo.AvailableColorNames = overrides[number][position].AvailableColorNames
+	switchInfo.AvailableColors = overrides[number][position].AvailableColors
 	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
 	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
 	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
@@ -133,7 +133,7 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	// Colors
 	switchInfo.ColorName = "Unknown"
 	if switchInfo.MaxNumberColors > 0 && switchInfo.Color <= switchInfo.MaxNumberColors && switchInfo.Color != -1 {
-		switchInfo.ColorName = overrides[number][position].AvailableColorNames[switchInfo.Color]
+		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.Color]
 	}
 
 	// Program Speed

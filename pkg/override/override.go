@@ -103,7 +103,7 @@ func CreateOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switc
 
 			if debug {
 				fmt.Printf("Setting Up Override for Switch No=%d Name=%s State No=%d Name=%s\n", swiTch.Number, swiTch.Name, state.Number, state.Name)
-				fmt.Printf("\t Override Colors %+v\n", override.AvailableColorNames)
+				fmt.Printf("\t Override Colors %+v\n", override.AvailableColors)
 			}
 		}
 	}
@@ -209,8 +209,8 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
 	newOverride.ColorName = cfg.ColorName
-	newOverride.AvailableColorNames = cfg.AvailableColorNames
-	newOverride.MaxColors = len(cfg.AvailableColorNames) - 1
+	newOverride.AvailableColors = cfg.AvailableColors
+	newOverride.MaxColors = len(cfg.AvailableColors) - 1
 
 	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo
@@ -242,7 +242,7 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 		fmt.Printf("Color OverrideAble %t\n", newOverride.IsColorOverrideAble)
 		fmt.Printf("Color %d\n", newOverride.Color)
 		fmt.Printf("ColorName %s\n", newOverride.ColorName)
-		fmt.Printf("AvailableColorNames %+v\n", newOverride.AvailableColorNames)
+		fmt.Printf("AvailableColors %+v\n", newOverride.AvailableColors)
 		fmt.Printf("MaxColors %d\n", newOverride.MaxColors)
 
 		fmt.Printf("Gobo OverrideAble %t\n", newOverride.IsGoboOverrideAble)

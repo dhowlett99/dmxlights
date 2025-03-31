@@ -1095,24 +1095,7 @@ func GetAvailableScannerGobos(sequenceNumber int, fixtures *Fixtures) map[int][]
 	return gobos
 }
 
-func GetAvailableColors(fixture *Fixture) []color.RGBA {
-
-	colors := []color.RGBA{}
-
-	for _, channel := range fixture.Channels {
-
-		if channel.Name == "Color" {
-			for _, setting := range channel.Settings {
-				color := common.GetRGBColorByName(setting.Name)
-				colors = append(colors, color)
-			}
-		}
-	}
-
-	return colors
-}
-
-func GetAvailableColorNames(fixture *Fixture) []string {
+func GetAvailableColors(fixture *Fixture) []string {
 
 	colors := []string{}
 
@@ -1120,7 +1103,6 @@ func GetAvailableColorNames(fixture *Fixture) []string {
 
 		if channel.Name == "Color" {
 			for _, setting := range channel.Settings {
-
 				colors = append(colors, setting.Name)
 			}
 		}
