@@ -21,6 +21,11 @@ jobs:
       with:
         go-version: '1.20'
 
+    - name: Add Lib Usb
+      if: runner.os == 'macOS'
+      shell: bash
+      run: /bin/launchctl setenv LIBRARY_PATH /usr/local/lib
+
     - name: Install macOS PortAudio dependencies
       if: runner.os == 'macOS'
       shell: bash
