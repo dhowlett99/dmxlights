@@ -134,7 +134,6 @@ func decreaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
 				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
-				{Name: "Available Colors", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors},
 				{Name: "Available Color Names", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColorNames},
 			},
 		}
@@ -262,7 +261,7 @@ func increaseSize(sequences []*common.Sequence, X int, Y int, this *CurrentState
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
 				{Name: "Color", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Color},
-				{Name: "Available Colors", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors},
+				//{Name: "Available Colors", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors},
 				{Name: "Available Color Names", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColorNames},
 			},
 		}

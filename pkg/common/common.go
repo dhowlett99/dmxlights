@@ -288,7 +288,6 @@ type Override struct {
 	HasColorChannel     bool
 	IsColorOverrideAble bool
 	OverrideColors      bool
-	AvailableColors     []color.RGBA
 	AvailableColorNames []string
 	Color               int
 	MaxColors           int
@@ -1315,6 +1314,80 @@ func GetColorList(colors []color.RGBA) ColorDisplayControl {
 		case found == "Violet":
 			control.Violet = true
 		case found == "White":
+			control.White = true
+		}
+
+	}
+
+	if debug {
+		fmt.Printf("GetColorList Control=%+v\n", control)
+	}
+
+	return control
+
+}
+
+// GetColorListByNames takes an array of color names and creates a ControlDisplayControl object which has the colors selected inside it.
+func GetColorListByNames(colors []string) ColorDisplayControl {
+
+	if debug {
+		fmt.Printf("GetColorListByNames Colors=%+v\n", colors)
+	}
+
+	control := ColorDisplayControl{}
+
+	for _, color := range colors {
+
+		switch color {
+		case "Red":
+			control.Red = true
+		case "Orange":
+			control.Orange = true
+		case "Yellow":
+			control.Yellow = true
+		case "Green":
+			control.Green = true
+		case "Cyan":
+			control.Cyan = true
+		case "Blue":
+			control.Blue = true
+		case "Purple":
+			control.Purple = true
+		case "Magenta":
+			control.Magenta = true
+
+		case "Crimson":
+			control.Crimson = true
+		case "DarkOrange":
+			control.DarkOrange = true
+		case "Gold":
+			control.Gold = true
+		case "ForestGreen":
+			control.ForestGreen = true
+		case "Aqua":
+			control.Aqua = true
+		case "SkyBlue":
+			control.SkyBlue = true
+		case "DarkPurple":
+			control.DarkPurple = true
+		case "Pink":
+			control.Pink = true
+
+		case "Salmon":
+			control.Salmon = true
+		case "LightOrange":
+			control.LightOrange = true
+		case "Olive":
+			control.Olive = true
+		case "LawnGreen":
+			control.LawnGreen = true
+		case "Teal":
+			control.Teal = true
+		case "LightBlue":
+			control.LightBlue = true
+		case "Violet":
+			control.Violet = true
+		case "White":
 			control.White = true
 		}
 

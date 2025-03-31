@@ -163,7 +163,6 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 			Args: []common.Arg{
 				// Add one since we count from 0
 				{Name: "Color", Value: cmd.SwiTch.Override.Color},
-				{Name: "Available Colors", Value: cmd.SwiTch.Override.AvailableColors},
 				{Name: "Available Color Names", Value: cmd.SwiTch.Override.AvailableColorNames},
 			},
 		}

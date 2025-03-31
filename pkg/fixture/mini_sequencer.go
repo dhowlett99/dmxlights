@@ -734,11 +734,10 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.Color != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors Index is %d from Available %+v\n", override.Color-1, override.AvailableColors)
+						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color-1, override.AvailableColorNames)
 						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)
 					}
 					// You can only override a single color.
-					cfg.AvailableColors = override.AvailableColors
 					newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color-1])
 					cfg.AvailableColors = []color.RGBA{
 						newColor,
@@ -977,10 +976,8 @@ func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Co
 	// Update Colors
 	if cmd.Action == common.UpdateColors {
 		const COLORS = 0
-		const AVAILABLE_COLORS = 1
-		const AVAILABLE_COLOR_NAMES = 2
+		const AVAILABLE_COLOR_NAMES = 1
 		override.Color = cmd.Args[COLORS].Value.(int)
-		override.AvailableColors = cmd.Args[AVAILABLE_COLORS].Value.([]color.RGBA)
 		override.AvailableColorNames = cmd.Args[AVAILABLE_COLOR_NAMES].Value.([]string)
 		newColor := common.GetRGBColorByName(override.AvailableColorNames[override.Color])
 		cfg.AvailableColors = []color.RGBA{
