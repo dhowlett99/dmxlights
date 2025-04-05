@@ -740,7 +740,7 @@ func newMiniSequencer(fixture *Fixture,
 					}
 				}
 
-				if override.Color != 0 {
+				if override.OverrideColors {
 					if debug_mini {
 						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color-1, override.AvailableColors)
 						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)

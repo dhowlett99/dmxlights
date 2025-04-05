@@ -59,9 +59,6 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		fmt.Printf("recallPreset() Preset Pressed X:%d Y:%d\n", X, Y)
 	}
 
-	// Remove the button off offset.
-	X = X - 100
-
 	// We just pushed save this preset.
 	if this.SavePreset {
 		this.SavePreset = false
@@ -71,6 +68,7 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	// If this is a valid preset we are either recalling (short press) it or deleting it (long press)
 	// If its not been set i.e. not valid we just ignore and return.
 	if !this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].State {
+		fmt.Printf("Not a valid preset X:%d Y:%d\n", X, Y)
 		return
 	}
 
@@ -80,9 +78,9 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	// Delete a preset - If the timer is longer than 1 seconds then we have a long press.
 	if elapsed > 1*time.Second {
 
-		if debug {
-			fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
-		}
+		//if debug {
+		fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
+		//}
 
 		// Get the name of the config file.
 		path := config.GetProjectConfigPath(this.ProjectName, X, Y)
