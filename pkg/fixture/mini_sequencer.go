@@ -605,15 +605,19 @@ func newMiniSequencer(fixture *Fixture,
 		case <-time.After(100 * time.Millisecond):
 		}
 
-		// Create a sequence and calculate steps.
+		// Insert configured colors into selectedColors.
 		if debug_mini {
-			fmt.Printf("Create the sequence and calculate steps.\n")
+			fmt.Printf("Insert configured colors into selectedColors.\n")
 		}
 		for _, color := range cfg.AvailableColors {
 			newColor := common.GetRGBColorByName(color)
 			cfg.SelectedColors = append(cfg.SelectedColors, newColor)
 		}
 
+		// Create a sequence and calculate steps.
+		if debug_mini {
+			fmt.Printf("Create the sequence and calculate steps.\n")
+		}
 		sequence, RGBPositions, numberSteps := createSequence(cfg)
 
 		var rotateCounter int
@@ -622,6 +626,8 @@ func newMiniSequencer(fixture *Fixture,
 
 		// Main chaser thread.
 		go func() {
+
+			var overrideHasHappened bool
 
 			if cfg.Rotatable {
 
@@ -682,6 +688,7 @@ func newMiniSequencer(fixture *Fixture,
 						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
 					}
 					cfg.SpeedDuration = common.SetSpeed(override.Speed)
+					overrideHasHappened = true
 				}
 
 				if override.Shutter || override.Strobe {
@@ -699,6 +706,7 @@ func newMiniSequencer(fixture *Fixture,
 						}
 						cfg.Shutter = shutter
 					}
+					overrideHasHappened = true
 				}
 
 				if override.ProgramSpeed != 0 {
@@ -706,6 +714,7 @@ func newMiniSequencer(fixture *Fixture,
 						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
 					}
 					cfg.ProgramSpeed = GetADMXValue(fixture, override.ProgramSpeed, "ProgramSpeed")
+					overrideHasHappened = true
 				}
 
 				if override.Shift != 0 {
@@ -713,18 +722,23 @@ func newMiniSequencer(fixture *Fixture,
 						fmt.Printf("Override is set so Shift is %d\n", override.Shift)
 					}
 					cfg.Shift = override.Shift
+					overrideHasHappened = true
 				}
+
 				if override.Size != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Size is %d\n", override.Size)
 					}
 					cfg.Size = override.Size
+					overrideHasHappened = true
 				}
+
 				if override.Fade != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Fade is %d\n", override.Fade)
 					}
 					cfg.Fade = override.Fade
+					overrideHasHappened = true
 				}
 
 				if override.Rotate != 0 {
@@ -738,18 +752,20 @@ func newMiniSequencer(fixture *Fixture,
 					if debug_override {
 						fmt.Printf("Apply Rotate Speed DMX Value=%d\n", cfg.RotateSpeed)
 					}
+					overrideHasHappened = true
 				}
 
 				if override.OverrideColors {
 					if debug_mini {
-						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color-1, override.AvailableColors)
+						fmt.Printf("Override is set so Colors Index is %d from Available %s\n", override.Color, override.AvailableColors)
 						fmt.Printf("Configured Colors is %+v\n", cfg.AvailableColors)
 					}
 					// You can only override a single color.
-					newColor := common.GetRGBColorByName(override.AvailableColors[override.Color-1])
+					newColor := common.GetRGBColorByName(override.AvailableColors[override.Color])
 					cfg.SelectedColors = []color.RGBA{
 						newColor,
 					}
+					overrideHasHappened = true
 				}
 
 				if override.Gobo != 0 {
@@ -757,6 +773,13 @@ func newMiniSequencer(fixture *Fixture,
 						fmt.Printf("Override is set so Gobo is %+v\n", override.Gobo)
 					}
 					cfg.Gobo = override.Gobo
+					overrideHasHappened = true
+				}
+
+				// If we've override anything then we need to recalculate
+				if overrideHasHappened {
+					sequence, RGBPositions, numberSteps = createSequence(cfg)
+					overrideHasHappened = false
 				}
 
 				if debug_mini {
