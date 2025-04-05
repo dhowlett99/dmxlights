@@ -645,7 +645,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
-		sequence.Switches[switchNumber].Override = common.Override{}
 		sequence.Switches[switchNumber].Override.OverrideSpeed = true
 		sequence.Switches[switchNumber].Override.Speed = switchSpeed
 
@@ -886,9 +885,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		newSwitch.Number = sequence.Switches[switchNumber].Number
 		newSwitch.States = sequence.Switches[switchNumber].States
 		newSwitch.UseFixture = sequence.Switches[switchNumber].UseFixture
-		// Since this is switch being set directly we should use the values from the config.
-		// So reset the overrides. Also done in the button copy of overrides.
-		sequence.Switches[switchNumber].Override = common.Override{}
 		newSwitch.Override = sequence.Switches[switchNumber].Override
 		newSwitch.Selected = command.Args[SWITCH_FOCUS].Value.(bool)
 		sequence.Switches[switchNumber] = newSwitch
