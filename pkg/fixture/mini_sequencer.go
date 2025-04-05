@@ -446,9 +446,9 @@ func newMiniSequencer(fixture *Fixture,
 		if fixtureHasChannel(fixture, "Rotate") {
 			if override.Rotate != 0 {
 				cfg.RotateSpeed = GetADMXValue(fixture, override.Rotate, "Rotate")
-				//if debug_mini {
-				fmt.Printf("Override is set so Rotate is %d DMX Vaue %d\n", override.Rotate, cfg.RotateSpeed)
-				//}
+				if debug_mini {
+					fmt.Printf("Override is set so Rotate is %d DMX Vaue %d\n", override.Rotate, cfg.RotateSpeed)
+				}
 			}
 		}
 
