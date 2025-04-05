@@ -243,6 +243,7 @@ type Override struct {
 	Shutter               bool
 
 	// Strobe
+	SignalOverrideStrobe         bool
 	IsStrobeOverrideAble         bool
 	Strobe                       bool // On / Off
 	StrobeSpeed                  int  // Index into strobe speed settings
@@ -250,12 +251,14 @@ type Override struct {
 	MaxStrobeSpeeds              int
 
 	// RGB / Scanner Speed
+	SignalOverrideSpeed bool
 	IsSpeedOverrideAble bool
 	OverrideSpeed       bool
 	Speed               int
 	MaxSpeeds           int
 
 	// Program Speed
+	SignalOverrideProgramSpeed    bool
 	IsProgramSpeedOverrideAble    bool
 	OverrideProgramSpeed          bool
 	ProgramSpeed                  int
@@ -263,27 +266,32 @@ type Override struct {
 	MaxProgramSpeeds              int
 
 	// Shift
-	OverrideShift bool
-	Shift         int
+	SignalOverrideShift bool
+	OverrideShift       bool
+	Shift               int
 
 	// Size
-	OverrideSize bool
-	Size         int
+	SignalOverrideSize bool
+	OverrideSize       bool
+	Size               int
 
 	// Fade
-	OverrideFade bool
-	Fade         int
+	SignalOverrideFade bool
+	OverrideFade       bool
+	Fade               int
 
 	// Rotate
-	IsRotateOverrideAble   bool
-	OverrideRotateSpeed    bool
-	Rotate                 int
-	RotateName             string
-	RotateChannels         []string
-	MaxRotateSpeedChannels int
-	MaxRotateSpeed         int
+	SignalOverrideRotateSpeed bool
+	IsRotateOverrideAble      bool
+	OverrideRotateSpeed       bool
+	Rotate                    int
+	RotateName                string
+	RotateChannels            []string
+	MaxRotateSpeedChannels    int
+	MaxRotateSpeed            int
 
 	// Colors
+	SignalOverrideColor bool
 	HasRGBChannels      bool
 	HasColorChannel     bool
 	IsColorOverrideAble bool
@@ -294,6 +302,7 @@ type Override struct {
 	ColorName           string
 
 	// Gobo
+	SignalOverrideGobo bool
 	IsGoboOverrideAble bool
 	OverrideGobo       bool
 	Gobo               int

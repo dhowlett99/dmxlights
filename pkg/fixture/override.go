@@ -27,7 +27,7 @@ import (
 func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.SwitchChannel) {
 
 	// Override the selected switches strobe.
-	if cmd.Override.Strobe {
+	if cmd.Override.SignalOverrideStrobe {
 
 		if debug {
 			fmt.Printf("Override switch number %d Strobe %t \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Strobe)
@@ -45,11 +45,12 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideStrobe = false
 		return
 	}
 
 	// Override the selected switch speed.
-	if cmd.Override.Speed > 0 {
+	if cmd.Override.SignalOverrideSpeed {
 
 		if debug {
 			fmt.Printf("Override switch number %d Speed %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Speed)
@@ -66,10 +67,11 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideSpeed = false
 		return
 	}
 
-	if cmd.Override.Shift > 0 {
+	if cmd.Override.SignalOverrideShift {
 
 		if debug {
 			fmt.Printf("Override switch number %d Shift %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Shift)
@@ -86,11 +88,12 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideShift = false
 		return
 	}
 
 	// Override the selected switch size.
-	if cmd.Override.Size > 0 {
+	if cmd.Override.SignalOverrideSize {
 
 		if debug {
 			fmt.Printf("Override switch number %d Size %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Size)
@@ -107,11 +110,12 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideSize = false
 		return
 	}
 
 	// Override the selected switch fade size.
-	if cmd.Override.Fade > 0 {
+	if cmd.Override.SignalOverrideFade {
 
 		if debug {
 			fmt.Printf("Override switch number %d Fade %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Fade)
@@ -128,11 +132,11 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
-
+		cmd.Override.SignalOverrideFade = false
 		return
 	}
 
-	if cmd.Override.Rotate > 0 {
+	if cmd.Override.SignalOverrideRotateSpeed {
 
 		if debug {
 			fmt.Printf("Override switch number %d RotateSpeed %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Rotate)
@@ -149,10 +153,11 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideRotateSpeed = false
 		return
 	}
 
-	if cmd.Override.OverrideColors {
+	if cmd.Override.SignalOverrideColor {
 
 		if debug {
 			fmt.Printf("Override switch number %d Color %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Color)
@@ -170,10 +175,11 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideColor = false
 		return
 	}
 
-	if cmd.Override.Gobo > 0 {
+	if cmd.Override.SignalOverrideGobo {
 
 		if debug {
 			fmt.Printf("Override switch number %d Gobo %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Gobo)
@@ -190,6 +196,7 @@ func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.Sw
 		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
 		case <-time.After(10 * time.Millisecond):
 		}
+		cmd.Override.SignalOverrideGobo = false
 		return
 	}
 }
