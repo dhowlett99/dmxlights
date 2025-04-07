@@ -84,7 +84,7 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		// Pull overrides.
 		overrides := *this.SwitchOverrides
 
-		// Reset any overrides for this switch and this state in our local copy.
+		// Reset any overrides for this switch and this state in the sequence.
 		cmd := common.Command{
 			Action: common.ClearSwitchOverrides,
 			Args: []common.Arg{
@@ -96,6 +96,7 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		}
 		// Send a message to the switch sequence.
 		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+		// Reset any overrides for this switch and this state in the local copy.
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]] = common.ClearOverrides(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]])
 
 		// Push Overrises back
