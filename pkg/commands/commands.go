@@ -876,6 +876,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
 		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
 
+		// Reset sequence copy of overrides.
+		sequence.Switches[switchNumber].Override = common.ClearOverrides(sequence.Switches[switchNumber].Override)
+
+		// Create a new
 		newSwitch := common.Switch{}
 		newSwitch.CurrentPosition = switchPosition
 		newSwitch.Description = sequence.Switches[switchNumber].Description

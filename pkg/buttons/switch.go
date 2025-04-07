@@ -81,6 +81,14 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		}
 
+		// Pull overrides.
+		overrides := *this.SwitchOverrides
+
+		// Reset any overrides for this switch and this state in our local copy.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]] = common.ClearOverrides(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]])
+
+		// Push Overrises back
+		this.SwitchOverrides = &overrides
 	}
 
 	// Light the correct selected switch.

@@ -180,26 +180,33 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.IsShutterOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Strobe")
 	newOverride.Strobe = cfg.Strobe
 	newOverride.StrobeSpeed = cfg.StrobeSpeed
+	newOverride.StartingStrobeSpeed = cfg.StrobeSpeed
 	newOverride.AvailableStrobeSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Speed")
 	newOverride.MaxStrobeSpeeds = len(newOverride.AvailableStrobeSpeedChannels)
 
 	newOverride.IsSpeedOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Speed")
+	newOverride.StartingSpeed = cfg.Speed
 	newOverride.Speed = cfg.Speed
 	newOverride.MaxSpeeds = common.MAX_SPEED
 
 	newOverride.Shift = cfg.Shift
+	newOverride.StartingShift = cfg.Shift
 
 	newOverride.Size = cfg.Size
+	newOverride.StartingSize = cfg.Size
 
 	newOverride.Fade = cfg.Fade
+	newOverride.StartingFade = cfg.Fade
 
 	newOverride.IsProgramSpeedOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "ProgramSpeed")
 	newOverride.ProgramSpeed = cfg.ProgramSpeed
+	newOverride.StartingProgramSpeed = cfg.ProgramSpeed
 	newOverride.AvailableProgramSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "ProgramSpeed")
 	newOverride.MaxProgramSpeeds = len(newOverride.AvailableProgramSpeedChannels)
 
 	newOverride.IsRotateOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Rotate")
 	newOverride.Rotate = cfg.Rotate
+	newOverride.StartingRotateSpeed = cfg.Rotate
 	newOverride.RotateName = fixture.GetRotateSpeedNameByNumber(useFixture, cfg.RotateSpeed)
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
@@ -208,12 +215,14 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.HasColorChannel = useFixture.HasColorChannel
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
+	newOverride.StartingColor = cfg.Color
 	newOverride.ColorName = cfg.ColorName
 	newOverride.AvailableColors = cfg.AvailableColors
 	newOverride.MaxColors = len(cfg.AvailableColors) - 1
 
 	newOverride.IsGoboOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Gobo")
 	newOverride.Gobo = cfg.Gobo
+	newOverride.StartingGobo = cfg.Gobo
 	newOverride.AvailableGobos = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Gobo")
 	newOverride.GoboName = fixture.GetGoboNameByNumber(useFixture, cfg.Gobo)
 	newOverride.MaxGobos = len(newOverride.AvailableGobos)

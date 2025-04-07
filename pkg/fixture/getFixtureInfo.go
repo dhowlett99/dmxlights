@@ -526,7 +526,7 @@ func GetColorNameByNumber(fixture *Fixture, number int) string {
 	}
 
 	if debug {
-		fmt.Printf("NOT Found  color name Unkown\n")
+		fmt.Printf("NOT Found color name Unknown\n")
 	}
 	return "Unknown"
 }

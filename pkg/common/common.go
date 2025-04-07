@@ -37,6 +37,7 @@ const MAX_TEXT_ENTRY_LENGTH = 35
 const DEFAULT_SCANNER_SIZE = 60
 const MAX_SCANNER_SIZE = 127
 const MIN_SPEED = 0
+const MIN_PROGRAM_SPEED = 1
 const MAX_SPEED = 12
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
@@ -247,6 +248,7 @@ type Override struct {
 	IsStrobeOverrideAble         bool
 	Strobe                       bool // On / Off
 	StrobeSpeed                  int  // Index into strobe speed settings
+	StartingStrobeSpeed          int
 	AvailableStrobeSpeedChannels []string
 	MaxStrobeSpeeds              int
 
@@ -254,6 +256,7 @@ type Override struct {
 	SignalOverrideSpeed bool
 	IsSpeedOverrideAble bool
 	OverrideSpeed       bool
+	StartingSpeed       int
 	Speed               int
 	MaxSpeeds           int
 
@@ -262,29 +265,34 @@ type Override struct {
 	IsProgramSpeedOverrideAble    bool
 	OverrideProgramSpeed          bool
 	ProgramSpeed                  int
+	StartingProgramSpeed          int
 	AvailableProgramSpeedChannels []string
 	MaxProgramSpeeds              int
 
 	// Shift
 	SignalOverrideShift bool
+	StartingShift       int
 	OverrideShift       bool
 	Shift               int
 
 	// Size
 	SignalOverrideSize bool
 	OverrideSize       bool
+	StartingSize       int
 	Size               int
 
 	// Fade
 	SignalOverrideFade bool
 	OverrideFade       bool
 	Fade               int
+	StartingFade       int
 
 	// Rotate
 	SignalOverrideRotateSpeed bool
 	IsRotateOverrideAble      bool
 	OverrideRotateSpeed       bool
 	Rotate                    int
+	StartingRotateSpeed       int
 	RotateName                string
 	RotateChannels            []string
 	MaxRotateSpeedChannels    int
@@ -298,6 +306,7 @@ type Override struct {
 	OverrideColors      bool
 	AvailableColors     []string
 	Color               int
+	StartingColor       int
 	MaxColors           int
 	ColorName           string
 
@@ -306,6 +315,7 @@ type Override struct {
 	IsGoboOverrideAble bool
 	OverrideGobo       bool
 	Gobo               int
+	StartingGobo       int
 	MaxGobos           int
 	AvailableGobos     []string
 	GoboName           string
@@ -1837,4 +1847,45 @@ func GetColor(X int, Y int) ColorPicker {
 		}
 	}
 	return ColorPicker{}
+}
+
+func ClearOverrides(override Override) Override {
+
+	override.IsShutterOverrideAble = false
+	override.Shutter = false
+	override.SignalOverrideStrobe = false
+	override.IsStrobeOverrideAble = false
+	override.Strobe = false
+	override.StrobeSpeed = override.StartingStrobeSpeed
+	override.SignalOverrideSpeed = false
+	override.IsSpeedOverrideAble = false
+	override.OverrideSpeed = false
+	override.Speed = override.StartingSpeed
+	override.SignalOverrideProgramSpeed = false
+	override.IsProgramSpeedOverrideAble = false
+	override.OverrideProgramSpeed = false
+	override.ProgramSpeed = override.StartingProgramSpeed
+	override.SignalOverrideShift = false
+	override.OverrideShift = false
+	override.Shift = override.StartingShift
+	override.SignalOverrideSize = false
+	override.OverrideSize = false
+	override.Size = override.StartingSize
+	override.SignalOverrideFade = false
+	override.OverrideFade = false
+	override.Fade = override.StartingFade
+	override.SignalOverrideRotateSpeed = false
+	override.IsRotateOverrideAble = false
+	override.OverrideRotateSpeed = false
+	override.Rotate = override.StartingRotateSpeed
+	override.SignalOverrideColor = false
+	override.IsColorOverrideAble = false
+	override.OverrideColors = false
+	override.Color = override.StartingColor
+	override.SignalOverrideGobo = false
+	override.IsGoboOverrideAble = false
+	override.OverrideGobo = false
+	override.Gobo = override.StartingGobo
+
+	return override
 }
