@@ -309,7 +309,7 @@ func newMiniSequencer(fixture *Fixture,
 			SetChannel(fixture.Address+int16(goboChannel), byte(gobo), dmxController, dmxInterfacePresent)
 		}
 
-		if fixtureHasChannel(fixture, "ProgramSpeed") {
+		if fixtureHasChannel(fixture, "ProgramSpeed") && action.ProgramSpeed != "" {
 			// Find the program speed channel for this fixture.
 			programSpeedChannel, err := GetChannelNumberByName(fixture, "ProgramSpeed")
 			if err != nil {

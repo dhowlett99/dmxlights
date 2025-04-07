@@ -85,6 +85,17 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 		overrides := *this.SwitchOverrides
 
 		// Reset any overrides for this switch and this state in our local copy.
+		cmd := common.Command{
+			Action: common.ClearSwitchOverrides,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Step", Value: false}, // Don't step the switch state.
+				{Name: "Focus", Value: true}, // Focus the switch lamp.
+			},
+		}
+		// Send a message to the switch sequence.
+		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]] = common.ClearOverrides(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]])
 
 		// Push Overrises back

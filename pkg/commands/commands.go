@@ -858,6 +858,26 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Switches[switchNumber].Override.StrobeSpeed = switchStrobeSpeed
 		sequence.Switches[switchNumber].Override.SignalOverrideStrobe = true
 
+		// Reset switch overrides.
+	case common.ClearSwitchOverrides:
+		const SWITCH_NUMBER = 0   // Integer
+		const SWITCH_POSITION = 1 // Integer
+		const SWITCH_STEP = 2     // Boolean,
+		const SWITCH_FOCUS = 3    // Boolean, true to focus switch, full brighness. false to defocue dim button.
+		if debug {
+			fmt.Printf("%d: Command Reset Overrides in Switch %d to Position %d Step %t Focus %t\n",
+				mySequenceNumber,
+				command.Args[SWITCH_NUMBER].Value,
+				command.Args[SWITCH_POSITION].Value,
+				command.Args[SWITCH_STEP].Value, command.Args[SWITCH_FOCUS].Value)
+		}
+
+		// Loop through all the switchies. and reset their current state back to 0.
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+
+		// Reset sequence copy of overrides.
+		sequence.Switches[switchNumber].Override = common.ClearOverrides(sequence.Switches[switchNumber].Override)
+
 	// Update the named switch position for the current sequence.
 	case common.UpdateSwitch:
 		const SWITCH_NUMBER = 0   // Integer
@@ -875,9 +895,6 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		// Loop through all the switchies. and reset their current state back to 0.
 		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
 		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
-
-		// Reset sequence copy of overrides.
-		sequence.Switches[switchNumber].Override = common.ClearOverrides(sequence.Switches[switchNumber].Override)
 
 		// Create a new
 		newSwitch := common.Switch{}

@@ -397,6 +397,7 @@ const (
 	GetUpdatedSequence
 	ResetAllSwitchPositions
 	UpdateSwitch
+	ClearSwitchOverrides
 	OverrideSpeed
 	OverrideProgramSpeed
 	OverrideShift
