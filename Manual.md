@@ -296,7 +296,7 @@ A switch sequence consists of eight switches, each switch can have a number of s
 * A switch can have multiple states, for example you could set a fixture to have specific color, brightness or gobo.
 * A switch can also be configured with a mini sequencer of its own, typically used to change the color of your booth or a particular project setting.
 
-Once you have selected the switch with the first tap, you can then tap to cycle through the switch states. Each state can be overriden but once you tap the switch again, the switch moves to the next state and all overrides are lost. If you want to select a particular switch state with a unique set of overrides then you should us a preset to save it.
+Once you have selected the switch with the first tap, you can then tap to cycle through the switch states. Each state can be overriden but once you tap the switch again, the switch moves to the next state and all overrides are lost. If you want to select a particular switch state with a unique set of overrides then you should use a preset to save it.
 
 ### Using DMX Values for fixture control
 
