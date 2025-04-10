@@ -641,7 +641,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
@@ -668,7 +668,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
@@ -741,7 +741,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
@@ -794,7 +794,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
@@ -821,7 +821,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true
@@ -850,7 +850,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Override = true
 
 		sequence.CurrentSwitch = switchNumber
-		sequence.LastSwitchSelected = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
 
 		sequence.Switches[switchNumber].CurrentPosition = switchPosition
 		sequence.Switches[switchNumber].Selected = true

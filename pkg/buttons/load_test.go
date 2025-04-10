@@ -16,17 +16,23 @@
 
 package buttons
 
-import "testing"
+import (
+	"testing"
+
+	"github.com/dhowlett99/dmxlights/pkg/common"
+)
 
 func Test_autoSelect(t *testing.T) {
 
 	type args struct {
-		this *CurrentState
+		this            *CurrentState
+		commandChannels []chan common.Command
 	}
 	tests := []struct {
 		name                 string
 		args                 args
 		wantSelectedSequence int
+		wantSelectedSwitch   int
 	}{
 		{
 			name: "first sequence is running",
@@ -106,8 +112,9 @@ func Test_autoSelect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotSelectedSequence := autoSelect(tt.args.this); gotSelectedSequence != tt.wantSelectedSequence {
-				t.Errorf("autoSelect() = %v, want %v", gotSelectedSequence, tt.wantSelectedSequence)
+			if gotSelectedSequence, gotSelectedSwitch := autoSelect(tt.args.this, tt.args.commandChannels); gotSelectedSequence != tt.wantSelectedSequence {
+				t.Errorf("autoSelect() SwitchNumber = %v, want %v", gotSelectedSwitch, tt.wantSelectedSequence)
+				t.Errorf("autoSelect() SequenceNumber = %v, want %v", gotSelectedSequence, tt.wantSelectedSwitch)
 			}
 		})
 	}

@@ -42,6 +42,8 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 	// Get an upto date copy of the switch information by updating our copy of the switch sequence.
 	sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
+	// Save this switch in the sequence.
+	sequences[this.SelectedSequence].LastSelectedSwitch = this.SelectedSwitch
 
 	// We have a valid switch.
 	if this.SelectedSwitch < len(sequences[this.SelectedSequence].Switches) {
@@ -107,7 +109,7 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	this.SelectedSequence = this.SwitchSequenceNumber
 	this.LastSelectedSwitch = this.SelectedSwitch
 
-	// Use the default behaviour of SelectSequence to turn of the other sequence select buttons.
+	// Use the default behaviour of SelectSequence to turn off the other sequence select buttons.
 	SelectSequence(this)
 
 	// Find out if this switch state has a music trigger.

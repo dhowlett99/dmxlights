@@ -547,7 +547,7 @@ type Sequence struct {
 	CurrentSwitch               int                         // Play this current switch position.
 	Optimisation                bool                        // Flag to decide on calculatePositions Optimisation.
 	RGBNumberStepsInFade        int                         // Number of steps in a RGB fade.
-	LastSwitchSelected          int                         // Storage for the last selected switch.
+	LastSelectedSwitch          int                         // Storage for the last selected switch.
 }
 
 type Function struct {

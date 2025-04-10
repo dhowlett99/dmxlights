@@ -140,6 +140,10 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			// Get an upto date copy of the switch sequence.
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
+			this.LastSelectedSwitch = sequences[sequenceNumber].LastSelectedSwitch
+			//this.LastSelectedSequence = sequenceNumber
+			fmt.Printf("Load Preset %d Setting Last Selected Switch to %d <<<- \n", sequenceNumber, this.LastSelectedSwitch)
+
 			// Get the overrides.
 			RefreshLocalOverrides(this, sequences[sequenceNumber])
 
@@ -169,7 +173,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 	}
 
 	// Auto select the last running or static sequence which lights it's select lamp.
-	this.SelectedSequence = autoSelect(this)
+	this.SelectedSequence, this.LastSelectedSwitch = autoSelect(this, commandChannels)
 	// And set its type.
 	this.SelectedType = this.SequenceType[this.SelectedSequence]
 
@@ -185,7 +189,10 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 }
 
-func autoSelect(this *CurrentState) (selectedSequence int) {
+func autoSelect(this *CurrentState, commandChannels []chan common.Command) (selectedSequence int, selectedSwitch int) {
+
+	selectedSequence = this.SwitchSequenceNumber
+	selectedSwitch = this.LastSelectedSequence
 
 	// Check for running sequences.
 	for sequenceNumber, sequenceRunning := range this.Running {
@@ -207,6 +214,27 @@ func autoSelect(this *CurrentState) (selectedSequence int) {
 		}
 	}
 
+	if commandChannels != nil {
+		fmt.Printf("Last Touched Sequence %d Switch is %d\n", this.LastSelectedSequence, this.LastSelectedSwitch)
+		// If this is a switch sequence also focus the last touched switch.
+		if this.LastSelectedSequence == this.SwitchSequenceNumber {
+
+			fmt.Printf("Set Switch as %d\n", this.LastSelectedSwitch)
+			// Just send a message to focus the switch button.
+			cmd := common.Command{
+				Action: common.UpdateSwitch,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+					{Name: "Step", Value: false}, // Don't step the switch state.
+					{Name: "Focus", Value: true}, // Focus the switch lamp.
+				},
+			}
+			// Send a message to the switch sequence.
+			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+		}
+	}
+
 	// default to first sequnce if nothings running.
-	return selectedSequence
+	return selectedSequence, selectedSwitch
 }

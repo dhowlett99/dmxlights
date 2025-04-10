@@ -41,12 +41,12 @@ func showSelectedSwitch(mySequenceNumber int, sequence *common.Sequence, fixture
 	}
 
 	// Dim the last lamp.
-	if sequence.CurrentSwitch != sequence.LastSwitchSelected || !sequence.FocusSwitch {
+	if sequence.CurrentSwitch != sequence.LastSelectedSwitch || !sequence.FocusSwitch {
 		// Clear the last selected switch.
-		newSwitch := sequence.Switches[sequence.LastSwitchSelected]
+		newSwitch := sequence.Switches[sequence.LastSelectedSwitch]
 		newSwitch.Selected = false
-		sequence.Switches[sequence.LastSwitchSelected] = newSwitch
-		setSwitchLamp(*sequence, sequence.LastSwitchSelected, eventsForLaunchpad, guiButtons)
+		sequence.Switches[sequence.LastSelectedSwitch] = newSwitch
+		setSwitchLamp(*sequence, sequence.LastSelectedSwitch, eventsForLaunchpad, guiButtons)
 	}
 
 	// Now show the current switch state.
@@ -60,5 +60,5 @@ func showSelectedSwitch(mySequenceNumber int, sequence *common.Sequence, fixture
 		setSwitchLamp(*sequence, sequence.CurrentSwitch, eventsForLaunchpad, guiButtons)
 	}
 
-	sequence.LastSwitchSelected = sequence.CurrentSwitch
+	sequence.LastSelectedSwitch = sequence.CurrentSwitch
 }
