@@ -112,7 +112,7 @@ func Test_autoSelect(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			if gotSelectedSequence, gotSelectedSwitch := autoSelect(tt.args.this, tt.args.commandChannels); gotSelectedSequence != tt.wantSelectedSequence {
+			if gotSelectedSequence, gotSelectedSwitch := autoSelect(tt.args.this, tt.args.commandChannels, 0); gotSelectedSequence != tt.wantSelectedSequence {
 				t.Errorf("autoSelect() SwitchNumber = %v, want %v", gotSelectedSwitch, tt.wantSelectedSequence)
 				t.Errorf("autoSelect() SequenceNumber = %v, want %v", gotSelectedSequence, tt.wantSelectedSwitch)
 			}
