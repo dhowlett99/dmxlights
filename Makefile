@@ -71,7 +71,8 @@ certificate:
 	# sudo security delete-certificate -c dmxlights
 	openssl genrsa -out dmxlights.rsa 2048
 	openssl req -new -key dmxlights.rsa -out dmxlights.csr -subj "/CN=dmxlights" -config openssl.cnf
-	openssl x509 -req -days 365 -in dmxlights.csr -signkey dmxlights.rsa -out dmxlights.crt
+	openssl req -x509 -new -nodes -key dmxlights.rsa -config /usr/local/etc/openssl/openssl.cnf -config code_sign_csr.conf -subj "/CN=dmxlights" -days 3650 -out dmxlights.crt -extensions v3_ca -extensions codesign_reqext 
+	#openssl x509 -req -days 365 -in dmxlights.csr -signkey dmxlights.rsa -out dmxlights.crt
 	
 	openssl x509 -in dmxlights.crt  -text -noout
 	
