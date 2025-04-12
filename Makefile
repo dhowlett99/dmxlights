@@ -63,7 +63,7 @@ certificate:
 	sudo security import dmxlights.rsa -k "/Users/derek/Library/Keychains/login.keychain"
 	sudo security add-trusted-cert -r trustRoot -k "/Users/derek/Library/Keychains/login.keychain" dmxlights.crt
 
-deploy: installer
+deploy: installer certificate
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
 	codesign --force --deep --entitlements entitlements.plist --sign ${CERT} -i ${APP_ID} /usr/local/opt/portaudio/lib/libportaudio.2.dylib
