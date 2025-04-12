@@ -53,7 +53,31 @@ legacy-deploy:
 
 installer:
 	go install fyne.io/fyne/v2/cmd/fyne@latest
+
+certificate:
+	# rm -rf cert.key public.key cert.csr cert.pem cert.p12
+	# openssl genrsa -out cert.key 2048
+	# openssl rsa -in cert.key -pubout -out public.key
+	# openssl req -new -key cert.key -out cert.csr -subj "/CN=dmxlights"
+	# openssl req -x509 -new -nodes -key cert.key -subj "/CN=dmxlights" -days 3650 -out cert.pem -reqexts v3_req -extensions v3_ca
+	# openssl pkcs12 -export -inkey cert.key -in cert.pem -out cert.p12
+
+	# sudo security add-trusted-cert -d -r trustRoot -k /Library/Keychains/System.keychain cert.pem
+	# sudo security import cert.key -k /Library/Keychains/System.keychain
+	# sudo security import public.key -k /Library/Keychains/System.keychain
+	# sudo security import cert.p12 -k /Library/Keychains/System.keychain -P fred
+
+	rm -rf dmxlights.csr dmxlights.rsa dmxlights.crt
+	# sudo security delete-certificate -c dmxlights
+	openssl genrsa -out dmxlights.rsa 2048
+	openssl req -new -key dmxlights.rsa -out dmxlights.csr -subj "/CN=dmxlights" -config openssl.cnf
+	openssl x509 -req -days 365 -in dmxlights.csr -signkey dmxlights.rsa -out dmxlights.crt
 	
+	openssl x509 -in dmxlights.crt  -text -noout
+	
+	sudo security import dmxlights.rsa -k "/Users/derek/Library/Keychains/login.keychain"
+	sudo security add-trusted-cert -r trustRoot -k "/Users/derek/Library/Keychains/login.keychain" dmxlights.crt
+
 deploy: installer
 	rm -rf dmxlights.app/
 	codesign --remove-signature /usr/local/opt/portaudio/lib/libportaudio.2.dylib
