@@ -4,3 +4,6 @@ presets.json
 dmxlights.app
 fyne_metadata_init.go
 .DS_Store
+dmxlights.crt
+dmxlights.csr
+dmslights.rsa
