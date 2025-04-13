@@ -332,8 +332,10 @@ func ProcessButtons(X int, Y int,
 
 	// S E L E C T   S E Q U E N C E
 	if X == 8 && (Y == 0 || Y == 1 || Y == 2) {
+		this.SelectedSequence = Y
+		this.LastSelectedSequence = this.SelectedSequence
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		selectSequence(sequences, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		selectSequence(sequences, this, eventsForLaunchpad, guiButtons, commandChannels)
 		return
 	}
 
@@ -385,6 +387,7 @@ func ProcessButtons(X int, Y int,
 	if X >= 0 && X < 8 && Y >= 0 && Y < 4 && sequences[Y].Type == "switch" {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
 		selectSwitch(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels, fixturesConfig)
+		this.LastSelectedSequence = this.SelectedSequence
 		return
 	}
 

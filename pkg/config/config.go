@@ -1,6 +1,7 @@
 // Copyright (C) 2022, 2023 dhowlett99.
 // This is the dmxlights config interface, used for reading and writing
-// the main configuration file.
+// the configuration files.
+// All configs are saved in configX,Y.json files.
 //
 // This program is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -27,7 +28,12 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func SaveConfigToFile(config []common.Sequence, filename string) {
+func SaveConfigToFile(config []common.Sequence, lastSelectedSequence int, filename string) {
+
+	// Add last selected sequence number to all sequences.
+	for sequenceNumber := range config {
+		config[sequenceNumber].LastSelectedSequence = lastSelectedSequence
+	}
 
 	// Marshall the config into a json object.
 	data, err := json.MarshalIndent(config, "", " ")
@@ -87,7 +93,7 @@ func GetProjectConfigPath(projectName string, X int, Y int) string {
 	return path
 }
 
-func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common.Sequence, X int, Y int, projectName string) {
+func AskToSaveConfig(sequences []chan common.Command, lastSelectedSequence int, replyChannel []chan common.Sequence, X int, Y int, projectName string) {
 
 	config := []common.Sequence{}
 
@@ -101,7 +107,7 @@ func AskToSaveConfig(sequences []chan common.Command, replyChannel []chan common
 		}
 
 		// Write to config file.
-		SaveConfigToFile(config, path)
+		SaveConfigToFile(config, lastSelectedSequence, path)
 	}()
 
 	// Ask for all the sequencers for their config.

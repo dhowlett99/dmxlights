@@ -25,9 +25,8 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
-func selectSequence(sequences []*common.Sequence, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func selectSequence(sequences []*common.Sequence, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
-	this.SelectedSequence = Y
 	this.SelectedType = sequences[this.SelectedSequence].Type
 
 	if this.ScannerChaser[this.SelectedSequence] {

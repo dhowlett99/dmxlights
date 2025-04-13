@@ -115,8 +115,6 @@ func savePresets(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 		fmt.Printf("Ask For Config Y=%d X=%d\n", Y, X)
 	}
 
-	fmt.Printf("SavePreset Last Selected Switch %d <<<---\n", this.LastSelectedSwitch)
-
 	if this.ShowRGBColorPicker {
 		this.ShowRGBColorPicker = false
 		removeColorPicker(this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
@@ -131,7 +129,7 @@ func savePresets(sequences []*common.Sequence, X int, Y int, this *CurrentState,
 		this.PresetsStore[location] = presets.Preset{State: true, Selected: true, Label: current.Label, ButtonColor: current.ButtonColor}
 		this.LastPreset = &location
 
-		config.AskToSaveConfig(commandChannels, replyChannels, X, Y, this.ProjectName)
+		config.AskToSaveConfig(commandChannels, this.SelectedSequence, replyChannels, X, Y, this.ProjectName)
 
 		// Turn off the save button from flashing.
 		common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)

@@ -30,6 +30,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight,
 	guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
+	var lastSelectedSequence int
 	var lastSelectedSwitch int
 
 	// Stop all sequences, so we start in sync.
@@ -105,6 +106,9 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		// Forget we've pressed twice.
 		this.SelectButtonPressed[sequenceNumber] = false
 
+		// Load the last selected sequence from the preset.
+		lastSelectedSequence = sequences[sequenceNumber].LastSelectedSequence
+
 		this.ScannerChaser[sequenceNumber] = sequences[sequenceNumber].ScannerChaser
 		this.Static[sequenceNumber] = sequences[sequenceNumber].Static
 		this.StaticFlashing[sequenceNumber] = false
@@ -142,10 +146,8 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			// Get an upto date copy of the switch sequence.
 			sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
+			// Load the last selected switch from the sequence.
 			lastSelectedSwitch = sequences[sequenceNumber].LastSelectedSwitch
-			//this.LastSelectedSequence = sequenceNumber
-			fmt.Printf("Load Preset %d Setting Last Selected Switch to %d <<<- \n", sequenceNumber, lastSelectedSwitch)
-
 			// Get the overrides.
 			RefreshLocalOverrides(this, sequences[sequenceNumber])
 
@@ -174,8 +176,9 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.StrobeSpeed[this.SelectedSequence] = sequences[this.SelectedSequence].StrobeSpeed
 	}
 
-	// Auto select the last running or static sequence which lights it's select lamp.
-	this.SelectedSequence, lastSelectedSwitch = autoSelect(this, commandChannels, lastSelectedSwitch)
+	// Auto select the last running or static sequence or switch which lights it's selected lamp.
+	this.SelectedSequence, this.LastSelectedSwitch = autoSelect(this, commandChannels, lastSelectedSequence, lastSelectedSwitch)
+
 	// And set its type.
 	this.SelectedType = this.SequenceType[this.SelectedSequence]
 
@@ -191,17 +194,16 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 }
 
-func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastSelectedSwitch int) (selectedSequence int, selectedSwitch int) {
-
-	selectedSequence = this.SwitchSequenceNumber
-	selectedSwitch = lastSelectedSwitch
+func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastSelectedSequence int, lastSelectedSwitch int) (int, int) {
 
 	// Check for running sequences.
 	for sequenceNumber, sequenceRunning := range this.Running {
 		if sequenceRunning {
-			selectedSequence = sequenceNumber
-			if selectedSequence == this.ChaserSequenceNumber {
-				selectedSequence = this.ScannerSequenceNumber
+			lastSelectedSequence = sequenceNumber
+			if lastSelectedSequence == this.ChaserSequenceNumber {
+				lastSelectedSequence = this.ScannerSequenceNumber
+				fmt.Printf("Found a running sequence %d\n", sequenceNumber)
+				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}
 	}
@@ -209,34 +211,35 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 	// Check for static sequences.
 	for sequenceNumber, sequenceInStatic := range this.Static {
 		if sequenceInStatic {
-			selectedSequence = sequenceNumber
-			if selectedSequence == this.ChaserSequenceNumber {
-				selectedSequence = this.ScannerSequenceNumber
+			lastSelectedSequence = sequenceNumber
+			if lastSelectedSequence == this.ChaserSequenceNumber {
+				lastSelectedSequence = this.ScannerSequenceNumber
+				fmt.Printf("Found a static sequence %d\n", sequenceNumber)
+				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}
 	}
 
-	if commandChannels != nil {
-		fmt.Printf("Last Touched Sequence %d Switch is %d\n", this.LastSelectedSequence, lastSelectedSwitch)
-		// If this is a switch sequence also focus the last touched switch.
-		if this.LastSelectedSequence == this.SwitchSequenceNumber {
+	// Check for a selected switch.
+	// If this is a switch sequence also focus the last touched switch.
+	if lastSelectedSequence == this.SwitchSequenceNumber {
 
-			fmt.Printf("Set Switch as %d\n", lastSelectedSwitch)
-			// Just send a message to focus the switch button.
-			cmd := common.Command{
-				Action: common.UpdateSwitch,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: lastSelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Step", Value: false}, // Don't step the switch state.
-					{Name: "Focus", Value: true}, // Focus the switch lamp.
-				},
-			}
+		// Just send a message to focus the switch button.
+		cmd := common.Command{
+			Action: common.UpdateSwitch,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: lastSelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[lastSelectedSwitch]},
+				{Name: "Step", Value: false}, // Don't step the switch state.
+				{Name: "Focus", Value: true}, // Focus the switch lamp.
+			},
+		}
+		if commandChannels != nil {
 			// Send a message to the switch sequence.
 			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 		}
 	}
 
 	// default to first sequnce if nothings running.
-	return selectedSequence, selectedSwitch
+	return lastSelectedSequence, lastSelectedSwitch
 }

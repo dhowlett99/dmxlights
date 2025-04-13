@@ -858,7 +858,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Switches[switchNumber].Override.StrobeSpeed = switchStrobeSpeed
 		sequence.Switches[switchNumber].Override.SignalOverrideStrobe = true
 
-		// Reset switch overrides.
+	// Clear switch overrides.
 	case common.ClearSwitchOverrides:
 		const SWITCH_NUMBER = 0   // Integer
 		const SWITCH_POSITION = 1 // Integer
