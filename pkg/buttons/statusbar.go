@@ -39,7 +39,6 @@ type SwitchInfo struct {
 	IsRotateOverrideAble bool
 	Rotate               int
 	RotateName           string
-	RotateSpeedName      string
 	AvailableRotates     []string
 	NumberOfRotates      int
 	Color                int
@@ -85,7 +84,7 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.OverrideGobo = overrides[number][position].Gobo
 	switchInfo.AvailableRotates = overrides[number][position].RotateChannels
 	switchInfo.Rotate = overrides[number][position].Rotate
-	switchInfo.RotateSpeedName = overrides[number][position].RotateName
+	switchInfo.RotateName = overrides[number][position].RotateName
 	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
 	switchInfo.Color = overrides[number][position].Color
 	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
@@ -288,7 +287,7 @@ func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 	switchInfo := getSwitchDetails(this)
 
 	if debug {
-		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", switchInfo.RGBShift, switchInfo.ScannerShift, switchInfo.RGBShift, switchInfo.Rotate, switchInfo.RotateSpeedName)
+		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", switchInfo.RGBShift, switchInfo.ScannerShift, switchInfo.RGBShift, switchInfo.Rotate, switchInfo.RotateName)
 		fmt.Printf("UpdateShift switchInfo.Type %s  switchInfo.FixtureType %s IsRotateOverrideAble %t ActionMode %s\n", switchInfo.Type, switchInfo.FixtureType, switchInfo.IsRotateOverrideAble, switchInfo.ActionMode)
 	}
 

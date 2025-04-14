@@ -181,83 +181,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	// Deal with the rotate parameters but only if there is a Rotate channel.
 	if IsThisAChannel(fixture, "Rotate") {
-		// Rotate is a channel with a number of settings,
-		// Each setting represents a speed, direction or both.
-		// At this point the rotate action contains the name of the setting.
-		// The rotate config needs to hold the rotate setting number so we can recall it and
-		// step through the settings with the override.
-		// We use the key words Forward and Reverse to represent Clockwise and Anticlockwise respectively.
-
-		// Lookup the setting number for this rotate name.
-
-		config.RotateName = action.Rotate
-		config.Rotate = GetRotateSpeedNumberByName(fixture, action.Rotate)
-		config.Rotatable = false
-		config.AutoRotate = false
-		config.RotateSpeed = 1
-
-		if strings.Contains(config.RotateName, "Off") {
-			config.Rotatable = false
-			config.AutoRotate = false
-			config.Forward = false
-			config.Reverse = false
-		}
-
-		if strings.Contains(config.RotateName, "Forward") {
-			config.Rotatable = true
-			config.AutoRotate = false
-			config.Forward = true
-			config.Reverse = false
-		}
-
-		if strings.Contains(config.RotateName, "Reverse") {
-			config.Rotatable = true
-			config.AutoRotate = false
-			config.Forward = false
-			config.Reverse = true
-		}
-		if strings.Contains(config.RotateName, "Auto") {
-			config.Rotatable = true
-			config.AutoRotate = true
-			config.Forward = false
-			config.Reverse = false
-			if IsThisAChannel(fixture, "Rotate") {
-				config.Rotatable = true
-			} else {
-				config.Rotatable = false
-			}
-		}
-
-		// Calculate the rotation speed based on direction and speed.
-		if config.Rotatable {
-			config.ReverseSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
-			if err != nil {
-				fmt.Printf("Looking in channel:Rotate for Setting:Reverse %s error: %s\n", action.RotateSpeed, err)
-			}
-			config.ForwardSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
-			if err != nil {
-				fmt.Printf("Looking in channel:Rotate for Setting:Forward %s error: %s\n", action.RotateSpeed, err)
-			}
-			if debug_rotate {
-				fmt.Printf("RotateName%s\n", config.RotateName)
-				fmt.Printf("Forward Speed %d\n", config.ForwardSpeed)
-				fmt.Printf("Reverse Speed %d\n", config.ReverseSpeed)
-				fmt.Printf("Rotate %d\n", config.Rotate)
-			}
-
-			if !config.Forward && !config.Reverse {
-				config.RotateSpeed = 1
-			}
-			if config.Forward {
-				config.RotateSpeed = config.ForwardSpeed
-			}
-			if config.Reverse {
-				config.RotateSpeed = config.ReverseSpeed
-			}
-			if debug_rotate {
-				fmt.Printf("RotateSpeed %d\n", config.RotateSpeed)
-			}
-		}
+		config = setRotate(fixture, config, action, fixturesConfig)
 	}
 
 	switch action.Speed {
@@ -426,4 +350,82 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 
 	}
 	return newAction
+}
+
+// Rotate is a channel with a number of settings,
+// Each setting represents a speed, direction or both.
+// At this point the rotate action contains the name of the setting.
+// The rotate config needs to hold the rotate setting number so we can recall it and
+// step through the settings with the override.
+// We use the key words Forward and Reverse to represent Clockwise and Anticlockwise respectively.
+func setRotate(fixture *Fixture, config ActionConfig, action Action, fixturesConfig *Fixtures) ActionConfig {
+
+	// Lookup the setting number for this rotate name.
+	config.RotateName = action.Rotate
+	config.Rotate = GetRotateSpeedNumberByName(fixture, action.Rotate)
+	config.Rotatable = false
+	config.AutoRotate = false
+	config.RotateSpeed = GetADMXValue(fixture, config.Rotate, "Rotate")
+
+	if strings.Contains(config.RotateName, "Off") {
+		config.Rotatable = false
+		config.AutoRotate = false
+		config.Forward = false
+		config.Reverse = false
+		return config
+	}
+
+	if strings.Contains(config.RotateName, "Forward") {
+		config.Rotatable = true
+		config.AutoRotate = false
+		config.Forward = true
+		config.Reverse = false
+		return config
+	}
+
+	if strings.Contains(config.RotateName, "Reverse") {
+		config.Rotatable = true
+		config.AutoRotate = false
+		config.Forward = false
+		config.Reverse = true
+		return config
+	}
+	if strings.Contains(config.RotateName, "Auto") {
+		config.Rotatable = true
+		config.AutoRotate = true
+		config.Forward = false
+		config.Reverse = false
+		config.Rotatable = true
+
+		var err error
+		// Calculate the rotation speed based on direction and speed.
+		if config.Rotatable {
+			config.ReverseSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Reverse", action.RotateSpeed, fixturesConfig)
+			if err != nil {
+				fmt.Printf("Looking in channel:Rotate for Setting:Reverse %s error: %s\n", action.RotateSpeed, err)
+			}
+			config.ForwardSpeed, err = GetChannelSettingByNameAndSpeed(fixture, "Rotate", "Forward", action.RotateSpeed, fixturesConfig)
+			if err != nil {
+				fmt.Printf("Looking in channel:Rotate for Setting:Forward %s error: %s\n", action.RotateSpeed, err)
+			}
+
+			if !config.Forward && !config.Reverse {
+				config.RotateSpeed = config.Rotate
+			}
+			if config.Forward {
+				config.RotateSpeed = config.ForwardSpeed
+			}
+			if config.Reverse {
+				config.RotateSpeed = config.ReverseSpeed
+			}
+			if debug_rotate {
+				fmt.Printf("RotateSpeed %d\n", config.RotateSpeed)
+			}
+		}
+
+		return config
+
+	}
+
+	return config
 }
