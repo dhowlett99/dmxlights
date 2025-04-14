@@ -150,14 +150,15 @@ type Group struct {
 }
 
 type FixtureInfo struct {
-	HasRotate          bool
-	RotateOptions      []string
-	HasRotateSpeed     bool
-	RotateSpeedOptions []string
-	HasGobo            bool
-	HasColorWheel      bool
-	HasProgram         bool
-	HasProgramSpeed    bool
+	HasRotate           bool
+	RotateChaseOptions  []string
+	RotateStaticOptions []string
+	HasRotateSpeed      bool
+	RotateSpeedOptions  []string
+	HasGobo             bool
+	HasColorWheel       bool
+	HasProgram          bool
+	HasProgramSpeed     bool
 }
 
 type Setting struct {

@@ -697,12 +697,13 @@ func GetFixtureInfo(thisFixture *Fixture) FixtureInfo {
 			if strings.Contains(option, "Auto") || strings.Contains(option, "auto") {
 				autoFound = true
 			}
-			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, option)
+			fixtureInfo.RotateStaticOptions = append(fixtureInfo.RotateStaticOptions, option)
+			fixtureInfo.RotateChaseOptions = append(fixtureInfo.RotateChaseOptions, option)
 		}
 		// Now if we didn't find a dedicated channel for automatically rotating in different directions.
 		// Add our internal keyword for Auto.
 		if !autoFound {
-			fixtureInfo.RotateOptions = append(fixtureInfo.RotateOptions, "Auto")
+			fixtureInfo.RotateChaseOptions = append(fixtureInfo.RotateChaseOptions, "Auto")
 		}
 	}
 
