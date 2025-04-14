@@ -3717,8 +3717,8 @@ fixtures:
       fade: Sharp
       size: ""
       speed: ""
-      rotate: ""
-      rotatespeed: ""
+      rotate: Auto
+      rotatespeed: Slow
       program: ""
       programspeed: ""
       strobe: ""

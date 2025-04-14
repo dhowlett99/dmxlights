@@ -237,11 +237,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 
 				if value == "Static" {
 					hideAllActionFields(o.(*fyne.Container))
+
 					newAction := createCopyOfAction(ap, i)
 					newAction.Mode = value
 					ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
+
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = false
 
@@ -256,8 +258,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[COLOR_SELECTION_BOX].(*fyne.Container).Objects[COLOR9].(*canvas.Rectangle).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[COLOR_SELECTION_BOX].(*fyne.Container).Objects[COLOR10].(*canvas.Rectangle).Hidden = false
 
-					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-					o.(*fyne.Container).Objects[ACTIONS_FADE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[RADIO_BUTTON].(*widget.RadioGroup).Horizontal = true
+					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[RADIO_BUTTON].(*widget.RadioGroup).Hidden = false
+
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
+					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
+
+					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
+					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
 
 				}
 
@@ -299,25 +307,9 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotate
 					o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotate
 
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasRotateSpeed
-					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasRotateSpeed
-
-					// If the rotate is set to auto then we need to show the rotate speed.
-					if o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
-						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-						o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
-					}
-
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = !fixtureInfo.HasGobo
 					o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = !fixtureInfo.HasGobo
 
-					if o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
-						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
-						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
-					} else {
-						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
-						o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
-					}
 				}
 
 				if value == "Control" {
@@ -398,11 +390,22 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 			// Rotate
 			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Rotate)
 			o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+
+				// If the rotate is set to auto then we need to show the rotate speed.
+				if o.(*fyne.Container).Objects[ACTIONS_ROTATE].(*fyne.Container).Objects[SELECT].(*widget.Select).Selected == "Auto" {
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = false
+				} else {
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = true
+					o.(*fyne.Container).Objects[ACTIONS_ROTATESPEED].(*fyne.Container).Objects[SELECT].(*widget.Select).Hidden = true
+				}
+
 				newAction := createCopyOfAction(ap, i)
 				newAction.Rotate = value
 				ap.ActionsList = updateAction(ap.CurrentStateName, ap.ActionsList, ap.ActionsList[i].Number, newAction)
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
+
 			}
 
 			// RotateSpeed
@@ -474,6 +477,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				ap.UpdateThisAction = ap.CurrentState
 			}
 		})
+
+	// If you click on the list, it highlights the whole panel in blue
+	// Since I don't want the panel to ever be blue, I de-select it every time you select it.
+	ap.ActionsPanel.OnSelected = func(id widget.ListItemID) {
+		ap.ActionsPanel.Unselect(id)
+	}
 
 	return &ap
 }

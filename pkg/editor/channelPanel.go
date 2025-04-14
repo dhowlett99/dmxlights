@@ -99,31 +99,49 @@ func NewChannelEditor(w fyne.Window, id int, channels []fixture.Channel, fp *Fix
 		Bold: true,
 	}
 
-	// Name, description and DMX address
-	nameInput := widget.NewEntry()
-	nameInput.SetPlaceHolder(thisFixture.Name)
-	descInput := widget.NewEntry()
-	descInput.SetPlaceHolder(thisFixture.Description)
-	addrInput := widget.NewEntry()
-	addrInput.SetPlaceHolder(fmt.Sprintf("%d", thisFixture.Address))
-
-	// Top Form.
+	// Name, Description,Type and DMX address
 	var formTopItems []*widget.FormItem
-	name1 := widget.NewEntry()
-	name1.SetText(thisFixture.Name)
-	formTopItem := widget.NewFormItem("Name", name1)
-	formTopItems = append(formTopItems, formTopItem)
-	name2 := widget.NewEntry()
-	name2.SetText(thisFixture.Description)
-	formTopItem2 := widget.NewFormItem("Description", name2)
-	formTopItems = append(formTopItems, formTopItem2)
-	name3 := widget.NewEntry()
-	name3.SetText(fmt.Sprintf("%d", thisFixture.Address))
-	formTopItem3 := widget.NewFormItem("DMX Address", name3)
-	formTopItems = append(formTopItems, formTopItem3)
+	name := widget.NewEntry()
+	name.TextStyle.Bold = true
+	name.SetText(thisFixture.Name)
+	name.OnChanged = func(value string) {
+		name.SetText(thisFixture.Name)
+	}
+	nameItem := widget.NewFormItem("Name", name)
+	formTopItems = append(formTopItems, nameItem)
+
+	tYpe := widget.NewEntry()
+	tYpe.TextStyle.Bold = true
+	tYpe.SetText(thisFixture.Type)
+	tYpe.OnChanged = func(value string) {
+		tYpe.SetText(thisFixture.Type)
+	}
+	typeItem := widget.NewFormItem("Type", tYpe)
+	formTopItems = append(formTopItems, typeItem)
+
+	description := widget.NewEntry()
+	description.TextStyle.Bold = true
+	description.SetText(thisFixture.Description)
+	description.OnChanged = func(value string) {
+		description.SetText(thisFixture.Description)
+	}
+	descriptionItem := widget.NewFormItem("Description", description)
+	formTopItems = append(formTopItems, descriptionItem)
+
+	dmxAddress := widget.NewEntry()
+	dmxAddress.TextStyle.Bold = true
+	dmxAddress.SetText(fmt.Sprintf("%d", thisFixture.Address))
+	dmxAddress.OnChanged = func(value string) {
+		tYpe.SetText(fmt.Sprintf("%d", thisFixture.Address))
+	}
+	dmxAddressItem := widget.NewFormItem("DMX Address", dmxAddress)
+	formTopItems = append(formTopItems, dmxAddressItem)
+
 	formTop := &widget.Form{
 		Items: formTopItems,
 	}
+
+	formTop.Items[0].HintText = "Name of Fixture"
 
 	labelChannels := widget.NewLabel("Channels")
 	labelChannels.TextStyle = fyne.TextStyle{
