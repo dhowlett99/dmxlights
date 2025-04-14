@@ -466,6 +466,9 @@ func GetADMXValueMaxMin(fixture *Fixture, settingName string, channelName string
 func IsThisChannelOverrideAble(fixture *Fixture, channelName string) bool {
 
 	for _, channel := range fixture.Channels {
+		if debug {
+			fmt.Printf("fixture %s channel.Name %s channel.Override %t\n", fixture.Name, channel.Name, channel.Override)
+		}
 		if channel.Name == channelName {
 			return channel.Override
 		}

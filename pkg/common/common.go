@@ -1877,7 +1877,6 @@ func ClearOverrides(override Override) Override {
 	override.OverrideFade = false
 	override.Fade = override.StartingFade
 	override.SignalOverrideRotateSpeed = false
-	override.IsRotateOverrideAble = false
 	override.OverrideRotateSpeed = false
 	override.Rotate = override.StartingRotateSpeed
 	override.SignalOverrideColor = false

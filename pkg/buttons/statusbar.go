@@ -289,6 +289,7 @@ func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 
 	if debug {
 		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", switchInfo.RGBShift, switchInfo.ScannerShift, switchInfo.RGBShift, switchInfo.Rotate, switchInfo.RotateSpeedName)
+		fmt.Printf("UpdateShift switchInfo.Type %s  switchInfo.FixtureType %s IsRotateOverrideAble %t ActionMode %s\n", switchInfo.Type, switchInfo.FixtureType, switchInfo.IsRotateOverrideAble, switchInfo.ActionMode)
 	}
 
 	// Chaser mode.
