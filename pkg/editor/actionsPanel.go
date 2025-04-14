@@ -75,7 +75,8 @@ const (
 )
 
 const (
-	ACTIONS_MODE int = iota
+	ACTIONS_LABEL int = iota
+	ACTIONS_MODE
 	ACTIONS_COLORS
 	ACTIONS_FADE
 	ACTIONS_SIZE
@@ -142,6 +143,8 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 		// Function to create list.
 		func() fyne.CanvasObject {
 			return container.NewVBox(
+
+				widget.NewLabel("Actions"),
 
 				container.NewHBox(
 					widget.NewLabel("Mode"),
@@ -215,11 +218,24 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 		func(i widget.ListItemID, o fyne.CanvasObject) {
 			hideAllActionFields(o.(*fyne.Container))
 
+			// Label
+			o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("Actions")
+			o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+				Bold: true,
+			}
+
 			// Mode
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Mode)
 			o.(*fyne.Container).Objects[ACTIONS_MODE].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
 
 				if value == "None" || value == "" {
+
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("This action is off for this fixture")
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+						Italic: true,
+						Bold:   true,
+					}
+
 					hideAllActionFields(o.(*fyne.Container))
 					newAction := createBlankAction(ap, i)
 					newAction.Mode = value
@@ -229,6 +245,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				}
 
 				if value == "Off" || value == "" {
+
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("This action is off for this fixture")
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+						Italic: true,
+						Bold:   true,
+					}
+
 					hideAllActionFields(o.(*fyne.Container))
 					newAction := createBlankAction(ap, i)
 					newAction.Mode = value
@@ -238,6 +261,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				}
 
 				if value == "Static" {
+
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("This action create a static scene for this fixture")
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+						Italic: true,
+						Bold:   true,
+					}
+
 					hideAllActionFields(o.(*fyne.Container))
 
 					newAction := createCopyOfAction(ap, i)
@@ -281,6 +311,12 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 					ap.UpdateActions = true
 					ap.UpdateThisAction = ap.CurrentState
 
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("This action creates a chaser for this fixture")
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+						Italic: true,
+						Bold:   true,
+					}
+
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
 					o.(*fyne.Container).Objects[ACTIONS_COLORS].(*fyne.Container).Objects[SELECT].(*widget.Button).Hidden = false
 
@@ -317,6 +353,13 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				}
 
 				if value == "Control" {
+
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).SetText("This action controls which show is active on this fixture")
+					o.(*fyne.Container).Objects[ACTIONS_LABEL].(*widget.Label).TextStyle = fyne.TextStyle{
+						Italic: true,
+						Bold:   true,
+					}
+
 					newAction := createBlankAction(ap, i)
 					newAction.Name = ap.ActionsList[i].Name
 					newAction.Number = ap.ActionsList[i].Number
