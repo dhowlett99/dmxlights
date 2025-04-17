@@ -55,12 +55,16 @@ installer:
 	go install fyne.io/fyne/v2/cmd/fyne@latest
 
 certificate:
+	# Clean out configuration files and existing certificate.
 	rm -rf dmxlights.csr dmxlights.rsa dmxlights.crt
 	- sudo security delete-certificate -c dmxlights
+	# Generate private key.
 	openssl genrsa -out dmxlights.rsa 2048
-	openssl req -new -key dmxlights.rsa -out dmxlights.csr -subj "/CN=dmxlights" -config openssl.cnf
-	openssl req -x509 -new -nodes -key dmxlights.rsa -config /usr/local/etc/openssl/openssl.cnf -config code_sign_csr.conf -subj "/CN=dmxlights" -days 3650 -out dmxlights.crt -extensions v3_ca -extensions codesign_reqext 
+	# Create signing request and generare certificate.
+	openssl req -x509 -new -nodes -key dmxlights.rsa -config code_sign_csr.conf -subj "/CN=dmxlights" -days 3650 -out dmxlights.crt -extensions v3_ca -extensions codesign_reqext 
+	# Upload private key to login keychain.
 	sudo security import dmxlights.rsa -k "/Users/derek/Library/Keychains/login.keychain"
+	# Upload self signed certificate to login keychain.
 	sudo security add-trusted-cert -r trustRoot -k "/Users/derek/Library/Keychains/login.keychain" dmxlights.crt
 
 deploy: installer certificate
