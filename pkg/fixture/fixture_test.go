@@ -125,10 +125,10 @@ func Test_getNumberOfFixtures(t *testing.T) {
 				sequenceNumber:     1,
 				fixtures: &Fixtures{
 					Fixtures: []Fixture{
-						{Name: "fixture1", Number: 1, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
-						{Name: "fixture2", Number: 2, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
-						{Name: "fixture3", Number: 3, Group: 2, MultiFixtureDevice: true, NumberSubFixtures: 8, Channels: eightColorChannels},
+						{Name: "fixture1", Number: 1, Group: 2, FixtureInfo: FixtureInfo{MultiFixtureDevice: true, NumberSubFixtures: 8}, Channels: eightColorChannels},
+						{Name: "fixture2", Number: 2, Group: 2, FixtureInfo: FixtureInfo{MultiFixtureDevice: true, NumberSubFixtures: 8}, Channels: eightColorChannels},
+						{Name: "fixture3", Number: 3, Group: 2, FixtureInfo: FixtureInfo{MultiFixtureDevice: true, NumberSubFixtures: 8}, Channels: eightColorChannels},
+						{Name: "fixture3", Number: 3, Group: 2, FixtureInfo: FixtureInfo{MultiFixtureDevice: true, NumberSubFixtures: 8}, Channels: eightColorChannels},
 					},
 				},
 			},

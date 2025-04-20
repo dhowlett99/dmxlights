@@ -127,21 +127,18 @@ type ActionConfig struct {
 }
 
 type Fixture struct {
-	ID                 int       `yaml:"id"`
-	Name               string    `yaml:"name"`
-	Label              string    `yaml:"label,omitempty"`
-	Number             int       `yaml:"number"`
-	Description        string    `yaml:"description"`
-	Type               string    `yaml:"type"`
-	Group              int       `yaml:"group"`
-	Address            int16     `yaml:"address"`
-	Channels           []Channel `yaml:"channels"`
-	States             []State   `yaml:"states,omitempty"`
-	MultiFixtureDevice bool      `yaml:"-"` // Calulated internally.
-	NumberSubFixtures  int       `yaml:"-"` // Calulated internally.
-	HasRGBChannels     bool      `yaml:"-"` // Calulated internally.
-	HasColorChannel    bool      `yaml:"-"` // Calulated internally.
-	UseFixture         string    `yaml:"use_fixture,omitempty"`
+	ID          int         `yaml:"id"`
+	Name        string      `yaml:"name"`
+	Label       string      `yaml:"label,omitempty"`
+	Number      int         `yaml:"number"`
+	Description string      `yaml:"description"`
+	Type        string      `yaml:"type"`
+	Group       int         `yaml:"group"`
+	Address     int16       `yaml:"address"`
+	Channels    []Channel   `yaml:"channels"`
+	States      []State     `yaml:"states,omitempty"`
+	FixtureInfo FixtureInfo `yaml:"-"` // Calulated internally.
+	UseFixture  string      `yaml:"use_fixture,omitempty"`
 }
 
 type Group struct {
@@ -150,13 +147,17 @@ type Group struct {
 }
 
 type FixtureInfo struct {
+	MultiFixtureDevice bool
+	NumberSubFixtures  int
+	HasRGBChannels     bool
+	//HasColorChannel     bool
 	HasRotate           bool
 	RotateChaseOptions  []string
 	RotateStaticOptions []string
 	HasRotateSpeed      bool
 	RotateSpeedOptions  []string
 	HasGobo             bool
-	HasColorWheel       bool
+	HasColorChannel     bool
 	HasProgram          bool
 	HasProgramSpeed     bool
 }
@@ -601,62 +602,5 @@ func limitDmxValue(MaxDegrees *int, Value int) int {
 func SendToAllFixtures(fixtureChannels []chan common.FixtureCommand, command common.FixtureCommand) {
 	for _, fixture := range fixtureChannels {
 		fixture <- command
-	}
-}
-
-// Automatically set the number of sub fixtures inside a fixture.
-func SetMultiFixtureFlag(fixturesConfig *Fixtures) {
-
-	for fixtureNumber, fixture := range fixturesConfig.Fixtures {
-		// Automatically set the number of sub fixtures inside a fixture.
-		var numberSubFixtures int
-		for _, channel := range fixture.Channels {
-			if strings.Contains(channel.Name, "Red") {
-				numberSubFixtures++
-			}
-		}
-		if numberSubFixtures > 1 {
-			if debug {
-				fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
-			}
-			fixturesConfig.Fixtures[fixtureNumber].MultiFixtureDevice = true
-			fixturesConfig.Fixtures[fixtureNumber].NumberSubFixtures = numberSubFixtures
-		}
-	}
-}
-
-// Does the fixture have red, green and blue channels.
-func SetHasRGBFlag(fixturesConfig *Fixtures) {
-
-	for fixtureNumber, fixture := range fixturesConfig.Fixtures {
-
-		var hasRed bool
-		var hasGreen bool
-		var hasBlue bool
-		var hasColor bool
-
-		for _, channel := range fixture.Channels {
-			if strings.Contains(channel.Name, "Red") || strings.Contains(channel.Name, "red") {
-				hasRed = true
-			}
-			if strings.Contains(channel.Name, "Green") || strings.Contains(channel.Name, "green") {
-				hasGreen = true
-			}
-			if strings.Contains(channel.Name, "Blue") || strings.Contains(channel.Name, "blue") {
-				hasBlue = true
-			}
-			if strings.Contains(channel.Name, "Color") || strings.Contains(channel.Name, "color") {
-				hasColor = true
-			}
-		}
-
-		// Now we have looked at every channel.
-		if hasRed && hasGreen && hasBlue {
-			fixturesConfig.Fixtures[fixtureNumber].HasRGBChannels = true
-		}
-		if hasColor {
-			fixturesConfig.Fixtures[fixtureNumber].HasColorChannel = true
-		}
-
 	}
 }

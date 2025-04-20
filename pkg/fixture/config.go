@@ -35,7 +35,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	var goboSettings []common.Setting
 	var err error
 
-	fixtureInfo := GetFixtureInfo(fixture)
+	fixtureInfo := GetFixtureInfo(fixture, fixturesConfig)
 	if debug {
 		fmt.Printf("GetConfig() This fixture %s has Rotate Feature %+v\n", fixture.Name, fixtureInfo)
 	}
@@ -109,7 +109,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	}
 
 	// If we have a color channel in the fixture get the color setting number based on color in the action.
-	if fixture.HasColorChannel {
+	if fixture.FixtureInfo.HasColorChannel {
 		// Find the avialable colors as listed in the color channel settings.
 		config.AvailableColors = GetAvailableColors(fixture)
 
@@ -125,7 +125,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	// If we have Red, Green, Blue color channels look for a matching color in
 	// the standard color pallete based on the first color in the actions.
-	if fixture.HasRGBChannels {
+	if fixture.FixtureInfo.HasRGBChannels {
 		if len(action.Colors) > 0 {
 			config.AvailableColors = colors.GetAvailableColorsAsStrings()
 			// Look up the first color from the action in the standard color library.

@@ -731,11 +731,8 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 				this.ProjectName = result[0]
 				myWindow.SetTitle("DMX Lights:" + this.ProjectName)
 
-				// Automatically set the number of sub fixtures inside a fixture.
-				fixture.SetMultiFixtureFlag(newFixturesConfig)
-
-				// Set the RGB if the fixture has red, green and blue channels.
-				fixture.SetHasRGBFlag(fixturesConfig)
+				// Populate the fixture info.
+				fixture.PopulateFixturesInfo(fixturesConfig)
 
 				// Copy the newFixtures into the old pointer to the fixtures config.
 				fixturesConfig.Fixtures = newFixturesConfig.Fixtures

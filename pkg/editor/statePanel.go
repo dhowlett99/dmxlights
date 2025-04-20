@@ -29,7 +29,7 @@ import (
 )
 
 // Show a list of States.
-func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *FixturesPanel, fixtures *fixture.Fixtures) (modal *widget.PopUp, err error) {
+func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *FixturesPanel, fixturesConfig *fixture.Fixtures) (modal *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewStateEditor\n")
@@ -39,13 +39,13 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	buttonSave := widget.NewButton("OK", func() {})
 
 	// Get the details of this fixture.
-	thisFixture, err := fixture.GetFixtureDetailsById(fixtureID, fixtures)
+	thisFixture, err := fixture.GetFixtureDetailsById(fixtureID, fixturesConfig)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsById %s", err.Error())
 	}
 
 	// Get used fixture id from its label.
-	useFixture, err := fixture.GetFixtureDetailsByLabel(useFixtureName, fixtures)
+	useFixture, err := fixture.GetFixtureDetailsByLabel(useFixtureName, fixturesConfig)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
 	}
@@ -53,17 +53,17 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	// If this is a pretend virtual fixture i.e a switch.
 	// Find the original fixture's details so we can make decisions on
 	// what options to put in the menus based on the fixtures capabilities.
-	basedOnFixture, err := fixture.GetFixtureDetailsByLabel(thisFixture.UseFixture, fixtures)
+	basedOnFixture, err := fixture.GetFixtureDetailsByLabel(thisFixture.UseFixture, fixturesConfig)
 	if err != nil {
 		return nil, fmt.Errorf("GetFixtureDetailsByLabel %s", err.Error())
 	}
-	fixtureInfo := fixture.GetFixtureInfo(basedOnFixture)
+	fixtureInfo := fixture.GetFixtureInfo(basedOnFixture, fixturesConfig)
 	if debug {
 		fmt.Printf("This fixture has Rotate Feature %+v\n", fixtureInfo)
 	}
 
 	// Generate a list of functions that switches can use.
-	fixturesAvailable := GetFixtureLabelsForSwitches(fixtures)
+	fixturesAvailable := GetFixtureLabelsForSwitches(fixturesConfig)
 
 	// Title.
 	title := widget.NewLabel(fmt.Sprintf("ID:%d Edit Switch States for Switch %d", thisFixture.ID, thisFixture.Number))
@@ -95,7 +95,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	// If this fixture has a gobo channel.
 	if fixtureInfo.HasGobo {
 		// Add all the specified options for the gobo channel
-		ap.ActionGoboOptions = append(ap.ActionGoboOptions, populateGoboNames(*useFixture, fixtures)...)
+		ap.ActionGoboOptions = append(ap.ActionGoboOptions, populateGoboNames(*useFixture, fixturesConfig)...)
 	}
 
 	ap.ActionsPanel.Hide()
@@ -131,7 +131,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 		fp.UpdateThisFixture = thisFixture.ID - 1
 		fp.UpdateUseFixture = true
 
-		useFixture, err := fixture.GetFixtureDetailsByLabel(useInput.Selected, fixtures)
+		useFixture, err := fixture.GetFixtureDetailsByLabel(useInput.Selected, fixturesConfig)
 		if err != nil {
 			addressInput.SetText("Not Found")
 		} else {
@@ -139,13 +139,13 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 		}
 
 		// Based on a new use fixture - Try again to populate the program and rotate options as available for this states action.
-		fixture, err := findFixtureByLabel(value, fixtures)
+		fixture, err := findFixtureByLabel(value, fixturesConfig)
 		if err != nil {
 			fmt.Printf("findFixtureByName: fixtureName: %s error %s\n", fixture.Name, err.Error())
 			return
 		}
 		// Look for any options for the Program channel.
-		ap.ActionProgramOptions = populateOptions(fixture, "Program", fixtures)
+		ap.ActionProgramOptions = populateOptions(fixture, "Program", fixturesConfig)
 
 		// Based on a new use fixture - Try again to populate the channel names in the settings panel.
 		st.ChannelOptions = populateChannelNames(useFixture.Channels)
@@ -200,7 +200,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 
 		// Insert updated fixture into fixtures.
 		newFixtures := fixture.Fixtures{}
-		for fixtureNumber, fixture := range fixtures.Fixtures {
+		for fixtureNumber, fixture := range fixturesConfig.Fixtures {
 			if fixture.ID == fixtureID {
 				// Insert new states into fixture above us, in the fixture selection panel.
 				fp.UpdateStates = true

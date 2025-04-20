@@ -74,7 +74,7 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 			for channelNumber, channel := range fixture.Channels {
 
 				// Match the fixture number unless there are mulitple sub fixtures.
-				if fixture.Number == displayFixture+1 || fixture.MultiFixtureDevice {
+				if fixture.Number == displayFixture+1 || fixture.FixtureInfo.MultiFixtureDevice {
 					if !chaser {
 						// Scanner channels
 						if strings.Contains(channel.Name, "Pan") {
@@ -227,7 +227,7 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 						}
 					}
 					// If the fixure supports red, green and blue channels we can set the color directly.
-					if fixture.HasRGBChannels {
+					if fixture.FixtureInfo.HasRGBChannels {
 						// Fixture channels.
 						if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
 							SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)

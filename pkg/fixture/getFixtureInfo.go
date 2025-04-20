@@ -673,24 +673,26 @@ func GetChannelNumberByName(fixture *Fixture, channelName string) (int, error) {
 	return 0, fmt.Errorf("channel %s not found in fixture %s", channelName, fixture.Name)
 }
 
-func GetFixtureInfo(thisFixture *Fixture) FixtureInfo {
+func PopulateFixturesInfo(fixtureConfig *Fixtures) {
 	if debug {
 		fmt.Printf("FindFixtureInfo\n")
 	}
 
+	for fixtureNumber, fixture := range fixtureConfig.Fixtures {
+		fixtureConfig.Fixtures[fixtureNumber].FixtureInfo = GetFixtureInfo(&fixture, fixtureConfig)
+	}
+}
+
+func GetFixtureInfo(fixture *Fixture, fixturesConfig *Fixtures) FixtureInfo {
+
 	fixtureInfo := FixtureInfo{}
 
-	if thisFixture == nil {
-		fmt.Printf("FindFixtureInfo: fixture is empty\n")
-		return fixtureInfo
-	}
-
-	fixtureInfo.HasRotate = IsThisAChannel(thisFixture, "Rotate")
-	fixtureInfo.HasRotateSpeed = IsThisAChannel(thisFixture, "RotateSpeed")
+	fixtureInfo.HasRotate = IsThisAChannel(fixture, "Rotate")
+	fixtureInfo.HasRotateSpeed = IsThisAChannel(fixture, "RotateSpeed")
 
 	// Find all the options for the channel called "Rotate".But only if we have a Rotate Channel exists.
 	if fixtureInfo.HasRotate {
-		availableRotateOptions := GetChannelOptions(*thisFixture, "Rotate")
+		availableRotateOptions := GetChannelOptions(fixture, "Rotate")
 		// Add the auto option for rotate
 		var autoFound bool
 		for _, option := range availableRotateOptions {
@@ -709,14 +711,59 @@ func GetFixtureInfo(thisFixture *Fixture) FixtureInfo {
 
 	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
-	fixtureInfo.HasColorWheel = IsThisAChannel(thisFixture, "Color")
-	fixtureInfo.HasGobo = IsThisAChannel(thisFixture, "Gobo")
-	fixtureInfo.HasProgram = IsThisAChannel(thisFixture, "Program")
-	fixtureInfo.HasProgramSpeed = IsThisAChannel(thisFixture, "ProgramSpeed")
+	fixtureInfo.HasColorChannel = IsThisAChannel(fixture, "Color")
+	fixtureInfo.HasGobo = IsThisAChannel(fixture, "Gobo")
+	fixtureInfo.HasProgram = IsThisAChannel(fixture, "Program")
+	fixtureInfo.HasProgramSpeed = IsThisAChannel(fixture, "ProgramSpeed")
+
+	// Automatically set the number of sub fixtures inside a fixture.
+	var numberSubFixtures int
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Red") {
+			numberSubFixtures++
+		}
+	}
+	if numberSubFixtures > 1 {
+		if debug {
+			fmt.Printf("\t fixture %s numberSubFixtures %d\n", fixture.Name, numberSubFixtures)
+		}
+		fixtureInfo.MultiFixtureDevice = true
+		fixtureInfo.NumberSubFixtures = numberSubFixtures
+	}
+
+	var hasRed bool
+	var hasGreen bool
+	var hasBlue bool
+	var hasColor bool
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Red") || strings.Contains(channel.Name, "red") {
+			hasRed = true
+		}
+		if strings.Contains(channel.Name, "Green") || strings.Contains(channel.Name, "green") {
+			hasGreen = true
+		}
+		if strings.Contains(channel.Name, "Blue") || strings.Contains(channel.Name, "blue") {
+			hasBlue = true
+		}
+		if strings.Contains(channel.Name, "Color") || strings.Contains(channel.Name, "color") {
+			hasColor = true
+		}
+	}
+
+	// Now we have looked at every channel.
+	if hasRed && hasGreen && hasBlue {
+		fixtureInfo.HasRGBChannels = true
+	}
+	if hasColor {
+		fixtureInfo.HasColorChannel = true
+	}
+
 	return fixtureInfo
+
 }
 
-func GetChannelOptions(thisFixture Fixture, channelName string) []string {
+func GetChannelOptions(thisFixture *Fixture, channelName string) []string {
 
 	if debug {
 		fmt.Printf("GetChannelOptions\n")
@@ -1040,11 +1087,11 @@ func CheckFixturesAreTheSame(fixtures *Fixtures, startConfig *Fixtures) (bool, s
 
 			}
 
-			if fixture.MultiFixtureDevice != startConfig.Fixtures[fixtureNumber].MultiFixtureDevice {
+			if fixture.FixtureInfo.MultiFixtureDevice != startConfig.Fixtures[fixtureNumber].FixtureInfo.MultiFixtureDevice {
 				return false, fmt.Sprintf("Fixture:%d MultiFixtureDevice is different\n", fixtureNumber+1)
 			}
 
-			if fixture.NumberSubFixtures != startConfig.Fixtures[fixtureNumber].NumberSubFixtures {
+			if fixture.FixtureInfo.NumberSubFixtures != startConfig.Fixtures[fixtureNumber].FixtureInfo.NumberSubFixtures {
 				return false, fmt.Sprintf("Fixture:%d NumberSubFixtures is different\n", fixtureNumber+1)
 			}
 
@@ -1221,7 +1268,7 @@ func GetNumberOfFixturesInGroup(sequenceNumber int, fixturesConfig *Fixtures) in
 			if !haveWeSeenThisBefore(recents, fixture.Number) {
 
 				// If this is a multifixture device
-				if fixture.MultiFixtureDevice {
+				if fixture.FixtureInfo.MultiFixtureDevice {
 
 					if debug {
 						fmt.Printf("\t\t%d: Found MultiFixtureDevice %d\n", sequenceNumber, fixture.Number)

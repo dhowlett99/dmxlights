@@ -211,8 +211,8 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.RotateChannels = fixture.GetAvailableRotateChannelsByFixure(useFixture)
 	newOverride.MaxRotateSpeed = len(newOverride.RotateChannels)
 
-	newOverride.HasRGBChannels = useFixture.HasRGBChannels
-	newOverride.HasColorChannel = useFixture.HasColorChannel
+	newOverride.HasRGBChannels = useFixture.FixtureInfo.HasRGBChannels
+	newOverride.HasColorChannel = useFixture.FixtureInfo.HasColorChannel
 	newOverride.IsColorOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Color")
 	newOverride.Color = cfg.Color
 	newOverride.StartingColor = cfg.Color
