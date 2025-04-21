@@ -24,6 +24,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
@@ -53,7 +54,7 @@ func togglePresetSaveMode(numberSequences int, this *CurrentState, eventsForLaun
 	common.FlashLight(common.SAVE_BUTTON, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)
 }
 
-func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
+func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, fixturesConfig *fixture.Fixtures, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
 
 	if debug {
 		fmt.Printf("recallPreset() Preset Pressed X:%d Y:%d\n", X, Y)
@@ -78,9 +79,9 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	// Delete a preset - If the timer is longer than 1 seconds then we have a long press.
 	if elapsed > 1*time.Second {
 
-		//if debug {
-		fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
-		//}
+		if debug {
+			fmt.Printf("Clear Preset X:%d Y:%d\n", X, Y)
+		}
 
 		// Get the name of the config file.
 		path := config.GetProjectConfigPath(this.ProjectName, X, Y)
@@ -96,6 +97,8 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 
 		// Show presets again.
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+
+		FullClear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
 
 	} else {
 		if debug {

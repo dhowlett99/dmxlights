@@ -108,6 +108,13 @@ func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fix
 		return
 	}
 
+	FullClear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
+
+}
+
+func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fixture.Fixtures,
+	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
 	if debug {
 		fmt.Printf("Start full clear process\n")
 	}
@@ -141,8 +148,7 @@ func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fix
 	// Turn off the this.Flood
 	if this.Flood {
 		this.Flood = false
-		// Turn the flood button back to white.
-		common.LightLamp(common.FLOOD_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		FloodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
 	}
 
 	// Turn off the strobe light.
@@ -208,12 +214,9 @@ func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fix
 		// Reset the sequence switch states back to config from the fixture config in memory.
 		// And ditch any out of date copy from a loaded preset.
 		if sequence.Type == "switch" {
-			// Get an upto date copy of the sequence.
-			sequences[this.SelectedSequence] = common.RefreshSequence(this.SelectedSequence, commandChannels, updateChannels)
-
 			// Now set our local representation of switches
-			for swiTchNumber, swiTch := range sequence.Switches {
-				this.SwitchPosition[swiTchNumber] = swiTch.CurrentPosition
+			for swiTchNumber := range sequence.Switches {
+				this.SwitchPosition[swiTchNumber] = 0
 			}
 
 			// Create a new set of overrides.

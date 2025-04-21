@@ -186,7 +186,7 @@ func ProcessButtons(X int, Y int,
 
 		// Remove the button off offset.
 		X = X - 100
-		recallPreset(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
+		recallPreset(sequences, X, Y, this, eventsForLaunchpad, guiButtons, fixturesConfig, commandChannels, updateChannels)
 		return
 	}
 

@@ -151,14 +151,14 @@ func generateFixtureNumberOptions(totalNumberOptions int) []string {
 	return options
 }
 
-func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixtureConfig *fixture.Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
+func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w fyne.Window, groupConfig *fixture.Groups, fixturesConfig *fixture.Fixtures, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, switchOverrides *[][]common.Override) (popupFixturePanel *widget.PopUp, err error) {
 
 	if debug {
 		fmt.Printf("NewFixturesPanel\n")
 	}
 
 	fp := FixturesPanel{}
-	fp.Fixtures = fixtureConfig
+	fp.Fixtures = fixturesConfig
 	fp.FixtureList = []fixture.Fixture{}
 
 	// Populate group options from the available sequence labels.
@@ -193,7 +193,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 	)
 
 	// Load the fixtures into the array used by the table.
-	data := makeArray(fixtureConfig)
+	data := makeArray(fixturesConfig)
 
 	// Title.
 	title := widget.NewLabel("Fixture List")
@@ -202,7 +202,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 	}
 
 	// Geneate the fixture list.
-	for no, f := range fixtureConfig.Fixtures {
+	for no, f := range fixturesConfig.Fixtures {
 		newItem := fixture.Fixture{}
 
 		if f.ID == 0 { // We have a empty ID for this fixture.
@@ -238,7 +238,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 				fp.UpdateChannels = false
 			}
 			if fp.UpdateUseFixture {
-				address := fixture.GetFadeValuesFixtureAddressByName(fp.UseFixture, fixtureConfig)
+				address := fixture.GetFadeValuesFixtureAddressByName(fp.UseFixture, fixturesConfig)
 				data[fp.UpdateThisFixture][FIXTURE_ADDRESS] = address
 				fp.FixtureList[fp.UpdateThisFixture].UseFixture = fp.UseFixture
 				dmx, _ := strconv.Atoi(address)
@@ -575,16 +575,16 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = nil
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).SetText("->")
 				o.(*fyne.Container).Objects[FIXTURE_CHANNELS].(*widget.Button).OnTapped = func() {
-					fixtureConfig.Fixtures = fp.FixtureList
+					fixturesConfig.Fixtures = fp.FixtureList
 					var modal *widget.PopUp
 					if fp.FixtureList[i.Row].Type == "switch" {
-						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].UseFixture, &fp, fixtureConfig)
+						modal, err = NewStatesEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].UseFixture, &fp, fixturesConfig)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return
 						}
 					} else {
-						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, groupConfig, fixtureConfig)
+						modal, err = NewChannelEditor(w, fp.FixtureList[i.Row].ID, fp.FixtureList[i.Row].Channels, &fp, groupConfig, fixturesConfig)
 						if err != nil {
 							fmt.Printf("config not found for Group %d and Fixture %d  - %s\n", fp.FixtureList[i.Row].Group, fp.FixtureList[i.Row].Number, err)
 							return
@@ -621,39 +621,10 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 		fp.FixtureList = removeEmptyActions(fp.FixtureList)
 
 		// Insert updated fixture into fixtures.
-		fixtureConfig.Fixtures = fp.FixtureList
+		fixturesConfig.Fixtures = fp.FixtureList
 
 		// Re-populate the fixture info based on the new state of fixtures.
-		fixture.PopulateFixturesInfo(fixtureConfig)
-
-		// Get the overrides.
-		for sequenceNumber := range sequences {
-			buttons.RefreshLocalOverrides(this, sequences[sequenceNumber])
-		}
-
-		// Stop any running sequences.
-		for _, sequence := range sequences {
-			cmd := common.Command{
-				Action: common.Stop,
-			}
-			// Send a message to the switch sequence.
-			common.SendCommandToSequence(sequence.Number, cmd, commandChannels)
-		}
-
-		// Clear the sequence buttons.
-		for _, sequence := range sequences {
-			this.Running[sequence.Number] = false
-			common.ShowRunningStatus(this.Running[sequence.Number], eventsForLaunchpad, guiButtons)
-			// Clear the pattern function keys
-			common.ClearSelectedRowOfButtons(sequence.Number, eventsForLaunchpad, guiButtons)
-			// Turn off any function mode.
-			this.SelectedMode[this.SelectedSequence] = buttons.NORMAL
-			this.SelectButtonPressed[sequence.Number] = false
-			buttons.SavePresetOff(this, eventsForLaunchpad, guiButtons)
-			if this.Flood { // Turn off flood.
-				buttons.FloodOff(len(sequences), this, commandChannels, eventsForLaunchpad, guiButtons)
-			}
-		}
+		fixture.PopulateFixturesInfo(fixturesConfig)
 
 		// Count the number of fixtures for all sequences since the user may have added or deleted fixtures.
 		// The chaser uses the fixtures from the scanner group.
@@ -661,46 +632,21 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 			cmd := common.Command{
 				Action: common.UpdateFixturesConfig,
 				Args: []common.Arg{
-					{Name: "Fixtures", Value: fixtureConfig},
+					{Name: "Fixtures", Value: fixturesConfig},
 				},
 			}
 			// Send a message to the switch sequence.
 			common.SendCommandToSequence(sequence.Number, cmd, commandChannels)
 		}
 
-		// Find the switch sequence number.
-		var SwitchSequenceNumber int
-		for sequenceNumber, sequence := range sequences {
-			if sequence.Type == "switch" {
-				SwitchSequenceNumber = sequenceNumber
-			}
-		}
-
-		// Clear switch positions to their first positions.
-		for switchNumber := 0; switchNumber < buttons.NUMBER_SWITCHES; switchNumber++ {
-			this.SwitchPosition[switchNumber] = 0
-		}
-
 		// When we add a new set of fixtues with a possible new switch states we also need to populate a new override for that switch state.
 		// So we recreate the overrides from scratch by using the pointer to SwitchOverrides.
-		override.CreateOverrides(SwitchSequenceNumber, fixtureConfig, switchOverrides)
+		override.CreateOverrides(this.SwitchSequenceNumber, fixturesConfig, switchOverrides)
 
-		// Clear switch positions to their first positions.
-		for _, seq := range sequences {
-			if seq.Type == "switch" {
-				cmd := common.Command{
-					Action: common.ResetAllSwitchPositions,
-					Args: []common.Arg{
-						{Name: "Fixtures", Value: fixtureConfig},
-					},
-				}
-				// Send a message to the switch sequence.
-				common.SendCommandToSequence(seq.Number, cmd, commandChannels)
-			}
-		}
+		buttons.FullClear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons)
 
 		// Check DMX addresses don't overlap.
-		reports, err = checkForNoOverlap(fixtureConfig, fp)
+		reports, err = checkForNoOverlap(fixturesConfig, fp)
 		if err != nil {
 			fmt.Printf("DMX Address %s:%s \n", err, strings.Join(reports, "\n"))
 			fp.FixturePanel.Refresh()
@@ -716,7 +662,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 			buttonSave.Enable()
 
 			// Check Name is not duplicated.
-			reports, err = checkForDuplicateName(fixtureConfig, fp)
+			reports, err = checkForDuplicateName(fixturesConfig, fp)
 			if err != nil {
 				fmt.Printf("Name Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
 				fp.FixturePanel.Refresh()
@@ -731,7 +677,7 @@ func NewFixturePanel(this *buttons.CurrentState, sequences []*common.Sequence, w
 				buttonSave.Enable()
 
 				// Check Name is not duplicated.
-				reports, err = checkForDuplicateLabel(fixtureConfig, fp)
+				reports, err = checkForDuplicateLabel(fixturesConfig, fp)
 				if err != nil {
 					fmt.Printf("Label Duplicated %s:%s \n", err, strings.Join(reports, "\n"))
 					fp.FixturePanel.Refresh()
