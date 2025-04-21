@@ -25,11 +25,9 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
-
-	"github.com/oliread/usbdmx/ft232"
 )
 
-func Clear(this *CurrentState, sequences []*common.Sequence, dmxController *ft232.DMXController, fixturesConfig *fixture.Fixtures,
+func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fixture.Fixtures,
 	commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, updateChannels []chan common.Sequence) {
 
 	if debug {

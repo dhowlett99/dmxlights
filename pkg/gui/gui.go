@@ -761,7 +761,7 @@ func FileOpen(myWindow fyne.Window, startConfig *fixture.Fixtures, this *buttons
 					presets.SavePresets(this.PresetsStore, this.ProjectName)
 				}
 			}
-			buttons.Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			buttons.Clear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		}
 	}, myWindow)
 	pwd, _ := os.Getwd()

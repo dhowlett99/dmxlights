@@ -197,7 +197,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("GUI Clear Pressed X:%d Y:%d\n", X, Y)
 		}
 
-		Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		Clear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
 
@@ -220,7 +220,7 @@ func ProcessButtons(X int, Y int,
 			fmt.Printf("Clear All If We're Not in Scanner Mode X:%d Y:%d\n", X, Y)
 		}
 
-		Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+		Clear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		return
 	}
 
@@ -237,7 +237,7 @@ func ProcessButtons(X int, Y int,
 		elapsed := time.Since(*this.ButtonTimer)
 		// If the timer is longer than 1 seconds then we have a long press.
 		if elapsed > 1*time.Second {
-			Clear(this, sequences, dmxController, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
+			Clear(this, sequences, fixturesConfig, commandChannels, eventsForLaunchpad, guiButtons, updateChannels)
 		} else {
 			// S E L E C T   S C A N N E R  P O S I T I O N  U P  A R R O W
 			if sequences[this.SelectedSequence].Type == "scanner" {
