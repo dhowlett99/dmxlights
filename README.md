@@ -10,6 +10,8 @@ connecting to the lighting fixtures.
 Novation Launchpad Mini Mk3 - https://novationmusic.com/en/launch/launchpad-mini
 FTDI interface card is USB to RS485 TTL Serial Converter Adapter FTDI interface FT232RL 75176 Module_AM.
 
+**Note:dmxlights is not compatibale with the Novation Launchpad X. It uses a different set of system exec commands and sends velocity information which dmxlights does not understand.Perhaps a future enhancement if there is interest from the community.**
+
 Built for Apple Mac (tested on Catalina 10.15.7)
 
 [DMX Lights Manual.](./Manual.md)
