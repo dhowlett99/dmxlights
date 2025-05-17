@@ -1853,18 +1853,14 @@ func GetColor(X int, Y int) ColorPicker {
 
 func ClearOverrides(override Override) Override {
 
-	override.IsShutterOverrideAble = false
 	override.Shutter = false
 	override.SignalOverrideStrobe = false
-	override.IsStrobeOverrideAble = false
 	override.Strobe = false
 	override.StrobeSpeed = override.StartingStrobeSpeed
 	override.SignalOverrideSpeed = false
-	override.IsSpeedOverrideAble = false
 	override.OverrideSpeed = false
 	override.Speed = override.StartingSpeed
 	override.SignalOverrideProgramSpeed = false
-	override.IsProgramSpeedOverrideAble = false
 	override.OverrideProgramSpeed = false
 	override.ProgramSpeed = override.StartingProgramSpeed
 	override.SignalOverrideShift = false
@@ -1880,11 +1876,9 @@ func ClearOverrides(override Override) Override {
 	override.OverrideRotateSpeed = false
 	override.Rotate = override.StartingRotateSpeed
 	override.SignalOverrideColor = false
-	override.IsColorOverrideAble = false
 	override.OverrideColors = false
 	override.Color = override.StartingColor
 	override.SignalOverrideGobo = false
-	override.IsGoboOverrideAble = false
 	override.OverrideGobo = false
 	override.Gobo = override.StartingGobo
 
