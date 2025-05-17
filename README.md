@@ -95,7 +95,7 @@ File size is also smaller 111044.
 
 # Build Instructions
 
-## First Creat a Self Signed Cert to sign the code.
+## First Create a Self Signed Cert to sign the code.
 Create self-signed certificates in Keychain Access on Mac
 1. In the Keychain Access app on your Mac, choose Keychain Access > Certificate Assistant > Create a Certificate.
 2. Enter a 'dmxlights' as the name for the certificate.
