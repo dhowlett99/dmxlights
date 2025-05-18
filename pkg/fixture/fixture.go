@@ -110,6 +110,7 @@ type ActionConfig struct {
 	Reverse           bool //AntiClockwise
 	AutoRotate        bool
 	Program           int
+	ProgramName       string
 	ProgramOptions    []string
 	ProgramSpeed      int
 	Music             int
@@ -172,14 +173,14 @@ type Setting struct {
 }
 
 type Channel struct {
-	Number     int16     `yaml:"number"`
-	Name       string    `yaml:"name"`
-	Value      *int16    `yaml:"value,omitempty"`
-	MaxDegrees *int      `yaml:"maxdegrees,omitempty"`
-	Offset     *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
-	Comment    string    `yaml:"comment,omitempty"`
-	Settings   []Setting `yaml:"settings,omitempty"`
-	Override   bool      `yaml:"override,omitempty"`
+	Number      int16     `yaml:"number"`
+	Name        string    `yaml:"name"`
+	Value       *int16    `yaml:"value,omitempty"`
+	MaxDegrees  *int      `yaml:"maxdegrees,omitempty"`
+	Offset      *int      `yaml:"offset,omitempty"` // Offset allows you to position the fixture.
+	Comment     string    `yaml:"comment,omitempty"`
+	Settings    []Setting `yaml:"settings,omitempty"`
+	Overridable bool      `yaml:"overridable,omitempty"`
 }
 
 // LoadFixturesReader opens the fixtures config file using the io reader passed.

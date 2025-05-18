@@ -1293,16 +1293,16 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 2
     name: Red1
-    override: true
+    overridable: true
   - number: 3
     name: Green1
-    override: true
+    overridable: true
   - number: 4
     name: Blue1
-    override: true
+    overridable: true
   - number: 5
     name: White1
   - number: 6
@@ -1417,16 +1417,16 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 2
     name: Red1
-    override: true
+    overridable: true
   - number: 3
     name: Green1
-    override: true
+    overridable: true
   - number: 4
     name: Blue1
-    override: true
+    overridable: true
   - number: 5
     name: White1
   - number: 6
@@ -1576,13 +1576,13 @@ fixtures:
       selectedvalue: ""
   - number: 2
     name: Red1
-    override: true
+    overridable: true
   - number: 3
     name: Green1
-    override: true
+    overridable: true
   - number: 4
     name: Blue1
-    override: true
+    overridable: true
   - number: 5
     name: Speed
   - number: 6
@@ -1710,7 +1710,7 @@ fixtures:
       channel: (Select one)
       value: "245"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 3
     name: Gobo
     settings:
@@ -1759,7 +1759,7 @@ fixtures:
       number: 9
       value: "197"
       selectedvalue: ""
-    override: true
+    overridable: true
 - id: 29
   name: 'Flames '
   label: flames
@@ -1886,7 +1886,7 @@ fixtures:
       number: 9
       value: "117"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 4
     name: Rotate
     value: 0
@@ -1926,7 +1926,7 @@ fixtures:
       number: 7
       value: "128"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 5
     name: Program
     settings:
@@ -2002,7 +2002,7 @@ fixtures:
       channel: New
       value: "200"
       selectedvalue: "200"
-    override: true
+    overridable: true
 - id: 31
   name: Equinox Helix
   label: helix
@@ -2134,7 +2134,7 @@ fixtures:
       channel: (Select one)
       value: 192-255
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 4
     name: Gobo
     value: 0
@@ -2209,7 +2209,7 @@ fixtures:
       number: 14
       value: "160"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 5
     name: Rotate
     value: 0
@@ -2255,7 +2255,7 @@ fixtures:
       number: 8
       value: "128"
       selectedvalue: ""
-    override: true
+    overridable: true
   - number: 6
     name: Program
     settings:
@@ -2314,6 +2314,7 @@ fixtures:
       number: 11
       value: "229"
       selectedvalue: ""
+    overridable: true
   - number: 7
     name: ProgramSpeed
     value: 0
@@ -2342,7 +2343,7 @@ fixtures:
       channel: New
       value: "200"
       selectedvalue: "200"
-    override: true
+    overridable: true
   states:
   - name: "Off"
     number: 1
@@ -2351,7 +2352,7 @@ fixtures:
     master: 0
     actions:
     - name: "Off"
-      number: 0
+      number: 1
       colors: []
       map: ""
       mode: Control
@@ -3444,7 +3445,7 @@ fixtures:
     master: 0
     actions:
     - name: "Off"
-      number: 0
+      number: 1
       colors: []
       map: ""
       mode: "Off"
@@ -3508,7 +3509,7 @@ fixtures:
     master: 0
     actions:
     - name: Red
-      number: 0
+      number: 1
       colors:
       - Red
       map: ""
@@ -3532,7 +3533,7 @@ fixtures:
     master: 0
     actions:
     - name: Green
-      number: 0
+      number: 1
       colors:
       - Green
       map: ""
@@ -3556,7 +3557,7 @@ fixtures:
     master: 0
     actions:
     - name: Blue
-      number: 0
+      number: 1
       colors:
       - Blue
       map: ""
@@ -3580,7 +3581,7 @@ fixtures:
     master: 0
     actions:
     - name: "On"
-      number: 0
+      number: 1
       colors:
       - Orange
       - Yellow
@@ -3610,7 +3611,7 @@ fixtures:
     master: 0
     actions:
     - name: Sound
-      number: 0
+      number: 1
       colors:
       - Orange
       - Yellow
@@ -3709,7 +3710,7 @@ fixtures:
     master: 0
     actions:
     - name: Red
-      number: 0
+      number: 1
       colors:
       - Red
       map: ""
@@ -3733,7 +3734,7 @@ fixtures:
     master: 0
     actions:
     - name: Green
-      number: 0
+      number: 1
       colors:
       - Green
       map: ""
@@ -3757,7 +3758,7 @@ fixtures:
     master: 0
     actions:
     - name: Blue
-      number: 0
+      number: 1
       colors:
       - Blue
       map: ""
@@ -3781,7 +3782,7 @@ fixtures:
     master: 0
     actions:
     - name: Soft
-      number: 0
+      number: 1
       colors:
       - Orange
       - Yellow
@@ -3811,7 +3812,7 @@ fixtures:
     master: 0
     actions:
     - name: Sound
-      number: 0
+      number: 1
       colors:
       - Yellow
       - White
@@ -3855,7 +3856,7 @@ fixtures:
     master: 0
     actions:
     - name: "Off"
-      number: 0
+      number: 1
       colors: []
       map: ""
       mode: Control
@@ -4257,7 +4258,7 @@ fixtures:
     master: 0
     actions:
     - name: "Off"
-      number: 0
+      number: 1
       colors: []
       map: ""
       mode: Control

@@ -46,11 +46,9 @@ type SwitchInfo struct {
 	MaxNumberColors      int
 	AvailableColors      []string
 
-	Gobo                   int
-	OverrideAvailableGobos int
-	GoboName               string
-	NumberOfGobos          int
-	MaxNumberGobos         int
+	Gobo           int
+	GoboName       string
+	MaxNumberGobos int
 
 	OverrideSpeed int
 	OverrideSize  int
@@ -59,6 +57,10 @@ type SwitchInfo struct {
 
 	ProgramSpeedName              string
 	ProgramSpeed                  int
+	MaxPrograms                   int
+	Program                       int
+	IsProgramOverrideAble         bool
+	ProgramName                   string
 	AvailableProgramSpeedChannels int
 	MaxNumberProgramSpeeds        int
 	NumberOfProgramSpeeds         int
@@ -72,50 +74,59 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 
 	var switchInfo SwitchInfo
 
+	// Pull overrides.
+	overrides := *this.SwitchOverrides
+
 	// Position
 	number := this.SelectedSwitch
 	position := this.SwitchPosition[this.SelectedSwitch]
 
-	// Pull overrides.
-	overrides := *this.SwitchOverrides
-
-	switchInfo.OverrideSpeed = overrides[number][position].Speed
-	switchInfo.OverrideSize = overrides[number][position].Size
-	switchInfo.OverrideGobo = overrides[number][position].Gobo
-	switchInfo.AvailableRotates = overrides[number][position].RotateChannels
-	switchInfo.Rotate = overrides[number][position].Rotate
-	switchInfo.RotateName = overrides[number][position].RotateName
-	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
-	switchInfo.Color = overrides[number][position].Color
-	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
-	switchInfo.AvailableColors = overrides[number][position].AvailableColors
-	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
-	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
-	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
-	switchInfo.AvailableProgramSpeedChannels = len(overrides[number][position].AvailableProgramSpeedChannels)
-	switchInfo.MaxNumberProgramSpeeds = overrides[number][position].MaxProgramSpeeds
-	switchInfo.IsProgramSpeedOverrideAble = overrides[number][position].IsProgramSpeedOverrideAble
-	switchInfo.ActionMode = overrides[number][position].Mode
-	switchInfo.Gobo = overrides[number][position].Gobo
-	switchInfo.OverrideAvailableGobos = len(overrides[number][position].AvailableGobos)
-	switchInfo.MaxNumberGobos = overrides[number][position].MaxGobos
-	switchInfo.OverrideFade = overrides[number][position].Fade
-
-	switchInfo.SelectedMode = this.SelectedMode[this.DisplaySequence]
+	// Type.
 	switchInfo.Type = this.SelectedType
+
+	// Fixture Type.
 	switchInfo.FixtureType = this.SelectedFixtureType
 
-	// Speed
+	// Mode.
+	switchInfo.SelectedMode = this.SelectedMode[this.DisplaySequence]
+	switchInfo.ActionMode = overrides[number][position].Mode
+
+	// Speed.
 	switchInfo.Speed = this.Speed[this.TargetSequence]
+	switchInfo.OverrideSpeed = overrides[number][position].Speed
 
-	// Size
+	// Shift.
+	switchInfo.RGBShift = this.RGBShift[this.TargetSequence]
+	switchInfo.ScannerShift = getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
+
+	// Size.
 	switchInfo.Size = this.RGBSize[this.TargetSequence]
+	switchInfo.OverrideSize = overrides[number][position].Size
 
-	// Fade
+	// Fade.
 	switchInfo.ScannerFade = this.ScannerSize[this.TargetSequence]
 	switchInfo.RGBFade = this.RGBFade[this.TargetSequence]
+	switchInfo.OverrideFade = overrides[number][position].Fade
 
-	// Rotate
+	// Scanner Coordinates.
+	switchInfo.ScannerCoordinates = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
+
+	// Gobo.
+	switchInfo.OverrideGobo = overrides[number][position].Gobo
+	switchInfo.Gobo = overrides[number][position].Gobo
+	switchInfo.MaxNumberGobos = overrides[number][position].MaxGobos
+	switchInfo.GoboName = "Unknown"
+	if switchInfo.MaxNumberGobos > 0 && switchInfo.Gobo < switchInfo.MaxNumberGobos && switchInfo.Gobo != -1 {
+		if switchInfo.Gobo != 0 {
+			switchInfo.GoboName = overrides[number][position].AvailableGobos[switchInfo.Gobo-1]
+		}
+	}
+
+	// Rotate.
+	switchInfo.Rotate = overrides[number][position].Rotate
+	switchInfo.AvailableRotates = overrides[number][position].RotateChannels
+	switchInfo.RotateName = overrides[number][position].RotateName
+	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
 	switchInfo.NumberOfRotates = len(switchInfo.AvailableRotates)
 	switchInfo.RotateName = "Unknown"
 	if switchInfo.NumberOfRotates > 0 && switchInfo.Rotate <= switchInfo.NumberOfRotates && switchInfo.Rotate != -1 {
@@ -124,37 +135,45 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 		}
 	}
 
-	// Shift
-	switchInfo.RGBShift = this.RGBShift[this.TargetSequence]
-	switchInfo.ScannerShift = getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-	switchInfo.ProgramSpeedName = "Unknown"
-
-	// Colors
+	// Color.
+	switchInfo.Color = overrides[number][position].Color
+	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
+	switchInfo.AvailableColors = overrides[number][position].AvailableColors
+	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
+	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
 	switchInfo.ColorName = "Unknown"
 	if switchInfo.MaxNumberColors > 0 && switchInfo.Color <= switchInfo.MaxNumberColors && switchInfo.Color != -1 {
 		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.Color]
 	}
 
-	// Program Speed
+	// Program.
+	switchInfo.Program = overrides[number][position].Program
+	switchInfo.IsProgramOverrideAble = overrides[number][position].IsProgramOverrideAble
+	switchInfo.MaxPrograms = overrides[number][position].MaxPrograms
+	switchInfo.ProgramName = "Unknown"
+	if switchInfo.MaxPrograms > 0 && switchInfo.Program <= switchInfo.MaxPrograms && switchInfo.Program != -1 {
+		availablePrograms := overrides[number][position].AvailableProgramChannels
+		if switchInfo.MaxPrograms > 0 {
+			if debug {
+				fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, switchInfo.MaxPrograms, switchInfo.Program)
+			}
+			switchInfo.ProgramName = availablePrograms[switchInfo.Program]
+		}
+	}
+
+	// Program Speed.
+	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
+	switchInfo.AvailableProgramSpeedChannels = len(overrides[number][position].AvailableProgramSpeedChannels)
+	switchInfo.MaxNumberProgramSpeeds = overrides[number][position].MaxProgramSpeeds
+	switchInfo.IsProgramSpeedOverrideAble = overrides[number][position].IsProgramSpeedOverrideAble
 	switchInfo.NumberOfProgramSpeeds = switchInfo.AvailableProgramSpeedChannels
+	switchInfo.ProgramSpeedName = "Unknown"
 	if switchInfo.NumberOfProgramSpeeds > 0 && switchInfo.ProgramSpeed <= switchInfo.MaxNumberProgramSpeeds && switchInfo.ProgramSpeed != -1 {
 		availableProgramSpeeds := overrides[number][position].AvailableProgramSpeedChannels
 		if switchInfo.NumberOfProgramSpeeds > 0 {
 			switchInfo.ProgramSpeedName = availableProgramSpeeds[switchInfo.ProgramSpeed-1]
 		}
 	}
-
-	// Gobo
-	switchInfo.GoboName = "Unknown"
-	switchInfo.NumberOfGobos = switchInfo.OverrideAvailableGobos
-	if switchInfo.NumberOfGobos > 0 && switchInfo.Gobo < switchInfo.MaxNumberGobos && switchInfo.Gobo != -1 {
-		if switchInfo.Gobo != 0 {
-			switchInfo.GoboName = overrides[number][position].AvailableGobos[switchInfo.Gobo-1]
-		}
-	}
-
-	// Scanner
-	switchInfo.ScannerCoordinates = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
 
 	return switchInfo
 }
@@ -323,14 +342,18 @@ func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
 			return
 		}
 
-		// Switch has a projector in control mode.
+		// Switch has a projector but not in control mode.
 		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" && switchInfo.IsRotateOverrideAble && switchInfo.ActionMode != "Control" {
 			common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchInfo.Rotate, switchInfo.RotateName), "shift", false, guiButtons)
 			return
 		}
 
-		// Assume nothing is selected, display a empty place holder.
-		common.UpdateStatusBar(fmt.Sprintf("Shift N/A%02d", 0), "shift", false, guiButtons)
+		// Switch has a projector in control mode. So shift becomes select Program or Show.
+		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" && switchInfo.IsProgramOverrideAble && switchInfo.ActionMode == "Control" {
+			common.UpdateStatusBar(fmt.Sprintf("Program %02d:%s", switchInfo.Program, switchInfo.ProgramName), "shift", false, guiButtons)
+			return
+		}
+
 		return
 	}
 

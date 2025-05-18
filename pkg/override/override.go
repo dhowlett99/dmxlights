@@ -50,6 +50,10 @@ func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumb
 
 func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumber int, fixturesConfig *fixture.Fixtures) common.Override {
 
+	if debug {
+		fmt.Printf("DiscoverSwitchOveride: fixture %s\n", useFixture.Name)
+	}
+
 	// Convert this switches action into a config we can query.
 	action := fixture.GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
 	cfg := fixture.GetConfig(action, useFixture, fixturesConfig)
@@ -204,6 +208,13 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 	newOverride.AvailableProgramSpeedChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "ProgramSpeed")
 	newOverride.MaxProgramSpeeds = len(newOverride.AvailableProgramSpeedChannels)
 
+	newOverride.IsProgramOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Program")
+	newOverride.Program = cfg.Program
+	newOverride.ProgramName = cfg.ProgramName
+	newOverride.StartingProgramNumber = cfg.Program
+	newOverride.AvailableProgramChannels = fixture.GetAvailableSettingsForChannelsByFixure(useFixture, "Program")
+	newOverride.MaxPrograms = len(newOverride.AvailableProgramChannels)
+
 	newOverride.IsRotateOverrideAble = fixture.IsThisChannelOverrideAble(useFixture, "Rotate")
 	newOverride.Rotate = cfg.Rotate
 	newOverride.StartingRotateSpeed = cfg.Rotate
@@ -241,6 +252,7 @@ func populateOverride(useFixture *fixture.Fixture, newOverride *common.Override,
 		fmt.Printf("ProgramSpeed %d\n", newOverride.ProgramSpeed)
 		fmt.Printf("AvailableProgramSpeedChannels %s\n", newOverride.AvailableProgramSpeedChannels)
 		fmt.Printf("MaxProgramSpeeds %d\n", newOverride.MaxProgramSpeeds)
+		fmt.Printf("MaxPrograms %d\n", newOverride.MaxPrograms)
 
 		fmt.Printf("Rotate OverrideAble %t\n", newOverride.IsRotateOverrideAble)
 		fmt.Printf("RotateSpeed %d\n", newOverride.Rotate)

@@ -119,10 +119,12 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 		switchPosition := this.SwitchPosition[this.SelectedSwitch]
 		IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
+		actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
+		IsProgramOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
 
-		if IsRotateOverrideAble {
+		if IsRotateOverrideAble && actionMode != "Control" {
 
-			// Decrement the Switch Shift.
+			// Decrement the Rotate Speed.
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
 			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
 				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
@@ -138,17 +140,19 @@ func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		} else {
+		}
 
-			// Decrement the Rotate Speed.
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < common.MIN_PROJECTOR_ROTATE_SPEED {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MIN_PROJECTOR_ROTATE_SPEED
+		if IsProgramOverrideAble && actionMode == "Control" {
+
+			// Decrement the program/show number .
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program - 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program < common.MIN_PROGRAM_NUMBER {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = common.MIN_PROGRAM_NUMBER
 			}
 
 			// Send a message to override / increase the selected rotate speed.
 			cmd := common.Command{
-				Action: common.OverrideRotateSpeed,
+				Action: common.OverrideProgram,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
@@ -266,9 +270,13 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 		switchPosition := this.SwitchPosition[this.SelectedSwitch]
 		isRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
+		actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
+		maxProgramNumber := overrides[this.SelectedSwitch][switchPosition].MaxPrograms
+		IsProgrameNumberOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
 
-		if isRotateOverrideAble {
-			// Increment the Switch Shift.
+		if isRotateOverrideAble && actionMode != "Control" {
+
+			// Increment the Rotate Speed.
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate + 1
 			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
 				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
@@ -284,17 +292,19 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 				},
 			}
 			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		} else {
+		}
 
-			// Increment the Switch Rotate Speed.
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
+		if IsProgrameNumberOverrideAble && actionMode == "Control" {
+
+			// Increment the program/show number .
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program + 1
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program > maxProgramNumber {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = maxProgramNumber
 			}
 
-			// Send a message to override / decrease the selected switch speed.
+			// Send a message to override / increase the program / show number.
 			cmd := common.Command{
-				Action: common.OverrideSpeed,
+				Action: common.OverrideProgram,
 				Args: []common.Arg{
 					{Name: "SwitchNumber", Value: this.SelectedSwitch},
 					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},

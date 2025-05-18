@@ -37,7 +37,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 
 	fixtureInfo := GetFixtureInfo(fixture, fixturesConfig)
 	if debug {
-		fmt.Printf("GetConfig() This fixture %s has Rotate Feature %+v\n", fixture.Name, fixtureInfo)
+		fmt.Printf("GetConfig() This fixture %s has FixtureInfo %+v\n", fixture.Name, fixtureInfo)
 	}
 
 	// Pass through which mode we are in.
@@ -54,10 +54,17 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		// Program Speed - Speed of programs or shows.
 		config.ProgramSpeed = GetChannelSettingInfo(fixture, "ProgramSpeed", action.ProgramSpeed, fixturesConfig)
 
-		// Look through the available settins and see if you can find the specified program action.
-		for _, setting := range programSettings {
-			if action.Program == setting.Name || setting.Name == "Default" {
-				config.Program = int(setting.Value)
+		// Look through the available program channel settins and see if you can find the specified program action.
+		for settingNumber, setting := range programSettings {
+			if debug {
+				fmt.Printf("Setting Number %d Setting Name %s Action Name %s Action Program %s\n", settingNumber, setting.Name, action.Name, action.Program)
+			}
+			if setting.Name == action.Program || setting.Name == "Default" {
+				config.Program = settingNumber
+				config.ProgramName = setting.Name
+				if debug {
+					fmt.Printf("---> Setting Program to %d\n", config.Program)
+				}
 			}
 		}
 	}
@@ -325,9 +332,13 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 				newAction.Colors = []string{setting.Name}
 			}
 			if setting.Name == "Off" {
+				newAction.Name = "Off"
+				newAction.Program = "Off"
 				newAction.Colors = []string{"Green"}
 			}
 			if setting.Name == "On" {
+				newAction.Name = "On"
+				newAction.Program = "On"
 				newAction.Colors = []string{"Red"}
 			}
 		}

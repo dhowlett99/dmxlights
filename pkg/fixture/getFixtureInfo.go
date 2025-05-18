@@ -467,10 +467,10 @@ func IsThisChannelOverrideAble(fixture *Fixture, channelName string) bool {
 
 	for _, channel := range fixture.Channels {
 		if debug {
-			fmt.Printf("fixture %s channel.Name %s channel.Override %t\n", fixture.Name, channel.Name, channel.Override)
+			fmt.Printf("fixture %s channel.Name %s channel.Override %t\n", fixture.Name, channel.Name, channel.Overridable)
 		}
 		if channel.Name == channelName {
-			return channel.Override
+			return channel.Overridable
 		}
 	}
 	return false
@@ -480,7 +480,7 @@ func GetAvailableSettingsForChannelsByFixure(fixture *Fixture, channelName strin
 
 	var settings []string
 	for _, channel := range fixture.Channels {
-		if strings.Contains(channel.Name, channelName) {
+		if channel.Name == channelName {
 			for _, setting := range channel.Settings {
 				settings = append(settings, setting.Name)
 			}
@@ -707,9 +707,8 @@ func GetFixtureInfo(fixture *Fixture, fixturesConfig *Fixtures) FixtureInfo {
 		if !autoFound {
 			fixtureInfo.RotateChaseOptions = append(fixtureInfo.RotateChaseOptions, "Auto")
 		}
+		fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
 	}
-
-	fixtureInfo.RotateSpeedOptions = []string{"Slow", "Medium", "Fast"}
 
 	fixtureInfo.HasColorChannel = IsThisAChannel(fixture, "Color")
 	fixtureInfo.HasGobo = IsThisAChannel(fixture, "Gobo")
@@ -827,8 +826,15 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 
 func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
 
+	if debug {
+		fmt.Printf("GetSwitchAction for Switch %d Position %d\n", switchNumber, switchState)
+	}
+
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "switch" {
+			if debug {
+				fmt.Printf("Fixture Name is %s Number is %d looking for switchNumber %d\n", fixture.Name, fixture.Number, switchNumber)
+			}
 			if fixture.Number == switchNumber {
 				if debug {
 					fmt.Printf("found fixture number %d name %s type %s\n", fixture.Number, fixture.Name, fixture.Type)
@@ -844,15 +850,17 @@ func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtur
 							for actionNumber, action = range state.Actions {
 								if action.Mode == "Control" {
 									if action.Name == "Off" {
+										action.Program = "Off"
 										action.Colors = []string{"Green"}
 									}
 									if action.Name == "On" {
+										action.Program = "On"
 										action.Colors = []string{"Red"}
 									}
 								}
 							}
 							if debug {
-								fmt.Printf("Actions:- Mode %s action number %d name %s colors %+v\n", action.Mode, actionNumber, action.Name, action.Colors)
+								fmt.Printf("Actions:- Mode %s action number %d name %s colors %+v program %s\n", action.Mode, actionNumber, action.Name, action.Colors, action.Program)
 							}
 							return action
 						}
@@ -860,7 +868,7 @@ func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtur
 						if state.Settings != nil {
 							if debug {
 								for _, setting := range state.Settings {
-									fmt.Printf("setting Number %d Label %s Channel %s Valuue %s\n", setting.Number, setting.Label, setting.Channel, setting.Value)
+									fmt.Printf("setting Number %d Label %s Channel %s Value %s\n", setting.Number, setting.Label, setting.Channel, setting.Value)
 								}
 							}
 							action := convertSettingToAction(fixture, state.Settings)
@@ -871,6 +879,10 @@ func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtur
 			}
 		}
 	}
+	if debug {
+		fmt.Printf("Action Not Found\n")
+	}
+
 	return Action{Name: "Not Found"}
 }
 

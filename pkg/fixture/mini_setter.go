@@ -187,9 +187,20 @@ func newMiniSetter(thisFixture *Fixture, override *common.Override, setting comm
 					if debug_mini_setter {
 						fmt.Printf("Override is set Address=%d ProgramSpeed=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.ProgramSpeed, programSpeed)
 					}
-					SetChannel(thisFixture.Address+int16(channel), byte(override.ProgramSpeed), dmxController, dmxInterfacePresent)
+					SetChannel(thisFixture.Address+int16(channel), byte(programSpeed), dmxController, dmxInterfacePresent)
 					overrideHasHappened = true
 					override.OverrideProgramSpeed = false
+				}
+
+				// Override Program.
+				if setting.Channel == "Program" && override.OverrideProgram {
+					program := GetADMXValue(thisFixture, override.Speed, "Program")
+					if debug_mini_setter {
+						fmt.Printf("Override is set Address=%d Program=%d DMX Value=%d\n", thisFixture.Address+int16(channel), override.Program, program)
+					}
+					SetChannel(thisFixture.Address+int16(channel), byte(program), dmxController, dmxInterfacePresent)
+					overrideHasHappened = true
+					override.OverrideProgram = false
 				}
 
 				// Override RotateSpeed.

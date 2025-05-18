@@ -38,6 +38,7 @@ const DEFAULT_SCANNER_SIZE = 60
 const MAX_SCANNER_SIZE = 127
 const MIN_SPEED = 0
 const MIN_PROGRAM_SPEED = 1
+const MIN_PROGRAM_NUMBER = 1
 const MAX_SPEED = 12
 const MIN_RGB_SHIFT = 1
 const MAX_RGB_SHIFT = 10
@@ -265,9 +266,19 @@ type Override struct {
 	IsProgramSpeedOverrideAble    bool
 	OverrideProgramSpeed          bool
 	ProgramSpeed                  int
+	ProgramName                   string
 	StartingProgramSpeed          int
 	AvailableProgramSpeedChannels []string
 	MaxProgramSpeeds              int
+
+	// Program Number
+	SignalOverrideProgram    bool
+	IsProgramOverrideAble    bool
+	OverrideProgram          bool
+	Program                  int
+	StartingProgramNumber    int
+	AvailableProgramChannels []string
+	MaxPrograms              int
 
 	// Shift
 	SignalOverrideShift bool
@@ -400,6 +411,7 @@ const (
 	ClearSwitchOverrides
 	OverrideSpeed
 	OverrideProgramSpeed
+	OverrideProgram
 	OverrideShift
 	OverrideSize
 	OverrideFade
@@ -1861,7 +1873,9 @@ func ClearOverrides(override Override) Override {
 	override.OverrideSpeed = false
 	override.Speed = override.StartingSpeed
 	override.SignalOverrideProgramSpeed = false
+	override.SignalOverrideProgram = false
 	override.OverrideProgramSpeed = false
+	override.OverrideProgram = false
 	override.ProgramSpeed = override.StartingProgramSpeed
 	override.SignalOverrideShift = false
 	override.OverrideShift = false

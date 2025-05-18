@@ -313,7 +313,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 					newChannel.Comment = cp.ChannelList[i.Row].Comment
 					newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
 					newChannel.Offset = cp.ChannelList[i.Row].Offset
-					newChannel.Override = cp.ChannelList[i.Row].Override
+					newChannel.Overridable = cp.ChannelList[i.Row].Overridable
 					cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
 					data = makeChannelsArray(cp.ChannelList)
 				}
@@ -367,7 +367,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 			// Override Check Box.
 			if i.Col == CHANNEL_OVERRIDE {
 				showChannelsField(CHANNEL_OVERRIDE, o)
-				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).SetChecked(cp.ChannelList[i.Row].Override)
+				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).SetChecked(cp.ChannelList[i.Row].Overridable)
 				o.(*fyne.Container).Objects[CHANNEL_OVERRIDE].(*widget.Check).OnChanged = func(value bool) {
 					if cp.ChannelList != nil {
 						newChannel := fixture.Channel{}
@@ -378,7 +378,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 						newChannel.Comment = cp.ChannelList[i.Row].Comment
 						newChannel.MaxDegrees = cp.ChannelList[i.Row].MaxDegrees
 						newChannel.Offset = cp.ChannelList[i.Row].Offset
-						newChannel.Override = value
+						newChannel.Overridable = value
 
 						cp.ChannelList = updateChannelItem(cp.ChannelList, cp.ChannelList[i.Row].Number, newChannel)
 						data = makeChannelsArray(cp.ChannelList)
