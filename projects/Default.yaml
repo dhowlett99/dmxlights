@@ -1517,6 +1517,7 @@ fixtures:
       number: 2
       value: "255"
       selectedvalue: ""
+    overridable: true
 - id: 26
   name: Vue1.1
   label: vue

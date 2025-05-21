@@ -796,7 +796,7 @@ func GetSwitchFixtureType(switchNumber int, stateNumber int16, fixturesConfig *F
 	return ""
 }
 
-func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixturesConfig *Fixtures) bool {
+func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int, fixturesConfig *Fixtures) bool {
 
 	for _, fixture := range fixturesConfig.Fixtures {
 		if fixture.Type == "switch" {
@@ -824,7 +824,7 @@ func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int16, fixture
 	return false
 }
 
-func GetSwitchAction(switchNumber int, switchState int16, fixturesConfig *Fixtures) Action {
+func GetSwitchAction(switchNumber int, switchState int, fixturesConfig *Fixtures) Action {
 
 	if debug {
 		fmt.Printf("GetSwitchAction for Switch %d Position %d\n", switchNumber, switchState)

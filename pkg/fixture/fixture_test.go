@@ -461,7 +461,7 @@ func TestGetSwitchSpeeds(t *testing.T) {
 	type args struct {
 		fixturesConfig *Fixtures
 		swiTchNumber   int
-		stateNumber    int16
+		stateNumber    int
 	}
 
 	fixturesConfig := &Fixtures{

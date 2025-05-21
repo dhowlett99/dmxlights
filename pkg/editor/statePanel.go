@@ -568,7 +568,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 }
 
 // UpdateItem replaces the selected item by id with newItem.
-func updateStateItem(states []fixture.State, id int16, newState fixture.State) []fixture.State {
+func updateStateItem(states []fixture.State, id int, newState fixture.State) []fixture.State {
 
 	if debug {
 		fmt.Printf("updateStateItem\n")
@@ -587,7 +587,7 @@ func updateStateItem(states []fixture.State, id int16, newState fixture.State) [
 	return newStates
 }
 
-func addState(states []fixture.State, id int16) (outItems []fixture.State) {
+func addState(states []fixture.State, id int) (outItems []fixture.State) {
 
 	if debug {
 		fmt.Printf("addState\n")
@@ -621,14 +621,14 @@ func addState(states []fixture.State, id int16) (outItems []fixture.State) {
 
 	// Now fix the item numbers
 	for number, indexedItem := range newStates {
-		indexedItem.Number = int16(number + 1)
+		indexedItem.Number = number + 1
 		outItems = append(outItems, indexedItem)
 	}
 
 	return outItems
 }
 
-func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State) {
+func deleteState(stateList []fixture.State, id int) (outItems []fixture.State) {
 
 	if debug {
 		fmt.Printf("deleteState\n")
@@ -643,7 +643,7 @@ func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State)
 
 	// Now fix the item numbers
 	for number, indexedItem := range newStates {
-		indexedItem.Number = int16(number + 1)
+		indexedItem.Number = number + 1
 		outItems = append(outItems, indexedItem)
 	}
 
@@ -658,7 +658,7 @@ func deleteState(stateList []fixture.State, id int16) (outItems []fixture.State)
 	return outItems
 }
 
-func populateSettingList(statesList []fixture.State, stateNumber int16) (settingsList []fixture.Setting) {
+func populateSettingList(statesList []fixture.State, stateNumber int) (settingsList []fixture.Setting) {
 
 	if debug {
 		fmt.Printf("populateSettingList\n")

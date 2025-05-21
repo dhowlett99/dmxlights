@@ -189,7 +189,7 @@ type Setting struct {
 
 type State struct {
 	Name        string
-	Number      int16
+	Number      int
 	Label       string
 	Values      []Value
 	ButtonColor string

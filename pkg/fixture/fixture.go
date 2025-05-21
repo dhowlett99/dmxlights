@@ -56,7 +56,7 @@ type Color struct {
 
 type State struct {
 	Name        string    `yaml:"name"`
-	Number      int16     `yaml:"number"`
+	Number      int       `yaml:"number"`
 	Label       string    `yaml:"label"`
 	ButtonColor string    `yaml:"buttoncolor"`
 	Master      int       `yaml:"master"`

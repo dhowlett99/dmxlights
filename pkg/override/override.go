@@ -29,7 +29,7 @@ const debug = false
 func ResetSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateNumber int, switchOverrides *[][]common.Override, fixturesConfig *fixture.Fixtures) common.Override {
 
 	// Convert this switches action into a config we can query.
-	action := fixture.GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
+	action := fixture.GetSwitchAction(switchNumber, stateNumber, fixturesConfig)
 	cfg := fixture.GetConfig(action, useFixture, fixturesConfig)
 
 	if debug {
@@ -55,7 +55,7 @@ func DiscoverSwitchOveride(useFixture *fixture.Fixture, switchNumber int, stateN
 	}
 
 	// Convert this switches action into a config we can query.
-	action := fixture.GetSwitchAction(switchNumber, int16(stateNumber), fixturesConfig)
+	action := fixture.GetSwitchAction(switchNumber, stateNumber, fixturesConfig)
 	cfg := fixture.GetConfig(action, useFixture, fixturesConfig)
 
 	if debug {
@@ -100,7 +100,7 @@ func CreateOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switc
 			}
 
 			// Load the config for this state of of this switch
-			override := DiscoverSwitchOveride(thisFixture, swiTchNumber, int(stateNumber), fixturesConfig)
+			override := DiscoverSwitchOveride(thisFixture, swiTchNumber, stateNumber, fixturesConfig)
 
 			// Assign this discovered override to the current switch state.
 			overrides[swiTchNumber] = append(overrides[swiTchNumber], override)
@@ -155,7 +155,7 @@ func ResetOverrides(sequenceNumber int, fixturesConfig *fixture.Fixtures, switch
 			}
 
 			// Load the config for this state of of this switch
-			overrides[swiTchNumber][stateNumber] = ResetSwitchOveride(thisFixture, swiTch.Number, int(state.Number), switchOverrides, fixturesConfig)
+			overrides[swiTchNumber][stateNumber] = ResetSwitchOveride(thisFixture, swiTch.Number, state.Number, switchOverrides, fixturesConfig)
 			switchOverrides = &overrides
 
 			if debug {
