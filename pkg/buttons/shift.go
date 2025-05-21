@@ -184,10 +184,24 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
+	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
+
+	if debug {
+		for switchNumber, swiTch := range overrides {
+			fmt.Printf("Switch %d\n", switchNumber)
+			for stateNumber, state := range swiTch {
+				fmt.Printf("\t State %d Mode %s Program %d\n", stateNumber, state.Mode, state.Program)
+			}
+		}
+	}
+
 	// If we're in shutter chase mode.
 	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
 
-	// Deal with an RGB sequence.
+	// Deal with an RGB sequence. Increase RGB shift.
 	if sequences[this.TargetSequence].Type == "rgb" {
 
 		// Increment the RGB Shift.
@@ -211,7 +225,7 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		return
 	}
 
-	// Deal with an Scanner sequence.
+	// Deal with an Scanner sequence. Increase scanner shift.
 	if sequences[this.TargetSequence].Type == "scanner" {
 
 		// Increment the Scanner Shift.
@@ -235,10 +249,9 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		return
 	}
 
-	// Deal with an Switch sequence with a RGB fixture.
+	// Deal with an Switch sequence with a RGB fixture. Increase override shift.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
 
-		overrides := *this.SwitchOverrides
 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
@@ -262,15 +275,10 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		return
 	}
 
-	// Deal with an Switch sequence that has a projector fixture.
+	// Deal with an Switch sequence that has a projector fixture.  Increase rotate.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		// Pull the overrides.
-		overrides := *this.SwitchOverrides
-
-		switchPosition := this.SwitchPosition[this.SelectedSwitch]
 		isRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
-		actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 		maxProgramNumber := overrides[this.SelectedSwitch][switchPosition].MaxPrograms
 		IsProgrameNumberOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
 

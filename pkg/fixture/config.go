@@ -60,7 +60,7 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 				fmt.Printf("Setting Number %d Setting Name %s Action Name %s Action Program %s\n", settingNumber, setting.Name, action.Name, action.Program)
 			}
 			if setting.Name == action.Program || setting.Name == "Default" {
-				config.Program = settingNumber
+				config.Program = settingNumber + 1
 				config.ProgramName = setting.Name
 				if debug {
 					fmt.Printf("---> Setting Program to %d\n", config.Program)

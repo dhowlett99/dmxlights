@@ -153,11 +153,11 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.ProgramName = "Unknown"
 	if switchInfo.MaxPrograms > 0 && switchInfo.Program <= switchInfo.MaxPrograms && switchInfo.Program != -1 {
 		availablePrograms := overrides[number][position].AvailableProgramChannels
-		if switchInfo.MaxPrograms > 0 {
-			if debug {
-				fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, switchInfo.MaxPrograms, switchInfo.Program)
-			}
-			switchInfo.ProgramName = availablePrograms[switchInfo.Program]
+		if debug {
+			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, switchInfo.MaxPrograms, switchInfo.Program)
+		}
+		if switchInfo.Program > 0 {
+			switchInfo.ProgramName = availablePrograms[switchInfo.Program-1]
 		}
 	}
 
@@ -170,7 +170,7 @@ func getSwitchDetails(this *CurrentState) SwitchInfo {
 	switchInfo.ProgramSpeedName = "Unknown"
 	if switchInfo.NumberOfProgramSpeeds > 0 && switchInfo.ProgramSpeed <= switchInfo.MaxNumberProgramSpeeds && switchInfo.ProgramSpeed != -1 {
 		availableProgramSpeeds := overrides[number][position].AvailableProgramSpeedChannels
-		if switchInfo.NumberOfProgramSpeeds > 0 {
+		if switchInfo.ProgramSpeed > 0 {
 			switchInfo.ProgramSpeedName = availableProgramSpeeds[switchInfo.ProgramSpeed-1]
 		}
 	}
