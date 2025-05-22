@@ -289,11 +289,7 @@ func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchInfo.OverrideSize), "size", false, guiButtons)
 		}
 		if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" {
-			if this.SwitchStateName != "Off" {
-				common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.Color, switchInfo.ColorName), "size", false, guiButtons)
-			} else {
-				common.ClearBottomStatusBar(guiButtons)
-			}
+			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.Color, switchInfo.ColorName), "size", false, guiButtons)
 		}
 	}
 	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
@@ -374,11 +370,7 @@ func UpdateFade(this *CurrentState, guiButtons chan common.ALight) {
 			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
 		}
 		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" {
-			if this.SwitchStateName != "Off" {
-				common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchInfo.Gobo, switchInfo.GoboName), "fade", false, guiButtons)
-			} else {
-				common.ClearBottomStatusBar(guiButtons)
-			}
+			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchInfo.Gobo, switchInfo.GoboName), "fade", false, guiButtons)
 		}
 	}
 	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
