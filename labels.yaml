@@ -91,6 +91,18 @@ entrys:
     label: "Rotate\nSpeed\nDown"
   - name: Up
     label: "Rotate\nSpeed\nUp"
+- name: Program Speed
+  labels:
+  - name: Down
+    label: "Program\nSpeed\nDown"
+  - name: Up
+    label: "Program\nSpeed\nUp"
+- name: Program Number
+  labels:
+  - name: Down
+    label: "Program\nNumber\nDown"
+  - name: Up
+    label: "Program\nNumber\nUp"
 - name: Color
   labels:
   - name: Down

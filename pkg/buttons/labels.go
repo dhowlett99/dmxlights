@@ -160,6 +160,10 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 		fmt.Printf("showBottomLabels() type=%s static=%t fixtureType=%s colors=%+v\n", this.SelectedType, this.Static[this.TargetSequence], this.SelectedFixtureType, sequenceColors)
 	}
 
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+	actionMode := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Mode
+
 	type bottonButton struct {
 		Label string
 		Color color.RGBA
@@ -219,6 +223,17 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	guiBottomProjectorButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Up"), Color: colors.Cyan}
 	guiBottomProjectorButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Down"), Color: colors.Cyan}
 	guiBottomProjectorButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Up"), Color: colors.Cyan}
+
+	// Storage for the rgb labels on the bottom row.
+	var guiBottomControlProjectorButtons [8]bottonButton
+	guiBottomControlProjectorButtons[0] = bottonButton{Label: labels.GetLabel(this.Labels, "Program Speed", "Down"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[1] = bottonButton{Label: labels.GetLabel(this.Labels, "Program Speed", "Up"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[2] = bottonButton{Label: labels.GetLabel(this.Labels, "Program Number", "Down"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[3] = bottonButton{Label: labels.GetLabel(this.Labels, "Program Number", "Up"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[4] = bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Down"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[5] = bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Up"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[6] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Down"), Color: colors.Cyan}
+	guiBottomControlProjectorButtons[7] = bottonButton{Label: labels.GetLabel(this.Labels, "Gobo", "Up"), Color: colors.Cyan}
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
@@ -297,8 +312,6 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 
 	}
 
-	overrides := *this.SwitchOverrides
-
 	// Switch functions.
 	if this.SelectedType == "switch" && this.SelectedFixtureType != "projector" {
 		// Loop through the available functions for this sequence
@@ -321,14 +334,27 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 		UpdateSize(this, guiButtons)
 		UpdateFade(this, guiButtons)
 
-		// Loop through the available functions for this sequence
-		for index, button := range guiBottomProjectorButtons {
-			if debug {
-				fmt.Printf("projector button %+v\n", button)
+		if actionMode == "Control" {
+			// Loop through the available functions for this sequence
+			for index, button := range guiBottomControlProjectorButtons {
+				if debug {
+					fmt.Printf("projector control buttons %+v\n", button)
+				}
+				common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+				common.LabelButton(index, bottomRow, button.Label, guiButtons)
 			}
-			common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
-			common.LabelButton(index, bottomRow, button.Label, guiButtons)
+
+		} else {
+			// Loop through the available functions for this sequence
+			for index, button := range guiBottomProjectorButtons {
+				if debug {
+					fmt.Printf("projector buttons %+v\n", button)
+				}
+				common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLauchpad, guiButtons)
+				common.LabelButton(index, bottomRow, button.Label, guiButtons)
+			}
 		}
+
 		control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors)
 		if debug {
 			fmt.Printf("Control %+v\n", control)
