@@ -1586,6 +1586,7 @@ fixtures:
     overridable: true
   - number: 5
     name: Speed
+    overridable: true
   - number: 6
     name: Master Reverse
 - id: 27
