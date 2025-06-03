@@ -117,6 +117,7 @@ func main() {
 	this.Blackout = false                                                 // Blackout starts in off.
 	this.Flood = false                                                    // Flood starts in off.
 	this.Running = make(map[int]bool, numberOfSequences)                  // Initialise storage for four sequences.
+	this.Paused = make(map[int]bool, numberOfSequences)                   // Initialise storage for four sequences.
 	this.Strobe = make(map[int]bool, numberOfSequences)                   // Initialise storage for four sequences.
 	this.MasterBrightness = 255                                           // Affects all DMX fixtures and launchpad lamps.
 	this.SoundGain = 0                                                    // Fine gain -0.09 -> 0.09
@@ -160,7 +161,7 @@ func main() {
 
 	// Now add channels to communicate with mini-sequencers on switch channels.
 	this.SwitchChannels = []common.SwitchChannel{}
-	for switchChannel := 0; switchChannel < 10; switchChannel++ {
+	for switchChannel := 0; switchChannel < NumberOfSwitches+1; switchChannel++ {
 		newSwitch := common.SwitchChannel{}
 		newSwitch.Stop = make(chan bool)
 		newSwitch.KeepRotateAlive = make(chan bool)
@@ -317,6 +318,7 @@ func main() {
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Selected speed for the sequence. Common to all types of sequence.
 		this.Running[sequenceNumber] = false                                         // Set this sequence to be in the not running state. Common to all types of sequence.
+		this.Paused[sequenceNumber] = false                                          // Set this sequence to not be paused.
 		this.Strobe[sequenceNumber] = false                                          // Set strobe to be off for all sequences.
 		this.StrobeSpeed[sequenceNumber] = common.DEFAULT_STROBE_SPEED               // Set the strobe speed to be the fastest for this sequence.
 		this.RGBShift[sequenceNumber] = common.DEFAULT_RGB_SHIFT                     // Default RGB shift size.

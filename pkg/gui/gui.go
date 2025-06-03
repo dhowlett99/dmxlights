@@ -514,6 +514,11 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 		var skipPopup bool
 		button.button = newNoHoverButton("     ", func() {
+			// Preset 24 is now the freeze button.
+			if Y == 7 && X == 7 {
+				skipPopup = true
+			}
+
 			if X == 8 && Y == 5 || X > 7 || Y < 5 || Y > 7 {
 				skipPopup = true
 			}
@@ -565,11 +570,16 @@ func (panel *MyPanel) GenerateRow(myWindow fyne.Window, rowNumber int,
 
 					// Setup OK buttons action.
 					buttonSave.OnTapped = func() {
+
 						popup.Hide()
 						if presetInput.Text == "" { // We clicked cancel so give up labelling.
 							return
 						}
 						this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y-1)] = presets.Preset{Label: presetInput.Text, State: true, Selected: true, ButtonColor: buttonColorSelect.Selected}
+						if Y == common.FREEZE_BUTTON.Y && X == common.FREEZE_BUTTON.X {
+							fmt.Printf("We are trying to save to freeze button\n")
+							return
+						}
 						presets.SavePresets(this.PresetsStore, this.ProjectName)
 						presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 					}

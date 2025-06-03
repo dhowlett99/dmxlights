@@ -113,6 +113,16 @@ func StartSequence(sequence common.Sequence,
 			// Remember every step contains infomation for all the fixtures in this sequence group.
 			for step := 0; step < sequence.NumberSteps; step++ {
 
+				// Loop for ever waiting for unpause command.
+				if sequence.Pause {
+					for {
+						sequence = commands.ListenCommandChannelAndWait(sequence.Number, 50*time.Hour, sequence, channels, fixturesConfig)
+						if !sequence.Pause {
+							break
+						}
+					}
+				}
+
 				// This is were we set the speed of the sequence to current speed.
 				speed := sequence.CurrentSpeed / 10
 				if sequence.Type == "scanner" {
@@ -146,6 +156,7 @@ func StartSequence(sequence common.Sequence,
 				for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 					playStep(&sequence, step, fixtureNumber, rgbPositions, scannerPositions, fixtureStepChannels)
 				}
+
 			}
 		} else {
 			if debug {

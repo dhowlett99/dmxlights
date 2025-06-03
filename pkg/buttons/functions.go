@@ -600,6 +600,9 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 		}
 		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+		// Update the running flag.
+		this.Running[this.ChaserSequenceNumber] = true
+
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)
 
@@ -644,7 +647,10 @@ func processFunctions(sequences []*common.Sequence, X int, Y int, this *CurrentS
 
 		// Make sure any left over static scene is turned off.
 		this.Static[this.ChaserSequenceNumber] = false
-		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false
+		this.Functions[this.TargetSequence][common.Function7_Invert_Chase].State = false // Update the running flag.
+
+		// Update the running flag.
+		this.Running[this.ChaserSequenceNumber] = false
 
 		// Update the labels.
 		showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)

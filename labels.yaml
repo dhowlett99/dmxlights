@@ -175,3 +175,9 @@ entrys:
     label: "Chaser\nInvert"  
   - name: "Music"
     label: "Chaser\nMusic"
+- name: Freeze
+  labels:
+  - name: On
+    label: Resume
+  - name: Off
+    label: Freeze

@@ -311,6 +311,24 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = true
 		return sequence
 
+	case common.Pause:
+		if debug {
+			fmt.Printf("%d: Command Pause\n", mySequenceNumber)
+		}
+		sequence.Chase = true
+		sequence.Static = false
+		sequence.Pause = true
+		return sequence
+
+	case common.UnPause:
+		if debug {
+			fmt.Printf("%d: Command Pause\n", mySequenceNumber)
+		}
+		sequence.Chase = true
+		sequence.Static = false
+		sequence.Pause = false
+		return sequence
+
 	case common.StartChase:
 		if debug {
 			fmt.Printf("%d: Command StartChase\n", mySequenceNumber)

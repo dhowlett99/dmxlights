@@ -39,6 +39,11 @@ type Preset struct {
 func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
+
+			// Preset 24 is now the freeze button.
+			if y == common.FREEZE_BUTTON.Y && x == common.FREEZE_BUTTON.X {
+				return
+			}
 			// State true is a preset which is being used and has a saved config.
 			if presets[fmt.Sprint(x)+","+fmt.Sprint(y)].State {
 				// Selected preset is set to it's flashing color.
@@ -77,6 +82,11 @@ func RefreshPresets(eventsForLauchpad chan common.ALight, guiButtons chan common
 func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.ALight, presets map[string]Preset) {
 	for y := 4; y < 7; y++ {
 		for x := 0; x < 8; x++ {
+			// Preset 24 is now the freeze button.
+			if y == common.FREEZE_BUTTON.Y && x == common.FREEZE_BUTTON.X {
+				return
+			}
+
 			newPreset := presets[fmt.Sprint(x)+","+fmt.Sprint(y)]
 			newPreset.Selected = false
 			presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset
@@ -85,6 +95,10 @@ func ClearPresets(eventsForLauchpad chan common.ALight, guiButtons chan common.A
 }
 
 func RemovePreset(presets map[string]Preset, x int, y int) {
+	// Preset 24 is now the freeze button.
+	if y == common.FREEZE_BUTTON.Y && x == common.FREEZE_BUTTON.X {
+		return
+	}
 	newPreset := presets[fmt.Sprint(x)+","+fmt.Sprint(y)]
 	newPreset.Selected = false
 	presets[fmt.Sprint(x)+","+fmt.Sprint(y)] = newPreset

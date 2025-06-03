@@ -68,6 +68,8 @@ type CurrentState struct {
 	ScannerFade                 map[int]int                // Indexed by sequence.
 	ScannerCoordinates          map[int]int                // Number of coordinates for scanner patterns is selected from 4 choices. ScannerCoordinates  0=12, 1=16,2=24,3=32,4=64, Indexed by sequence.
 	Running                     map[int]bool               // Which sequence is running. Indexed by sequence. True if running.
+	AllPaused                   bool                       // All sequences paused.
+	Paused                      map[int]bool               // Which sequence is paused. Indexed by sequence. True if paused.
 	Strobe                      map[int]bool               // We are in strobe mode. True if strobing
 	StrobeSpeed                 map[int]int                // Strobe speed. value is speed 0-255, indexed by sequence number.
 	SavePreset                  bool                       // Save a preset flag.
@@ -179,10 +181,41 @@ func ProcessButtons(X int, Y int,
 		return
 	}
 
+	// S E L E C T   P A U S E - Pause all sequences.
+	if X == 7 && Y == 6 {
+
+		if !this.SavePreset {
+			SavePresetOff(this, eventsForLaunchpad, guiButtons)
+			if !this.AllPaused {
+				// Mark as paused.
+				this.AllPaused = true
+				pauseAllSequences(sequences, this, commandChannels)
+				//common.LightLamp(common.FREEZE_BUTTON, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+				common.FlashLight(common.Button{X: X, Y: Y}, colors.Magenta, colors.White, eventsForLaunchpad, guiButtons)
+				common.LabelButton(X, Y, labels.GetLabel(this.Labels, "Freeze", "On"), guiButtons)
+
+			} else {
+				// Mark as unpaused.
+				this.AllPaused = false
+				unPauseAllSequences(sequences, this, commandChannels)
+				common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+				common.LabelButton(X, Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
+			}
+		} else {
+			// Turn the save mode off.
+			this.SavePreset = false
+			presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+			common.LightLamp(common.SAVE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			return
+		}
+
+		return
+	}
+
 	// S E L E C T   P R E S E T S
 	// recall (short press) or delete (long press) the preset.
 	if X >= 100 && X < 108 &&
-		(Y > 3 && Y < 7) {
+		(Y > 3 && Y < 7) && (X != 7 && Y != 6) {
 
 		// Remove the button off offset.
 		X = X - 100
@@ -570,6 +603,10 @@ func InitButtons(this *CurrentState, sequenceColors []color.RGBA, staticColors [
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
 	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
+
+	// Preset 24 is now used for a Freeze button.
+	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
 }
 

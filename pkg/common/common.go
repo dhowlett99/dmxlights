@@ -80,6 +80,7 @@ var GlobalScannerSequenceNumber int
 
 var FLOOD_BUTTON = Button{X: 8, Y: 3}
 var SAVE_BUTTON = Button{X: 8, Y: 4}
+var FREEZE_BUTTON = Button{X: 7, Y: 6}
 var RUNNING_BUTTON = Button{X: 8, Y: 5}
 var STROBE_BUTTON = Button{X: 8, Y: 6}
 var BLACKOUT_BUTTON = Button{X: 8, Y: 7}
@@ -391,6 +392,8 @@ const (
 	StartChase
 	Stop
 	StopChase
+	Pause
+	UnPause
 	ReadConfig
 	LoadPreset
 	UpdateSpeed
@@ -471,6 +474,7 @@ type Sequence struct {
 	ChaserSequenceNumber        int                         // Chaser Sequence Number.
 	ScannerSequenceNumber       int                         // Scanner Sequence Number.
 	Run                         bool                        // True if this sequence is running.
+	Pause                       bool                        // True if this sequence is paused.
 	SavedRun                    bool                        // Place to save state when loading.
 	Bounce                      bool                        // True if this sequence is bouncing.
 	RGBInvert                   bool                        // True if RGB sequence patten is inverted.

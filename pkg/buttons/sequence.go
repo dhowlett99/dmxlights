@@ -130,3 +130,62 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 		return
 	}
 }
+
+func pauseAllSequences(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("pauseAllSequences\n")
+	}
+
+	for sequenceNumber := range sequences {
+
+		// P A U S E - If sequence is not paused but running, stop it
+		if !this.Paused[sequenceNumber] && this.Running[sequenceNumber] {
+
+			if debug {
+				fmt.Printf("Pause Sequence %d \n", sequenceNumber)
+			}
+
+			// Mark as paused.
+			this.Paused[sequenceNumber] = true
+
+			cmd := common.Command{
+				Action: common.Pause,
+				Args: []common.Arg{
+					{Name: "Speed", Value: this.Speed[sequenceNumber]},
+				},
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+		}
+
+	}
+}
+
+func unPauseAllSequences(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("unPauseAllSequences\n")
+	}
+
+	for sequenceNumber := range sequences {
+
+		if this.Paused[sequenceNumber] && this.Running[sequenceNumber] {
+
+			// UnPause this sequence.
+			if debug {
+				fmt.Printf("Start Sequence %d \n", sequenceNumber)
+			}
+
+			// Mark as unpaused.
+			this.Paused[sequenceNumber] = false
+
+			// UnPause the sequence.
+			cmd := common.Command{
+				Action: common.UnPause,
+			}
+			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+
+		}
+	}
+}
