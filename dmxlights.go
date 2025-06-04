@@ -313,7 +313,9 @@ func main() {
 		sequences = append(sequences, &newSequence)
 
 		// Report on what we found.
-		fmt.Printf("Found sequence %s, fixtures %d, label:%s \tdesc: %s, \ttype: \t%s\n", sequenceConf.Name, newSequence.NumberFixtures, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
+		if debug {
+			fmt.Printf("Found sequence %s, fixtures %d, label:%s \tdesc: %s, \ttype: \t%s\n", sequenceConf.Name, newSequence.NumberFixtures, sequenceConf.Label, sequenceConf.Description, sequenceConf.Type)
+		}
 
 		// Setup Default State.
 		this.Speed[sequenceNumber] = common.DEFAULT_SPEED                            // Selected speed for the sequence. Common to all types of sequence.

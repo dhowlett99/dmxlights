@@ -61,7 +61,9 @@ func NewSoundTrigger(channels common.Channels, guiButtons chan common.ALight, ev
 
 func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons chan common.ALight, eventsForLaunchpad chan common.ALight) {
 
-	fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
+	if debug {
+		fmt.Printf("Starting Sound System Version %s\n", portaudio.VersionText())
+	}
 
 	soundConfig.deviceName = deviceName
 
@@ -90,18 +92,28 @@ func (soundConfig *SoundConfig) StartSoundConfig(deviceName string, guiButtons c
 				fmt.Printf("error: portaudio: failed to list input channels \n")
 			}
 			for _, inputChannel := range inputChannels {
-				fmt.Printf("New Input Channel %v\n", *inputChannel)
+				if debug {
+					fmt.Printf("New Input Channel %v\n", *inputChannel)
+				}
 
 				for _, device := range inputChannel.Devices {
 					if device.MaxInputChannels > 0 {
 						if device.Name == deviceName {
-							fmt.Printf("Found device %s\n", device.Name)
+							if debug {
+								fmt.Printf("Found device %s\n", device.Name)
+							}
 							p := portaudio.HighLatencyParameters(device, nil)
-							fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
+							if debug {
+								fmt.Printf("Input.Channels %d\n", device.MaxInputChannels)
+							}
 							p.Input.Channels = device.MaxInputChannels
-							fmt.Printf("Output.Channels %d\n", device.MaxOutputChannels)
+							if debug {
+								fmt.Printf("Output.Channels %d\n", device.MaxOutputChannels)
+							}
 							p.Output.Channels = device.MaxOutputChannels
-							fmt.Printf("SampleRate %f\n", device.DefaultSampleRate)
+							if debug {
+								fmt.Printf("SampleRate %f\n", device.DefaultSampleRate)
+							}
 							p.SampleRate = device.DefaultSampleRate
 							p.FramesPerBuffer = len(in)
 							soundConfig.stream, err = portaudio.OpenStream(p, in)
