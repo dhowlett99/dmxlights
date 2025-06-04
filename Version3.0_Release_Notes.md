@@ -28,6 +28,8 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Support for Equinox Helix
 * Bug fix to entering ranges in settings panel.
 * Self signed certificate used in code signing are now generated in the Makefile.
+* A Freeze all sequences button is provided in place of preset 24.
+* Sound card and sequence startup debug messages removed.
 
 ## Known Problems
 
