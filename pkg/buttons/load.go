@@ -22,6 +22,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/config"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
@@ -96,6 +97,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.Running[sequenceNumber] = sequences[sequenceNumber].SavedRun
 		this.Strobe[sequenceNumber] = sequences[sequenceNumber].Strobe
 		this.StrobeSpeed[sequenceNumber] = sequences[sequenceNumber].StrobeSpeed
+		this.Paused[sequenceNumber] = false
 
 		// Setup the correct mode for the displays.
 		this.SequenceType[sequenceNumber] = sequences[sequenceNumber].Type
@@ -191,6 +193,10 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 	// Light the sequence selector button.
 	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
+
+	// Clear the pause button.
+	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
 }
 
