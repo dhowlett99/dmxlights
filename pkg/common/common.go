@@ -239,7 +239,8 @@ type Switch struct {
 type Override struct {
 
 	// Currents action modes are mini sequencer - Off ,Static, Control, Chase and for the mini setter - Setting.
-	Mode string
+	Mode         string
+	ChaseRunning bool
 
 	// Shutter
 	IsShutterOverrideAble bool
@@ -253,6 +254,11 @@ type Override struct {
 	StartingStrobeSpeed          int
 	AvailableStrobeSpeedChannels []string
 	MaxStrobeSpeeds              int
+
+	// Pause Chaser mode.
+	SignalOverridePause bool
+	OverridePause       bool
+	Pause               bool
 
 	// RGB / Scanner Speed
 	SignalOverrideSpeed bool
@@ -422,6 +428,7 @@ const (
 	OverrideColor
 	OverrideGobo
 	OverrideStrobe
+	OverridePause
 	Inverted
 	UpdateGobo
 	Flood
@@ -450,6 +457,7 @@ const (
 	UpdateMusicTrigger
 	UpdateScannerHasShutterChase
 	UpdateFixturesConfig
+	UpdatePause
 )
 
 // A full step cycle is 39 ticks ie 39 values.

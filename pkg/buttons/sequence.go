@@ -160,6 +160,33 @@ func pauseAllSequences(sequences []*common.Sequence, this *CurrentState, command
 		}
 
 	}
+
+	// Find any switches that have a chase configured and send a message to pause it.
+	// pull overrides.
+	overrides := *this.SwitchOverrides
+	for switchNumber := 0; switchNumber < 8; switchNumber++ {
+
+		numberOfStates := len(overrides[switchNumber])
+
+		// Go through switches.
+		for stateNumber := 0; stateNumber < numberOfStates; stateNumber++ {
+
+			// Now look at each state.
+			if overrides[switchNumber][stateNumber].Mode == "Chase" && overrides[switchNumber][stateNumber].ChaseRunning {
+				// We have found a mini-sequencer configured as a chaser.
+				// Send an override command to pause this switch state.
+				cmd := common.Command{
+					Action: common.OverridePause,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: switchNumber},
+						{Name: "StateNumber", Value: stateNumber},
+						{Name: "Pause", Value: true},
+					},
+				}
+				common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+			}
+		}
+	}
 }
 
 func unPauseAllSequences(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command) {
@@ -186,6 +213,33 @@ func unPauseAllSequences(sequences []*common.Sequence, this *CurrentState, comma
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 
+		}
+	}
+
+	// Find any switches that have a chase configured and send a message to pause it.
+	// pull overrides.
+	overrides := *this.SwitchOverrides
+	for switchNumber := 0; switchNumber < 8; switchNumber++ {
+
+		numberOfStates := len(overrides[switchNumber])
+
+		// Go through switches.
+		for stateNumber := 0; stateNumber < numberOfStates; stateNumber++ {
+
+			// Now look at each state.
+			if overrides[switchNumber][stateNumber].Mode == "Chase" && overrides[switchNumber][stateNumber].ChaseRunning {
+				// We have found a mini-sequencer configured as a chaser.
+				// Send an override command to pause this switch state.
+				cmd := common.Command{
+					Action: common.OverridePause,
+					Args: []common.Arg{
+						{Name: "SwitchNumber", Value: switchNumber},
+						{Name: "StateNumber", Value: stateNumber},
+						{Name: "Pause", Value: false},
+					},
+				}
+				common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+			}
 		}
 	}
 }

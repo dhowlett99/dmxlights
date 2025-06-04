@@ -642,6 +642,33 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlaySingleSwitch = false
 		return sequence
 
+	case common.OverridePause:
+		const SWITCH_NUMBER = 0 // Integer
+		const SWITCH_POSITION = 1
+		const SWITCH_PAUSE = 2 // Bool
+
+		switchNumber := command.Args[SWITCH_NUMBER].Value.(int)
+		switchPosition := command.Args[SWITCH_POSITION].Value.(int)
+		switchPause := command.Args[SWITCH_PAUSE].Value.(bool)
+
+		if debug {
+			fmt.Printf("%d: Command Pause Switch Number %d Position %d Pause %t\n", mySequenceNumber, switchNumber, switchPosition, switchPause)
+		}
+
+		sequence.PlaySwitchOnce = true
+		sequence.Override = true
+
+		sequence.CurrentSwitch = switchNumber
+		sequence.LastSelectedSwitch = switchNumber
+
+		sequence.Switches[switchNumber].CurrentPosition = switchPosition
+		sequence.Switches[switchNumber].Selected = true
+		sequence.Switches[switchNumber].Override.OverridePause = true
+		sequence.Switches[switchNumber].Override.Pause = switchPause
+		sequence.Switches[switchNumber].Override.SignalOverridePause = true
+
+		return sequence
+
 	case common.OverrideSpeed:
 		const SWITCH_NUMBER = 0 // Integer
 		const SWITCH_POSITION = 1

@@ -125,6 +125,7 @@ type ActionConfig struct {
 	Pan               int
 	Tilt              int
 	RotateSensitivity int
+	Pause             bool
 }
 
 type Fixture struct {

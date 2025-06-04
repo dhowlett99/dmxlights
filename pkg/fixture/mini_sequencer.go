@@ -683,6 +683,20 @@ func newMiniSequencer(fixture *Fixture,
 
 			for {
 				// Apply the overrides.
+				if override.Pause {
+					//if debug_mini {
+					fmt.Printf("Override Pause %t\n", override.Pause)
+					//}
+					cfg.Pause = true
+					overrideHasHappened = true
+				} else {
+					//if debug_mini {
+					fmt.Printf("Override Pause %t\n", override.Pause)
+					//}
+					cfg.Pause = false
+					overrideHasHappened = true
+				}
+
 				if !cfg.MusicTrigger && override.Speed != 0 {
 					if debug_mini {
 						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
@@ -711,7 +725,7 @@ func newMiniSequencer(fixture *Fixture,
 
 				if override.ProgramSpeed != 0 {
 					if debug_mini {
-						fmt.Printf("Override is set so Speed is %d\n", override.Speed)
+						fmt.Printf("Override is set so Speed is %d\n", override.ProgramSpeed)
 					}
 					cfg.ProgramSpeed = GetADMXValue(fixture, override.ProgramSpeed, "ProgramSpeed")
 					overrideHasHappened = true
@@ -837,15 +851,36 @@ func newMiniSequencer(fixture *Fixture,
 					select {
 					// First five triggers are occupied by sequence 0-FOH,1-Upluighters,2-Scanners,3-Switches,4-ShutterChaser
 					// So switch channels use 5 -12
+
+					// Receive command.
 					case cmd := <-switchChannels[swiTch.Number].CommandChannel:
 						cfg = listenForOverrideCommands(fixture, cfg, cmd, &override)
+
+						if cfg.Pause {
+							for {
+								select {
+								case cmd := <-switchChannels[swiTch.Number].CommandChannel:
+									cfg = listenForOverrideCommands(fixture, cfg, cmd, &override)
+
+								// Just time out.
+								case <-time.After(cfg.SpeedDuration / 50):
+								}
+								if !cfg.Pause {
+									break
+								}
+							}
+
+						}
 						// Recreate the sequence and recalculate steps.
 						if debug_mini {
 							fmt.Printf("Recreate the sequence and recalculate steps.\n")
 						}
 						sequence, RGBPositions, numberSteps = createSequence(cfg)
 
+					// Receive beat to advance sequence, go to next step.
 					case <-soundConfig.SoundTriggers[swiTch.Number+4].Channel:
+
+					// Receive stop command.
 					case <-switchChannels[swiTch.Number].Stop:
 						// Stop.
 						if cfg.Rotatable {
@@ -854,6 +889,8 @@ func newMiniSequencer(fixture *Fixture,
 						// And turn the fixture off.
 						MapFixtures(false, false, mySequenceNumber, myFixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, blackout, brightness, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 						return
+
+					// Just time out.
 					case <-time.After(cfg.SpeedDuration / 50):
 					}
 
@@ -939,6 +976,16 @@ func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Co
 	if debug_override {
 		fmt.Printf("CMD is %+v\n", cmd)
 	}
+	// Update Pause.
+	if cmd.Action == common.UpdatePause {
+		const SHIFT = 0
+		override.Pause = cmd.Args[SHIFT].Value.(bool)
+		cfg.Pause = cmd.Args[SHIFT].Value.(bool)
+		if debug_override {
+			fmt.Printf("Pause %t\n", cmd.Args[SHIFT].Value.(bool))
+		}
+	}
+
 	// Update RGB Speed or Scanner Shutter Speed but not in music trigger mode.
 	if !cfg.MusicTrigger && cmd.Action == common.UpdateSpeed {
 		const SPEED = 0

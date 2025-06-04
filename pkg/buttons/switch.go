@@ -45,8 +45,16 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	// Save this switch in the sequence.
 	sequences[this.SelectedSequence].LastSelectedSwitch = this.SelectedSwitch
 
+	// Pull overrides.
+	overrides := *this.SwitchOverrides
+
 	// We have a valid switch.
 	if this.SelectedSwitch < len(sequences[this.SelectedSequence].Switches) {
+
+		// Clear the chase running flag.
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ChaseRunning {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ChaseRunning = false
+		}
 
 		// Second time we've pressed this switch button, actually step the state.
 		if this.SelectedSwitch == this.LastSelectedSwitch {
@@ -67,6 +75,12 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			}
 			// Send a message to the switch sequence.
 			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
+			// Remember if this state contains a action to start a mini sequencer.
+			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Mode == "Chase" {
+				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ChaseRunning = true
+			}
+
 		} else {
 			// Just send a message to focus the switch button.
 			cmd := common.Command{
@@ -82,9 +96,6 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
 
 		}
-
-		// Pull overrides.
-		overrides := *this.SwitchOverrides
 
 		// Reset any overrides for this switch and this state in the sequence.
 		cmd := common.Command{
