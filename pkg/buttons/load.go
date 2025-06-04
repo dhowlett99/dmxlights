@@ -202,7 +202,9 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 			lastSelectedSequence = sequenceNumber
 			if lastSelectedSequence == this.ChaserSequenceNumber {
 				lastSelectedSequence = this.ScannerSequenceNumber
-				fmt.Printf("Found a running sequence %d\n", sequenceNumber)
+				if debug {
+					fmt.Printf("Found a running sequence %d\n", sequenceNumber)
+				}
 				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}
