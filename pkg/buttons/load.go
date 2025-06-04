@@ -195,6 +195,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 	lightSelectedButton(eventsForLaunchpad, guiButtons, this)
 
 	// Clear the pause button.
+	this.AllPaused = false
 	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
