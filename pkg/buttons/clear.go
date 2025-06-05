@@ -23,6 +23,7 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/override"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
@@ -130,6 +131,11 @@ func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig 
 	if this.LaunchPadConnected {
 		this.Pad.Program()
 	}
+
+	// Turn off pause lamp.
+	this.AllPaused = false
+	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
 	// Send reset to all sequences.
 	// Look at the reset process in commands.go as a lot of stuff in the sequence is reset there.

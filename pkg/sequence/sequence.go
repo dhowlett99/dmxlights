@@ -117,9 +117,8 @@ func StartSequence(sequence common.Sequence,
 				if sequence.Pause {
 					for {
 						sequence = commands.ListenCommandChannelAndWait(sequence.Number, 50*time.Hour, sequence, channels, fixturesConfig)
-						if !sequence.Pause {
-							break
-						}
+						sequence.Pause = false
+						break
 					}
 				}
 

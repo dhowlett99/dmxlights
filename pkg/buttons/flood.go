@@ -22,6 +22,7 @@ import (
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
+	"github.com/dhowlett99/dmxlights/pkg/labels"
 	"github.com/dhowlett99/dmxlights/pkg/presets"
 )
 
@@ -73,6 +74,11 @@ func FloodOff(numberSequences int, this *CurrentState, commandChannels []chan co
 }
 
 func floodOn(numberSequences int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	// Turn off pause lamp.
+	this.AllPaused = false
+	common.LightLamp(common.FREEZE_BUTTON, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(common.FREEZE_BUTTON.X, common.FREEZE_BUTTON.Y, labels.GetLabel(this.Labels, "Freeze", "Off"), guiButtons)
 
 	// Remember which sequence is currently selected.
 	this.LastSelectedSequence = this.SelectedSequence

@@ -684,15 +684,15 @@ func newMiniSequencer(fixture *Fixture,
 			for {
 				// Apply the overrides.
 				if override.Pause {
-					//if debug_mini {
-					fmt.Printf("Override Pause %t\n", override.Pause)
-					//}
+					if debug_mini {
+						fmt.Printf("Override Pause %t\n", override.Pause)
+					}
 					cfg.Pause = true
 					overrideHasHappened = true
 				} else {
-					//if debug_mini {
-					fmt.Printf("Override Pause %t\n", override.Pause)
-					//}
+					if debug_mini {
+						fmt.Printf("Override Pause %t\n", override.Pause)
+					}
 					cfg.Pause = false
 					overrideHasHappened = true
 				}
