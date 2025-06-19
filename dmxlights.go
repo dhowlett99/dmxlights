@@ -130,6 +130,7 @@ func main() {
 	this.EditScannerColorsMode = false                                    // Remember when we are in setting scanner color mode.
 	this.EditGoboSelectionMode = false                                    // Remember when we are in selecting gobo mode.
 	this.Static = make([]bool, numberOfSequences)                         // Remember when this sequence is in static mode.
+	this.WasStatic = make([]bool, numberOfSequences)                      // Remember when this sequence is was in static mode.
 	this.StaticFlashing = make([]bool, numberOfSequences)                 // Remember when we are in static buttons are flashing.
 	this.SequenceType = make([]string, numberOfSequences)                 // Remember sequence type.
 	this.EditPatternMode = false                                          // Remember when we are in editing pattern mode.

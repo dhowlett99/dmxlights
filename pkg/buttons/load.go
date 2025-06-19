@@ -75,16 +75,15 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 
 		sequences[sequenceNumber] = common.RefreshSequence(sequenceNumber, commandChannels, updateChannels)
 
-		// If we're a scanner sequence and not in static mode clear the buttom
-		if this.SequenceType[sequenceNumber] == "scanner" && !this.Static[sequenceNumber] {
+		// If we're a scanner sequence and not in static mode or the chaser is not in static mode, clear the buttom
+		if this.SequenceType[sequenceNumber] == "scanner" &&
+			!this.Static[sequenceNumber] &&
+			!this.Static[this.ChaserSequenceNumber] {
 			common.ClearSelectedRowOfButtons(sequenceNumber, eventsForLaunchpad, guiButtons)
 		}
 
 		// Clear any left over labels.
 		common.ClearLabelsSelectedRowOfButtons(this.SelectedSequence, guiButtons)
-
-		// Play out this sequence.
-		displayMode(sequenceNumber, this.SelectedMode[this.SelectedSequence], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Restore the speed, shift, size, fade, coordinates label data.
 		this.Speed[sequenceNumber] = sequences[sequenceNumber].Speed
@@ -119,7 +118,13 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 		this.ShowRGBColorPicker = false
 
 		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
-		if this.SequenceType[sequenceNumber] == "scanner" && !this.Running[this.ScannerSequenceNumber] && this.ScannerChaser[this.ScannerSequenceNumber] {
+		if this.Static[sequenceNumber] {
+			// So adjust the mode to be NORMAL_STATIC
+			this.SelectedMode[sequenceNumber] = NORMAL_STATIC
+		}
+
+		// If the scanner sequence isn't running but the shutter chaser is, then it makes sense to show the shutter chaser.
+		if this.SequenceType[sequenceNumber] == "scanner" && this.ScannerChaser[this.ScannerSequenceNumber] {
 			// So adjust the mode to be CHASER_DISPLAY
 			this.SelectedMode[sequenceNumber] = CHASER_DISPLAY
 		}
@@ -163,6 +168,9 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			}
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
+
+		// Set the dsiplay mode for this sequence.
+		displayMode(sequenceNumber, this.SelectedMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
 		if debug {
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
@@ -223,7 +231,9 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 			lastSelectedSequence = sequenceNumber
 			if lastSelectedSequence == this.ChaserSequenceNumber {
 				lastSelectedSequence = this.ScannerSequenceNumber
-				fmt.Printf("Found a static sequence %d\n", sequenceNumber)
+				if debug {
+					fmt.Printf("Found a static sequence %d\n", sequenceNumber)
+				}
 				return lastSelectedSequence, common.NOT_SELECTED
 			}
 		}

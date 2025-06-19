@@ -212,7 +212,7 @@ func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan c
 	// 1 x switch sequence.
 
 	if debug {
-		fmt.Printf("SequenceSelect\n")
+		fmt.Printf("lightSelectedButton\n")
 	}
 
 	if this.SelectedSequence > NumberOfSelectableSequences-1 {

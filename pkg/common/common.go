@@ -449,6 +449,7 @@ const (
 	ClearStaticColor
 	SetStaticColorBar
 	Static
+	StopStatic
 	Master
 	UpdateNumberCoordinates
 	UpdateOffsetPan
@@ -531,6 +532,7 @@ type Sequence struct {
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
+	StopStatic                  bool                        // Direct command to stop static.
 	Override                    bool                        // Override a switch.
 	PlaySingleSwitch            bool                        // Play a single switch.
 	StepSwitch                  bool                        // Step the switch if true.
@@ -764,7 +766,24 @@ func SendCommandToAllSequenceExcept(targetSequence int, command Command, command
 	}
 }
 
+func StopStaticSequence(targetSequence int, commandChannels []chan Command) {
+
+	if debug {
+		fmt.Printf("\tStopStaticSequence Number %d\n", targetSequence)
+	}
+
+	cmd := Command{
+		Action: StopStatic,
+	}
+	SendCommandToSequence(targetSequence, cmd, commandChannels)
+}
+
 func RevealSequence(targetSequence int, commandChannels []chan Command) {
+
+	if debug {
+		fmt.Printf("\tRevealSequence Number %d\n", targetSequence)
+	}
+
 	cmd := Command{
 		Action: Reveal,
 	}
@@ -772,6 +791,11 @@ func RevealSequence(targetSequence int, commandChannels []chan Command) {
 }
 
 func HideSequence(targetSequence int, commandChannels []chan Command) {
+
+	if debug {
+		fmt.Printf("\tHideSequence Number %d\n", targetSequence)
+	}
+
 	cmd := Command{
 		Action: Hide,
 	}
@@ -780,19 +804,26 @@ func HideSequence(targetSequence int, commandChannels []chan Command) {
 
 func HideAllSequences(commandChannels []chan Command) {
 
+	if debug {
+		fmt.Printf("\tHideAllSequences \n")
+	}
+
 	cmd := Command{
 		Action: Hide,
 	}
 	SendCommandToAllSequence(cmd, commandChannels)
 }
 
-func StartStaticSequences(sequences []*Sequence, commandChannels []chan Command) {
-	for sequenceNumber := range sequences {
-		cmd := Command{
-			Action: Normal,
-		}
-		SendCommandToSequence(sequenceNumber, cmd, commandChannels)
+func StartStaticSequence(sequenceNumber int, commandChannels []chan Command) {
+
+	if debug {
+		fmt.Printf("\tStartStaticSequence Number %d\n", sequenceNumber)
 	}
+
+	cmd := Command{
+		Action: Normal,
+	}
+	SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 }
 
 // Colors are selected from a pallete of 8 colors, this function takes 0-9 (repeating 4 time) and

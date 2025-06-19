@@ -85,6 +85,7 @@ type CurrentState struct {
 	EditScannerColorsMode       bool                       // This flag is true when the sequence is in select scanner colors editing mode.
 	EditGoboSelectionMode       bool                       // This flag is true when the sequence is in sequence gobo selection mode.
 	Static                      []bool                     // This flag is true when the sequence is in edit static colors mode.
+	WasStatic                   []bool                     // This flag is true when the sequence was previously in static colors mode.
 	ShowRGBColorPicker          bool                       // This flag is true when the sequence is in when we are showing the color picker.
 	ShowStaticColorPicker       bool                       // This flag is true when the sequence is showing the static color picker mode.
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.

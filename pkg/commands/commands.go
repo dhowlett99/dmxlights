@@ -196,6 +196,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.PlayStaticOnce = false
 		return sequence
 
+	case common.StopStatic:
+		if debug {
+			fmt.Printf("%d: Command Stop Static=%t\n", mySequenceNumber, sequence.Static)
+		}
+		sequence.Hidden = false
+		sequence.StopStatic = true
+		return sequence
+
 	case common.UpdateSpeed:
 		const SPEED = 0
 		if debug {

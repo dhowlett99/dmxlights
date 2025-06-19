@@ -56,6 +56,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			fmt.Printf("%d: DisplayMode: NORMAL\n", sequenceNumber)
 		}
 
+		// Stop any static scene in this sequence.
+		if this.WasStatic[sequenceNumber] {
+			common.StopStaticSequence(sequenceNumber, commandChannels)
+			this.WasStatic[sequenceNumber] = false
+		}
+
 		// Make sure we hide the shutter chaser.
 		if this.SequenceType[sequenceNumber] == "scanner" {
 			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
@@ -71,13 +77,21 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			fmt.Printf("%d: DisplayMode: NORMAL STATIC\n", sequenceNumber)
 		}
 
-		// Make sure we hide any shutter chaser.
-		if this.SelectedType == "scanner" {
-			common.HideSequence(this.ChaserSequenceNumber, commandChannels)
+		// Start the static scene in this sequence.
+		if sequences[sequenceNumber].Static {
+			this.Static[sequenceNumber] = true
+			this.WasStatic[sequenceNumber] = true
+			common.StartStaticSequence(sequenceNumber, commandChannels)
 		}
 
-		// Reveal the selected sequence.
-		common.RevealSequence(sequenceNumber, commandChannels)
+		if sequences[sequenceNumber].Type == "scanner" {
+			// Make sure we hide any rotates and show chaser.
+			common.HideSequence(sequenceNumber, commandChannels)
+			common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+		} else {
+			// Reveal the selected sequence.
+			common.RevealSequence(sequenceNumber, commandChannels)
+		}
 
 		return
 
