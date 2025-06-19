@@ -322,3 +322,34 @@ func TestReverseDmx(t *testing.T) {
 		})
 	}
 }
+
+func TestGetLaunchPadCodeByRGBColor(t *testing.T) {
+	type args struct {
+		selectedColor color.RGBA
+	}
+	tests := []struct {
+		name string
+		args args
+		want byte
+	}{
+		{
+			name: "Test Red",
+			args: args{
+				selectedColor: color.RGBA{
+					R: 255,
+					G: 0,
+					B: 0,
+					A: 255,
+				},
+			},
+			want: 0x48,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := GetLaunchPadCodeByRGBColor(tt.args.selectedColor); got != tt.want {
+				t.Errorf("GetLaunchPadCodeByRGBColor() = %v, want %v", got, tt.want)
+			}
+		})
+	}
+}

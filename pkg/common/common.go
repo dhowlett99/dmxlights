@@ -1222,7 +1222,7 @@ func ShowStaticButtons(sequence *Sequence, staticFlashing bool, eventsForLaunchp
 
 		if staticColorButton.Enabled {
 			if staticColorButton.Flash || staticFlashing {
-				onColor := color.RGBA{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B}
+				onColor := color.RGBA{R: staticColorButton.Color.R, G: staticColorButton.Color.G, B: staticColorButton.Color.B, A: staticColorButton.Color.A}
 				FlashLight(Button{X: fixtureNumber, Y: sequenceNumber}, onColor, colors.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				LightLamp(Button{X: fixtureNumber, Y: sequenceNumber}, staticColorButton.Color, sequence.Master, eventsForLaunchpad, guiButtons)

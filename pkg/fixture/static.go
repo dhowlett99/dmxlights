@@ -49,7 +49,7 @@ func setStaticOn(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixture
 		// If we're not hiding the sequence on the launchpad, show the static colors on the buttons.
 		if !cmd.Hidden {
 			if lamp.Flash {
-				onColor := color.RGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B}
+				onColor := color.RGBA{R: lamp.Color.R, G: lamp.Color.G, B: lamp.Color.B, A: lamp.Color.A}
 				common.FlashLight(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, onColor, colors.Black, eventsForLaunchpad, guiButtons)
 			} else {
 				common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, cmd.Master, eventsForLaunchpad, guiButtons)
