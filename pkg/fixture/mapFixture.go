@@ -199,10 +199,10 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 								SetChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
 							}
 						}
-						// Scanner Color
+						// Scanner Color Wheel.
 						if strings.Contains(channel.Name, "Color") {
 							for _, setting := range channel.Settings {
-								if setting.Number-1 == scannerColor {
+								if setting.Number == scannerColor {
 									v, _ := strconv.Atoi(setting.Value)
 									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
