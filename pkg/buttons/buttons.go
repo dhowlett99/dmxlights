@@ -217,6 +217,7 @@ func ProcessButtons(X int, Y int,
 	// recall (short press) or delete (long press) the preset. & Not the pause button.
 	if X >= 100 && X < 108 &&
 		(Y > 3 && Y < 7) &&
+		!(X == 107 && Y == 6) &&
 		!(X == 7 && Y == 6) {
 
 		// Remove the button off offset.
