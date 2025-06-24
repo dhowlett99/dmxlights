@@ -56,14 +56,15 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 	music := flashSequence.Pattern.Steps[X].Fixtures[X].Music
 	gobo := flashSequence.Pattern.Steps[X].Fixtures[X].Gobo
 	program := flashSequence.Pattern.Steps[X].Fixtures[X].Program
+	programSpeed := flashSequence.Pattern.Steps[X].Fixtures[X].ProgramSpeed
 
 	if this.SelectedType == "rgb" {
 		common.LightLamp(common.Button{X: X, Y: Y}, color, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 	if this.SelectedType == "scanner" {
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 
 	if this.GUI {
@@ -71,7 +72,7 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 		brightness := 0
 		master := 0
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		fixture.MapFixtures(false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 }
 
@@ -90,9 +91,10 @@ func flashOff(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.A
 	music := 0
 	gobo := 0
 	program := 0
+	programSpeed := 0
 	brightness := 0
 	master := 0
 
 	common.LightLamp(common.Button{X: X, Y: Y}, colors.Black, common.MIN_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-	fixture.MapFixtures(false, false, Y, X, colors.Black, colors.Black, pan, tilt, shutter, rotate, program, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+	fixture.MapFixtures(false, false, Y, X, colors.Black, colors.Black, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, brightness, master, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 }

@@ -340,7 +340,7 @@ func AllFixturesOff(sequences []*common.Sequence, eventsForLaunchpad chan common
 		if sequences[y].Type != "switch" && sequences[y].Label != "chaser" {
 			for x := 0; x < 8; x++ {
 				common.LightLamp(common.Button{X: x, Y: y}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-				MapFixtures(false, false, y, x, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
+				MapFixtures(false, false, y, x, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, 0, fixturesConfig, true, 0, 0, 0, false, 0, dmxController, dmxInterfacePresent)
 				common.LabelButton(x, y, "", guiButtons)
 			}
 		}
@@ -367,7 +367,7 @@ func clearFixture(fixtureNumber int, cmd common.FixtureCommand, stopFadeDown cha
 	case <-time.After(100 * time.Millisecond):
 	}
 
-	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
+	return MapFixtures(false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, cmd.ScannerColor, fixtures, cmd.Blackout, cmd.Master, cmd.Master, cmd.Music, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
 }
 
 func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dmxController *ft232.DMXController, fixtures *Fixtures, dmxInterfacePresent bool) {
@@ -388,7 +388,7 @@ func MapFixturesColorOnly(sequenceNumber, selectedFixture, selectedColor int, dm
 							for _, setting := range channel.Settings {
 								if setting.Number-1 == selectedColor {
 									v, _ := strconv.ParseFloat(setting.Value, 32)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+									SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 								}
 							}
 						}
@@ -479,7 +479,7 @@ func MapFixturesGoboOnly(sequenceNumber, selectedFixture, selectedGobo int, fixt
 						for _, setting := range channel.Settings {
 							if setting.Number == selectedGobo {
 								v, _ := strconv.Atoi(setting.Value)
-								SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+								SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
@@ -519,12 +519,12 @@ func calcFinalValueBasedOnConfigAndSettingValue(configValue string, settingValue
 	}
 }
 
-func SetChannel(index int16, data byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+func SetChannel(fixtureName string, channelName string, address int16, value byte, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
 	if dmxDebug {
-		fmt.Printf("DMX Debug    Channel %d Value %d\n", index, data)
+		fmt.Printf("DMX Debug  %s Channel Name=%s Address=%d Value=%d\n", fixtureName, channelName, address, value)
 	}
 	if dmxInterfacePresent {
-		dmxController.SetChannel(index, data)
+		dmxController.SetChannel(address, value)
 	}
 }
 

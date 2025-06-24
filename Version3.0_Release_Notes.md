@@ -30,6 +30,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * Self signed certificate used in code signing are now generated in the Makefile.
 * A Freeze all sequences button is provided in place of preset 24.
 * Sound card and sequence startup debug messages removed.
+* MapFixture rewritten for clarity.
 
 ## Known Problems
 
@@ -38,6 +39,9 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * When you have the scanner sequence selected, the top left clear button is used for tilting up the scanners. The clear button is activated by a long press instead of a short press. In the GUI the tilt up is not available and the clear is always a single short press.
 
 * Presets can be deleted by a long press on the launchpad, but you cannot delete a preset from the GUI.
+
+* UnSupported channels names are "Macro", "ColorMacros". "FinePan" & "FineTilt can be configured but are not used."
+* White, Amber, UV are not supported. Yet!
 
 * When opening the open or save project you may see an error message, this is because Fyne.io hard codes the favorites locations. 
 

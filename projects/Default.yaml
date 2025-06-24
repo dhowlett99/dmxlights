@@ -1011,7 +1011,7 @@ fixtures:
       value: "1"
       selectedvalue: ""
   - number: 11
-    name: DimmerCurve
+    name: Curve
     settings:
     - name: DefaultCurve
       number: 1
@@ -1150,7 +1150,7 @@ fixtures:
       value: "1"
       selectedvalue: ""
   - number: 11
-    name: DimmerCurves
+    name: Curve
     settings:
     - name: Default Curve
       number: 1

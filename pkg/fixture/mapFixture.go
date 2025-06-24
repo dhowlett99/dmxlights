@@ -30,18 +30,14 @@ import (
 
 // When want to light a DMX fixture we need to find it in our fuxture.yaml configuration file.
 // This function maps the requested fixture into a DMX address.
-func MapFixtures(chaser bool, hasShutterChaser bool,
+func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool,
 	mySequenceNumber int,
 	displayFixture int,
 	color color.RGBA,
 	baseColorName color.RGBA,
-	pan int, tilt int, shutter int, rotate int, program int, selectedGobo int, scannerColor int,
+	pan int, tilt int, shutter int, rotate int, program int, programSpeed int, selectedGobo int, scannerColor int,
 	fixtures *Fixtures, blackout bool, brightness int, master int, music int, strobe bool, strobeSpeed int,
 	dmxController *ft232.DMXController, dmxInterfacePresent bool) (lastColor common.LastColor) {
-
-	if debug {
-		fmt.Printf("MapFixtures Fixture No %d Sequence No %d color %+v\n", displayFixture, mySequenceNumber, color)
-	}
 
 	// We control the brightness of each color with the brightness value.
 	// The overall fixture brightness is set from the master value.
@@ -64,9 +60,10 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 		Red = (float64(color.R) / 100) * (float64(Brightness) / 2.55)
 		Green = (float64(color.G) / 100) * (float64(Brightness) / 2.55)
 		Blue = (float64(color.B) / 100) * (float64(Brightness) / 2.55)
+
 	}
 	if debug {
-		fmt.Printf("MapFixtures Fixture No %d Sequence No %d Red %f Green %f Blue %f Brightness %d Master %d Blackout %t\n", displayFixture, mySequenceNumber, Red, Green, Blue, Brightness, Master, blackout)
+		fmt.Printf("MapFixtures Fixture No %d Sequence No %d iAmAChaserSequence %t iAmARunningChaserSequence %t Red %f Green %f Blue %f Brightness %d Master %d Blackout %t\n", displayFixture, mySequenceNumber, iAmAChaserSequence, iAmARunningChaserSequence, Red, Green, Blue, Brightness, Master, blackout)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
@@ -75,179 +72,95 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 
 				// Match the fixture number unless there are mulitple sub fixtures.
 				if fixture.Number == displayFixture+1 || fixture.FixtureInfo.MultiFixtureDevice {
-					if !chaser {
-						// Scanner channels
-						if strings.Contains(channel.Name, "Pan") {
-							if channel.Offset != nil {
-								SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
-							} else {
-								SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan)), dmxController, dmxInterfacePresent)
-							}
-						}
-						if strings.Contains(channel.Name, "Tilt") {
-							if channel.Offset != nil {
-								SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
-							}
-							SetChannel(fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "Shutter") {
-							// If we have defined settings for the shutter channel, then use them.
-							if channel.Settings != nil {
-								// Look through any settings configured for Shutter.
-								for _, s := range channel.Settings {
-									if !strobe && (s.Name == "On" || s.Name == "Open") {
-										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-									if strobe && strings.Contains(s.Name, "Strobe") {
-										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-								}
-							} else {
-								// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
-								SetChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
-							}
-						}
-						if strings.Contains(channel.Name, "Rotate") {
-							SetChannel(fixture.Address+int16(channelNumber), byte(rotate), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "Music") {
-							SetChannel(fixture.Address+int16(channelNumber), byte(music), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "Program") {
-							SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "ProgramSpeed") {
-							SetChannel(fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
-						}
-						if !hasShutterChaser {
-							if strings.Contains(channel.Name, "Gobo") {
-								for _, setting := range channel.Settings {
-									if setting.Number == selectedGobo {
-										v, _ := strconv.Atoi(setting.Value)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-								}
-							}
-						}
-						if !hasShutterChaser {
-							if strings.Contains(channel.Name, "Color") {
-								for _, setting := range channel.Settings {
-									if setting.Number-1 == scannerColor {
-										v, _ := strconv.Atoi(setting.Value)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-								}
-							}
-						}
-						if strings.Contains(channel.Name, "Strobe") {
-							if strobe {
-								SetChannel(fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
-							} else {
-								SetChannel(fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
-							}
-						}
-						// Master Dimmer.
-						if !hasShutterChaser {
-							if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-								if strings.Contains(channel.Name, "reverse") ||
-									strings.Contains(channel.Name, "Reverse") ||
-									strings.Contains(channel.Name, "invert") ||
-									strings.Contains(channel.Name, "Invert") {
-									if debug {
-										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), int(reverse_dmx(Master)))
-									}
-									SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(Master)), dmxController, dmxInterfacePresent)
-								} else {
-									if debug {
-										fmt.Printf("MapFixtures: fixture %s: send ChannelName %s Address %d Value %d \n", fixture.Name, channel.Name, fixture.Address+int16(channelNumber), Master)
-									}
-									SetChannel(fixture.Address+int16(channelNumber), byte(Master), dmxController, dmxInterfacePresent)
-								}
-							}
-						}
-					} else { // We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
-						// Master Dimmer.
-						if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
-							if strings.Contains(channel.Name, "reverse") ||
-								strings.Contains(channel.Name, "Reverse") ||
-								strings.Contains(channel.Name, "invert") ||
-								strings.Contains(channel.Name, "Invert") {
-								SetChannel(fixture.Address+int16(channelNumber), byte(reverse_dmx(Master)), dmxController, dmxInterfacePresent)
-							} else {
-								SetChannel(fixture.Address+int16(channelNumber), byte(Master), dmxController, dmxInterfacePresent)
-							}
-						}
-						// Shutter
-						if strings.Contains(channel.Name, "Shutter") {
-							// If we have defined settings for the shutter channel, then use them.
-							if channel.Settings != nil {
-								// Look through any settings configured for Shutter.
-								for _, s := range channel.Settings {
-									if !strobe && (s.Name == "On" || s.Name == "Open") {
-										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-									if strobe && strings.Contains(s.Name, "Strobe") {
-										v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
-										SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-									}
-								}
-							} else {
-								// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
-								SetChannel(fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
-							}
-						}
-						// Scanner Color Wheel.
-						if strings.Contains(channel.Name, "Color") {
-							for _, setting := range channel.Settings {
-								if setting.Number == scannerColor {
-									v, _ := strconv.Atoi(setting.Value)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-								}
-							}
-						}
-						// Scanner Gobo
-						if strings.Contains(channel.Name, "Gobo") {
-							for _, setting := range channel.Settings {
-								if setting.Number == selectedGobo {
-									v, _ := strconv.Atoi(setting.Value)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-								}
-							}
-						}
-					}
-				}
-				if !chaser {
+
 					// Static value.
 					if strings.Contains(channel.Name, "Static") {
 						if channel.Value != nil {
-							SetChannel(fixture.Address+int16(channelNumber), byte(*channel.Value), dmxController, dmxInterfacePresent)
+							SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(*channel.Value), dmxController, dmxInterfacePresent)
 						}
 					}
 					// If the fixure supports red, green and blue channels we can set the color directly.
 					if fixture.FixtureInfo.HasRGBChannels {
 						// Fixture channels.
-						if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
-							SetChannel(fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
-							SetChannel(fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
-						}
-						if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
-							SetChannel(fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
-						}
+						SetRGBChannels(channel, fixture, displayFixture, channelNumber, Red, Green, Blue, dmxController, dmxInterfacePresent)
 					} else {
 						// Set the color using the original actions base color.
 						if strings.Contains(channel.Name, "Color") {
 							baseColor := common.GetColorNameByRGB(baseColorName)
 							// Look for a setting that matches the color.
-							for _, setting := range channel.Settings {
-								if setting.Name == baseColor {
-									v, _ := strconv.Atoi(setting.Value)
-									SetChannel(fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
-								}
+							SetColorByName(channel, fixture, channelNumber, baseColor, dmxController, dmxInterfacePresent)
+						}
+					}
+
+					if iAmAChaserSequence {
+
+						// We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
+
+						// Shutter
+						if strings.Contains(channel.Name, "Shutter") {
+							SetShutter(channel, fixture, channelNumber, shutter, strobe, strobeSpeed, dmxController, dmxInterfacePresent)
+						}
+						// Scanner Color Wheel.
+						if strings.Contains(channel.Name, "Color") {
+							SetColorByNumber(channel, fixture, channelNumber, scannerColor, dmxController, dmxInterfacePresent)
+						}
+						// Scanner Gobo
+						if strings.Contains(channel.Name, "Gobo") {
+							SetGobo(channel, fixture, channelNumber, selectedGobo, dmxController, dmxInterfacePresent)
+						}
+
+						// Master Dimmer.
+						if iAmARunningChaserSequence {
+							if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+								SetMaster(channel, fixture, channelNumber, Master, dmxController, dmxInterfacePresent)
+							}
+						}
+
+					} else {
+						// Master Dimmer.
+						if !iAmARunningChaserSequence {
+							if strings.Contains(channel.Name, "Master") || strings.Contains(channel.Name, "Dimmer") {
+								SetMaster(channel, fixture, channelNumber, Master, dmxController, dmxInterfacePresent)
+							}
+						}
+
+						// Scanner channels
+						if strings.Contains(channel.Name, "Pan") {
+							SetPan(channel, fixture, channelNumber, pan, dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "Tilt") {
+							SetTilt(channel, fixture, channelNumber, tilt, dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "Shutter") {
+							SetShutter(channel, fixture, channelNumber, shutter, strobe, strobeSpeed, dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "Rotate") {
+							SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(rotate), dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "Music") || strings.Contains(channel.Name, "Sound") {
+							SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(music), dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "Program") || strings.Contains(channel.Name, "Show") {
+							SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(program), dmxController, dmxInterfacePresent)
+						}
+						if strings.Contains(channel.Name, "ProgramSpeed") || strings.Contains(channel.Name, "ShowSpeed") {
+							SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(programSpeed), dmxController, dmxInterfacePresent)
+						}
+						if !iAmARunningChaserSequence {
+							if strings.Contains(channel.Name, "Gobo") {
+								SetGobo(channel, fixture, channelNumber, selectedGobo, dmxController, dmxInterfacePresent)
+							}
+						}
+						if !iAmARunningChaserSequence {
+							if strings.Contains(channel.Name, "Color") {
+								SetColorByNumber(channel, fixture, channelNumber, scannerColor, dmxController, dmxInterfacePresent)
+							}
+						}
+						if strings.Contains(channel.Name, "Strobe") {
+							if strobe {
+								SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
+							} else {
+								SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
 							}
 						}
 					}
@@ -260,4 +173,110 @@ func MapFixtures(chaser bool, hasShutterChaser bool,
 	lastColor.ScannerColor = scannerColor
 
 	return lastColor
+}
+
+func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channelNumber int, Red float64, Green float64, Blue float64, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
+	}
+	if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
+	}
+	if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
+	}
+}
+
+func SetPan(channel Channel, fixture Fixture, channelNumber int, pan int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+
+	if channel.Offset != nil {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan+*channel.Offset)), dmxController, dmxInterfacePresent)
+	} else {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, pan)), dmxController, dmxInterfacePresent)
+	}
+
+}
+
+func SetTilt(channel Channel, fixture Fixture, channelNumber int, tilt int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	if channel.Offset != nil {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt+*channel.Offset)), dmxController, dmxInterfacePresent)
+	}
+	SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(limitDmxValue(channel.MaxDegrees, tilt)), dmxController, dmxInterfacePresent)
+}
+
+func SetGobo(channel Channel, fixture Fixture, channelNumber int, gobo int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	for _, setting := range channel.Settings {
+		if setting.Number == gobo {
+			v, _ := strconv.Atoi(setting.Value)
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		}
+	}
+}
+
+func SetShutter(channel Channel, fixture Fixture, channelNumber int, shutter int, strobe bool, strobeSpeed int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	// If we have defined settings for the shutter channel, then use them.
+	if channel.Settings != nil {
+		// Look through any settings configured for Shutter.
+		for _, s := range channel.Settings {
+			if !strobe && (s.Name == "On" || s.Name == "Open") {
+				v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, shutter)
+				SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+			}
+			if strobe && strings.Contains(s.Name, "Strobe") {
+				v := calcFinalValueBasedOnConfigAndSettingValue(s.Value, strobeSpeed)
+				SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+			}
+		}
+	} else {
+		// Ok no settings. so send out the strobe speed as a 0-255 on the Shutter channel.
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(shutter), dmxController, dmxInterfacePresent)
+	}
+}
+
+func SetMaster(channel Channel, fixture Fixture, channelNumber int, master int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+
+	if strings.Contains(channel.Name, "reverse") ||
+		strings.Contains(channel.Name, "Reverse") ||
+		strings.Contains(channel.Name, "invert") ||
+		strings.Contains(channel.Name, "Invert") {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(reverse_dmx(master)), dmxController, dmxInterfacePresent)
+	} else {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(master), dmxController, dmxInterfacePresent)
+	}
+
+}
+
+func SetColorByNumber(channel Channel, fixture Fixture, channelNumber int, color int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	for _, setting := range channel.Settings {
+		if setting.Number == color {
+			v, _ := strconv.Atoi(setting.Value)
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		}
+	}
+}
+
+func SetColorByName(channel Channel, fixture Fixture, channelNumber int, colorName string, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	for _, setting := range channel.Settings {
+		if setting.Name == colorName {
+			v, _ := strconv.Atoi(setting.Value)
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		}
+	}
+}
+
+func SetColorWheel(channel Channel, fixture Fixture, channelNumber int, colorWheel int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	for _, setting := range channel.Settings {
+		if setting.Number == colorWheel {
+			v, _ := strconv.Atoi(setting.Value)
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(v), dmxController, dmxInterfacePresent)
+		}
+	}
+}
+
+func SetStrobe(channel Channel, fixture Fixture, channelNumber int, strobe bool, strobeSpeed int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
+	if strobe {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(strobeSpeed), dmxController, dmxInterfacePresent)
+	} else {
+		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(0), dmxController, dmxInterfacePresent)
+	}
 }

@@ -299,6 +299,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Scanner Size to %d\n", mySequenceNumber, command.Args[SCANNER_SIZE].Value)
 		}
+		sequence.StartPattern = true
 		sequence.ScannerSize = command.Args[SCANNER_SIZE].Value.(int)
 		return sequence
 
@@ -1079,6 +1080,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Number Coordinates to  %d\n", mySequenceNumber, command.Args[NUMBER_COORDINATES].Value)
 		}
+		sequence.StartPattern = true
 		sequence.ScannerSelectedCoordinates = command.Args[NUMBER_COORDINATES].Value.(int)
 		return sequence
 
@@ -1087,6 +1089,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Offset Pan to  %d\n", mySequenceNumber, command.Args[OFFSET_PAN].Value)
 		}
+		sequence.StartPattern = true
 		sequence.ScannerOffsetPan = command.Args[OFFSET_PAN].Value.(int)
 		return sequence
 
@@ -1095,6 +1098,7 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
 		}
+		sequence.StartPattern = true
 		sequence.ScannerOffsetTilt = command.Args[OFFSET_TILT].Value.(int)
 		return sequence
 

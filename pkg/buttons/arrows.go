@@ -37,7 +37,7 @@ func upArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.AL
 	if this.OffsetTilt > 255 {
 		this.OffsetTilt = 255
 	}
-	// Clear the sequence colors for this sequence.
+	// Send update to Tilt Offset.
 	cmd := common.Command{
 		Action: common.UpdateOffsetTilt,
 		Args: []common.Arg{
@@ -63,7 +63,7 @@ func downArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 	if this.OffsetTilt < 0 {
 		this.OffsetTilt = 0
 	}
-	// Clear the sequence colors for this sequence.
+	// Send update to Tilt Offset.
 	cmd := common.Command{
 		Action: common.UpdateOffsetTilt,
 		Args: []common.Arg{
@@ -90,7 +90,7 @@ func leftArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 		this.OffsetPan = 255
 	}
 
-	// Clear the sequence colors for this sequence.
+	// Send update to Pan Offset.
 	cmd := common.Command{
 		Action: common.UpdateOffsetPan,
 		Args: []common.Arg{
@@ -118,7 +118,7 @@ func rightArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common
 		this.OffsetPan = 0
 	}
 
-	// Clear the sequence colors for this sequence.
+	// Send update to Pan Offset.
 	cmd := common.Command{
 		Action: common.UpdateOffsetPan,
 		Args: []common.Arg{

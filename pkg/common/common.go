@@ -656,10 +656,13 @@ type FixtureCommand struct {
 	ScannerNumberCoordinates int
 	ScannerShutterPositions  map[int]Position
 
-	// Derby Commands
-	Rotate  int
-	Music   int
-	Program int
+	// General Commands
+	Rotate int
+	Music  int
+
+	// Program or Show Commands.
+	Program      int
+	ProgramSpeed int
 
 	// Switch Commands
 	CurrentSwitch      int
@@ -695,6 +698,7 @@ type Fixture struct {
 	Music          int
 	Gobo           int
 	Program        int
+	ProgramSpeed   int
 	Enabled        bool
 	Inverted       bool
 	State          int // Last thing we did :- MAKE SAME AGAIN ,FADEUP or FADEDOWN
