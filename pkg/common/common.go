@@ -395,6 +395,7 @@ const (
 	Reveal
 	Hide
 	Start
+	UpdateRotateRunning
 	StartChase
 	Stop
 	StopChase
@@ -529,6 +530,7 @@ type Sequence struct {
 	LoadNewFixtures             bool                        // Load all fixtures for this sequence.
 	LoadPatterns                bool                        // Load RGB Patterns for this sequence.
 	Static                      bool                        // We're a static sequence.
+	RotateRunning               bool                        // We're issueing rotate commands on Pan and Tilt.
 	PlayStaticOnce              bool                        // Play a static scene only once.
 	PlayStaticLampsOnce         bool                        // Play a static scene but only on indicator lamps.
 	PlaySwitchOnce              bool                        // Play a switch sequence scene only once.
@@ -644,6 +646,9 @@ type FixtureCommand struct {
 	RGBStaticColors   []StaticColorButton
 	RGBPlayStaticOnce bool
 	RGBFade           int
+
+	// Chaser
+	RotateRunning bool // The scanner is rotating.
 
 	// Scanner Commands.
 	ScannerColor             int

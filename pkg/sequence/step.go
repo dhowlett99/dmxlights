@@ -171,6 +171,7 @@ func playStep(sequence *common.Sequence, step int, fixtureNumber int, rgbPositio
 		ScannerOffsetTilt:        sequence.ScannerOffsetTilt,
 		ScannerNumberCoordinates: sequence.ScannerCoordinates[sequence.ScannerSelectedCoordinates],
 		MasterChanging:           sequence.MasterChanging,
+		RotateRunning:            sequence.RotateRunning,
 	}
 
 	// Start the fixture group.

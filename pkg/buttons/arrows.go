@@ -45,6 +45,9 @@ func upArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.AL
 		},
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+	if this.ScannerChaser[this.SelectedSequence] {
+		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+	}
 
 	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -71,6 +74,9 @@ func downArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 		},
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+	if this.ScannerChaser[this.SelectedSequence] {
+		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+	}
 
 	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Tilt %02d", this.OffsetTilt), "tilt", false, guiButtons)
@@ -98,6 +104,9 @@ func leftArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.
 		},
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+	if this.ScannerChaser[this.SelectedSequence] {
+		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+	}
 
 	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
@@ -126,6 +135,9 @@ func rightArrow(X int, Y int, this *CurrentState, eventsForLaunchpad chan common
 		},
 	}
 	common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
+	if this.ScannerChaser[this.SelectedSequence] {
+		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+	}
 
 	// Update status bar.
 	common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)

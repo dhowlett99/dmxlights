@@ -76,6 +76,16 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 			}
 			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
+			// If we're a scanner sequence, send a message to the chaser sequence so it knowns
+			// rotate commands are NOT being sent to the Pan and Tilt channels.
+			cmd = common.Command{
+				Action: common.UpdateRotateRunning,
+				Args: []common.Arg{
+					{Name: "Rotate", Value: false},
+				},
+			}
+			common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
+
 			this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false
 			this.Functions[this.SelectedSequence][common.Function7_Invert_Chase].State = false
 			this.Functions[this.ChaserSequenceNumber][common.Function6_Static_Gobo].State = false
@@ -117,6 +127,16 @@ func toggleSequence(sequences []*common.Sequence, X int, Y int, this *CurrentSta
 		}
 		common.SendCommandToSequence(this.SelectedSequence, cmd, commandChannels)
 		common.LightLamp(common.Button{X: X, Y: Y}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+
+		// If we're a scanner sequence, send a message to the chaser sequence so it knowns
+		// rotate commands are being sent to the Pan and Tilt channels.
+		cmd = common.Command{
+			Action: common.UpdateRotateRunning,
+			Args: []common.Arg{
+				{Name: "Rotate", Value: true},
+			},
+		}
+		common.SendCommandToSequence(this.ChaserSequenceNumber, cmd, commandChannels)
 
 		this.Running[this.SelectedSequence] = true
 		this.Functions[this.SelectedSequence][common.Function6_Static_Gobo].State = false

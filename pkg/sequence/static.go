@@ -45,18 +45,21 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 		}
 		// Prepare a message to be sent to the fixtures in the sequence.
 		command := common.FixtureCommand{
-			Master:          sequence.Master,
-			Blackout:        sequence.Blackout,
-			Type:            sequence.Type,
-			Label:           sequence.Label,
-			SequenceNumber:  sequence.Number,
-			RGBStaticFadeUp: true,
-			RGBFade:         sequence.RGBFade,
-			RGBStaticColors: sequence.StaticColors,
-			Hidden:          false,
-			StrobeSpeed:     sequence.StrobeSpeed,
-			Strobe:          sequence.Strobe,
-			ScannerChaser:   sequence.ScannerChaser,
+			Master:            sequence.Master,
+			Blackout:          sequence.Blackout,
+			Type:              sequence.Type,
+			Label:             sequence.Label,
+			SequenceNumber:    sequence.Number,
+			RGBStaticFadeUp:   true,
+			RGBFade:           sequence.RGBFade,
+			RGBStaticColors:   sequence.StaticColors,
+			Hidden:            false,
+			StrobeSpeed:       sequence.StrobeSpeed,
+			Strobe:            sequence.Strobe,
+			ScannerChaser:     sequence.ScannerChaser,
+			ScannerOffsetPan:  sequence.ScannerOffsetPan,
+			ScannerOffsetTilt: sequence.ScannerOffsetTilt,
+			RotateRunning:     sequence.RotateRunning,
 		}
 
 		// Now tell all the fixtures what they need to do.
@@ -67,20 +70,23 @@ func startStatic(mySequenceNumber int, sequence *common.Sequence, channels commo
 	} else {
 		// else just play the static scene.
 		if debug {
-			fmt.Printf("%d: Sequence Turn on static \n", mySequenceNumber)
+			fmt.Printf("%d: Sequence Turn on static Label %s\n", mySequenceNumber, sequence.Label)
 		}
 		command := common.FixtureCommand{
-			Master:          sequence.Master,
-			Blackout:        sequence.Blackout,
-			Type:            sequence.Type,
-			Label:           sequence.Label,
-			SequenceNumber:  sequence.Number,
-			Hidden:          false,
-			StrobeSpeed:     sequence.StrobeSpeed,
-			Strobe:          sequence.Strobe,
-			ScannerChaser:   sequence.ScannerChaser,
-			RGBStaticOn:     true,
-			RGBStaticColors: sequence.StaticColors,
+			Master:            sequence.Master,
+			Blackout:          sequence.Blackout,
+			Type:              sequence.Type,
+			Label:             sequence.Label,
+			SequenceNumber:    sequence.Number,
+			Hidden:            false,
+			StrobeSpeed:       sequence.StrobeSpeed,
+			Strobe:            sequence.Strobe,
+			ScannerChaser:     sequence.ScannerChaser,
+			RGBStaticOn:       true,
+			RGBStaticColors:   sequence.StaticColors,
+			ScannerOffsetPan:  sequence.ScannerOffsetPan,
+			ScannerOffsetTilt: sequence.ScannerOffsetTilt,
+			RotateRunning:     sequence.RotateRunning,
 		}
 
 		// Now tell all the fixtures what they need to do.
@@ -97,18 +103,20 @@ func stopStatic(mySequenceNumber int, sequence *common.Sequence, channels common
 
 	// Prepare a message to be sent to the fixtures in the sequence.
 	command := common.FixtureCommand{
-		Master:          sequence.Master,
-		Blackout:        sequence.Blackout,
-		Type:            sequence.Type,
-		Label:           sequence.Label,
-		SequenceNumber:  sequence.Number,
-		Hidden:          sequence.Hidden,
-		StrobeSpeed:     sequence.StrobeSpeed,
-		Strobe:          sequence.Strobe,
-		ScannerChaser:   sequence.ScannerChaser,
-		RGBStaticOff:    true,
-		RGBStaticColors: sequence.StaticColors,
-		RGBFade:         sequence.RGBFade,
+		Master:            sequence.Master,
+		Blackout:          sequence.Blackout,
+		Type:              sequence.Type,
+		Label:             sequence.Label,
+		SequenceNumber:    sequence.Number,
+		Hidden:            sequence.Hidden,
+		StrobeSpeed:       sequence.StrobeSpeed,
+		Strobe:            sequence.Strobe,
+		ScannerChaser:     sequence.ScannerChaser,
+		RGBStaticOff:      true,
+		RGBStaticColors:   sequence.StaticColors,
+		RGBFade:           sequence.RGBFade,
+		ScannerOffsetPan:  sequence.ScannerOffsetPan,
+		ScannerOffsetTilt: sequence.ScannerOffsetTilt,
 	}
 
 	// Now tell all the fixtures what they need to do.

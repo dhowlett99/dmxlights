@@ -320,6 +320,14 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		sequence.Run = true
 		return sequence
 
+	case common.UpdateRotateRunning:
+		const ROTATE = 0
+		if debug {
+			fmt.Printf("%d: Command Rotate %t\n", mySequenceNumber, command.Args[ROTATE].Value.(bool))
+		}
+		sequence.RotateRunning = command.Args[ROTATE].Value.(bool)
+		return sequence
+
 	case common.Pause:
 		if debug {
 			fmt.Printf("%d: Command Pause\n", mySequenceNumber)
@@ -1089,6 +1097,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		if debug {
 			fmt.Printf("%d: Command Update Offset Pan to  %d\n", mySequenceNumber, command.Args[OFFSET_PAN].Value)
 		}
+		if sequence.Static {
+			sequence.PlayStaticOnce = true
+		}
 		sequence.StartPattern = true
 		sequence.ScannerOffsetPan = command.Args[OFFSET_PAN].Value.(int)
 		return sequence
@@ -1097,6 +1108,9 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 		const OFFSET_TILT = 0
 		if debug {
 			fmt.Printf("%d: Command Update Offset Tilt to  %d\n", mySequenceNumber, command.Args[OFFSET_TILT].Value)
+		}
+		if sequence.Static {
+			sequence.PlayStaticOnce = true
 		}
 		sequence.StartPattern = true
 		sequence.ScannerOffsetTilt = command.Args[OFFSET_TILT].Value.(int)

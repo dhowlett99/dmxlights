@@ -30,7 +30,7 @@ import (
 
 // When want to light a DMX fixture we need to find it in our fuxture.yaml configuration file.
 // This function maps the requested fixture into a DMX address.
-func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool,
+func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scannerRotateIsRunning bool,
 	mySequenceNumber int,
 	displayFixture int,
 	color color.RGBA,
@@ -63,7 +63,7 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool,
 
 	}
 	if debug {
-		fmt.Printf("MapFixtures Fixture No %d Sequence No %d iAmAChaserSequence %t iAmARunningChaserSequence %t Red %f Green %f Blue %f Brightness %d Master %d Blackout %t\n", displayFixture, mySequenceNumber, iAmAChaserSequence, iAmARunningChaserSequence, Red, Green, Blue, Brightness, Master, blackout)
+		fmt.Printf("MapFixtures Fixture No %d Sequence No %d iAmAChaserSequence %t iAmARunningChaserSequence %t scannerRotateIsRunning %t Red %f Green %f Blue %f Brightness %d Master %d Blackout %t\n", displayFixture, mySequenceNumber, iAmAChaserSequence, iAmARunningChaserSequence, scannerRotateIsRunning, Red, Green, Blue, Brightness, Master, blackout)
 	}
 
 	for _, fixture := range fixtures.Fixtures {
@@ -95,6 +95,15 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool,
 					if iAmAChaserSequence {
 
 						// We are a scanner chaser, so operate on brightness to master dimmer and scanner color and gobo.
+						// If the scanner rotater isn't running, issue Pan and Tilt commmands.
+						if !scannerRotateIsRunning {
+							if strings.Contains(channel.Name, "Pan") {
+								SetPan(channel, fixture, channelNumber, pan, dmxController, dmxInterfacePresent)
+							}
+							if strings.Contains(channel.Name, "Tilt") {
+								SetTilt(channel, fixture, channelNumber, tilt, dmxController, dmxInterfacePresent)
+							}
+						}
 
 						// Shutter
 						if strings.Contains(channel.Name, "Shutter") {
