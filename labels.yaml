@@ -140,7 +140,7 @@ entrys:
   - name: Pattern
     label: "Scanner\nPatten"
   - name: "Color"
-    label: "Scanner\nAuto\nColor"
+    label: "Scanner\nColor"
   - name: "Auto Color"
     label: "Scanner\nAuto\nColor"   
   - name: "Auto Pattern"
