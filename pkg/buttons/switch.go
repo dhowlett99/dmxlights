@@ -130,10 +130,10 @@ func selectSwitch(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
 
 	// Switch overrides will get displayed here as well.
-	UpdateSpeed(this, guiButtons)
-	UpdateShift(this, guiButtons)
-	UpdateSize(this, guiButtons)
-	UpdateFade(this, guiButtons)
+	// UpdateSpeed(this, guiButtons)
+	// UpdateShift(this, guiButtons)
+	// UpdateSize(this, guiButtons)
+	// UpdateFade(this, guiButtons)
 
 	// Update the labels.
 	showStatusBars(this, sequences, eventsForLaunchpad, guiButtons)

@@ -20,247 +20,256 @@ package buttons
 import (
 	"fmt"
 
-	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func decreaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+func decreaseShiftRGB(this *CurrentState, commandChannels []chan common.Command) {
 
 	if debug {
 		fmt.Printf("Decrease Shift\n")
 	}
 
-	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
-
-	// If we're in shutter chase mode.
-	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
-
-	// Deal with an RGB sequence.
-	if sequences[this.TargetSequence].Type == "rgb" {
-
-		// Decrement the RGB Shift.
-		this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] - 1
-		if this.RGBShift[this.TargetSequence] < 0 {
-			this.RGBShift[this.TargetSequence] = 0
-		}
-
-		// Send a message to the RGB sequence.
-		cmd := common.Command{
-			Action: common.UpdateRGBShift,
-			Args: []common.Arg{
-				{Name: "RGBShift", Value: this.RGBShift[this.TargetSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
+	// Decrement the RGB Shift.
+	this.RGBShift[this.TargetSequence]--
+	if this.RGBShift[this.TargetSequence] < common.MIN_RGB_SHIFT {
+		this.RGBShift[this.TargetSequence] = common.MIN_RGB_SHIFT
 	}
 
-	// Deal with an Scanner sequence.
-	if sequences[this.TargetSequence].Type == "scanner" {
-
-		// Decrement the Scanner Shift.
-		this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] - 1
-		if this.ScannerShift[this.TargetSequence] < common.MIN_SCANNER_SHIFT {
-			this.ScannerShift[this.TargetSequence] = common.MIN_SCANNER_SHIFT
-		}
-
-		// Send a message to the Scanner sequence.
-		cmd := common.Command{
-			Action: common.UpdateScannerShift,
-			Args: []common.Arg{
-				{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
+	// Send a message to the RGB sequence.
+	cmd := common.Command{
+		Action: common.UpdateRGBShift,
+		Args: []common.Arg{
+			{Name: "RGBShift", Value: this.RGBShift[this.TargetSequence]},
+		},
 	}
-
-	// Deal with an RGB Switch sequence.
-	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
-
-		// Decrement the Switch Shift.
-		overrides := *this.SwitchOverrides
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift - 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift < 0 {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = 0
-		}
-		this.SwitchOverrides = &overrides
-
-		// Send a message to override / increase the selected switch shift.
-		cmd := common.Command{
-			Action: common.OverrideShift,
-			Args: []common.Arg{
-				{Name: "SwitchNumber", Value: this.SelectedSwitch},
-				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-				{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
-	}
-
-	// Deal with an Switch that holds a projector.
-	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
-
-		// Pull the overrides
-		overrides := *this.SwitchOverrides
-
-		switchPosition := this.SwitchPosition[this.SelectedSwitch]
-		IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
-		actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
-		IsProgramOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
-
-		if IsRotateOverrideAble && actionMode != "Control" {
-
-			// Decrement the Rotate Speed.
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate - 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
-			}
-
-			// Send a message to override / increase the selected switch shift.
-			cmd := common.Command{
-				Action: common.OverrideRotateSpeed,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
-		if IsProgramOverrideAble && actionMode == "Control" {
-
-			// Decrement the program/show number .
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program - 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program < common.MIN_PROGRAM_NUMBER {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = common.MIN_PROGRAM_NUMBER
-			}
-
-			// Send a message to override / increase the selected rotate speed.
-			cmd := common.Command{
-				Action: common.OverrideProgram,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Rotate", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
-		// Get the current switch state in order to decide what we display on status bar.
-		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
-
-		// Push the overrides.
-		this.SwitchOverrides = &overrides
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
-	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 }
 
-func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
+// Deal with an Scanner sequence.
+func decreaseShiftScanner(this *CurrentState, commandChannels []chan common.Command) {
 
-	if debug {
-		fmt.Printf("Increase Shift \n")
+	// Decrement the Scanner Shift.
+	this.ScannerShift[this.TargetSequence]--
+	if this.ScannerShift[this.TargetSequence] < common.MIN_SCANNER_SHIFT {
+		this.ScannerShift[this.TargetSequence] = common.MIN_SCANNER_SHIFT
 	}
 
-	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
+	// Send a message to the Scanner sequence.
+	cmd := common.Command{
+		Action: common.UpdateScannerShift,
+		Args: []common.Arg{
+			{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+}
+
+// func decreaseShiftSwitchRGB(this *CurrentState, commandChannels []chan common.Command) {
+
+// 	// Deal with an RGB Switch sequence.
+// 	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
+
+// 		// Decrement the Switch Shift.
+// 		overrides := *this.SwitchOverrides
+// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift - 1
+// 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift < 0 {
+// 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = 0
+// 		}
+// 		this.SwitchOverrides = &overrides
+
+// 		// Send a message to override / increase the selected switch shift.
+// 		cmd := common.Command{
+// 			Action: common.OverrideShift,
+// 			Args: []common.Arg{
+// 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+// 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+// 				{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
+// 			},
+// 		}
+// 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+// 	}
+// }
+
+func decreaseRotateSpeed(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides
+	overrides := *this.SwitchOverrides
+
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
+	IsRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
+	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
+
+	if IsRotateOverrideAble && actionMode != "Control" {
+
+		// Decrement the Rotate Speed.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate--
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate < common.MIN_PROJECTOR_ROTATE_SPEED {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = common.MIN_PROJECTOR_ROTATE_SPEED
+		}
+
+		// Send a message to override / increase the selected switch shift.
+		cmd := common.Command{
+			Action: common.OverrideRotateSpeed,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+	}
+}
+
+func decreaseProgram(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides
+	overrides := *this.SwitchOverrides
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
+	IsProgramOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
+
+	if IsProgramOverrideAble {
+
+		// Decrement the program/show number .
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program--
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program < common.MIN_PROGRAM_NUMBER {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = common.MIN_PROGRAM_NUMBER
+		}
+
+		// Send a message to override / increase the selected rotate speed.
+		cmd := common.Command{
+			Action: common.OverrideProgram,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Rotate", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+		// Push the overrides.
+		this.SwitchOverrides = &overrides
+	}
+}
+
+func increaseShiftRGB(this *CurrentState, commandChannels []chan common.Command) {
+
+	if debug {
+		fmt.Printf("Increase Shift %d\n", this.RGBShift[this.TargetSequence])
+	}
+
+	// Increment the RGB Shift.
+	this.RGBShift[this.TargetSequence]++
+	if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
+		this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
+	}
+
+	// Send a message to the RGB sequence.
+	cmd := common.Command{
+		Action: common.UpdateRGBShift,
+		Args: []common.Arg{
+			{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+}
+
+func increaseShiftScanner(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Increment the Scanner Shift.
+	this.ScannerShift[this.TargetSequence]++
+	if this.ScannerShift[this.TargetSequence] > common.MAX_SCANNER_SHIFT {
+		this.ScannerShift[this.TargetSequence] = common.MAX_SCANNER_SHIFT
+	}
+
+	// Send a message to the Scanner sequence.
+	cmd := common.Command{
+		Action: common.UpdateScannerShift,
+		Args: []common.Arg{
+			{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+}
+
+// func increaseShiftSwitchRGB(this *CurrentState, commandChannels []chan common.Command) {
+
+// 	// Pull the overrides.
+// 	overrides := *this.SwitchOverrides
+
+// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
+// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
+// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
+// 	}
+
+// 	// Send a message to override / increase the selected switch shift.
+// 	cmd := common.Command{
+// 		Action: common.OverrideShift,
+// 		Args: []common.Arg{
+// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+// 			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
+// 		},
+// 	}
+// 	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+// 	// Push the overrides.
+// 	this.SwitchOverrides = &overrides
+
+// }
+
+func increaseRotateSpeed(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Pull the overrides.
 	overrides := *this.SwitchOverrides
 	switchPosition := this.SwitchPosition[this.SelectedSwitch]
-	actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
 
-	if debug {
-		for switchNumber, swiTch := range overrides {
-			fmt.Printf("Switch %d\n", switchNumber)
-			for stateNumber, state := range swiTch {
-				fmt.Printf("\t State %d Mode %s Program %d\n", stateNumber, state.Mode, state.Program)
-			}
+	isRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
+
+	if isRotateOverrideAble {
+
+		// Increment the Rotate Speed.
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate++
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
 		}
-	}
-
-	// If we're in shutter chase mode.
-	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
-
-	// Deal with an RGB sequence. Increase RGB shift.
-	if sequences[this.TargetSequence].Type == "rgb" {
-
-		// Increment the RGB Shift.
-		this.RGBShift[this.TargetSequence] = this.RGBShift[this.TargetSequence] + 1
-		if this.RGBShift[this.TargetSequence] > common.MAX_RGB_SHIFT {
-			this.RGBShift[this.TargetSequence] = common.MAX_RGB_SHIFT
-		}
-
-		// Send a message to the RGB sequence.
-		cmd := common.Command{
-			Action: common.UpdateRGBShift,
-			Args: []common.Arg{
-				{Name: "Shift", Value: this.RGBShift[this.TargetSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
-	}
-
-	// Deal with an Scanner sequence. Increase scanner shift.
-	if sequences[this.TargetSequence].Type == "scanner" {
-
-		// Increment the Scanner Shift.
-		this.ScannerShift[this.TargetSequence] = this.ScannerShift[this.TargetSequence] + 1
-		if this.ScannerShift[this.TargetSequence] > common.MAX_SCANNER_SHIFT {
-			this.ScannerShift[this.TargetSequence] = common.MAX_SCANNER_SHIFT
-		}
-
-		// Send a message to the Scanner sequence.
-		cmd := common.Command{
-			Action: common.UpdateScannerShift,
-			Args: []common.Arg{
-				{Name: "ScannerShift", Value: this.ScannerShift[this.TargetSequence]},
-			},
-		}
-		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
-	}
-
-	// Deal with an Switch sequence with a RGB fixture. Increase override shift.
-	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
-
-		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift + 1
-		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift > common.MAX_RGB_SHIFT {
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift = common.MAX_RGB_SHIFT
-		}
-		this.SwitchOverrides = &overrides
 
 		// Send a message to override / increase the selected switch shift.
 		cmd := common.Command{
-			Action: common.OverrideShift,
+			Action: common.OverrideRotateSpeed,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+	}
+}
+
+func increaseProgram(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+	switchPosition := this.SwitchPosition[this.SelectedSwitch]
+
+	IsProgrameNumberOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
+	maxProgramNumber := overrides[this.SelectedSwitch][switchPosition].MaxPrograms
+
+	if IsProgrameNumberOverrideAble {
+
+		// Increment the program/show number .
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program++
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program > maxProgramNumber {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = maxProgramNumber
+		}
+
+		// Send a message to override / increase the program / show number.
+		cmd := common.Command{
+			Action: common.OverrideProgram,
 			Args: []common.Arg{
 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
@@ -269,69 +278,9 @@ func increaseShift(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 		}
 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
 	}
 
-	// Deal with an Switch sequence that has a projector fixture.  Increase rotate.
-	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
+	// Push the overrides.
+	this.SwitchOverrides = &overrides
 
-		isRotateOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsRotateOverrideAble
-		maxProgramNumber := overrides[this.SelectedSwitch][switchPosition].MaxPrograms
-		IsProgrameNumberOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramOverrideAble
-
-		if isRotateOverrideAble && actionMode != "Control" {
-
-			// Increment the Rotate Speed.
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxRotateSpeed
-			}
-
-			// Send a message to override / increase the selected switch shift.
-			cmd := common.Command{
-				Action: common.OverrideRotateSpeed,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "RotateSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Rotate},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-		}
-
-		if IsProgrameNumberOverrideAble && actionMode == "Control" {
-
-			// Increment the program/show number .
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program > maxProgramNumber {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Program = maxProgramNumber
-			}
-
-			// Send a message to override / increase the program / show number.
-			cmd := common.Command{
-				Action: common.OverrideProgram,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Shift},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-		}
-
-		// Get the current switch state in order to decide what we display on status bar.
-		this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
-
-		// Push the overrides.
-		this.SwitchOverrides = &overrides
-
-		// Update the status bar
-		UpdateShift(this, guiButtons)
-
-		return
-	}
 }

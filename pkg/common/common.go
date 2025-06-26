@@ -58,11 +58,11 @@ const MIN_DMX_BRIGHTNESS = 0
 const CENTER_DMX_BRIGHTNESS = 127
 const MAX_DMX_BRIGHTNESS = 255
 const DEFAULT_PATTERN = 0
-const DEFAULT_RGB_SIZE = 0
+const DEFAULT_RGB_SIZE = 1
 const DEFAULT_RGB_FADE = 1
 const DEFAULT_SCANNER_FADE = 10
 const DEFAULT_SPEED = 7
-const DEFAULT_RGB_SHIFT = 0
+const DEFAULT_RGB_SHIFT = 1
 const DEFAULT_SCANNER_COLOR = 0
 const DEFAULT_SCANNER_GOBO = 0
 const DEFAULT_SCANNER_SHIFT = 0
@@ -377,6 +377,47 @@ type Command struct {
 	Action int
 	Args   []Arg
 }
+
+// Valid StatusBar Actions.
+const (
+	StatusBarAction int = iota
+	ActionRGB
+	ActionChaser
+	ActionScanner
+	ActionSwitchSetting
+	ActionSwitchOff
+	ActionSwitchStatic
+	ActionSwitchControl
+	ActionSwitchChaser
+)
+
+// Valid StatusBar Sub Actions.
+const (
+	DisplayAll int = iota
+	DisplaySpeed
+	DisplayShift
+	DisplaySize
+	DisplayFase
+	ChangeSpeed
+	ChangeShift
+	ChangeSize
+	ChangeFade
+)
+
+// Valid Directions
+const (
+	Display int = iota
+	Decrease
+	Increase
+)
+
+// Valid Fixture Types
+const (
+	RGB       int = iota // Has Red Green Blue
+	Scanner              // Has Pan Tilt Color Rotate
+	Derby                // Has Red Green Blue Rotate
+	Projector            // Has Speed, Rotate , Color & Gobo
+)
 
 // Valid Command Actions.
 const (
@@ -747,7 +788,9 @@ const (
 )
 
 func SendCommandToSequence(targetSequence int, command Command, commandChannels []chan Command) {
-	commandChannels[targetSequence] <- command
+	if commandChannels != nil {
+		commandChannels[targetSequence] <- command
+	}
 }
 
 func SendCommandToAllSequence(command Command, commandChannels []chan Command) {

@@ -18,22 +18,11 @@
 package buttons
 
 import (
-	"fmt"
-
-	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
-
-	if debug {
-		fmt.Printf("Decrease Speed SelectedType %s SelectedFixtureType %s\n", this.SelectedType, this.SelectedFixtureType)
-	}
-
-	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
-
-	// If we're in shutter chase mode.
-	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
+// Deal with an RGB sequence.
+func decreaseSpeed(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command) {
 
 	// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
 	// Decrease Strobe Speed.
@@ -93,149 +82,111 @@ func decreaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			this.SwitchOverrides = &overrides
 
 		}
-
-		// Update the status bar.
-		UpdateSpeed(this, guiButtons)
-
-		return
 	}
-
-	// Get an upto date copy of the sequence so we know if the music trigger is on in the sequence.
-	sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
-
 	// Don't give option to change speed when in music trigger mode.
-	if !sequences[this.TargetSequence].MusicTrigger {
+	if !this.SoundTriggers[this.SelectedSequence].State {
 
-		// Deal with an RGB sequence.
-		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
-
-			// Decrease RGB / Scanner Speed.
-			this.Speed[this.TargetSequence]--
-			if this.Speed[this.TargetSequence] < 1 {
-				this.Speed[this.TargetSequence] = 1
-			}
-
-			cmd := common.Command{
-				Action: common.UpdateSpeed,
-				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-				},
-			}
-
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-			// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
-			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
-
-			UpdateSpeed(this, guiButtons)
-
-			return
+		// Decrease RGB / Scanner Speed.
+		this.Speed[this.TargetSequence]--
+		if this.Speed[this.TargetSequence] < 1 {
+			this.Speed[this.TargetSequence] = 1
 		}
 
-		// Deal with an RGB Switch sequence.
-		if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
-
-			// Pull the overrides.
-			overrides := *this.SwitchOverrides
-
-			// Decrement the Switch Speed.
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed - 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < 0 {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = 0
-			}
-			this.SwitchOverrides = &overrides
-
-			// Send a message to override / decrease the selected switch speed.
-			cmd := common.Command{
-				Action: common.OverrideSpeed,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-			// Push the overrides.
-			this.SwitchOverrides = &overrides
-
-			// Update the status bar.
-			UpdateSpeed(this, guiButtons)
-
-			return
+		cmd := common.Command{
+			Action: common.UpdateSpeed,
+			Args: []common.Arg{
+				{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+			},
 		}
 
-		// Deal with an Switch that holds a projector.
-		if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-			// Pull the overrides.
-			overrides := *this.SwitchOverrides
+		// Speed is used to control fade time in mini sequencer so send to switch sequence as well.
+		common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
 
-			switchPosition := this.SwitchPosition[this.SelectedSwitch]
-			isProgramSpeedOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
-			actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
-
-			if isProgramSpeedOverrideAble && actionMode == "Control" {
-
-				// Decrement the Switch Speed.
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed - 1
-				if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed < common.MIN_PROJECTOR_PROGRAM_SPEED {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = common.MIN_PROJECTOR_PROGRAM_SPEED
-				}
-
-				// Send a message to override / increase the selected switch shift.
-				cmd := common.Command{
-					Action: common.OverrideProgramSpeed,
-					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "Program Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-			} else {
-
-				// Decrement the Switch Speed.
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed - 1
-				if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < common.MIN_PROJECTOR_PROGRAM_SPEED {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MIN_PROJECTOR_PROGRAM_SPEED
-				}
-
-				// Send a message to override / increase the selected switch speed.
-				cmd := common.Command{
-					Action: common.OverrideSpeed,
-					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-			}
-			// Get the current switch state in order to decide what we display on status bar.
-			this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
-
-			// Push the overrides.
-			this.SwitchOverrides = &overrides
-
-			// Update the status bar
-			UpdateSpeed(this, guiButtons)
-
-			return
-		}
 	}
 }
 
-func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command, updateChannels []chan common.Sequence) {
+func decreaseOverrideSpeedRGB(this *CurrentState, commandChannels []chan common.Command) {
 
-	if debug {
-		fmt.Printf("Increase Speed SelectedType %s SelectedFixtureType %s\n", this.SelectedType, this.SelectedFixtureType)
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+
+	// Decrement the Switch Speed.
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed - 1
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < 0 {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = 0
+	}
+	this.SwitchOverrides = &overrides
+
+	// Send a message to override / decrease the selected switch speed.
+	cmd := common.Command{
+		Action: common.OverrideSpeed,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+	// Push the overrides.
+	this.SwitchOverrides = &overrides
+
+}
+
+func decreaseProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+
+	// Decrement the Switch Speed.
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed - 1
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed < common.MIN_PROJECTOR_PROGRAM_SPEED {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = common.MIN_PROJECTOR_PROGRAM_SPEED
 	}
 
-	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
+	// Send a message to override / increase the selected switch shift.
+	cmd := common.Command{
+		Action: common.OverrideProgramSpeed,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Program Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-	// If we're in shutter chase mode.
-	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
+}
+
+// func decreaseSpeedSwitchChaser(this *CurrentState, commandChannels []chan common.Command) {
+
+// 	// Pull the overrides.
+// 	overrides := *this.SwitchOverrides
+
+// 	// Decrement the Switch Speed.
+// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed - 1
+// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed < common.MIN_PROJECTOR_PROGRAM_SPEED {
+// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MIN_PROJECTOR_PROGRAM_SPEED
+// 	}
+
+// 	// Send a message to override / increase the selected switch speed.
+// 	cmd := common.Command{
+// 		Action: common.OverrideSpeed,
+// 		Args: []common.Arg{
+// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+// 			{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+// 		},
+// 	}
+// 	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+// 	// Push the overrides.
+// 	this.SwitchOverrides = &overrides
+
+// }
+
+func increaseSpeedRGB(sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command) {
 
 	// Strobe only every operates on the selected sequence, i.e chaser never applies strobe.
 	// Increase Strobe Speed.
@@ -293,132 +244,114 @@ func increaseSpeed(sequences []*common.Sequence, X int, Y int, this *CurrentStat
 			this.SwitchOverrides = &overrides
 
 		}
-
-		// Update the status bar
-		UpdateSpeed(this, guiButtons)
-
-		return
 	}
 
-	// Get an upto date copy of the sequence so we know if the music trigger is on in the sequence.
-	sequences[this.TargetSequence] = common.RefreshSequence(this.TargetSequence, commandChannels, updateChannels)
-
-	if !sequences[this.TargetSequence].MusicTrigger {
-
-		// Deal with an RGB / Scanner sequence.
-		if sequences[this.TargetSequence].Type == "rgb" || sequences[this.TargetSequence].Type == "scanner" {
-
-			// Increment the RGB Speed.
-			this.Speed[this.TargetSequence]++
-			if this.Speed[this.TargetSequence] > common.MAX_SPEED {
-				this.Speed[this.TargetSequence] = common.MAX_SPEED
-			}
-
-			cmd := common.Command{
-				Action: common.UpdateSpeed,
-				Args: []common.Arg{
-					{Name: "Speed", Value: this.Speed[this.TargetSequence]},
-				},
-			}
-			common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-			// Update the status bar
-			UpdateSpeed(this, guiButtons)
-
-			return
-		}
-
-		// Deal with an Switch sequence with a RGB fixture.
-		if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
-
-			// Pull the overrides.
-			overrides := *this.SwitchOverrides
-
-			maxNumberProgramSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds
-
-			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
-			if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > maxNumberProgramSpeeds {
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = maxNumberProgramSpeeds
-			}
-			this.SwitchOverrides = &overrides
-
-			// Send a message to override / increase the selected switch speed.
-			cmd := common.Command{
-				Action: common.OverrideSpeed,
-				Args: []common.Arg{
-					{Name: "SwitchNumber", Value: this.SelectedSwitch},
-					{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-					{Name: "ProgramSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
-				},
-			}
-			common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
-
-			// Push the overrides.
-			this.SwitchOverrides = &overrides
-
-			// Update the status bar
-			UpdateSpeed(this, guiButtons)
-
-			return
-		}
-
-		// Deal with an Switch sequence that has a projector fixture.
-		if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
-
-			// Pull the overrides.
-			overrides := *this.SwitchOverrides
-
-			switchPosition := this.SwitchPosition[this.SelectedSwitch]
-			isProgramSpeedOverrideAble := overrides[this.SelectedSwitch][switchPosition].IsProgramSpeedOverrideAble
-			actionMode := overrides[this.SelectedSwitch][switchPosition].Mode
-
-			if isProgramSpeedOverrideAble && actionMode == "Control" {
-
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
-				if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds
-				}
-
-				// Send a message to override / increase the selected switch shift.
-				cmd := common.Command{
-					Action: common.OverrideProgramSpeed,
-					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-
-			} else {
-
-				overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed + 1
-				if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > common.MAX_SPEED {
-					overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MAX_SPEED
-				}
-
-				// Send a message to override / decrease the selected switch speed.
-				cmd := common.Command{
-					Action: common.OverrideSpeed,
-					Args: []common.Arg{
-						{Name: "SwitchNumber", Value: this.SelectedSwitch},
-						{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-						{Name: "ProgramSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
-					},
-				}
-				common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
-			}
-
-			// Get the current switch state in order to decide what we display on status bar.
-			this.SwitchStateName = sequences[this.SelectedSequence].Switches[this.SelectedSwitch].States[this.SwitchPosition[this.SelectedSwitch]].Name
-
-			// Push the overrides.
-			this.SwitchOverrides = &overrides
-
-			// Update the status bar
-			UpdateSpeed(this, guiButtons)
-
-			return
-		}
+	// Increment the RGB Speed.
+	this.Speed[this.TargetSequence]++
+	if this.Speed[this.TargetSequence] > common.MAX_SPEED {
+		this.Speed[this.TargetSequence] = common.MAX_SPEED
 	}
+
+	cmd := common.Command{
+		Action: common.UpdateSpeed,
+		Args: []common.Arg{
+			{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+}
+
+func increaseSpeedScanner(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Increment the RGB Speed.
+	this.Speed[this.TargetSequence]++
+	if this.Speed[this.TargetSequence] > common.MAX_SPEED {
+		this.Speed[this.TargetSequence] = common.MAX_SPEED
+	}
+
+	cmd := common.Command{
+		Action: common.UpdateSpeed,
+		Args: []common.Arg{
+			{Name: "Speed", Value: this.Speed[this.TargetSequence]},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+}
+
+// func increaseSwitchRGB(this *CurrentState, commandChannels []chan common.Command) {
+
+// 	// Pull the overrides.
+// 	overrides := *this.SwitchOverrides
+
+// 	maxNumberProgramSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds
+
+// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
+// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > maxNumberProgramSpeeds {
+// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = maxNumberProgramSpeeds
+// 	}
+// 	this.SwitchOverrides = &overrides
+
+// 	// Send a message to override / increase the selected switch speed.
+// 	cmd := common.Command{
+// 		Action: common.OverrideSpeed,
+// 		Args: []common.Arg{
+// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+// 			{Name: "ProgramSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
+// 		},
+// 	}
+// 	common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+
+// 	// Push the overrides.
+// 	this.SwitchOverrides = &overrides
+// }
+
+func increaseProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed++
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed > overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds
+	}
+
+	// Send a message to override / increase the selected switch shift.
+	cmd := common.Command{
+		Action: common.OverrideProgramSpeed,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Speed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+}
+
+func increaseOverrideSpeedRGB(this *CurrentState, commandChannels []chan common.Command) {
+
+	// Pull the overrides.
+	overrides := *this.SwitchOverrides
+
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed + 1
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > common.MAX_SPEED {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = common.MAX_SPEED
+	}
+
+	// Send a message to override / decrease the selected switch speed.
+	cmd := common.Command{
+		Action: common.OverrideSpeed,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "ProgramSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+	// Push the overrides.
+	this.SwitchOverrides = &overrides
+
 }

@@ -341,28 +341,28 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeShift, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseShift(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeShift, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  S P E E D
 	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseSpeed(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
+		updateStatusBar(X, Y, common.ChangeSpeed, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S P E E D
 	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseSpeed(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels, updateChannels)
+		updateStatusBar(X, Y, common.ChangeSpeed, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -394,28 +394,28 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S I Z E
 	if X == 4 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseSize(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeSize, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  S I Z E
 	if X == 5 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseSize(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeSize, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  F A D E
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		decreaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeFade, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  F A D E
 	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		increaseFade(sequences, X, Y, this, eventsForLaunchpad, guiButtons, commandChannels)
+		updateStatusBar(X, Y, common.ChangeFade, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 

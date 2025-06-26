@@ -19,44 +19,46 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
 type SwitchInfo struct {
-	Number               int
-	Mode                 int
-	SelectedMode         int
-	Type                 string
-	FixtureType          string
-	Speed                int
-	RGBShift             int
-	ScannerShift         string
-	Size                 int
-	RGBFade              int
-	ScannerFade          int
-	ScannerCoordinates   string
+	Number int
+	Mode   int
+	//SelectedMode int
+	//Type         string
+	//FixtureType  string
+	//Speed                int
+	//StrobeSpeed          int
+	//RGBShift             int
+	ScannerShift string
+	Size         int
+	//RGBFade      int
+	//ScannerFade          int
+	//ScannerCoordinates   string
 	Position             int
 	IsRotateOverrideAble bool
-	Rotate               int
-	RotateName           string
-	AvailableRotates     []string
-	NumberOfRotates      int
-	Color                int
-	ColorName            string
-	MaxNumberColors      int
-	AvailableColors      []string
+	//Rotate               int
+	RotateName       string
+	AvailableRotates []string
+	NumberOfRotates  int
+	Color            int
+	ColorName        string
+	MaxNumberColors  int
+	AvailableColors  []string
 
-	Gobo           int
-	GoboName       string
-	MaxNumberGobos int
+	//Gobo     int
+	//GoboName string
+	//MaxNumberGobos int
 
-	OverrideSpeed int
-	OverrideSize  int
-	OverrideFade  int
-	OverrideGobo  int
+	//OverrideSpeed int
+	OverrideSize int
+	//OverrideFade int
+	//OverrideGobo int
 
-	ProgramSpeedName              string
-	ProgramSpeed                  int
+	//ProgramSpeedName              string
+	//ProgramSpeed                  int
 	MaxPrograms                   int
 	Program                       int
 	IsProgramOverrideAble         bool
@@ -67,313 +69,683 @@ type SwitchInfo struct {
 	IsProgramSpeedOverrideAble    bool
 	HasColorChannel               bool
 	HasRGBChannels                bool
-	ActionMode                    string
+	//ActionMode                    string
 }
 
-func getSwitchDetails(this *CurrentState) SwitchInfo {
+func getAction(this *CurrentState) int {
 
-	var switchInfo SwitchInfo
+	var action int
 
-	// Pull overrides.
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+	overrides := *this.SwitchOverrides
+
+	//if this.SelectedType == "rgb" && sequences[this.SelectedSequence].Label != "chaser" {
+	if this.SelectedType == "rgb" {
+		action = common.ActionRGB
+		if debug {
+			fmt.Printf("Action RGB\n")
+		}
+	}
+	if this.SelectedType == "scanner" {
+		action = common.ActionScanner
+		if debug {
+			fmt.Printf("Action Scanner\n")
+		}
+	}
+
+	//if this.SelectedType == "rgb" && sequences[this.SelectedSequence].Label == "chaser" {
+	if this.SelectedType == "rgb" {
+		action = common.ActionChaser
+		if debug {
+			fmt.Printf("Action Chaser\n")
+		}
+	}
+	if this.SelectedType == "switch" {
+		if debug {
+			fmt.Printf("Action Switch ")
+		}
+		switch overrides[number][position].Mode {
+
+		case "Setting":
+
+			action = common.ActionSwitchSetting
+			if debug {
+				fmt.Printf("Setting \n")
+			}
+
+		case "Off":
+			action = common.ActionSwitchOff
+			if debug {
+				fmt.Printf("Off \n")
+			}
+
+		case "Static":
+			action = common.ActionSwitchStatic
+			if debug {
+				fmt.Printf("Static \n")
+			}
+
+		case "Control":
+			action = common.ActionSwitchControl
+			if debug {
+				fmt.Printf("Control \n")
+			}
+
+		case "Chase":
+			action = common.ActionSwitchChaser
+			if debug {
+				fmt.Printf("Chase \n")
+			}
+		}
+	}
+
+	return action
+}
+
+func getType(selectedFixtureType string) int {
+
+	var fixtureType int
+	switch selectedFixtureType {
+
+	case "rgb":
+		fixtureType = common.RGB
+
+	case "scanner":
+		fixtureType = common.Scanner
+
+	case "derby":
+		fixtureType = common.Derby
+
+	case "projector":
+		fixtureType = common.Projector
+	}
+
+	return fixtureType
+}
+
+// updateStatusBar processes speed, shift, size and fade actions and all there variations, depending on fixture.
+// calling with sub=
+//
+//	common,Increase
+//	common.Decrease
+//
+// or
+//
+//	common,DisplayAll
+//	common.DisplaySpeed,
+//	common.DisplayShift,
+//	common.DisplaySize
+//	common.Display.Fade
+func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("DecideOnAction action \n")
+	}
+
+	action := getAction(this)
+	fixtureType := getType(this.SelectedFixtureType)
+
+	// If we're in shutter chase mode.
+	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
+
+	if !(X == 0 || Y == 0) {
+		buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
+	}
+
+	switch action {
+
+	// Common RGB Fixure.
+	case common.ActionRGB:
+		rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+
+	// Scanner RGB Shutter Chaser. With Speed, Shift, Size & Fade.
+	case common.ActionChaser:
+		chaserFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+
+	// Scanner with Speed, Shift, Size & Coordinates.
+	case common.ActionScanner:
+		scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+
+	// A Switch that has Settings could be a RGB Lamp, Scanner (TODO), Derby RGB with Rotate or a Projector with Color & Gobo Wheels.
+	case common.ActionSwitchSetting:
+
+		switch fixtureType {
+
+		case common.RGB:
+			rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Scanner:
+			scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Derby:
+			derbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Projector:
+			projectorFixture(sub, direction, this, commandChannels, guiButtons)
+		}
+
+	case common.ActionSwitchOff:
+		blankFixture(sub, this, guiButtons)
+
+	case common.ActionSwitchStatic:
+		staticFixture(sub, direction, this, commandChannels, guiButtons)
+
+	case common.ActionSwitchControl:
+		programFixture(sub, direction, this, commandChannels, guiButtons)
+
+	// Control a fixture that has a mini sequencer in chase mode.
+	// The chaser can control a RGB lamp, a scanner (TODO), a derby with RGB and rotate, a projector with gobo and color wheels
+	case common.ActionSwitchChaser:
+
+		switch fixtureType {
+
+		case common.RGB:
+			rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Scanner:
+			scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Derby:
+			derbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		case common.Projector:
+			projectorFixture(sub, direction, this, commandChannels, guiButtons)
+		}
+
+	}
+}
+
+func rgbFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedRGB(sequences, this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftRGB(this, commandChannels)
+		case common.Increase:
+			increaseShiftRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.SelectedSequence]), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeRGB(this, commandChannels)
+		case common.Increase:
+			increaseSizeRGB(this, commandChannels)
+		}
+
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.SelectedSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseFadeRGB(this, commandChannels)
+		case common.Increase:
+			increaseFadeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.SelectedSequence]), "fade", false, guiButtons)
+	}
+}
+
+func chaserFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedRGB(sequences, this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftRGB(this, commandChannels)
+		case common.Increase:
+			increaseShiftRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %02d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeRGB(this, commandChannels)
+		case common.Increase:
+			increaseSizeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseFadeRGB(this, commandChannels)
+		case common.Increase:
+			increaseFadeRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+	}
+}
+
+func scannerFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %s", getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseShiftScanner(this, commandChannels)
+		case common.Increase:
+			increaseShiftScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Shift %s", getScannerShiftLabel(this.ScannerShift[this.SelectedSequence])), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseSizeScanner(this, commandChannels)
+		case common.Increase:
+			increaseSizeScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Scanner Size %02d", this.ScannerSize[this.TargetSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseFadeScannerNumberCoordinates(this, commandChannels)
+		case common.Increase:
+			increaseFadeScannerNumberCoordinates(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])), "fade", false, guiButtons)
+	}
+}
+
+func derbyFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	color, colorName := getColor(this)
+	rotate, rotateName := getRotate(this)
+	gobo, goboName := getGobo(this)
+
+	switch sub {
+
+	// ShutterSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseSpeed(sequences, this, commandChannels)
+		case common.Increase:
+			increaseSpeedScanner(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+	// RotateSpeed
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseRotateSpeed(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+
+		// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseColor(this, commandChannels)
+		case common.Increase:
+			increaseColor(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+
+	// GoboWheel
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseGobo(this, commandChannels)
+		case common.Increase:
+			increaseGobo(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), "fade", false, guiButtons)
+	}
+}
+
+func projectorFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		color, colorName := getColor(this)
+		rotate, rotateName := getRotate(this)
+		gobo, goboName := getGobo(this)
+		speed := getSpeed(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", color, colorName), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
+
+	// ShutterSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideSpeedRGB(this, commandChannels)
+		case common.Increase:
+			increaseOverrideSpeedRGB(this, commandChannels)
+		}
+		speed := getSpeed(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+
+	// RotateSpeed.
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseRotateSpeed(this, commandChannels)
+		}
+		rotate, rotateName := getRotate(this)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+
+	// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseColor(this, commandChannels)
+		case common.Increase:
+			increaseColor(this, commandChannels)
+		}
+		color, colorName := getColor(this)
+		common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", color, colorName), "size", false, guiButtons)
+
+	// GoboWheel
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseGobo(this, commandChannels)
+		case common.Increase:
+			increaseGobo(this, commandChannels)
+		}
+		gobo, goboName := getGobo(this)
+		common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", gobo, goboName), "fade", false, guiButtons)
+	}
+}
+
+func programFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		programSpeed, programSpeedName := getProgramSpeed(this)
+		program, programName := getProgram(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %d:%s", programSpeed, programSpeedName), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), "shift", false, guiButtons)
+		common.UpdateStatusBar("     ", "size", false, guiButtons)
+		common.UpdateStatusBar("     ", "fade", false, guiButtons)
+
+	// ProgramSpeed
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseProgramSpeed(this, commandChannels)
+		case common.Increase:
+			increaseProgramSpeed(this, commandChannels)
+		}
+		programSpeed, programSpeedName := getProgramSpeed(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %d:%s", programSpeed, programSpeedName), "speed", false, guiButtons)
+
+	// Program
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseProgram(this, commandChannels)
+		case common.Increase:
+			increaseProgram(this, commandChannels)
+		}
+		program, programName := getProgram(this)
+		common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), "shift", false, guiButtons)
+	}
+}
+
+func blankFixture(sub int, this *CurrentState, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Shift %d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+	case common.ChangeShift:
+		common.UpdateStatusBar(fmt.Sprintf("Shift %d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+
+	case common.ChangeSize:
+		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+
+	case common.ChangeFade:
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+	}
+}
+
+func staticFixture(sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
+
+	switch sub {
+
+	case common.DisplayAll:
+		rotate, rotateName := getRotate(this)
+		color, colorName := getColor(this)
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+
+	case common.ChangeSpeed:
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideSpeedRGB(this, commandChannels)
+		case common.Increase:
+			increaseOverrideSpeedRGB(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+
+	// RotateSpeed
+	case common.ChangeShift:
+		switch direction {
+		case common.Decrease:
+			decreaseRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseRotateSpeed(this, commandChannels)
+		}
+		rotate, rotateName := getRotate(this)
+		common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %d:%s", rotate, rotateName), "shift", false, guiButtons)
+
+	// ColorWheel
+	case common.ChangeSize:
+		switch direction {
+		case common.Decrease:
+			decreaseColor(this, commandChannels)
+		case common.Increase:
+			increaseSizeScanner(this, commandChannels)
+		}
+		color, colorName := getColor(this)
+		common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), "size", false, guiButtons)
+
+	// GoboWheel
+	case common.ChangeFade:
+		switch direction {
+		case common.Decrease:
+			decreaseGobo(this, commandChannels)
+		case common.Increase:
+			increaseGobo(this, commandChannels)
+		}
+		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+	}
+}
+
+func getRotate(this *CurrentState) (int, string) {
+
+	// Pull Overrides
 	overrides := *this.SwitchOverrides
 
 	// Position
 	number := this.SelectedSwitch
 	position := this.SwitchPosition[this.SelectedSwitch]
 
-	// Type.
-	switchInfo.Type = this.SelectedType
-
-	// Fixture Type.
-	switchInfo.FixtureType = this.SelectedFixtureType
-
-	// Mode.
-	switchInfo.SelectedMode = this.SelectedMode[this.DisplaySequence]
-	switchInfo.ActionMode = overrides[number][position].Mode
-
-	// Speed.
-	switchInfo.Speed = this.Speed[this.TargetSequence]
-	switchInfo.OverrideSpeed = overrides[number][position].Speed
-
-	// Shift.
-	switchInfo.RGBShift = this.RGBShift[this.TargetSequence]
-	switchInfo.ScannerShift = getScannerShiftLabel(this.ScannerShift[this.TargetSequence])
-
-	// Size.
-	switchInfo.Size = this.RGBSize[this.TargetSequence]
-	switchInfo.OverrideSize = overrides[number][position].Size
-
-	// Fade.
-	switchInfo.ScannerFade = this.ScannerSize[this.TargetSequence]
-	switchInfo.RGBFade = this.RGBFade[this.TargetSequence]
-	switchInfo.OverrideFade = overrides[number][position].Fade
-
-	// Scanner Coordinates.
-	switchInfo.ScannerCoordinates = getScannerCoordinatesLabel(this.ScannerCoordinates[this.TargetSequence])
-
-	// Gobo.
-	switchInfo.OverrideGobo = overrides[number][position].Gobo
-	switchInfo.Gobo = overrides[number][position].Gobo
-	switchInfo.MaxNumberGobos = overrides[number][position].MaxGobos
-	switchInfo.GoboName = "Unknown"
-	if switchInfo.MaxNumberGobos > 0 && switchInfo.Gobo < switchInfo.MaxNumberGobos && switchInfo.Gobo != -1 {
-		if switchInfo.Gobo != 0 {
-			switchInfo.GoboName = overrides[number][position].AvailableGobos[switchInfo.Gobo-1]
-		}
-	}
-
 	// Rotate.
-	switchInfo.Rotate = overrides[number][position].Rotate
-	switchInfo.AvailableRotates = overrides[number][position].RotateChannels
-	switchInfo.RotateName = overrides[number][position].RotateName
-	switchInfo.IsRotateOverrideAble = overrides[number][position].IsRotateOverrideAble
-	switchInfo.NumberOfRotates = len(switchInfo.AvailableRotates)
-	switchInfo.RotateName = "Unknown"
-	if switchInfo.NumberOfRotates > 0 && switchInfo.Rotate <= switchInfo.NumberOfRotates && switchInfo.Rotate != -1 {
-		if switchInfo.Rotate > 0 {
-			switchInfo.RotateName = switchInfo.AvailableRotates[switchInfo.Rotate-1]
+	rotate := overrides[number][position].Rotate
+	availableRotates := overrides[number][position].RotateChannels
+	// rotateName := overrides[number][position].RotateName
+	//isRotateOverrideAble := overrides[number][position].IsRotateOverrideAble
+	numberOfRotates := len(availableRotates)
+	rotateName := "Unknown"
+	if numberOfRotates > 0 && rotate <= numberOfRotates && rotate != -1 {
+		if rotate > 0 {
+			rotateName = availableRotates[rotate-1]
 		}
 	}
+
+	return rotate, rotateName
+}
+
+func getColor(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
 
 	// Color.
-	switchInfo.Color = overrides[number][position].Color
-	switchInfo.MaxNumberColors = overrides[number][position].MaxColors
-	switchInfo.AvailableColors = overrides[number][position].AvailableColors
-	switchInfo.HasColorChannel = overrides[number][position].HasColorChannel
-	switchInfo.HasRGBChannels = overrides[number][position].HasRGBChannels
-	switchInfo.ColorName = "Unknown"
-	if switchInfo.MaxNumberColors > 0 && switchInfo.Color <= switchInfo.MaxNumberColors && switchInfo.Color != -1 {
-		switchInfo.ColorName = overrides[number][position].AvailableColors[switchInfo.Color]
+	color := overrides[number][position].Color
+	maxNumberColors := overrides[number][position].MaxColors
+	availableColors := overrides[number][position].AvailableColors
+	//hasColorChannel := overrides[number][position].HasColorChannel
+	//hasRGBChannels := overrides[number][position].HasRGBChannels
+	colorName := "Unknown"
+	if maxNumberColors > 0 && color <= maxNumberColors && color != -1 {
+		colorName = availableColors[color]
 	}
+	return color, colorName
+}
+
+func getGobo(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
+
+	// Gobo.
+	gobo := overrides[number][position].Gobo
+	maxNumberGobos := overrides[number][position].MaxGobos
+	goboName := "Unknown"
+	if maxNumberGobos > 0 && gobo < maxNumberGobos && gobo != -1 {
+		if gobo != 0 {
+			goboName = overrides[number][position].AvailableGobos[gobo-1]
+		}
+	}
+	return gobo, goboName
+}
+
+func getProgram(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
 
 	// Program.
-	switchInfo.Program = overrides[number][position].Program
-	switchInfo.IsProgramOverrideAble = overrides[number][position].IsProgramOverrideAble
-	switchInfo.MaxPrograms = overrides[number][position].MaxPrograms
-	switchInfo.ProgramName = "Unknown"
-	if switchInfo.MaxPrograms > 0 && switchInfo.Program <= switchInfo.MaxPrograms && switchInfo.Program != -1 {
+	program := overrides[number][position].Program
+	//isProgramOverrideAble := overrides[number][position].IsProgramOverrideAble
+	maxPrograms := overrides[number][position].MaxPrograms
+	programName := "Unknown"
+	if maxPrograms > 0 && program <= maxPrograms && program != -1 {
 		availablePrograms := overrides[number][position].AvailableProgramChannels
 		if debug {
-			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, switchInfo.MaxPrograms, switchInfo.Program)
+			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, maxPrograms, program)
 		}
-		if switchInfo.Program > 0 {
-			switchInfo.ProgramName = availablePrograms[switchInfo.Program-1]
+		if program > 0 {
+			programName = availablePrograms[program-1]
 		}
 	}
+
+	return program, programName
+}
+
+func getProgramSpeed(this *CurrentState) (int, string) {
+
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
+
+	// Position
+	number := this.SelectedSwitch
+	position := this.SwitchPosition[this.SelectedSwitch]
 
 	// Program Speed.
-	switchInfo.ProgramSpeed = overrides[number][position].ProgramSpeed
-	switchInfo.AvailableProgramSpeedChannels = len(overrides[number][position].AvailableProgramSpeedChannels)
-	switchInfo.MaxNumberProgramSpeeds = overrides[number][position].MaxProgramSpeeds
-	switchInfo.IsProgramSpeedOverrideAble = overrides[number][position].IsProgramSpeedOverrideAble
-	switchInfo.NumberOfProgramSpeeds = switchInfo.AvailableProgramSpeedChannels
-	switchInfo.ProgramSpeedName = "Unknown"
-	if switchInfo.NumberOfProgramSpeeds > 0 && switchInfo.ProgramSpeed <= switchInfo.MaxNumberProgramSpeeds && switchInfo.ProgramSpeed != -1 {
+	programSpeed := overrides[number][position].ProgramSpeed
+	availableProgramSpeedChannels := len(overrides[number][position].AvailableProgramSpeedChannels)
+	maxNumberProgramSpeeds := overrides[number][position].MaxProgramSpeeds
+	//isProgramSpeedOverrideAble := overrides[number][position].IsProgramSpeedOverrideAble
+	numberOfProgramSpeeds := availableProgramSpeedChannels
+	programSpeedName := "Unknown"
+	if numberOfProgramSpeeds > 0 && programSpeed <= maxNumberProgramSpeeds && programSpeed != -1 {
 		availableProgramSpeeds := overrides[number][position].AvailableProgramSpeedChannels
-		if switchInfo.ProgramSpeed > 0 {
-			switchInfo.ProgramSpeedName = availableProgramSpeeds[switchInfo.ProgramSpeed-1]
+		if programSpeed > 0 {
+			programSpeedName = availableProgramSpeeds[programSpeed-1]
 		}
 	}
 
-	return switchInfo
+	return programSpeed, programSpeedName
 }
 
-func UpdateSpeed(this *CurrentState, guiButtons chan common.ALight) {
+func getSpeed(this *CurrentState) int {
 
-	switchInfo := getSwitchDetails(this)
+	// Pull Overrides
+	overrides := *this.SwitchOverrides
 
-	// Are we changing the strobe speed.
-	if this.Strobe[this.SelectedSequence] {
-		// Update the status bar
-		common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
-		return
-	}
+	return overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 
-	// Are we in music trigger so no speed to change. Sequence or Switch.
-	if this.Functions[this.TargetSequence][common.Function8_Music_Trigger].State || this.SwitchHasMusicTrigger {
-		common.UpdateStatusBar("  MUSIC  ", "speed", false, guiButtons)
-		return
-	}
-
-	// Chaser mode.
-	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
-
-		if !this.Strobe[this.TargetSequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Chase Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-		} else {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-		}
-		return
-	}
-
-	// Not a Chaser.
-	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
-
-		// Sequence is strobing this fixture.
-		if this.Strobe[this.TargetSequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.TargetSequence]), "speed", false, guiButtons)
-			return
-		}
-
-		// Sequence has a RGB fixture.
-		if switchInfo.Type == "rgb" && !this.Strobe[this.TargetSequence] {
-			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-			return
-		}
-
-		// Sequence has a Scanner fixture.
-		if switchInfo.Type == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-			return
-		}
-
-		// Switch has a RGB fixture.
-		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-			return
-		}
-
-		// Switch has a scanner fixture.
-		if switchInfo.Type == "switch" && this.SelectedFixtureType == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-			return
-		}
-
-		// Switch has a projector in control mode.
-		if switchInfo.Type == "switch" &&
-			this.SelectedFixtureType == "projector" &&
-			switchInfo.IsProgramSpeedOverrideAble &&
-			switchInfo.ActionMode == "Control" {
-
-			common.UpdateStatusBar(fmt.Sprintf("Program Speed %02d:%s", switchInfo.ProgramSpeed, switchInfo.ProgramSpeedName), "speed", false, guiButtons)
-			return
-		}
-
-		if switchInfo.Type == "switch" &&
-			this.SelectedFixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.OverrideSpeed), "speed", false, guiButtons)
-			return
-		}
-
-		// // Switch has a projector that has a dedicated color wheel and associated channel.
-		// if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" && switchInfo.HasColorChannel {
-		// 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-		// 	return
-		// }
-
-		// // Switch has a projector that has a RGB channels.
-		// if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" && switchInfo.HasRGBChannels {
-		// 	common.UpdateStatusBar(fmt.Sprintf("Speed %02d", switchInfo.Speed), "speed", false, guiButtons)
-		// 	return
-		// }
-
-		// Assume nothing is selected, display a empty place holder.
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", 0), "speed", false, guiButtons)
-		return
-
-	}
-}
-
-func UpdateSize(this *CurrentState, guiButtons chan common.ALight) {
-
-	switchInfo := getSwitchDetails(this)
-
-	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
-		if switchInfo.Type == "rgb" || switchInfo.Type == "switch" {
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchInfo.Size), "size", false, guiButtons)
-		}
-		if switchInfo.Type == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Size %02d", switchInfo.ScannerFade), "size", false, guiButtons)
-		}
-		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Size %02d", switchInfo.OverrideSize), "size", false, guiButtons)
-		}
-		if switchInfo.Type == "switch" && this.SelectedFixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Color %02d:%s", switchInfo.Color, switchInfo.ColorName), "size", false, guiButtons)
-		}
-	}
-	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Size %02d", switchInfo.Size), "size", false, guiButtons)
-	}
-}
-
-func UpdateShift(this *CurrentState, guiButtons chan common.ALight) {
-
-	switchInfo := getSwitchDetails(this)
-
-	if debug {
-		fmt.Printf("UpdateShift RGBShift=%d scannerShift=%s switchShift=%d switchRotateSpeed %d switchRotateSpeedName=%s\n", switchInfo.RGBShift, switchInfo.ScannerShift, switchInfo.RGBShift, switchInfo.Rotate, switchInfo.RotateName)
-		fmt.Printf("UpdateShift switchInfo.Type %s  switchInfo.FixtureType %s IsRotateOverrideAble %t ActionMode %s\n", switchInfo.Type, switchInfo.FixtureType, switchInfo.IsRotateOverrideAble, switchInfo.ActionMode)
-	}
-
-	// Chaser mode.
-	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
-	}
-
-	// Not a Chaser.
-	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
-
-		// Sequence has a RGB fixture.
-		if switchInfo.Type == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
-			return
-		}
-
-		// Sequence has a Scanner fixture.
-		if switchInfo.Type == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", switchInfo.ScannerShift), "shift", false, guiButtons)
-			return
-		}
-
-		// Switch has a RGB fixture.
-		if switchInfo.Type == "switch" && this.SelectedFixtureType == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Shift %02d", switchInfo.RGBShift), "shift", false, guiButtons)
-			return
-		}
-
-		// Switch has a scanner fixture.
-		if switchInfo.Type == "switch" && switchInfo.FixtureType == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Shift %s", switchInfo.ScannerShift), "shift", false, guiButtons)
-			return
-		}
-
-		// Switch has a projector but not in control mode.
-		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" && switchInfo.IsRotateOverrideAble && switchInfo.ActionMode != "Control" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate %02d:%s", switchInfo.Rotate, switchInfo.RotateName), "shift", false, guiButtons)
-			return
-		}
-
-		// Switch has a projector in control mode. So shift becomes select Program or Show.
-		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" && switchInfo.IsProgramOverrideAble && switchInfo.ActionMode == "Control" {
-			common.UpdateStatusBar(fmt.Sprintf("Program %02d:%s", switchInfo.Program, switchInfo.ProgramName), "shift", false, guiButtons)
-			return
-		}
-
-		return
-	}
-
-}
-
-func UpdateFade(this *CurrentState, guiButtons chan common.ALight) {
-
-	switchInfo := getSwitchDetails(this)
-
-	if switchInfo.Mode == NORMAL || switchInfo.Mode == FUNCTION || switchInfo.Mode == STATUS {
-		if switchInfo.Type == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
-		}
-		if switchInfo.Type == "scanner" {
-			common.UpdateStatusBar(fmt.Sprintf("Rotate Coord %s", switchInfo.ScannerCoordinates), "fade", false, guiButtons)
-		}
-		if switchInfo.Type == "switch" && switchInfo.FixtureType == "rgb" {
-			common.UpdateStatusBar(fmt.Sprintf("Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
-		}
-		if switchInfo.Type == "switch" && switchInfo.FixtureType == "projector" {
-			common.UpdateStatusBar(fmt.Sprintf("Gobo %02d:%s", switchInfo.Gobo, switchInfo.GoboName), "fade", false, guiButtons)
-		}
-	}
-	if switchInfo.Mode == CHASER_DISPLAY || switchInfo.Mode == CHASER_FUNCTION {
-		common.UpdateStatusBar(fmt.Sprintf("Chase Fade %02d", switchInfo.RGBFade), "fade", false, guiButtons)
-	}
 }

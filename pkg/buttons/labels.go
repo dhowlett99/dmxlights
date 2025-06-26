@@ -54,10 +54,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	}
 
 	// Update status bar.
-	UpdateSpeed(this, guiButtons)
-	UpdateShift(this, guiButtons)
-	UpdateSize(this, guiButtons)
-	UpdateFade(this, guiButtons)
+	updateStatusBar(0, 0, common.DisplayAll, common.Display, sequences, this, nil, eventsForLaunchpad, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
 	staticColors := []color.RGBA{}
@@ -241,10 +238,16 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// RGB Front of house or uplighters.
 	if this.SelectedType == "rgb" {
 
-		UpdateSpeed(this, guiButtons)
-		UpdateShift(this, guiButtons)
-		UpdateSize(this, guiButtons)
-		UpdateFade(this, guiButtons)
+		// Update status bar.
+		// DecideOnAction(0, 0, common.Speed, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Shift, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Size, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Fade, common.Display, nil, this, nil, nil, guiButtons, nil)
+
+		// UpdateSpeed(this, guiButtons)
+		// UpdateShift(this, guiButtons)
+		// UpdateSize(this, guiButtons)
+		// UpdateFade(this, guiButtons)
 
 		// Loop through the available button names this sequence
 		for index, button := range guiBottomRGBButtons {
@@ -271,10 +274,16 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == NORMAL || this.SelectedMode[this.DisplaySequence] == FUNCTION || this.SelectedMode[this.DisplaySequence] == STATUS) {
 
-		UpdateSpeed(this, guiButtons)
-		UpdateShift(this, guiButtons)
-		UpdateSize(this, guiButtons)
-		UpdateFade(this, guiButtons)
+		// Update status bar.
+		// DecideOnAction(0, 0, common.Speed, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Shift, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Size, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Fade, common.Display, nil, this, nil, nil, guiButtons, nil)
+
+		// UpdateSpeed(this, guiButtons)
+		// UpdateShift(this, guiButtons)
+		// UpdateSize(this, guiButtons)
+		// UpdateFade(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomScannerButtons {
@@ -293,10 +302,16 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	if this.SelectedType == "scanner" &&
 		(this.SelectedMode[this.DisplaySequence] == CHASER_DISPLAY || this.SelectedMode[this.DisplaySequence] == CHASER_FUNCTION) {
 
-		UpdateSpeed(this, guiButtons)
-		UpdateShift(this, guiButtons)
-		UpdateSize(this, guiButtons)
-		UpdateFade(this, guiButtons)
+		// Update status bar.
+		// DecideOnAction(0, 0, common.Speed, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Shift, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Size, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Fade, common.Display, nil, this, nil, nil, guiButtons, nil)
+
+		// UpdateSpeed(this, guiButtons)
+		// UpdateShift(this, guiButtons)
+		// UpdateSize(this, guiButtons)
+		// UpdateFade(this, guiButtons)
 
 		// Loop through the available functions for this sequence
 		for index, button := range guiBottomChaserButtons {
@@ -329,10 +344,16 @@ func showBottomLabels(this *CurrentState, sequenceColors []color.RGBA, staticCol
 	// Projector functions.
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {
 
-		UpdateSpeed(this, guiButtons)
-		UpdateShift(this, guiButtons)
-		UpdateSize(this, guiButtons)
-		UpdateFade(this, guiButtons)
+		// Update status bar.
+		// DecideOnAction(0, 0, common.Speed, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Shift, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Size, common.Display, nil, this, nil, nil, guiButtons, nil)
+		// DecideOnAction(0, 0, common.Fade, common.Display, nil, this, nil, nil, guiButtons, nil)
+
+		// UpdateSpeed(this, guiButtons)
+		// UpdateShift(this, guiButtons)
+		// UpdateSize(this, guiButtons)
+		// UpdateFade(this, guiButtons)
 
 		if actionMode == "Control" {
 			// Loop through the available functions for this sequence
