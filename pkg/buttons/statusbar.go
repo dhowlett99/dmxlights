@@ -23,55 +23,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-type SwitchInfo struct {
-	Number int
-	Mode   int
-	//SelectedMode int
-	//Type         string
-	//FixtureType  string
-	//Speed                int
-	//StrobeSpeed          int
-	//RGBShift             int
-	ScannerShift string
-	Size         int
-	//RGBFade      int
-	//ScannerFade          int
-	//ScannerCoordinates   string
-	Position             int
-	IsRotateOverrideAble bool
-	//Rotate               int
-	RotateName       string
-	AvailableRotates []string
-	NumberOfRotates  int
-	Color            int
-	ColorName        string
-	MaxNumberColors  int
-	AvailableColors  []string
-
-	//Gobo     int
-	//GoboName string
-	//MaxNumberGobos int
-
-	//OverrideSpeed int
-	OverrideSize int
-	//OverrideFade int
-	//OverrideGobo int
-
-	//ProgramSpeedName              string
-	//ProgramSpeed                  int
-	MaxPrograms                   int
-	Program                       int
-	IsProgramOverrideAble         bool
-	ProgramName                   string
-	AvailableProgramSpeedChannels int
-	MaxNumberProgramSpeeds        int
-	NumberOfProgramSpeeds         int
-	IsProgramSpeedOverrideAble    bool
-	HasColorChannel               bool
-	HasRGBChannels                bool
-	//ActionMode                    string
-}
-
 func getAction(this *CurrentState) int {
 
 	var action int
@@ -81,7 +32,6 @@ func getAction(this *CurrentState) int {
 	position := this.SwitchPosition[this.SelectedSwitch]
 	overrides := *this.SwitchOverrides
 
-	//if this.SelectedType == "rgb" && sequences[this.SelectedSequence].Label != "chaser" {
 	if this.SelectedType == "rgb" {
 		action = common.ActionRGB
 		if debug {
@@ -95,8 +45,7 @@ func getAction(this *CurrentState) int {
 		}
 	}
 
-	//if this.SelectedType == "rgb" && sequences[this.SelectedSequence].Label == "chaser" {
-	if this.SelectedType == "rgb" {
+	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] {
 		action = common.ActionChaser
 		if debug {
 			fmt.Printf("Action Chaser\n")
