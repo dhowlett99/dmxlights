@@ -224,7 +224,7 @@ func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.S
 		}
 
 	case common.ActionSwitchOff:
-		blankFixture(sub, this, guiButtons)
+		blankFixture(sub, guiButtons)
 
 	case common.ActionSwitchStatic:
 		staticFixture(sub, direction, this, commandChannels, guiButtons)
@@ -541,27 +541,27 @@ func programFixture(sub int, direction int, this *CurrentState, commandChannels 
 	}
 }
 
-func blankFixture(sub int, this *CurrentState, guiButtons chan common.ALight) {
+func blankFixture(sub int, guiButtons chan common.ALight) {
 
 	switch sub {
 
 	case common.DisplayAll:
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Shift %d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
+		common.UpdateStatusBar("    ", "size", false, guiButtons)
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
 
 	case common.ChangeSpeed:
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		common.UpdateStatusBar("    ", "speed", false, guiButtons)
 
 	case common.ChangeShift:
-		common.UpdateStatusBar(fmt.Sprintf("Shift %d", this.RGBShift[this.TargetSequence]), "shift", false, guiButtons)
+		common.UpdateStatusBar("    ", "shift", false, guiButtons)
 
 	case common.ChangeSize:
-		common.UpdateStatusBar(fmt.Sprintf("Size %02d", this.RGBSize[this.TargetSequence]), "size", false, guiButtons)
+		common.UpdateStatusBar("    ", "size", false, guiButtons)
 
 	case common.ChangeFade:
-		common.UpdateStatusBar(fmt.Sprintf("Fade %02d", this.RGBFade[this.TargetSequence]), "fade", false, guiButtons)
+		common.UpdateStatusBar("    ", "fade", false, guiButtons)
 	}
 }
 
@@ -705,7 +705,7 @@ func getProgram(this *CurrentState) (int, string) {
 	if maxPrograms > 0 && program <= maxPrograms && program != -1 {
 		availablePrograms := overrides[number][position].AvailableProgramChannels
 		if debug {
-			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", overrides[number][position].AvailableProgramChannels, maxPrograms, program)
+			fmt.Printf("AvailableProgramChannels %+v switchInfo.MaxPrograms %d switchInfo.Program %d\n", availablePrograms, maxPrograms, program)
 		}
 		if program > 0 {
 			programName = availablePrograms[program-1]

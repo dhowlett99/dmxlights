@@ -57,9 +57,9 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		// Look through the available program channel settins and see if you can find the specified program action.
 		for settingNumber, setting := range programSettings {
 			if debug {
-				fmt.Printf("Setting Number %d Setting Name %s Action Name %s Action Program %s\n", settingNumber, setting.Name, action.Name, action.Program)
+				fmt.Printf("Fixture %s Setting Number %d Setting Name %s Action Name %s Action Program %s\n", fixture.Name, settingNumber, setting.Name, action.Name, action.Program)
 			}
-			if setting.Name == action.Program || setting.Name == "Default" {
+			if setting.Name == action.Program || setting.Name == "Default" || setting.Name == "Blackout" {
 				config.Program = settingNumber + 1
 				config.ProgramName = setting.Name
 				if debug {
