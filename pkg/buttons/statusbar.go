@@ -217,7 +217,12 @@ func rgbFixture(sequences []*common.Sequence, sub int, direction int, this *Curr
 		case common.Increase:
 			increaseSpeedRGB(sequences, this, commandChannels)
 		}
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		}
 
 	case common.ChangeShift:
 		switch direction {
@@ -265,8 +270,11 @@ func chaserFixture(sequences []*common.Sequence, sub int, direction int, this *C
 		case common.Increase:
 			increaseSpeedRGB(sequences, this, commandChannels)
 		}
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
-
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.SelectedSequence]), "speed", false, guiButtons)
+		}
 	case common.ChangeShift:
 		switch direction {
 		case common.Decrease:
@@ -313,7 +321,11 @@ func scannerFixture(sequences []*common.Sequence, sub int, direction int, this *
 		case common.Increase:
 			increaseSpeedScanner(this, commandChannels)
 		}
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		}
 
 	case common.ChangeShift:
 		switch direction {
@@ -360,7 +372,11 @@ func derbyFixture(sequences []*common.Sequence, sub int, direction int, this *Cu
 		case common.Increase:
 			increaseSpeedScanner(this, commandChannels)
 		}
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", this.Speed[this.TargetSequence]), "speed", false, guiButtons)
+		}
 
 	// RotateSpeed
 	case common.ChangeShift:
@@ -416,8 +432,13 @@ func projectorFixture(sub int, direction int, this *CurrentState, commandChannel
 		case common.Increase:
 			increaseOverrideSpeedRGB(this, commandChannels)
 		}
-		speed := getSpeed(this)
-		common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+
+		if this.Strobe[this.SelectedSequence] {
+			common.UpdateStatusBar(fmt.Sprintf("Strobe %02d", this.StrobeSpeed[this.SelectedSequence]), "speed", false, guiButtons)
+		} else {
+			speed := getSpeed(this)
+			common.UpdateStatusBar(fmt.Sprintf("Speed %02d", speed), "speed", false, guiButtons)
+		}
 
 	// RotateSpeed.
 	case common.ChangeShift:
