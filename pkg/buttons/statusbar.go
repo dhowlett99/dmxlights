@@ -23,55 +23,6 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
-type SwitchInfo struct {
-	Number int
-	Mode   int
-	//SelectedMode int
-	//Type         string
-	//FixtureType  string
-	//Speed                int
-	//StrobeSpeed          int
-	//RGBShift             int
-	ScannerShift string
-	Size         int
-	//RGBFade      int
-	//ScannerFade          int
-	//ScannerCoordinates   string
-	Position             int
-	IsRotateOverrideAble bool
-	//Rotate               int
-	RotateName       string
-	AvailableRotates []string
-	NumberOfRotates  int
-	Color            int
-	ColorName        string
-	MaxNumberColors  int
-	AvailableColors  []string
-
-	//Gobo     int
-	//GoboName string
-	//MaxNumberGobos int
-
-	//OverrideSpeed int
-	OverrideSize int
-	//OverrideFade int
-	//OverrideGobo int
-
-	//ProgramSpeedName              string
-	//ProgramSpeed                  int
-	MaxPrograms                   int
-	Program                       int
-	IsProgramOverrideAble         bool
-	ProgramName                   string
-	AvailableProgramSpeedChannels int
-	MaxNumberProgramSpeeds        int
-	NumberOfProgramSpeeds         int
-	IsProgramSpeedOverrideAble    bool
-	HasColorChannel               bool
-	HasRGBChannels                bool
-	//ActionMode                    string
-}
-
 func getAction(this *CurrentState) int {
 
 	var action int
@@ -166,18 +117,6 @@ func getType(selectedFixtureType string) int {
 }
 
 // updateStatusBar processes speed, shift, size and fade actions and all there variations, depending on fixture.
-// calling with sub=
-//
-//	common,Increase
-//	common.Decrease
-//
-// or
-//
-//	common,DisplayAll
-//	common.DisplaySpeed,
-//	common.DisplayShift,
-//	common.DisplaySize
-//	common.Display.Fade
 func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.Sequence, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	if debug {
@@ -199,14 +138,17 @@ func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.S
 	// Common RGB Fixure.
 	case common.ActionRGB:
 		rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
 
 	// Scanner RGB Shutter Chaser. With Speed, Shift, Size & Fade.
 	case common.ActionChaser:
 		chaserFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.ChaserButtons, eventsForLaunchpad, guiButtons)
 
 	// Scanner with Speed, Shift, Size & Coordinates.
 	case common.ActionScanner:
 		scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+		labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
 
 	// A Switch that has Settings could be a RGB Lamp, Scanner (TODO), Derby RGB with Rotate or a Projector with Color & Gobo Wheels.
 	case common.ActionSwitchSetting:
@@ -215,19 +157,45 @@ func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.S
 
 		case common.RGB:
 			rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
+
 		case common.Scanner:
 			scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
+
 		case common.Derby:
 			derbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.DerbyButtons, eventsForLaunchpad, guiButtons)
+
 		case common.Projector:
 			projectorFixture(sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ProjectorButtons, eventsForLaunchpad, guiButtons)
 		}
 
 	case common.ActionSwitchOff:
 		blankFixture(sub, guiButtons)
+		labelButtons(this.ButtonConfig.BlankButtons, eventsForLaunchpad, guiButtons)
 
 	case common.ActionSwitchStatic:
 		staticFixture(sub, direction, this, commandChannels, guiButtons)
+
+		switch fixtureType {
+		case common.RGB:
+			rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
+
+		case common.Scanner:
+			scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
+
+		case common.Derby:
+			derbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.DerbyButtons, eventsForLaunchpad, guiButtons)
+
+		case common.Projector:
+			projectorFixture(sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ProjectorButtons, eventsForLaunchpad, guiButtons)
+		}
 
 	case common.ActionSwitchControl:
 		programFixture(sub, direction, this, commandChannels, guiButtons)
@@ -240,15 +208,42 @@ func updateStatusBar(X int, Y int, sub int, direction int, sequences []*common.S
 
 		case common.RGB:
 			rgbFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.RGBButtons, eventsForLaunchpad, guiButtons)
 		case common.Scanner:
 			scannerFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ScannerButtons, eventsForLaunchpad, guiButtons)
+
 		case common.Derby:
 			derbyFixture(sequences, sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.DerbyButtons, eventsForLaunchpad, guiButtons)
+
 		case common.Projector:
 			projectorFixture(sub, direction, this, commandChannels, guiButtons)
+			labelButtons(this.ButtonConfig.ProjectorButtons, eventsForLaunchpad, guiButtons)
+
 		}
 
 	}
+
+	// Pull overrides.
+	overrides := *this.SwitchOverrides
+	// Show the color display.
+	control := common.GetColorListByNames(overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].AvailableColors)
+	if debug {
+		fmt.Printf("Control %+v\n", control)
+	}
+	common.UpdateColorDisplay(control, guiButtons)
+
+	// var control common.ColorDisplayControl
+	// if !this.Static[this.TargetSequence] {
+	// 	// Update the color display for the sequence.
+	// 	control = common.GetColorList(sequenceColors)
+	// } else {
+	// 	// Use static colors for color display.
+	// 	control = common.GetColorList(staticColors)
+	// }
+	// common.UpdateColorDisplay(control, guiButtons)
+
 }
 
 func rgbFixture(sequences []*common.Sequence, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, guiButtons chan common.ALight) {
@@ -748,4 +743,19 @@ func getSpeed(this *CurrentState) int {
 
 	return overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed
 
+}
+
+func labelButtons(b []bottonButton, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Loop through the available button names this sequence
+	for index, button := range b {
+		if debug {
+			fmt.Printf("labelButtons %+v\n", button)
+		}
+		common.LightLamp(common.Button{X: index, Y: bottomRow}, button.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+		common.LabelButton(index, bottomRow, button.Label, guiButtons)
+	}
 }

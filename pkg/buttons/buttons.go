@@ -123,6 +123,7 @@ type CurrentState struct {
 	ChaserSequenceNumber        int                        // Chaser sequence number, setup at start.
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
 	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
+	ButtonConfig                ButtonConfig               // Context sensitive abels for bottom row of buttons.
 }
 
 func ProcessButtons(X int, Y int,
@@ -598,7 +599,7 @@ func InitButtons(this *CurrentState, sequenceColors []color.RGBA, staticColors [
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	showBottomLabels(this, sequenceColors, staticColors, eventsForLaunchpad, guiButtons)
+	//(this, sequenceColors, staticColors, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)

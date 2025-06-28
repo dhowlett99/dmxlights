@@ -85,7 +85,7 @@ entrys:
     label: "Shutter\nSpeed\nDown"
   - name: Up
     label: "Shutter\nSpeed\nUp"
-- name: Rotate Speed
+- name: Rotate
   labels:
   - name: Down
     label: "Rotate\nSpeed\nDown"

@@ -86,6 +86,9 @@ func main() {
 		os.Exit(-1)
 	}
 
+	// Configure buttons.
+	this.ButtonConfig = buttons.ConfigureButtons(&this)
+
 	// Read sequences config file
 	fmt.Println("Load Sequences Config File")
 	sequencesConfig, numberOfSequences, err := sequence.LoadSequences()
