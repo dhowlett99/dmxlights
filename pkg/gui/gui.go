@@ -802,7 +802,7 @@ func FileSave(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 		}
 	}, myWindow)
 	pwd, _ := os.Getwd()
-	currentmfolder, _ := filepath.Abs(pwd + "/projects")
+	currentmfolder, _ := filepath.Abs(pwd + "/" + "projects")
 	if currentmfolder != "" {
 		mfileURI := storage.NewFileURI(currentmfolder)
 		mfileLister, _ := storage.ListerForURI(mfileURI)
@@ -814,7 +814,7 @@ func FileSave(myWindow fyne.Window, startConfig *fixture.Fixtures, fixturesConfi
 			},
 		})
 		filename := strings.Split(myWindow.Title(), ":")
-		fileSaver.SetFileName(filename[1])
+		fileSaver.SetFileName(filename[1] + ".yaml")
 	}
 	fileSaver.Show()
 
