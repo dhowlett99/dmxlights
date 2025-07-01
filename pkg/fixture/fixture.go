@@ -225,7 +225,7 @@ func SaveFixturesWriter(writer fyne.URIWriteCloser, fixtures *Fixtures) error {
 	}
 
 	// Write the fixtures.yaml file.
-	_, err = io.WriteString(writer, string(data))
+	_, err = io.Writer.Write(writer, data)
 	if err != nil {
 		return errors.New("error: writing file: " + writer.URI().Name() + err.Error())
 	}

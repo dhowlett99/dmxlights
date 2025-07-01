@@ -2994,10 +2994,10 @@ fixtures:
       channel: Rotate
       value: "0"
       selectedvalue: ""
-    - name: "Off"
-      label: "Off"
+    - name: Color
+      label: Color
       number: 3
-      channel: Gobo
+      channel: Color
       value: "0"
       selectedvalue: ""
     flash: false
