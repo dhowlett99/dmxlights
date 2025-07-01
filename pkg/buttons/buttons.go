@@ -124,6 +124,7 @@ type CurrentState struct {
 	ScannerSequenceNumber       int                        // Scanner sequence number, setup at start.
 	Labels                      *labels.LabelData          // Space for button labels as loaded from labels.yaml
 	ButtonConfig                ButtonConfig               // Context sensitive abels for bottom row of buttons.
+	FixturesConfig              *fixture.Fixtures          // Pointer to fixtures.
 }
 
 func ProcessButtons(X int, Y int,
@@ -342,28 +343,28 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S H I F T
 	if X == 2 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeShift, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeShift, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S H I F T
 	if X == 3 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeShift, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeShift, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  S P E E D
 	if X == 0 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeSpeed, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeSpeed, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E   S P E E D
 	if X == 1 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeSpeed, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeSpeed, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
@@ -395,28 +396,28 @@ func ProcessButtons(X int, Y int,
 	// S E L E C T   D E C R E A S E  S I Z E
 	if X == 4 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeSize, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeSize, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  S I Z E
 	if X == 5 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeSize, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeSize, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   D E C R E A S E  F A D E
 	if X == 6 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeFade, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeFade, common.Decrease, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 
 	// S E L E C T   I N C R E A S E  F A D E
 	if X == 7 && Y == 7 && !this.ShowRGBColorPicker {
 		SavePresetOff(this, eventsForLaunchpad, guiButtons)
-		updateStatusBar(X, Y, common.ChangeFade, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
+		updateBottomStatusBar(X, Y, common.ChangeFade, common.Increase, sequences, this, commandChannels, eventsForLaunchpad, guiButtons)
 		return
 	}
 

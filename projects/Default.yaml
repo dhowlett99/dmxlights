@@ -1714,7 +1714,7 @@ fixtures:
       selectedvalue: ""
     overridable: true
   - number: 3
-    name: Gobo
+    name: Color
     settings:
     - name: White
       label: White
@@ -3022,8 +3022,8 @@ fixtures:
     - name: Color1
       label: Color1
       number: 3
-      channel: Gobo
-      value: "0"
+      channel: Color
+      value: 0
       selectedvalue: Color1
     flash: false
   - name: Color2
@@ -3047,7 +3047,7 @@ fixtures:
     - name: Color2
       label: Color2
       number: 3
-      channel: Gobo
+      channel: Color
       value: "33"
       selectedvalue: Color2
     flash: false
@@ -3072,7 +3072,7 @@ fixtures:
     - name: Color3
       label: Color3
       number: 3
-      channel: Gobo
+      channel: Color
       value: "60"
       selectedvalue: Color3
     flash: false
@@ -3097,7 +3097,7 @@ fixtures:
     - name: Color4
       label: Color4
       number: 3
-      channel: Gobo
+      channel: Color
       value: "81"
       selectedvalue: Color4
     flash: false

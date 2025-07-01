@@ -1371,7 +1371,7 @@ func LightLamp(button Button, color color.RGBA, master int, eventsForLauchpad ch
 
 func UpdateColorDisplay(control ColorDisplayControl, guiButtons chan ALight) {
 	if debug {
-		fmt.Printf("UpdateColorDisplay: control %+v\n", control)
+		fmt.Printf("UpdateColorDisplay: trying to display control %+v\n", control)
 	}
 	event := ALight{
 		ColorDisplay:        true,

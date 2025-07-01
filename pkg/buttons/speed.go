@@ -135,7 +135,7 @@ func decreaseOverrideSpeedRGB(this *CurrentState, commandChannels []chan common.
 
 }
 
-func decreaseProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseOverrideProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Pull the overrides.
 	overrides := *this.SwitchOverrides
@@ -280,35 +280,7 @@ func increaseSpeedScanner(this *CurrentState, commandChannels []chan common.Comm
 
 }
 
-// func increaseSwitchRGB(this *CurrentState, commandChannels []chan common.Command) {
-
-// 	// Pull the overrides.
-// 	overrides := *this.SwitchOverrides
-
-// 	maxNumberProgramSpeeds := overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].MaxProgramSpeeds
-
-// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed + 1
-// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed > maxNumberProgramSpeeds {
-// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Speed = maxNumberProgramSpeeds
-// 	}
-// 	this.SwitchOverrides = &overrides
-
-// 	// Send a message to override / increase the selected switch speed.
-// 	cmd := common.Command{
-// 		Action: common.OverrideSpeed,
-// 		Args: []common.Arg{
-// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-// 			{Name: "ProgramSpeed", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ProgramSpeed},
-// 		},
-// 	}
-// 	common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
-
-// 	// Push the overrides.
-// 	this.SwitchOverrides = &overrides
-// }
-
-func increaseProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
+func increaseOverrideProgramSpeed(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Pull the overrides.
 	overrides := *this.SwitchOverrides

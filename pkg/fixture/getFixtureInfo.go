@@ -796,6 +796,22 @@ func GetSwitchFixtureType(switchNumber int, stateNumber int16, fixturesConfig *F
 	return ""
 }
 
+func GetSwitchUseFixture(switchNumber int, stateNumber int16, fixturesConfig *Fixtures) *Fixture {
+	for _, fixture := range fixturesConfig.Fixtures {
+		if fixture.Type == "switch" {
+			if fixture.Number == switchNumber+1 {
+
+				useFixture, _ := GetFixtureDetailsByLabel(fixture.UseFixture, fixturesConfig)
+				if debug {
+					fmt.Printf("fixture number %d name %s use fixture %s type %s\n", fixture.Number, fixture.Name, fixture.UseFixture, useFixture.Type)
+				}
+				return useFixture
+			}
+		}
+	}
+	return nil
+}
+
 func GetSwitchStateIsMusicTriggerOn(switchNumber int, stateNumber int, fixturesConfig *Fixtures) bool {
 
 	for _, fixture := range fixturesConfig.Fixtures {

@@ -104,6 +104,8 @@ func main() {
 		os.Exit(1)
 	}
 
+	this.FixturesConfig = fixturesConfig
+
 	// Load groups.
 	groupConfig, err := fixture.LoadFixtureGroups("groups.yaml")
 	if err != nil {

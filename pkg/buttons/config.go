@@ -130,6 +130,18 @@ func ConfigureButtons(this *CurrentState) ButtonConfig {
 	BlankButtons = append(BlankButtons, bottonButton{Label: "", Color: colors.Cyan})
 	buttonConfig.SwitchChaseButtons = BlankButtons
 
+	// Storage for the switch buttons in static mode on the bottom row.
+	var SwitchStaticsButtons []bottonButton
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Down"), Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: labels.GetLabel(this.Labels, "Color", "Up"), Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	SwitchStaticsButtons = append(SwitchStaticsButtons, bottonButton{Label: "", Color: colors.Cyan})
+	buttonConfig.SwitchStaticsButtons = SwitchStaticsButtons
+
 	// Storage for the switch buttons in chase mode on the bottom row.
 	var SwitchChaseButtons []bottonButton
 	SwitchChaseButtons = append(SwitchChaseButtons, bottonButton{Label: labels.GetLabel(this.Labels, "Shutter Speed", "Down"), Color: colors.Cyan})

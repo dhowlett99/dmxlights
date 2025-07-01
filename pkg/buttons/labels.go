@@ -54,7 +54,7 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	}
 
 	// Update status bar.
-	updateStatusBar(0, 0, common.DisplayAll, common.Display, sequences, this, nil, eventsForLaunchpad, guiButtons)
+	updateBottomStatusBar(0, 0, common.DisplayAll, common.Display, sequences, this, nil, eventsForLaunchpad, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
 	staticColors := []color.RGBA{}

@@ -49,7 +49,7 @@ func decreaseFadeRGB(this *CurrentState, commandChannels []chan common.Command) 
 
 }
 
-func decreaseFadeScannerNumberCoordinates(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseScannerCoordinates(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Update Coordinates.
 
@@ -70,30 +70,30 @@ func decreaseFadeScannerNumberCoordinates(this *CurrentState, commandChannels []
 
 }
 
-// func decreaseOverrideFadeRGB(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseOverrideFade(this *CurrentState, commandChannels []chan common.Command) {
 
-// 	// Decrease the fade size.
-// 	overrides := *this.SwitchOverrides
-// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade--
-// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade < common.MIN_RGB_FADE {
-// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MIN_RGB_FADE
-// 	}
-// 	this.SwitchOverrides = &overrides
+	// Decrease the fade size.
+	overrides := *this.SwitchOverrides
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade--
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade < common.MIN_RGB_FADE {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MIN_RGB_FADE
+	}
+	this.SwitchOverrides = &overrides
 
-// 	// Send a message to override / increase the selected switch shift.
-// 	cmd := common.Command{
-// 		Action: common.OverrideFade,
-// 		Args: []common.Arg{
-// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-// 			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
-// 		},
-// 	}
-// 	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+	// Send a message to override / increase the selected switch shift.
+	cmd := common.Command{
+		Action: common.OverrideFade,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-// }
+}
 
-func decreaseGobo(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseOverrideGobo(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Decrease the gobo.
 	overrides := *this.SwitchOverrides
@@ -139,7 +139,7 @@ func increaseFadeRGB(this *CurrentState, commandChannels []chan common.Command) 
 
 }
 
-func increaseFadeScannerNumberCoordinates(this *CurrentState, commandChannels []chan common.Command) {
+func increaseScannerCoordinates(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Fade also send more or less coordinates for the scanner patterns.
 	this.ScannerCoordinates[this.TargetSequence]++
@@ -158,30 +158,30 @@ func increaseFadeScannerNumberCoordinates(this *CurrentState, commandChannels []
 
 }
 
-// func increaseFadeSwitchRGB(this *CurrentState, commandChannels []chan common.Command) {
+func increaseOverrideFade(this *CurrentState, commandChannels []chan common.Command) {
 
-// 	// Increase the switch size.
-// 	overrides := *this.SwitchOverrides
-// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade + 1
-// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade > common.MAX_RGB_SHIFT {
-// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MAX_RGB_SHIFT
-// 	}
-// 	this.SwitchOverrides = &overrides
+	// Increase the switch size.
+	overrides := *this.SwitchOverrides
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade++
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade > common.MAX_RGB_SHIFT {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade = common.MAX_RGB_SHIFT
+	}
+	this.SwitchOverrides = &overrides
 
-// 	// Send a message to override / increase the selected switch shift.
-// 	cmd := common.Command{
-// 		Action: common.OverrideFade,
-// 		Args: []common.Arg{
-// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-// 			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
-// 		},
-// 	}
-// 	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+	// Send a message to override / increase the selected switch shift.
+	cmd := common.Command{
+		Action: common.OverrideFade,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Fade},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-// }
+}
 
-func increaseGobo(this *CurrentState, commandChannels []chan common.Command) {
+func increaseOverrideGobo(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Deal with an Switch sequence with a projector fixture. Increase Gobo
 	if this.SelectedType == "switch" && this.SelectedFixtureType == "projector" {

@@ -68,32 +68,31 @@ func decreaseSizeScanner(this *CurrentState, commandChannels []chan common.Comma
 
 }
 
-// Deal with the switch sequence.  Decrease Size.
-// func decreaseOverrideSizeRGB(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseOverrideSize(this *CurrentState, commandChannels []chan common.Command) {
 
-// 	// Decrement the switch size.
-// 	overrides := *this.SwitchOverrides
-// 	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size--
-// 	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size < common.MIN_RGB_SIZE {
-// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MIN_RGB_SIZE
-// 	}
-// 	this.SwitchOverrides = &overrides
+	// Decrement the switch size.
+	overrides := *this.SwitchOverrides
+	overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size--
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size < common.MIN_RGB_SIZE {
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MIN_RGB_SIZE
+	}
+	this.SwitchOverrides = &overrides
 
-// 	// Send a message to override / increase the selected switch shift.
-// 	cmd := common.Command{
-// 		Action: common.OverrideSize,
-// 		Args: []common.Arg{
-// 			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-// 			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-// 			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
-// 		},
-// 	}
-// 	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+	// Send a message to override / increase the selected switch shift.
+	cmd := common.Command{
+		Action: common.OverrideSize,
+		Args: []common.Arg{
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+			{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
+		},
+	}
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-// }
+}
 
 // Deal with the switch sequence that has a projector fixture.
-func decreaseColor(this *CurrentState, commandChannels []chan common.Command) {
+func decreaseOverrideColor(this *CurrentState, commandChannels []chan common.Command) {
 
 	// Pull overrides.
 	overrides := *this.SwitchOverrides
@@ -163,34 +162,33 @@ func increaseSizeScanner(this *CurrentState, commandChannels []chan common.Comma
 
 }
 
-// Deal with an Switch sequence with a RGB fixture.
-// func increaseOverrideSizeRGB(this *CurrentState, commandChannels []chan common.Command) {
+func increaseOverrideSize(this *CurrentState, commandChannels []chan common.Command) {
 
-// 	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
+	if this.SelectedType == "switch" && this.SelectedFixtureType == "rgb" {
 
-// 		// Increase the switch size.
-// 		overrides := *this.SwitchOverrides
-// 		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size + 1
-// 		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size > common.MAX_RGB_SHIFT {
-// 			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MAX_RGB_SHIFT
-// 		}
-// 		this.SwitchOverrides = &overrides
+		// Increase the switch size.
+		overrides := *this.SwitchOverrides
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size++
+		if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size > common.MAX_RGB_SHIFT {
+			overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size = common.MAX_RGB_SHIFT
+		}
+		this.SwitchOverrides = &overrides
 
-// 		// Send a message to override / increase the selected switch shift.
-// 		cmd := common.Command{
-// 			Action: common.OverrideSize,
-// 			Args: []common.Arg{
-// 				{Name: "SwitchNumber", Value: this.SelectedSwitch},
-// 				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
-// 				{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
-// 			},
-// 		}
-// 		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+		// Send a message to override / increase the selected switch shift.
+		cmd := common.Command{
+			Action: common.OverrideSize,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Shift", Value: overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Size},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
-// 	}
-// }
+	}
+}
 
-func increaseColor(this *CurrentState, commandChannels []chan common.Command) {
+func increaseOverrideColor(this *CurrentState, commandChannels []chan common.Command) {
 
 	//  Pull overrides.
 	overrides := *this.SwitchOverrides
