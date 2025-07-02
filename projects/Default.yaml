@@ -1533,43 +1533,43 @@ fixtures:
     - name: RGB Mode
       label: New
       number: 1
-      value: 0-24
+      value: "0"
       selectedvalue: ""
     - name: Mode1
       number: 2
-      value: 25-49
+      value: "25"
       selectedvalue: ""
     - name: Mode2
       number: 3
-      value: 50-74
+      value: "50"
       selectedvalue: ""
     - name: Mode3
       number: 4
-      value: 75-99
+      value: "75"
       selectedvalue: ""
     - name: Mode4
       number: 5
-      value: 100-124
+      value: "100"
       selectedvalue: ""
     - name: Mode5
       number: 6
-      value: 125-149
+      value: "125"
       selectedvalue: ""
     - name: Mode6
       number: 7
-      value: 150-174
+      value: "150"
       selectedvalue: ""
     - name: Mode7
       number: 8
-      value: 175-199
+      value: "175"
       selectedvalue: ""
     - name: Mode8
       number: 9
-      value: 200-224
+      value: "200"
       selectedvalue: ""
     - name: Mode9
       number: 10
-      value: 225-249
+      value: "225"
       selectedvalue: ""
     - name: Mode10
       number: 11
@@ -3189,8 +3189,9 @@ fixtures:
     master: 0
     settings:
     - name: Program
+      label: Program
       number: 1
-      channel: "1"
+      channel: Program
       value: "0"
       selectedvalue: ""
     - name: Red
@@ -3228,7 +3229,7 @@ fixtures:
     - name: Program
       label: Program
       number: 1
-      channel: "1"
+      channel: Program
       value: "0"
       selectedvalue: ""
     - name: Red
@@ -3310,37 +3311,37 @@ fixtures:
       label: Program
       number: 1
       channel: Program
-      value: 25
+      value: "25"
       selectedvalue: ""
     - name: Red
       label: Red
       number: 2
       channel: Red1
-      value: 0
+      value: "0"
       selectedvalue: ""
     - name: Green
       label: Green
       number: 3
       channel: Green1
-      value: 0
+      value: "0"
       selectedvalue: ""
     - name: Blue
       label: Blue
       number: 4
       channel: Blue1
-      value: 0
+      value: "0"
       selectedvalue: ""
     - name: Speed
       label: Speed
       number: 5
       channel: Speed
-      value: 0
+      value: "0"
       selectedvalue: ""
     - name: Master Reverse
       label: Master Reverse
       number: 6
       channel: Master Reverse
-      value: 255
+      value: "255"
       selectedvalue: ""
     flash: false
   - name: Meduim Color Change
@@ -3352,36 +3353,37 @@ fixtures:
     - name: Program
       label: Program
       number: 1
-      channel: "1"
-      value: "25"
+      channel: Program
+      value: "0"
       selectedvalue: ""
     - name: Red
       label: Red
       number: 2
-      channel: "2"
+      channel: Red1
       value: "0"
       selectedvalue: ""
     - name: Green
       label: Green
       number: 3
-      channel: "3"
+      channel: Green1
       value: "0"
       selectedvalue: ""
-    - name: Blue
-      label: Blue
+    - name: Red
+      label: Red
       number: 4
-      channel: "4"
+      channel: Red1
       value: "0"
       selectedvalue: ""
     - name: Speed
       label: Speed
       number: 5
-      channel: "5"
+      channel: Speed
       value: "100"
       selectedvalue: ""
     - name: Master Reverse
+      label: Master Reverse
       number: 6
-      channel: "6"
+      channel: Master Reverse
       value: "255"
       selectedvalue: ""
     flash: false
@@ -3394,36 +3396,37 @@ fixtures:
     - name: Program
       label: Program
       number: 1
-      channel: "1"
-      value: "255"
+      channel: Program
+      value: "0"
       selectedvalue: ""
     - name: Red
       label: Red
       number: 2
-      channel: "2"
+      channel: Red1
       value: "0"
       selectedvalue: ""
     - name: Green
       label: Green
       number: 3
-      channel: "3"
+      channel: Green1
       value: "0"
       selectedvalue: ""
     - name: Blue
       label: Blue
       number: 4
-      channel: "4"
+      channel: Blue1
       value: "0"
       selectedvalue: ""
     - name: Speed
       label: Speed
       number: 5
-      channel: "5"
+      channel: Speed
       value: "100"
       selectedvalue: ""
     - name: Master Reverse
+      label: Master Reverse
       number: 6
-      channel: "6"
+      channel: Master Reverse
       value: "255"
       selectedvalue: ""
     flash: false
@@ -3433,7 +3436,7 @@ fixtures:
     buttoncolor: White
     master: 0
     actions:
-    - name: Mini
+    - name: Sound
       number: 1
       colors:
       - Green

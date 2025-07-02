@@ -502,6 +502,36 @@ func GetAvailableRotateChannelsByFixure(fixture *Fixture) []string {
 	return rotateSpeeds
 }
 
+// GetProgramNameByNumber takes the program number and returns the program name for this fixture.
+func GetProgramNameByNumber(fixture *Fixture, number string) string {
+
+	if fixture == nil {
+		return "Not Found"
+	}
+	if debug {
+		fmt.Printf("GetProgramNameByNumber looking for program number %s inside fixture %s\n", number, fixture.Name)
+	}
+
+	for _, channel := range fixture.Channels {
+		if strings.Contains(channel.Name, "Program") {
+			for _, setting := range channel.Settings {
+				fmt.Printf("Looking in setting %dfor %s \n", setting.Number, number)
+				if setting.Value == number {
+					if debug {
+						fmt.Printf("Found program name %s\n", setting.Name)
+					}
+					return setting.Name
+				}
+			}
+		}
+	}
+
+	if debug {
+		fmt.Printf("NOT Found program name Unknown\n")
+	}
+	return "Unknown"
+}
+
 // GetColorNameByNumber takes the color number and returns the color name for this fixture.
 func GetColorNameByNumber(fixture *Fixture, number int) string {
 

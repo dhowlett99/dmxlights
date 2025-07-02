@@ -411,14 +411,9 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 			fmt.Printf("inspect channel %s for %s\n", channel.Name, channelName)
 		}
 		// Match the channel. So covert to lowercase first and then look if it is the search Name.
-		channelName := strings.ToLower(channel.Name)
-		searchName := strings.ToLower(channelName)
-		if debug {
-			fmt.Printf("channelName=%s searchName=%s\n", channelName, searchName)
-		}
-		if channelName == searchName {
+		if strings.Contains(strings.ToLower(channel.Name), strings.ToLower(channelName)) {
 			if debug {
-				fmt.Printf("Found a matching name: channel.Settings %+v\n", channel.Settings)
+				fmt.Printf("Found a matching name: channel name %s\n", channelName)
 			}
 
 			// Look through the settings.
@@ -428,7 +423,7 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 				}
 
 				// Match Setting. So covert to lowercase first and then look if it is the search label.
-				if strings.EqualFold(setting.Label, label) {
+				if strings.Contains(strings.ToLower(setting.Label), strings.ToLower(label)) {
 					if debug {
 						fmt.Printf("Found a matcing label: Fixture.Name=%s Channel.Name=%s Label=%s Setting.Name %s Setting.Value %s\n", fixture.Name, channel.Name, label, setting.Name, setting.Value)
 					}
@@ -439,7 +434,7 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 		}
 	}
 
-	return 0, fmt.Errorf("findChannelSettingByLabel: label setting \"%s\" not found in channel \"%s\" fixture :%s", label, channelName, fixture.Name)
+	return 0, fmt.Errorf("findChannelSettingByLabel: fixture :%s label \"%s\" not found in channel \"%s\" ", fixture.Name, label, channelName)
 }
 
 func fixtureHasChannel(fixture *Fixture, channelName string) bool {
