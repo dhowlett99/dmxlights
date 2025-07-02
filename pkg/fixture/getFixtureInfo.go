@@ -515,7 +515,9 @@ func GetProgramNameByNumber(fixture *Fixture, number string) string {
 	for _, channel := range fixture.Channels {
 		if strings.Contains(channel.Name, "Program") {
 			for _, setting := range channel.Settings {
-				fmt.Printf("Looking in setting %dfor %s \n", setting.Number, number)
+				if debug {
+					fmt.Printf("Looking in setting %dfor %s \n", setting.Number, number)
+				}
 				if setting.Value == number {
 					if debug {
 						fmt.Printf("Found program name %s\n", setting.Name)

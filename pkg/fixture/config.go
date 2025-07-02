@@ -68,7 +68,6 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 			// If a action program is a number look up program name in program channel.
 			if IsNumericOnly(action.Program) {
 				name := GetProgramNameByNumber(fixture, action.Program)
-				fmt.Printf("Fixture=%s Action Program=%s Name=%s\n", fixture.Name, action.Program, name)
 				action.Program = name
 			}
 
