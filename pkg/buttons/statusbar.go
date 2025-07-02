@@ -27,6 +27,15 @@ import (
 	"github.com/dhowlett99/dmxlights/pkg/labels"
 )
 
+type Slot struct {
+	Button          int
+	Label           string
+	ChannelAssigned string
+}
+
+const UPDATE = 0
+const DISPLAY = 1
+
 func getAction(this *CurrentState) int {
 
 	var action int
@@ -176,7 +185,7 @@ func updateBottomStatusBar(X int, Y int, sub int, direction int, sequences []*co
 		for _, channel := range useFixture.Channels {
 			channels = append(channels, channel.Name)
 		}
-		overrideAvailableSettings(channels, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		overrideAvailableSettings(channels, sub, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
 
 	case common.ActionSwitchOff:
 		if debug {
@@ -825,48 +834,138 @@ func labelButtons(b []bottonButton, eventsForLaunchpad chan common.ALight, guiBu
 
 func getSlot(button int) (label string) {
 
+	if debug {
+		fmt.Printf("Button is %d\n", button)
+	}
+
 	switch button {
+
+	case 0:
+		label = "speed"
 
 	case 1:
 		label = "speed"
 
 	case 2:
-		label = "speed"
+		label = "shift"
 
 	case 3:
 		label = "shift"
 
 	case 4:
-		label = "shift"
+		label = "size"
 
 	case 5:
 		label = "size"
 
 	case 6:
-		label = "size"
+		label = "fade"
 
 	case 7:
 		label = "fade"
-
-	case 8:
-		label = "fade"
 	}
 
+	if debug {
+		fmt.Printf("Label is %s\n", label)
+	}
 	return label
 }
 
-func overrideAvailableSettings(channels []string, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func overrideAvailableSettings(channels []string, sub int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	var slots []Slot
 
 	//  The bottom row of the Novation Launchpad.
 	bottomRow := 7
-
-	button := -2
-	maxSlots := 7
 
 	// We are going to assign buttons based on overridable channels so clear all buttons down first.
 	for button := 0; button < 7; button++ {
 		common.LabelButton(button, bottomRow, "   ", guiButtons)
 	}
+	// Clear labels
+	common.UpdateStatusBar("", "speed", false, guiButtons)
+	common.UpdateStatusBar("", "shift", false, guiButtons)
+	common.UpdateStatusBar("", "size", false, guiButtons)
+	common.UpdateStatusBar("", "fade", false, guiButtons)
+
+	slots = findSlots(channels)
+
+	switch sub {
+
+	case common.DisplayAll:
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeSpeed:
+		UpdateSlot(slots, "speed", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeShift:
+		UpdateSlot(slots, "shift", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeSize:
+		UpdateSlot(slots, "size", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "fade", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	case common.ChangeFade:
+		UpdateSlot(slots, "fade", channels, UPDATE, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+		UpdateSlot(slots, "speed", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "shift", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+		UpdateSlot(slots, "size", channels, DISPLAY, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+	}
+}
+
+func UpdateSlot(slots []Slot, label string, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	// Find out what has been assigned to this slot of type label
+	// And call the relevant update channel.
+	for _, slot := range slots {
+
+		if slot.Label == label {
+
+			switch slot.ChannelAssigned {
+
+			case "Program":
+				UpdateSettingProgram(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "ProgramSpeed":
+				UpdateSettingProgramSpeed(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Color":
+				UpdateSettingColor(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Gobo":
+				UpdateSettingGobo(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+
+			case "Rotate":
+				UpdateSettingRotate(slot.Button, channels, action, direction, this, commandChannels, eventsForLaunchpad, guiButtons)
+			}
+		}
+	}
+}
+
+// findSlots will allocate channels to buttons and return a list of slots used by which channel.
+func findSlots(channels []string) []Slot {
+
+	var slots []Slot
+	button := 0
+	maxSlots := 7
+	var colorAssigned bool
 
 	for _, channel := range channels {
 
@@ -880,59 +979,30 @@ func overrideAvailableSettings(channels []string, direction int, this *CurrentSt
 
 		if channel == "ProgramSpeed" {
 
-			if debug {
-				fmt.Printf("\t\tFound Program Speed Button %d\n", button)
-			}
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
 
 			button = button + 2
 			if button > maxSlots {
-				break
+				return slots
 			}
-
-			switch direction {
-			case common.Decrease:
-				decreaseOverrideProgramSpeed(this, commandChannels)
-			case common.Increase:
-				increaseOverrideProgramSpeed(this, commandChannels)
-			}
-
-			speed := getSpeed(this)
-			common.UpdateStatusBar(fmt.Sprintf("Program Speed %d", speed), getSlot(button), false, guiButtons)
-
-			common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Down"), guiButtons)
-
-			common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Up"), guiButtons)
-
 		}
 
 		if channel == "Program" {
-			if debug {
-				fmt.Printf("\t\tFound Program Button\n")
-			}
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
 
 			button = button + 2
 			if button > maxSlots {
-				break
+				return slots
 			}
-
-			switch direction {
-			case common.Decrease:
-				increaseOverrideProgram(this, commandChannels)
-			case common.Increase:
-				increaseOverrideProgram(this, commandChannels)
-			}
-
-			program, programName := getProgram(this)
-			common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), getSlot(button), false, guiButtons)
-
-			common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program", "Down"), guiButtons)
-
-			common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program", "Up"), guiButtons)
-
 		}
 
 		if strings.Contains(channel, "Red") || strings.Contains(channel, "red") ||
@@ -940,86 +1010,246 @@ func overrideAvailableSettings(channels []string, direction int, this *CurrentSt
 			strings.Contains(channel, "Blue") || strings.Contains(channel, "blue") ||
 			strings.Contains(channel, "Color") || strings.Contains(channel, "color") {
 
-			if debug {
-				fmt.Printf("\t\tFound Color Button\n")
+			// Only assign color once.
+			if !colorAssigned {
+				slot := Slot{}
+				slot.ChannelAssigned = "Color"
+				slot.Label = getSlot(button)
+				slot.Button = button
+				slots = append(slots, slot)
+
+				button = button + 2
+				if button > maxSlots {
+					return slots
+				}
+				if button > maxSlots {
+					return slots
+				}
 			}
 
-			button = button + 2
-			if button > maxSlots {
-				break
-			}
-
-			switch direction {
-			case common.Decrease:
-				decreaseOverrideColor(this, commandChannels)
-			case common.Increase:
-				increaseOverrideColor(this, commandChannels)
-			}
-
-			color, colorName := getProgram(this)
-			common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), getSlot(button), false, guiButtons)
-
-			common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Color", "Down"), guiButtons)
-
-			//fmt.Printf("\t\t\tLabel Button %d as Color Up\n", button+1)
-			common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Color", "Up"), guiButtons)
-
+			colorAssigned = true
 		}
 
 		if channel == "Gobo" {
-			if debug {
-				fmt.Printf("\t\tFound Gobo Button\n")
-			}
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
 
 			button = button + 2
 			if button > maxSlots {
-				break
+				return slots
 			}
-
-			switch direction {
-			case common.Decrease:
-				decreaseOverrideGobo(this, commandChannels)
-			case common.Increase:
-				increaseOverrideGobo(this, commandChannels)
-			}
-
-			gobo, goboName := getGobo(this)
-			common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), getSlot(button), false, guiButtons)
-
-			common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Down"), guiButtons)
-
-			common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Up"), guiButtons)
 		}
 
 		if channel == "Rotate" {
-			if debug {
-				fmt.Printf("\t\tFound Rotate Button\n")
-			}
+
+			slot := Slot{}
+			slot.ChannelAssigned = channel
+			slot.Label = getSlot(button)
+			slot.Button = button
+			slots = append(slots, slot)
 
 			button = button + 2
 			if button > maxSlots {
-				break
+				return slots
 			}
-
-			switch direction {
-			case common.Decrease:
-				decreaseOverrideRotateSpeed(this, commandChannels)
-			case common.Increase:
-				increaseOverrideRotateSpeed(this, commandChannels)
-			}
-
-			rotate, rotateName := getRotate(this)
-			common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", rotate, rotateName), getSlot(button), false, guiButtons)
-
-			common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Down"), guiButtons)
-
-			common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
-			common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Up"), guiButtons)
 		}
 	}
+
+	return slots
+}
+
+func UpdateSettingProgramSpeed(button int, channels []string, action, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	if debug {
+		fmt.Printf("\t\tFound Program Speed Button %d\n", button)
+	}
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideProgramSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgramSpeed(this, commandChannels)
+		}
+	}
+
+	// Display
+	speed := getSpeed(this)
+	common.UpdateStatusBar(fmt.Sprintf("Program Speed %d", speed), getSlot(button), false, guiButtons)
+
+	fmt.Printf("\t\t\tLabel Button %d as Program Speed Down\n", button+1)
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Down"), guiButtons)
+
+	fmt.Printf("\t\t\tLabel Button %d as Program Speed Up\n", button+1)
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Up"), guiButtons)
+
+}
+
+func UpdateSettingProgram(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Program Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			increaseOverrideProgram(this, commandChannels)
+		case common.Increase:
+			increaseOverrideProgram(this, commandChannels)
+		}
+	}
+
+	// Display
+	program, programName := getProgram(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", program, programName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Program %d:%s", program, programName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Down\n", button+1)
+		common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	}
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program", "Up"), guiButtons)
+
+}
+
+func UpdateSettingColor(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Color Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideColor(this, commandChannels)
+		case common.Increase:
+			increaseOverrideColor(this, commandChannels)
+		}
+	}
+
+	// Display
+	color, colorName := getColor(this)
+	if debug {
+		fmt.Printf("Setting Color %d Name %s on slot %s\n", color, colorName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Color %d:%s", color, colorName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Color Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Color", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Color Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Color", "Up"), guiButtons)
+}
+
+func UpdateSettingGobo(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Gobo Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideGobo(this, commandChannels)
+		case common.Increase:
+
+		}
+	}
+
+	// Display
+	gobo, goboName := getGobo(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", gobo, goboName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Gobo %d:%s", gobo, goboName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Gobo Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Gobo Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Gobo", "Up"), guiButtons)
+
+}
+
+func UpdateSettingRotate(button int, channels []string, action int, direction int, this *CurrentState, commandChannels []chan common.Command, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+
+	if debug {
+		fmt.Printf("\t\tFound Rotate Button\n")
+	}
+
+	//  The bottom row of the Novation Launchpad.
+	bottomRow := 7
+
+	// Update
+	if action == UPDATE {
+		switch direction {
+		case common.Decrease:
+			decreaseOverrideRotateSpeed(this, commandChannels)
+		case common.Increase:
+			increaseOverrideRotateSpeed(this, commandChannels)
+		}
+	}
+
+	// Display
+	rotate, rotateName := getRotate(this)
+	if debug {
+		fmt.Printf("Setting Program %d Name %s on slot %s\n", rotate, rotateName, getSlot(button))
+	}
+	common.UpdateStatusBar(fmt.Sprintf("Rotate %d:%s", rotate, rotateName), getSlot(button), false, guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Rotate Down\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Down"), guiButtons)
+
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Rotate Up\n", button+1)
+	}
+	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Rotate", "Up"), guiButtons)
+
 }

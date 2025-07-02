@@ -1575,6 +1575,7 @@ fixtures:
       number: 11
       value: Sound
       selectedvalue: ""
+    overridable: true
   - number: 2
     name: Red1
     overridable: true
@@ -3023,7 +3024,7 @@ fixtures:
       label: Color1
       number: 3
       channel: Color
-      value: 0
+      value: "0"
       selectedvalue: Color1
     flash: false
   - name: Color2

@@ -190,6 +190,10 @@ func increaseOverrideSize(this *CurrentState, commandChannels []chan common.Comm
 
 func increaseOverrideColor(this *CurrentState, commandChannels []chan common.Command) {
 
+	if debug {
+		fmt.Printf("increaseOverrideColor\n")
+	}
+
 	//  Pull overrides.
 	overrides := *this.SwitchOverrides
 
