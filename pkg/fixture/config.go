@@ -19,6 +19,7 @@ package fixture
 
 import (
 	"fmt"
+	"image/color"
 	"strconv"
 	"strings"
 	"time"
@@ -133,8 +134,9 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 	// If we have Red, Green, Blue color channels look for a matching color in
 	// the standard color pallete based on the first color in the actions.
 	if fixture.FixtureInfo.HasRGBChannels {
+
+		config.AvailableColors = colors.GetAvailableColorsAsStrings()
 		if len(action.Colors) > 0 {
-			config.AvailableColors = colors.GetAvailableColorsAsStrings()
 			// Look up the first color from the action in the standard color library.
 			config.ColorName = action.Colors[0]
 			config.Color = colors.FindColorIndexByName(config.AvailableColors, action.Colors[0])
@@ -276,6 +278,12 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 	newAction.Name = "Setting"
 	newAction.Number = 1
 
+	var hasRGBChannels bool
+
+	var red int
+	var green int
+	var blue int
+
 	// Look through settings and buuld up the new action.
 	for _, setting := range settings {
 
@@ -317,9 +325,34 @@ func convertSettingToAction(fixture Fixture, settings []Setting) Action {
 			newAction.ProgramSpeed = setting.Name
 		}
 
+		if strings.Contains(setting.Name, "Red") || strings.Contains(setting.Name, "red") {
+			red, _ = strconv.Atoi(setting.Value)
+			hasRGBChannels = true
+		}
+		if strings.Contains(setting.Name, "Green") || strings.Contains(setting.Name, "green") {
+			green, _ = strconv.Atoi(setting.Value)
+			hasRGBChannels = true
+		}
+		if strings.Contains(setting.Name, "Blue") || strings.Contains(setting.Name, "blue") {
+			blue, _ = strconv.Atoi(setting.Value)
+			hasRGBChannels = true
+		}
+
+		if hasRGBChannels {
+			actualColor := color.RGBA{
+				R: uint8(red),
+				G: uint8(green),
+				B: uint8(blue),
+				A: 255,
+			}
+			colorName := common.GetColorNameByRGB(actualColor)
+			newAction.Colors = []string{colorName}
+		}
+
 		// A channel setting can only contain one value
 		// so only one color.
 		if setting.Channel == "Color" {
+			hasRGBChannels = false
 			// If a setting has a channel name which is a number we lookup that color name.
 			if IsNumericOnly(setting.Name) {
 				if colorNumber, err := strconv.Atoi(setting.Value); err == nil {
