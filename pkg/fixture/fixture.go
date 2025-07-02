@@ -424,16 +424,11 @@ func findChannelSettingByLabel(fixture *Fixture, channelName string, label strin
 			// Look through the settings.
 			for _, setting := range channel.Settings {
 				if debug {
-					fmt.Printf("inspect setting -> Label %s = label %s\n", setting.Label, label)
+					fmt.Printf("inspect setting.Label %s = label %s\n", setting.Label, label)
 				}
 
 				// Match Setting. So covert to lowercase first and then look if it is the search label.
-				channelLabel := strings.ToLower(setting.Label)
-				searchLabel := strings.ToLower(label)
-				if debug {
-					fmt.Printf("channelLabel=%s searchLabel=%s\n", channelLabel, searchLabel)
-				}
-				if channelLabel == searchLabel {
+				if strings.EqualFold(setting.Label, label) {
 					if debug {
 						fmt.Printf("Found a matcing label: Fixture.Name=%s Channel.Name=%s Label=%s Setting.Name %s Setting.Value %s\n", fixture.Name, channel.Name, label, setting.Name, setting.Value)
 					}

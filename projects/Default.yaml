@@ -2960,7 +2960,7 @@ fixtures:
       gobo: ""
       gobospeed: ""
     settings:
-    - name: mode
+    - name: Program
       number: 1
       channel: "1"
       value: "255"
@@ -3145,32 +3145,38 @@ fixtures:
     buttoncolor: Green
     master: 0
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 1
       channel: Program
       value: "0"
       selectedvalue: ""
-    - name: red
+    - name: Red
+      label: Red
       number: 2
       channel: Red1
       value: "0"
       selectedvalue: ""
-    - name: green
+    - name: Green
+      label: Green
       number: 3
       channel: "3"
       value: "0"
       selectedvalue: ""
-    - name: blue
+    - name: Blue
+      label: Blue
       number: 4
       channel: "4"
       value: "0"
       selectedvalue: ""
-    - name: strobe
+    - name: Strobe
+      label: Strobe
       number: 5
       channel: "5"
       value: "0"
       selectedvalue: ""
-    - name: master reverse dimmer
+    - name: Master Reverse dimmer
+      label: Master Reverse dimmer
       number: 6
       channel: "6"
       value: "0"
@@ -3182,32 +3188,32 @@ fixtures:
     buttoncolor: Red
     master: 0
     settings:
-    - name: mode
+    - name: Program
       number: 1
       channel: "1"
       value: "0"
       selectedvalue: ""
-    - name: red
+    - name: Red
       number: 2
       channel: "2"
       value: "255"
       selectedvalue: ""
-    - name: green
+    - name: Green
       number: 3
       channel: "3"
       value: "0"
       selectedvalue: ""
-    - name: blue
+    - name: Blue
       number: 4
       channel: "4"
       value: "0"
       selectedvalue: ""
-    - name: strobe
+    - name: Strobe
       number: 5
       channel: "5"
       value: "0"
       selectedvalue: ""
-    - name: master reverse dimmer
+    - name: Master Reverse
       number: 6
       channel: "6"
       value: "255"
@@ -3219,33 +3225,33 @@ fixtures:
     buttoncolor: Green
     master: 0
     settings:
-    - name: mode
-      label: mode
+    - name: Program
+      label: Program
       number: 1
       channel: "1"
       value: "0"
       selectedvalue: ""
-    - name: red
+    - name: Red
       number: 2
       channel: "2"
       value: "0"
       selectedvalue: ""
-    - name: green
+    - name: Green
       number: 3
       channel: "3"
       value: "255"
       selectedvalue: ""
-    - name: blue
+    - name: Blue
       number: 4
       channel: "4"
       value: "0"
       selectedvalue: ""
-    - name: strobe
+    - name: Strobe
       number: 5
       channel: "5"
       value: "0"
       selectedvalue: ""
-    - name: master reverse
+    - name: Master Reverse
       number: 6
       channel: "6"
       value: "255"
@@ -3257,38 +3263,38 @@ fixtures:
     buttoncolor: Blue
     master: 0
     settings:
-    - name: mode
-      label: mode
+    - name: Program
+      label: Program
       number: 1
       channel: Program
       value: "0"
       selectedvalue: ""
-    - name: red
-      label: red
+    - name: Red
+      label: Red
       number: 2
       channel: Red1
       value: "0"
       selectedvalue: "0"
-    - name: green
-      label: green
+    - name: Green
+      label: Green
       number: 3
       channel: Green1
       value: "0"
       selectedvalue: ""
-    - name: blue
-      label: blue
+    - name: Blue
+      label: Blue
       number: 4
       channel: Blue1
       value: "255"
       selectedvalue: ""
-    - name: strobe
-      label: strobe
+    - name: Strobe
+      label: Strobe
       number: 5
       channel: Speed
       value: "0"
       selectedvalue: ""
-    - name: master reverse
-      label: master reverse
+    - name: Master Reverse
+      label: Master Reverse
       number: 6
       channel: Master Reverse
       value: "255"
@@ -3300,35 +3306,41 @@ fixtures:
     buttoncolor: Red
     master: 0
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 1
-      channel: "1"
-      value: "25"
+      channel: Program
+      value: 25
       selectedvalue: ""
-    - name: red
+    - name: Red
+      label: Red
       number: 2
-      channel: "2"
-      value: "0"
+      channel: Red1
+      value: 0
       selectedvalue: ""
-    - name: green
+    - name: Green
+      label: Green
       number: 3
-      channel: "3"
-      value: "0"
+      channel: Green1
+      value: 0
       selectedvalue: ""
-    - name: blue
+    - name: Blue
+      label: Blue
       number: 4
-      channel: "4"
-      value: "0"
+      channel: Blue1
+      value: 0
       selectedvalue: ""
-    - name: speed
+    - name: Speed
+      label: Speed
       number: 5
-      channel: "5"
-      value: "0"
+      channel: Speed
+      value: 0
       selectedvalue: ""
-    - name: master reverse dimmer
+    - name: Master Reverse
+      label: Master Reverse
       number: 6
-      channel: "6"
-      value: "255"
+      channel: Master Reverse
+      value: 255
       selectedvalue: ""
     flash: false
   - name: Meduim Color Change
@@ -3337,32 +3349,37 @@ fixtures:
     buttoncolor: Yellow
     master: 0
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 1
       channel: "1"
       value: "25"
       selectedvalue: ""
-    - name: red
+    - name: Red
+      label: Red
       number: 2
       channel: "2"
       value: "0"
       selectedvalue: ""
-    - name: green
+    - name: Green
+      label: Green
       number: 3
       channel: "3"
       value: "0"
       selectedvalue: ""
-    - name: blue
+    - name: Blue
+      label: Blue
       number: 4
       channel: "4"
       value: "0"
       selectedvalue: ""
-    - name: speed
+    - name: Speed
+      label: Speed
       number: 5
       channel: "5"
       value: "100"
       selectedvalue: ""
-    - name: master reverse dimmer
+    - name: Master Reverse
       number: 6
       channel: "6"
       value: "255"
@@ -3374,32 +3391,37 @@ fixtures:
     buttoncolor: White
     master: 0
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 1
       channel: "1"
       value: "255"
       selectedvalue: ""
-    - name: red
+    - name: Red
+      label: Red
       number: 2
       channel: "2"
       value: "0"
       selectedvalue: ""
-    - name: green
+    - name: Green
+      label: Green
       number: 3
       channel: "3"
       value: "0"
       selectedvalue: ""
-    - name: blue
+    - name: Blue
+      label: Blue
       number: 4
       channel: "4"
       value: "0"
       selectedvalue: ""
-    - name: speed
+    - name: Speed
+      label: Speed
       number: 5
       channel: "5"
       value: "100"
       selectedvalue: ""
-    - name: master reverse dimmer
+    - name: Master Reverse
       number: 6
       channel: "6"
       value: "255"
@@ -3465,42 +3487,50 @@ fixtures:
       gobo: ""
       gobospeed: ""
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 1
       channel: "150"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 2
       channel: "151"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 3
       channel: "152"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 4
       channel: "153"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 5
       channel: "154"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 6
       channel: "155"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 7
       channel: "156"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 8
       channel: "157"
       value: "0"
@@ -3638,12 +3668,14 @@ fixtures:
       gobo: ""
       gobospeed: ""
     settings:
-    - name: mode
+    - name: Program
+      label: Program
       number: 0
       channel: "150"
       value: "0"
       selectedvalue: ""
-    - name: mode
+    - name: Program
+      label: Program
       number: 0
       channel: "157"
       value: "0"
