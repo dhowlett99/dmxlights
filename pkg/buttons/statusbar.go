@@ -1084,12 +1084,15 @@ func UpdateSettingProgramSpeed(button int, channels []string, action, direction 
 	// Display
 	speed := getSpeed(this)
 	common.UpdateStatusBar(fmt.Sprintf("Program Speed %d", speed), getSlot(button), false, guiButtons)
-
-	fmt.Printf("\t\t\tLabel Button %d as Program Speed Down\n", button+1)
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Speed Down\n", button+1)
+	}
 	common.LightLamp(common.Button{X: button, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	common.LabelButton(button, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Down"), guiButtons)
 
-	fmt.Printf("\t\t\tLabel Button %d as Program Speed Up\n", button+1)
+	if debug {
+		fmt.Printf("\t\t\tLabel Button %d as Program Speed Up\n", button+1)
+	}
 	common.LightLamp(common.Button{X: button + 1, Y: bottomRow}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	common.LabelButton(button+1, bottomRow, labels.GetLabel(this.Labels, "Program Speed", "Up"), guiButtons)
 
