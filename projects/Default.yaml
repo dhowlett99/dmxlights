@@ -355,128 +355,6 @@ fixtures:
   - number: 26
     name: Strobe
 - id: 12
-  name: Uplighter2
-  label: RAIL2
-  number: 2
-  description: Chauvet Color Rail IRC
-  type: rgb
-  group: 2
-  address: 227
-  channels:
-  - number: 1
-    name: Master
-  - number: 2
-    name: Red1
-  - number: 3
-    name: Green1
-  - number: 4
-    name: Blue1
-  - number: 5
-    name: Red2
-  - number: 6
-    name: Green2
-  - number: 7
-    name: Blue2
-  - number: 8
-    name: Red3
-  - number: 9
-    name: Green3
-  - number: 10
-    name: Blue3
-  - number: 11
-    name: Red4
-  - number: 12
-    name: Green4
-  - number: 13
-    name: Blue4
-  - number: 14
-    name: Red5
-  - number: 15
-    name: Green5
-  - number: 16
-    name: Blue5
-  - number: 17
-    name: Red6
-  - number: 18
-    name: Green6
-  - number: 19
-    name: Blue6
-  - number: 20
-    name: Red7
-  - number: 21
-    name: Green7
-  - number: 22
-    name: Blue7
-  - number: 23
-    name: Red8
-  - number: 24
-    name: Green8
-  - number: 25
-    name: Blue8
-  - number: 26
-    name: Strobe
-- id: 13
-  name: Uplighter3
-  label: RAIL3
-  number: 3
-  description: Chauvet Color Rail IRC
-  type: rgb
-  group: 2
-  address: 253
-  channels:
-  - number: 1
-    name: Master
-  - number: 2
-    name: Red1
-  - number: 3
-    name: Green1
-  - number: 4
-    name: Blue1
-  - number: 5
-    name: Red2
-  - number: 6
-    name: Green2
-  - number: 7
-    name: Blue2
-  - number: 8
-    name: Red3
-  - number: 9
-    name: Green3
-  - number: 10
-    name: Blue3
-  - number: 11
-    name: Red4
-  - number: 12
-    name: Green4
-  - number: 13
-    name: Blue4
-  - number: 14
-    name: Red5
-  - number: 15
-    name: Green5
-  - number: 16
-    name: Blue5
-  - number: 17
-    name: Red6
-  - number: 18
-    name: Green6
-  - number: 19
-    name: Blue6
-  - number: 20
-    name: Red7
-  - number: 21
-    name: Green7
-  - number: 22
-    name: Blue7
-  - number: 23
-    name: Red8
-  - number: 24
-    name: Green8
-  - number: 25
-    name: Blue8
-  - number: 26
-    name: Strobe
-- id: 14
   name: Uplighter4
   label: RAIL4
   number: 4
@@ -533,7 +411,7 @@ fixtures:
     name: Green8
   - number: 24
     name: Blue8
-- id: 15
+- id: 13
   name: Scanner 1
   label: ADJ.Com.Scan1
   number: 1
@@ -602,7 +480,7 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Master
-- id: 16
+- id: 14
   name: Scanner 2
   label: ADJ.Com.Scan2
   number: 2
@@ -671,7 +549,7 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Master
-- id: 17
+- id: 15
   name: Scanner 3
   label: ADJ.Com.Scan3
   number: 3
@@ -740,7 +618,7 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Master
-- id: 18
+- id: 16
   name: Scanner 4
   label: ADJ.Com.Scan4
   number: 4
@@ -809,7 +687,7 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Master
-- id: 19
+- id: 17
   name: Scanner 5
   label: ADJ.Com.Scan5
   number: 5
@@ -878,7 +756,7 @@ fixtures:
       selectedvalue: ""
   - number: 5
     name: Master
-- id: 20
+- id: 18
   name: Scanner 6
   label: ADJ.Inno.Spot1
   number: 6
@@ -1017,7 +895,7 @@ fixtures:
       number: 1
       value: "255"
       selectedvalue: ""
-- id: 21
+- id: 19
   name: Scanner 7
   label: ADJ.Inno.Spot2
   number: 7
@@ -1156,7 +1034,7 @@ fixtures:
       number: 1
       value: "255"
       selectedvalue: ""
-- id: 22
+- id: 20
   name: ADJ QA PAR 38
   label: par38
   number: 1
@@ -1247,7 +1125,7 @@ fixtures:
       number: 5
       value: "48"
       selectedvalue: ""
-- id: 23
+- id: 21
   name: ADJ Dekker1
   label: dekker1
   number: 1
@@ -1373,7 +1251,7 @@ fixtures:
       number: 3
       value: "255"
       selectedvalue: ""
-- id: 24
+- id: 22
   name: ADJ Dekker2
   label: dekker2
   number: 1
@@ -1497,7 +1375,7 @@ fixtures:
       number: 3
       value: "255"
       selectedvalue: ""
-- id: 25
+- id: 23
   name: Oil
   label: Oil1
   number: 1
@@ -1518,7 +1396,7 @@ fixtures:
       value: "255"
       selectedvalue: ""
     overridable: true
-- id: 26
+- id: 24
   name: Vue1.1
   label: vue
   number: 1
@@ -1590,7 +1468,7 @@ fixtures:
     overridable: true
   - number: 6
     name: Master Reverse
-- id: 27
+- id: 25
   name: ADJ MegaBar
   label: megabar
   number: 1
@@ -1662,7 +1540,7 @@ fixtures:
       selectedvalue: ""
   - number: 7
     name: Master
-- id: 28
+- id: 26
   name: Deluge
   label: deluge
   number: 1
@@ -1763,7 +1641,7 @@ fixtures:
       value: "197"
       selectedvalue: ""
     overridable: true
-- id: 29
+- id: 27
   name: 'Flames '
   label: flames
   number: 1
@@ -1785,7 +1663,7 @@ fixtures:
       number: 2
       value: "255"
       selectedvalue: ""
-- id: 30
+- id: 28
   name: Equinox Graphix
   label: graphix
   number: 1
@@ -2007,7 +1885,7 @@ fixtures:
       value: "200"
       selectedvalue: "200"
     overridable: true
-- id: 31
+- id: 29
   name: Equinox Helix
   label: helix
   number: 2
@@ -2746,7 +2624,7 @@ fixtures:
       gobo: Auto
       gobospeed: Fast
     flash: false
-- id: 32
+- id: 30
   name: switch1
   label: SW1.Oil
   number: 1
@@ -2803,7 +2681,7 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: Oil1
-- id: 33
+- id: 31
   name: switch2
   label: SW2.Booth
   number: 2
@@ -2967,7 +2845,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   use_fixture: megabar
-- id: 34
+- id: 32
   name: switch3
   label: SW3.Deluge
   number: 3
@@ -3129,7 +3007,7 @@ fixtures:
       gobospeed: Fast
     flash: false
   use_fixture: deluge
-- id: 35
+- id: 33
   name: switch4
   label: SW4.Vue
   number: 4
@@ -3457,7 +3335,7 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: vue
-- id: 36
+- id: 34
   name: switch5
   label: SW5.QPar38
   number: 5
@@ -3685,7 +3563,7 @@ fixtures:
       selectedvalue: ""
     flash: false
   use_fixture: par38
-- id: 37
+- id: 35
   name: switch6
   label: SW6.Derbys
   number: 6
@@ -3878,7 +3756,7 @@ fixtures:
       gobospeed: ""
     flash: false
   use_fixture: dekker1
-- id: 38
+- id: 36
   name: switch7
   label: SW7.Graphix
   number: 7
@@ -4280,7 +4158,7 @@ fixtures:
       gobospeed: Fast
     flash: false
   use_fixture: graphix
-- id: 39
+- id: 37
   name: switch8
   label: SW8.Helix
   number: 8
