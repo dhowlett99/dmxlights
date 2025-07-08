@@ -36,7 +36,6 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 
 	sensitivity := common.FindSensitivity(this.SoundGain)
 	common.UpdateStatusBar(fmt.Sprintf("Sensitivity %02d", sensitivity), "sensitivity", false, guiButtons)
-	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
 
 	// Make sure modes are setup.
 	if this.SelectedType == "scanner" && this.ScannerChaser[this.SelectedSequence] &&
@@ -47,6 +46,9 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 		this.TargetSequence = this.SelectedSequence
 		this.DisplaySequence = this.SelectedSequence
 	}
+
+	sequence := getSelectedSequenceNumber(this.TargetSequence, this.SelectedType, this.SelectedSwitch)
+	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness[sequence]), "master", false, guiButtons)
 
 	if debug {
 		fmt.Printf("Target Sequence %d Mode %s Type %s\n", this.TargetSequence, printMode(this.SelectedMode[this.TargetSequence]), sequences[this.TargetSequence].Type)
@@ -106,24 +108,24 @@ func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, gui
 	// Storage for the scanner labels on the Top row.
 	var guiTopScannerButtons [8]topButton
 	guiTopScannerButtons[0] = topButton{Label: labels.GetLabel(this.Labels, "Clear", "Clear ^"), Color: colors.White}
-	guiTopScannerButtons[1] = topButton{Label: "V", Color: colors.White}
-	guiTopScannerButtons[2] = topButton{Label: "<", Color: colors.White}
-	guiTopScannerButtons[3] = topButton{Label: ">", Color: colors.White}
-	guiTopScannerButtons[4] = topButton{Label: "SENS -", Color: colors.Cyan}
-	guiTopScannerButtons[5] = topButton{Label: "SENS +", Color: colors.Cyan}
-	guiTopScannerButtons[6] = topButton{Label: "MAST -", Color: colors.Cyan}
-	guiTopScannerButtons[7] = topButton{Label: "MAST +", Color: colors.Cyan}
+	guiTopScannerButtons[1] = topButton{Label: labels.GetLabel(this.Labels, "Scanner Buttons", "Down"), Color: colors.White}
+	guiTopScannerButtons[2] = topButton{Label: labels.GetLabel(this.Labels, "Scanner Buttons", "Left"), Color: colors.White}
+	guiTopScannerButtons[3] = topButton{Label: labels.GetLabel(this.Labels, "Scanner Buttons", "Right"), Color: colors.White}
+	guiTopScannerButtons[4] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Decrease"), Color: colors.Cyan}
+	guiTopScannerButtons[5] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Increase"), Color: colors.Cyan}
+	guiTopScannerButtons[6] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Decrease"), Color: colors.Cyan}
+	guiTopScannerButtons[7] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Increase"), Color: colors.Cyan}
 
 	// Storage for the switch labels on the top row.
 	var guiTopSwitchButtons [8]topButton
-	guiTopSwitchButtons[0] = topButton{Label: "CLEAR", Color: colors.Magenta}
-	guiTopSwitchButtons[1] = topButton{Label: "RED", Color: colors.Red}
-	guiTopSwitchButtons[2] = topButton{Label: "GREEN", Color: colors.Green}
-	guiTopSwitchButtons[3] = topButton{Label: "BLUE", Color: colors.Blue}
-	guiTopSwitchButtons[4] = topButton{Label: "SENS -", Color: colors.Cyan}
-	guiTopSwitchButtons[5] = topButton{Label: "SENS +", Color: colors.Cyan}
-	guiTopSwitchButtons[6] = topButton{Label: "MAST -", Color: colors.Cyan}
-	guiTopSwitchButtons[7] = topButton{Label: "MAST +", Color: colors.Cyan}
+	guiTopSwitchButtons[0] = topButton{Label: labels.GetLabel(this.Labels, "Clear", "Clear"), Color: colors.Magenta}
+	guiTopSwitchButtons[1] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Red"), Color: colors.Red}
+	guiTopSwitchButtons[2] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Green"), Color: colors.Green}
+	guiTopSwitchButtons[3] = topButton{Label: labels.GetLabel(this.Labels, "Colors", "Blue"), Color: colors.Blue}
+	guiTopSwitchButtons[4] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Decrease"), Color: colors.Cyan}
+	guiTopSwitchButtons[5] = topButton{Label: labels.GetLabel(this.Labels, "Sensitivity", "Increase"), Color: colors.Cyan}
+	guiTopSwitchButtons[6] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Decrease"), Color: colors.Cyan}
+	guiTopSwitchButtons[7] = topButton{Label: labels.GetLabel(this.Labels, "Master", "Increase"), Color: colors.Cyan}
 
 	//  The Top row of the Novation Launchpad.
 	TopRow := -1

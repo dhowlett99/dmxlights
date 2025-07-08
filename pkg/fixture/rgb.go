@@ -46,7 +46,8 @@ func playRGB(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures, e
 		if cmd.Label == "chaser" {
 			scannerFixturesSequenceNumber := common.GlobalScannerSequenceNumber // Scanner sequence number from config.
 			if !cmd.Hidden {
-				common.LightLamp(common.Button{X: fixtureNumber, Y: scannerFixturesSequenceNumber}, fixture.Color, fixture.Brightness, eventsForLaunchpad, guiButtons)
+				fade := applyMasterToFade(fixture.Brightness, cmd.Master)
+				common.LightLamp(common.Button{X: fixtureNumber, Y: scannerFixturesSequenceNumber}, fixture.Color, fade, eventsForLaunchpad, guiButtons)
 			}
 
 			// Fixture brightness is sent as master in this case because a shutter chaser is controlling a scanner lamp.

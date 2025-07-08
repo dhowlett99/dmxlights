@@ -91,7 +91,7 @@ type CurrentState struct {
 	EditWhichStaticSequence     int                        // Which static sequence is currently being edited.
 	EditPatternMode             bool                       // This flag is true when the sequence is in pattern editing mode.
 	EditFixtureSelectionMode    bool                       // This flag is true when the sequence is in select fixture mode.
-	MasterBrightness            int                        // Affects all DMX fixtures and launchpad lamps.
+	MasterBrightness            []int                      // Affects selected sequences DMX fixtures and launchpad lamps.
 	LastStaticColorButtonX      int                        // Which Static Color button did we change last.
 	LastStaticColorButtonY      int                        // Which Static Color button did we change last.
 	SoundGain                   float32                    // Fine gain -0.09 -> 0.09

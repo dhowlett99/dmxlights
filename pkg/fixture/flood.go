@@ -77,7 +77,7 @@ func stopFlood(fixtureNumber int, cmd common.FixtureCommand, fixtures *Fixtures,
 	}
 
 	if !cmd.Hidden {
-		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, colors.Black, 0, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		common.LabelButton(fixtureNumber, cmd.SequenceNumber, "", guiButtons)
 	}
 	return MapFixtures(false, false, false, cmd.SequenceNumber, fixtureNumber, colors.Black, colors.Black, 0, 0, 0, 0, 0, 0, 0, 0, fixtures, cmd.Blackout, 0, 0, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)

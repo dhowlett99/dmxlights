@@ -22,9 +22,9 @@ entrys:
 - name: Master
   labels:
   - name: Decrease
-    label: "MAST\n-"
+    label: "DIMMER\n-"
   - name: Increase
-    label: "MAST\n+"
+    label: "DIMMER\n+"
 - name: Speed
   labels:
   - name: Down
@@ -143,6 +143,14 @@ entrys:
     label: "RGB\nMusic"
 - name: Scanner Buttons
   labels:
+  - name: Up
+    label: "^"
+  - name: Down
+    label: "v"
+  - name: Left
+    label: "<"
+  - name: Right
+    label: ">"
   - name: Pattern
     label: "Scanner\nPatten"
   - name: "Color"

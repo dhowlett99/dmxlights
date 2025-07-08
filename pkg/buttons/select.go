@@ -39,7 +39,7 @@ func selectSequence(sequences []*common.Sequence, this *CurrentState, eventsForL
 		fmt.Printf("Select Sequence %d Type %s\n", this.SelectedSequence, this.SelectedType)
 	}
 
-	// // If we're in shutter chase mode
+	// If we're in shutter chase mode
 	if this.SelectedMode[this.SelectedSequence] == CHASER_FUNCTION || this.SelectedMode[this.SelectedSequence] == CHASER_DISPLAY {
 		this.TargetSequence = this.ChaserSequenceNumber
 	} else {
@@ -74,7 +74,7 @@ func ShowSelectFixtureButtons(targetSequence common.Sequence, displaySequence in
 		if fixture.Flash {
 			common.FlashLight(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, colors.White, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, targetSequence.Master, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: displaySequence}, fixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		}
 		common.LabelButton(fixtureNumber, displaySequence, fixture.Label, guiButtons)
 	}
@@ -106,7 +106,7 @@ func ShowGoboSelectionButtons(sequence common.Sequence, this *CurrentState, even
 			Black := colors.Black
 			common.FlashLight(common.Button{X: goboNumber, Y: this.SelectedSequence}, gobo.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.Button{X: goboNumber, Y: this.SelectedSequence}, gobo.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: goboNumber, Y: this.SelectedSequence}, gobo.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		}
 		goboName := common.FormatLabel(gobo.Name)
 		common.LabelButton(goboNumber, this.SelectedSequence, goboName, guiButtons)
@@ -130,7 +130,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 
 		for _, fixture := range fixtures.Fixtures {
 			if fixture.Group == this.SelectedSequence+1 {
-				common.LightLamp(common.Button{X: fixture.Number - 1, Y: this.SelectedSequence}, colors.White, sequence.Master, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.Button{X: fixture.Number - 1, Y: this.SelectedSequence}, colors.White, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			}
 		}
 		if this.GUI {
@@ -154,7 +154,7 @@ func ShowScannerColorSelectionButtons(sequence common.Sequence, this *CurrentSta
 			Black := colors.Black
 			common.FlashLight(common.Button{X: fixtureNumber, Y: this.SelectedSequence}, lamp.Color, Black, eventsForLaunchpad, guiButtons)
 		} else {
-			common.LightLamp(common.Button{X: fixtureNumber, Y: this.SelectedSequence}, lamp.Color, sequence.Master, eventsForLaunchpad, guiButtons)
+			common.LightLamp(common.Button{X: fixtureNumber, Y: this.SelectedSequence}, lamp.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 		}
 		// Remove any labels.
 		common.LabelButton(fixtureNumber, this.SelectedSequence, "", guiButtons)
@@ -184,7 +184,7 @@ func ShowPatternSelectionButtons(sequence *common.Sequence, master int, targetSe
 			if pattern.Number == targetSequence.SelectedPattern {
 				common.FlashLight(common.Button{X: pattern.Number, Y: displaySequence}, colors.White, colors.LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.Button{X: pattern.Number, Y: displaySequence}, colors.LightBlue, master, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.Button{X: pattern.Number, Y: displaySequence}, colors.LightBlue, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			}
 			common.LabelButton(pattern.Number, displaySequence, pattern.Label, guiButtons)
 		}
@@ -196,7 +196,7 @@ func ShowPatternSelectionButtons(sequence *common.Sequence, master int, targetSe
 			if pattern.Number == targetSequence.SelectedPattern {
 				common.FlashLight(common.Button{X: pattern.Number, Y: displaySequence}, colors.White, colors.LightBlue, eventsForLaunchpad, guiButtons)
 			} else {
-				common.LightLamp(common.Button{X: pattern.Number, Y: displaySequence}, colors.LightBlue, master, eventsForLaunchpad, guiButtons)
+				common.LightLamp(common.Button{X: pattern.Number, Y: displaySequence}, colors.LightBlue, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			}
 			common.LabelButton(pattern.Number, displaySequence, pattern.Label, guiButtons)
 		}
@@ -242,6 +242,6 @@ func lightSelectedButton(eventsForLauchpad chan common.ALight, guiButtons chan c
 func ClearPatternSelectionButtons(mySequenceNumber int, sequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 	// Check if we need to flash this button.
 	for myFixtureNumber := 0; myFixtureNumber < 4; myFixtureNumber++ {
-		common.LightLamp(common.Button{X: myFixtureNumber, Y: mySequenceNumber}, colors.Black, sequence.Master, eventsForLaunchpad, guiButtons)
+		common.LightLamp(common.Button{X: myFixtureNumber, Y: mySequenceNumber}, colors.Black, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 	}
 }

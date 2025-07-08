@@ -133,6 +133,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 					case <-time.After(10 * time.Millisecond):
 					}
 					if !cmd.Hidden {
+						fade := applyMasterToFade(fade, master)
 						common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 					}
 					var iAmAChaserSequence bool
@@ -188,6 +189,7 @@ func fadeUpStatic(fixtureNumber int, cmd common.FixtureCommand, lastColor common
 						iAmAChaserSequence = false
 					}
 					if !cmd.Hidden {
+						fade := applyMasterToFade(fade, master)
 						common.LightLamp(common.Button{X: fixtureNumber, Y: cmd.SequenceNumber}, lamp.Color, fade, eventsForLaunchpad, guiButtons)
 					}
 					lastColor = MapFixtures(iAmAChaserSequence, cmd.ScannerChaser, cmd.RotateRunning, cmd.SequenceNumber, fixtureNumber, lamp.Color, lamp.Color, cmd.ScannerOffsetPan, cmd.ScannerOffsetTilt, 0, 0, 0, 0, scannerGobo, scannerColor, fixtures, cmd.Blackout, fade, master, 0, cmd.Strobe, cmd.StrobeSpeed, dmxController, dmxInterfacePresent)
@@ -250,6 +252,7 @@ func staticOff(fixtureNumber int, cmd common.FixtureCommand, lastColor common.La
 					return
 				case <-time.After(10 * time.Millisecond):
 				}
+				fade := applyMasterToFade(fade, master)
 				common.LightLamp(common.Button{X: fixtureNumber, Y: sequenceNumber}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 				if cmd.Label == "chaser" {
 					// If we are a RGB chaser used as a shutter chasser apply fade values to the scanner's master dimmer channel because

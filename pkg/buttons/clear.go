@@ -193,9 +193,13 @@ func FullClear(this *CurrentState, sequences []*common.Sequence, fixturesConfig 
 		this.ShowRGBColorPicker = false                                              // Clear rgb color mode.
 		this.Static[sequenceNumber] = false                                          // Clear static color mode.
 		this.ShowStaticColorPicker = false                                           // Clear the static color picker.
-		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS                            // Reset brightness to max.
-		this.StaticFlashing[sequenceNumber] = false                                  // Turn off any flashing static buttons.
-		this.ClearPressed[this.TargetSequence] = false                               // Reset the counter that counts how many times we've pressed the clear button.
+
+		this.StaticFlashing[sequenceNumber] = false    // Turn off any flashing static buttons.
+		this.ClearPressed[this.TargetSequence] = false // Reset the counter that counts how many times we've pressed the clear button.
+
+		for selectableSequence := 0; selectableSequence < len(this.MasterBrightness); selectableSequence++ {
+			this.MasterBrightness[selectableSequence] = common.MAX_DMX_BRIGHTNESS // Reset brightness to max.
+		}
 
 		// Clear switch positions to their first positions.
 		for switchNumber := 0; switchNumber < NUMBER_SWITCHES; switchNumber++ {

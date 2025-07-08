@@ -630,14 +630,16 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 	// We are setting the Master brightness in this sequence.
 	case common.Master:
 		const MASTER = 0
+		const SWITCH_NUMBER = 1
 		if debug {
-			fmt.Printf("%d: Command Master Brightness set to %d\n", mySequenceNumber, command.Args[MASTER].Value)
+			fmt.Printf("%d: Switch:%d Command Master Brightness set to %d\n", mySequenceNumber, command.Args[SWITCH_NUMBER].Value, command.Args[MASTER].Value)
 		}
 		sequence.StaticFadeUpOnce = false // Don't soft fade as we change the brightness.
 		sequence.PlayStaticOnce = true
 		sequence.PlaySwitchOnce = true
 		sequence.FloodPlayOnce = true
 		sequence.Master = command.Args[MASTER].Value.(int)
+		sequence.CurrentSwitch = SWITCH_NUMBER
 		sequence.MasterChanging = true
 		return sequence
 

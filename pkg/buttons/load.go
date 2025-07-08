@@ -169,6 +169,10 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
+		// Restore the master brightness, remember that the master is for all sequences in this loaded config.
+		// So the master we retrive from this selected sequence will be the same for all the others.
+		this.MasterBrightness[sequenceNumber] = sequences[sequenceNumber].Master
+
 		// Set the dsiplay mode for this sequence.
 		displayMode(sequenceNumber, this.SelectedMode[sequenceNumber], this, sequences, eventsForLaunchpad, guiButtons, commandChannels)
 
@@ -176,10 +180,6 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			fmt.Printf("Loading Sequence %d Name %s Label %s Static %t\n", sequenceNumber, sequences[sequenceNumber].Name, sequences[sequenceNumber].Label, this.Static[sequenceNumber])
 		}
 	}
-
-	// Restore the master brightness, remember that the master is for all sequences in this loaded config.
-	// So the master we retrive from this selected sequence will be the same for all the others.
-	this.MasterBrightness = sequences[this.SelectedSequence].Master
 
 	// Show the correct running and strobe buttons.
 	if this.Strobe[this.SelectedSequence] {

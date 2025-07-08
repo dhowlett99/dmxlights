@@ -32,43 +32,56 @@ func decraseBrightness(X int, Y int, this *CurrentState, eventsForLaunchpad chan
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
-	this.MasterBrightness = this.MasterBrightness - 10
-	if this.MasterBrightness < 0 {
-		this.MasterBrightness = 0
+	sequence := getSelectedSequenceNumber(this.TargetSequence, this.SelectedType, this.SelectedSwitch)
+	this.MasterBrightness[sequence] = this.MasterBrightness[sequence] - 10
+	if this.MasterBrightness[sequence] < 0 {
+		this.MasterBrightness[sequence] = 0
 	}
 	cmd := common.Command{
 		Action: common.Master,
 		Args: []common.Arg{
-			{Name: "Master", Value: this.MasterBrightness},
+			{Name: "Master", Value: this.MasterBrightness[sequence]},
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
 		},
 	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 	// Update the status bar
-	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness[sequence]), "master", false, guiButtons)
 }
 
 func increaseBrightness(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("Brightness Up \n")
+		fmt.Printf("Brightness Up Sequence %d Switch %d\n", this.SelectedSequence, this.SelectedSwitch)
 	}
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
-	this.MasterBrightness = this.MasterBrightness + 10
-	if this.MasterBrightness > common.MAX_DMX_BRIGHTNESS {
-		this.MasterBrightness = common.MAX_DMX_BRIGHTNESS
+	sequence := getSelectedSequenceNumber(this.TargetSequence, this.SelectedType, this.SelectedSwitch)
+	this.MasterBrightness[sequence] = this.MasterBrightness[sequence] + 10
+	if this.MasterBrightness[sequence] > common.MAX_DMX_BRIGHTNESS {
+		this.MasterBrightness[sequence] = common.MAX_DMX_BRIGHTNESS
 	}
 	cmd := common.Command{
 		Action: common.Master,
 		Args: []common.Arg{
-			{Name: "Master", Value: this.MasterBrightness},
+			{Name: "Master", Value: this.MasterBrightness[sequence]},
+			{Name: "SwitchNumber", Value: this.SelectedSwitch},
 		},
 	}
-	common.SendCommandToAllSequence(cmd, commandChannels)
+	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 	// Update the status bar
-	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness), "master", false, guiButtons)
+	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness[sequence]), "master", false, guiButtons)
 
+}
+
+func getSelectedSequenceNumber(selectedSequence int, selectedType string, selectedSwitch int) int {
+
+	if selectedType == "switch" {
+		return selectedSwitch + 5
+	}
+
+	return selectedSequence
 }

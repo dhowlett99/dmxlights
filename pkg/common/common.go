@@ -1339,14 +1339,14 @@ func LabelButton(X int, Y int, label string, guiButtons chan ALight) {
 }
 
 // LightOn Turn on a Light.
-func LightLamp(button Button, color color.RGBA, master int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
+func LightLamp(button Button, color color.RGBA, brightness int, eventsForLauchpad chan ALight, guiButtons chan ALight) {
 	if debug {
-		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", button.X, button.Y, color.R, color.G, color.B, master)
+		fmt.Printf("LightLamp  X:%d  Y:%d Red %d Green %d Blue %d Brightnes %d\n", button.X, button.Y, color.R, color.G, color.B, brightness)
 	}
 	// Send message to Novation Launchpad.
 	event := ALight{
 		Button:     button,
-		Brightness: master,
+		Brightness: brightness,
 		Red:        color.R,
 		Green:      color.G,
 		Blue:       color.B,
@@ -1360,7 +1360,7 @@ func LightLamp(button Button, color color.RGBA, master int, eventsForLauchpad ch
 			X: button.X,
 			Y: button.Y + 1,
 		},
-		Brightness: master,
+		Brightness: brightness,
 		Red:        color.R,
 		Green:      color.G,
 		Blue:       color.B,
@@ -1551,7 +1551,7 @@ func FlashLight(button Button, onColor color.RGBA, offColor color.RGBA, eventsFo
 	// Now ask the fixture lamp to flash on the launch pad by sending an event.
 	e := ALight{
 		Button:     button,
-		Brightness: 255,
+		Brightness: MAX_DMX_BRIGHTNESS,
 		Flash:      true,
 		OnColor:    onColor,
 		OffColor:   offColor,
@@ -1561,7 +1561,7 @@ func FlashLight(button Button, onColor color.RGBA, offColor color.RGBA, eventsFo
 	// Send message to GUI
 	event := ALight{
 		Button:     Button{X: button.X, Y: button.Y + 1},
-		Brightness: 255,
+		Brightness: MAX_DMX_BRIGHTNESS,
 		Flash:      true,
 		OnColor:    onColor,
 		OffColor:   offColor,

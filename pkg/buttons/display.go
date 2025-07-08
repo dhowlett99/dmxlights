@@ -20,6 +20,7 @@ package buttons
 import (
 	"fmt"
 
+	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
 )
 
@@ -69,6 +70,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		common.RevealSequence(sequenceNumber, commandChannels)
 
+		// Label the select button to let you know your in static mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, ">", guiButtons)
+		}
+
 		return
 
 	case mode == NORMAL_STATIC:
@@ -93,6 +100,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 			common.RevealSequence(sequenceNumber, commandChannels)
 		}
 
+		// Label the select button to let you know your in static mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Static >", guiButtons)
+		}
+
 		return
 
 	case mode == CHASER_DISPLAY:
@@ -106,6 +119,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Reveal the chaser sequence.
 		common.RevealSequence(this.ChaserSequenceNumber, commandChannels)
+
+		// Label the select button to let you know your in chaser mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
+		}
 
 		return
 
@@ -123,6 +142,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Select all fixtures.
 		this.SelectAllStaticFixtures = true
+
+		// Label the select button to let you know your in chaser mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
+		}
 
 		return
 
@@ -145,6 +170,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Show the function buttons.
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
 
+		// Label the select button to let you know your in function mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Function >", guiButtons)
+		}
+
 		return
 
 	case mode == CHASER_FUNCTION:
@@ -162,6 +193,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 		// Show the chaser function buttons.
 		this.TargetSequence = this.ChaserSequenceNumber
 		ShowFunctionButtons(this, eventsForLaunchpad, guiButtons)
+
+		// Label the select button to let you know your in chaser mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
+		}
 
 		return
 
@@ -181,6 +218,12 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Display the fixture status bar.
 		showFixtureStatus(this.TargetSequence, sequences[sequenceNumber], eventsForLaunchpad, guiButtons, commandChannels)
+
+		// Label the select button to let you know your in status mode.
+		if this.SelectedSequence < 3 {
+			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Green, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			common.LabelButton(8, this.SelectedSequence, "Status >", guiButtons)
+		}
 
 		return
 	}

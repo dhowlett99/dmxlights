@@ -59,12 +59,12 @@ func flashOn(sequences []*common.Sequence, X int, Y int, this *CurrentState, eve
 	programSpeed := flashSequence.Pattern.Steps[X].Fixtures[X].ProgramSpeed
 
 	if this.SelectedType == "rgb" {
-		common.LightLamp(common.Button{X: X, Y: Y}, color, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		common.LightLamp(common.Button{X: X, Y: Y}, color, this.MasterBrightness[this.TargetSequence], eventsForLaunchpad, guiButtons)
+		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness[this.TargetSequence], this.MasterBrightness[this.TargetSequence], music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 	if this.SelectedType == "scanner" {
-		common.LightLamp(common.Button{X: X, Y: Y}, colors.White, this.MasterBrightness, eventsForLaunchpad, guiButtons)
-		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness, this.MasterBrightness, music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
+		common.LightLamp(common.Button{X: X, Y: Y}, colors.White, this.MasterBrightness[this.TargetSequence], eventsForLaunchpad, guiButtons)
+		fixture.MapFixtures(false, false, false, Y, X, color, color, pan, tilt, shutter, rotate, program, programSpeed, gobo, 0, fixturesConfig, this.Blackout, this.MasterBrightness[this.TargetSequence], this.MasterBrightness[this.TargetSequence], music, this.Strobe[this.SelectedSequence], this.StrobeSpeed[this.SelectedSequence], dmxController, this.DmxInterfacePresent)
 	}
 
 	if this.GUI {

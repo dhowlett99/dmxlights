@@ -150,6 +150,7 @@ func newMiniSequencer(fixture *Fixture,
 					return
 				case <-time.After(10 * time.Millisecond):
 				}
+				fade = applyMasterToFade(fade, master)
 				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 				MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, lastColor.RGBColor, lastColor.RGBColor, 0, 0, 0, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 				// Control how long the fade take with the fade control.
@@ -213,7 +214,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		if fixtureHasChannel(fixture, "Master") {
-			// Find the program speed channel for this fixture.
+			// Find the master channel for this fixture.
 			masterChannel, err := GetChannelNumberByName(fixture, "Master")
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
@@ -225,7 +226,7 @@ func newMiniSequencer(fixture *Fixture,
 		}
 
 		if fixtureHasChannel(fixture, "Shutter") {
-			// Find the program speed channel for this fixture.
+			// Find the shutter channel for this fixture.
 			shutterChannel, err := GetChannelNumberByName(fixture, "Shutter")
 			if err != nil {
 				fmt.Printf("warning: Switch Number %d: %s\n", swiTch.Number, err)
@@ -470,6 +471,7 @@ func newMiniSequencer(fixture *Fixture,
 							return
 						case <-time.After(10 * time.Millisecond):
 						}
+						fade = applyMasterToFade(fade, master)
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 						MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, lastColor.RGBColor, lastColor.RGBColor, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, 0, 0, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 						// Control how long the fade take with the fade control.
@@ -492,6 +494,7 @@ func newMiniSequencer(fixture *Fixture,
 						return
 					case <-time.After(10 * time.Millisecond):
 					}
+					fade = applyMasterToFade(fade, master)
 					common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, color, fade, eventsForLaunchpad, guiButtons)
 					MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, color, color, cfg.Pan, cfg.Tilt, cfg.Shutter, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, cfg.Gobo, cfg.ScannerColor, fixturesConfig, blackout, fade, master, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 					// Control how long the fade take with the fade control.
@@ -554,6 +557,7 @@ func newMiniSequencer(fixture *Fixture,
 					return
 				case <-time.After(10 * time.Millisecond):
 				}
+				fade = applyMasterToFade(fade, master)
 				common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, lastColor.RGBColor, fade, eventsForLaunchpad, guiButtons)
 				MapFixtures(false, false, false, mySequenceNumber, myFixtureNumber, lastColor.RGBColor, lastColor.RGBColor, 0, 0, 0, cfg.RotateSpeed, cfg.Program, cfg.ProgramSpeed, 0, 0, fixturesConfig, blackout, brightness, fade, cfg.Music, cfg.Strobe, cfg.StrobeSpeed, dmxController, dmxInterfacePresent)
 				// Control how long the fade take with the fade control.
