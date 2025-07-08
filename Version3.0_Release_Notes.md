@@ -31,6 +31,7 @@ This version of DMX Lights was developed on macOS 10.15.7 (19H2026)
 * A Freeze all sequences button is provided in place of preset 24.
 * Sound card and sequence startup debug messages removed.
 * MapFixture rewritten for clarity.
+* Master Dimmer has been replaced with Dimmer controls that now controls the brightness of selected sequences or switch fixtures.
 
 ## Known Problems
 
