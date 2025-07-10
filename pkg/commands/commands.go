@@ -1215,6 +1215,10 @@ func ListenCommandChannelAndWait(mySequenceNumber int, currentSpeed time.Duratio
 				sequence.UpdateColors = true
 				// Since avalaible patterns aren't stored in the sequence, we need to create them again.
 				sequence.LoadPatterns = true
+				// If we have loaded a switch sequence play the configured switch states.
+				if sequence.Type == "switch" {
+					sequence.PlaySwitchOnce = true
+				}
 				return sequence
 			}
 		}

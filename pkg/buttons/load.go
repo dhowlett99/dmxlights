@@ -169,8 +169,7 @@ func loadPreset(sequences []*common.Sequence, this *CurrentState,
 			common.SendCommandToSequence(sequenceNumber, cmd, commandChannels)
 		}
 
-		// Restore the master brightness, remember that the master is for all sequences in this loaded config.
-		// So the master we retrive from this selected sequence will be the same for all the others.
+		// Restore the master brightness for each individual sequence in this loaded config.
 		this.MasterBrightness[sequenceNumber] = sequences[sequenceNumber].Master
 
 		// Set the dsiplay mode for this sequence.
