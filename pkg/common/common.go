@@ -242,6 +242,11 @@ type Override struct {
 	Mode         string
 	ChaseRunning bool
 
+	// Master.
+	SignalOverrideMaster bool
+	OverrideMaster       bool
+	Master               int
+
 	// Shutter
 	IsShutterOverrideAble bool
 	Shutter               bool
@@ -471,6 +476,7 @@ const (
 	OverrideGobo
 	OverrideStrobe
 	OverridePause
+	OverrideMaster
 	Inverted
 	UpdateGobo
 	Flood
@@ -501,6 +507,7 @@ const (
 	UpdateScannerHasShutterChase
 	UpdateFixturesConfig
 	UpdatePause
+	UpdateMaster
 )
 
 // A full step cycle is 39 ticks ie 39 values.

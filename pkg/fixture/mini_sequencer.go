@@ -687,6 +687,13 @@ func newMiniSequencer(fixture *Fixture,
 
 			for {
 				// Apply the overrides.
+				if override.Master != 0 {
+					if debug_mini {
+						fmt.Printf("Override is set so Master is %d\n", override.Master)
+					}
+					master = override.Master
+					overrideHasHappened = true
+				}
 				if override.Pause {
 					if debug_mini {
 						fmt.Printf("Override Pause %t\n", override.Pause)
@@ -907,7 +914,7 @@ func newMiniSequencer(fixture *Fixture,
 					for fixtureNumber := 0; fixtureNumber < sequence.NumberFixtures; fixtureNumber++ {
 
 						thisFixture := fixtures[fixtureNumber]
-						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, thisFixture.Color, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, thisFixture.Color, master, eventsForLaunchpad, guiButtons)
 						if cfg.Map {
 							// Use sound triggered brighness and apply master
 							actualMaster = int((float64(thisFixture.Brightness) / 100) * (float64(master) / 2.55))
@@ -980,6 +987,16 @@ func listenForOverrideCommands(fixture *Fixture, cfg ActionConfig, cmd common.Co
 	if debug_override {
 		fmt.Printf("CMD is %+v\n", cmd)
 	}
+
+	// Update Master.
+	if cmd.Action == common.UpdateMaster {
+		const MASTER = 0
+		override.Master = cmd.Args[MASTER].Value.(int)
+		if debug_override {
+			fmt.Printf("Master %t\n", cmd.Args[MASTER].Value.(bool))
+		}
+	}
+
 	// Update Pause.
 	if cmd.Action == common.UpdatePause {
 		const SHIFT = 0

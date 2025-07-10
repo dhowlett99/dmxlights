@@ -26,6 +26,28 @@ import (
 
 func overrideMiniSequencer(cmd common.FixtureCommand, switchChannels []common.SwitchChannel) {
 
+	// Override the selected switches master.
+	if cmd.Override.SignalOverrideMaster {
+
+		if debug {
+			fmt.Printf("Override switch number %d Master %d \n", cmd.CurrentSwitch, cmd.SwiTch.Override.Master)
+		}
+		// Send a message to the selected switch device.
+		switchCommand := common.Command{
+			Action: common.UpdateMaster,
+			Args: []common.Arg{
+				// Add one since we count from 0
+				{Name: "Master", Value: cmd.SwiTch.Override.Master},
+			},
+		}
+		select {
+		case switchChannels[cmd.CurrentSwitch+1].CommandChannel <- switchCommand:
+		case <-time.After(10 * time.Millisecond):
+		}
+		cmd.Override.SignalOverrideMaster = false
+		return
+	}
+
 	// Override the selected switches pause.
 	if cmd.Override.SignalOverridePause {
 

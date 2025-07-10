@@ -27,27 +27,54 @@ import (
 func decraseBrightness(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 
 	if debug {
-		fmt.Printf("Brightness Down \n")
+		fmt.Printf("Brightness Down Sequence %d Switch %d\n", this.SelectedSequence, this.SelectedSwitch)
 	}
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
+	// pull overrides.
+	overrides := *this.SwitchOverrides
+
+	// find the psudo sequence number.
 	sequence := getSelectedSequenceNumber(this.TargetSequence, this.SelectedType, this.SelectedSwitch)
+
+	// Decrement the brightness.
 	this.MasterBrightness[sequence] = this.MasterBrightness[sequence] - 10
 	if this.MasterBrightness[sequence] < 0 {
 		this.MasterBrightness[sequence] = 0
 	}
-	cmd := common.Command{
-		Action: common.Master,
-		Args: []common.Arg{
-			{Name: "Master", Value: this.MasterBrightness[sequence]},
-			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-		},
-	}
-	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
+	// Now look the mode to find switch action that is a mini sequencer in chase mode.
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Mode == "Chase" &&
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ChaseRunning {
+
+		// We have found a mini-sequencer configured as a chaser.
+		// Send an override command to change the master brightness for this fixture.
+		cmd := common.Command{
+			Action: common.OverrideMaster,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "StateNumber", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Master", Value: this.MasterBrightness[sequence]},
+			},
+		}
+		common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+
+	} else {
+
+		cmd := common.Command{
+			Action: common.Master,
+			Args: []common.Arg{
+				{Name: "Master", Value: this.MasterBrightness[sequence]},
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
+	}
 	// Update the status bar
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness[sequence]), "master", false, guiButtons)
+
 }
 
 func increaseBrightness(X int, Y int, this *CurrentState, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
@@ -58,19 +85,46 @@ func increaseBrightness(X int, Y int, this *CurrentState, eventsForLaunchpad cha
 
 	buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 
+	// pull overrides.
+	overrides := *this.SwitchOverrides
+
+	// find the psudo sequence number.
 	sequence := getSelectedSequenceNumber(this.TargetSequence, this.SelectedType, this.SelectedSwitch)
+
+	// Increment the brightness.
 	this.MasterBrightness[sequence] = this.MasterBrightness[sequence] + 10
 	if this.MasterBrightness[sequence] > common.MAX_DMX_BRIGHTNESS {
 		this.MasterBrightness[sequence] = common.MAX_DMX_BRIGHTNESS
 	}
-	cmd := common.Command{
-		Action: common.Master,
-		Args: []common.Arg{
-			{Name: "Master", Value: this.MasterBrightness[sequence]},
-			{Name: "SwitchNumber", Value: this.SelectedSwitch},
-		},
+
+	// Now look the mode to find switch action that is a mini sequencer in chase mode.
+	if overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].Mode == "Chase" &&
+		overrides[this.SelectedSwitch][this.SwitchPosition[this.SelectedSwitch]].ChaseRunning {
+
+		// We have found a mini-sequencer configured as a chaser.
+		// Send an override command to change the master brightness for this fixture.
+		cmd := common.Command{
+			Action: common.OverrideMaster,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+				{Name: "StateNumber", Value: this.SwitchPosition[this.SelectedSwitch]},
+				{Name: "Master", Value: this.MasterBrightness[sequence]},
+			},
+		}
+		common.SendCommandToSequence(this.SwitchSequenceNumber, cmd, commandChannels)
+
+	} else {
+
+		cmd := common.Command{
+			Action: common.Master,
+			Args: []common.Arg{
+				{Name: "Master", Value: this.MasterBrightness[sequence]},
+				{Name: "SwitchNumber", Value: this.SelectedSwitch},
+			},
+		}
+		common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
+
 	}
-	common.SendCommandToSequence(this.TargetSequence, cmd, commandChannels)
 
 	// Update the status bar
 	common.UpdateStatusBar(fmt.Sprintf("Master %02d", this.MasterBrightness[sequence]), "master", false, guiButtons)
