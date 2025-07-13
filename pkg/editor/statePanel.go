@@ -206,7 +206,7 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 				fp.UpdateStates = true
 				fp.UpdateThisFixture = fixtureNumber
 				// Update our copy of the state list.
-				fp.UpdatedStatesList = sp.StatesList
+				fp.UpdatedStatesList = ClearNoneActions(sp.StatesList)
 				newFixtures.Fixtures = append(newFixtures.Fixtures, thisFixture)
 			} else {
 				newFixtures.Fixtures = append(newFixtures.Fixtures, fixture)
@@ -247,6 +247,41 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	)
 	return modal, nil
 
+}
+
+func ClearNoneActions(statesList []fixture.State) []fixture.State {
+
+	// Remove any none actions in the states list.
+	cleanStateList := []fixture.State{}
+
+	for _, state := range statesList {
+
+		newState := state
+
+		cleanActionList := []fixture.Action{}
+
+		for _, action := range state.Actions {
+			//fmt.Printf("State %s Action Mode %s\n", state.Name, action.Mode)
+			if action.Mode == "Off" {
+				cleanActionList = append(cleanActionList, action)
+			}
+			if action.Mode == "Static" {
+				cleanActionList = append(cleanActionList, action)
+			}
+			if action.Mode == "Control" {
+				cleanActionList = append(cleanActionList, action)
+			}
+			if action.Mode == "Chase" {
+				cleanActionList = append(cleanActionList, action)
+			}
+		}
+
+		newState.Actions = cleanActionList
+
+		cleanStateList = append(cleanStateList, newState)
+	}
+
+	return cleanStateList
 }
 
 func populateOptions(thisFixture *fixture.Fixture, channelName string, fixtures *fixture.Fixtures) []string {
@@ -370,7 +405,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 	sp.StateOptions = []string{"Off", "On", "Red", "Green", "Blue", "Soft", "Sharp", "Sound", "Rotate"}
 	sp.StatesList = statesList
 
-	// statees Selection Panel.
+	// states Selection Panel.
 	sp.StatePanel = widget.NewTable(
 		// Function to find length.
 		func() (int, int) {
@@ -507,9 +542,6 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 						index := sp.StatesList[thisState.Row].Number - 1
 						data = updateStatesArray(sp.StatesList)
 						ap.ActionsList = sp.StatesList[index].Actions
-
-						// Remove any actions which are off from any previous selections.
-						//ap.ActionsList = ClearOffActions(ap.ActionsList)
 
 						// If the settings are empty create a new set of settings.
 						if len(ap.ActionsList) == 0 {
