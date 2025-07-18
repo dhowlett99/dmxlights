@@ -24,12 +24,14 @@ import (
 	"fyne.io/fyne/v2"
 	"fyne.io/fyne/v2/canvas"
 	"fyne.io/fyne/v2/container"
+	"fyne.io/fyne/v2/layout"
 	"fyne.io/fyne/v2/widget"
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/fixture"
 )
 
 type ActionPanel struct {
+	Fixture                   fixture.Fixture
 	ActionsPanel              *widget.List
 	ActionsList               []fixture.Action
 	ActionNameOptions         []string
@@ -52,6 +54,7 @@ type ActionPanel struct {
 	UpdateThisAction          int
 	CurrentState              int
 	CurrentStateName          string
+	ErrorPanel                *ErrorPanel
 }
 
 const (
@@ -90,9 +93,18 @@ const (
 	ACTIONS_GOBO_SPEED
 )
 
-func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fixture.FixtureInfo) *ActionPanel {
+type ErrorPanel struct {
+	Answer        bool
+	PopupOnlyOnce bool
+}
+
+func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fixture.FixtureInfo, fixturesConfig *fixture.Fixtures) *ActionPanel {
 
 	ap := ActionPanel{}
+
+	ep := ErrorPanel{}
+	ap.ErrorPanel = &ep
+
 	ap.ActionsList = actionsList
 	// TODO all these options should be set dynamically from fixtureInfo.
 	ap.ActionModeOptions = []string{"None", "Off", "Static", "Chase", "Control"}
@@ -526,10 +538,14 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 				ap.UpdateActions = true
 				ap.UpdateThisAction = ap.CurrentState
 			}
-
 			// Gobo
 			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).SetSelected(ap.ActionsList[i].Gobo)
 			o.(*fyne.Container).Objects[ACTIONS_GOBO].(*fyne.Container).Objects[SELECT].(*widget.Select).OnChanged = func(value string) {
+				// We have data for Gobo, but no gobo channel.
+				if !ep.PopupOnlyOnce && ap.ActionsList[i].Gobo != "" && !fixtureInfo.HasGobo {
+					ep.PopupOnlyOnce = true
+					popupGoboErrorMessage(w, ap, &ep, fixturesConfig)
+				}
 
 				if value == "Auto" {
 					o.(*fyne.Container).Objects[ACTIONS_GOBO_SPEED].(*fyne.Container).Objects[LABEL].(*widget.Label).Hidden = false
@@ -564,6 +580,84 @@ func NewActionsPanel(w fyne.Window, actionsList []fixture.Action, fixtureInfo fi
 	}
 
 	return &ap
+}
+
+func popupGoboErrorMessage(myWindow fyne.Window, ap ActionPanel, errorPanel *ErrorPanel, fixturesConfig *fixture.Fixtures) {
+
+	// Create a dialog for error messages.
+	popupErrorPanel := &widget.PopUp{}
+	// Ok button.
+	okButton := widget.NewButton("Yes", func() {
+		popupErrorPanel.Hide()
+		errorPanel.Answer = true
+		if errorPanel.Answer {
+			fixConfig(ap, fixturesConfig)
+			ap.ActionsPanel.Refresh()
+			errorPanel.Answer = false
+		}
+	})
+
+	cancelButton := widget.NewButton("No", func() {
+		popupErrorPanel.Hide()
+		errorPanel.Answer = false
+	})
+
+	popupErrorPanel = widget.NewModalPopUp(
+		container.NewVBox(
+			widget.NewLabel("Title"),
+			widget.NewLabel("Error Message"),
+			widget.NewLabel("Question"),
+			container.NewHBox(layout.NewSpacer(), cancelButton, okButton),
+		),
+		myWindow.Canvas(),
+	)
+
+	popupErrorPanel.Content.(*fyne.Container).Objects[0].(*widget.Label).Text = "Erorr Message"
+	popupErrorPanel.Content.(*fyne.Container).Objects[1].(*widget.Label).Text = "We have data for Gobo, but no gobo channel"
+	popupErrorPanel.Content.(*fyne.Container).Objects[2].(*widget.Label).Text = "Delete Gobo on this Action ?"
+	popupErrorPanel.Show()
+
+}
+
+func fixConfig(ap ActionPanel, fixturesConfig *fixture.Fixtures) {
+
+	//fmt.Printf("Switch Fixture ID %d Name %s\n", ap.Fixture.ID, ap.Fixture.Name)
+	//fmt.Printf("Trying to fix state %d %s %+v\n", ap.CurrentState, ap.CurrentStateName, i)
+
+	newConfig := *fixturesConfig
+
+	// Look for state.
+	newStates := []fixture.State{}
+	newAction := fixture.Action{}
+
+	for _, fixture := range newConfig.Fixtures {
+
+		//fmt.Printf("Fixture is %s %d\n", fixture.Name, fixture.ID)
+		// Found fixture.
+		if fixture.ID == ap.Fixture.ID {
+
+			for _, state := range fixture.States {
+				if state.Number == ap.CurrentState+1 {
+					//fmt.Printf("Fixture is %s\n", fixture.Name)
+					//fmt.Printf("Fixture Number is %d\n", fixture.Number)
+					//fmt.Printf("Actions %+v\n", state.Actions)
+					//fmt.Printf("Gobo %s\n", state.Actions[0].Gobo)
+					//fmt.Printf("GoboSpeed %s\n", state.Actions[0].GoboSpeed)
+
+					newAction = state.Actions[0]
+					newAction.Gobo = ""
+					newAction.GoboSpeed = ""
+					state.Actions[0] = newAction
+				}
+
+				newStates = append(newStates, state)
+			}
+
+			fixture.States = newStates
+		}
+	}
+
+	fixturesConfig = &newConfig
 }
 
 func createCopyOfAction(ap ActionPanel, i int) fixture.Action {

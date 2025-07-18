@@ -89,7 +89,8 @@ func NewStatesEditor(w fyne.Window, fixtureID int, useFixtureName string, fp *Fi
 	}
 
 	// Create Actions Panel. fixtureInfo controls what options we see.
-	ap := NewActionsPanel(w, []fixture.Action{}, fixtureInfo)
+	ap := NewActionsPanel(w, []fixture.Action{}, fixtureInfo, fixturesConfig)
+	ap.Fixture = thisFixture
 	ap.ActionGoboOptions = []string{"Default", "Auto"}
 
 	// If this fixture has a gobo channel.
@@ -533,6 +534,7 @@ func NewStatePanel(statesList []fixture.State, ap *ActionPanel, st *SettingsPane
 
 			// Actions button.
 			if thisState.Col == STATE_ACTIONS {
+				ap.ErrorPanel.PopupOnlyOnce = false
 				showStatesField(STATE_ACTIONS, o)
 				o.(*fyne.Container).Objects[STATE_ACTIONS].(*widget.Button).OnTapped = func() {
 					// Highlight this channel

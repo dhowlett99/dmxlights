@@ -3003,8 +3003,8 @@ fixtures:
       programspeed: ""
       strobe: ""
       strobespeed: ""
-      gobo: Auto
-      gobospeed: Fast
+      gobo: ""
+      gobospeed: ""
     flash: false
   use_fixture: deluge
 - id: 33
