@@ -702,7 +702,7 @@ func newMiniSequencer(fixture *Fixture,
 					overrideHasHappened = true
 				} else {
 					if debug_mini {
-						fmt.Printf("Override Pause %t\n", override.Pause)
+						fmt.Printf("Override Pause Off %t\n", override.Pause)
 					}
 					cfg.Pause = false
 					overrideHasHappened = true
@@ -890,6 +890,9 @@ func newMiniSequencer(fixture *Fixture,
 
 					// Receive beat to advance sequence, go to next step.
 					case <-soundConfig.SoundTriggers[swiTch.Number+4].Channel:
+						if debug_mini {
+							fmt.Printf("Receive beat.\n")
+						}
 
 					// Receive stop command.
 					case <-switchChannels[swiTch.Number].Stop:

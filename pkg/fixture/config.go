@@ -155,6 +155,13 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		}
 	}
 
+	// If we don't have any RGB channels or a dedicated color wheel just configure black and white as
+	// available colors so the chaser can run.
+	if !fixture.FixtureInfo.HasColorChannel && !fixture.FixtureInfo.HasRGBChannels {
+		config.AvailableColors = append(config.AvailableColors, common.GetColorNameByRGB(colors.Black))
+		config.AvailableColors = append(config.AvailableColors, common.GetColorNameByRGB(colors.White))
+	}
+
 	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
 	switch action.Map {
 	case "Off":

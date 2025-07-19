@@ -204,7 +204,9 @@ func (soundConfig *SoundConfig) EnableSoundTrigger(name string) error {
 	// Step through the existing sound triggers and find the one we want to enable.
 	for triggerNumber, trigger := range soundConfig.SoundTriggers {
 		if trigger.Name == name {
-			//fmt.Printf("Enable trigger number %d name %s\n", triggerNumber, trigger.Name)
+			if debug {
+				fmt.Printf("Enable trigger number %d name %s\n", triggerNumber, trigger.Name)
+			}
 			soundConfig.SoundTriggers[triggerNumber].State = true
 			return nil
 		}
