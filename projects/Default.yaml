@@ -4140,9 +4140,8 @@ fixtures:
     - name: Auto
       number: 1
       colors:
-      - Green
-      - Cyan
-      - Blue
+      - White
+      - Black
       map: "On"
       mode: Chase
       fade: Soft
