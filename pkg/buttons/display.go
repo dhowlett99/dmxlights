@@ -72,7 +72,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Label the select button to let you know your in static mode.
 		if this.SelectedSequence < 3 {
-			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
 			common.LabelButton(8, this.SelectedSequence, ">", guiButtons)
 		}
 
@@ -102,7 +106,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Label the select button to let you know your in static mode.
 		if this.SelectedSequence < 3 {
-			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
 			common.LabelButton(8, this.SelectedSequence, "Static >", guiButtons)
 		}
 
@@ -122,7 +130,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Label the select button to let you know your in chaser mode.
 		if this.SelectedSequence < 3 {
-			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
 			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
 		}
 
@@ -145,7 +157,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Label the select button to let you know your in chaser mode.
 		if this.SelectedSequence < 3 {
-			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Yellow, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
 			common.LabelButton(8, this.SelectedSequence, "Chaser >", guiButtons)
 		}
 
@@ -172,6 +188,11 @@ func displayMode(sequenceNumber int, mode int, this *CurrentState, sequences []*
 
 		// Label the select button to let you know your in function mode.
 		if this.SelectedSequence < 3 {
+			if this.SelectedSequence == sequenceNumber {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Magenta, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			} else {
+				common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+			}
 			common.LightLamp(common.Button{X: 8, Y: this.SelectedSequence}, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 			common.LabelButton(8, this.SelectedSequence, "Function >", guiButtons)
 		}
