@@ -1343,7 +1343,7 @@ func LoadSwitchConfiguration(mySequenceNumber int, fixturesConfig *fixture.Fixtu
 					newAction.ProgramSpeed = action.ProgramSpeed
 					newAction.Gobo = action.Gobo
 					newAction.GoboSpeed = action.GoboSpeed
-					newAction.Map = action.Map
+					newAction.DimmerAction = action.DimmerAction
 					newState.Actions = append(newState.Actions, newAction)
 				}
 

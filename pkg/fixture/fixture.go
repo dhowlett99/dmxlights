@@ -69,7 +69,7 @@ type Action struct {
 	Name         string `yaml:"name"`
 	Number       int
 	Colors       []string `yaml:"colors"`
-	Map          string   `yaml:"map"`
+	DimmerAction string   `yaml:"dimmer"`
 	Mode         string   `yaml:"mode"`
 	Fade         string   `yaml:"fade"`
 	Size         string   `yaml:"size"`
@@ -91,7 +91,7 @@ type ActionConfig struct {
 	SelectedColors    []color.RGBA
 	Color             int // The selected color index for this fixture.
 	ColorName         string
-	Map               bool
+	DimmerAction      bool
 	Fade              int
 	NumberSteps       int
 	Shutter           int

@@ -918,8 +918,8 @@ func newMiniSequencer(fixture *Fixture,
 
 						thisFixture := fixtures[fixtureNumber]
 						common.LightLamp(common.Button{X: swiTch.Number - 1, Y: 3}, thisFixture.Color, master, eventsForLaunchpad, guiButtons)
-						if cfg.Map {
-							// Use sound triggered brighness and apply master
+						if cfg.DimmerAction {
+							// Use sound or time triggered brighness and apply to master channel.
 							actualMaster = int((float64(thisFixture.Brightness) / 100) * (float64(master) / 2.55))
 						} else {
 							actualMaster = master

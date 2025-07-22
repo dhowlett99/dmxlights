@@ -162,14 +162,16 @@ func GetConfig(action Action, fixture *Fixture, fixturesConfig *Fixtures) Action
 		config.AvailableColors = append(config.AvailableColors, common.GetColorNameByRGB(colors.White))
 	}
 
-	// Map - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
-	switch action.Map {
-	case "Off":
-		config.Map = false // Don't map
-	case "On":
-		config.Map = true // Map brightness to master dimmer.
+	// ShutterAction - A switch to map the brightness to the master dimmer, useful for fixtures that don't have RGB.
+	switch action.DimmerAction {
+	case "":
+		config.DimmerAction = false // Don't map
+	case "Static":
+		config.DimmerAction = false // Don't map
+	case "Chase":
+		config.DimmerAction = true // Map brightness to master dimmer.
 	default:
-		config.Map = false // Don't map
+		config.DimmerAction = false // Don't map
 	}
 
 	// Fade - Time taken to fade up and down.

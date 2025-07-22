@@ -31,7 +31,7 @@ As of versions 2.0 of dmxlights we now support a fixture editior. The editor is 
 - Single key blackout.
 - Fixture editor.
 
-## Instalation
+## Installation
 
 clone the DMX lights repositary
 
@@ -344,6 +344,19 @@ Speed | Speed of the chase.
 Rotate | If the fixture has a rotate channel this usually controls the direction. Off,ClockWise,AntiClockWise or Auto for automatically changing direction.
 Rotate Speed | If the fixture has a Rotate Speed channel,this controls the speed.
 
+
+Note when configuring a chase action on a fixture that doesn't have a color wheel or RGB channels. The chaser defaults to black and white for the color selection. 
+
+The chaser will then be able use the remaining channels e.g Gobo and or rotate to create effects with this fixture.
+
+Notice the Dimmer Action  "Static" and "Chase" radio buttons adjacent to the Color selection. Switching to Static will use the fixtures master (dimmer) channel to fade up and down in time with the speed set or music playing.
+Switch to Static makes the master (dimmer) channel to static ie.Not dimmed.
+
+***Master dimmer for this sequence still applies.***
+
+The indicator button will then pulse black and white.
+
+![Action in fixture without colors.](ActionWithNoColors.png)
 
 
 

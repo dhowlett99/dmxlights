@@ -213,7 +213,7 @@ type Action struct {
 	Program      string
 	ProgramSpeed string
 	Strobe       string
-	Map          string
+	DimmerAction string
 	Gobo         string
 	GoboSpeed    string
 }

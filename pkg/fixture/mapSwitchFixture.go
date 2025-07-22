@@ -98,7 +98,7 @@ func MapSwitchFixture(swiTch common.Switch,
 			newAction.Program = action.Program
 			newAction.ProgramSpeed = action.ProgramSpeed
 			newAction.Strobe = action.Strobe
-			newAction.Map = action.Map
+			newAction.DimmerAction = action.DimmerAction
 			newAction.Gobo = action.Gobo
 			newAction.GoboSpeed = action.GoboSpeed
 			newMiniSequencer(thisFixture, swiTch, override, newAction, dmxController, fixturesConfig, switchChannels, soundConfig, blackout, brightness, master, masterChanging, lastColor, dmxInterfacePresent, eventsForLaunchpad, guiButtons, fixtureStepChannel)

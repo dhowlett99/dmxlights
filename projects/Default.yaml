@@ -2236,7 +2236,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2400,7 +2400,7 @@ fixtures:
     - name: Show0
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2423,7 +2423,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2446,7 +2446,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2469,7 +2469,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2492,7 +2492,7 @@ fixtures:
     - name: Show4
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2515,7 +2515,7 @@ fixtures:
     - name: Show5
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2538,7 +2538,7 @@ fixtures:
     - name: Show6
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2561,7 +2561,7 @@ fixtures:
     - name: Show7
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2584,7 +2584,7 @@ fixtures:
     - name: Show8
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2610,7 +2610,7 @@ fixtures:
       - Green
       - Cyan
       - Blue
-      map: "On"
+      dimmer: Static
       mode: Chase
       fade: Soft
       size: Short
@@ -2643,7 +2643,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2666,7 +2666,7 @@ fixtures:
     - name: "On"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -2700,7 +2700,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: "Off"
       fade: ""
       size: ""
@@ -2724,7 +2724,7 @@ fixtures:
       number: 1
       colors:
       - Red
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -2748,7 +2748,7 @@ fixtures:
       number: 1
       colors:
       - Green
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -2772,7 +2772,7 @@ fixtures:
       number: 1
       colors:
       - Blue
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -2798,7 +2798,7 @@ fixtures:
       - Red
       - Green
       - Blue
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: Medium
@@ -2824,7 +2824,7 @@ fixtures:
       - Green
       - Red
       - Blue
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Sharp
       size: "Off"
@@ -2992,7 +2992,7 @@ fixtures:
       - Red
       - Green
       - Blue
-      map: "On"
+      dimmer: Static
       mode: Chase
       fade: Soft
       size: Long
@@ -3320,7 +3320,7 @@ fixtures:
       - Green
       - Red
       - Blue
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: "Off"
@@ -3354,7 +3354,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: "Off"
       fade: ""
       size: ""
@@ -3427,7 +3427,7 @@ fixtures:
       number: 1
       colors:
       - Red
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -3451,7 +3451,7 @@ fixtures:
       number: 1
       colors:
       - Green
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -3475,7 +3475,7 @@ fixtures:
       number: 1
       colors:
       - Blue
-      map: ""
+      dimmer: ""
       mode: Static
       fade: ""
       size: ""
@@ -3505,7 +3505,7 @@ fixtures:
       - Blue
       - Purple
       - Pink
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: Long
@@ -3535,7 +3535,7 @@ fixtures:
       - Blue
       - Purple
       - Pink
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: Medium
@@ -3630,7 +3630,7 @@ fixtures:
       number: 1
       colors:
       - Red
-      map: ""
+      dimmer: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -3654,7 +3654,7 @@ fixtures:
       number: 1
       colors:
       - Green
-      map: ""
+      dimmer: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -3678,7 +3678,7 @@ fixtures:
       number: 1
       colors:
       - Blue
-      map: ""
+      dimmer: ""
       mode: Static
       fade: Sharp
       size: ""
@@ -3708,7 +3708,7 @@ fixtures:
       - Blue
       - Purple
       - Pink
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: Short
@@ -3741,7 +3741,7 @@ fixtures:
       - Cyan
       - Blue
       - Purple
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: "Off"
@@ -3775,7 +3775,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -3933,7 +3933,7 @@ fixtures:
     - name: Show0
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -3956,7 +3956,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -3979,7 +3979,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4002,7 +4002,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4025,7 +4025,7 @@ fixtures:
     - name: Show4
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4048,7 +4048,7 @@ fixtures:
     - name: Show5
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4071,7 +4071,7 @@ fixtures:
     - name: Show6
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4094,7 +4094,7 @@ fixtures:
     - name: Show7
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4117,7 +4117,7 @@ fixtures:
     - name: Show8
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4142,7 +4142,7 @@ fixtures:
       colors:
       - White
       - Black
-      map: "On"
+      dimmer: Chase
       mode: Chase
       fade: Soft
       size: Short
@@ -4176,7 +4176,7 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4346,7 +4346,7 @@ fixtures:
     - name: Show0
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4369,7 +4369,7 @@ fixtures:
     - name: Show1
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4392,7 +4392,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4415,7 +4415,7 @@ fixtures:
     - name: New
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4438,7 +4438,7 @@ fixtures:
     - name: Show4
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4461,7 +4461,7 @@ fixtures:
     - name: Show5
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4484,7 +4484,7 @@ fixtures:
     - name: Show6
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4507,7 +4507,7 @@ fixtures:
     - name: Show7
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4530,7 +4530,7 @@ fixtures:
     - name: Show8
       number: 1
       colors: []
-      map: ""
+      dimmer: ""
       mode: Control
       fade: ""
       size: ""
@@ -4562,7 +4562,7 @@ fixtures:
       - Purple
       - Pink
       - White
-      map: ""
+      dimmer: ""
       mode: Chase
       fade: Soft
       size: Medium
@@ -4595,7 +4595,7 @@ fixtures:
       - Pink
       - White
       - Black
-      map: "On"
+      dimmer: Static
       mode: Chase
       fade: Soft
       size: Short
