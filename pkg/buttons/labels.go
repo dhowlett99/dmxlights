@@ -20,6 +20,8 @@ package buttons
 import (
 	"fmt"
 	"image/color"
+	"strconv"
+	"strings"
 
 	"github.com/dhowlett99/dmxlights/pkg/colors"
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -59,22 +61,8 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	updateBottomStatusBar(0, 0, common.DisplayAll, common.Display, sequences, this, nil, eventsForLaunchpad, guiButtons)
 
 	showTopLabels(this, eventsForLaunchpad, guiButtons)
-	staticColors := []color.RGBA{}
-	for buttonNumber, button := range sequences[this.TargetSequence].StaticColors {
-		if buttonNumber > 7 { // Only copy the first eight fixtures.
-			break
-		}
-		staticColors = append(staticColors, button.Color)
-	}
 
-	var control common.ColorDisplayControl
-	if !this.Static[this.TargetSequence] {
-		// Update the color display for the sequence.
-		control = common.GetColorList(sequences[this.TargetSequence].SequenceColors)
-	} else {
-		// Use static colors for color display.
-		control = common.GetColorList(staticColors)
-	}
+	control := getControl(sequences, this)
 	common.UpdateColorDisplay(control, guiButtons)
 
 	// Hide the color editing buttons.
@@ -83,6 +71,160 @@ func showStatusBars(this *CurrentState, sequences []*common.Sequence, eventsForL
 	common.UpdateStatusBar("        ", "green", false, guiButtons)
 	common.UpdateStatusBar(fmt.Sprintf("Pan %02d", this.OffsetPan), "pan", false, guiButtons)
 
+}
+
+// getControl looks at the sequences and switches and find the current colors.
+// relies on sequences being an upto date copy of the sequences.
+func getControl(sequences []*common.Sequence, this *CurrentState) common.ColorDisplayControl {
+
+	// Sequence is a switch sequence, so check switch actions for appropriate colors.
+	if sequences[this.TargetSequence].Type == "switch" {
+		return getSwitchColors(sequences, this)
+	}
+
+	// Sequence with RGB or Scanner.
+	if !this.Static[this.TargetSequence] {
+		// Update the color display for the sequence.
+		return common.GetColorList(sequences[this.TargetSequence].SequenceColors)
+	}
+
+	// Sequence in static mode.
+	if this.Static[this.TargetSequence] {
+		// Use static colors for color display.
+		staticColors := []color.RGBA{}
+		for buttonNumber, button := range sequences[this.TargetSequence].StaticColors {
+			if buttonNumber > 7 { // Only copy the first eight fixtures.
+				break
+			}
+			staticColors = append(staticColors, button.Color)
+		}
+		return common.GetColorList(staticColors)
+	}
+
+	// Nothig found, return an blank color display.
+	return common.ColorDisplayControl{}
+}
+
+func getSwitchColors(sequences []*common.Sequence, this *CurrentState) common.ColorDisplayControl {
+
+	var control common.ColorDisplayControl
+
+	// Look inside the switch configuration to see what type of action has been set.
+	for swiTchNumber, swiTch := range sequences[this.TargetSequence].Switches {
+		if swiTchNumber == this.SelectedSwitch {
+			// Look inside switch state.
+			for stateNumber, state := range swiTch.States {
+				if stateNumber == this.SwitchPosition[this.SelectedSwitch] {
+
+					// Look at the settings.
+					// Settings override any actions so check them first.
+					if len(state.Settings) > 0 {
+						control := checkStateSettings(state)
+						empty := common.ColorDisplayControl{}
+						if control != empty {
+							return control
+						}
+					}
+					// Look at the actions.
+					if len(state.Actions) > 0 {
+						return checkStateActions(state)
+					}
+				}
+			}
+		}
+	}
+	return control
+}
+
+func checkStateSettings(state common.State) common.ColorDisplayControl {
+
+	if debug {
+		fmt.Printf("checkStateSettings\n")
+	}
+
+	var red int
+	var green int
+	var blue int
+
+	var foundRGB bool
+	var colorFound color.RGBA
+	var colorsList []color.RGBA
+
+	for _, setting := range state.Settings {
+
+		// If a color wheel is present.
+		if setting.Channel == "Color" {
+			foundRGB = false
+			// TODO work out what color has been selected.
+		}
+		// If settins for RGB channels exist
+		// construct a color from them.
+		if strings.Contains(setting.Name, "Red") ||
+			strings.Contains(setting.Name, "red") ||
+			strings.Contains(setting.Channel, "Red") ||
+			strings.Contains(setting.Channel, "red") {
+
+			foundRGB = true
+
+			red, _ = strconv.Atoi(setting.FixtureValue)
+		}
+		if strings.Contains(setting.Name, "Green") ||
+			strings.Contains(setting.Name, "green") ||
+			strings.Contains(setting.Channel, "Green") ||
+			strings.Contains(setting.Channel, "green") {
+
+			foundRGB = true
+			green, _ = strconv.Atoi(setting.FixtureValue)
+		}
+		if strings.Contains(setting.Name, "Blue") ||
+			strings.Contains(setting.Name, "blue") ||
+			strings.Contains(setting.Channel, "Blue") ||
+			strings.Contains(setting.Channel, "blue") {
+
+			foundRGB = true
+			blue, _ = strconv.Atoi(setting.FixtureValue)
+		}
+
+		if foundRGB {
+			colorFound.R = uint8(red)
+			colorFound.G = uint8(green)
+			colorFound.B = uint8(blue)
+			colorFound.A = 255
+		}
+
+		colorsList = append(colorsList, colorFound)
+	}
+
+	return common.GetColorList(colorsList)
+}
+
+func checkStateActions(state common.State) common.ColorDisplayControl {
+
+	if debug {
+		fmt.Printf("checkStateActions\n")
+	}
+
+	var control common.ColorDisplayControl
+
+	// Look inside state action.
+	switch state.Actions[0].Mode {
+
+	case "Off":
+		// Return the blank control struct.
+		return control
+	case "Static":
+		control := common.GetColorListByNames(state.Actions[0].Colors)
+		return control
+	case "Control":
+		// Because shows contain an unknow number of colors return the blank control struct.
+		return control
+	case "Chase":
+		control := common.GetColorListByNames(state.Actions[0].Colors)
+		return control
+	default:
+		// Return the blank control struct.
+		return control
+	}
 }
 
 func showTopLabels(this *CurrentState, eventsForLauchpad chan common.ALight, guiButtons chan common.ALight) {
