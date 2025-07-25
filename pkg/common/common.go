@@ -551,6 +551,7 @@ type Sequence struct {
 	LastMusicTrigger            bool                        // Save copy of music trigger.
 	Blackout                    bool                        // Flag to indicate we're in blackout mode.
 	SequenceColors              []color.RGBA                // Temporay storage for changing sequence colors.
+	StaticSequenceColors        []color.RGBA                // Temporay storage for changing static colors.
 	ScannerSteps                []Step                      // Pan & Tilt steps in this  sequence.
 	NumberSteps                 int                         // Holds the number of steps this sequence has. Will change if you change size, fade times etc.
 	NumberFixtures              int                         // Total Number of fixtures for this sequence.
@@ -560,6 +561,7 @@ type Sequence struct {
 	GuiFixtureLabels            []string                    // Storage for the fixture labels. Used for scanner names.
 	Pattern                     Pattern                     // Contains fixtures and RGB steps info.
 	RGBAvailableColors          []StaticColorButton         // Available colors for the RGB fixtures.
+	AvailableStaticColors       []StaticColorButton         // Available colors for static scenes.
 	RGBAvailablePatterns        []Pattern                   // Available RGB Patterns. Index by pattern number.
 	RGBColor                    int                         // The selected RGB fixture color.
 	FadeUp                      []int                       // Fade up values.

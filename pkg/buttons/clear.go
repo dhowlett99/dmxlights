@@ -51,8 +51,8 @@ func Clear(this *CurrentState, sequences []*common.Sequence, fixturesConfig *fix
 		// Clear the local copy of colors.
 		sequences[this.EditWhichStaticSequence].SequenceColors = []color.RGBA{}
 
-		// Flash the correct color buttons
-		ShowRGBColorPicker(*sequences[this.EditWhichStaticSequence], eventsForLaunchpad, guiButtons, commandChannels)
+		// Flash the correct color buttons.
+		ShowRGBColorPicker(sequences[this.TargetSequence].SequenceColors, sequences[this.EditWhichStaticSequence].RGBAvailableColors, eventsForLaunchpad, guiButtons, commandChannels)
 
 		// Clear has been pressed, next time we press clear we will get the full clear.
 		this.ClearPressed[this.TargetSequence] = true

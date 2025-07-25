@@ -143,7 +143,7 @@ func selectRGBChaseColor(sequences []*common.Sequence, X int, Y int, this *Curre
 	this.ShowRGBColorPicker = true
 
 	// We call ShowRGBColorPicker here so the selections will flash as you press them.
-	ShowRGBColorPicker(*sequences[this.TargetSequence], eventsForLaunchpad, guiButtons, commandChannels)
+	ShowRGBColorPicker(sequences[this.TargetSequence].SequenceColors, sequences[this.TargetSequence].RGBAvailableColors, eventsForLaunchpad, guiButtons, commandChannels)
 
 }
 
@@ -196,13 +196,13 @@ func selectScannerColor(sequences []*common.Sequence, X int, Y int, this *Curren
 
 }
 
-func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
+func FindCurrentColor(X int, Y int, RGBAvailableColors []common.StaticColorButton) color.RGBA {
 
 	if debug {
 		fmt.Printf("FindCurrentColor\n")
 	}
 
-	for _, availableColor := range targetSequence.RGBAvailableColors {
+	for _, availableColor := range RGBAvailableColors {
 		if availableColor.X == X && availableColor.Y == Y {
 			return availableColor.Color
 		}
@@ -211,13 +211,14 @@ func FindCurrentColor(X int, Y int, targetSequence common.Sequence) color.RGBA {
 	return color.RGBA{}
 }
 
-// For the given sequence show the available sequence colors on the relevant buttons.
-// With the new color picker there can be 24 colors displayed.
-// ShowRGBColorPicker operates on the sequence.RGBAvailableColors which is an array of type []common.StaticColorButton
-// the targetSequence .CurrentColors selects which colors are selected.
-// Returns nothing, simply displays the available colors on the buttons.
-func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
-
+// ShowRGBColorPicker - For the given sequence show the available sequence colors on the relevant buttons.
+// With the this new color picker there can be 24 colors displayed.
+//
+//	availableColors which is an array of type []common.StaticColorButton
+//	currentColors is the colors currently set in this sequence.[]color.RGBA
+//
+// Returns nothing, simply displays the available colors on first three rows of buttons.
+func ShowRGBColorPicker(currentColors []color.RGBA, availableColors []common.StaticColorButton, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight, commandChannels []chan common.Command) {
 	if debug {
 		fmt.Printf("Color Picker - Show Color Selection Buttons\n")
 	}
@@ -226,13 +227,13 @@ func ShowRGBColorPicker(targetSequence common.Sequence, eventsForLaunchpad chan 
 	common.HideSequence(1, commandChannels)
 	common.HideSequence(1, commandChannels)
 
-	for myFixtureNumber, lamp := range targetSequence.RGBAvailableColors {
+	for myFixtureNumber, lamp := range availableColors {
 
 		lamp.Flash = false
 
 		// Check if we need to flash this button.
-		for index, availableColor := range targetSequence.RGBAvailableColors {
-			for _, sequenceColor := range targetSequence.SequenceColors {
+		for index, availableColor := range availableColors {
+			for _, sequenceColor := range currentColors {
 				if availableColor.Color == sequenceColor {
 					if myFixtureNumber == index {
 						if debug {

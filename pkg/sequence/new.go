@@ -39,6 +39,9 @@ func NewSequence(
 	// Populate the static colors for this sequence with the defaults.
 	staticColorsButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
 
+	// Populate the available static colors for this sequence with the defaults.
+	availableStaticColorsButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
+
 	// Populate the edit sequence colors for this sequence with the defaults.
 	sequenceColorButtons := common.SetDefaultStaticColorButtons(mySequenceNumber)
 
@@ -120,6 +123,7 @@ func NewSequence(
 		Hidden:                 false,
 		Chase:                  true,
 		StaticColors:           staticColorsButtons,
+		AvailableStaticColors:  availableStaticColorsButtons,
 		RGBAvailableColors:     sequenceColorButtons,
 		ScannerAvailableGobos:  availableScannerGobos,
 		Name:                   sequenceType,
