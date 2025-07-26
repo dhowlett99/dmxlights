@@ -186,15 +186,14 @@ func checkStateSettings(state common.State) common.ColorDisplayControl {
 		}
 
 		if foundRGB {
+			foundRGB = false
 			colorFound.R = uint8(red)
 			colorFound.G = uint8(green)
 			colorFound.B = uint8(blue)
 			colorFound.A = 255
+			colorsList = append(colorsList, colorFound)
 		}
-
-		colorsList = append(colorsList, colorFound)
 	}
-
 	return common.GetColorList(colorsList)
 }
 
