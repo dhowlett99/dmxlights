@@ -149,10 +149,10 @@ type Group struct {
 }
 
 type FixtureInfo struct {
-	MultiFixtureDevice bool
-	NumberSubFixtures  int
-	HasRGBChannels     bool
-	//HasColorChannel     bool
+	MultiFixtureDevice  bool
+	NumberSubFixtures   int
+	HasRGBChannels      bool
+	HasWhiteChannel     bool
 	HasRotate           bool
 	RotateChaseOptions  []string
 	RotateStaticOptions []string

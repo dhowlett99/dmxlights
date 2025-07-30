@@ -744,6 +744,7 @@ func GetFixtureInfo(fixture *Fixture, fixturesConfig *Fixtures) FixtureInfo {
 	}
 
 	fixtureInfo.HasColorChannel = IsThisAChannel(fixture, "Color")
+	fixtureInfo.HasWhiteChannel = IsThisAChannel(fixture, "White")
 	fixtureInfo.HasGobo = IsThisAChannel(fixture, "Gobo")
 	fixtureInfo.HasProgram = IsThisAChannel(fixture, "Program")
 	fixtureInfo.HasProgramSpeed = IsThisAChannel(fixture, "ProgramSpeed")

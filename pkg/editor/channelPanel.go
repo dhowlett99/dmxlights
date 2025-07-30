@@ -232,6 +232,7 @@ func NewChannelPanel(thisFixture fixture.Fixture, channels []fixture.Channel, st
 		"Red1", "Red2", "Red3", "Red4", "Red5", "Red6", "Red7", "Red8",
 		"Green1", "Green2", "Green3", "Green4", "Green5", "Green6", "Green7", "Green8",
 		"Blue1", "Blue2", "Blue3", "Blue4", "Blue5", "Blue6", "Blue7", "Blue8",
+		"White",
 		"Master", "Master Reverse", "Dimmer", "Static",
 		"Pan", "FinePan", "Tilt", "FineTilt", "Shutter", "Strobe",
 		"Color", "Gobo", "Program", "ProgramSpeed", "Show", "ShowSpeed",

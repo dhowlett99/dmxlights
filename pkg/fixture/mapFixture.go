@@ -185,15 +185,29 @@ func MapFixtures(iAmAChaserSequence bool, iAmARunningChaserSequence bool, scanne
 }
 
 func SetRGBChannels(channel Channel, fixture Fixture, displayFixture int, channelNumber int, Red float64, Green float64, Blue float64, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
-	if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
-		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
+
+	// If we are trying to generate White and the fixture has a white channel
+	// then use this value as a white.
+	//fmt.Printf("Red %f Green %f Blue %f HasWhite %t\n", Red, Green, Blue, fixture.FixtureInfo.HasWhiteChannel)
+	if Red == Green && Green == Blue && Blue == Red && fixture.FixtureInfo.HasWhiteChannel &&
+		(Red != 0 && Green != 0 && Blue != 0) {
+		if strings.Contains(channel.Name, "White") {
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
+		}
+	} else {
+		// Set RGB as normal.
+		if strings.Contains(channel.Name, "Red"+strconv.Itoa(displayFixture+1)) {
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Red)), dmxController, dmxInterfacePresent)
+		}
+		if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
+		}
+		if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
+			SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
+		}
+
 	}
-	if strings.Contains(channel.Name, "Green"+strconv.Itoa(displayFixture+1)) {
-		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Green)), dmxController, dmxInterfacePresent)
-	}
-	if strings.Contains(channel.Name, "Blue"+strconv.Itoa(displayFixture+1)) {
-		SetChannel(fixture.Name, channel.Name, fixture.Address+int16(channelNumber), byte(int(Blue)), dmxController, dmxInterfacePresent)
-	}
+
 }
 
 func SetPan(channel Channel, fixture Fixture, channelNumber int, pan int, dmxController *ft232.DMXController, dmxInterfacePresent bool) {
