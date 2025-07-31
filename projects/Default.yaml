@@ -1376,25 +1376,25 @@ fixtures:
       value: "255"
       selectedvalue: ""
 - id: 23
-  name: Oil
-  label: Oil1
+  name: MirrorBall
+  label: MirrorBall
   number: 1
-  description: Oil
-  type: projector
+  description: Ball
+  type: rgb
   group: 104
-  address: 69
+  address: 60
   channels:
   - number: 1
-    name: Program
-    settings:
-    - name: "Off"
-      number: 1
-      value: "0"
-      selectedvalue: ""
-    - name: "On"
-      number: 2
-      value: "255"
-      selectedvalue: ""
+    name: Red1
+    overridable: true
+  - number: 2
+    name: Green1
+    overridable: true
+  - number: 3
+    name: Blue1
+    overridable: true
+  - number: 4
+    name: White
     overridable: true
 - id: 24
   name: Vue1.1
@@ -2626,12 +2626,12 @@ fixtures:
     flash: false
 - id: 30
   name: switch1
-  label: SW1.Oil
+  label: SW1.DiscoBall
   number: 1
-  description: Projectors
+  description: Mirror Ball
   type: switch
   group: 4
-  address: 69
+  address: 60
   channels: []
   states:
   - name: "Off"
@@ -2643,31 +2643,57 @@ fixtures:
     - name: "Off"
       number: 1
       colors: []
-      dimmer: ""
-      mode: Control
+      dimmer: Static
+      mode: "Off"
       fade: ""
       size: ""
       speed: ""
       rotate: ""
       rotatespeed: ""
-      program: "Off"
+      program: ""
       programspeed: ""
       strobe: ""
       strobespeed: ""
       gobo: ""
       gobospeed: ""
+    settings:
+    - name: Red
+      label: Red
+      number: 1
+      channel: Red1
+      value: "0"
+      selectedvalue: ""
+    - name: Green
+      label: Green
+      number: 2
+      channel: Green1
+      value: "0"
+      selectedvalue: ""
+    - name: Blue
+      label: Blue
+      number: 3
+      channel: Blue1
+      value: "0"
+      selectedvalue: ""
+    - name: White
+      label: White
+      number: 4
+      channel: White
+      value: "0"
+      selectedvalue: ""
     flash: false
-  - name: "On"
+  - name: Red
     number: 2
-    label: "On"
+    label: Red
     buttoncolor: Red
     master: 0
     actions:
-    - name: "On"
+    - name: Red
       number: 1
-      colors: []
-      dimmer: ""
-      mode: Control
+      colors:
+      - Red
+      dimmer: Static
+      mode: Static
       fade: ""
       size: ""
       speed: ""
@@ -2680,7 +2706,55 @@ fixtures:
       gobo: ""
       gobospeed: ""
     flash: false
-  use_fixture: Oil1
+  - name: Green
+    number: 3
+    label: Green
+    buttoncolor: Green
+    master: 0
+    actions:
+    - name: Green
+      number: 1
+      colors:
+      - Green
+      dimmer: Static
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  - name: Blue
+    number: 4
+    label: Blue
+    buttoncolor: Blue
+    master: 0
+    actions:
+    - name: Blue
+      number: 1
+      colors:
+      - Blue
+      dimmer: Static
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
+  use_fixture: MirrorBall
 - id: 31
   name: switch2
   label: SW2.Booth

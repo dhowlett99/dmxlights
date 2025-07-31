@@ -58,7 +58,12 @@ func NewDmXController() (*ft232.DMXController, *usbdmx.ControllerConfig, error) 
 				log.Fatalf("Failed to render output: %s", err)
 			}
 			// DMX refresh rate.
-			time.Sleep(30 * time.Millisecond)
+			// The DMX512 standard specifies a maximum refresh rate of 44 frames per second (fps) for a full 512-channel universe
+			// Therefore When transmitting all 512 channels, the maximum refresh rate is approximately 44Hz (or 44 frames per second)
+			// To calculate the time in milliseconds for a 44 Hz refresh rate,
+			// divide 1000 (milliseconds in a second) by 44.
+			// This results in approximately 22.73 milliseconds per refresh.
+			time.Sleep(23 * time.Millisecond)
 		}
 	}(&controller)
 
