@@ -66,6 +66,9 @@ func setSwitchDMX(sequence common.Sequence, switchNumber int, fixtureStepChannel
 
 	state := swiTch.States[swiTch.CurrentPosition]
 
+	// Since we're moving the switch position we need to reset the overrides.
+	sequence.Switches[switchNumber].Override = common.Override{}
+
 	// Now send a message to the fixture to play all the values for this state.
 	command := common.FixtureCommand{
 		Master:             sequence.Master,
