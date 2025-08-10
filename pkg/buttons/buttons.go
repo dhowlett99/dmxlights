@@ -582,7 +582,7 @@ func ProcessButtons(X int, Y int,
 	}
 }
 
-func InitButtons(this *CurrentState, sequenceColors []color.RGBA, staticColors []color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
+func InitButtons(this *CurrentState, sequenceColors []color.RGBA, eventsForLaunchpad chan common.ALight, guiButtons chan common.ALight) {
 
 	// Light the logo blue.
 	if this.LaunchPadConnected {
@@ -600,7 +600,17 @@ func InitButtons(this *CurrentState, sequenceColors []color.RGBA, staticColors [
 	presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
 
 	// Show the correct labels at the bottom.
-	//(this, sequenceColors, staticColors, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SPEED_DOWN_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SPEED_UP_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+
+	common.LightLamp(common.SHIFT_DOWN_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SHIFT_UP_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+
+	common.LightLamp(common.SIZE_DOWN_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.SIZE_UP_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+
+	common.LightLamp(common.FADE_DOWN_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
+	common.LightLamp(common.FADE_UP_BUTTON, colors.Cyan, common.MAX_DMX_BRIGHTNESS, eventsForLaunchpad, guiButtons)
 
 	// Light the top labels.
 	showTopLabels(this, eventsForLaunchpad, guiButtons)

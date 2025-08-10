@@ -140,7 +140,7 @@ func updateBottomStatusBar(X int, Y int, sub int, direction int, sequences []*co
 	// If we're in shutter chase mode.
 	this.TargetSequence = CheckType(this.SequenceType[this.SelectedSequence], this)
 
-	if !(X == 0 || Y == 0) {
+	if !(X == 0 && Y == 0) {
 		buttonTouched(common.Button{X: X, Y: Y}, colors.White, colors.Cyan, eventsForLaunchpad, guiButtons)
 	}
 

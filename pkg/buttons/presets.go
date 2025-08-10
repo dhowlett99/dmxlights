@@ -69,7 +69,6 @@ func recallPreset(sequences []*common.Sequence, X int, Y int, this *CurrentState
 	// If this is a valid preset we are either recalling (short press) it or deleting it (long press)
 	// If its not been set i.e. not valid we just ignore and return.
 	if !this.PresetsStore[fmt.Sprint(X)+","+fmt.Sprint(Y)].State {
-		fmt.Printf("Not a valid preset X:%d Y:%d\n", X, Y)
 		return
 	}
 

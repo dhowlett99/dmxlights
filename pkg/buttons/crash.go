@@ -18,7 +18,6 @@
 package buttons
 
 import (
-	"image/color"
 	"time"
 
 	"github.com/dhowlett99/dmxlights/pkg/common"
@@ -43,16 +42,12 @@ func handleLaunchPadCrash(sequences []*common.Sequence, X int, Y int, this *Curr
 	}
 	// Crash 2 message has appeared and this isn't a pad program ack.
 	if X != 0 && Y == 8 && this.Crash2 {
-		// Start a supervisor thread which will reset the launchpad every 1/2 second.
-		time.Sleep(200 * time.Millisecond)
+		// Wait for launchpad
+		time.Sleep(300 * time.Millisecond)
+
 		if this.LaunchPadConnected {
 			this.Pad.Program()
 		}
-		staticColors := []color.RGBA{}
-		for _, button := range sequences[0].StaticColors {
-			staticColors = append(staticColors, button.Color)
-		}
-		InitButtons(this, sequences[0].SequenceColors, staticColors, eventsForLaunchpad, guiButtons)
 
 		// Show the static and switch settings.
 		cmd := common.Command{
@@ -60,8 +55,41 @@ func handleLaunchPadCrash(sequences []*common.Sequence, X int, Y int, this *Curr
 		}
 		common.SendCommandToAllSequence(cmd, commandChannels)
 
+		// Loop around the switches and redisplay their status.
+		for swiTchNumber := 0; swiTchNumber < 8; swiTchNumber++ {
+			// Send a message to the sequence for it to show the current switch state.
+			cmd := common.Command{
+				Action: common.UpdateSwitch,
+				Args: []common.Arg{
+					{Name: "SwitchNumber", Value: swiTchNumber},
+					{Name: "SwitchPosition", Value: this.SwitchPosition[swiTchNumber]},
+					{Name: "Step", Value: false}, // Step the switch state.
+					{Name: "Focus", Value: true}, // Focus the switch lamp.
+				},
+			}
+			// Send a message to the switch sequence.
+			common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+		}
+
+		// Select last selected switch.
+		// Send a message to the sequence for it to show the current switch state.
+		cmd = common.Command{
+			Action: common.UpdateSwitch,
+			Args: []common.Arg{
+				{Name: "SwitchNumber", Value: this.LastSelectedSwitch},
+				{Name: "SwitchPosition", Value: this.SwitchPosition[this.LastSelectedSwitch]},
+				{Name: "Step", Value: false}, // Step the switch state.
+				{Name: "Focus", Value: true}, // Focus the switch lamp.
+			},
+		}
+		// Send a message to the switch sequence.
+		common.SendCommandToAllSequenceOfType(sequences, cmd, commandChannels, "switch")
+
 		// Show the presets again.
 		presets.RefreshPresets(eventsForLaunchpad, guiButtons, this.PresetsStore)
+
+		InitButtons(this, sequences[0].SequenceColors, eventsForLaunchpad, guiButtons)
+
 		this.Crash1 = false
 		this.Crash2 = false
 		return

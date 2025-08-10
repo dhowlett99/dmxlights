@@ -529,7 +529,7 @@ func main() {
 	// Light the first sequence as the default selected.
 	this.SelectedSequence = 0
 	this.SelectedType = "rgb"
-	buttons.InitButtons(&this, sequences[0].SequenceColors, []color.RGBA{}, eventsForLaunchpad, guiButtons)
+	buttons.InitButtons(&this, sequences[0].SequenceColors, eventsForLaunchpad, guiButtons)
 
 	// Label the right hand buttons.
 	panel.LabelRightHandButtons()

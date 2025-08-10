@@ -85,6 +85,15 @@ var RUNNING_BUTTON = Button{X: 8, Y: 5}
 var STROBE_BUTTON = Button{X: 8, Y: 6}
 var BLACKOUT_BUTTON = Button{X: 8, Y: 7}
 
+var SPEED_DOWN_BUTTON = Button{X: 0, Y: 7}
+var SPEED_UP_BUTTON = Button{X: 1, Y: 7}
+var SHIFT_DOWN_BUTTON = Button{X: 2, Y: 7}
+var SHIFT_UP_BUTTON = Button{X: 3, Y: 7}
+var SIZE_DOWN_BUTTON = Button{X: 4, Y: 7}
+var SIZE_UP_BUTTON = Button{X: 5, Y: 7}
+var FADE_DOWN_BUTTON = Button{X: 6, Y: 7}
+var FADE_UP_BUTTON = Button{X: 7, Y: 7}
+
 var RED_BUTTON = Button{X: 1, Y: -1}
 var GREEN_BUTTON = Button{X: 2, Y: -1}
 var BLUE_BUTTON = Button{X: 3, Y: -1}

@@ -259,5 +259,6 @@ func autoSelect(this *CurrentState, commandChannels []chan common.Command, lastS
 	}
 
 	// default to first sequnce if nothings running.
+	lastSelectedSwitch = common.NOT_SELECTED
 	return lastSelectedSequence, lastSelectedSwitch
 }
