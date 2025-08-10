@@ -48,7 +48,7 @@ func ReadLaunchPadButtons(guiButtons chan common.ALight, this *buttons.CurrentSt
 
 	// Create a channel to listen for buttons being pressed.
 	// Send the button pressed hit to the button channel.
-	buttonChannel := make(chan pad.Hit)
+	buttonChannel := make(chan common.Button)
 	go func() {
 		this.Pad.Listen(buttonChannel)
 	}()
