@@ -2754,6 +2754,30 @@ fixtures:
       gobo: ""
       gobospeed: ""
     flash: false
+  - name: Purple
+    number: 5
+    label: Purple
+    buttoncolor: Purple
+    master: 0
+    actions:
+    - name: Purple
+      number: 1
+      colors:
+      - Purple
+      dimmer: Static
+      mode: Static
+      fade: ""
+      size: ""
+      speed: ""
+      rotate: ""
+      rotatespeed: ""
+      program: ""
+      programspeed: ""
+      strobe: ""
+      strobespeed: ""
+      gobo: ""
+      gobospeed: ""
+    flash: false
   use_fixture: MirrorBall
 - id: 31
   name: switch2
